@@ -1,0 +1,9 @@
+popup.title=Customize Cyberfox
+popup.msg.restart=È necessario riavviare Cyberfox per rendere effettive le modifiche.\nRiavviare adesso?
+import.error=Errore: rilevato file corrotto o modificato.\nNon è possibile importare alcun dato.
+ctr_extrabar=Barra degli strumenti aggiuntiva
+ctr_actthrobber=Activity Indicator
+notification_msg_firstrun=CTRpreferences has been found select restart to apply
+notification_button_firstrun=Restart
+notification_msg_change=Your pre-set CTRpreferences has been modified 
+notification_button_change=Options

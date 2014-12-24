@@ -1,0 +1,41 @@
+# -*- Mode: python; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+EXPORTS.mozilla.dom += [
+    'EncodingUtils.h',
+    'FallbackEncoding.h',
+    'TextDecoder.h',
+    'TextEncoder.h',
+]
+
+UNIFIED_SOURCES += [
+    'EncodingUtils.cpp',
+    'FallbackEncoding.cpp',
+    'TextDecoder.cpp',
+    'TextEncoder.cpp',
+]
+
+FAIL_ON_WARNINGS = True
+
+FINAL_LIBRARY = 'xul'
+LOCAL_INCLUDES += [
+    '/intl/locale',
+]
+
+GENERATED_FILES += [
+    'domainsfallbacks.properties.h',
+    'encodingsgroups.properties.h',
+    'labelsencodings.properties.h',
+    'localesfallbacks.properties.h',
+    'nonparticipatingdomains.properties.h',
+]
+
+MOCHITEST_MANIFESTS += [
+    'test/mochitest.ini',
+    'test/unit/mochitest.ini',
+]
+MOCHITEST_CHROME_MANIFESTS += ['test/chrome.ini']
+XPCSHELL_TESTS_MANIFESTS += ['test/unit/xpcshell.ini']

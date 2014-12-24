@@ -1,0 +1,9 @@
+popup.title=Customize Cyberfox
+popup.msg.restart=Cyberfox tiene que ser reiniciado para que se efectúen los cambios.\n¿Reiniciar ahora?
+import.error=ERROR: ¡Se encontró un fichero erróneo o modificado!\n¡No se pudo importar nada!
+ctr_extrabar=Barra de herramientas adicional
+ctr_actthrobber=Activity Indicator
+notification_msg_firstrun=CTRpreferences has been found select restart to apply
+notification_button_firstrun=Restart
+notification_msg_change=Your pre-set CTRpreferences has been modified 
+notification_button_change=Options

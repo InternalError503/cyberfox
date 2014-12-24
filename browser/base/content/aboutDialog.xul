@@ -1,0 +1,79 @@
+<?xml version="1.0"?> <!-- -*- Mode: HTML -*- --> 
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://browser/content/aboutDialog.css" type="text/css"?>
+<?xml-stylesheet href="chrome://branding/content/aboutDialog.css" type="text/css"?>
+
+<!DOCTYPE window [
+<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
+%brandDTD;
+<!ENTITY % aboutDialogDTD SYSTEM "chrome://browser/locale/aboutDialog.dtd" >
+%aboutDialogDTD;
+]>
+
+#ifdef XP_MACOSX
+<?xul-overlay href="chrome://browser/content/macBrowserOverlay.xul"?>
+#endif
+
+<window xmlns:html="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        id="aboutDialog"
+        windowtype="Browser:About"
+        onload="init(event);"
+#ifdef XP_MACOSX
+        inwindowmenu="false"
+#else
+        title="&aboutDialog.title;"
+#endif
+        role="dialog"
+        aria-describedby="version distribution distributionId communityDesc contributeDesc trademark"
+        >
+
+  <script type="application/javascript" src="chrome://browser/content/aboutDialog.js"/>
+
+  <vbox id="aboutDialogContainer">
+    <hbox id="clientBox">
+      <vbox id="leftBox" flex="1"/>
+      <vbox id="rightBox" flex="1">
+#expand <label id="version">__MOZ_APP_VERSION__</label>
+        <label id="distribution" class="text-blurb"/>
+        <label id="distributionId" class="text-blurb"/>
+
+        <vbox id="detailsBox">
+          <vbox id="updateBox">
+          		  <deck id="manualCheckDeck" orient="vertical">
+              <hbox id="checkForUpdates" align="center">
+                <label  id="checkForUpdatesButton" align="start"
+                        class="text-link" href="" onclick="window.close();" style="text-decoration:none!important;">
+						<button id="update-button-checkNow" label="&update.checkForUpdatesButton.label;"/>
+						<image class="update-throbber" id="update-button-checking-throbber"></image><button id="update-button-checking" label="&update.checkingForUpdates;"/>
+						<button id="update-button-no-update" label="&update.noUpdatesFound;"/>
+						<button id="update-button-download" label="&update.manual.start; 8pecxstudios"/>
+						</label>
+                <spacer flex="1"/>
+              </hbox>
+            </deck>
+          </vbox>
+          <description class="text-blurb" id="communityDesc">
+            &community.start2;<label class="text-link" href="https://8pecxstudios.com">&community.mozillaLink;</label>&community.middle2; &community.end3;
+          </description>
+        </vbox>
+      </vbox>
+    </hbox>
+    <vbox id="bottomBox">
+      <description id="trademark">&trademarkInfo.part1;</description>
+    </vbox>
+  </vbox>
+  
+  <keyset>
+    <key keycode="VK_ESCAPE" oncommand="window.close();"/>
+  </keyset>
+
+#ifdef XP_MACOSX
+#include browserMountPoints.inc
+#endif
+</window>

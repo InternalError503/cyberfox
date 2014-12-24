@@ -1,0 +1,53 @@
+Copyright (c) 2014 8pecxstudios
+Designed & developed for use on cyberfox project.
+
+Download Packs From:
+
+You can ether download and fix up the English text in current released packs from this URL.
+https://8pecxstudios.com/current-release-language-packs
+
+or you can download packs when added from this url for the next release version.
+
+https://8pecxstudios.com/download/latest/language/<add version number here>/<pack name here>.xpi
+
+Example: https://8pecxstudios.com/download/latest/language/28.0/fr.xpi
+https://8pecxstudios.com/download/latest/language/29.0.1/en-us.xpi
+
+
+Instructions:
+Download the language pack(s) to _Originals Folder
+Start XPI Language Unpacker[Version-2.0.1].cmd
+If not already created select the first option (1) create directory tree
+Once the directory tree has been constructed.
+Select (yes) on extract xpi files.
+Now once the pack(s) have been extracted.
+Select (no) on package packs and exit the Language Unpacker
+Your can edit the pack file in _XPI_Folder Folder
+Once editing is complete
+Start XPI Language Unpacker[Version-2.0.1].cmd
+Then select option (3) package xpi files
+Once packaged go up one directory to _Installation Folder and inside the language folder is your pack.
+
+For pack submissions please read the informational section of the post where the language tool was downloaded from.
+https://8pecxstudios.com/Forums/viewforum.php?f=13
+
+Branding and branding properties (Must be done before final packing):
+In the XPI Branding Folder are to core banding files.
+Once these files have been edited just start XPI Language Compy Branding[Version-2.0.1].cmd
+To copy over the newly changed files. 
+
+Bookmarks.html (This file must remain unmodified) but has to be copied over (Must be done before final packing):
+Start XPI Language Compy Bookmarks[Version-2.0.1].cmd
+To copy over the Bookmarks.html.
+
+Additional Notes: 
+Make sure to purge the XPI_Folder directory when about to work with a newer version of the language packs.
+Keep notes on what files you edit and what the edits are, Keep is separate from _Build folder this way if anything happens you don't loose your work or progress.
+Don't be afraid to ask for help if unsure or have an issue even if it seems like a silly questions please don't be scared to ask.
+When testing the language its usually best to download cyberfox portable and just have a portable installation to test language packs on in-case of error, (Don't Test packs on current installed profiles, Loss of profile data can occur).
+If you wish to submit documentation on how to use or instructions on how to use XPI Language Unpacker please fee free.
+
+
+To use BrowerDTD_Helper simply start it then add the text you wish to append to the end of all browser.dtd files in _BrowserDTD then apply.
+Warning: it requires the absolute directory structure its shipped with, So it requires _BrowserDTD to be in the same directory as  BrowerDTD_Helper.exe
+Additionally when you click apply wait for the finish notification before closing, As the files are processed off the main thread leaving a responsive UI.

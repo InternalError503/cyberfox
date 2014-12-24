@@ -1,0 +1,11 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url(chrome://browser/content/browser.xul){
+	#PanelUI-contents label {
+	  visibility: collapse !important;
+	}
+	/* When hiding all labels we forget that the zoom percentage|zoom reset button only has text, We still need that text or we have empty button*/
+	#zoom-reset-button label{
+		visibility: visible !important;
+	}
+}

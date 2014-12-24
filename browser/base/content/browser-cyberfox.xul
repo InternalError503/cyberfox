@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://browser/content/browser-cyberfox.css" type="text/css"?>
+	<!DOCTYPE overlay [
+	<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
+		%browserDTD;
+	]>
+
+<overlay id="toolbarCustomButtonOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
+	<toolbarpalette id="BrowserToolbarPalette">	
+			<toolbarbutton id="toolbar_restartBrowser" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"
+									  label="&restartBrowserButton.label;"	
+									  tooltiptext="&restartBrowserButton.label;"  
+									  oncommand="gCyberfoxCustom.restartBrowser();" />     
+			<toolbarbutton id="tbar-clonenewtab" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
+									  tooltiptext="&cloneCurrentTab.label;" 
+									  label="&cloneCurrentTab.label;"
+									  oncommand="gCyberfoxCustom.CloneCurrentTab();"/>      
+			<toolbarbutton id="tbar-clonenewwindow" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
+									  tooltiptext="&cloneInNewWindow.label;"  
+									  label="&cloneInNewWindow.label;" 
+									  oncommand="gCyberfoxCustom.CloneCurrentTabNewWindow();"/>
+			<toolbarbutton id="downloads-button-additional" class="toolbarbutton-1 chromeclass-toolbar-additional"
+									  key="key_openDownloads"
+									  command="Tools:Downloads"
+									  label="&downloads.label;"
+									  removable="true"
+									  tooltiptext="&downloads.label;"/>
+			<toolbarbutton id="tbar-copycurrenttaburl" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
+									  tooltiptext="&copyTabURL.label;"  
+									  label="&copyTabURL.label;" 
+									  oncommand="gCyberfoxCustom.CopyCurrentTabUrl();"/>
+			<toolbarbutton id="tbar_browserconsole" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"							  
+									  tooltiptext="&browserConsoleCmd.label;"  
+									  label="&browserConsoleCmd.label;" 
+									  oncommand="HUDService.toggleBrowserConsole();"/>										  
+	</toolbarpalette>						   
+</overlay>

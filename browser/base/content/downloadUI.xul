@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+
+<?xml-stylesheet href="chrome://global/skin/"?>
+<?xml-stylesheet href="chrome://browser/content/downloads/contentAreaDownloadsView.css"?>
+<?xml-stylesheet href="chrome://browser/skin/downloads/contentAreaDownloadsView.css"?>
+<?xul-overlay href="chrome://global/content/editMenuOverlay.xul"?>
+<?xul-overlay href="chrome://browser/content/downloads/allDownloadsViewOverlay.xul"?>
+
+
+<!DOCTYPE window [
+<!ENTITY % downloadsDTD SYSTEM "chrome://browser/locale/downloads/downloads.dtd">
+%downloadsDTD;
+]>
+
+<window id="contentAreaDownloadsView"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="&downloads.title;"
+		width="400px"
+		height="334px"
+        onload="ContentAreaDownloadsView.init(); window.focus();">
+		  
+  <script type="application/javascript"
+          src="chrome://global/content/globalOverlay.js"/>
+  <script type="application/javascript"
+          src="chrome://browser/content/downloads/contentAreaDownloadsView.js"/>		  
+  <script type="application/javascript" src="chrome://browser/content/downloads/downloads-cyberfox.js"/>	
+  <commandset id="editMenuCommands"/>
+  <commandset id="downloadCommands"/>
+  <menupopup id="downloadsContextMenu"/> 
+  
+  <stack flex="1">
+
+    <richlistbox id="downloadsRichListBox" 
+					  class="plain"
+					  flex="1"
+					  context="downloadsContextMenu"					  
+	                  style="border-radius:3px;"/>
+    <description id="downloadsListEmptyDescription"
+                 value="&downloadsListEmpty.label;"/>
+  </stack>
+  <separator id="downloadss" />
+  <hbox align="center">  
+  <button id="clearDownloadsButton"                   
+                   label="&clearDownloadsButton.label;"
+                   command="downloadsCmd_clearDownloads"
+                   tooltiptext="&clearDownloadsButton.tooltip;" align="start"></button>
+	<spacer flex="1" />
+	<textbox id="searchFilter"
+				  clickSelectsAll="true"
+				  type="search"
+	              oncommand="gDownloadsCustom.onSearch(this.value);" align="right">	</textbox>		   
+ </hbox> 	
+
+	<keyset>
+		<key keycode="VK_ESCAPE" oncommand="window.close();"/>
+	</keyset>	 
+				   
+</window>

@@ -1,0 +1,9 @@
+popup.title=Customize Cyberfox
+popup.msg.restart=Cyberfox dyrbi so znowa startować, zo bychu so změny wuskutkowali.\nNětko znowa startować?
+import.error=ZMYLK: Wopačna abo změnjena dataja namakana!\nJe móžno, zo so ničo njeimportuje!
+ctr_extrabar=Přidatna symbolowa lajsta
+ctr_actthrobber=Activity Indicator
+notification_msg_firstrun=CTRpreferences has been found select restart to apply
+notification_button_firstrun=Restart
+notification_msg_change=Your pre-set CTRpreferences has been modified 
+notification_button_change=Options

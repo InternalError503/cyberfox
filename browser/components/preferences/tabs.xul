@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+
+# -*- Mode: Java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<!DOCTYPE overlay [
+<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+%brandDTD;
+<!ENTITY % tabsDTD SYSTEM "chrome://browser/locale/preferences/tabs.dtd">
+%tabsDTD;
+<!ENTITY % mainDTD SYSTEM "chrome://browser/locale/preferences/main.dtd">
+%mainDTD;
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
+%browserDTD;
+]>
+
+<overlay id="TabsPaneOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<script type="application/javascript" 
+        src="chrome://browser/content/preferences/in-content/main.js"/>
+  <prefpane id="paneTabs"
+#ifdef XP_WIN
+            onpaneload="gTabsPane.init();"
+#endif
+           >
+
+    <preferences id="tabsPreferences">
+      <preference id="browser.link.open_newwindow"     name="browser.link.open_newwindow"     type="int"/>
+      <preference id="browser.tabs.loadInBackground"   name="browser.tabs.loadInBackground"   type="bool" inverted="true"/>
+      <preference id="browser.tabs.warnOnClose"        name="browser.tabs.warnOnClose"        type="bool"/>
+	  <preference id="browser.tabs.warnOnOpen"         name="browser.tabs.warnOnOpen"         type="bool"/>	  
+	  
+	  <!-- Cyberfeatures -->
+	  <preference id="browser.tabs.animate" 				name="browser.tabs.animate" 					type="bool"/>	  
+      <preference id="browser.warnOnQuit"         			name="browser.warnOnQuit"         			type="bool"/>
+	  <preference id="browser.newtabpage.enabled"      name="browser.newtabpage.enabled"         type="bool"/>
+	  <preference id="browser.newtab.preload"         	name="browser.newtab.preload"         		type="bool"/>
+	  <preference id="browser.newtab.url"         			name="browser.newtab.url"         				type="string"/>
+      <preference id="pref.browser.newtabpage.disable_button.restore_default"
+                name="pref.browser.newtabpage.disable_button.restore_default"
+                type="bool"/>	
+	  <preference id="pref.browser.newtabpage.disable_button.bookmark_page"
+                name="pref.browser.newtabpage.disable_button.bookmark_page"
+                type="bool"/>
+	  <preference id="browser.newtab.search.enabled"         	name="browser.newtab.search.enabled"         		type="bool"/>
+	  <preference id="browser.pagethumbnails.capturing_disabled"         	name="browser.pagethumbnails.capturing_disabled"         		type="bool"/>	  
+	  <!-- Cyberfeatures -->
+      <preference id="browser.sessionstore.restore_on_demand" name="browser.sessionstore.restore_on_demand" type="bool"/>
+#ifdef XP_WIN
+      <preference id="browser.taskbar.previews.enable" name="browser.taskbar.previews.enable" type="bool"/>
+#endif
+    </preferences>
+    
+    <script type="application/javascript" src="chrome://browser/content/preferences/tabs.js"/>
+
+    <!-- XXX flex below is a hack because wrapping checkboxes don't reflow
+             properly; see bug 349098 -->
+    <vbox id="tabPrefsBox" align="start" flex="1">
+      <checkbox id="linkTargeting" label="&newWindowsAsTabs.label;"
+                accesskey="&newWindowsAsTabs.accesskey;"
+                preference="browser.link.open_newwindow"
+                onsyncfrompreference="return gTabsPane.readLinkTarget();"
+                onsynctopreference="return gTabsPane.writeLinkTarget();"/>
+      <checkbox id="warnCloseMultiple" label="&warnCloseMultipleTabs.label;"
+                accesskey="&warnCloseMultipleTabs.accesskey;"
+                preference="browser.tabs.warnOnClose"/>
+      <checkbox id="warnOpenMany" label="&warnOpenManyTabs.label;"
+                accesskey="&warnOpenManyTabs.accesskey;"
+                preference="browser.tabs.warnOnOpen"/>	
+	  <!-- Cyberfeatures -->				
+      <checkbox id="warnOnQuit" label="&warnOnQuit.label;"
+                preference="browser.warnOnQuit"/>								
+	  <!-- Cyberfeatures -->				
+      <checkbox id="restoreOnDemand" label="&restoreTabsOnDemand.label;"
+                accesskey="&restoreTabsOnDemand.accesskey;"
+                preference="browser.sessionstore.restore_on_demand"/>
+      <checkbox id="switchToNewTabs" label="&switchToNewTabs.label;"
+                accesskey="&switchToNewTabs.accesskey;"
+                preference="browser.tabs.loadInBackground"/>
+#ifdef XP_WIN
+      <checkbox id="showTabsInTaskbar" label="&showTabsInTaskbar.label;"
+                accesskey="&showTabsInTaskbar.accesskey;"
+                preference="browser.taskbar.previews.enable"/>
+#endif
+	<!-- Cyberfeatures -->	
+	  <checkbox id="browser.tabs.animate" label="&tabsAnimation.label;"
+				preference="browser.tabs.animate"/>
+	<!-- Cyberfeatures -->	
+    </vbox>
+<!-- Cyberfeatures -->
+	<groupbox flex="1">
+		<caption label="&newtabsoptions.label;"/>
+		      <checkbox id="browser.newtabpage.enabled" label="&newtabenabled.label;"
+							   preference="browser.newtabpage.enabled"/>
+			  <checkbox id="browser.newtab.preload" label="&newtabpreload.label;"
+							   preference="browser.newtab.preload"/>
+			  <checkbox id="browser.newtab.search.enabled" label="&newtabsearch.label;"
+							   preference="browser.newtab.search.enabled"/>
+			  <checkbox id="browser.pagethumbnails.capturing_disabled" label="&newtabthumbnail.label;"
+							   preference="browser.pagethumbnails.capturing_disabled"/>							   
+<hbox align="center">								   
+    <label value="&newtabpage.label;"
+           control="browserNewTabPage"/>
+    <textbox id="browserNewTabPage"
+             class="padded uri-element"
+             flex="1"
+             type="autocomplete"
+             autocompletesearch="history"
+             onsyncfrompreference="return gMainPane.syncFromNewTabPref();"
+             onsynctopreference="return gMainPane.syncToNewTabPref(this.value);"
+             placeholder="&aboutnewtab.pageTitle;"
+             preference="browser.newtab.url"/>
+</hbox>		
+ <hbox align="center" pack="end">
+     <button label="&chooseBookmark.label;"
+            accesskey="&chooseBookmark.accesskey;"
+            oncommand="gMainPane.setNewTabPageToBookmark();"
+            id="useBookmark"
+            preference="pref.browser.newtabpage.disable_button.bookmark_page"/>
+    <button label="&restoreDefault.label;"
+            oncommand="gMainPane.restoreDefaultNewTabPage();"
+            id="restoreDefaultNewTabPage"
+            preference="pref.browser.newtabpage.disable_button.restore_default"/>
+  </hbox>					   
+		</groupbox>
+		<!-- Cyberfeatures -->
+
+  </prefpane>
+
+</overlay>

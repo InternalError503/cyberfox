@@ -1,0 +1,44 @@
+# -*- Mode: python; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+FAIL_ON_WARNINGS = True
+
+LIBRARY_NAME = 'mozsandbox'
+FORCE_SHARED_LIB = True
+
+EXPORTS.mozilla += [
+    'Sandbox.h',
+]
+
+SOURCES += [
+    # Bug 1059038 workaround:
+    '../../../xpcom/glue/unused.cpp',
+    '../chromium/base/shim/base/logging.cpp',
+    '../chromium/sandbox/linux/seccomp-bpf/basicblock.cc',
+    '../chromium/sandbox/linux/seccomp-bpf/codegen.cc',
+    '../chromium/sandbox/linux/seccomp-bpf/die.cc',
+    '../chromium/sandbox/linux/seccomp-bpf/syscall.cc',
+    'Sandbox.cpp',
+    'SandboxAssembler.cpp',
+    'SandboxFilter.cpp',
+]
+
+DEFINES['NS_NO_XPCOM'] = True
+DISABLE_STL_WRAPPING = True
+
+LOCAL_INCLUDES += ['/security/sandbox/chromium/base/shim']
+LOCAL_INCLUDES += ['/security/sandbox/chromium']
+LOCAL_INCLUDES += ['/security/sandbox']
+
+if CONFIG['OS_TARGET'] != 'Android':
+    # Needed for clock_gettime with glibc < 2.17:
+    OS_LIBS += [
+        'rt',
+    ]
+
+DIRS += [
+    'glue',
+]

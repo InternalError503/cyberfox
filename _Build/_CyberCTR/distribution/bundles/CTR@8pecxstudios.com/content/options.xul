@@ -1,0 +1,902 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://classic_theme_restorer/content/overlay.css" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://classic_theme_restorer/locale/options.dtd">
+
+<prefwindow xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	id="ClassicTRoptions"
+	title="&Ctr_title;"
+    type="prefwindow"
+	onload="classicthemerestorerjso.ctr.initprefwindow()"
+	onunload="classicthemerestorerjso.ctr.unloadprefwindow()"
+	buttons="accept"
+	autosize="true"
+	resizable="yes"
+	ondialogaccept="return true"
+	persist="screenX screenY sizemode"
+>
+
+<script type="application/x-javascript" src="options.js"/>
+
+<prefpane id="ClassicTRoptionsPane" flex="1">
+    <preferences>
+
+		<preference id="ctraddon_tabsintitlebar" name="browser.tabs.drawInTitlebar"					type="bool"		instantApply="true"/>
+
+		<preference id="ctraddon_tabs"			name="extensions.classicthemerestorer.tabs" 		type="string"	instantApply="true"/>
+		<preference id="ctraddon_tabsontop"		name="extensions.classicthemerestorer.tabsontop" 	type="string"	instantApply="true"/>
+		<preference id="ctraddon_tabwidth"		name="extensions.classicthemerestorer.ctabwidth"	type="int"		instantApply="true"/>
+		<preference id="ctraddon_tabmwidth"		name="extensions.classicthemerestorer.ctabmwidth"	type="int"		instantApply="true"/>
+		<preference id="ctraddon_closetab"		name="extensions.classicthemerestorer.closetab" 	type="string"	instantApply="true"/>
+		<preference id="ctraddon_closetabhfl"	name="extensions.classicthemerestorer.closetabhfl"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_closealt"		name="extensions.classicthemerestorer.closealt"		type="bool"		instantApply="true"/>
+		<preference id="ctraddon_closeonleft"	name="extensions.classicthemerestorer.closeonleft"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_closewwltab"	name="browser.tabs.closeWindowWithLastTab"			type="bool"		instantApply="true"/>
+		
+		<preference id="ctraddon_am_extrabars"	name="extensions.classicthemerestorer.am_extrabars"	type="int"		instantApply="true"/>
+
+		<preference id="ctraddon_appbutton"		name="extensions.classicthemerestorer.appbutton" 	type="string"	instantApply="true"/>
+		<preference id="ctraddon_appbuttonc"	name="extensions.classicthemerestorer.appbuttonc" 	type="string"	instantApply="true"/>
+		<preference id="ctraddon_alttbappb"		name="extensions.classicthemerestorer.alttbappb" 	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_appbutmhi"		name="extensions.classicthemerestorer.appbutmhi" 	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_appbutbdl"		name="extensions.classicthemerestorer.appbutbdl" 	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_appbuttontxt"	name="extensions.classicthemerestorer.appbuttontxt" type="string"	instantApply="true"/>
+
+		<preference id="ctraddon_nbiconsize"	name="extensions.classicthemerestorer.nbiconsize" 	type="string"	instantApply="true"/>
+		<preference id="ctraddon_nbisizedelay"	name="extensions.classicthemerestorer.nbisizedelay" type="int"		instantApply="true"/>
+		<preference id="ctraddon_smallnavbut"	name="extensions.classicthemerestorer.smallnavbut"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_hide_bf_popup"	name="extensions.classicthemerestorer.hide_bf_popup" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hidenavbar"	name="extensions.classicthemerestorer.hidenavbar"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_backforward"	name="extensions.classicthemerestorer.backforward"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_noconicons"	name="extensions.classicthemerestorer.noconicons"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_wincontrols"	name="extensions.classicthemerestorer.wincontrols"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_hideprbutton"	name="extensions.classicthemerestorer.hideprbutton"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_starinurl"		name="extensions.classicthemerestorer.starinurl"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_feedinurl"		name="extensions.classicthemerestorer.feedinurl"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_statusbar"		name="extensions.classicthemerestorer.statusbar"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_hideurelstop"	name="extensions.classicthemerestorer.hideurelstop"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_urlbardropm"	name="extensions.classicthemerestorer.urlbardropm"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_combrelstop"	name="extensions.classicthemerestorer.combrelstop"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_panelmenucol"	name="extensions.classicthemerestorer.panelmenucol"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_activndicat"	name="extensions.classicthemerestorer.activndicat"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_verifiedcolors" name="extensions.classicthemerestorer.verifiedcolors" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_findbar"		name="extensions.classicthemerestorer.findbar"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_nav_txt_ico"	name="extensions.classicthemerestorer.nav_txt_ico" 	type="string"	instantApply="true"/>
+		<preference id="ctraddon_iat_notf_vt"	name="extensions.classicthemerestorer.iat_notf_vt"	type="bool"		instantApply="true"/>
+
+		<preference id="ctraddon_ctab1"			name="extensions.classicthemerestorer.ctab1"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctab2"			name="extensions.classicthemerestorer.ctab2"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabhov1"		name="extensions.classicthemerestorer.ctabhov1"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabhov2"		name="extensions.classicthemerestorer.ctabhov2"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabact1"		name="extensions.classicthemerestorer.ctabact1"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabact2"		name="extensions.classicthemerestorer.ctabact2"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabpen1"		name="extensions.classicthemerestorer.ctabpen1"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabpen2"		name="extensions.classicthemerestorer.ctabpen2"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabunr1"		name="extensions.classicthemerestorer.ctabunr1"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabunr2"		name="extensions.classicthemerestorer.ctabunr2"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_cntab1"		name="extensions.classicthemerestorer.cntab1"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_cntab2"		name="extensions.classicthemerestorer.cntab2"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_cntabhov1"		name="extensions.classicthemerestorer.cntabhov1"	type="string"	instantApply="true"/>
+		<preference id="ctraddon_cntabhov2"		name="extensions.classicthemerestorer.cntabhov2"	type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabt"			name="extensions.classicthemerestorer.ctabt"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabhovt"		name="extensions.classicthemerestorer.ctabhovt"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabactt"		name="extensions.classicthemerestorer.ctabactt"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabpent"		name="extensions.classicthemerestorer.ctabpent"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabunrt"		name="extensions.classicthemerestorer.ctabunrt"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabtsh"		name="extensions.classicthemerestorer.ctabtsh"		type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabhovtsh"	name="extensions.classicthemerestorer.ctabhovtsh"	type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabacttsh"	name="extensions.classicthemerestorer.ctabacttsh"	type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabpentsh"	name="extensions.classicthemerestorer.ctabpentsh"	type="string"	instantApply="true"/>
+		<preference id="ctraddon_ctabunrtsh"	name="extensions.classicthemerestorer.ctabunrtsh"	type="string"	instantApply="true"/>
+
+		<preference id="ctraddon_tabcolor_def"	name="extensions.classicthemerestorer.tabcolor_def"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextc_def"	name="extensions.classicthemerestorer.tabtextc_def"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextsh_def"	name="extensions.classicthemerestorer.tabtextsh_def" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabcolor_act"	name="extensions.classicthemerestorer.tabcolor_act"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextc_act"	name="extensions.classicthemerestorer.tabtextc_act"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextsh_act"	name="extensions.classicthemerestorer.tabtextsh_act" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabcolor_hov"	name="extensions.classicthemerestorer.tabcolor_hov"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextc_hov"	name="extensions.classicthemerestorer.tabtextc_hov"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextsh_hov"	name="extensions.classicthemerestorer.tabtextsh_hov" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabcolor_pen"	name="extensions.classicthemerestorer.tabcolor_pen"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextc_pen"	name="extensions.classicthemerestorer.tabtextc_pen"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextsh_pen"	name="extensions.classicthemerestorer.tabtextsh_pen" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabcolor_unr"	name="extensions.classicthemerestorer.tabcolor_unr"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextc_unr"	name="extensions.classicthemerestorer.tabtextc_unr"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabtextsh_unr"	name="extensions.classicthemerestorer.tabtextsh_unr" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_ntabcolor_def"	name="extensions.classicthemerestorer.ntabcolor_def" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_ntabcolor_hov"	name="extensions.classicthemerestorer.ntabcolor_hov" type="bool"	instantApply="true"/>
+
+		<preference id="ctraddon_tabfbold_def"	name="extensions.classicthemerestorer.tabfbold_def"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfbold_act"	name="extensions.classicthemerestorer.tabfbold_act"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfbold_pen"	name="extensions.classicthemerestorer.tabfbold_pen"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfbold_unr"	name="extensions.classicthemerestorer.tabfbold_unr"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfbold_hov"	name="extensions.classicthemerestorer.tabfbold_hov"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfita_def"	name="extensions.classicthemerestorer.tabfita_def"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfita_act"	name="extensions.classicthemerestorer.tabfita_act"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfita_pen"	name="extensions.classicthemerestorer.tabfita_pen"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfita_unr"	name="extensions.classicthemerestorer.tabfita_unr"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabfita_hov"	name="extensions.classicthemerestorer.tabfita_hov"	 type="bool"	instantApply="true"/>
+		
+		<preference id="ctraddon_tabc_hov_unl"	name="extensions.classicthemerestorer.tabc_hov_unl"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabc_hov_unr"	name="extensions.classicthemerestorer.tabc_hov_unr"	 type="bool"	instantApply="true"/>
+
+		<preference id="ctraddon_highaddonsbar"	name="extensions.classicthemerestorer.highaddonsbar" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hightabpososx"	name="extensions.classicthemerestorer.hightabpososx" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_altmenubar"	name="extensions.classicthemerestorer.altmenubar" 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_altmenubarpos"	name="extensions.classicthemerestorer.altmenubarpos" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_altmenubarpos2" name="extensions.classicthemerestorer.altmenubarpos2" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_menubarnofog"	name="extensions.classicthemerestorer.menubarnofog"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_noaddonbarbg"	name="extensions.classicthemerestorer.noaddonbarbg"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_notabfog"		name="extensions.classicthemerestorer.notabfog" 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_notabbg"		name="extensions.classicthemerestorer.notabbg" 	 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_nobookbarbg"	name="extensions.classicthemerestorer.nobookbarbg" 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_nonavbarbg"	name="extensions.classicthemerestorer.nonavbarbg" 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_nonavborder"	name="extensions.classicthemerestorer.nonavborder" 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_nonavtbborder"	name="extensions.classicthemerestorer.nonavtbborder" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hidesbclose"	name="extensions.classicthemerestorer.hidesbclose"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_chevronfix"	name="extensions.classicthemerestorer.chevronfix"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_alttabstb"		name="extensions.classicthemerestorer.alttabstb" 	 type="bool"	instantApply="true"/>
+		
+		<preference id="ctraddon_cpanelmenus"	name="extensions.classicthemerestorer.cpanelmenus"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_bfurlbarfix"	name="extensions.classicthemerestorer.bfurlbarfix"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_bf_space"		name="extensions.classicthemerestorer.bf_space"	 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_emptyfavicon"	name="extensions.classicthemerestorer.emptyfavicon"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_emptyfavicon2"	name="extensions.classicthemerestorer.emptyfavicon2" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_noemptypticon"	name="extensions.classicthemerestorer.noemptypticon" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hidezoomres"	name="extensions.classicthemerestorer.hidezoomres"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_alt_newtabp"	name="extensions.classicthemerestorer.alt_newtabp"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_pmhidelabels"	name="extensions.classicthemerestorer.pmhidelabels"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_menupopupscr"	name="extensions.classicthemerestorer.menupopupscr"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hideprivmask"	name="extensions.classicthemerestorer.hideprivmask"	 type="bool"	instantApply="true"/>
+
+		<preference id="ctraddon_invicomenubar"	name="extensions.classicthemerestorer.invicomenubar"   type="bool"	instantApply="true"/>
+		<preference id="ctraddon_invicotabsbar"	name="extensions.classicthemerestorer.invicotabsbar"   type="bool"	instantApply="true"/>
+		<preference id="ctraddon_inviconavbar"	name="extensions.classicthemerestorer.inviconavbar"	   type="bool"	instantApply="true"/>
+		<preference id="ctraddon_invicobookbar"	name="extensions.classicthemerestorer.invicobookbar"   type="bool"	instantApply="true"/>
+		<preference id="ctraddon_invicoaddonbar" name="extensions.classicthemerestorer.invicoaddonbar" type="bool"	instantApply="true"/>
+		
+		<preference id="ctraddon_invicoextrabar"  name="extensions.classicthemerestorer.invicoextrabar"  type="bool" instantApply="true"/>
+
+		<preference id="ctraddon_tabmokcolor"	name="extensions.classicthemerestorer.tabmokcolor" 	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabmokcolor2"	name="extensions.classicthemerestorer.tabmokcolor2"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabmokcolor3"	name="extensions.classicthemerestorer.tabmokcolor3"  type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tabmokcolor4"	name="extensions.classicthemerestorer.tabmokcolor4"  type="bool"	instantApply="true"/>
+		
+		<preference id="ctraddon_mbarposition"	name="extensions.classicthemerestorer.mbarposition"	 type="string"	instantApply="true"/>
+		<preference id="ctraddon_athrobberurl"	name="extensions.classicthemerestorer.athrobberurl"	 type="string"	instantApply="true"/>
+		<preference id="ctraddon_mbarforceleft"	name="extensions.classicthemerestorer.mbarforceleft" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_mbarforceright" name="extensions.classicthemerestorer.mbarforceright" type="bool"	instantApply="true"/>
+
+		<preference id="ctraddon_dblclnewtab"	name="extensions.classicthemerestorer.dblclnewtab"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hidetbwot"		name="extensions.classicthemerestorer.hidetbwot"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_hidetbwote"	name="extensions.classicthemerestorer.hidetbwote"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_faviconurl"	name="extensions.classicthemerestorer.faviconurl"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_padlock"		name="extensions.classicthemerestorer.padlock"	 	 type="string"	instantApply="true"/>
+		<preference id="ctraddon_padlockex"		name="extensions.classicthemerestorer.padlockex"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_icopageinfo"	name="extensions.classicthemerestorer.icopageinfo"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_dblclclosefx"	name="extensions.classicthemerestorer.dblclclosefx"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_appbclmmenus"	name="extensions.classicthemerestorer.appbclmmenus"	 type="bool"	instantApply="true"/>
+
+		<preference id="ctraddon_throbberalt"	name="extensions.classicthemerestorer.throbberalt" 	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_bmanimation"	name="extensions.classicthemerestorer.bmanimation"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_pananimation"	name="extensions.classicthemerestorer.pananimation"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_tabsanimate"	name="browser.tabs.animate"							type="bool"		instantApply="true"/>
+		<preference id="ctraddon_dlanimate"		name="browser.download.animateNotifications"		type="bool"		instantApply="true"/>
+
+		<preference id="ctraddon_closeabarbut"	name="extensions.classicthemerestorer.closeabarbut"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_toolsitem"		name="extensions.classicthemerestorer.toolsitem"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_appmenuitem"	name="extensions.classicthemerestorer.appmenuitem"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_contextitem"	name="extensions.classicthemerestorer.contextitem"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_puictrbutton"	name="extensions.classicthemerestorer.puictrbutton"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_cuibuttons"	name="extensions.classicthemerestorer.cuibuttons"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_bmarkoinpw"	name="extensions.classicthemerestorer.bmarkoinpw"	type="bool"		instantApply="true"/>
+    <preference id="ctraddon_titleintitlebar"	name="extensions.classicthemerestorer.titleintitlebar"	type="bool"		instantApply="true"/>
+	</preferences>
+
+
+<hbox flex="1" orient="horizontal" id="ctrPrefBox">
+  
+  <radiogroup id="CtrRadioGroup" class="ctraddontabs" orient="vertical" flex="1"
+	value="ctraddon_tabsbox" oncommand="classicthemerestorerjso.ctr.onCtrPanelSelect();">
+
+	  <radio class="ctraddontab" value="ctraddon_tabsbox" 		label="&Ctr_tabs;"/>
+	  <radio class="ctraddontab" value="ctraddon_fontbox"    	label="&Ctr_tabcolors_t;" id="ctraddon_sqtabcolorstab"/>
+	  <radio class="ctraddontab" value="ctraddon_appbuttonbox" 	label="&Ctr_appbutton;"/>
+	  <radio class="ctraddontab" value="ctraddon_generaluibox"	label="&Ctr_ui;"/>
+	  <radio class="ctraddontab" value="ctraddon_iconsbox"		label="&Ctr_urlbar;"/>
+	  <radio class="ctraddontab" value="ctraddon_toolbarsbox"	label="&Ctr_toolbars; (1)"/>
+	  <radio class="ctraddontab" value="ctraddon_toolbarsbox2"	label="&Ctr_toolbars; (2)"/>
+	  <radio class="ctraddontab" value="ctraddon_animationbox"	label="&Ctr_animation;"/>
+	  <radio class="ctraddontab" value="ctraddon_ctraddonbox"	label="&Ctr_title;"/>
+	  <label value=""/>
+	  <description id="ctraddon_pw_radiorestart">&Ctr_rr;</description>
+
+  </radiogroup>
+
+  <splitter id="ctraddon_pw_splitter"/>
+
+  <deck id="ctrPrefBoxContainer" flex="1">
+
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_tabsbox">
+
+	  <groupbox>
+		<caption  label="&Ctr_tabs;" class="ctraddon_topic"/>
+		<menulist preference="ctraddon_tabs" id="ctraddon_pw_tabmenulist">
+			<menupopup>
+				<menuitem value="tabs_default"	 label="&Ctr_tabs0;"  oncommand="classicthemerestorerjso.ctr.unsetTabColorsAndMore();"/>
+				<menuitem value="tabs_squared"	 label="&Ctr_tabs1;"  oncommand="classicthemerestorerjso.ctr.unsetTabColorsAndMore();"/>
+				<menuitem value="tabs_squaredc2" label="&Ctr_tabs1; (v2)"  oncommand="classicthemerestorerjso.ctr.unsetTabColorsAndMore();"/>
+				<menuitem value="tabs_squared2"	 label="&Ctr_tabs1m;" oncommand="classicthemerestorerjso.ctr.unsetTabColorsAndMore();"/>
+				<menuitem value="tabs_curved" 	 label="&Ctr_tabs2;"  oncommand="classicthemerestorerjso.ctr.unsetTabColorsAndMore();"/>
+				<menuitem value="tabs_curvedall" label="&Ctr_tabs3;"  oncommand="classicthemerestorerjso.ctr.unsetTabColorsAndMore();" id="tabs_curvedall"/>
+			</menupopup>
+		</menulist>
+
+		<description id="ctraddon_pw_tabforminfo">&Ctr_tabforminfo;</description>
+
+		<menulist preference="ctraddon_tabsontop">
+			<menupopup>
+				<menuitem value="unset"	 label="&Ctr_tabsontop0;"/>
+				<menuitem value="true"	 label="&Ctr_tabsontop1;"/>
+				<menuitem value="false"	 label="&Ctr_tabsontop2;"/>
+				<menuitem value="false2" label="&Ctr_tabsontop3;"/>
+				<label value=" "/>
+				<description class="ctraddon_font1">&Ctr_tabsontopI1;</description>
+				<description>#main-window, #navigator-toolbox, #titlebar, #nav-bar,</description>
+				<description>#toolbar-menubar, #TabsToolbar,</description>
+				<description>#PersonalToolbar, #ctraddon_addon-bar</description>
+			</menupopup>
+		</menulist>
+		
+		<checkbox label="&Ctr_emptyfavicon;"	preference="ctraddon_emptyfavicon" id="ctraddon_pw_tab_emptyfavicon"/>
+				<checkbox label="&Ctr_noemptypticon;"	preference="ctraddon_noemptypticon" id="ctraddon_pw_tab_noemptypticon"/>
+		<checkbox label="&ctr_tabtitleintitlebar;"	preference="ctraddon_titleintitlebar" id="ctraddon_titleintitlebar"/>
+		
+		<grid>
+		  <rows>
+			<row>
+				<label value="&Ctr_tabminwidth;" id="ctraddon_pw_tabMinWidth_L1"/>
+				<hbox>
+					<textbox id="ctraddon_pw_tabMinWidth" size="3" maxlength="3" preference="ctraddon_tabmwidth" type="number"/>
+					<label value="px"/>
+				</hbox>
+				<label value="100px &Ctr_tabwidthdef;" id="ctraddon_pw_tabMinWidth_L2"/>
+			</row>
+			<row>
+				<label value="&Ctr_tabmaxwidth;" id="ctraddon_pw_tabMaxWidth_L1"/>
+				<hbox>
+					<textbox id="ctraddon_pw_tabMaxWidth" size="3" maxlength="3" preference="ctraddon_tabwidth" type="number"/>
+					<label value="px"/>
+				</hbox>
+				<label value="210px &Ctr_tabwidthdef; / 250px &Ctr_tabwidthcla;" id="ctraddon_pw_tabMaxWidth_L2"/>
+			</row>
+		  </rows>
+		</grid>
+
+		<description id="ctraddon_pw_tabwidthinfo" class="ctraddon_topic">&Ctr_tabwidthinfo;</description>
+		<description id="ctraddon_pw_tabwidthinfo2" class="ctraddon_topic">&Ctr_tabwidthinfo2;</description>
+		<description id="ctraddon_pw_tabwidthinfo3" class="ctraddon_topic">&Ctr_tabwidthinfo3;</description>
+		
+	  </groupbox>
+	  <groupbox>
+		<caption  label="&Ctr_closetab_0;" class="ctraddon_topic"/>
+		<menulist preference="ctraddon_closetab" id="ctraddon_pw_closetab">
+			<menupopup>
+				<menuitem value="closetab_default"	label="&Ctr_tabwidthdef;" oncommand="classicthemerestorerjso.ctr.ctrpwTabcloseextra(false);classicthemerestorerjso.ctr.ctrpwTabcloseextra2(false);"/>
+				<menuitem value="closetab_forced"	label="&Ctr_closetab_5; *" oncommand="classicthemerestorerjso.ctr.ctrpwTabcloseextra(false);classicthemerestorerjso.ctr.ctrpwTabcloseextra2(false);"/>
+				<menuitem value="closetab_active"	label="&Ctr_closetab_1;" id="ctraddon_closetab_pw_act" oncommand="classicthemerestorerjso.ctr.ctrpwTabcloseextra(false);classicthemerestorerjso.ctr.ctrpwTabcloseextra2(false);"/>
+				<menuitem value="closetab_none"		label="&Ctr_closetab_2;" id="ctraddon_closetab_pw_non" oncommand="classicthemerestorerjso.ctr.ctrpwTabcloseextra(true);classicthemerestorerjso.ctr.ctrpwTabcloseextra2(true);"/>
+				<menuitem value="closetab_tb_start"	label="&Ctr_closetab_4;" id="ctraddon_closetab_pw_sta" oncommand="classicthemerestorerjso.ctr.ctrpwTabcloseextra(true);classicthemerestorerjso.ctr.ctrpwTabcloseextra2(false);"/>
+				<menuitem value="closetab_tb_end"	label="&Ctr_closetab_3;" id="ctraddon_closetab_pw_end" oncommand="classicthemerestorerjso.ctr.ctrpwTabcloseextra(true);classicthemerestorerjso.ctr.ctrpwTabcloseextra2(false);"/>
+				<label value=" "/>
+				<description class="ctraddon_font1">* &Ctr_appbuttonI1;</description>
+			</menupopup>
+		</menulist>
+		<checkbox label="&Ctr_closetab_hfot;" preference="ctraddon_closetabhfl" id="ctraddon_pw_closetabhfl"/>
+		<checkbox label="&Ctr_closeonleft;" preference="ctraddon_closeonleft" id="ctraddon_pw_closeonleft"/>
+		<checkbox label="&Ctr_closealt;" preference="ctraddon_closealt" id="ctraddon_pw_closealt"/>
+		<checkbox label="&Ctr_close_wwltab;" preference="ctraddon_closewwltab"/>
+
+	  </groupbox>
+
+	</box>
+	
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_fontbox">
+
+	  <description></description>
+	  <description class="ctraddon_tabcolorlabel" id="ctraddon_ccap_t_default">&Ctr_tabs0;</description>
+	  <description class="ctraddon_tabcolorlabel" id="ctraddon_ccap_t_squared">&Ctr_tabs1;</description>
+	  <description class="ctraddon_tabcolorlabel" id="ctraddon_ccap_t_squaredc2">&Ctr_tabs1; v2</description>
+	  <description class="ctraddon_tabcolorlabel" id="ctraddon_ccap_t_squared2">&Ctr_tabs1m;</description>
+	  <description class="ctraddon_tabcolorlabel" id="ctraddon_ccap_t_curved">&Ctr_tabs2;</description>
+	  <description class="ctraddon_tabcolorlabel" id="ctraddon_ccap_t_curvedaero">&Ctr_tabs3;</description>
+	  <description>&Ctr_tab_tf_info1; &Ctr_tab_tf_info2;</description>
+	  <label value=""/>
+
+	  <tabbox>
+		<tabs id="ctraddon_tabcolor_tabs">
+			<tab label="&Ctr_tabact_t;"/>
+			<tab label="&Ctr_tabhov_t;"/>
+			<tab label="&Ctr_tabnor_t;"/>
+			<tab label="&Ctr_tabpen_t;"/>
+			<tab label="&Ctr_tabunr_t;"/>
+			<tab label="&Ctr_ntab_t;" id="ctraddon_pw_colors_ntab_t"/>
+		</tabs>
+
+		<tabpanels id="ctraddon_pw_tabs_tabpanels">
+
+		  <tabpanel>
+			<groupbox>
+				<caption  label="&Ctr_tabact;" class="ctraddon_topic"/>
+				<grid>
+				  <rows>
+					<row>
+						<checkbox label="&Ctr_customsqtab1;" preference="ctraddon_tabcolor_act" class="tabactcolorbox" id="ctraddon_pw_ccol_act_pref"/>
+						<textbox preference="ctraddon_ctabact1" class="tabactcolorbox" id="ctraddon_pw_ccol_act_b1"/>
+						<colorpicker preference="ctraddon_ctabact1" type="button" class="tabactcolorbox" id="ctraddon_pw_ccol_act_cp1"/>
+					</row>
+					<row>
+						<label value=""/>
+						<textbox preference="ctraddon_ctabact2" class="tabactcolorbox" id="ctraddon_pw_ccol_act_b2"/>
+						<colorpicker preference="ctraddon_ctabact2" type="button" class="tabactcolorbox" id="ctraddon_pw_ccol_act_cp2"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctext;"	preference="ctraddon_tabtextc_act"/>
+						<textbox preference="ctraddon_ctabactt" />
+						<colorpicker preference="ctraddon_ctabactt" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctextsh;"	preference="ctraddon_tabtextsh_act"/>
+						<textbox preference="ctraddon_ctabacttsh" />
+						<colorpicker preference="ctraddon_ctabacttsh" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_bold;"	preference="ctraddon_tabfbold_act"/>
+						<checkbox label="&Ctr_italic;"	preference="ctraddon_tabfita_act"/>
+					</row>
+				  </rows>
+				</grid>
+			</groupbox>
+		  </tabpanel>
+
+		  <tabpanel>
+			<groupbox>
+				<caption  label="&Ctr_tabhov;" class="ctraddon_topic"/>
+				<grid>
+				  <rows>
+					<row>
+						<checkbox label="&Ctr_customsqtab1;" preference="ctraddon_tabcolor_hov" class="tabhovcolorbox"/>
+						<textbox preference="ctraddon_ctabhov1" class="tabhovcolorbox"/>
+						<colorpicker preference="ctraddon_ctabhov1" type="button" class="tabhovcolorbox"/>
+					</row>
+					<row>
+						<label value=""/>
+						<textbox preference="ctraddon_ctabhov2" class="tabhovcolorbox"/>
+						<colorpicker preference="ctraddon_ctabhov2" type="button" class="tabhovcolorbox"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctext;"	preference="ctraddon_tabtextc_hov"/>
+						<textbox preference="ctraddon_ctabhovt" />
+						<colorpicker preference="ctraddon_ctabhovt" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctextsh;"	preference="ctraddon_tabtextsh_hov"/>
+						<textbox preference="ctraddon_ctabhovtsh" />
+						<colorpicker preference="ctraddon_ctabhovtsh" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_bold;"	preference="ctraddon_tabfbold_hov"/>
+						<checkbox label="&Ctr_italic;"	preference="ctraddon_tabfita_hov"/>
+					</row>
+					
+				  </rows>
+				</grid>
+			</groupbox>
+
+		  </tabpanel>
+
+		  <tabpanel>
+			<groupbox>
+				<caption  label="&Ctr_tabnor;" class="ctraddon_topic"/>
+				<grid>
+				  <rows>
+					<row>
+						<checkbox label="&Ctr_customsqtab1;"  preference="ctraddon_tabcolor_def" class="tabcolorbox"/>
+						<textbox preference="ctraddon_ctab1" class="tabcolorbox"/>
+						<colorpicker preference="ctraddon_ctab1" type="button" class="tabcolorbox"/>
+					</row>
+					<row>
+						<label value=""/>
+						<textbox preference="ctraddon_ctab2" class="tabcolorbox"/>
+						<colorpicker preference="ctraddon_ctab2" type="button" class="tabcolorbox"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctext;"	preference="ctraddon_tabtextc_def"/>
+						<textbox preference="ctraddon_ctabt"/>
+						<colorpicker preference="ctraddon_ctabt" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctextsh;"	preference="ctraddon_tabtextsh_def"/>
+						<textbox preference="ctraddon_ctabtsh"/>
+						<colorpicker preference="ctraddon_ctabtsh" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_bold;"	preference="ctraddon_tabfbold_def"/>
+						<checkbox label="&Ctr_italic;"	preference="ctraddon_tabfita_def"/>
+					</row>
+				  </rows>
+				</grid>
+			</groupbox>
+
+		  </tabpanel>
+
+		  <tabpanel>
+			<groupbox>
+				<caption  label="&Ctr_tabpen;" class="ctraddon_topic"/>
+				<grid>
+				  <rows>
+					<row>
+						<checkbox label="&Ctr_customsqtab1;" preference="ctraddon_tabcolor_pen" class="tabpencolorbox"/>
+						<textbox preference="ctraddon_ctabpen1" class="tabpencolorbox"/>
+						<colorpicker preference="ctraddon_ctabpen1" type="button" class="tabpencolorbox"/>
+					</row>
+					<row>
+						<label value=""/>
+						<textbox preference="ctraddon_ctabpen2" class="tabpencolorbox"/>
+						<colorpicker preference="ctraddon_ctabpen2" type="button" class="tabpencolorbox"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctext;"	preference="ctraddon_tabtextc_pen"/>
+						<textbox preference="ctraddon_ctabpent"/>
+						<colorpicker preference="ctraddon_ctabpent" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctextsh;"	preference="ctraddon_tabtextsh_pen"/>
+						<textbox preference="ctraddon_ctabpentsh"/>
+						<colorpicker preference="ctraddon_ctabpentsh" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_bold;"	preference="ctraddon_tabfbold_pen"/>
+						<checkbox label="&Ctr_italic;"	preference="ctraddon_tabfita_pen"/>
+					</row>
+				  </rows>
+				</grid>
+				<checkbox label="&Ctr_notabhov;"	preference="ctraddon_tabc_hov_unl"/>
+			</groupbox>
+
+		  </tabpanel>
+
+		  <tabpanel>
+			<groupbox>
+				<caption  label="&Ctr_tabunr;" class="ctraddon_topic"/>
+				<grid>
+				  <rows>
+					<row>
+						<checkbox label="&Ctr_customsqtab1;" preference="ctraddon_tabcolor_unr" class="tabunrcolorbox"/>
+						<textbox preference="ctraddon_ctabunr1" class="tabunrcolorbox"/>
+						<colorpicker preference="ctraddon_ctabunr1" type="button" class="tabunrcolorbox"/>
+					</row>
+					<row>
+						<label value=""/>
+						<textbox preference="ctraddon_ctabunr2" class="tabunrcolorbox"/>
+						<colorpicker preference="ctraddon_ctabunr2" type="button" class="tabunrcolorbox"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctext;"	preference="ctraddon_tabtextc_unr"/>
+						<textbox preference="ctraddon_ctabunrt"/>
+						<colorpicker preference="ctraddon_ctabunrt" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_ctextsh;"	preference="ctraddon_tabtextsh_unr"/>
+						<textbox preference="ctraddon_ctabunrtsh"/>
+						<colorpicker preference="ctraddon_ctabunrtsh" type="button"/>
+					</row>
+					<row>
+						<checkbox label="&Ctr_bold;"	preference="ctraddon_tabfbold_unr"/>
+						<checkbox label="&Ctr_italic;"	preference="ctraddon_tabfita_unr"/>
+					</row>
+				  </rows>
+				</grid>
+				<checkbox label="&Ctr_notabhov;"	preference="ctraddon_tabc_hov_unr"/>
+			</groupbox>
+
+		  </tabpanel>
+
+		  <tabpanel>
+			<vbox>
+				<groupbox class="ntabcolorbox">
+					<caption  label="&Ctr_ntabnor;" class="ctraddon_topic"/>
+					<grid>
+					  <rows>
+						<row>
+							<checkbox label="&Ctr_customsqtab1;"	preference="ctraddon_ntabcolor_def"/>
+							<textbox preference="ctraddon_cntab1"/>
+							<colorpicker preference="ctraddon_cntab1" type="button" class="tabcolorbox"/>
+						</row>
+						<row>
+							<label value=""/>
+							<textbox preference="ctraddon_cntab2"/>
+							<colorpicker preference="ctraddon_cntab2" type="button" class="tabcolorbox"/>
+						</row>
+					  </rows>
+					</grid>
+				</groupbox>
+
+				<groupbox class="ntabcolorbox">
+					<caption  label="&Ctr_ntabhov;" class="ctraddon_topic"/>
+					<grid>
+					  <rows>
+						<row>
+							<checkbox label="&Ctr_customsqtab1;"	preference="ctraddon_ntabcolor_hov"/>
+							<textbox preference="ctraddon_cntabhov1"/>
+							<colorpicker preference="ctraddon_cntabhov1" type="button" class="tabcolorbox"/>
+						</row>
+						<row>
+							<label value=""/>
+							<textbox preference="ctraddon_cntabhov2"/>
+							<colorpicker preference="ctraddon_cntabhov2" type="button" class="tabcolorbox"/>
+						</row>
+					  </rows>
+					</grid>
+				</groupbox>
+			</vbox>
+
+		  </tabpanel>
+
+		</tabpanels>
+	  </tabbox>
+	  <description id="ctraddon_pw_special_font" class="ctraddon_topic">&Ctr_special_font;</description>
+
+	</box>
+
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_appbuttonbox">
+
+	  <hbox><checkbox label="&Ctr_tabsintitlebar;"	preference="ctraddon_tabsintitlebar" id="ctraddon_tabs_in_titlebar"/></hbox>
+
+	  <groupbox>
+		<caption  label="&Ctr_appbutton;" class="ctraddon_topic"/>
+		<menulist preference="ctraddon_appbutton" id="ctraddon_appbutton_list1">
+			<menupopup>
+				<menuitem value="appbutton_off"	  label="&Ctr_appbutton0;"			oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_off',true)"/>
+				<menuitem value="appbutton_v1"	  label="&Ctr_appbutton1;"			oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v1',true)"/>
+				<menuitem value="appbutton_v1wt"  label="&Ctr_appbutton1wt;"		oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v1wt',true)"/>
+				<menuitem value="appbutton_v2"	  label="&Ctr_appbutton2;"			oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v2',true)"/>
+				<menuitem value="appbutton_v2wt2" label="&Ctr_appbutton2; (v2)"		oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v2wt2',true)"/>
+				<menuitem value="appbutton_v2io"  label="&Ctr_appbutton2io;"		oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v2io',true)"/>
+				<menuitem value="appbutton_v2io2" label="&Ctr_appbutton2io; (v2)"	oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v2io2',true)"/>
+				<menuitem value="appbutton_pm" 	  label="&Ctr_paneluibtweak;"		oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_pm',true)"/>
+				<label value=" "/>
+				<description class="ctraddon_font1">&Ctr_appbuttonI1;</description>
+			</menupopup>
+		</menulist>
+		
+		<menulist preference="ctraddon_appbutton" id="ctraddon_appbutton_list2">
+			<menupopup>
+				<menuitem value="appbutton_off"	 label="&Ctr_appbutton0;"	oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_off',true)"/>
+				<menuitem value="appbutton_v1"	 label="&Ctr_appbutton1;"	oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v1',true)"/>
+				<menuitem value="appbutton_v1wt" label="&Ctr_appbutton1wt;" oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_v1wt',true)"/>
+			</menupopup>
+		</menulist>
+
+		<description>&Ctr_appbuttonI1e;</description>
+
+		<menulist preference="ctraddon_appbuttonc" id="ctraddon_appbutcolor_list">
+			<menupopup>
+						<menuitem value="appbuttonc_nightly" label="&Ctr_appbuttonc_n;"/>
+						<menuitem value="appbuttonc_aurora"	 label="&Ctr_appbuttonc_a;"/>	
+						<menuitem value="appbuttonc_cyan"	 label="&Ctr_appbuttonc_a; (Light)"/>						
+						<menuitem value="appbuttonc_default"	 label="&Ctr_appbuttonc_d;"/>
+						<menuitem value="appbuttonc_gray"	 label="&Ctr_appbuttonc_gr;"/>						
+						<menuitem value="appbuttonc_green"	 label="&Ctr_appbuttonc_g;"/>	
+						<menuitem value="appbuttonc_green_dark"	 label="&Ctr_appbuttonc_g;  (Dark)"/>						
+						<menuitem value="appbuttonc_orange"	 label="&Ctr_appbuttonc_o;"/>
+						<menuitem value="appbuttonc_orange_dark"	 label="&Ctr_appbuttonc_o;  (Dark)"/>
+						<menuitem value="appbuttonc_purple"	 label="&Ctr_appbuttonc_pu;"/>
+						<menuitem value="appbuttonc_red"	 label="&Ctr_appbuttonc_r;"/>
+						<menuitem value="appbuttonc_red_dark"	 label="&Ctr_appbuttonc_r; (Dark)"/>	
+						<menuitem value="appbuttonc_salmon"	 label="&Ctr_appbuttonc_s;"/>						
+						<menuitem value="appbuttonc_transp"  label="&Ctr_appbuttonc_t;"/>
+						<menuitem value="appbuttonc_white"	 label="&Ctr_appbuttonc_wh;"/>
+			</menupopup>
+		</menulist>
+		
+		<description>&Ctr_appbuttonI2;</description>
+		
+		<checkbox label="&Ctr_alttbappb;"	 preference="ctraddon_alttbappb" id="ctraddon_alt_abicons"/>
+		<checkbox label="&Ctr_appbutmhi;"	 preference="ctraddon_appbutmhi" id="ctraddon_abhigher" class="ctraddon_windowsonly"/>
+		<checkbox label="&Ctr_appbutbdl;"	 preference="ctraddon_appbutbdl" id="ctraddon_appbutbdl"/>
+		<checkbox label="&Ctr_dblclclosefx;" preference="ctraddon_dblclclosefx" id="ctraddon_dblclclosefx" class="ctraddon_windowsonly"/>
+		<checkbox label="&Ctr_appbclmmenus;" preference="ctraddon_appbclmmenus" id="ctraddon_appbclmmenus"/>
+	    
+		<grid class="ctraddon_windowsonly">
+		  <rows>
+			<row>
+				<description id="ctraddon_pw_appbutonclab">&Ctr_appbutonclab;</description>
+				<textbox id="ctraddon_pw_appbuttontxt" preference="ctraddon_appbuttontxt" size="auto" minwidth="380px" maxwidth="380px" type="autocomplete" placeholder="&Ctr_appbutonclab2;" onkeydown="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<label value=" "/>
+			</row>
+		  </rows>
+		</grid>
+	  </groupbox>
+
+	</box>
+
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_generaluibox">
+	  <groupbox>
+		<caption  label="&Ctr_ui;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_smallnavbut;"		preference="ctraddon_smallnavbut" oncommand="if(this.checked) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',true);} else if(classicthemerestorerjso.ctr.prefs.getBoolPref('backforward')==false) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',false);}" id="ctraddon_pw_smallnavbut"/>
+		<checkbox label="&Ctr_bfurlbarfix;"		preference="ctraddon_bfurlbarfix" id="ctraddon_pw_bfurlbarfix" class="ctraddonsuboption"/>
+		<checkbox label="&Ctr_backforward;"		preference="ctraddon_backforward"  id="ctraddon_pw_backforward" oncommand="if(this.checked) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',true);classicthemerestorerjso.ctr.ctrpwBFextra(true);} else if(classicthemerestorerjso.ctr.prefs.getBoolPref('smallnavbut')==false) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',false);classicthemerestorerjso.ctr.ctrpwBFextra(false);} else {classicthemerestorerjso.ctr.ctrpwBFextra(false);}"/>
+		<checkbox label="&Ctr_bf_space;"		preference="ctraddon_bf_space" id="ctraddon_pw_bf_space" class="ctraddonsuboption"/>
+		<checkbox label="&Ctr_hide_bf_popup;"	preference="ctraddon_hide_bf_popup" id="ctraddon_pw_hide_bf_popup" class="ctraddonsuboption"/>
+		
+		<checkbox label="&Ctr_mstatusbar;"		preference="ctraddon_statusbar" id="ctraddon_pw_statusbar" oncommand="classicthemerestorerjso.ctr.ctrMovStatusextra()"/>
+		<description class="ctraddon_topic ctraddonsuboption" id="ctraddon_pw_statusbar_s4e_info">&Ctr_mstatusbars4e;</description>
+		<description class="ctraddon_topic ctraddonsuboption" id="ctraddon_pw_statusbar_tpp_info">&Ctr_mstatusbartpp;</description>
+		<description class="ctraddon_topic ctraddonsuboption" id="ctraddon_pw_statusbar_pzt_info">&Ctr_mstatusbarpzt;</description>
+		<description class="ctraddon_topic ctraddonsuboption" id="ctraddon_pw_statusbar_abr_info">&Ctr_mstatusbarabr;</description>
+		
+		<checkbox label="&Ctr_noconicons;"		preference="ctraddon_noconicons" id="ctraddon_pw_noconicons"/>
+		<checkbox label="&Ctr_hideprivmask;"	preference="ctraddon_hideprivmask" id="ctraddon_pw_hideprivmask"/>
+		<checkbox label="&Ctr_combrelstop;"		preference="ctraddon_combrelstop" id="ctraddon_pw_stopreload"/>
+		<description class="ctraddonsuboption">&Ctr_stoprel1;</description>
+
+		<checkbox label="&Ctr_wincontrols;"		preference="ctraddon_wincontrols" id="ctraddon_wincontrols"/>
+		<checkbox label="&Ctr_emptyfavicon2;"	preference="ctraddon_emptyfavicon2" id="ctraddon_pw_emptyfavicon2" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwTabEmptyFavicon(true);} else {classicthemerestorerjso.ctr.ctrpwTabEmptyFavicon(false);}"/>
+		<checkbox label="&Ctr_panelmenucol;"	preference="ctraddon_panelmenucol" id="ctraddon_pw_panelmenucolor"/>
+		<checkbox label="&Ctr_cpanelmenus;"		preference="ctraddon_cpanelmenus"/>
+		<checkbox label="&Ctr_pmhidelabels;"	preference="ctraddon_pmhidelabels"/>
+		<checkbox label="&Ctr_menupopupscr;"	preference="ctraddon_menupopupscr"/>
+		<checkbox label="&Ctr_hidezoomres;"		preference="ctraddon_hidezoomres"/>
+		<checkbox label="&Ctr_alt_newtabp;"		preference="ctraddon_alt_newtabp"/>
+	  </groupbox>
+ 
+	  <groupbox>
+	    <caption  label="&Ctr_navthrobber;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_navthrobber;"	preference="ctraddon_activndicat" id="ctraddon_pw_activitythrobber" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+	    <description>&Ctr_navthrobber1;</description>
+		<grid>
+		  <rows>
+			<row>
+				<textbox id="ctraddon_pw_athrobberurlbox" preference="ctraddon_athrobberurl" size="auto" minwidth="380px" maxwidth="380px" type="autocomplete" placeholder="&Ctr_navthrobber2;"/>
+				<label value=" "/>
+			</row>
+		  </rows>
+		</grid>
+	  </groupbox>
+
+	  <groupbox class="ctraddon_winmaconly" id="ctraddon_pw_mockupoptions">
+	    <caption  label="&Ctr_fxmockup;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_tabmokcolor;"		preference="ctraddon_tabmokcolor" class="ctraddon_winmaconly" id="ctraddon_pw_tabmokcolor"/>
+		<checkbox label="&Ctr_tabmokcolor2;"	preference="ctraddon_tabmokcolor2" class="ctraddon_winmaconly" id="ctraddon_pw_tabmokcolor2"/>
+		<checkbox label="&Ctr_tabmokcolor3;"	preference="ctraddon_tabmokcolor3" class="ctraddon_winmaconly" id="ctraddon_pw_tabmokcolor3"/>
+		<checkbox label="&Ctr_tabmokcolor4;"	preference="ctraddon_tabmokcolor4" class="ctraddon_winmaconly" id="ctraddon_pw_tabmokcolor4"/>
+	  </groupbox>
+
+	</box>
+	
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_iconsbox">
+	  
+	  <groupbox>
+	    <caption  label="&Ctr_urlbar;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_starinurl;" preference="ctraddon_starinurl" id="ctraddon_pw_starinurl" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<checkbox label="&Ctr_feedinurl;" preference="ctraddon_feedinurl" id="ctraddon_pw_feedinurl" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<checkbox label="&Ctr_hideurelstop;" preference="ctraddon_hideurelstop" id="ctraddon_pw_hideurelstop"/>
+		<checkbox label="&Ctr_urlbardropm;"	 preference="ctraddon_urlbardropm"  id="ctraddon_pw_urlbardropm"/>
+		<checkbox label="&Ctr_hideprbutton;" preference="ctraddon_hideprbutton" id="ctraddon_pw_urlbarpblocked"/>
+	  </groupbox>
+		
+	  <groupbox>
+	    <caption  label="&Ctr_urlbar_ib;" class="ctraddon_topic"/>
+		
+		  <menulist preference="ctraddon_padlock" id="ctraddon_padlock_list">
+			<menupopup>
+				<menuitem value="padlock_default" label="&Ctr_padlock_def;" id="ctraddon_pw_padlock_default"/>
+				<menuitem value="padlock_classic" label="&Ctr_padlock_cla;" id="ctraddon_pw_padlock_classic"/>
+				<menuitem value="padlock_modern"  label="&Ctr_padlock_mod;" id="ctraddon_pw_padlock_modern"/>
+				<menuitem value="padlock_none"	  label="&Ctr_padlock_hid;" id="ctraddon_pw_padlock_none"/>
+			</menupopup>
+		  </menulist>
+		
+		<checkbox label="&Ctr_faviconurl;"	preference="ctraddon_faviconurl" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwFaviconextra(true);} else {classicthemerestorerjso.ctr.ctrpwFaviconextra(false);} classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<checkbox label="&Ctr_padlock_ext;"		preference="ctraddon_padlockex" id="ctraddon_padlock_extra"/>
+		<checkbox label="&Ctr_icopageinfo;"		preference="ctraddon_icopageinfo"/>
+		<checkbox label="&Ctr_verifiedcolors;"	preference="ctraddon_verifiedcolors" id="ctraddon_pw_verifiedcolors"/>
+		
+	  </groupbox>
+
+	</box>
+	
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_toolbarsbox">
+
+		<description class="ctraddon_font1">&Ctr_nbiconsize0;</description>
+		<menulist preference="ctraddon_nbiconsize">
+			<menupopup>
+				<menuitem value="small"	label="#nav-bar[iconsize='small'] &Ctr_tabwidthdef;"/>
+				<menuitem value="large"	label="#nav-bar[iconsize='large']"/>
+			</menupopup>
+		</menulist>
+		<hbox>
+		  <textbox id="ctraddon_pw_nbisizedelay" size="4" maxlength="4" preference="ctraddon_nbisizedelay" type="number" min="0" max="9999"/>
+		  <label value="&Ctr_nbisizedelay;"/>
+		</hbox>
+		
+		<description class="ctraddon_font1">&Ctr_cuimode;</description>
+		<menulist preference="ctraddon_nav_txt_ico">
+			<menupopup>
+				<menuitem value="icons"		label="&Ctr_nav_txt_ico0;" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('icons')"/>
+				<menuitem value="iconsbig"	label="&Ctr_nav_txt_ico1;" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('iconsbig')" id="ctraddon_pw_iconsbig"/>
+				<menuitem value="iconstxt"	label="&Ctr_nav_txt_ico2;" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('iconstxt')"/>
+				<menuitem value="iconstxt2"	label="&Ctr_nav_txt_ico2; v2" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('iconstxt2')"/>
+				<menuitem value="txtonly"	label="&Ctr_nav_txt_ico3;" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('txtonly')"/>
+				<description class="ctraddon_font1">&Ctr_nav_txt_exp;</description>
+				<menuitem value="full"		label="[mode='full']" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('full')"/>
+				<menuitem value="text"		label="[mode='text']" oncommand="classicthemerestorerjso.ctr.ctrpwModeextra('text')"/>
+			</menupopup>
+		</menulist>
+		<checkbox label="&Ctr_iat_notf_vt;"  preference="ctraddon_iat_notf_vt" id="ctraddon_pw_iat_notf_vt"/>
+		
+		<description class="ctraddon_font1">&Ctr_findbar;</description>
+		<menulist preference="ctraddon_findbar">
+			<menupopup>
+				<menuitem value="findbar_default" label="&Ctr_findbar_def;"/>
+				<menuitem value="findbar_bottoma" label="&Ctr_findbar_bota;"/>
+				<menuitem value="findbar_top"	  label="&Ctr_findbar_top;"/>
+				<menuitem value="findbar_topa"	  label="&Ctr_findbar_topa;"/>
+			</menupopup>
+		</menulist>
+		
+		<description class="ctraddon_windowsonly ctraddon_font1">&Ctr_menubar_items;</description>
+		<menulist preference="ctraddon_mbarposition" class="ctraddon_windowsonly">
+			<menupopup>
+				<menuitem value="toolbar-menubar"	 label="&Ctr_menubar; &Ctr_tabwidthdef;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<menuitem value="TabsToolbar"		 label="&Ctr_tabstoolbar;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<menuitem value="nav-bar"			 label="&Ctr_navbar;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<menuitem value="ctraddon_extra-bar" label="&Ctr_extrabar1;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<menuitem value="PersonalToolbar"	 label="&Ctr_bookbar;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<menuitem value="ctraddon_addon-bar" label="&Ctr_addonbar;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+				<menuitem value="ctraddon_toolbar_dummy" label="&Ctr_notoolbar;" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+			</menupopup>
+		</menulist>
+		<hbox>
+		  <checkbox label="&Ctr_mbarforceleft;"	preference="ctraddon_mbarforceleft"/>
+		  <checkbox label="&Ctr_mbarforceright;"	preference="ctraddon_mbarforceright"/>
+		  <spacer flex="1"/>
+		</hbox>
+
+		<description class="ctraddon_font1">&Ctr_extrabar;</description>
+		<hbox>
+		  <textbox id="ctraddon_pw_am_extrabars" size="2" maxlength="2" preference="ctraddon_am_extrabars" type="number" min="0" max="20"  onchange="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		  <description>&Ctr_extrabar0;</description>
+		</hbox>
+		<description>&Ctr_extrabarinfo;</description>
+	  
+	</box>
+
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_toolbarsbox2">
+
+	  <description class="ctraddon_topic">&Ctr_special_info;</description>
+
+	  <groupbox>
+	    <caption  label="&Ctr_toolbars;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_hidenavbar;"				 preference="ctraddon_hidenavbar"/>
+		<checkbox label="&Ctr_nonavbarbg;"	 			 preference="ctraddon_nonavbarbg" id="ctraddon_pw_nonavbarbg"/>
+		<checkbox label="&Ctr_chevronfix;"				 preference="ctraddon_chevronfix"/>
+		<checkbox label="&Ctr_nobookbarbg;"	 			 preference="ctraddon_nobookbarbg" id="ctraddon_pw_nobookbarbg"/>
+		<checkbox label="&Ctr_nonavborder; &Ctr_tnot;"	 preference="ctraddon_nonavborder" class="ctraddon_windowsonly" id="ctraddon_pw_nonavborder"/>
+		<checkbox label="&Ctr_nonavtbborder; &Ctr_tnot;" preference="ctraddon_nonavtbborder" id="ctraddon_pw_nonavtbborder"/>
+		<checkbox label="&Ctr_hidesbclose;"				 preference="ctraddon_hidesbclose"/>
+	  </groupbox>
+
+	  <groupbox>
+	    <caption  label="&Ctr_tabstoolbar;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_dblclnewtab;"	preference="ctraddon_dblclnewtab" class="ctraddon_windowsonly"/>
+		<checkbox label="&Ctr_hidetbwot;"	preference="ctraddon_hidetbwot" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwHidetbwotExtra(true);} else {classicthemerestorerjso.ctr.ctrpwHidetbwotExtra(false);}"/>
+		<checkbox label="&Ctr_hidetbwote;"	preference="ctraddon_hidetbwote" class="ctraddonsuboption" id="ctraddon_pw_hidetbwote"/>
+		<checkbox label="&Ctr_notabfog;"	preference="ctraddon_notabfog" class="ctraddon_windowsonly" id="ctraddon_pw_notabfog"/>
+		<checkbox label="&Ctr_notabbg;"		preference="ctraddon_notabbg" id="ctraddon_pw_notabbg"/>
+		<checkbox label="&Ctr_hightabpos;"	preference="ctraddon_hightabpososx"/>
+		<checkbox label="&Ctr_alttabstb;"	preference="ctraddon_alttabstb" id="ctraddon_pw_alttabstb" class="ctraddon_winlinonly"/>
+	  </groupbox>
+
+	  <groupbox id="ctraddon_pw_menubargroup" class="ctraddon_windowsonly">
+	    <caption  label="&Ctr_menubar;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_menubarnofog;"			preference="ctraddon_menubarnofog" id="ctraddon_pw_menubarnofog"/>
+		<checkbox label="&Ctr_altmenubarpos;"			preference="ctraddon_altmenubarpos" id="ctraddon_pw_altmenubarpos"/>
+		<checkbox label="&Ctr_altmenubarpos; (v2)" 		preference="ctraddon_altmenubarpos2" id="ctraddon_pw_altmenubarpos2"/>
+		<checkbox label="&Ctr_altmenubar; &Ctr_tnot;"	preference="ctraddon_altmenubar" id="ctraddon_pw_altmenubar"/>
+	  </groupbox>
+
+	  <groupbox>
+	    <caption  label="&Ctr_addonbar;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_closeabarbut;"	preference="ctraddon_closeabarbut"/>
+		<checkbox label="&Ctr_highaddonsbar;"	preference="ctraddon_highaddonsbar"/>
+		<checkbox label="&Ctr_notabbg;"			preference="ctraddon_noaddonbarbg" id="ctraddon_pw_noaddonbarbg"/>
+	  </groupbox>
+  
+	  <groupbox id="ctraddon_pw_invertedicons">
+		<caption  label="&Ctr_invicons;" class="ctraddon_topic"/>
+		<grid>
+		  <rows>
+			<row>
+			  <checkbox label="&Ctr_menubar;"		preference="ctraddon_invicomenubar"/>
+			  <checkbox label="&Ctr_tabstoolbar;"	preference="ctraddon_invicotabsbar"/>
+			</row>
+			<row>
+			  <checkbox label="&Ctr_navbar;"		preference="ctraddon_inviconavbar"/>
+			  <checkbox label="&Ctr_bookbar;"		preference="ctraddon_invicobookbar"/>
+			</row>
+			<row>
+			  <checkbox label="&Ctr_addonbar;"		preference="ctraddon_invicoaddonbar"/>
+			  <checkbox label="&Ctr_extrabar0;"		preference="ctraddon_invicoextrabar"/>
+			</row>
+		  </rows>
+		</grid>
+	  </groupbox>
+
+	</box>
+	
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_animationbox">
+
+	  <groupbox>
+		<caption  label="&Ctr_animation;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_throbberalt;"		preference="ctraddon_throbberalt" id="ctraddon_pw_throbberalt"/>
+		<checkbox label="&Ctr_bmanimation;"		preference="ctraddon_bmanimation" id="ctraddon_pw_bmanimation"/>
+		<checkbox label="&Ctr_pananimation;"	preference="ctraddon_pananimation" id="ctraddon_pw_pananimation"/>
+		<checkbox label="&Ctr_tabanimation;"	preference="ctraddon_tabsanimate"/>
+		<checkbox label="&Ctr_dlanimation;"		preference="ctraddon_dlanimate"/>
+	  </groupbox>
+
+	</box>
+	
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_ctraddonbox">
+
+	  <groupbox>
+		<caption  label="&Ctr_title;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_toolsitem;"		preference="ctraddon_toolsitem" id="ctraddon_pw_toolsitem"/>
+		<checkbox label="&Ctr_appmenuitem;"		preference="ctraddon_appmenuitem" id="ctraddon_pw_appmenuitem"/>
+		<checkbox label="&Ctr_contextitem;"		preference="ctraddon_contextitem" id="ctraddon_pw_contextitem"/>
+		<checkbox label="&Ctr_puictrbutton;"	preference="ctraddon_puictrbutton" id="ctraddon_pw_puictrbutton"/>
+	  </groupbox>
+
+	  <groupbox>
+		<caption  label="&Ctr_otherctroptns;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_cuibotbuttons;"	preference="ctraddon_cuibuttons"/>
+		<checkbox label="&Ctr_bookmarkoinpw;"	preference="ctraddon_bmarkoinpw"/>
+	  </groupbox>
+	  
+	</box>
+	
+  </deck>
+</hbox>
+
+  <hbox flex="1" id="ctraddon_pw_special_info2">
+	<spacer flex="1" />
+	<description class="ctraddon_topic">&Ctr_special_info2;</description>
+	<spacer flex="1" />
+  </hbox>
+
+  <popupset>
+	<menupopup id="ctr_pw_settingsPopup" position="before_start">
+		<menuitem label="&Ctr_pw_set_reset;"  id="ctr_pw_settings_reset"	oncommand="classicthemerestorerjso.ctr.resetCTRpreferences();" class="menuitem-iconic"/>
+		<menuseparator/>
+		<menuitem label="&Ctr_pw_set_predef;" id="ctr_pw_settings_classic"	oncommand="classicthemerestorerjso.ctr.classicCTRpreferences();" class="menuitem-iconic"/>
+    <menuitem label="&Ctr_pw_set_preaust;" id="ctr_pw_settings_australis"	oncommand="classicthemerestorerjso.ctr.AustralisCTRpreferences();" class="menuitem-iconic"/>		
+    <menuseparator/>
+    <menuitem label="&Ctr_pw_set_export;" id="ctr_pw_settings_export"	oncommand="classicthemerestorerjso.ctr.exportCTRpreferences();" class="menuitem-iconic"/>
+		<menuitem label="&Ctr_pw_set_import;" id="ctr_pw_settings_import"	oncommand="classicthemerestorerjso.ctr.importCTRpreferences();" class="menuitem-iconic"/>
+	</menupopup>
+  </popupset>
+  
+  <hbox align="center" flex="1" style="padding-top:5px;">
+    <button label="&Ctr_pw_settings;" popup="ctr_pw_settingsPopup"/>
+<spacer flex="1" />
+<label value="&ctr_help_features;" id="ctraddon_help_features" class="text-link" onclick="window.open('chrome://classic_theme_restorer/content/compatibility/features.html', '_blank'); window.close();"/>
+<label value="&ctr_Support_forums;" href="https://8pecxstudios.com/Forums/index.php" class="text-link" id="ctraddon_support" onclick="window.close();"/>
+<button dlgtype="accept" id="ctraddon_pw_okbutton"/>
+  </hbox> 
+
+</prefpane>
+		
+</prefwindow>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+		<ShortName>Startpage (SSL)</ShortName>
+			<Description>StartPage does not collect or share any personal information! learn more: https://startpage.com/eng/aboutstartpage/?</Description>
+				<InputEncoding>UTF-8</InputEncoding>
+					<OutputEncoding>UTF-8</OutputEncoding>	
+
+	<!-- Get Favicon of engine (Data URI) -->						
+	<Image width="16" height="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACwElEQVQ4y2WTX4hVVRjFf985+84fZ8Sj01wq0nFGDQt0MnUiwfElS7NGEGd8CLNCxYeofMlCe0h9y0n8A/kgkSMlXEJQRCqCwEFEofCKSjSaoyNF/r0x986ce/Y+++vhXkfHvqcF32Ktb+3Nkv3nEp+mCAGV8TCGEcIHEB1DEgqkismgpuzA++oyrTJSgRACFIcSFgvUDVwgntUOjRGp14pwCsZasA4CecxIIDBK0w99PH1oJ2GxAMCt1R9w863PCAykCiZOwHqQcacreAgtPPXNTobb5lKc+QJP/tRH9vu9UCjw58ZefA2YJFWsVrNXRQKUiVcv0Hz2OAAXPzqIa4j4a8laXty6lOzPffzzUhfFeZ0Ya5XYyZjxgyhzjuyg6eIpbENE4sDGioumcem9XbTvW0/9lTz3n+vExBbKVgFBAsjWg0c4t/EgL/d2E13PM+PbHeTf3kUAWFsxsA5iBdmQi711SEMNvNORYcHUgJEEtpws4+4W6NzTw+QbeUrNLdyc30XrqcOUmls4vTmHRJHKuu9in1pk+4oM2YnCL394Bu96rhWU7ATh76F7dOzuYcpQnmRCxPmV27ix4E3SuoiMUTXOKq8/b2htCvjkeMLtYWXlnJD3l2QAuHanmc9Hcyw90EPTUJ5oMM/vHWuRBDQFYx1Mn1J5uY6WgFdnhzTWCsWyUkqg9YmAthmTObkpx/Kvunn2zGEUON39RUXAWegf8CxqC1nVbgD48XLKoTOW9mdCtryWIU2glJnEsXdzdH3dg/dgnYIR5I39o2odzJsWMCsb0D/gEKCxTvh0eQ2lsvLhkQSVyj/Xjf5LuT4ClEwtyCu9Iw9bAqxZaFi/uJJ/4Jbn46MJxRGtdmP8iICxiY7beA+/Xvf8NphyIu8YjhWPgIOgyhNfJQcgy74c8TZ99AhB/ldhQQF5TKCmVvgPdxIscN1CBWAAAAAASUVORK5CYII=</Image>
+	
+<Url type="text/html" method="POST" template="https://www.startpage.com/do/search">
+	   <Param name="query" value="{searchTerms}"/>
+	   <Param name="language" value="english"/>
+	   <Param name="cat" value="web"/>	   
+</Url>
+
+<moz:SearchForm>https://startpage.com/</moz:SearchForm>
+</OpenSearchDescription>

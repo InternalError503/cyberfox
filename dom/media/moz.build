@@ -1,0 +1,74 @@
+# -*- Mode: python; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+DIRS += ['gmp-plugin']
+if CONFIG['MOZ_WEBRTC']:
+    DIRS += ['bridge']
+
+    LOCAL_INCLUDES += [
+        '/media/webrtc/signaling/src/common',
+        '/media/webrtc/trunk',
+    ]
+
+    MOCHITEST_MANIFESTS += ['tests/mochitest/mochitest.ini']
+    WEBRTC_SIGNALLING_TEST_MANIFESTS += ['tests/mochitest/steeplechase.ini']
+
+XPIDL_SOURCES += [
+    'nsIDOMMediaStream.idl',
+    'nsIDOMNavigatorUserMedia.idl',
+    'nsIMediaManager.idl',
+]
+
+XPIDL_MODULE = 'dom_media'
+
+EXPORTS.mozilla.dom += [
+    'GetUserMediaRequest.h',
+]
+
+EXPORTS.mozilla += [
+    'MediaManager.h',
+]
+
+UNIFIED_SOURCES += [
+    'GetUserMediaRequest.cpp',
+    'MediaManager.cpp',
+]
+
+EXTRA_COMPONENTS += [
+    'PeerConnection.js',
+    'PeerConnection.manifest',
+]
+
+EXTRA_JS_MODULES.media += [
+    'IdpProxy.jsm',
+    'PeerConnectionIdp.jsm',
+    'RTCStatsReport.jsm',
+]
+
+if CONFIG['MOZ_B2G']:
+    EXPORTS.mozilla += [
+        'MediaPermissionGonk.h',
+    ]
+    SOURCES += [
+        'MediaPermissionGonk.cpp',
+    ]
+
+FAIL_ON_WARNINGS = True
+
+LOCAL_INCLUDES += [
+    '../base',
+    '../camera',
+    '/caps',
+]
+
+include('/ipc/chromium/chromium-config.mozbuild')
+
+FINAL_LIBRARY = 'xul'
+
+MOCHITEST_MANIFESTS += [
+    'tests/identity/mochitest.ini',
+    'tests/ipc/mochitest.ini',
+]

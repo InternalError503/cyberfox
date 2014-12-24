@@ -1,0 +1,21 @@
+21/12/2014
+Updated: Multiple scripts added new scripts.
+
+12/01/2014
+Updated: Browserdtd helper.
+
+8/07/2014
+Fixed URL template in documentation
+Added Browserdtd helper.
+
+21/06/2014
+XPI Language Unpacker[Version-2.0.1]
+Fixed: File string issue, Paths now can contain spaces in path names (Example: "C:\Users\Freddy Franks\_Build" as where before it was limited to "C:\Users\FreddyFranks\_Build" no spaces in path string).
+Added: Translation notes to XPI Branding files with brief example of how to translate the file.
+Added: Update log.
+Updated: README.info with additional information.
+
+
+13/06/2014
+XPI Language Unpacker[Version-2.0]
+Initial public release.

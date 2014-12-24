@@ -1,0 +1,9 @@
+popup.title=Customize Cyberfox
+popup.msg.restart=Ο Cyberfox θα πρέπει να επανεκκινηθεί για να εφαρμοστούν οι αλλαγές.\nΕπανεκκίνηση τώρα;
+import.error=ΣΦΑΛΜΑ: Βρέθηκε λάθος ή τροποποιημένο αρχείο!\nΤίποτα δεν κατέστη δυνατό να εισαχθεί!
+ctr_extrabar=Επιπρόσθετη εργαλειοθήκη
+ctr_actthrobber=Ενδείκτης δραστηριότητας
+notification_msg_firstrun=CTRpreferences has been found select restart to apply
+notification_button_firstrun=Restart
+notification_msg_change=Your pre-set CTRpreferences has been modified 
+notification_button_change=Options

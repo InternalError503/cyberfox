@@ -1,0 +1,25 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. --> 
+
+<!ENTITY  brandShortName        "Cyberfox">
+<!ENTITY  brandFullName         "Cyberfox">
+<!ENTITY  vendorShortName       "8pecxstudios">
+
+<!-- LOCALIZATION NOTE: Translate the text below this notice.
+
+To translate the text for each of the strings below follow this example.
+
+Example: Here we are translating this string from en-us english to fr french.
+
+en-us english:
+<!ENTITY  trademarkInfo.part1   "Cyberfox and the Cyberfox logos are trademarks of the 8pecxstudios, Cyberfox is powered by Mozilla Firefox source code.">
+
+fr french:
+<!ENTITY  trademarkInfo.part1   "Cyberfox et l' Cyberfox logos sont des marques déposées de la 8pecxstudios, Cyberfox est alimenté par Mozilla Firefox code source.">
+
+In .dtd files we translate the text between the double quotations ("") and leave the rest of the text unmodified as this will cause error in pack if modified.
+
+-->
+
+<!ENTITY  trademarkInfo.part1   "Cyberfox and the Cyberfox logos are trademarks of the 8pecxstudios, Cyberfox is powered by Mozilla Firefox source code.">

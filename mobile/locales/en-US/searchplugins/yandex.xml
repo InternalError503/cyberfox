@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"> 
+		<ShortName>yandex (SSL)</ShortName> 
+			<Description>Yandex is one of the largest internet companies in Europe, operating Russia’s most popular search engine and its most visited website. learn more: https://company.yandex.com/</Description> 
+				<InputEncoding>UTF-8</InputEncoding>
+					<OutputEncoding>UTF-8</OutputEncoding>
+					
+	<!-- Get Favicon of engine (Data URI) -->						
+	<Image height="16" width="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEFklEQVRYw7WXXUybZRTHf6UVRAr4ceGYwXfBoBIXL8wYGx9zd1u8U1d1S1yyxITIYrJkkrgwo2uWAINuJp0adDOCzDs35wU3GtQEcCGAJmrMPgqDFfu+RMo+gEHbt8cLnr6U0haalZP8L/o855z//5z36fNhY8kKgRKgAMghu3YNuJdq0gE4gXLAxsZYSToBAM8B23p6ej5YWFiYkuxZ1O12HwC2qQ6ntJeAylAoFJQsm2EYvwKVwPPpBFQClSJReRDM//Sj+DSb+DRkorxcjZvR5ubmg4ojZRe2A9uj0ag8CHSXS3wa4tOQmVOnlsd1vU9xpOxCFVCVmHCyulrGy8pkorxcFkZG0pKHdV1GtVzxacjYlkKJBIMr5tva2g4pnqI0AkyJx/TxJqsi4+Dbkjgfj5mWFsv3v/ePrpoPBCYHFE9FMgE7gB1R05R4hA1DRrV88WnIqJYrYb9fEn2ipinRSEQmni1XfnYJjY0l9WttbX1Hca3qwk5gp2makoiphgarsukTJySZz1xvr+Wju1xJfUzTFF3XryiuFxIFVAPVphmRRCzeuC6jml18GnJzS4lE7s+v8tH377cEzPf3S7I8MXg8LfWKrzheQA1QE4lEJBn0t960CO50dq6YCxmGjGp54tMQf22NpMoRQyAQGFR8W+MF1AK1kUhYkmF+eMj6f/urqlbMBT0eS9zdi99Jqhzx8Hg8DYrT6kIdUBcJhyUV/t2z1yKa6+uzxicqKsSnIePPlElkcVHS5YjB7/cPK84XYwJ2AbvC4ZCkwuzPywst8IZLwuGQzPX3WWPBT85IuvhEnD7d/p7ifdQGvAwQDoV+SbdfG7t3szg5ANjZ3HuNWe9Z7l46Q46tmKdGxrA5nes+HnXD+KO0tPQIcNsRO4YFSRtU2NjI4pFXAZN7Z73c//4SAM4DDeAsWDM+idkAm2P5HpA+Qf4re3no+FbCs38xe/EzhBA2cnHW168Zm2jd3V1fK96bywJkbcFFjUeZ/ugQQgiAR+pc2Ddtyojf0I3fjx1r+hO4k9EnAMh37cP+8YeY4geg4PDhjFvf1d3dqTjHYleydXYAsDtwbH4ac3JJgKOsLLPqp6aGm5qa/gZuAzMrBWS+iMg07ty5898ovtH4S+nSJ5DM6UTWHxcI6ENut/uf+Oqz0AFZd9z5rzq6FZcv8Vpu22h6v39y6OTJ1quq8mBSARu5BDo6vrigeG4ke5hkuJgkox74J28Ntre3X1WVB5MJyOxFZM+xNiZbjj29VBHxej//NlX1sf14D+CYMvQup9P5eDbfZOMTtwYrKircwDRwJdXbcBp48vIPl7/c9/pr7+blPVyUDXIRkU+93gvq5/V0J1KxuiZl+1Ucs2ngt3QCAB5Tj9QnNkDIgBKR1P4HZwQx5F2Z3wkAAAAASUVORK5CYII=</Image>
+  
+<Url type="text/html" method="get" template="https://www.yandex.com/yandsearch?lr=87&amp;text={searchTerms}"/>
+
+</OpenSearchDescription> 
