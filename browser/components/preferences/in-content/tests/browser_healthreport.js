@@ -29,7 +29,7 @@ function test() {
 }
 
 function testBasic(win, doc, policy) {
-  is(policy.healthReportUploadEnabled, true, "Health Report upload enabled on app first run.");
+  is(policy.healthReportUploadEnabled, false, "Health Report upload enabled on app first run.");
 
   let checkbox = doc.getElementById("submitHealthReportBox");
   ok(checkbox);
@@ -41,7 +41,7 @@ function testBasic(win, doc, policy) {
 
   checkbox.checked = true;
   checkbox.doCommand();
-  is(policy.healthReportUploadEnabled, true, "Checking checkbox allows FHR upload.");
+  is(policy.healthReportUploadEnabled, false, "Checking checkbox allows FHR upload.");
 
   win.close();
   Services.prefs.lockPref("datareporting.healthreport.uploadEnabled");

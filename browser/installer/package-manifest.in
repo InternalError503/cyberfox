@@ -230,11 +230,13 @@
 @BINPATH@/components/dom_settings.xpt
 @BINPATH@/components/dom_permissionsettings.xpt
 @BINPATH@/components/dom_sidebar.xpt
+@BINPATH@/components/dom_cellbroadcast.xpt
 @BINPATH@/components/dom_mobilemessage.xpt
 @BINPATH@/components/dom_storage.xpt
 @BINPATH@/components/dom_stylesheets.xpt
 @BINPATH@/components/dom_telephony.xpt
 @BINPATH@/components/dom_traversal.xpt
+@BINPATH@/components/dom_voicemail.xpt
 #ifdef MOZ_WEBSPEECH
 @BINPATH@/components/dom_webspeechrecognition.xpt
 #endif
@@ -326,6 +328,8 @@
 @BINPATH@/components/shistory.xpt
 @BINPATH@/components/spellchecker.xpt
 @BINPATH@/components/storage.xpt
+@BINPATH@/components/toolkit_asyncshutdown.xpt
+@BINPATH@/components/toolkit_filewatcher.xpt
 @BINPATH@/components/toolkit_finalizationwitness.xpt
 @BINPATH@/components/toolkit_formautofill.xpt
 @BINPATH@/components/toolkit_osfile.xpt
@@ -390,6 +394,8 @@
 @BINPATH@/browser/components/BrowserPlaces.manifest
 @BINPATH@/browser/components/devtools-clhandler.manifest
 @BINPATH@/browser/components/devtools-clhandler.js
+@BINPATH@/browser/components/webideCli.js
+@BINPATH@/browser/components/webideComponents.manifest
 @BINPATH@/browser/components/Experiments.manifest
 @BINPATH@/browser/components/ExperimentsService.js
 @BINPATH@/browser/components/translation.manifest
@@ -442,6 +448,9 @@
 @BINPATH@/components/addoncompat.manifest
 @BINPATH@/components/multiprocessShims.js
 @BINPATH@/components/pluginGlue.manifest
+@BINPATH@/components/ProcessSingleton.manifest
+@BINPATH@/components/MainProcessSingleton.js
+@BINPATH@/components/ContentProcessSingleton.js
 @BINPATH@/browser/components/nsSessionStore.manifest
 @BINPATH@/browser/components/nsSessionStartup.js
 @BINPATH@/browser/components/nsSessionStore.js
@@ -608,6 +617,9 @@
 #ifdef MOZ_WEBSPEECH
 @BINPATH@/components/dom_webspeechsynth.xpt
 #endif
+
+@BINPATH@/components/nsAsyncShutdown.manifest
+@BINPATH@/components/nsAsyncShutdown.js
 
 ; InputMethod API
 @BINPATH@/components/MozKeyboard.js

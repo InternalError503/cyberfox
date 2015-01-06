@@ -116,16 +116,16 @@ let AboutHome = {
         break;
 
       case "AboutHome:Downloads":
-		var DownloadsWindow;
-		if ( Services.prefs.getBoolPref("browser.download.useToolkitUI")){
-				if(DownloadsWindow == null || DownloadsWindow.closed){
-						window.open("chrome://browser/content/downloadUI.xul","Downloads","resizable,chrome,centerscreen");
-				}else{
-						DownloadsWindow.focus();
-					}
-		}else{	  
-				window.BrowserDownloadsUI();
-		}
+				var DownloadsWindow;
+				if ( Services.prefs.getBoolPref("browser.download.useToolkitUI")){
+						if(DownloadsWindow == null || DownloadsWindow.closed){
+								window.open("chrome://browser/content/downloadUI.xul","Downloads","resizable,chrome,centerscreen");
+						}else{
+								DownloadsWindow.focus();
+							}
+				}else{	  
+						window.BrowserDownloadsUI();
+				}
         break;
 
       case "AboutHome:Bookmarks":
@@ -186,7 +186,7 @@ let AboutHome = {
 
           let engine = Services.search.currentEngine;
 #ifdef MOZ_SERVICES_HEALTHREPORT
-          window.BrowserSearch.recordSearchInHealthReport(engine, "abouthome");
+          window.BrowserSearch.recordSearchInHealthReport(engine, "abouthome", data.selection);
 #endif
           // Trigger a search through nsISearchEngine.getSubmission()
           let submission = engine.getSubmission(data.searchTerms, null, "homepage");

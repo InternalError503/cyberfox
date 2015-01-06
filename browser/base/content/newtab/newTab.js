@@ -11,7 +11,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/PageThumbs.jsm");
 Cu.import("resource://gre/modules/BackgroundPageThumbs.jsm");
-Cu.import("resource://gre/modules/DirectoryLinksProvider.jsm");
 Cu.import("resource://gre/modules/NewTabUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "Rect",
@@ -31,7 +30,7 @@ let {
   blockedLinks: gBlockedLinks,
   gridPrefs: gGridPrefs
 } = NewTabUtils;
-var isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled"); 
+let isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled"); 
 XPCOMUtils.defineLazyGetter(this, "gStringBundle", function() {
   return Services.strings.
     createBundle("chrome://browser/locale/newTab.properties");

@@ -66,7 +66,7 @@ function testBasic(win, policy) {
 
   resetPreferences();
 
-  is(policy.healthReportUploadEnabled, true, "Health Report upload enabled on app first run.");
+  is(policy.healthReportUploadEnabled, false, "Health Report upload enabled on app first run.");
 
   let checkbox = doc.getElementById("submitHealthReportBox");
   ok(checkbox);
@@ -78,7 +78,7 @@ function testBasic(win, policy) {
 
   checkbox.checked = true;
   checkbox.doCommand();
-  is(policy.healthReportUploadEnabled, true, "Checking checkbox allows FHR upload.");
+  is(policy.healthReportUploadEnabled, false, "Checking checkbox allows FHR upload.");
 
   win.close();
   finish();

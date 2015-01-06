@@ -699,12 +699,19 @@ nsDisplayScrollLayer::ComputeFrameMetrics(nsIFrame* aForFrame,
     nsPoint scrollPosition = scrollableFrame->GetScrollPosition();
     metrics.SetScrollOffset(CSSPoint::FromAppUnits(scrollPosition));
 
+    nsPoint smoothScrollPosition = scrollableFrame->LastScrollDestination();
+    metrics.SetSmoothScrollOffset(CSSPoint::FromAppUnits(smoothScrollPosition));
+
     // If the frame was scrolled since the last layers update, and by
     // something other than the APZ code, we want to tell the APZ to update
     // its scroll offset.
-    nsIAtom* originOfLastScroll = scrollableFrame->OriginOfLastScroll();
-    if (originOfLastScroll && originOfLastScroll != nsGkAtoms::apz) {
+    nsIAtom* lastScrollOrigin = scrollableFrame->LastScrollOrigin();
+    if (lastScrollOrigin && lastScrollOrigin != nsGkAtoms::apz) {
       metrics.SetScrollOffsetUpdated(scrollableFrame->CurrentScrollGeneration());
+    }
+    nsIAtom* lastSmoothScrollOrigin = scrollableFrame->LastSmoothScrollOrigin();
+    if (lastSmoothScrollOrigin) {
+      metrics.SetSmoothScrollOffsetUpdated(scrollableFrame->CurrentScrollGeneration());
     }
   }
 
@@ -808,14 +815,14 @@ nsDisplayScrollLayer::ComputeFrameMetrics(nsIFrame* aForFrame,
         }
 #endif
       } else {
-        LayoutDeviceIntRect contentBounds;
-        if (nsLayoutUtils::GetContentViewerBounds(presContext, contentBounds)) {
+        LayoutDeviceIntSize contentSize;
+        if (nsLayoutUtils::GetContentViewerSize(presContext, contentSize)) {
           LayoutDeviceToParentLayerScale scale(1.0f);
           if (presContext->GetParentPresContext()) {
             gfxSize res = presContext->GetParentPresContext()->PresShell()->GetCumulativeResolution();
             scale = LayoutDeviceToParentLayerScale(res.width, res.height);
           }
-          metrics.mCompositionBounds = LayoutDeviceRect(contentBounds) * scale;
+          metrics.mCompositionBounds.SizeTo(contentSize * scale);
         }
       }
     }
@@ -921,14 +928,12 @@ nsDisplayListBuilder::GetCaret() {
 }
 
 void
-nsDisplayListBuilder::EnterPresShell(nsIFrame* aReferenceFrame,
-                                     const nsRect& aDirtyRect) {
+nsDisplayListBuilder::EnterPresShell(nsIFrame* aReferenceFrame)
+{
   PresShellState* state = mPresShellStates.AppendElement();
   state->mPresShell = aReferenceFrame->PresContext()->PresShell();
   state->mCaretFrame = nullptr;
   state->mFirstFrameMarkedForDisplay = mFramesMarkedForDisplay.Length();
-  state->mPrevDirtyRect = mDirtyRect;
-  mDirtyRect = aDirtyRect;
 
   state->mPresShell->UpdateCanvasBackground();
 
@@ -961,12 +966,11 @@ nsDisplayListBuilder::EnterPresShell(nsIFrame* aReferenceFrame,
 }
 
 void
-nsDisplayListBuilder::LeavePresShell(nsIFrame* aReferenceFrame,
-                                     const nsRect& aDirtyRect) {
+nsDisplayListBuilder::LeavePresShell(nsIFrame* aReferenceFrame)
+{
   NS_ASSERTION(CurrentPresShellState()->mPresShell ==
       aReferenceFrame->PresContext()->PresShell(),
       "Presshell mismatch");
-  mDirtyRect = CurrentPresShellState()->mPrevDirtyRect;
   ResetMarkedFramesForDisplayList();
   mPresShellStates.SetLength(mPresShellStates.Length() - 1);
 }
@@ -1064,6 +1068,42 @@ nsDisplayListBuilder::FindReferenceFrameFor(const nsIFrame *aFrame,
     *aOffset = aFrame->GetOffsetToCrossDoc(mReferenceFrame);
   }
   return mReferenceFrame;
+}
+
+void
+nsDisplayListBuilder::AdjustWindowDraggingRegion(nsIFrame* aFrame)
+{
+  if (!IsForPainting() || IsInSubdocument() || IsInTransform()) {
+    return;
+  }
+
+  // We do some basic visibility checking on the frame's border box here.
+  // We intersect it both with the current dirty rect and with the current
+  // clip. Either one is just a conservative approximation on its own, but
+  // their intersection luckily works well enough for our purposes, so that
+  // we don't have to do full-blown visibility computations.
+  // The most important case we need to handle is the scrolled-off tab:
+  // If the tab bar overflows, tab parts that are clipped by the scrollbox
+  // should not be allowed to interfere with the window dragging region. Using
+  // just the current DisplayItemClip is not enough to cover this case
+  // completely because clips are reset while building stacking context
+  // contents, so for example we'd fail to clip frames that have a clip path
+  // applied to them. But the current dirty rect doesn't get reset in that
+  // case, so we use it to make this case work.
+  nsRect borderBox = aFrame->GetRectRelativeToSelf().Intersect(mDirtyRect);
+  borderBox += ToReferenceFrame(aFrame);
+  const DisplayItemClip* clip = ClipState().GetCurrentCombinedClip(this);
+  if (clip) {
+    borderBox = clip->ApplyNonRoundedIntersection(borderBox);
+  }
+  if (!borderBox.IsEmpty()) {
+    const nsStyleUserInterface* styleUI = aFrame->StyleUserInterface();
+    if (styleUI->mWindowDragging == NS_STYLE_WINDOW_DRAGGING_DRAG) {
+      mWindowDraggingRegion.OrWith(borderBox);
+    } else {
+      mWindowDraggingRegion.SubOut(borderBox);
+    }
+  }
 }
 
 void nsDisplayListSet::MoveTo(const nsDisplayListSet& aDestination) const
@@ -1197,7 +1237,7 @@ void nsDisplayList::PaintRoot(nsDisplayListBuilder* aBuilder,
 /**
  * We paint by executing a layer manager transaction, constructing a
  * single layer representing the display list, and then making it the
- * root of the layer manager, drawing into the ThebesLayers.
+ * root of the layer manager, drawing into the PaintedLayers.
  */
 void nsDisplayList::PaintForFrame(nsDisplayListBuilder* aBuilder,
                                   nsRenderingContext* aCtx,
@@ -1345,7 +1385,7 @@ void nsDisplayList::PaintForFrame(nsDisplayListBuilder* aBuilder,
 
   MaybeSetupTransactionIdAllocator(layerManager, view);
 
-  layerManager->EndTransaction(FrameLayerBuilder::DrawThebesLayer,
+  layerManager->EndTransaction(FrameLayerBuilder::DrawPaintedLayer,
                                aBuilder, flags);
   aBuilder->SetIsCompositingCheap(temp);
   layerBuilder->DidEndTransaction();
@@ -1763,20 +1803,12 @@ nsDisplaySolidColor::WriteDebugInfo(nsACString& aTo)
 static void
 RegisterThemeGeometry(nsDisplayListBuilder* aBuilder, nsIFrame* aFrame)
 {
-  nsIFrame* displayRoot = nsLayoutUtils::GetDisplayRootFrame(aFrame);
-
-  for (nsIFrame* f = aFrame; f; f = f->GetParent()) {
-    // Bail out if we're in a transformed subtree
-    if (f->IsTransformed())
-      return;
-    // Bail out if we're not in the displayRoot's document
-    if (!f->GetParent() && f != displayRoot)
-      return;
+  if (!aBuilder->IsInSubdocument() && !aBuilder->IsInTransform()) {
+    nsIFrame* displayRoot = nsLayoutUtils::GetDisplayRootFrame(aFrame);
+    nsRect borderBox(aFrame->GetOffsetTo(displayRoot), aFrame->GetSize());
+    aBuilder->RegisterThemeGeometry(aFrame->StyleDisplay()->mAppearance,
+        borderBox.ToNearestPixels(aFrame->PresContext()->AppUnitsPerDevPixel()));
   }
-
-  nsRect borderBox(aFrame->GetOffsetTo(displayRoot), aFrame->GetSize());
-  aBuilder->RegisterThemeGeometry(aFrame->StyleDisplay()->mAppearance,
-      borderBox.ToNearestPixels(aFrame->PresContext()->AppUnitsPerDevPixel()));
 }
 
 nsDisplayBackgroundImage::nsDisplayBackgroundImage(nsDisplayListBuilder* aBuilder,
@@ -2184,10 +2216,9 @@ nsDisplayBackgroundImage::ConfigureLayer(ImageLayer* aLayer, const nsIntPoint& a
   NS_ASSERTION(imageSize.width != 0 && imageSize.height != 0, "Invalid image size!");
 
   gfxPoint p = mDestRect.TopLeft() + aOffset;
-  gfx::Matrix transform;
-  transform.Translate(p.x, p.y);
-  transform.Scale(mDestRect.width/imageSize.width,
-                  mDestRect.height/imageSize.height);
+  Matrix transform = Matrix::Translation(p.x, p.y);
+  transform.PreScale(mDestRect.width / imageSize.width,
+                     mDestRect.height / imageSize.height);
   aLayer->SetBaseTransform(gfx::Matrix4x4::From2D(transform));
 }
 
@@ -2241,7 +2272,7 @@ nsDisplayBackgroundImage::GetInsideClipRegion(nsDisplayItem* aItem,
       clipRect = frame->GetPaddingRect() - frame->GetPosition() + aItem->ToReferenceFrame();
       break;
     case NS_STYLE_BG_CLIP_CONTENT:
-      clipRect = frame->GetContentRect() - frame->GetPosition() + aItem->ToReferenceFrame();
+      clipRect = frame->GetContentRectRelativeToSelf() + aItem->ToReferenceFrame();
       break;
     default:
       NS_NOTREACHED("Unknown clip type");
@@ -3037,11 +3068,11 @@ nsDisplayBoxShadowInner::Paint(nsDisplayListBuilder* aBuilder,
     js::ProfileEntry::Category::GRAPHICS);
 
   for (uint32_t i = 0; i < rects.Length(); ++i) {
-    aCtx->PushState();
+    aCtx->ThebesContext()->Save();
     aCtx->IntersectClip(rects[i]);
     nsCSSRendering::PaintBoxShadowInner(presContext, *aCtx, mFrame,
                                         borderRect, rects[i]);
-    aCtx->PopState();
+    aCtx->ThebesContext()->Restore();
   }
 }
 
@@ -3200,7 +3231,7 @@ void nsDisplayWrapList::Paint(nsDisplayListBuilder* aBuilder,
 
 /**
  * Returns true if all descendant display items can be placed in the same
- * ThebesLayer --- GetLayerState returns LAYER_INACTIVE or LAYER_NONE,
+ * PaintedLayer --- GetLayerState returns LAYER_INACTIVE or LAYER_NONE,
  * and they all have the expected animated geometry root.
  */
 static LayerState
@@ -3254,6 +3285,13 @@ void
 nsDisplayWrapList::SetVisibleRect(const nsRect& aRect)
 {
   mVisibleRect = aRect;
+}
+
+void
+nsDisplayWrapList::SetReferenceFrame(const nsIFrame* aFrame)
+{
+  mReferenceFrame = aFrame;
+  mToReferenceFrame = mFrame->GetOffsetToCrossDoc(mReferenceFrame);
 }
 
 static nsresult
@@ -4872,15 +4910,18 @@ nsDisplayTransform::ShouldPrerenderTransformedContent(nsDisplayListBuilder* aBui
   // for shadows, borders, etc.
   refSize += nsSize(refSize.width / 8, refSize.height / 8);
   nsSize frameSize = aFrame->GetVisualOverflowRectRelativeToSelf().Size();
+  nscoord maxInAppUnits = nscoord_MAX;
   if (frameSize <= refSize) {
-    nscoord max = aFrame->PresContext()->DevPixelsToAppUnits(4096);
+    maxInAppUnits = aFrame->PresContext()->DevPixelsToAppUnits(4096);
     nsRect visual = aFrame->GetVisualOverflowRect();
-    if (visual.width <= max && visual.height <= max) {
+    if (visual.width <= maxInAppUnits && visual.height <= maxInAppUnits) {
       return true;
     }
   }
 
   if (aLogAnimations) {
+    nsRect visual = aFrame->GetVisualOverflowRect();
+
     nsCString message;
     message.AppendLiteral("Performance warning: Async animation disabled because frame size (");
     message.AppendInt(nsPresContext::AppUnitsToIntCSSPixels(frameSize.width));
@@ -4890,6 +4931,12 @@ nsDisplayTransform::ShouldPrerenderTransformedContent(nsDisplayListBuilder* aBui
     message.AppendInt(nsPresContext::AppUnitsToIntCSSPixels(refSize.width));
     message.AppendLiteral(", ");
     message.AppendInt(nsPresContext::AppUnitsToIntCSSPixels(refSize.height));
+    message.AppendLiteral(") or the visual rectangle (");
+    message.AppendInt(nsPresContext::AppUnitsToIntCSSPixels(visual.width));
+    message.AppendLiteral(", ");
+    message.AppendInt(nsPresContext::AppUnitsToIntCSSPixels(visual.height));
+    message.AppendLiteral(") is larger than the max allowable value (");
+    message.AppendInt(nsPresContext::AppUnitsToIntCSSPixels(maxInAppUnits));
     message.Append(')');
     AnimationPlayerCollection::LogAsyncAnimationFailure(message,
                                                         aFrame->GetContent());

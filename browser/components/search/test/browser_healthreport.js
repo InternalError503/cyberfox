@@ -107,5 +107,5 @@ function resetPreferences() {
                                   .getService(Components.interfaces.nsISupports)
                                   .wrappedJSObject;
   service.policy._prefs.resetBranch("datareporting.policy.");
-  service.policy.dataSubmissionPolicyBypassNotification = true;
+  service.policy.dataSubmissionPolicyBypassNotification = false;
 }

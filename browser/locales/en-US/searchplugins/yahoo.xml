@@ -19,5 +19,4 @@
   <Param name="p" value="{searchTerms}"/>
   <Param name="ei" value="UTF-8"/>
 </Url>
-<SearchForm>https://search.yahoo.com/</SearchForm>
 </SearchPlugin>

@@ -235,6 +235,8 @@ private:
   mozilla::dom::CSSValue* DoGetMinHeight();
   mozilla::dom::CSSValue* DoGetMinWidth();
   mozilla::dom::CSSValue* DoGetMixBlendMode();
+  mozilla::dom::CSSValue* DoGetObjectFit();
+  mozilla::dom::CSSValue* DoGetObjectPosition();
   mozilla::dom::CSSValue* DoGetLeft();
   mozilla::dom::CSSValue* DoGetTop();
   mozilla::dom::CSSValue* DoGetRight();
@@ -436,6 +438,7 @@ private:
   mozilla::dom::CSSValue* DoGetUserInput();
   mozilla::dom::CSSValue* DoGetUserModify();
   mozilla::dom::CSSValue* DoGetUserSelect();
+  mozilla::dom::CSSValue* DoGetWindowDragging();
 
   /* Column properties */
   mozilla::dom::CSSValue* DoGetColumnCount();
@@ -519,9 +522,16 @@ private:
   mozilla::dom::CSSValue* DoGetCustomProperty(const nsAString& aPropertyName);
 
   nsDOMCSSValueList* GetROCSSValueList(bool aCommaDelimited);
+
+  /* Helper functions */
   void SetToRGBAColor(nsROCSSPrimitiveValue* aValue, nscolor aColor);
   void SetValueToStyleImage(const nsStyleImage& aStyleImage,
                             nsROCSSPrimitiveValue* aValue);
+  void SetValueToPositionCoord(
+    const nsStyleBackground::Position::PositionCoord& aCoord,
+    nsROCSSPrimitiveValue* aValue);
+  void SetValueToPosition(const nsStyleBackground::Position& aPosition,
+                          nsDOMCSSValueList* aValueList);
 
   /**
    * A method to get a percentage base for a percentage value.  Returns true
@@ -575,6 +585,10 @@ private:
   void SetCssTextToCoord(nsAString& aCssText, const nsStyleCoord& aCoord);
   mozilla::dom::CSSValue* CreatePrimitiveValueForStyleFilter(
     const nsStyleFilter& aStyleFilter);
+
+  // Helper function for computing basic shape styles.
+  mozilla::dom::CSSValue* CreatePrimitiveValueForClipPath(
+    const nsStyleBasicShape* aStyleBasicShape, uint8_t aSizingBox);
 
   static nsComputedStyleMap* GetComputedStyleMap();
 

@@ -16,12 +16,12 @@
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
 									  tooltiptext="&cloneCurrentTab.label;" 
 									  label="&cloneCurrentTab.label;"
-									  oncommand="gCyberfoxCustom.CloneCurrentTab();"/>      
+									  oncommand="gCyberfoxCustom.CloneCurrent('tab');"/>      
 			<toolbarbutton id="tbar-clonenewwindow" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
 									  tooltiptext="&cloneInNewWindow.label;"  
 									  label="&cloneInNewWindow.label;" 
-									  oncommand="gCyberfoxCustom.CloneCurrentTabNewWindow();"/>
+									  oncommand="gCyberfoxCustom.CloneCurrent('window');"/>
 			<toolbarbutton id="downloads-button-additional" class="toolbarbutton-1 chromeclass-toolbar-additional"
 									  key="key_openDownloads"
 									  command="Tools:Downloads"

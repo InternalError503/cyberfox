@@ -2521,6 +2521,27 @@ CSS_PROP_DISPLAY(
     kBlendModeKTable,
     CSS_PROP_NO_OFFSET,
     eStyleAnimType_None)
+CSS_PROP_POSITION(
+    object-fit,
+    object_fit,
+    ObjectFit,
+    CSS_PROPERTY_PARSE_VALUE,
+    "layout.css.object-fit-and-position.enabled",
+    VARIANT_HK,
+    kObjectFitKTable,
+    CSS_PROP_NO_OFFSET,
+    eStyleAnimType_None)
+CSS_PROP_POSITION(
+    object-position,
+    object_position,
+    ObjectPosition,
+    CSS_PROPERTY_PARSE_FUNCTION |
+        CSS_PROPERTY_STORES_CALC,
+    "layout.css.object-fit-and-position.enabled",
+    0,
+    kBackgroundPositionKTable,
+    offsetof(nsStylePosition, mObjectPosition),
+    eStyleAnimType_Custom)
 CSS_PROP_DISPLAY(
     opacity,
     opacity,
@@ -3365,6 +3386,16 @@ CSS_PROP_POSITION(
     kWidthKTable,
     offsetof(nsStylePosition, mWidth),
     eStyleAnimType_Coord)
+CSS_PROP_USERINTERFACE(
+    -moz-window-dragging,
+    _moz_window_dragging,
+    CSS_PROP_DOMPROP_PREFIXED(WindowDragging),
+    CSS_PROPERTY_PARSE_VALUE,
+    "",
+    VARIANT_HK,
+    kWindowDraggingKTable,
+    CSS_PROP_NO_OFFSET,
+    eStyleAnimType_None)
 CSS_PROP_UIRESET(
     -moz-window-shadow,
     _moz_window_shadow,
@@ -3581,10 +3612,10 @@ CSS_PROP_SVGRESET(
     clip-path,
     clip_path,
     ClipPath,
-    CSS_PROPERTY_PARSE_VALUE |
+    CSS_PROPERTY_PARSE_FUNCTION |
         CSS_PROPERTY_CREATES_STACKING_CONTEXT,
     "",
-    VARIANT_HUO,
+    0,
     nullptr,
     CSS_PROP_NO_OFFSET,
     eStyleAnimType_None)

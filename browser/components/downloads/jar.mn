@@ -20,4 +20,4 @@ browser.jar:
 # Add Files For Cyberfox
 
 #Download UI		
-	        content/browser/downloads/downloads-cyberfox.js  (content/downloads-cyberfox.js)	
+	      content/browser/downloads/downloads-cyberfox.js  (content/downloads-cyberfox.js)	

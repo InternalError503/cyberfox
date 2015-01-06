@@ -14,11 +14,6 @@ xul|page {
   background-image: linear-gradient(#fff, #ededed 100px);
 }
 
-xul|treecol {
-  /* override the * rule to let the treecol be sortable */
-  -moz-user-select: none;
-}
-
 html|body {
   font-size: 15px;
   font-weight: normal;

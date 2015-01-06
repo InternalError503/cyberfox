@@ -287,7 +287,7 @@
             <caption label="&httpCache.label;"/>
 
             <hbox align="center">
-              <label id="actualDiskCacheSize" flex="1" hidden="false"/>
+              <label id="actualDiskCacheSize" flex="1"/>
               <button id="clearCacheButton" icon="clear"
                       label="&clearCacheNow.label;" accesskey="&clearCacheNow.accesskey;"
                       oncommand="gAdvancedPane.clearCache();"/>

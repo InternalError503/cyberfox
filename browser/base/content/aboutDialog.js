@@ -54,19 +54,18 @@ function init(aEvent)
     document.getElementById("communityDesc").hidden = true;
   }
   
-  function _Enabled(element){
-		document.getElementById(element).hidden = false;
-  }
+  function ElementState(element, state){
+	
+	if (!typeof true || !typeof false){return;}
+	document.getElementById(element).hidden = state;
   
-   function _Disabled(element){ 
-		document.getElementById(element).hidden = true;
-  } 
-  		
-		_Disabled("update-button-checkNow");
-		_Enabled("update-button-checking");
-		_Enabled("update-button-checking-throbber");		
-		_Disabled("update-button-no-update");
-		_Disabled("update-button-download");
+  }
+ 		
+		ElementState("update-button-checkNow", true);
+		ElementState("update-button-checking", false);
+		ElementState("update-button-checking-throbber", false);	
+		ElementState("update-button-no-update", true);
+		ElementState("update-button-download", true);
 
 	 //Clear any previous set urls
 	Services.prefs.clearUserPref("app.update.url.manual");		
@@ -74,7 +73,7 @@ function init(aEvent)
 //If its disabled we don't want to see any buttons here.	
 if(!Services.prefs.getBoolPref("app.update.check.enabled")){   
 		//hide buttons :P	  
-					_Disabled("updateBox");
+					ElementState("updateBox", true);
 }	
 if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){
 	document.getElementById("version").textContent += " beta";
@@ -125,11 +124,11 @@ if(Services.prefs.getBoolPref("app.update.check.enabled")){
 			
 			if(!IsJsonValid(text)){
 				 		//hide buttons		  
-					_Enabled("update-button-checkNow");
-					_Disabled("update-button-checking-throbber");
-					_Disabled("update-button-checking");
-					_Disabled("update-button-no-update");
-					_Disabled("update-button-download");
+					ElementState("update-button-checkNow", false);
+					ElementState("update-button-checking-throbber", true);
+					ElementState("update-button-checking", true);
+					ElementState("update-button-no-update", true);
+					ElementState("update-button-download", true);
 				//Throw error message	
 				console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
 				//Return error
@@ -159,17 +158,17 @@ if(Services.prefs.getBoolPref("app.update.check.enabled")){
 			switch (versions.compareVersions(Services.appinfo.version, currentVersion.toString())){
 			
 			case false:
-					_Disabled("update-button-checking-throbber");
-					_Disabled("update-button-checking");
-					_Enabled("update-button-download");
+					ElementState("update-button-checking-throbber", true);
+					ElementState("update-button-checking", true);
+					ElementState("update-button-download", false);
 			break;
 			
 			
 			case true:
-			_Disabled("update-button-checking-throbber");
-			_Disabled("update-button-checking");
+			ElementState("update-button-checking-throbber", true);
+			ElementState("update-button-checking", true);
 			Services.prefs.setCharPref("app.update.url.manual", "https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-" + Services.appinfo.version);
-						_Enabled("update-button-no-update");
+						ElementState("update-button-no-update", false);
 						//set the browsers core version in-case "app.update.url.manual" is not changed from a browser update or switched versions.
 						manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));			
 			break;
@@ -187,11 +186,11 @@ if(Services.prefs.getBoolPref("app.update.check.enabled")){
 			//Prompt return failed check message for request time-out!
 			console.log(_locMSG.GetStringFromName("updateCheckErrorTitle") + " " + _locMSG.GetStringFromName("updateCheckError"));
 			prompts.alert(window, _locMSG.GetStringFromName("updateCheckErrorTitle"), _locMSG.GetStringFromName("updateCheckError"));
-					_Disabled("update-button-checkNow");
-					_Disabled("update-button-checking-throbber");
-					_Disabled("update-button-checking");
-					_Disabled("update-button-no-update");
-					_Enabled("update-button-download");
+					ElementState("update-button-checkNow", true);
+					ElementState("update-button-checking-throbber", true);
+					ElementState("update-button-checking", true);
+					ElementState("update-button-no-update", true);
+					ElementState("update-button-download", false);
 	};
 	
 	request.onerror = function(aEvent) {
@@ -232,11 +231,11 @@ if(Services.prefs.getBoolPref("app.update.check.enabled")){
 	
 	}
 		//hide buttons		  
-					_Disabled("update-button-checkNow");
-					_Disabled("update-button-checking-throbber");
-					_Disabled("update-button-checking");
-					_Disabled("update-button-no-update");
-					_Disabled("update-button-download");
+					ElementState("update-button-checkNow", true);
+					ElementState("update-button-checking-throbber", true);
+					ElementState("update-button-checking", true);
+					ElementState("update-button-no-update", true);
+					ElementState("update-button-download", true);
 	};
 	
 	//Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
@@ -265,11 +264,11 @@ if(Services.prefs.getBoolPref("app.update.check.enabled")){
         Components.utils.reportError(ex);
       } 
 	 		//hide buttons		  
-					_Enabled("update-button-checkNow");
-					_Disabled("update-button-checking-throbber");
-					_Disabled("update-button-checking");
-					_Disabled("update-button-no-update");
-					_Disabled("update-button-download");
+					ElementState("update-button-checkNow", false);
+					ElementState("update-button-checking-throbber", true);
+					ElementState("update-button-checking", true);
+					ElementState("update-button-no-update", true);
+					ElementState("update-button-download", true);
 
 }	 
 

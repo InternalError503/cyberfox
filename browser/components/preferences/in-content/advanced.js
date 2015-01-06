@@ -26,9 +26,19 @@ var gAdvancedPane = {
 
 	//Temp solution as the update system not active for beta so we don't want users trying just yet.
 	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){
-		document.getElementById("updateOptions").hidden = true;
-		document.getElementById("app.update.autocheck").hidden = true;
-		document.getElementById("app.update.check.enabled").hidden = true;
+	
+		let elements = [
+				document.getElementById("updateOptions"),
+				document.getElementById("app.update.autocheck"),
+				document.getElementById("app.update.check.enabled")
+			];
+			
+			for (i=0; elements[i]; i++){
+				elements[i].hidden = true;
+			}
+			
+		Services.prefs.setBoolPref("app.update.autocheck", false);
+		Services.prefs.setBoolPref("app.update.check.enabled", false);		
 	}	
 	
     var preference = document.getElementById("browser.preferences.advanced.selectedTabIndex");

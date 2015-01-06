@@ -161,6 +161,16 @@ toolbarpaletteitem[place="palette"] > #panic-button {
   -moz-image-region: rect(32px, 896px, 64px, 864px);
 }
 
+#web-apps-button[cui-areatype="menu-panel"],
+toolbarpaletteitem[place="palette"] > #web-apps-button {
+  -moz-image-region: rect(0, 928px, 32px, 896px);
+}
+
+#webide-button[cui-areatype="menu-panel"],
+toolbarpaletteitem[place="palette"] > #webide-button {
+  -moz-image-region: rect(0px, 960px, 32px, 928px);
+}
+
 toolbaritem[sdkstylewidget="true"] > toolbarbutton {
   -moz-image-region: rect(0, 832px, 32px, 800px);
 }
@@ -232,5 +242,10 @@ toolbarpaletteitem[place="palette"] > #zoom-controls > #zoom-out-button {
 
 #zoom-controls@inAnyPanel@ > #zoom-in-button,
 toolbarpaletteitem[place="palette"] > #zoom-controls > #zoom-in-button {
+  -moz-image-region: rect(0px, 96px, 16px, 80px);
+}
+
+#add-share-provider {
+  list-style-image: url(chrome://browser/skin/menuPanel-small.png);
   -moz-image-region: rect(0px, 96px, 16px, 80px);
 }

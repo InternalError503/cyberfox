@@ -9,7 +9,7 @@ if CONFIG['OS_ARCH'] == 'Linux':
 elif CONFIG['OS_ARCH'] == 'Darwin':
     DIRS += ['mac']
 elif CONFIG['OS_ARCH'] == 'WINNT':
-    LIBRARY_NAME = 'sandbox_s'
+    Library('sandbox_s')
     FORCE_STATIC_LIB = True
 
     DIRS += [
@@ -17,6 +17,13 @@ elif CONFIG['OS_ARCH'] == 'WINNT':
         'win/src/sandboxbroker',
         'win/src/sandboxtarget',
     ]
+
+    if CONFIG['MOZ_CONTENT_SANDBOX']:
+        EXPORTS.mozilla.warnonlysandbox += [
+            'win/src/warnonlysandbox/warnOnlySandbox.h',
+            'win/src/warnonlysandbox/wosCallbacks.h',
+            'win/src/warnonlysandbox/wosTypes.h',
+        ]
 
     include('objs.mozbuild')
     SOURCES += security_sandbox_cppsrcs

@@ -23,31 +23,7 @@ a , a:active{
 a:hover {
   color: #3399FF !important;
 }
-/*
-button {
-	color: rgb(235, 235, 237, .3);
-    background-color: rgb(237, 237, 239);
-	background-image: url("chrome://browser/content/abouthome/noise.png"), linear-gradient(rgb(247, 248, 250), rgb(247, 248, 250) 95%, rgb(235, 235, 235));
-	border: 2px solid #acacac;
-	padding: 3px;
-}
 
-button:hover{
-	color: #3399FF;
-    background-color: rgb(247, 247, 249);
-	background-image: url("chrome://browser/content/abouthome/noise.png"), linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255) 95%, rgb(245, 245, 245));
-	border: 2px solid #cacaca;
-    -moz-transition: .1s ease-in;	
-}
-
-button:focus, button:active{
- 	color: #000;
-    background-color: rgb(227, 227, 229);
-	background-image: url("chrome://browser/content/abouthome/noise.png"), linear-gradient(rgb(217, 218, 220), rgb(217, 218, 220) 95%, rgb(205, 205, 205));
-	border: 2px solid #aaaaaa;
-    -moz-transition: .1s ease-out;	
-}
-*/
 .page-subtitle {
   margin-bottom: 3em;
 }

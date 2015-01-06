@@ -23,9 +23,19 @@ var gAdvancedPane = {
 
 	//Temp solution as the update system not active for beta so we don't want users trying just yet.
 	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){
-		document.getElementById("updateOptions").hidden = true;
-		document.getElementById("app.update.autocheck").hidden = true;
-		document.getElementById("app.update.check.enabled").hidden = true;
+	
+		let elements = [
+				document.getElementById("updateOptions"),
+				document.getElementById("app.update.autocheck"),
+				document.getElementById("app.update.check.enabled")
+			];
+			
+			for (i=0; elements[i]; i++){
+				elements[i].hidden = true;
+			}
+			
+		Services.prefs.setBoolPref("app.update.autocheck", false);
+		Services.prefs.setBoolPref("app.update.check.enabled", false);		
 	}	
 	
     var extraArgs = window.arguments[1];
@@ -392,6 +402,7 @@ var gAdvancedPane = {
       cache.clear();
     } catch(ex) {}
     this.updateActualCacheSize();
+    Services.obs.notifyObservers(null, "clear-private-data", null);
   },
 
   /**
@@ -404,6 +415,7 @@ var gAdvancedPane = {
 
     this.updateActualAppCacheSize();
     this.updateOfflineApps();
+    Services.obs.notifyObservers(null, "clear-private-data", null);
   },
 
   readOfflineNotify: function()
@@ -668,7 +680,7 @@ var gAdvancedPane = {
     }
     try {
       const DRIVE_FIXED = 3;
-      const LPCWSTR = ctypes.jschar.ptr;
+      const LPCWSTR = ctypes.char16_t.ptr;
       const UINT = ctypes.uint32_t;
       let kernel32 = ctypes.open("kernel32");
       let GetDriveType = kernel32.declare("GetDriveTypeW", ctypes.default_abi, UINT, LPCWSTR);

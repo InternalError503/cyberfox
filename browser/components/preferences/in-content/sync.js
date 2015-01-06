@@ -126,9 +126,9 @@ let gSyncPane = {
     });
     setEventListener("syncViewQuota", "command", gSyncPane.openQuotaDialog);
     setEventListener("syncChangePassword", "command",
-      gSyncUtils.changePassword);
+      () => gSyncUtils.changePassword());
     setEventListener("syncResetPassphrase", "command",
-      gSyncUtils.resetPassphrase);
+      () => gSyncUtils.resetPassphrase());
     setEventListener("syncReset", "command", gSyncPane.resetSync);
     setEventListener("syncAddDeviceLabel", "click", function () {
       gSyncPane.openAddDevice();
@@ -326,7 +326,7 @@ let gSyncPane = {
     }
   },
 
-  openContentInBrowser: function(url) {
+  openContentInBrowser: function(url, options) {
     let win = Services.wm.getMostRecentWindow("navigator:browser");
     if (!win) {
       // no window to use, so use _openLink to create a new one.  We don't
@@ -335,7 +335,7 @@ let gSyncPane = {
       gSyncUtils._openLink(url);
       return;
     }
-    win.openUILinkIn(url, "tab");
+    win.switchToTabHavingURI(url, true, options);
   },
 
 

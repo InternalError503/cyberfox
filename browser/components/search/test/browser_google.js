@@ -82,11 +82,6 @@ function test() {
           mozparams: {
           },
         },
-        {
-          type: "text/html",
-          method: "GET",
-          template: "https://www.google.com/",
-        },
       ],
     },
   };

@@ -78,10 +78,12 @@ libs:: $(srcdir)/profile/channel-prefs.js
 	$(NSINSTALL) -D $(DIST)/bin/defaults/pref
 	$(call py_action,preprocessor,-Fsubstitution $(PREF_PPFLAGS) $(ACDEFINES) $^ -o $(DIST)/bin/defaults/pref/channel-prefs.js)
 endif
+
+
 #Install user-agent list for developer tools
 libs::
 	$(INSTALL) $(IFLAGS1) $(srcdir)/agents.json $(FINAL_TARGET)
-	
+
 libs:: $(srcdir)/blocklist.xml
 	$(INSTALL) $(IFLAGS1) $^ $(FINAL_TARGET)
 

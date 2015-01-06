@@ -21,6 +21,9 @@
 #include "mozilla/plugins/PluginInstanceParent.h"
 #include "mozilla/Preferences.h"
 #include "mozilla/Services.h"
+#ifdef MOZ_TELEMETRY_REPORTING
+#include "mozilla/Telemetry.h"
+#endif
 #include "mozilla/unused.h"
 #include "nsAutoPtr.h"
 #include "nsCRT.h"
@@ -31,6 +34,7 @@
 #include "PluginIdentifierParent.h"
 #include "prsystem.h"
 #include "GeckoProfiler.h"
+#include "nsPluginTags.h"
 
 #ifdef XP_WIN
 #include "PluginHangUIParent.h"
@@ -86,7 +90,7 @@ struct RunnableMethodTraits<mozilla::plugins::PluginModuleParent>
 
 // static
 PluginLibrary*
-PluginModuleParent::LoadModule(const char* aFilePath)
+PluginModuleParent::LoadModule(const char* aFilePath, nsPluginTag* aPluginTag)
 {
     PLUGIN_LOG_DEBUG_FUNCTION;
 
@@ -120,6 +124,13 @@ PluginModuleParent::LoadModule(const char* aFilePath)
     mozilla::MutexAutoLock lock(parent->mCrashReporterMutex);
     parent->mCrashReporter = parent->CrashReporter();
 #endif
+#endif
+
+#ifdef XP_WIN
+    if (aPluginTag->mIsFlashPlugin &&
+        Preferences::GetBool("dom.ipc.plugins.flash.disable-protected-mode", false)) {
+        parent->SendDisableFlashProtectedMode();
+    }
 #endif
 
     return parent.forget();
@@ -743,7 +754,10 @@ PluginModuleParent::ActorDestroy(ActorDestroyReason why)
 #ifdef MOZ_CRASHREPORTER
         ProcessFirstMinidump();
 #endif
-
+#ifdef MOZ_TELEMETRY_REPORTING
+        Telemetry::Accumulate(Telemetry::SUBPROCESS_ABNORMAL_ABORT,
+                              NS_LITERAL_CSTRING("plugin"), 1);
+#endif
         mShutdown = true;
         // Defer the PluginCrashed method so that we don't re-enter
         // and potentially modify the actor child list while enumerating it.

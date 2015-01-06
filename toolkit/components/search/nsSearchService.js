@@ -488,7 +488,6 @@ function queryCharsetFromCode(aCode) {
   codes[1284] = "windows-1254";
   codes[1285] = "windows-1255";
   codes[1286] = "windows-1256";
-  codes[1536] = "us-ascii";
   codes[1584] = "GB2312";
   codes[1585] = "gbk";
   codes[1600] = "EUC-KR";
@@ -2842,9 +2841,11 @@ Submission.prototype = {
 }
 
 // nsISearchParseSubmissionResult
-function ParseSubmissionResult(aEngine, aTerms) {
+function ParseSubmissionResult(aEngine, aTerms, aTermsOffset, aTermsLength) {
   this._engine = aEngine;
   this._terms = aTerms;
+  this._termsOffset = aTermsOffset;
+  this._termsLength = aTermsLength;
 }
 ParseSubmissionResult.prototype = {
   get engine() {
@@ -2853,11 +2854,17 @@ ParseSubmissionResult.prototype = {
   get terms() {
     return this._terms;
   },
+  get termsOffset() {
+    return this._termsOffset;
+  },
+  get termsLength() {
+    return this._termsLength;
+  },
   QueryInterface: XPCOMUtils.generateQI([Ci.nsISearchParseSubmissionResult]),
 }
 
 const gEmptyParseSubmissionResult =
-      Object.freeze(new ParseSubmissionResult(null, ""));
+      Object.freeze(new ParseSubmissionResult(null, "", -1, 0));
 
 function executeSoon(func) {
   Services.tm.mainThread.dispatch(func, Ci.nsIThread.DISPATCH_NORMAL);
@@ -3785,16 +3792,23 @@ SearchService.prototype = {
       }
     }
 
-    // Array for the remaining engines, alphabetically sorted
-    var alphaEngines = [];
+    // Array for the remaining engines, alphabetically sorted.
+    let alphaEngines = [];
 
     for each (engine in this._engines) {
       if (!(engine.name in addedEngines))
         alphaEngines.push(this._engines[engine.name]);
     }
-    alphaEngines = alphaEngines.sort(function (a, b) {
-                                       return a.name.localeCompare(b.name);
-                                     });
+
+    let locale = Cc["@mozilla.org/intl/nslocaleservice;1"]
+                   .getService(Ci.nsILocaleService)
+                   .newLocale(getLocale());
+    let collation = Cc["@mozilla.org/intl/collation-factory;1"]
+                      .createInstance(Ci.nsICollationFactory)
+                      .CreateCollation(locale);
+    const strength = Ci.nsICollation.kCollationCaseInsensitiveAscii;
+    let comparator = (a, b) => collation.compareString(strength, a.name, b.name);
+    alphaEngines.sort(comparator);
     return this.__sortedEngines = this.__sortedEngines.concat(alphaEngines);
   },
 
@@ -3863,10 +3877,14 @@ SearchService.prototype = {
     if (observer) {
       this._initObservers.promise.then(
         function onSuccess() {
-          observer.onInitComplete(self._initRV);
+          try {
+            observer.onInitComplete(self._initRV);
+          } catch (e) {
+            Cu.reportError(e);
+          }
         },
         function onError(aReason) {
-          Components.utils.reportError("Internal error while initializing SearchService: " + aReason);
+          Cu.reportError("Internal error while initializing SearchService: " + aReason);
           observer.onInitComplete(Components.results.NS_ERROR_UNEXPECTED);
         }
       );
@@ -4356,6 +4374,23 @@ SearchService.prototype = {
       return gEmptyParseSubmissionResult;
     }
 
+    let length = 0;
+    let offset = aURL.indexOf("?") + 1;
+    let query = aURL.slice(offset);
+    // Iterate a second time over the original input string to determine the
+    // correct search term offset and length in the original encoding.
+    for (let param of query.split("&")) {
+      let equalPos = param.indexOf("=");
+      if (equalPos != -1 &&
+          param.substr(0, equalPos) == mapEntry.termsParameterName) {
+        // This is the parameter we are looking for.
+        offset += equalPos + 1;
+        length = param.length - equalPos - 1;
+        break;
+      }
+      offset += param.length + 1;
+    }
+
     // Decode the terms using the charset defined in the search engine.
     let terms;
     try {
@@ -4370,7 +4405,7 @@ SearchService.prototype = {
     }
 
     LOG("Match found. Terms: " + terms);
-    return new ParseSubmissionResult(mapEntry.engine, terms);
+    return new ParseSubmissionResult(mapEntry.engine, terms, offset, length);
   },
 
   // nsIObserver

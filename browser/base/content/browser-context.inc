@@ -73,8 +73,8 @@
                 accesskey="&bookmarkThisLinkCmd.accesskey;"
                 oncommand="gContextMenu.bookmarkLink();"/>
       <menuitem id="context-sharelink"
-                label="&shareLinkCmd.label;"
-                accesskey="&shareLinkCmd.accesskey;"
+                label="&shareLink.label;"
+                accesskey="&shareLink.accesskey;"
                 oncommand="gContextMenu.shareLink();"/>
       <menuitem id="context-savelink"
 				        class="menuitem-iconic"
@@ -202,8 +202,8 @@
                 accesskey="&saveImageCmd.accesskey;"
                 oncommand="gContextMenu.saveMedia();"/>
       <menuitem id="context-shareimage"
-                label="&shareImageCmd.label;"
-                accesskey="&shareImageCmd.accesskey;"
+                label="&shareImage.label;"
+                accesskey="&shareImage.accesskey;"
                 oncommand="gContextMenu.shareImage();"/>
       <menuitem id="context-sendimage"
                 label="&emailImageCmd.label;"
@@ -227,8 +227,8 @@
                 accesskey="&saveVideoCmd.accesskey;"
                 oncommand="gContextMenu.saveMedia();"/>
       <menuitem id="context-sharevideo"
-                label="&shareVideoCmd.label;"
-                accesskey="&shareVideoCmd.accesskey;"
+                label="&shareVideo.label;"
+                accesskey="&shareVideo.accesskey;"
                 oncommand="gContextMenu.shareVideo();"/>
       <menuitem id="context-saveaudio"
                 label="&saveAudioCmd.label;"
@@ -349,8 +349,8 @@
       <menuitem id="context-searchselect"
                 oncommand="BrowserSearch.loadSearchFromContext(this.searchTerms);"/>
       <menuitem id="context-shareselect"
-                label="&shareSelectCmd.label;"
-                accesskey="&shareSelectCmd.accesskey;"
+                label="&shareSelect.label;"
+                accesskey="&shareSelect.accesskey;"
                 oncommand="gContextMenu.shareSelect(getBrowserSelection());"/>
       <menuseparator id="frame-sep"/>
       <menu id="frame" label="&thisFrameMenu.label;" accesskey="&thisFrameMenu.accesskey;">

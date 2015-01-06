@@ -111,12 +111,12 @@
 	    <menuitem id="context_CopyCurrentTabUrl" 
 					        label="&copyTabURL.label;" 
 					        oncommand="gCyberfoxCustom.CopyCurrentTabUrl();"/>		  
-      <menuitem id="context_CloneCurrentTab" 
+		  <menuitem id="context_CloneCurrentTab" 
 					        label="&cloneCurrentTab.label;" 
-					        oncommand="gCyberfoxCustom.CloneCurrentTab();"/>					
+					        oncommand="gCyberfoxCustom.CloneCurrent('tab');"/>					
 	    <menuitem id="context_CloneCurrentTabNewWindow" 
 					        label="&cloneInNewWindow.label;" 
-					        oncommand="gCyberfoxCustom.CloneCurrentTabNewWindow();"/>
+					        oncommand="gCyberfoxCustom.CloneCurrent('window');"/>			
       <menuitem id="context_reloadAllTabs" label="&reloadAllTabs.label;" accesskey="&reloadAllTabs.accesskey;"
                 tbattr="tabbrowser-multiple-visible"
                 oncommand="gBrowser.reloadAllTabs();"/>
@@ -286,7 +286,7 @@
     </panel>
 
     <panel id="abouthome-search-panel" orient="vertical" type="arrow" hidden="true">
-      <hbox id="abouthome-search-panel-manage" class="abouthome-search-panel-item"
+      <hbox id="abouthome-search-panel-manage"
             onclick="openPreferences('paneSearch')">
         <label>&cmd_engineManager.label;</label>
       </hbox>
@@ -300,7 +300,11 @@
            onpopuphidden="SocialShare.onHidden()"
            hidden="true">
       <vbox class="social-share-toolbar">
-        <arrowscrollbox id="social-share-provider-buttons" orient="vertical" flex="1"/>
+        <arrowscrollbox id="social-share-provider-buttons" orient="vertical" flex="1">
+          <toolbarbutton id="add-share-provider" class="toolbarbutton share-provider-button" type="radio"
+                         group="share-providers" tooltiptext="&findShareServices.label;"
+                         oncommand="SocialShare.showDirectory()"/>
+        </arrowscrollbox>
       </vbox>
     </panel>
 
@@ -553,6 +557,11 @@
 #endif
     </tooltip>
 
+    <tooltip id="share-button-tooltip" onpopupshowing="SocialShare.createTooltip(event);">
+      <label class="tooltip-label"/>
+      <label class="tooltip-label"/>
+    </tooltip>
+
 #include popup-notifications.inc
 
 #include ../../components/customizableui/content/panelUI.inc.xul
@@ -735,7 +744,11 @@
              aria-label="&navbarCmd.label;"
              fullscreentoolbar="true" mode="icons" customizable="true"
              iconsize="small"
-             defaultset="urlbar-container,search-container,bookmarks-menu-button,downloads-button,home-button,social-share-button,social-toolbar-item"
+#ifdef MOZ_DEV_EDITION
+             defaultset="urlbar-container,search-container,developer-button,bookmarks-menu-button,downloads-button,home-button"
+#else
+             defaultset="urlbar-container,search-container,bookmarks-menu-button,downloads-button,home-button"
+#endif
              customizationtarget="nav-bar-customization-target"
              overflowable="true"
              overflowbutton="nav-bar-overflow-button"
@@ -789,7 +802,6 @@
                 <image id="webapps-notification-icon" class="notification-anchor-icon" role="button"/>
                 <image id="plugins-notification-icon" class="notification-anchor-icon" role="button"/>
                 <image id="web-notifications-notification-icon" class="notification-anchor-icon" role="button"/>
-                <image id="plugin-install-notification-icon" class="notification-anchor-icon" role="button"/>
                 <image id="bad-content-blocked-notification-icon" class="notification-anchor-icon" role="button"/>
                 <image id="bad-content-unblocked-notification-icon" class="notification-anchor-icon" role="button"/>
                 <image id="webRTC-shareDevices-notification-icon" class="notification-anchor-icon" role="button"/>
@@ -822,7 +834,7 @@
                 </hbox>
               </box>
               <box id="urlbar-display-box" align="center">
-                <label id="urlbar-display" value="&urlbar.switchToTab.label;"/>
+                <label class="urlbar-display urlbar-display-switchtab" value="&urlbar.switchToTab.label;"/>
               </box>
               <hbox id="urlbar-icons">
                 <image id="page-report-button"
@@ -983,15 +995,6 @@
                        onclick="BrowserGoHome(event);"
                        cui-areatype="toolbar"
                        aboutHomeOverrideTooltip="&abouthome.pageTitle;"/>
-
-        <toolbarbutton id="social-share-button"
-                       class="toolbarbutton-1 chromeclass-toolbar-additional"
-                       label="&sharePageCmd.label;"
-                       tooltiptext="&sharePageCmd.label;"
-                       cui-areatype="toolbar"
-                       removable="true"
-                       hidden="true"
-                       command="Social:SharePage"/>
       </hbox>
 
       <toolbarbutton id="nav-bar-overflow-button"
@@ -1136,7 +1139,7 @@
     </toolbarpalette>
   </toolbox>
 
-  <hbox id="fullscr-toggler" collapsed="true"/>
+  <hbox id="fullscr-toggler" hidden="true"/>
 
   <deck id="content-deck" flex="1">
     <hbox flex="1" id="browser">

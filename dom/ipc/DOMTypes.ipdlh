@@ -7,10 +7,20 @@
 include protocol PBlob;
 include InputStreamParams;
 
-using struct mozilla::SerializedStructuredCloneBuffer from "ipc/IPCMessageUtils.h";
+using struct mozilla::void_t
+  from "ipc/IPCMessageUtils.h";
+
+using struct mozilla::SerializedStructuredCloneBuffer
+  from "ipc/IPCMessageUtils.h";
 
 namespace mozilla {
 namespace dom {
+
+union OptionalID
+{
+  nsID;
+  void_t;
+};
 
 struct ClonedMessageData
 {
@@ -35,6 +45,7 @@ struct FileBlobConstructorParams
 struct SlicedBlobConstructorParams
 {
   PBlob source;
+  nsID id;
   uint64_t begin;
   uint64_t end;
   nsString contentType;
@@ -45,17 +56,44 @@ struct MysteryBlobConstructorParams
   // Nothing is known about this type of blob.
 };
 
-union ChildBlobConstructorParams
+struct KnownBlobConstructorParams
 {
+  nsID id;
+};
+
+union AnyBlobConstructorParams
+{
+  // These types may be sent to/from parent and child.
   NormalBlobConstructorParams;
   FileBlobConstructorParams;
-  SlicedBlobConstructorParams;
+
+  // This type may only be sent from parent to child.
   MysteryBlobConstructorParams;
+
+  // These types may only be sent from child to parent.
+  SlicedBlobConstructorParams;
+  KnownBlobConstructorParams;
+};
+
+struct ChildBlobConstructorParams
+{
+  nsID id;
+
+  // May not be SlicedBlobConstructorParams or KnownBlobConstructorParams.
+  AnyBlobConstructorParams blobParams;
 };
 
 struct ParentBlobConstructorParams
 {
-  ChildBlobConstructorParams blobParams;
+  // May not be MysteryBlobConstructorParams.
+  AnyBlobConstructorParams blobParams;
+
+  // This must be of type void_t for:
+  //   - SlicedBlobConstructorParams
+  //   - KnownBlobConstructorParams
+  // This must be of type InputStreamParams for:
+  //   - NormalBlobConstructorParams
+  //   - FileBlobConstructorParams
   OptionalInputStreamParams optionalInputStreamParams;
 };
 

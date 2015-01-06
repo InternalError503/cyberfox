@@ -8,6 +8,10 @@
 #include "nsXULAppAPI.h"
 #include <time.h>
 
+#ifdef MOZ_TELEMETRY_REPORTING
+#include "mozilla/Telemetry.h"
+#endif
+
 #ifdef MOZ_CRASHREPORTER
 #include "nsExceptionHandler.h"
 #include "nsICrashService.h"
@@ -170,22 +174,36 @@ CrashReporterParent::NotifyCrashService()
 
     int32_t processType;
     int32_t crashType = nsICrashService::CRASH_TYPE_CRASH;
-
+#ifdef MOZ_TELEMETRY_REPORTING
+    nsCString telemetryKey;
+#endif
     switch (mProcessType) {
         case GeckoProcessType_Content:
             processType = nsICrashService::PROCESS_TYPE_CONTENT;
+      #ifdef MOZ_TELEMETRY_REPORTING
+            telemetryKey.AssignLiteral("content");
+      #endif
             break;
         case GeckoProcessType_Plugin: {
             processType = nsICrashService::PROCESS_TYPE_PLUGIN;
+      #ifdef MOZ_TELEMETRY_REPORTING
+            telemetryKey.AssignLiteral("plugin");
+      #endif
             nsAutoCString val;
             if (mNotes.Get(NS_LITERAL_CSTRING("PluginHang"), &val) &&
                 val.Equals(NS_LITERAL_CSTRING("1"))) {
                 crashType = nsICrashService::CRASH_TYPE_HANG;
+      #ifdef MOZ_TELEMETRY_REPORTING
+                telemetryKey.AssignLiteral("pluginhang");
+      #endif
             }
             break;
         }
         case GeckoProcessType_GMPlugin:
             processType = nsICrashService::PROCESS_TYPE_GMPLUGIN;
+#ifdef MOZ_TELEMETRY_REPORTING
+            telemetryKey.AssignLiteral("gmplugin");
+      #endif
             break;
         default:
             NS_ERROR("unknown process type");
@@ -193,6 +211,9 @@ CrashReporterParent::NotifyCrashService()
     }
 
     crashService->AddCrash(processType, crashType, mChildDumpID);
+ #ifdef MOZ_TELEMETRY_REPORTING
+    Telemetry::Accumulate(Telemetry::SUBPROCESS_CRASHES_WITH_DUMP, telemetryKey, 1);
+ #endif
 }
 #endif
 

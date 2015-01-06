@@ -30,14 +30,15 @@ let gSearch = {
  }else{
  
  try{
-	  let rmvEle = document.getElementById("newtab-search-form");
-	  let rmvXulEle = document.getElementById("newtab-search-panel");
-			if (rmvEle === null){return;}
-				rmvEle.parentNode.removeChild(rmvEle);
-			rmvXulEle.parentNode.removeChild(rmvXulEle);
+	  let searchFormElement = document.getElementById("newtab-search-form");
+	  let searchPanelElement = document.getElementById("newtab-search-panel");
+			if (searchFormElement === null){return;}
+					searchFormElement.parentNode.removeChild(searchFormElement);
+					searchPanelElement.parentNode.removeChild(searchPanelElement);
 		}catch (e){
 		//Catch any nasty errors and output to dialogue and console
-		alert("Were sorry but something has gone wrong with 'browser.newtab.search.enabled' " + e);	
+		alert("Were sorry but something has gone wrong with 'browser.newtab.search.enabled' " + e);
+		console.log("Were sorry but something has gone wrong with 'browser.newtab.search.enabled' " + e);    	
 		}
 	}
   
@@ -61,13 +62,24 @@ let gSearch = {
     if (event) {
       event.preventDefault();
     }
-    let searchStr = this._nodes.text.value;
+    let searchText = this._nodes.text;
+    let searchStr = searchText.value;
     if (this.currentEngineName && searchStr.length) {
-      this._send("Search", {
+
+      let eventData = {
         engineName: this.currentEngineName,
         searchString: searchStr,
         whence: "newtab",
-      });
+      }
+
+      if (searchText.hasAttribute("selection-index")) {
+        eventData.selection = {
+          index: searchText.getAttribute("selection-index"),
+          kind: searchText.getAttribute("selection-kind")
+        };
+      }
+
+      this._send("Search", eventData);
     }
     this._suggestionController.addInputValueToFormHistory();
   },
@@ -186,6 +198,14 @@ if(isSearchEnabled){
     }
   },
 
+  // Converts favicon array buffer into data URI of the right size and dpi.
+  _getFaviconURIFromBuffer: function (buffer) {
+    let blob = new Blob([buffer]);
+    let dpiSize = Math.round(16 * window.devicePixelRatio);
+    let sizeStr = dpiSize + "," + dpiSize;
+    return URL.createObjectURL(blob) + "#-moz-resolution=" + sizeStr;
+  },
+
   _makePanelEngine: function (panel, engine) {
     let box = document.createElementNS(XUL_NAMESPACE, "hbox");
     box.className = "newtab-search-panel-engine";
@@ -199,10 +219,7 @@ if(isSearchEnabled){
 
     let image = document.createElementNS(XUL_NAMESPACE, "image");
     if (engine.iconBuffer) {
-      let blob = new Blob([engine.iconBuffer]);
-      let size = Math.round(16 * window.devicePixelRatio);
-      let sizeStr = size + "," + size;
-      let uri = URL.createObjectURL(blob) + "#-moz-resolution=" + sizeStr;
+      let uri = this._getFaviconURIFromBuffer(engine.iconBuffer);
       image.setAttribute("src", uri);
     }
     box.appendChild(image);
@@ -220,17 +237,27 @@ if(isSearchEnabled){
 if(isSearchEnabled){	
 
     if (!this.useNewUI) {
-      // Set the logo.
-      let logoBuf = window.devicePixelRatio == 2 ? engine.logo2xBuffer :
+      let type = "";
+      let uri;
+      let logoBuf = window.devicePixelRatio >= 2 ?
+                    engine.logo2xBuffer || engine.logoBuffer :
                     engine.logoBuffer || engine.logo2xBuffer;
       if (logoBuf) {
-        this._nodes.logo.hidden = false;
-        let uri = URL.createObjectURL(new Blob([logoBuf]));
+        uri = URL.createObjectURL(new Blob([logoBuf]));
+        type = "logo";
+      }
+      else if (engine.iconBuffer) {
+        uri = this._getFaviconURIFromBuffer(engine.iconBuffer);
+        type = "favicon";
+      }
+      this._nodes.logo.setAttribute("type", type);
+
+      if (uri) {
         this._nodes.logo.style.backgroundImage = "url(" + uri + ")";
         this._nodes.text.placeholder = "";
       }
       else {
-        this._nodes.logo.hidden = true;
+        this._nodes.logo.style.backgroundImage = "";
         this._nodes.text.placeholder = engine.name;
       }
     }

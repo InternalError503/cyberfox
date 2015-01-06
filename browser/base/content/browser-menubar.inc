@@ -83,19 +83,25 @@
                           accesskey="&emailPageCmd.accesskey;"
                           command="Browser:SendLink"/>
                 <menuseparator/>
-				<menuitem id="menu_print"
-						class="menuitem-iconic"
-						label="&printCmd.label;"
-						command="cmd_print"
-						key="printKb"/>
-				<menuitem id="menu_printPreview"
-				        accesskey="&printPreviewCmd.accesskey;"
-						class="menuitem-iconic"				
-						label="&printPreviewCmd.label;"
-						command="cmd_printPreview"/>
-				<menuitem id="menu_printSetup"
-						label="&printSetupCmd.label;"
-						command="cmd_pageSetup"/>
+#if !defined(MOZ_WIDGET_GTK) && !defined(MOZ_WIDGET_QT)
+                <menuitem id="menu_printSetup"
+                          label="&printSetupCmd.label;"
+                          accesskey="&printSetupCmd.accesskey;"
+                          command="cmd_pageSetup"/>
+#endif
+#ifndef XP_MACOSX
+                <menuitem id="menu_printPreview"
+                          label="&printPreviewCmd.label;"
+                          class="menuitem-iconic"
+                          accesskey="&printPreviewCmd.accesskey;"
+                          command="cmd_printPreview"/>
+#endif
+                <menuitem id="menu_print"
+                          label="&printCmd.label;"
+                          class="menuitem-iconic"
+                          accesskey="&printCmd.accesskey;"
+                          key="printKb"
+                          command="cmd_print"/>
                 <menuseparator/>
                 <menuitem id="goOfflineMenuitem"
                           label="&goOfflineCmd.label;"
@@ -103,6 +109,9 @@
                           type="checkbox"
                           observes="workOfflineMenuitemState"
                           oncommand="BrowserOffline.toggleOfflineStatus();"/>
+ 				       <menuitem id="app_restartBrowser"
+						              label="&restartBrowser.label;"
+						              oncommand="gCyberfoxCustom.restartBrowser();"/>
                 <menuitem id="menu_FileQuitItem"
 #ifdef XP_WIN
 						              class="menuitem-iconic"	
@@ -482,13 +491,17 @@
                         accesskey="&addons.accesskey;"
                         key="key_openAddons"
                         command="Tools:Addons"/>
+              <menuitem id="menu_openApps"
+                        label="&webapps.label;"
+                        accesskey="&webapps.accesskey;"
+                        oncommand="BrowserOpenApps();"/>
 #ifdef MOZ_SERVICES_SYNC
               <!-- only one of sync-setup or sync-menu will be showing at once -->
               <menuitem id="sync-setup"
                         label="&syncSetup.label;"
                         accesskey="&syncSetup.accesskey;"
                         observes="sync-setup-state"
-                        oncommand="gSyncUI.openSetup()"/>
+                        oncommand="gSyncUI.openSetup(null, 'menubar')"/>
               <menuitem id="sync-syncnowitem"
                         label="&syncSyncNowItem.label;"
                         accesskey="&syncSyncNowItem.accesskey;"
@@ -498,7 +511,7 @@
                         label="&syncReAuthItem.label;"
                         accesskey="&syncReAuthItem.accesskey;"
                         observes="sync-reauth-state"
-                        oncommand="gSyncUI.openSignInAgainPage();"/>
+                        oncommand="gSyncUI.openSignInAgainPage('menubar');"/>
 #endif
               <menuseparator id="devToolsSeparator"/>
               <menu id="webDeveloperMenu"
@@ -556,10 +569,7 @@
                         command="View:PageInfo"/>
 				 <menuitem id="minimizeMemoryUsage"
 						            label="&minimizeMemoryCache.label;"
-						            oncommand="Cu.forceGC();"/>
-				<menuitem id="app_restartBrowser"
-						            label="&restartBrowser.label;"
-						            oncommand="gCyberfoxCustom.restartBrowser();"/>		  
+						            oncommand="Cu.forceGC();"/>		  
 #ifndef XP_UNIX
               <menuseparator id="prefSep"/>
               <menuitem id="menu_preferences"
