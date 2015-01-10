@@ -239,6 +239,7 @@ if(Services.prefs.getBoolPref("app.update.check.enabled")){
 	};
 	
 	//Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
+	request.timeout = 5000;
 	request.open("GET", url, true);
 	request.setRequestHeader("Content-Type", "application/json");
 	request.send(null);
