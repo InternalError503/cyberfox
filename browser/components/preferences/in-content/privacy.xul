@@ -99,6 +99,10 @@
 		 </menupopup>		
       </menulist>
 	  </hbox>
+  <label class="text-link" id="doNotTrackInfo"
+         href="https://www.mozilla.org/dnt">
+    &doNotTrackInfo.label;
+  </label>
 </groupbox>
 <hbox id="georefoptions"  data-category="panePrivacy" hidden="true">
 	<!-- Tracking Geo Location -->

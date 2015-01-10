@@ -113,7 +113,10 @@
 		 </menupopup>		
       </menulist>
 	  </hbox>
-
+      <label class="text-link" id="doNotTrackInfo"
+             href="https://www.mozilla.org/dnt">
+             &doNotTrackInfo.label;
+      </label>
     </groupbox>
 	<hbox flex="1">
 	<!-- Tracking Geo Location -->
