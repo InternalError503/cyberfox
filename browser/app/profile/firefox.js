@@ -1583,12 +1583,6 @@ pref("browser.newtabpage.rows", 3);
 
 // number of columns of newtab grid
 pref("browser.newtabpage.columns", 5);
-//Note: Checkout
-// directory tiles download URL
-pref("browser.newtabpage.directory.source", "https://tiles.services.mozilla.com/v2/links/fetch/%LOCALE%");
-//Note: Checkout
-// endpoint to send newtab click and view pings
-pref("browser.newtabpage.directory.ping", "https://tiles.services.mozilla.com/v2/links/");
 
 // Enable the DOM fullscreen API.
 pref("full-screen-api.enabled", true);
