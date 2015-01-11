@@ -985,6 +985,9 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!-- one click search Tweak -->
 <!ENTITY turnoffoneclicksearch.label "Turn on one click search.">
 
+<!-- Loop Toggle Tweak -->
+<!ENTITY enablehellochat.label "Enable hello chat.">
+
 <!-- about:home localization Tweak -->
 <!ENTITY abouthome.google.label "Google">
 <!ENTITY abouthome.google.url "https://www.google.com/">

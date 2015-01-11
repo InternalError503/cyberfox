@@ -43,48 +43,50 @@
       <preference id="layout.spellcheckDefault"        name="layout.spellcheckDefault"        type="int"/>
 				<!-- Features Tab -->	     
 	  <preference id="browser.restart.enabled"
-				  name="browser.restart.enabled"
-				  type="bool"/>				  
+						   name="browser.restart.enabled"
+						   type="bool"/>				  
       <preference id="clean.ram.cache"
-				  name="clean.ram.cache"
-				  type="bool"/>	
-				  
+						   name="clean.ram.cache"
+						   type="bool"/>			  
 	  <preference id="browser.download.useToolkitUI"
-				  name="browser.download.useToolkitUI"
-				  type="bool"/>
+						   name="browser.download.useToolkitUI"
+						   type="bool"/>
 	  <preference id="browser.preferences.inContent"
-				  name="browser.preferences.inContent"
-				  type="bool"/>	
+						   name="browser.preferences.inContent"
+						   type="bool"/>	
 	  <preference id="browser.restart.purgecache" 
-				  name="browser.restart.purgecache" 
-				  type="bool"/>          			  
+						   name="browser.restart.purgecache" 
+						   type="bool"/>          			  
 	  <preference id="browser.tabs.clonetab" 
-				  name="browser.tabs.clonetab" 
-				  type="bool"/>			  
+						   name="browser.tabs.clonetab" 
+						   type="bool"/>			  
 	  <preference id="app.update.autocheck" 
-				  name="app.update.autocheck" 
-				  type="bool"/>				  
+						   name="app.update.autocheck" 
+						   type="bool"/>				  
 	  <preference id="browser.tabs.copyurl" 
-				  name="browser.tabs.copyurl" 
-				  type="bool"/>
-  	<preference id="browser.context.classic" 
-				  name="browser.context.classic" 
-				  type="bool"/> 
+						   name="browser.tabs.copyurl" 
+						   type="bool"/>
+	  <preference id="browser.context.classic" 
+						   name="browser.context.classic" 
+						   type="bool"/> 
  	  <preference id="browser.context.emaillink" 
-				  name="browser.context.emaillink" 
-				  type="bool"/>
-  <preference id="browser.context.aboutconfig" 
-				name="browser.context.aboutconfig" 
-				type="bool"/>
-  <preference id="browser.menu.aboutconfig" 
-				name="browser.menu.aboutconfig" 
-				type="bool"/>
-  <preference id="browser.search.showOneOffButtons" 
-				name="browser.search.showOneOffButtons" 
-				type="bool"/>
-  <preference id="app.update.check.enabled" 
-				name="app.update.check.enabled" 
-				type="bool"/>	        				
+						   name="browser.context.emaillink" 
+						   type="bool"/>
+	  <preference id="browser.context.aboutconfig" 
+						   name="browser.context.aboutconfig" 
+						   type="bool"/>
+	  <preference id="browser.menu.aboutconfig" 
+						   name="browser.menu.aboutconfig" 
+						   type="bool"/>
+	  <preference id="browser.search.showOneOffButtons" 
+						   name="browser.search.showOneOffButtons" 
+						   type="bool"/>
+	  <preference id="app.update.check.enabled" 
+						   name="app.update.check.enabled" 
+						   type="bool"/>
+	  <preference id="loop.enabled" 
+						   name="loop.enabled" 
+						   type="bool"/>							   
       <!-- Data Choices tab -->
 
 #ifdef MOZ_TELEMETRY_REPORTING
@@ -466,7 +468,7 @@
 							preference="browser.tabs.clonetab"/>
 					<checkbox id="browser.tabs.copyurl" label="&copyTabURLOptions.label;"
 							preference="browser.tabs.copyurl"/>
-          <checkbox id="browser.context.emaillink" label="&turnoffemaillink.label;"
+				    <checkbox id="browser.context.emaillink" label="&turnoffemaillink.label;"
 							preference="browser.context.emaillink"/>
  					<checkbox id="browser.context.aboutconfig" label="&turnoffcontextabout.label;"
 							preference="browser.context.aboutconfig"/>
@@ -477,7 +479,9 @@
  					<checkbox id="browser.context.classic" label="&contextNavigationClassic.label;"
 							preference="browser.context.classic"/>
  					<checkbox id="browser.search.showOneOffButtons" label="&turnoffoneclicksearch.label;"
-							preference="browser.search.showOneOffButtons" />							
+							preference="browser.search.showOneOffButtons" />		
+ 					<checkbox id="loop.enabled" label="&enablehellochat.label;"
+							preference="loop.enabled" />								
 			</groupbox>
 			
 			<groupbox id="alternateOptionsRestart" orient="vertical">
