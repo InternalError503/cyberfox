@@ -88,7 +88,10 @@
 						   type="bool"/>
 	  <preference id="loop.enabled" 
 						   name="loop.enabled" 
-						   type="bool"/>					
+						   type="bool"/>
+	  <preference id="browser.tabs.copyallurls" 
+						   name="browser.tabs.copyallurls" 
+						   type="bool"/>               					
 <!-- Cyberfeatures -->
    			  
 #ifdef MOZ_TELEMETRY_REPORTING
@@ -480,7 +483,9 @@
 					<checkbox id="enableCloneIt" label="&turnonclone.label;"
 							preference="browser.tabs.clonetab"/>
 					<checkbox id="browser.tabs.copyurl" label="&copyTabURLOptions.label;"
-							preference="browser.tabs.copyurl"/>              
+							preference="browser.tabs.copyurl"/>
+					<checkbox id="browser.tabs.copyallurls" label="&copyAllTabUrlsOptions.label;"
+							preference="browser.tabs.copyallurls"/>                            
 					<checkbox id="browser.context.emaillink" label="&turnoffemaillink.label;"
 							preference="browser.context.emaillink"/>
 					<checkbox id="browser.context.aboutconfig" label="&turnoffcontextabout.label;"

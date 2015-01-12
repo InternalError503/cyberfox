@@ -971,6 +971,8 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Copy Tab URL">
 <!ENTITY copyTabURLOptions.label "Turn on copy tab url menu item.">
+<!ENTITY copyAllTabUrls.label "Copy All Tab URLS">
+<!ENTITY copyAllTabUrlsOptions.label "Turn on all tab urls menu item.">
 
 <!-- Classic Context Menu Tweak -->
 <!ENTITY contextNavigationClassic.label "Use classic context menu.">

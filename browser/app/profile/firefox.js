@@ -1886,6 +1886,9 @@ pref("app.update.check.enabled", true);
 //set bool pref for copy tab url enabled
 pref("browser.tabs.copyurl", true);
 
+//set bool pref for copy all tab urls enabled
+pref("browser.tabs.copyallurls", true);
+
 //set Bool pref for classic context menu
 pref("browser.context.classic", true);
 

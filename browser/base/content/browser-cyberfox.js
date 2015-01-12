@@ -11,6 +11,10 @@ if (!gCyberfoxCustom) {gCyberfoxCustom = {};};
 let DownloadsWindow = null;	
 let params = "resizable=yes,chrome=yes,centerscreen=yes,top=yes,alwaysRaised=no";
 
+let urlArray = {
+	url: []
+};
+
 var gCyberfoxCustom = {
 
 	restartBrowser: function (e) {	
@@ -61,6 +65,63 @@ var gCyberfoxCustom = {
 			console.log("Were sorry but something has gone wrong with 'CopyCurrentTabUrl' " + e);
 		}			
 },
+	//Copies all tab urls to clipboard	
+	CopyAllTabUrls : function(e) {
+
+    //Get all urls
+		this.getAllUrls();
+			
+	try{	
+		  //Enumerate all urls in to a list.
+			var urlItems = urlArray.url;
+			var urlList = "";
+			for (i = 0; urlItems[i]; i++) {	
+				try {			
+					urlList += urlItems[i].url + "\n";
+				} catch(e) {
+					//Catch any nasty errors and output to dialogue
+					Components.utils.reportError(e);
+				}					
+			}
+			//Send list to clipboard.				
+			const gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+										   .getService(Components.interfaces.nsIClipboardHelper);
+			gClipboardHelper.copyString(urlList);
+			
+			//Reset the array.
+			urlArray = {
+				url: []
+			};
+			
+		}catch (e){
+			//Catch any nasty errors and output to console
+			console.log("Were sorry but something has gone wrong with 'CopyAllTabUrls' " + e);
+		}				
+},
+
+  //Get all the tab urls into a json array.
+	getAllUrls: function(){
+	
+			var _tabCount = gBrowser.browsers.length;
+			
+			for (var i = 0; i < _tabCount; i++) {
+			
+				  var _browsersI = gBrowser.getBrowserAtIndex(i);
+				  
+				  try {
+					var urlItems = _browsersI.currentURI.spec;
+					
+						urlArray.url.push({
+							"url" : urlItems
+						});
+						
+				  } catch(e) {
+						//Catch any nasty errors and output to dialogue
+						Components.utils.reportError(e);
+				  }
+			}		
+	
+	},
 	
 	_ElementState :  function (element, state){
 	
@@ -96,10 +157,17 @@ document.getElementById("tabContextMenu")
 		}else{
 				gCyberfoxCustom._ElementState("context_CopyCurrentTabUrl", true);
 		}
-	
+
+		//Copy all tab urls
+		if (Services.prefs.getBoolPref("browser.tabs.copyallurls")){
+				gCyberfoxCustom._ElementState("context_CopyAllTabUrls", false);
+		}else{
+				gCyberfoxCustom._ElementState("context_CopyAllTabUrls", true);
+		}
+		
 	}catch (e){
 		//Catch any nasty errors and output to console
-		console.log("Were sorry but something has gone wrong with 'browser.tabs.clonetab' | browser.tabs.copyurl " + e);
+		console.log("Were sorry but something has gone wrong with 'browser.tabs.clonetab' | browser.tabs.copyurl | browser.tabs.copyallurls " + e);
 	}
 	
   

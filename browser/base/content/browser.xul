@@ -110,7 +110,10 @@
       <menuseparator/>
 	    <menuitem id="context_CopyCurrentTabUrl" 
 					        label="&copyTabURL.label;" 
-					        oncommand="gCyberfoxCustom.CopyCurrentTabUrl();"/>		  
+					        oncommand="gCyberfoxCustom.CopyCurrentTabUrl();"/>
+	    <menuitem id="context_CopyAllTabUrls" 
+					        label="&copyAllTabUrls.label;" 
+					        oncommand="gCyberfoxCustom.CopyAllTabUrls();"/>                  		  
 		  <menuitem id="context_CloneCurrentTab" 
 					        label="&cloneCurrentTab.label;" 
 					        oncommand="gCyberfoxCustom.CloneCurrent('tab');"/>					
