@@ -479,9 +479,11 @@
  					<checkbox id="browser.context.classic" label="&contextNavigationClassic.label;"
 							preference="browser.context.classic"/>
  					<checkbox id="browser.search.showOneOffButtons" label="&turnoffoneclicksearch.label;"
-							preference="browser.search.showOneOffButtons" />		
+							preference="browser.search.showOneOffButtons" 
+							tooltiptext="&restartRequiredMSG.label;" />		
  					<checkbox id="loop.enabled" label="&enablehellochat.label;"
-							preference="loop.enabled" />								
+							preference="loop.enabled" 
+							tooltiptext="&restartRequiredMSG.label;" />								
 			</groupbox>
 			
 			<groupbox id="alternateOptionsRestart" orient="vertical">
