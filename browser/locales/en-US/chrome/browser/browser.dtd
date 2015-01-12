@@ -993,6 +993,10 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Browser Restart Required.">
 
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
+<!ENTITY disableflashprotect.label "Disable flash player protection mode">
+
 <!-- about:home localization Tweak -->
 <!ENTITY abouthome.google.label "Google">
 <!ENTITY abouthome.google.url "https://www.google.com/">

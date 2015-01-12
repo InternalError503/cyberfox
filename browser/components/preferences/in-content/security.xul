@@ -26,7 +26,11 @@
   <preference id="browser.safebrowsing.enabled"
               name="browser.safebrowsing.enabled"
               type="bool"/>
-
+			  
+  <preference id="dom.ipc.plugins.flash.disable-protected-mode"
+              name="dom.ipc.plugins.flash.disable-protected-mode"
+              type="bool"/>
+				  
   <!-- Passwords -->
   <preference id="signon.rememberSignons" name="signon.rememberSignons" type="bool"/>
 
@@ -68,6 +72,13 @@
               preference="browser.safebrowsing.enabled" />
   </vbox>
 </groupbox>
+
+    <groupbox id="flashGroup" orient="vertical">
+      <caption label="&disableflashprotectgroup.label;"/>	
+      <checkbox id="dom.ipc.plugins.flash.disable-protected-mode"
+                label="&disableflashprotect.label;"
+                preference="dom.ipc.plugins.flash.disable-protected-mode" />	  
+    </groupbox>	
 
 <!-- Passwords -->
 <groupbox id="passwordsGroup" orient="vertical" data-category="paneSecurity" hidden="true">
