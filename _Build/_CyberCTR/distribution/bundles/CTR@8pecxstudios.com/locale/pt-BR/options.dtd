@@ -30,14 +30,16 @@
 <!ENTITY Ctr_tabs2			"Guias arredondadas (alternativas)">
 <!ENTITY Ctr_tabs3			"Guias arredondadas (alternativas Aero)">
 <!ENTITY Ctr_tabforminfo	"A aparência da guia é controlada pelo tema atual.">
-<!ENTITY Ctr_tabsontop0		"Guias no topo (padrão) - [não definida]">
-<!ENTITY Ctr_tabsontop1		"Guias no topo - definida [guiasnotopo=verdadeiro]">
-<!ENTITY Ctr_tabsontop2		"Guias embaixo - definida [guiasnotopo=falso]">
-<!ENTITY Ctr_tabsontop3		"Guias embaixo (v2) - definida [guiasnotopo=falso]">
-<!ENTITY Ctr_tabsontopI1	"Adicionar atributo [guiasnotopo=verdadeiro/falso] para">
+<!ENTITY Ctr_tabsontop0		"Guias no topo (padrão)">
+<!ENTITY Ctr_tabsontop1		"Guias no topo --- definida [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Guias embaixo (v1) --- definida [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Guias embaixo (v2) --- definida [tabsontop=false]">
+<!ENTITY Ctr_tabsontopW1	"v2 is for some add-ons and complete themes only!">
+<!ENTITY Ctr_tabsontopI1	"Adicionar atributo [tabsontop=true/false] para">
 <!ENTITY Ctr_tabsintitlebar	"Barra de título do Cyberfox (about:config)">
 <!ENTITY Ctr_tabwidthdef	"(padrão)">
 <!ENTITY Ctr_tabwidthcla	"(clássica)">
+<!ENTITY Ctr_tabminheight	"Height:">
 <!ENTITY Ctr_tabmaxwidth	"Largura Máxima:">
 <!ENTITY Ctr_tabminwidth	"Largura Mínima:">
 <!ENTITY Ctr_tabwidthinfo	"As larguras mínimas e máximas são controladas pelo TabMixPlus">
@@ -45,6 +47,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Values below 48px will cause glitches in most cases!">
 <!ENTITY Ctr_emptyfavicon	"Restaurar o favicon vazio (se um site não oferecer um)">
 <!ENTITY Ctr_noemptypticon	"Remover o favicon vazio da guia pinada">
+<!ENTITY Ctr_e10stab_notd	"E10s tabs: remove underline">
 <!ENTITY Ctr_closetab_0		"Fechar a Guia">
 <!ENTITY Ctr_closetab_1		"Só na guia ativa">
 <!ENTITY Ctr_closetab_2		"Em nenhuma">
@@ -74,6 +77,7 @@
 <!ENTITY Ctr_appbuttonc_gr	"Botão cinza">
 <!ENTITY Ctr_appbuttonc_pu	"Botão púrpura">
 <!ENTITY Ctr_appbuttonc_wh	"Botão branco">
+<!ENTITY Ctr_appbuttonc_cu	"Custom button color">
 <!ENTITY Ctr_appbuttonI1	"recomenda-se reiniciar">
 <!ENTITY Ctr_appbuttonI1e	"invisível na barra de título do Sistema Operacional">
 <!ENTITY Ctr_appbuttonI2	"Colorido só nas barras de título e de guias!">
@@ -90,9 +94,11 @@
 <!ENTITY Ctr_smallnavbut	"Botões pequenos na barra de navegação">
 <!ENTITY Ctr_bfurlbarfix	"Corrigir a borda-alcance das barras de URLs">
 <!ENTITY Ctr_backforward	"Botão móvel voltar-avançar">
+<!ENTITY Ctr_nbcompact		"Reduce navigation toolbars height">
 <!ENTITY Ctr_hide_bf_popup	"Ocultar o menú histórico ao pressionar o mouse">
 <!ENTITY Ctr_bf_space		"Reduce space between buttons (if possible)">
 <!ENTITY Ctr_noconicons		"Substituir os ícones do menu de contexto da página com etiquetas (voltar, avançar, parar, recarregar, página de favoritos)">
+<!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
 <!ENTITY Ctr_wincontrols	"Controles móveis da janela em tela cheia">
 <!ENTITY Ctr_emptyfavicon2	"Substituir o favicon genérico (vazio e pontilhado) pelo favicon de folha">
 <!ENTITY Ctr_mstatusbar		"Painel móvel da barra de status">
@@ -152,6 +158,7 @@
 <!ENTITY Ctr_bold			"Negrito">
 <!ENTITY Ctr_italic			"Itálico">
 <!ENTITY Ctr_notabhov		"Enabled settings override 'hovered' settings">
+<!ENTITY Ctr_tabc_act_tb	"Background color on toolbars">
 
 <!ENTITY Ctr_urlbar			"Barra de URLs">
 <!ENTITY Ctr_starinurl		"Botão de favoritos">
@@ -198,6 +205,7 @@
 <!ENTITY Ctr_altmenubarpos	"Posição alternativa (abaixo da barra de título)">
 <!ENTITY Ctr_menubarnofog	"Remover a cor/névoa do fundo (Windows AeroGlass / Win8)">
 
+<!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
 <!ENTITY Ctr_hidenavbar		"Ocultar a barra de navegação">
 <!ENTITY Ctr_nobookbarbg	"Barra de favoritos: remover a cor do fundo">
 <!ENTITY Ctr_nonavbarbg		"Barra de navegação: remover a cor do fundo">
@@ -224,6 +232,11 @@
 <!ENTITY Ctr_otherctroptns	"Other settings">
 <!ENTITY Ctr_cuibotbuttons	"Botões extra no modo 'personalização'">
 <!ENTITY Ctr_bookmarkoinpw	"'Open in a new private window' entry in bookmarks context menu">
+
+<!ENTITY Ctr_experttweaks	"Advanced">
+<!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
+<!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
+<!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
 
 
 <!ENTITY Ctr_pw_settings	"Configurações">

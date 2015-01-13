@@ -5,12 +5,12 @@
   <meta charset="utf-8" />
   <title id="windowtitle">CyberCTR Features</title>
 	<link rel="icon" 
-			type="image/png" 
-			id="favicon"
-			href="images/icon.png">
+			 type="image/png" 
+			 id="favicon"
+			 href="images/icon.png">
 	<link rel="stylesheet"
-			href="css/uikit.gradient.min.css"  
-			="text/css" />
+			 href="css/uikit.gradient.min.css"  
+			 type="text/css" />
 	<script src="js/jquery-2.1.1.min.js"></script>
 	<script src="js/uikit.min.js"></script>
 	<script src="js/features.js"></script>		
@@ -23,25 +23,72 @@
 <nav class="uk-navbar uk-animation-slide-top">
 <a class="uk-navbar-brand uk-hidden-small"><i class="uk-icon-cubes uk-icon-small"></i> <span class="uk-text-primary uk-text-bold">Cyber</span><span class="uk-text-bold">CTR</span></a>
     <ul class="uk-navbar-nav uk-hidden-small">		
-		<li><a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475" title="CyberCTR Update Package" target="_blank"><i class="uk-icon-cloud-download uk-icon-medium"></i> CyberCTR Update Package</a></li>
-		<li><a title="Documentation" onclick="cyberctrFeatures.get_localized_document();" target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>
-        <li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8" title="Cyberfox FAQ" target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> Frequently Ask Questions</a></li>		
-        <li><a href="https://8pecxstudios.com/Forums/index.php" title="8pecxstudios support forums" target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> Support Forums</a></li>
-        <li><a href="https://8pecxstudios.com/contact-us" title="Contact Us" target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> Contact Us</a></li>
+		<li><a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475" 
+					title="CyberCTR Update Package" 
+					target="_blank"><i class="uk-icon-cloud-download uk-icon-medium"></i> CyberCTR Update Package</a></li>
+		<li><a title="Documentation" 
+					onclick="cyberctrFeatures.get_localized_document();" 
+					target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>
+        <li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8" 
+					title="Cyberfox FAQ" 
+					target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> Frequently Ask Questions</a></li>		
+        <li><a href="https://8pecxstudios.com/Forums/index.php" 
+					title="8pecxstudios support forums" 
+					target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> Support Forums</a></li>
+        <li><a href="https://8pecxstudios.com/contact-us" 
+					title="Contact Us" 
+					target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> Contact Us</a></li>
     </ul>
 		<a class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas="{target:'#small-menu'}" href="#"></a>	
 </nav>
 <hr class="uk-grid-divider" style="border:none;"></hr>
+
+<div id="first_run_message" hidden="true">
+	<div class="uk-alert uk-alert-success" data-uk-alert="">
+			<a href="" class="uk-alert-close uk-close"></a>
+			<p class="uk-text uk-text-center"><i class="uk-icon-info-circle uk-icon-medium"></i> Welcome to features and information, Here you will find useful information and links to help improve your browsing experience.</p>
+	</div>
+</div>
 <div class="uk-panel uk-panel-box uk-animation-slide-bottom">
 	<h2>Main features (Added to CyberCTR)</h2>	
 	<h3>App-Menu button</h3>
 		<ul class="uk-list">
-			<li>Button color <span style="color:#0291e6;cursor:pointer;" class="uk-text-bold" data-uk-tooltip="{pos:'bottom-left',animation:'true'}" title="Color" onmouseover="$('.uk-tooltip').css('background', this.style.color);">Aurora</span> (Light)</li>
-			<li>Button color <span style="color:#3F3F3F;cursor:pointer;" class="uk-text-bold"  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" title="Color" onmouseover="$('.uk-tooltip').css('background', this.style.color);">Cyberfox</span></li>			
-			<li>Button color <span style="color:#2e7704;cursor:pointer;" class="uk-text-bold" data-uk-tooltip="{pos:'bottom-left',animation:'true'}" title="Color" onmouseover="$('.uk-tooltip').css('background', this.style.color);">Green</span> (Dark)</li>
-			<li>Button color <span style="color:#C1690C;cursor:pointer;" class="uk-text-bold" data-uk-tooltip="{pos:'bottom-left',animation:'true'}" title="Color" onmouseover="$('.uk-tooltip').css('background', this.style.color);">Orange</span> (Dark)</li>			
-			<li>Button color <span style="color:#f51417;cursor:pointer;" class="uk-text-bold" data-uk-tooltip="{pos:'bottom-left',animation:'true'}" title="Color" onmouseover="$('.uk-tooltip').css('background', this.style.color);">Red</span> (Dark)</li>		
-			<li>Button color <span style="color:#ef5c45;cursor:pointer;" class="uk-text-bold" data-uk-tooltip="{pos:'bottom-left',animation:'true'}" title="Color" onmouseover="$('.uk-tooltip').css('background', this.style.color);">Salmon</span></li>			
+			<li>Button color <span style="color:#0291e6;cursor:pointer;" 
+												  class="uk-text-bold" 
+												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
+												  title="Color" 
+												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
+												  onmouseout="$('.uk-tooltip').removeAttr('style');">Aurora</span> (Light)</li>
+			<li>Button color <span style="color:#3F3F3F;cursor:pointer;" 
+												  class="uk-text-bold"  
+												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
+												  title="Color" 
+												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
+												  onmouseout="$('.uk-tooltip').removeAttr('style');">Cyberfox</span></li>			
+			<li>Button color <span style="color:#2e7704;cursor:pointer;" 
+												  class="uk-text-bold" 
+												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
+												  title="Color" 
+												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
+												  onmouseout="$('.uk-tooltip').removeAttr('style');">Green</span> (Dark)</li>
+			<li>Button color <span style="color:#C1690C;cursor:pointer;" 
+												  class="uk-text-bold" 
+												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
+												  title="Color" 
+												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
+												  onmouseout="$('.uk-tooltip').removeAttr('style');">Orange</span> (Dark)</li>			
+			<li>Button color <span style="color:#f51417;cursor:pointer;" 
+												  class="uk-text-bold" 
+												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
+												  title="Color" 
+												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
+												  onmouseout="$('.uk-tooltip').removeAttr('style');">Red</span> (Dark)</li>		
+			<li>Button color <span style="color:#ef5c45;cursor:pointer;" 
+												  class="uk-text-bold" 
+												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
+												  title="Color" 
+												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
+												  onmouseout="$('.uk-tooltip').removeAttr('style');">Salmon</span></li>			
 		</ul>
 	<h3>Shipped Pre-Sets</h3>
 		<ul class="uk-list">
@@ -49,7 +96,11 @@
 		</ul>
 	<h3>Additional Features</h3>
 		<ul class="uk-list">
-			<li>Pre-Configure CyberCTR Settings <a href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&t=672" target="_blank" data-uk-tooltip="{pos:'bottom-right',animation:'true'}" title="Pre-Configure CyberCTR Settings"><i class="uk-icon-external-link"></i> FAQ article</a></li>			
+			<li>Pre-Configure CyberCTR Settings 
+			<a href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&t=672" 
+				  target="_blank" 
+				  data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
+				  title="Pre-Configure CyberCTR Settings"><i class="uk-icon-external-link"></i> FAQ article</a></li>			
 			<li>Pre-Configure CyberCTR Settings file change detection &amp; notification.</li>			
 		</ul>		
 <p>Plus many under the hood changes and many more visual changes to come.</p>					
@@ -159,9 +210,20 @@ Toolbar: [something]...[stop-button][reload-button]...[something]</p>
 
 <h4>Spaces, flexible spaces ans separators</h4>
 <p>These toolbar items appear in customizing mode and can be moved to toolbars like on previous Firefox versions.</p>
-<span class="uk-text-primary">Quoted from <a href="https://addons.mozilla.org/en-US/firefox/addon/classicthemerestorer#addon-description" target="_blank" data-uk-tooltip="{pos:'bottom-right',animation:'true'}" title="Classic Theme Restorer by Aris" ><i class="uk-icon-external-link"></i> original addons page</a></span>
-			</div><br/><center><span class="uk-text-center"><a href="https://8pecxstudios.com/" title="8pecxstudios" data-uk-tooltip="{pos:'top',animation:'true'}">8pecxstudios &trade;</a></span> 
-			<a class="uk-icon-button uk-icon-facebook-square" href="https://www.facebook.com/8pecxstudios" title="Give us a like" data-uk-tooltip="{pos:'top',animation:'true'}"></a> </center>
+<span class="uk-text-primary">Quoted from <a href="https://addons.mozilla.org/en-US/firefox/addon/classicthemerestorer#addon-description" 
+																			 target="_blank" 
+																			 data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
+																			 title="Classic Theme Restorer by Aris" ><i class="uk-icon-external-link"></i> original addons page</a></span>
+			</div><br/><center>
+			<span class="uk-text-center">
+			<a href="https://8pecxstudios.com/" 
+				 title="8pecxstudios" 
+				 data-uk-tooltip="{pos:'top',animation:'true'}">8pecxstudios &trade;</a>
+			</span> 			
+			<a class="uk-icon-button uk-icon-facebook-square" 
+			      href="https://www.facebook.com/8pecxstudios" 
+				  title="Give us a like" 
+				  data-uk-tooltip="{pos:'top',animation:'true'}"></a> </center>
 		</div>	
 	</div>
 </div>	
@@ -172,11 +234,21 @@ Toolbar: [something]...[stop-button][reload-button]...[something]</p>
 						<a class="uk-navbar-brand"><i class="uk-icon-cubes uk-icon-small" style="color:#f8f8f8;"></i> <span class="uk-text-bold" style="color:#f8f8f8;">CyberCTR</span></a>
                 </div>			
                 <ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav="">
-					<li><a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475" title="CyberCTR Update Package" target="_blank" ><i class="uk-icon-cloud-download uk-icon-medium"></i> CyberCTR Update Package</a></li>
-					<li><a title="Documentation" onclick="cyberctrFeatures.get_localized_document();"  target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>					
-					<li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8" title="Cyberfox FAQ" target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> Frequently Ask Questions</a></li>		
-					<li><a href="https://8pecxstudios.com/Forums/index.php" title="8pecxstudios support forums" target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> Support Forums</a></li>
-					<li><a href="https://8pecxstudios.com/contact-us" title="Contact Us" target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> Contact Us</a></li>	
+					<li><a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475" 
+								title="CyberCTR Update Package" 
+								target="_blank" ><i class="uk-icon-cloud-download uk-icon-medium"></i> CyberCTR Update Package</a></li>
+					<li><a title="Documentation" 
+								onclick="cyberctrFeatures.get_localized_document();"  
+								target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>					
+					<li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8" 
+								 title="Cyberfox FAQ" 
+								 target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> Frequently Ask Questions</a></li>		
+					<li><a href="https://8pecxstudios.com/Forums/index.php" 
+								title="8pecxstudios support forums" 
+								target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> Support Forums</a></li>
+					<li><a href="https://8pecxstudios.com/contact-us" 
+								title="Contact Us" 
+								target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> Contact Us</a></li>	
                     </ul>
             </div>
         </div>

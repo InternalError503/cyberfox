@@ -34,10 +34,12 @@
 <!ENTITY Ctr_tabsontop1		"Sekmeler Tepede (varsayılan) - [ayarlanmamış]">
 <!ENTITY Ctr_tabsontop2		"Sekmeler Tepede - ayarla [tabsontop=true]">
 <!ENTITY Ctr_tabsontop3		"Sekmeler Tepede Değil - ayarla [tabsontop=false]">
+<!ENTITY Ctr_tabsontopW1	"v2 is for some add-ons and complete themes only!">
 <!ENTITY Ctr_tabsontopI1	"Öznitelik Ekler [tabsontop=true/false] to">
 <!ENTITY Ctr_tabsintitlebar	"Cyberfox başlık çubuğu (about:config)">
 <!ENTITY Ctr_tabwidthdef	"(varsayılan)">
 <!ENTITY Ctr_tabwidthcla	"(klasik)">
+<!ENTITY Ctr_tabminheight	"Height:">
 <!ENTITY Ctr_tabmaxwidth	"Max-genişlik:">
 <!ENTITY Ctr_tabminwidth	"Min-genişlik:">
 <!ENTITY Ctr_tabwidthinfo	"Sekmelerin min-genişlik ve max-genişlik leri TabUtilities tarafından kontrol ediliyor">
@@ -45,6 +47,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Values below 48px will cause glitches in most cases!">
 <!ENTITY Ctr_emptyfavicon	"Restore empty favicon (if a site does not offer one)">
 <!ENTITY Ctr_noemptypticon	"Remove empty favicon from pinned tab">
+<!ENTITY Ctr_e10stab_notd	"E10s tabs: remove underline">
 <!ENTITY Ctr_closetab_0		"Sekme Kapat">
 <!ENTITY Ctr_closetab_1		"Sadece aktif sekme için">
 <!ENTITY Ctr_closetab_2		"Hiçbir yerde">
@@ -90,9 +93,11 @@
 <!ENTITY Ctr_smallnavbut	"Gezinti çubuğunda küçük butonlar">
 <!ENTITY Ctr_bfurlbarfix	"URL çubuğu çapını ve sınırlarını düzelt">
 <!ENTITY Ctr_backforward	"Hareketli İleri-Geri butonları">
+<!ENTITY Ctr_nbcompact		"Reduce navigation toolbars height">
 <!ENTITY Ctr_hide_bf_popup	"Geçmiş menüsü butonunu gizlemek için Fare tuşuna basın">
 <!ENTITY Ctr_bf_space		"Reduce space between buttons (if possible)">
 <!ENTITY Ctr_noconicons		"Replace page context menu icons with labels (back, forward, stop, reload, bookmark page)">
+<!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
 <!ENTITY Ctr_wincontrols	"Hareketli tam ekran penceresi kontrolleri">
 <!ENTITY Ctr_emptyfavicon2	"Replace generic favicon (empty and dotted) with sheet favicon">
 <!ENTITY Ctr_mstatusbar		"Movable status-bar panel">
@@ -152,6 +157,7 @@
 <!ENTITY Ctr_bold			"Kalın">
 <!ENTITY Ctr_italic			"İtalik">
 <!ENTITY Ctr_notabhov		"Enabled settings override 'hovered' settings">
+<!ENTITY Ctr_tabc_act_tb	"Background color on toolbars">
 
 <!ENTITY Ctr_urlbar			"Location bar">
 <!ENTITY Ctr_starinurl		"Star-button">
@@ -198,6 +204,7 @@
 <!ENTITY Ctr_altmenubarpos	"Alternatif pozisyon (Cyberfox başlık çubuğunda altında)">
 <!ENTITY Ctr_menubarnofog	"Arkaplan bulanıklığı/rengi kaldır (Windows AeroGlass/8)">
 
+<!ENTITY Ctr_aerocolors		"Blue Aero colors for toolbars (and tabs)">
 <!ENTITY Ctr_hidenavbar		"Gezinti Araç çubuğu: Çubuğu gizle">
 <!ENTITY Ctr_nobookbarbg	"Yerimi araç çubuğu: Arkaplan rengini kaldır">
 <!ENTITY Ctr_nonavbarbg		"Gezinti Araç çubuğu: Arkaplan rengini kaldır">
@@ -224,6 +231,13 @@
 <!ENTITY Ctr_otherctroptns	"Other settings">
 <!ENTITY Ctr_cuibotbuttons	"Extra buttons in 'customizing' mode">
 <!ENTITY Ctr_bookmarkoinpw	"'Open in a new private window' entry in bookmarks context menu">
+
+<!ENTITY Ctr_experttweaks	"Advanced">
+<!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
+<!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
+<!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
+
+
 
 <!ENTITY Ctr_pw_settings	"Ayarlar">
 <!ENTITY Ctr_pw_set_reset	"Sıfırla">

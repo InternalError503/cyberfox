@@ -76,6 +76,7 @@
 		  <toolbaritem id="ctraddon_statusbar"
 					   title="&Ctr_statusbar;"
 					   customizableui-areatype="toolbar"
+					   overflows="false"
 					   removable="true"/>
 		</toolbar>
 		<toolbar id="ctraddon_toolbar_dummy" customizable="false"
@@ -120,7 +121,6 @@
 	<toolbarbutton id="alltabs-button" removable="true"/>
 	<toolbarbutton id="webrtc-status-button" removable="true"/>
 	<toolbarbutton id="social-share-button" removable="true"/>
-	<toolbarbutton id="bookmarks-menu-button" overflows="false"/>
 	<toolbaritem id="social-toolbar-item" removable="true"/>
 
 	<toolbar id="TabsToolbar">
@@ -210,10 +210,7 @@
       <menuitem id="appmenu_minimizeMemoryUsage"
 				        class="menuitem-iconic menuitem-iconic-tooltip"
 				        label="&minimizeMemoryCache.label;"
-				        oncommand="Cu.forceGC();"/>
-	  <menuitem id="appmenu_restartBrowser"
-				        label="&restartBrowser.label;"
-				        oncommand="gCyberfoxCustom.restartBrowser();"/>					
+				        oncommand="Cu.forceGC();"/>					
 			<menuseparator/>
 
 			<hbox id="ctraddon_appmenubox_edit" label="&editMenu.label;">
@@ -401,6 +398,9 @@
 					  observes="sync-setup-state"
 					  oncommand="gSyncUI.openSetup()"
 					  class="menuitem-iconic"/>
+	  <menuitem id="appmenu_restartBrowser"
+				        label="&restartBrowser.label;"
+				        oncommand="gCyberfoxCustom.restartBrowser();"/>					  
 			<menuitem id="appmenu-quit"
 					  class="menuitem-iconic ctraddon_windowsonly"
 					  label="&quitApplicationCmdWin.label;"
@@ -663,7 +663,7 @@
 		
 	  <!--### appbutton for toolbars (Windows, Linux, MacOSX) ###-->
 	  <toolbarbutton id="ctraddon_appbutton"
-                     class="toolbarbutton-1"
+                     class="toolbarbutton-1 ctraddon-toolbarbutton"
                      persist="class"
                      removable="true"
                      type="menu"
@@ -674,7 +674,7 @@
 
 	  <!--### adds own history menu button to browsers customizing area ###-->
 	  <toolbarbutton id="ctraddon_history-menu-toolbar-button"
-                     class="toolbarbutton-1 chromeclass-toolbar-additional"
+                     class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                      persist="class"
                      removable="true"
                      type="menu"
@@ -728,7 +728,7 @@
       
 	  <!--### adds own bookmarks menu button to browsers customizing area ###-->
 	  <toolbarbutton id="ctraddon_bookmarks-menu-toolbar-button"
-                     class="toolbarbutton-1 chromeclass-toolbar-additional"
+                     class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                      persist="class"
                      removable="true"
                      type="menu"
@@ -798,7 +798,7 @@
       </toolbarbutton>
 	  
 	  <!--### creates a CTR preference button ###-->
-	  <toolbarbutton id="ctraddon_ctr-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+	  <toolbarbutton id="ctraddon_ctr-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
 					 label="&Ctr_title;"
 					 persist="class"
 					 cui-areatype="toolbar"
@@ -806,13 +806,13 @@
                      tooltiptext="&Ctr_title;"/>
 
 	  <!--### creates a bookmarks sidebar button ###-->
-	  <toolbarbutton id="ctraddon_bookmarks-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+	  <toolbarbutton id="ctraddon_bookmarks-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
 					 label="&bookmarksMenuButton.label;"
                      observes="viewBookmarksSidebar"
                      tooltiptext="&bookmarksMenuButton.label; &Ctr_sidebarbutton;"/>
 					 
       <!--### creates a history sidebar button ###-->
-	  <toolbarbutton id="ctraddon_history-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+	  <toolbarbutton id="ctraddon_history-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
 					 label="&historyButton.label;"
                      observes="viewHistorySidebar"
                      tooltiptext="&historyButton.label; &Ctr_sidebarbutton;"/>
@@ -834,6 +834,7 @@
 	  <toolbaritem id="ctraddon_puib_separator"
                    title="&Ctr_puibseparator;"
                    customizableui-areatype="toolbar"
+				   overflows="false"
                    removable="true"/>
 				   
 	  <toolbaritem id="ctraddon_navigator-throbber"
@@ -842,6 +843,7 @@
 				   align="center"
 				   pack="center"
 				   onclick="classicthemerestorerjs.ctr.openAThrobberUrl();"
+				   overflows="false"
                    removable="true"/>
 	  
 	  <!--### creates movable back-forward buttons ###-->
@@ -850,14 +852,14 @@
                    forwarddisabled="false"
 				   overflows="false"
                    title="&backCmd.label; &forwardCmd.label;">
-          <toolbarbutton id="ctraddon_back-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+          <toolbarbutton id="ctraddon_back-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                          label="&backCmd.label;"
                          command="Browser:BackOrBackDuplicate"
 						 onmousedown="classicthemerestorerjs.ctr.ctrBackMenuShow(this);"
 						 onclick="checkForMiddleClick(this, event);"
                          tooltip="back-button-tooltip"
                          context="backForwardMenu"/>
-          <toolbarbutton id="ctraddon_forward-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+          <toolbarbutton id="ctraddon_forward-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                          label="&forwardCmd.label;"
                          command="Browser:ForwardOrForwardDuplicate"
 						 onmousedown="classicthemerestorerjs.ctr.ctrBackMenuShow(this);"
@@ -870,7 +872,7 @@
 	  <toolbarbutton id="ctraddon_back-forward-dropmarker" type="menu" 
 			disabled="false"
 			label="&backCmd.label; &forwardCmd.label;"
-			class="toolbarbutton-1 chromeclass-toolbar-additional tabs-alltabs-button"
+			class="toolbarbutton-1 chromeclass-toolbar-additional tabs-alltabs-button ctraddon-toolbarbutton"
 			onbroadcast="if (this.disabled) this.disabled =
 			document.getElementById('Browser:Back').hasAttribute('disabled') &amp;&amp;
 			document.getElementById('Browser:Forward').hasAttribute('disabled');">
@@ -885,29 +887,27 @@
 	  
       
 	  <!--### creates a movable reload button ###-->
-	  <toolbarbutton id="ctraddon_reload-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+	  <toolbarbutton id="ctraddon_reload-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                      label="&reloadCmd.label;" removable="true"
                      command="Browser:ReloadOrDuplicate"
                      onclick="checkForMiddleClick(this, event);"
                      tooltiptext="&reloadButton.tooltip;"/>
 
       <!--### creates a movable stop button ###-->
-	  <toolbarbutton id="ctraddon_stop-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
+	  <toolbarbutton id="ctraddon_stop-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                      label="&stopCmd.label;" removable="true"
                      command="Browser:Stop"
                      tooltiptext="&stopButton.tooltip;"/>
   
 	  <!--### creates clone of fullscreen window control buttons ###-->
 	  <toolbaritem id="ctraddon_window-controls" class="chromeclass-toolbar-additional"
-                   removable="true" title="&Ctr_windowcontrols;">
+                   removable="true" overflows="false" title="&Ctr_windowcontrols;">
         <toolbarbutton id="minimize-button"
                        tooltiptext="&fullScreenMinimize.tooltip;"
                        oncommand="window.minimize();"/>
-
         <toolbarbutton id="restore-button"
                        tooltiptext="&fullScreenRestore.tooltip;"
                        oncommand="BrowserFullScreen();"/>
-
         <toolbarbutton id="close-button"
                        tooltiptext="&fullScreenClose.tooltip;"
                        oncommand="BrowserTryToCloseWindow();"/>

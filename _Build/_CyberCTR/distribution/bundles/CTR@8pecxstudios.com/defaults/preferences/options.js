@@ -1,8 +1,11 @@
 // tab settings
 pref("extensions.classicthemerestorer.tabs","tabs_squared");
 pref("extensions.classicthemerestorer.tabsontop",'unset');
+pref("extensions.classicthemerestorer.ctabheightcb",false);
+pref("extensions.classicthemerestorer.ctabheight",28);
 pref("extensions.classicthemerestorer.ctabmwidth",100);
 pref("extensions.classicthemerestorer.ctabwidth",210);
+pref("extensions.classicthemerestorer.e10stab_notd",false);
 pref("extensions.classicthemerestorer.emptyfavicon",false);
 pref("extensions.classicthemerestorer.noemptypticon",false);
 pref("extensions.classicthemerestorer.closetab","closetab_default");
@@ -21,17 +24,21 @@ pref("extensions.classicthemerestorer.appbclmmenus",true);
 
 pref("extensions.classicthemerestorer.appbuttontxt",'');
 
+pref("extensions.classicthemerestorer.cappbutc1",'#00FF00');
+pref("extensions.classicthemerestorer.cappbutc2",'#007700');
+
 //General UI
 pref("extensions.classicthemerestorer.smallnavbut",false);
 pref("extensions.classicthemerestorer.bfurlbarfix",false);
 pref("extensions.classicthemerestorer.bf_space",false);
 pref("extensions.classicthemerestorer.backforward",false);
 pref("extensions.classicthemerestorer.hide_bf_popup",false);
+pref("extensions.classicthemerestorer.nbcompact",false);
 pref("extensions.classicthemerestorer.statusbar",true);
 pref("extensions.classicthemerestorer.noconicons",false);
+pref("extensions.classicthemerestorer.svgfilters",false);
 pref("extensions.classicthemerestorer.combrelstop",false);
 pref("extensions.classicthemerestorer.activndicat",false);
-pref("extensions.classicthemerestorer.nbiconsize",'small');
 pref("extensions.classicthemerestorer.nbisizedelay",0);
 pref("extensions.classicthemerestorer.findbar","findbar_default");
 pref("extensions.classicthemerestorer.nav_txt_ico","icons");
@@ -74,6 +81,9 @@ pref("extensions.classicthemerestorer.padlockex",true);
 pref("extensions.classicthemerestorer.icopageinfo",false);
 
 // Toolbar settings
+pref("extensions.classicthemerestorer.aerocolors",false);
+pref("extensions.classicthemerestorer.nbiconsize",'small');
+
 pref("extensions.classicthemerestorer.nobookbarbg",false);
 pref("extensions.classicthemerestorer.hidenavbar",false);
 pref("extensions.classicthemerestorer.nonavbarbg",false);
@@ -181,6 +191,7 @@ pref("extensions.classicthemerestorer.tabfita_pen",false);
 pref("extensions.classicthemerestorer.tabfita_unr",false);
 pref("extensions.classicthemerestorer.tabfita_hov",false);
 
+pref("extensions.classicthemerestorer.tabc_act_tb",false);
 pref("extensions.classicthemerestorer.tabc_hov_unr",false);
 pref("extensions.classicthemerestorer.tabc_hov_unl",false);
 
@@ -205,4 +216,7 @@ pref("extensions.classicthemerestorer.ctrpref.lastmodapply", false);
 pref("extensions.classicthemerestorer.titleintitlebar", false);
 
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.1.9");
+pref("extensions.classicthemerestorer.version", "1.2.0");
+
+//Features
+pref("extensions.classicthemerestorer.features.firstrun", false);

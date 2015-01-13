@@ -30,14 +30,16 @@
 <!ENTITY Ctr_tabs2			"Zakulacené panely (alternativní)">
 <!ENTITY Ctr_tabs3			"Zakulacené panely (alternativní Aero)">
 <!ENTITY Ctr_tabforminfo	"Vzhled panelů je určen současným motivem vzhledu.">
-<!ENTITY Ctr_tabsontop0		"Panely navrchu (výchozí) - [not set]">
-<!ENTITY Ctr_tabsontop1		"Panely navrchu - nastaveno [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Panely pod adresním řádkem - nastaveno [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Panely pod adresním řádkem (v2) - nastaveno [tabsontop=false]">
+<!ENTITY Ctr_tabsontop0		"Panely navrchu (výchozí)">
+<!ENTITY Ctr_tabsontop1		"Panely navrchu --- nastaveno [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Panely pod adresním řádkem (v1) --- nastaveno [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Panely pod adresním řádkem (v2) --- nastaveno [tabsontop=false]">
+<!ENTITY Ctr_tabsontopW1	"v2 is for some add-ons and complete themes only!">
 <!ENTITY Ctr_tabsontopI1	"Přidává atribut [tabsontop=true/false] pro">
 <!ENTITY Ctr_tabsintitlebar	"Záhlaví okna Cyberfox (předvolba about:config)">
 <!ENTITY Ctr_tabwidthdef	"(výchozí)">
 <!ENTITY Ctr_tabwidthcla	"(klasický)">
+<!ENTITY Ctr_tabminheight	"Height:">
 <!ENTITY Ctr_tabmaxwidth	"Max-width:">
 <!ENTITY Ctr_tabminwidth	"Min-width:">
 <!ENTITY Ctr_tabwidthinfo	"Šířka panelů (min-width a max-width) je určena doplňkem TabMixPlus">
@@ -45,6 +47,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Values below 48px will cause glitches in most cases!">
 <!ENTITY Ctr_emptyfavicon	"Obnovit prázdnou faviconu (pokud stránka nemá vlastní)">
 <!ENTITY Ctr_noemptypticon	"Odebrat prázdnou faviconu z připnutého panelu">
+<!ENTITY Ctr_e10stab_notd	"E10s tabs: remove underline">
 <!ENTITY Ctr_closetab_0		"Zavřít panel">
 <!ENTITY Ctr_closetab_1		"Pouze na aktivním panelu">
 <!ENTITY Ctr_closetab_2		"Nikde">
@@ -74,6 +77,7 @@
 <!ENTITY Ctr_appbuttonc_gr	"Šedé tlačítko">
 <!ENTITY Ctr_appbuttonc_pu	"Fialové tlačítko">
 <!ENTITY Ctr_appbuttonc_wh	"Bíle tlačítko">
+<!ENTITY Ctr_appbuttonc_cu	"Custom button color">
 <!ENTITY Ctr_appbuttonI1	"Doporučený restart">
 <!ENTITY Ctr_appbuttonI1e	"Není viditelné v záhlaví okna Windows OS, pouze v záhlaví okna Cyberfoxu!">
 <!ENTITY Ctr_appbuttonI2	"Barva tlačítka jsou viditelné pouze v záhlaví okna nebo liště s panely!">
@@ -90,9 +94,11 @@
 <!ENTITY Ctr_smallnavbut	"Malá tlačítka na liště navigace">
 <!ENTITY Ctr_bfurlbarfix	"Upravit okraje adresního řádku">
 <!ENTITY Ctr_backforward	"Přesunutelná tlačítka zpět-vpřed">
+<!ENTITY Ctr_nbcompact		"Reduce navigation toolbars height">
 <!ENTITY Ctr_hide_bf_popup	"Skrýt nabídku historie tlačítek při kliknutí myší">
 <!ENTITY Ctr_bf_space		"Reduce space between buttons (if possible)">
 <!ENTITY Ctr_noconicons		"Nahradit ikony v kontextové nabídce stránky textem (zpět, vpřed, zastavit, obnovit, přidat do záložek)">
+<!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
 <!ENTITY Ctr_wincontrols	"Přesunutelné ovládací prvky okna v režimu celé obrazovky">
 <!ENTITY Ctr_emptyfavicon2	"Nahradit obecnou faviconu (prázdnou tečkovanou) faviconou listu">
 <!ENTITY Ctr_mstatusbar		"Přesunutelný stavový řádek">
@@ -152,6 +158,7 @@
 <!ENTITY Ctr_bold			"Tučný">
 <!ENTITY Ctr_italic			"Kurzíva">
 <!ENTITY Ctr_notabhov		"Enabled settings override 'hovered' settings">
+<!ENTITY Ctr_tabc_act_tb	"Background color on toolbars">
 
 <!ENTITY Ctr_urlbar			"Urlbar">
 <!ENTITY Ctr_starinurl		"Tlačítko hvězdičky">
@@ -198,6 +205,7 @@
 <!ENTITY Ctr_altmenubarpos	"Alternativní umístění (pod lištou záhlaví Cyberfox)">
 <!ENTITY Ctr_menubarnofog	"Odstranit barevné/zamlžené pozadí (Windows AeroGlass/8)">
 
+<!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
 <!ENTITY Ctr_hidenavbar		"Navigační lišta: skrýt lištu">
 <!ENTITY Ctr_nobookbarbg	"Lišta záložek: odstranit barvu pozadí">
 <!ENTITY Ctr_nonavbarbg		"Navigační lišta: odstranit barvu pozadí">
@@ -224,6 +232,11 @@
 <!ENTITY Ctr_otherctroptns	"Other settings">
 <!ENTITY Ctr_cuibotbuttons	"Vlastní tlačítka v režimu 'přizpůsobení'">
 <!ENTITY Ctr_bookmarkoinpw	"'Open in a new private window' entry in bookmarks context menu">
+
+<!ENTITY Ctr_experttweaks	"Advanced">
+<!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
+<!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
+<!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
 
 
 <!ENTITY Ctr_pw_settings	"Možnosti">

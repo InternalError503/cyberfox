@@ -5,7 +5,7 @@
 	  visibility: collapse !important;
 	}
 	/* When hiding all labels we forget that the zoom percentage|zoom reset button only has text, We still need that text or we have empty button*/
-	#zoom-reset-button label{
+	#PanelUI-contents #zoom-reset-button label{
 		visibility: visible !important;
 	}
 }

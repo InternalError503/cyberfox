@@ -30,14 +30,16 @@
 <!ENTITY Ctr_tabs2			"Karty zaokrąglone (alternatywne)">
 <!ENTITY Ctr_tabs3			"Karty zaokrąglone (alternatywne Aero)">
 <!ENTITY Ctr_tabforminfo	"Wygląd karty jest kontrolowany przez obecny styl.">
-<!ENTITY Ctr_tabsontop0		"Karty na górze (domyślne) - [tabsontop]">
-<!ENTITY Ctr_tabsontop1		"Karty na górze - ustawienie [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Karty nie na górze - ustawienie [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Karty nie na górze (v2) - ustawienie [tabsontop=false]">
+<!ENTITY Ctr_tabsontop0		"Karty na górze (domyślne)">
+<!ENTITY Ctr_tabsontop1		"Karty na górze --- atrybut [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Karty nie na górze (v1) --- atrybut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Karty nie na górze (v2) --- atrybut [tabsontop=false]">
+<!ENTITY Ctr_tabsontopW1	"v2 jest tylko dla niektórych dodatków i kompletnych motywów!">
 <!ENTITY Ctr_tabsontopI1	"Dodaje atrybut [tabsontop=true/false] do:">
 <!ENTITY Ctr_tabsintitlebar	"Pasek tytułu Cyberfoksa (ustawienie about:config)">
 <!ENTITY Ctr_tabwidthdef	"(domyślne)">
 <!ENTITY Ctr_tabwidthcla	"(klasyczne)">
+<!ENTITY Ctr_tabminheight	"Wysokość:">
 <!ENTITY Ctr_tabmaxwidth	"Maksymalna szerokość:">
 <!ENTITY Ctr_tabminwidth	"Minimalna szerokość:">
 <!ENTITY Ctr_tabwidthinfo	"Szerokość karty jest kontrolowana przez TabMixPlus">
@@ -45,6 +47,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Wartości poniżej 48 pikseli w większości przypadków spowodują błędy!">
 <!ENTITY Ctr_emptyfavicon	"Przywróć pustą ikonę ulubionych (jeżeli strona nie zaoferuje żadnej)">
 <!ENTITY Ctr_noemptypticon	"Usuń pustą ikonę ulubionych z przypiętej karty">
+<!ENTITY Ctr_e10stab_notd	"Karty E10s: usuń podkreślenie">
 <!ENTITY Ctr_closetab_0		"Przycisk zamknięcia karty">
 <!ENTITY Ctr_closetab_1		"Tylko na aktywnej karcie">
 <!ENTITY Ctr_closetab_2		"Nigdzie">
@@ -74,6 +77,7 @@
 <!ENTITY Ctr_appbuttonc_gr	"Szary kolor przycisku">
 <!ENTITY Ctr_appbuttonc_pu	"Fioletowy kolor przycisku">
 <!ENTITY Ctr_appbuttonc_wh	"Biały kolor przycisku">
+<!ENTITY Ctr_appbuttonc_cu	"Niestandardowy kolor przycisku">
 <!ENTITY Ctr_appbuttonI1	"Zalecany restart">
 <!ENTITY Ctr_appbuttonI1e	"Niewidoczny na systemowym pasku tytułu, tylko na pasku tytułu Cyberfoksa!">
 <!ENTITY Ctr_appbuttonI2	"Kolory przycisku są tylko widoczne na pasku tytułu oraz pasku kart!">
@@ -90,9 +94,11 @@
 <!ENTITY Ctr_smallnavbut	"Małe przyciski na pasku nawigacji">
 <!ENTITY Ctr_bfurlbarfix	"Napraw promień krawędzi paska adresu">
 <!ENTITY Ctr_backforward	"Ruchomy przycisk wstecz-do przodu">
+<!ENTITY Ctr_nbcompact		"Zmniejsz wysokość paska nawigacji">
 <!ENTITY Ctr_hide_bf_popup	"Ukryj menu historii po naciśnięciu przycisku myszki">
 <!ENTITY Ctr_bf_space		"Zmniejsz odstęp pomiędzy przyciskami (jeżeli możliwe)">
 <!ENTITY Ctr_noconicons		"Zastąp etykietami ikony menu kontekstowego strony (wstecz, do przodu, zatrzymaj, odśwież, dodaj zakładkę)">
+<!ENTITY Ctr_svgfilters		"Kolory SVG ikon przycisków domyślnego paska narzędzi">
 <!ENTITY Ctr_wincontrols	"Ruchome kontrolki okna pełnego ekranu">
 <!ENTITY Ctr_emptyfavicon2	"Wymień standardową ikonę ulubionych (pusta i wykropkowana) na ikonę kartki">
 <!ENTITY Ctr_mstatusbar		"Ruchomy panel paska statusu">
@@ -152,6 +158,7 @@
 <!ENTITY Ctr_bold			"Pogrubiona">
 <!ENTITY Ctr_italic			"Kursywa">
 <!ENTITY Ctr_notabhov		"Włączone ustawienia nie uwzględniają ustawień 'najechania'">
+<!ENTITY Ctr_tabc_act_tb	"Kolor tła na paskach narzędzi">
 
 <!ENTITY Ctr_urlbar			"Pasek adresu">
 <!ENTITY Ctr_starinurl		"Przycisk 'gwiazdka'">
@@ -198,6 +205,7 @@
 <!ENTITY Ctr_altmenubarpos	"Alternatywna pozycja (poniżej paska tytułu Cyberfoksa)">
 <!ENTITY Ctr_menubarnofog	"Usuń kolor tła i mgłę (Windows AeroGlass/8)">
 
+<!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
 <!ENTITY Ctr_hidenavbar		"Pasek nawigacji: ukryj pasek narzędzi">
 <!ENTITY Ctr_nobookbarbg	"Pasek zakładek: usuń kolor tła">
 <!ENTITY Ctr_nonavbarbg		"Pasek nawigacji: usuń kolor tła">
@@ -209,7 +217,7 @@
 <!ENTITY Ctr_closeabarbut	"Usuń przycisk zamknięcia paska dodatków">
 <!ENTITY Ctr_highaddonsbar	"Zwiększ wysokość">
 
-<!ENTITY Ctr_animation		"Animacja">
+<!ENTITY Ctr_animation		"Animacje">
 <!ENTITY Ctr_throbberalt	"Alternatywna animacja ładowania wskaźnika aktywności karty">
 <!ENTITY Ctr_bmanimation	"Animacja dodawania zakładki">
 <!ENTITY Ctr_pananimation	"Animacja otwierania panelu">
@@ -224,6 +232,12 @@
 <!ENTITY Ctr_otherctroptns	"Inne ustawienia">
 <!ENTITY Ctr_cuibotbuttons	"Dodatkowe przyciski w trybie 'dostosowywania'">
 <!ENTITY Ctr_bookmarkoinpw	"Pozycja 'Otwórz w nowym oknie prywatnym' w menu kontekstowym zakładek">
+
+
+<!ENTITY Ctr_experttweaks	"Poprawki eksperckie">
+<!ENTITY Ctr_fx33layers		"Gecko 33+ wprowadził 'nowe funkcje renderowania' odpowiedzialne obecnie za 'zawieszanie się kart' w niektórych systemach. Odznaczenie tego ustawienia rozwiązuje ten problem.">
+<!ENTITY Ctr_fx34search		"Gecko 34+ wprowadził 'nowy interfejs wyszukiwania'. Odznaczenie tego ustawienia przywraca 'stary interfejs wyszukiwania'.">
+<!ENTITY Ctr_fx34loop		"Gecko 34+ wprowadził funkcje 'dzwonienia i konwersacji'. Odznaczenie tego ustawienia usunie je.">
 
 
 <!ENTITY Ctr_pw_settings	"Ustawienia">

@@ -30,14 +30,16 @@
 <!ENTITY Ctr_tabs2			"Καμπυλόγραμμες καρτέλες (εναλλακτική τεχνοτροπία)">
 <!ENTITY Ctr_tabs3			"Καμπυλόγραμμες καρτέλες (εναλλακτική τεχνοτροπία, Aero)">
 <!ENTITY Ctr_tabforminfo	"Η εμφάνιση των καρτελών ελέγχεται από το τρέχον θέμα.">
-<!ENTITY Ctr_tabsontop0		"Καρτέλες στο πάνω μέρος (προεπιλογή) - [μη ορισμένο]">
-<!ENTITY Ctr_tabsontop1		"Καρτέλες στο πάνω μέρος - ορισμός [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Καρτέλες όχι στο πάνω μέρος - ορισμός [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Καρτέλες όχι στο πάνω μέρος (v2) - ορισμός [tabsontop=false]">
+<!ENTITY Ctr_tabsontop0		"Καρτέλες στο πάνω μέρος (προεπιλογή)">
+<!ENTITY Ctr_tabsontop1		"Καρτέλες στο πάνω μέρος --- ορισμός [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Καρτέλες όχι στο πάνω μέρος (v1) --- ορισμός [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Καρτέλες όχι στο πάνω μέρος (v2) --- ορισμός [tabsontop=false]">
+<!ENTITY Ctr_tabsontopW1	"v2 is for some add-ons and complete themes only!">
 <!ENTITY Ctr_tabsontopI1	"Προσθέτει χαρακτηριστικό [tabsontop=true/false] σε">
 <!ENTITY Ctr_tabsintitlebar	"Γραμμή τίτλου cyberfox (προτίμηση about:config)">
 <!ENTITY Ctr_tabwidthdef	"(προεπιλογή)">
 <!ENTITY Ctr_tabwidthcla	"(κλασικό)">
+<!ENTITY Ctr_tabminheight	"Height:">
 <!ENTITY Ctr_tabmaxwidth	"Μέγιστο εύρος:">
 <!ENTITY Ctr_tabminwidth	"Ελάχιστο εύρος:">
 <!ENTITY Ctr_tabwidthinfo	"Το εύρος καρτελών ελέγχεται από την επέκταση «TabMixPlus»">
@@ -45,6 +47,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Τιμές κάτω από 48px θα προκαλέσουν δυσλειτουργίες στις περισσότερες περιπτώσεις!">
 <!ENTITY Ctr_emptyfavicon	"Επαναφορά κενού εικονιδίου (εάν ένας ιστότοπος δεν διαθέτει εικονίδιο)">
 <!ENTITY Ctr_noemptypticon	"Αφαίρεση κενού εικονιδίου από καρτέλες εφαρμογών">
+<!ENTITY Ctr_e10stab_notd	"E10s tabs: remove underline">
 <!ENTITY Ctr_closetab_0		"Κλείσιμο καρτέλας">
 <!ENTITY Ctr_closetab_1		"Μόνο στην ενεργή καρτέλα">
 <!ENTITY Ctr_closetab_2		"Πουθενά">
@@ -74,6 +77,7 @@
 <!ENTITY Ctr_appbuttonc_gr	"Γκρι χρώμα κουμπιού">
 <!ENTITY Ctr_appbuttonc_pu	"Πορφυρό χρώμα κουμπιού">
 <!ENTITY Ctr_appbuttonc_wh	"Άσπρο χρώμα κουμπιού">
+<!ENTITY Ctr_appbuttonc_cu	"Custom button color">
 <!ENTITY Ctr_appbuttonI1	"Συνιστάται επανεκκίνηση">
 <!ENTITY Ctr_appbuttonI1e	"Δεν είναι ορατό στη γραμμή τίτλου του Λ.Σ. Windows, μόνο στη γραμμή τίτλου του Cyberfox!">
 <!ENTITY Ctr_appbuttonI2	"Τα χρώματα του κουμπιού είναι ορατά μόνο στη γραμμή τίτλου και στην εργαλειοθήκη καρτελών!">
@@ -90,9 +94,11 @@
 <!ENTITY Ctr_smallnavbut	"Μικρά κουμπιά στην εργαλειοθήκη πλοήγησης">
 <!ENTITY Ctr_bfurlbarfix	"Διόρθωση ακτίνας περιγράμματος γραμμής τοποθεσιών">
 <!ENTITY Ctr_backforward	"Μετακινήσιμα κουμπιά πίσω-εμπρός">
+<!ENTITY Ctr_nbcompact		"Reduce navigation toolbars height">
 <!ENTITY Ctr_hide_bf_popup	"Απόκρυψη αναδυόμενου μενού ιστορικού κουμπιών κατά το πάτημά τους">
 <!ENTITY Ctr_bf_space		"Μείωση διαστήματος μεταξύ των κουμπιών (εάν είναι δυνατόν)">
 <!ENTITY Ctr_noconicons		"Μενού περιεχομένου σελίδας: αντικατάσταση εικονιδίων με ετικέτες («Πίσω», «Μπροστά», «Διακοπή», «Ανανέωση», «Η σελίδα ως σελιδοδείκτης»)">
+<!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
 <!ENTITY Ctr_wincontrols	"Μετακινήσιμα στοιχεία ελέγχου παραθύρου σε προβολή πλήρους οθόνης">
 <!ENTITY Ctr_emptyfavicon2	"Αντικατάσταση γενικού εικονιδίου (κενό και διάστικτο) με εικονίδιο φύλλου">
 <!ENTITY Ctr_mstatusbar		"Μετακινήσιμο πινακίδιο γραμμής κατάστασης">
@@ -152,6 +158,7 @@
 <!ENTITY Ctr_bold			"Έντονη γραφή">
 <!ENTITY Ctr_italic			"Πλάγια γραφή">
 <!ENTITY Ctr_notabhov		"Παράκαμψη ρυθμίσεων κατάδειξης από τις ενεργοποιημένες ρυθμίσεις εδώ">
+<!ENTITY Ctr_tabc_act_tb	"Background color on toolbars">
 
 <!ENTITY Ctr_urlbar			"Γραμμή τοποθεσιών">
 <!ENTITY Ctr_starinurl		"Κουμπί-αστέρι">
@@ -198,6 +205,7 @@
 <!ENTITY Ctr_altmenubarpos	"Εναλλακτική θέση (παρακάτω από τη γραμμή τίτλου του cyberfox)">
 <!ENTITY Ctr_menubarnofog	"Αφαίρεση χρώματος/ομίχλης φόντου (Windows AeroGlass/8)">
 
+<!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
 <!ENTITY Ctr_hidenavbar		"Εργαλειοθήκη πλοήγησης: απόκρυψη εργαλειοθήκης">
 <!ENTITY Ctr_nobookbarbg	"Εργαλειοθήκη σελιδοδεικτών: αφαίρεση χρώματος φόντου">
 <!ENTITY Ctr_nonavbarbg		"Εργαλειοθήκη πλοήγησης: αφαίρεση χρώματος φόντου">
@@ -224,6 +232,11 @@
 <!ENTITY Ctr_otherctroptns	"Άλλες ρυθμίσεις">
 <!ENTITY Ctr_cuibotbuttons	"Επιπρόσθετα κουμπιά στη λειτουργία προσαρμογής">
 <!ENTITY Ctr_bookmarkoinpw	"Καταχώριση «&Ctr_openInPrivateWindow;» στο μενού περιεχομένου σελιδοδεικτών">
+
+<!ENTITY Ctr_experttweaks	"Advanced">
+<!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
+<!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
+<!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
 
 
 <!ENTITY Ctr_pw_settings	"Ρυθμίσεις">
