@@ -73,7 +73,7 @@
   </vbox>
 </groupbox>
 
-    <groupbox id="flashGroup" orient="vertical">
+    <groupbox id="flashGroup" orient="vertical" data-category="paneSecurity" hidden="true">
       <caption label="&disableflashprotectgroup.label;"/>	
       <checkbox id="dom.ipc.plugins.flash.disable-protected-mode"
                 label="&disableflashprotect.label;"
