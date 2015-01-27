@@ -3,7 +3,7 @@
 ;Script Version: 1.9.40
 
 #define MyAppName "Cyberfox"
-#define MyAppVersion "35.0.0.0"
+#define MyAppVersion "35.0.1.0"
 #define MyAppPublisher "8pecxstudios"
 #define MyAppURL "https://8pecxstudios.com/"
 #define MyAppDescription "Cyberfox Web Browser"
