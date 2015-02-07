@@ -521,6 +521,10 @@ Root: "HKCR"; Subkey: "CyberfoxURL"; ValueType: none; Flags: dontcreatekey unins
 Root: "HKLM"; Subkey: "SOFTWARE\Clients\StartMenuInternet\CYBERFOX.EXE"; ValueType: none; Flags: dontcreatekey uninsdeletekey
 
 [Code]
+//Setup exit code for check for running function.
+procedure ExitProcess(exitCode:integer);
+  external 'ExitProcess@kernel32.dll stdcall';
+
 //Check for running process before initializing the installer (Boolean)
 function IsAppRunning(const FileName : string): Boolean;
 	var
@@ -550,7 +554,7 @@ function InitializeSetup(): Boolean;
 		if (IsAppRunning('Cyberfox.exe')) then
 	begin
 		msgbox(ExpandConstant ('{cm:ProcessName}{cm:IsAppRunning}'), mbInformation, MB_OK)
-			Result := false;
+			ExitProcess(9); // Our Exit code for process is running.
 	end
 		else
 	begin
@@ -573,7 +577,7 @@ begin
   if (IsAppRunning('Cyberfox.exe')) then
 	begin
 		msgbox(ExpandConstant ('{cm:ProcessName}{cm:IsAppRunningUninstall}'), mbInformation, MB_OK)
-			Result := false;
+			ExitProcess(9); // Our Exit code for process is running.		
 	end
 		else
 	begin
