@@ -225,7 +225,7 @@
                     <menuseparator/>
 			              <menuitem id="AboutConfigMenuItem"
 				                      label="About:Config"
-				                      oncommand="openUILinkIn('about:config', 'tab');"/>	
+				                      oncommand="gCyberfoxCustom.openAboutConfig();"/>	
                     <menuitem id="menu_customizeToolbars"
                               label="&viewCustomizeToolbar.label;"
                               accesskey="&viewCustomizeToolbar.accesskey;"

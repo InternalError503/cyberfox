@@ -385,7 +385,7 @@
                 accesskey="&viewCustomizeToolbar.accesskey;"/>
 			<menuitem id="menu-aboutconfig"
 				        label="About:Config"
-				        oncommand="openUILinkIn('about:config', 'tab');"/>
+				        oncommand="gCyberfoxCustom.openAboutConfig();"/>
     </menupopup>
 
     <menupopup id="blockedPopupOptions"
