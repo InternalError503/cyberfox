@@ -1,9 +1,4 @@
-XPCOMUtils.defineLazyGetter(this, "gPrefService", function() {
-  return Services.prefs;
-});
-
 Cu.import("resource://gre/modules/Services.jsm");
-
 
 if (typeof gCyberfoxCustom == "undefined") {var gCyberfoxCustom = {};};
 if (!gCyberfoxCustom) {gCyberfoxCustom = {};};
