@@ -27,58 +27,58 @@
                     "agent": "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2292.0 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.3 Version: 40.0.2214.94 x64",
+                    "name": "Chrome Win 6.3 Version: 40.0.2214.111 x64",
                     "os": "Win 6.3",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.2 Version: 40.0.2214.94 x64",
+                    "name": "Chrome Win 6.2 Version: 40.0.2214.111 x64",
                     "os": "Win 6.2",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.1 Version: 40.0.2214.94 x64",
+                    "name": "Chrome Win 6.1 Version: 40.0.2214.111 x64",
                     "os": "Win 6.1",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.0 Version: 40.0.2214.94 x64",
+                    "name": "Chrome Win 6.0 Version: 40.0.2214.111 x64",
                     "os": "Win 6.0",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.3 Version: 40.0.2214.94",
+                    "name": "Chrome Win 6.3 Version: 40.0.2214.111",
                     "os": "Win 6.3",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.2 Version: 40.0.2214.94",
+                    "name": "Chrome Win 6.2 Version: 40.0.2214.111",
                     "os": "Win 6.2",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.1 Version: 40.0.2214.94",
+                    "name": "Chrome Win 6.1 Version: 40.0.2214.111",
                     "os": "Win 6.1",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Win 6.0 Version: 40.0.2214.94",
+                    "name": "Chrome Win 6.0 Version: 40.0.2214.111",
                     "os": "Win 6.0",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
-                    "name": "Chrome Mac OS X 10_9_1 Version: 40.0.2214.94",
+                    "name": "Chrome Mac OS X 10_9_1 Version: 40.0.2214.111",
                     "os": "Mac OS X 10_9_1",
-                    "version": "40.0.2214.94",
-                    "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36"
+                    "version": "40.0.2214.111",
+                    "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
                 },
                 {
                     "name": "Cyberfox Win 6.3 Version: 36.0",
