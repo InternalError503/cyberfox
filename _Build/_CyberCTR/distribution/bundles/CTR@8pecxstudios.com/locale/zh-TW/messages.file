@@ -1,6 +1,7 @@
 popup.title=Customize Cyberfox
 popup.msg.restart=Cyberfox 需要重新啟動以套用新的設定值。\n現在重啟?
 import.error=錯誤: 發現錯誤或檔案損壞!\n匯入已中止!
+import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=新增工具列
 ctr_actthrobber=Activity Indicator
 notification_msg_firstrun=CTRpreferences has been found select restart to apply

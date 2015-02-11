@@ -1,4 +1,16 @@
-<!ENTITY Ctr_title			"Customize Cyberfox">
+<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
+	   controls the use of (&brandShortName;) this gets replaced at run time
+	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
+	   in firefox (&brandShortName;) says firefox, This item can not be edited or
+	   errors may occur.
+-->
+<!-- Do not edit -->
+<!ENTITY % brandDTD
+    SYSTEM "chrome://branding/locale/brand.dtd">
+  %brandDTD;
+<!-- Do not edit above this message-->  
+
+<!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Панель додатків">
 <!ENTITY Ctr_statusbar		"Панель статусу">
@@ -9,7 +21,7 @@
 <!ENTITY Ctr_navthrobber	"Індикатор активності">
 <!ENTITY Ctr_sidebarbutton	"Бокова панель">
 <!ENTITY Ctr_windowcontrols	"мін/макс/закрити (Повний екран)">
-<!ENTITY Ctr_rr				"Перезапустіть Cyberfox!">
+<!ENTITY Ctr_rr				"Перезапустіть &brandShortName;!">
 
 <!ENTITY Ctr_cuibuttons		"Кнопки">
 <!ENTITY Ctr_cuibutnormal	"Нормальні">
@@ -18,6 +30,7 @@
 <!ENTITY Ctr_cuiico			"Іконки">
 <!ENTITY Ctr_cuiicotxt		"Іконки + Текст">
 <!ENTITY Ctr_cuitxt			"Текст">
+<!ENTITY Ctr_cuitabsnontop	"Вкладки не нагорі">
 
 <!ENTITY Ctr_tnot			"(вкладки не нагорі)">
 
@@ -36,15 +49,17 @@
 <!ENTITY Ctr_tabsontop3		"Вкладки не нагорі (v2) --- встановлено [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 - тільки для деяких додатків і повних тем!">
 <!ENTITY Ctr_tabsontopI1	"Додає атрибут [tabsontop=true/false] для">
-<!ENTITY Ctr_tabsintitlebar	"Панель заголовку cyberfox (about:config preference)">
+<!ENTITY Ctr_tabsintitlebar	"Панель заголовку &brandShortName; (about:config preference)">
 <!ENTITY Ctr_tabwidthdef	"(типово)">
 <!ENTITY Ctr_tabwidthcla	"(класичний)">
 <!ENTITY Ctr_tabminheight	"Висота:">
+<!ENTITY Ctr_tabheightinfo	"Низькі значення викличуть збої у розгорнутому режимі!">
 <!ENTITY Ctr_tabmaxwidth	"Макс.ширина:">
 <!ENTITY Ctr_tabminwidth	"Мін.ширина:">
 <!ENTITY Ctr_tabwidthinfo	"Мінімальна та максимальна ширина вкладок контролюються за допомогою TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Мінімальна та максимальна ширина вкладок контролюються за допомогою TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Значення нижче 48пікс викличе збої в більшості випадків!">
+<!ENTITY Ctr_tabinsertion	"Вставити відповідну вкладку після поточної вкладки (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Відновити порожній значок сайту (якщо сайт не пропонує його)">
 <!ENTITY Ctr_noemptypticon	"Прибрати порожній значок адреси з прикріпленої вкладки">
 <!ENTITY Ctr_e10stab_notd	"E10s вкладки: видалити підкреслення">
@@ -63,9 +78,10 @@
 <!ENTITY Ctr_appbutton0		"Кнопка вимкнена">
 <!ENTITY Ctr_appbutton1		"Кнопка на панелі">
 <!ENTITY Ctr_appbutton1wt	"Кнопка на панелі (тільки текст)">
-<!ENTITY Ctr_appbutton2		"Кнопка на [cyberfox] панелі заголовку">
-<!ENTITY Ctr_appbutton2io	"Кнопка на [cyberfox] панелі заголовку (тільки іконка)">
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
+<!ENTITY Ctr_appbutton2		"Кнопка на [&brandShortName;] панелі заголовку">
+<!ENTITY Ctr_appbutton2h	"Кнопка на [&brandShortName;] панелі заголовку (прихована)">
+<!ENTITY Ctr_appbutton2io	"Кнопка на [&brandShortName;] панелі заголовку (тільки іконка)">
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (default)">
 <!ENTITY Ctr_paneluibtweak	"Оранжева кнопка меню на панелі вкладок">
 <!ENTITY Ctr_appbuttonc_o	"Оранжева кнопка (за умовчанням)">
 <!ENTITY Ctr_appbuttonc_a	"Синя кнопка (Aurora)">
@@ -79,7 +95,7 @@
 <!ENTITY Ctr_appbuttonc_wh	"Біла кнопка">
 <!ENTITY Ctr_appbuttonc_cu	"Вибрати колір кнопки">
 <!ENTITY Ctr_appbuttonI1	"рекомендовано перезапуск">
-<!ENTITY Ctr_appbuttonI1e	"Не видно в рядку заголовку Windows OS, тільки в cyberfox заголовку!">
+<!ENTITY Ctr_appbuttonI1e	"Не видно в рядку заголовку Windows OS, тільки в &brandShortName; заголовку!">
 <!ENTITY Ctr_appbuttonI2	"Кольори кнопок видимі тільки на панелях заголовку і вкладок!">
 <!ENTITY Ctr_alttbappb		"Альтернативні іконки">
 <!ENTITY Ctr_appbutmhi		"Вища позиція (якщо на панелі вкладок)">
@@ -98,7 +114,7 @@
 <!ENTITY Ctr_hide_bf_popup	"Приховати меню історії при натисканні миші">
 <!ENTITY Ctr_bf_space		"Зменшити відстань між кнопками (якщо це можливо)">
 <!ENTITY Ctr_noconicons		"Замінити іконки контекстного меню сторінки написами (назад, вперед, стоп, перезавантажити, сторінка закладок)">
-<!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
+<!ENTITY Ctr_svgfilters		"SVG кольори для типових іконок кнопок панелі інструментів">
 <!ENTITY Ctr_wincontrols	"Рухоме управління повноекранним режимом">
 <!ENTITY Ctr_emptyfavicon2	"Замінити загальний значок сайту (порожній і пунктирний)">
 <!ENTITY Ctr_mstatusbar		"Рухомий рядок стану">
@@ -125,10 +141,11 @@
 <!ENTITY Ctr_cpanelmenus	"Панель меню: компактний вигляд (закладки, історія тощо)">
 <!ENTITY Ctr_hidezoomres	"Управління масштабом на панелі: приховати кнопку скидання масштабу">
 <!ENTITY Ctr_alt_newtabp	"Сторінка нової вкладки: альтернативний вигляд">
+<!ENTITY Ctr_noresizerxp	"Приховати «Індикатор зміни розміру» (Windows XP)">
 <!ENTITY Ctr_pmhidelabels	"Спливаюче вікно панелі меню: приховати написи на кнопках">
 <!ENTITY Ctr_menupopupscr	"Спливаючі вікна меню: показувати полоси прокручування замість стрілки прокручування">
 
-<!ENTITY Ctr_fxmockup		"Cyberfox макет">
+<!ENTITY Ctr_fxmockup		"&brandShortName; макет">
 <!ENTITY Ctr_tabmokcolor	"Білий колір для кнопок вкладок (закрити, нова, групи, список усіх)">
 <!ENTITY Ctr_tabmokcolor2	"Білий колір і темна тінь для тексту на неактивній вкладці">
 <!ENTITY Ctr_tabmokcolor3	"Білий колір для розділювачів вкладок">
@@ -180,7 +197,7 @@
 <!ENTITY Ctr_extrabar		"Додаткові панелі інструментів">
 <!ENTITY Ctr_extrabar0		"Додаткова панель(і)">
 <!ENTITY Ctr_extrabar1		"Додаткова панель">
-<!ENTITY Ctr_extrabarinfo	"Перемикання між способами «вкладки нагорі» і «вкладки не нагорі» змінює розташування додаткових панелей. Cyberfox повинен бути перезапущений, щоб вирішити цю проблему.">
+<!ENTITY Ctr_extrabarinfo	"Перемикання між способами «вкладки нагорі» і «вкладки не нагорі» змінює розташування додаткових панелей. &brandShortName; повинен бути перезапущений, щоб вирішити цю проблему.">
 
 <!ENTITY Ctr_invicons		"Інвертовані іконки">
 <!ENTITY Ctr_menubar		"Панель меню">
@@ -200,15 +217,18 @@
 <!ENTITY Ctr_notabbg		"Прибрати колір тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Зменшити простір над панеллю інструментів (якщо можливо)">
 <!ENTITY Ctr_alttabstb		"Альтернативний колір тла">
+<!ENTITY Ctr_alttabstb2		"У розширеному режимі (вкладки нагорі)">
 
 <!ENTITY Ctr_altmenubar		"Додати колір тла (рядок заголовку Windows)">
-<!ENTITY Ctr_altmenubarpos	"Альтернативна позиція (нижче рядку заголовку Cyberfox)">
+<!ENTITY Ctr_altmenubarpos	"Альтернативна позиція (нижче рядку заголовку &brandShortName;)">
 <!ENTITY Ctr_menubarnofog	"Прибрати затуманення/колір тла (Windows AeroGlass/8)">
 
-<!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
+<!ENTITY Ctr_aerocolors		"Кольори Blue Aero для основних панелей і вкладок">
 <!ENTITY Ctr_hidenavbar		"Панель навігації: приховати панель">
 <!ENTITY Ctr_nobookbarbg	"Панель закладок: прибрати колір тла">
 <!ENTITY Ctr_nonavbarbg		"Панель навігації: прибрати колір тла">
+<!ENTITY Ctr_nonavbarbg1	"Ця функція на додаткових панелях та інших верхніх панелях пошкоджена іншим додатком.">
+<!ENTITY Ctr_nonavbarbg2	"Всі панелі Slim Chrome додатку 'The Fox, Only Better' пошкоджено.">
 <!ENTITY Ctr_nonavborder	"Панель закладок: додати верхню межу для панелі інструментів">
 <!ENTITY Ctr_nonavtbborder	"Верхні панелі інструментів: прибрати межі панелі">
 <!ENTITY Ctr_hidesbclose	"Бокові панелі: приховати кнопку «Закрити» бокової панелі">
@@ -216,6 +236,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Приховати кнопку закривання панелі додатків">
 <!ENTITY Ctr_highaddonsbar	"Збільшити висоту">
+<!ENTITY Ctr_addonbarfs		"У повноекранному режимі">
 
 <!ENTITY Ctr_animation		"Анімація">
 <!ENTITY Ctr_throbberalt	"Альтернативна анімація">
@@ -232,11 +253,14 @@
 <!ENTITY Ctr_otherctroptns	"Інші налаштування">
 <!ENTITY Ctr_cuibotbuttons	"Свої кнопки в «ручному» режимі">
 <!ENTITY Ctr_bookmarkoinpw	"Напис «Відкрити в новому приватному вікні» в контекстному меню закладок">
+<!ENTITY Ctr_nodevtheme		"Запобігти увімкненню «Теми розробника»">
 
 <!ENTITY Ctr_experttweaks	"Розширені опції">
 <!ENTITY Ctr_fx33layers		"В Gecko 33+ введено «нові візуальні особливості», які в даний час відповідають за «зависання» вкладок на деяких системах. Вимкнення цього параметра вирішує цю проблему.">
 <!ENTITY Ctr_fx34search		"В Gecko 34+ введено «новий пошуковий інтерфейс». Вимкнення цього параметра поверне  «старий пошуковий інтерфейс».">
 <!ENTITY Ctr_fx34loop		"В Gecko 34+ введені особливості «виклику та сеансу зв’язку». Вимкнення цього параметру видалить їх.">
+<!ENTITY Ctr_fx35devtheme	"В Gecko 35+ введено нову «тему» від розробника. Вимкнення цих налаштувань вимикає цю «тему» і її кнопку в ручному режимі налаштувань.">
+<!ENTITY Ctr_fx36prefs		"В Gecko 36+ введено нове налаштування у вкладці. Вимкнення цього пункту відновлює вікно зі старими налаштуванням.">
 
 
 <!ENTITY Ctr_pw_settings	"Налаштування">
@@ -247,7 +271,7 @@
 
 <!ENTITY Ctr_special_font	"Налаштування кольору тла - тільки для типової теми!">
 <!ENTITY Ctr_special_info	"Деякі параметри не можуть запропонувати візуальні зміни в усіх випадках">
-<!ENTITY Ctr_special_info2	"Налаштування зроблені для типової теми Cyberfox і не можуть працювати з усіма сторонніми темами!">
+<!ENTITY Ctr_special_info2	"Налаштування зроблені для типової теми &brandShortName; і не можуть працювати з усіма сторонніми темами!">
 <!ENTITY Ctr_support		"Форум підтримки">
 <!ENTITY Ctr_newversion		"Нова версія?">
 
@@ -255,9 +279,17 @@
 <!ENTITY Ctr_openInPrivateWindow	"Відкрити в новому приватному вікні">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Початок роботи">
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
+
+<!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+
+<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
+<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">

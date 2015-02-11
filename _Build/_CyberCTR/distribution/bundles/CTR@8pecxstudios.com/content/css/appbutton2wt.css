@@ -47,8 +47,8 @@
 			#main-window[tabsintitlebar][sizemode="normal"] #TabsToolbar .titlebar-placeholder{
 			  visibility:collapse !important;
 			}
-			#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="normal"] #toolbar-menubar ~ #TabsToolbar,
-			#main-window[tabsintitlebar][sizemode="normal"] #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
+			#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar ~ #TabsToolbar,
+			#main-window[tabsintitlebar][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
 			  margin-top: 20px !important;
 			}
 			
@@ -59,8 +59,8 @@
 			  visibility:collapse !important;
 			}
 
-			#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="normal"] #toolbar-menubar ~ #TabsToolbar,
-			#main-window[tabsintitlebar][sizemode="normal"] #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
+			#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar ~ #TabsToolbar,
+			#main-window[tabsintitlebar][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
 			  margin-top: 26px !important;
 			}
 		}
@@ -73,12 +73,25 @@
 		#main-window[tabsintitlebar][sizemode="normal"] #TabsToolbar .titlebar-placeholder{
 		  visibility:collapse !important;
 		}
-		#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="normal"] #toolbar-menubar ~ #TabsToolbar,
-		#main-window[tabsintitlebar][sizemode="normal"] #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
+		#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar ~ #TabsToolbar,
+		#main-window[tabsintitlebar][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
 		  margin-top: 16px !important;
 		}
 	
 	  }
+	}
+	
+	/* for LavaFox themes lol*/
+	#main-window[currenttheme^="LavaFox"][tabsintitlebar][chromehidden~="menubar"][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar ~ #TabsToolbar,
+	#main-window[currenttheme^="LavaFox"][tabsintitlebar][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
+	  margin-top: 0px !important;
+	}
+	#main-window[currenttheme^="LavaFox"][tabsintitlebar][sizemode="normal"] #titlebar:not([hidden]) ~ * #toolbar-menubar {
+	 -moz-margin-start: 0px !important;
+	}
+	#main-window[currenttheme^="LavaFox"][tabsintitlebar][chromehidden~="menubar"][sizemode="maximized"]:not([tabsontop="false"]) #toolbar-menubar ~ #TabsToolbar,
+	#main-window[currenttheme^="LavaFox"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
+	 -moz-margin-start: 97px !important;
 	}
 
 }

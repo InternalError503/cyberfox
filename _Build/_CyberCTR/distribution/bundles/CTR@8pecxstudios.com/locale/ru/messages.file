@@ -1,6 +1,7 @@
 popup.title=Customize Cyberfox
 popup.msg.restart=Cyberfox должен быть перезапущен для вступления изменений в силу. \nВы хотите сделать это сейчас?
 import.error=ОШИБКА: Найден неправильный или изменённый файл\nНичего не может быть импортировано!
+import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=Дополнительная панель
 ctr_actthrobber=Индикатор активности
 notification_msg_firstrun=Обнаружен набор опций CTRpreferences, для применения требуется перезапуск

@@ -16,7 +16,7 @@ cyberctrFeatures = {
 	
 get_localized_document: function(){
 
-	window.location.assign("chrome://classic_theme_restorer/locale/CyberCTR_Documentation.pdf");
+	window.location.assign("chrome://classic_theme_restorer/content/compatibility/documentation/CyberCTR_Documentation.pdf");
 	
 }
 

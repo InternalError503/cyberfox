@@ -1,4 +1,16 @@
-<!ENTITY Ctr_title			"Customize Cyberfox">
+<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
+	   controls the use of (&brandShortName;) this gets replaced at run time
+	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
+	   in firefox (&brandShortName;) says firefox, This item can not be edited or
+	   errors may occur.
+-->
+<!-- Do not edit -->
+<!ENTITY % brandDTD
+    SYSTEM "chrome://branding/locale/brand.dtd">
+  %brandDTD;
+<!-- Do not edit above this message-->  
+ 
+<!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"アドオンバー">
 <!ENTITY Ctr_statusbar		"ステータスバー">
@@ -9,7 +21,7 @@
 <!ENTITY Ctr_navthrobber	"Activity Indicator">
 <!ENTITY Ctr_sidebarbutton	"サイドバー">
 <!ENTITY Ctr_windowcontrols	"最小/最大/閉じる (Fullscreen)">
-<!ENTITY Ctr_rr				"要 Cyberfox 再起動">
+<!ENTITY Ctr_rr				"要 &brandShortName; 再起動">
 
 <!ENTITY Ctr_cuibuttons		"ボタン">
 <!ENTITY Ctr_cuibutnormal	"通常">
@@ -18,6 +30,7 @@
 <!ENTITY Ctr_cuiico			"アイコン">
 <!ENTITY Ctr_cuiicotxt		"アイコン+テキスト">
 <!ENTITY Ctr_cuitxt			"テキスト">
+<!ENTITY Ctr_cuitabsnontop	"タブを下にする">
 
 <!ENTITY Ctr_tnot			"(タブを上にする)">
 
@@ -36,15 +49,17 @@
 <!ENTITY Ctr_tabsontop3		"タブを下にする (v2) --- [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 is for some add-ons and complete themes only!">
 <!ENTITY Ctr_tabsontopI1	"以下に属性[tabsontop=true/false]を加える">
-<!ENTITY Ctr_tabsintitlebar	"Cyberfoxタイトルバー (about:config設定)">
+<!ENTITY Ctr_tabsintitlebar	"&brandShortName;タイトルバー (about:config設定)">
 <!ENTITY Ctr_tabwidthdef	"(デフォルト)">
 <!ENTITY Ctr_tabwidthcla	"(クラシック)">
-<!ENTITY Ctr_tabminheight	"Height:">
-<!ENTITY Ctr_tabmaxwidth	"max-width:">
-<!ENTITY Ctr_tabminwidth	"min-width:">
-<!ENTITY Ctr_tabwidthinfo	"タブのmin-widthとmax-widthはTabMixPlusで制御されます。">
-<!ENTITY Ctr_tabwidthinfo2	"タブのmin-widthとmax-widthはTabUtilitiesで制御されます。">
+<!ENTITY Ctr_tabminheight	"高さ:">
+<!ENTITY Ctr_tabheightinfo	"Low values will cause glitches in maximized mode!">
+<!ENTITY Ctr_tabmaxwidth	"最大幅:">
+<!ENTITY Ctr_tabminwidth	"最小幅:">
+<!ENTITY Ctr_tabwidthinfo	"タブの最小幅と最大幅は Tab Mix Plus で制御されます。">
+<!ENTITY Ctr_tabwidthinfo2	"タブの最小幅と最大幅は Tab Utilities で制御されます。">
 <!ENTITY Ctr_tabwidthinfo3	"Values below 48px will cause glitches in most cases!">
+<!ENTITY Ctr_tabinsertion	"Insert related tab after current tab (about:config)">
 <!ENTITY Ctr_emptyfavicon	"空 favicon を表示する (サイトが提供しない場合)">
 <!ENTITY Ctr_noemptypticon	"ピン止めタブから空ファビコンを取り除く">
 <!ENTITY Ctr_e10stab_notd	"E10s tabs: remove underline">
@@ -53,7 +68,7 @@
 <!ENTITY Ctr_closetab_2		"表示しない">
 <!ENTITY Ctr_closetab_3		"ツールバーの最後に表示">
 <!ENTITY Ctr_closetab_4		"ツールバーの最初に表示">
-<!ENTITY Ctr_closetab_5		"全タブ (強制)">
+<!ENTITY Ctr_closetab_5		"全てのタブ (強制)">
 <!ENTITY Ctr_closetab_hfot	"可視タブに対して隠す">
 <!ENTITY Ctr_closealt		"別バージョンのアイコンにする">
 <!ENTITY Ctr_closeonleft	"別の位置に表示">
@@ -63,31 +78,32 @@
 <!ENTITY Ctr_appbutton0		"ボタンを無効にする">
 <!ENTITY Ctr_appbutton1		"ツールバーに表示">
 <!ENTITY Ctr_appbutton1wt	"ツールバーに表示 (テキストのみ)">
-<!ENTITY Ctr_appbutton2		"Cyberfox タイトルバーに表示">
-<!ENTITY Ctr_appbutton2io	"Cyberfox タイトルバーに表示 (アイコンのみ)">
+<!ENTITY Ctr_appbutton2		"&brandShortName; タイトルバーに表示">
+<!ENTITY Ctr_appbutton2h	"&brandShortName; タイトルバーに表示 (hidden)">
+<!ENTITY Ctr_appbutton2io	"&brandShortName; タイトルバーに表示 (アイコンのみ)">
 <!ENTITY Ctr_paneluibtweak	"タブツールバーに橙のパネルメニューボタン">
 <!ENTITY Ctr_appbuttonc_o	"橙色 (デフォルト)">
 <!ENTITY Ctr_appbuttonc_a	"青色 (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"黒色 (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"透過色">
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox (Default)">
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; (Default)">
 <!ENTITY Ctr_appbuttonc_r	"赤色">
 <!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 <!ENTITY Ctr_appbuttonc_g	"緑色">
 <!ENTITY Ctr_appbuttonc_gr	"灰色">
 <!ENTITY Ctr_appbuttonc_pu	"紫色">
 <!ENTITY Ctr_appbuttonc_wh	"白色">
-<!ENTITY Ctr_appbuttonc_cu	"Custom button color">
+<!ENTITY Ctr_appbuttonc_cu	"任意の色">
 <!ENTITY Ctr_appbuttonI1	"再起動を推奨">
-<!ENTITY Ctr_appbuttonI1e	"WindowsのOSタイトルバーには表示されません。Cyberfoxタイトルバー上のみです。">
+<!ENTITY Ctr_appbuttonI1e	"WindowsのOSタイトルバーには表示されません。&brandShortName;タイトルバー上のみです。">
 <!ENTITY Ctr_appbuttonI2	"ボタン色はタイトルバーとタブツールバーのみに表示されます。">
 <!ENTITY Ctr_alttbappb		"別バージョンのアイコンにする">
 <!ENTITY Ctr_appbutmhi		"高い位置に表示 (タブツールバーに表示した時のみ)">
 <!ENTITY Ctr_appbutbdl		"ボーダーと背景色を隠す">
 <!ENTITY Ctr_dblclclosefx	"ダブルクリックで現在のウィンドウを閉じる">
 <!ENTITY Ctr_appbclmmenus	"Clickable menus inside button menu (New Tab, Print...)">
-<!ENTITY Ctr_appbutonclab	"Title">
-<!ENTITY Ctr_appbutonclab2	"Add title or leave empty">
+<!ENTITY Ctr_appbutonclab	"タイトル">
+<!ENTITY Ctr_appbutonclab2	"タイトルを入力するか、空欄のままにしてください">
 
 <!ENTITY Ctr_ui				"UI 一般">
 <!ENTITY Ctr_nbiconsize0	"ナビゲーションツールバー属性の設定">
@@ -96,7 +112,7 @@
 <!ENTITY Ctr_backforward	"戻る-進むボタンを移動可にする">
 <!ENTITY Ctr_nbcompact		"Reduce navigation toolbars height">
 <!ENTITY Ctr_hide_bf_popup	"マウスを押す時に履歴メニューを隠す">
-<!ENTITY Ctr_bf_space		"Reduce space between buttons (if possible)">
+<!ENTITY Ctr_bf_space		"(可能であれば) ボタン間のスペースを減らす">
 <!ENTITY Ctr_noconicons		"ラベル(戻る、進む、停止、ブックマーク)をもつページコンテキストメニューアイコンを置換する">
 <!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
 <!ENTITY Ctr_wincontrols	"フルスクリーンウィンドウ制御を移動可にする">
@@ -125,23 +141,24 @@
 <!ENTITY Ctr_cpanelmenus	"パネルメニュー：コンパクトビュー (ブックマーク、履歴など)">
 <!ENTITY Ctr_hidezoomres	"ツールバーのズームコントロール: ズームリセットボタンを隠す">
 <!ENTITY Ctr_alt_newtabp	"New tab page: alternative appearance">
+<!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
 <!ENTITY Ctr_pmhidelabels	"パネルメニューポップアップ：ボタンのラベルを隠す">
 <!ENTITY Ctr_menupopupscr	"メニューポップアップ: 矢印の代わりにスクロールバーを表示する">
 
-<!ENTITY Ctr_fxmockup		"Cyberfox モックアップ">
+<!ENTITY Ctr_fxmockup		"&brandShortName; モックアップ">
 <!ENTITY Ctr_tabmokcolor	"タブボタンを白色にする (閉じる、新しいタブを開く、タブグループ、タブを一覧表示)">
 <!ENTITY Ctr_tabmokcolor2	"非アクティブタブを白色の文字にして、灰色の影をつける">
 <!ENTITY Ctr_tabmokcolor3	"タブセパレータを白色にする">
 <!ENTITY Ctr_tabmokcolor4	"White color for empty dotted tab favicon">
 
 <!ENTITY Ctr_navthrobber1	"Clicking activity indicator opens specified url:">
-<!ENTITY Ctr_navthrobber2	"Add url or leave empty">
+<!ENTITY Ctr_navthrobber2	"URL を入力するか、空欄のままにしてください">
 
 <!ENTITY Ctr_tab_tf_info1	"色名、16 進コード、rgb(a)、hsl(a) の値をサポートします。">
 <!ENTITY Ctr_tab_tf_info2	"入力値は検証されません。">
-<!ENTITY Ctr_tabact_t		"active">
+<!ENTITY Ctr_tabact_t		"アクティブ">
 <!ENTITY Ctr_tabhov_t		"hover">
-<!ENTITY Ctr_tabnor_t		"default">
+<!ENTITY Ctr_tabnor_t		"デフォルト">
 <!ENTITY Ctr_tabpen_t		"未読み込み">
 <!ENTITY Ctr_tabunr_t		"未読">
 <!ENTITY Ctr_ntab_t			"新しいタブ">
@@ -160,9 +177,9 @@
 <!ENTITY Ctr_notabhov		"Enabled settings override 'hovered' settings">
 <!ENTITY Ctr_tabc_act_tb	"Background color on toolbars">
 
-<!ENTITY Ctr_urlbar			"Urlbar">
-<!ENTITY Ctr_starinurl		"URLバーにスターボタンを表示する">
-<!ENTITY Ctr_feedinurl		"URLバーにフィードボタンを表示する">
+<!ENTITY Ctr_urlbar			"URL バー">
+<!ENTITY Ctr_starinurl		"URL バーにスターボタンを表示する">
+<!ENTITY Ctr_feedinurl		"URL バーにフィードボタンを表示する">
 <!ENTITY Ctr_hideurelstop	"URL バーの中止&amp;再読み込みボタンを隠す">
 <!ENTITY Ctr_urlbardropm	"Move dropmarker to urlbars end">
 <!ENTITY Ctr_hideprbutton	"Hide notification icon when a popup gets blocked">
@@ -180,7 +197,7 @@
 <!ENTITY Ctr_extrabar		"Additional Toolbars">
 <!ENTITY Ctr_extrabar0		"Additional Toolbar(s)">
 <!ENTITY Ctr_extrabar1		"追加のツールバー">
-<!ENTITY Ctr_extrabarinfo	"Switching between 'tabs on top' and 'tabs not on top' modes randomly alters additional toolbars order. Cyberfox has to be restarted to solve this issue.">
+<!ENTITY Ctr_extrabarinfo	"Switching between 'tabs on top' and 'tabs not on top' modes randomly alters additional toolbars order. &brandShortName; has to be restarted to solve this issue.">
 
 <!ENTITY Ctr_invicons		"反転アイコン">
 <!ENTITY Ctr_menubar		"メニューバー">
@@ -200,15 +217,18 @@
 <!ENTITY Ctr_notabbg		"背景色を取り除く (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"ツールバーの上の間隔を減らす (可能ならば)">
 <!ENTITY Ctr_alttabstb		"別の背景色にする">
+<!ENTITY Ctr_alttabstb2		"In maximized mode (tabs on top)">
 
 <!ENTITY Ctr_altmenubar		"背景色を加える (OS タイトルバー)">
-<!ENTITY Ctr_altmenubarpos	"別の位置 Cyberfoxタイトルバーの下)">
+<!ENTITY Ctr_altmenubarpos	"別の位置 &brandShortName;タイトルバーの下)">
 <!ENTITY Ctr_menubarnofog	"背景色とぼかしを取り除く (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
 <!ENTITY Ctr_hidenavbar		"ナビゲーションツールバー：ツールバーを隠す">
 <!ENTITY Ctr_nobookbarbg	"ブックマークツールバー: 背景色を取り除く">
 <!ENTITY Ctr_nonavbarbg		"ナビゲーションツールバー: 背景色を取り除く">
+<!ENTITY Ctr_nonavbarbg1	"This add-on's additional toolbars and other top toolbars are affected.">
+<!ENTITY Ctr_nonavbarbg2	"All toolbars in 'The Fox, Only Better' add-on's Slim Chrome are affected.">
 <!ENTITY Ctr_nonavborder	"ブックマークツールバー: ツールバーに上ボーダーを加える">
 <!ENTITY Ctr_nonavtbborder	"ツールバー: 上ボーダーを取り除く">
 <!ENTITY Ctr_hidesbclose	"Sidebars: hide sidebar close button">
@@ -216,6 +236,7 @@
 
 <!ENTITY Ctr_closeabarbut	"アドオンバーの閉じるボタンを隠す">
 <!ENTITY Ctr_highaddonsbar	"高さを増やす">
+<!ENTITY Ctr_addonbarfs		"In fullscreen mode">
 
 <!ENTITY Ctr_animation		"アニメーション">
 <!ENTITY Ctr_throbberalt	"別バージョンのタブ読み込みアイコンアニメーションにする">
@@ -232,11 +253,14 @@
 <!ENTITY Ctr_otherctroptns	"Other settings">
 <!ENTITY Ctr_cuibotbuttons	"'カスタマイズ'モードの追加ボタンを表示する">
 <!ENTITY Ctr_bookmarkoinpw	"'Open in a new private window' entry in bookmarks context menu">
+<!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
-<!ENTITY Ctr_experttweaks	"Advanced">
+<!ENTITY Ctr_experttweaks	"拡張設定">
 <!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
 <!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
 <!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
+<!ENTITY Ctr_fx35devtheme	"Gecko 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
+<!ENTITY Ctr_fx36prefs		"Gecko 36+ introduced preferences in a tab. Unchecking this preference restores the old preference window.">
 
 
 <!ENTITY Ctr_pw_settings	"設定">
@@ -247,7 +271,7 @@
 
 <!ENTITY Ctr_special_font	"背景色の設定はデフォルトテーマのみに適用されます。">
 <!ENTITY Ctr_special_info	"一部オプションは特定のケースでのみ動作します。">
-<!ENTITY Ctr_special_info2	"設定はCyberfox デフォルトテーマ用に作成されたもので、サードパーティのテーマで動作しないかもしれません。">
+<!ENTITY Ctr_special_info2	"設定は&brandShortName; デフォルトテーマ用に作成されたもので、サードパーティのテーマで動作しないかもしれません。">
 <!ENTITY Ctr_support		"サポートフォーラム (英語)">
 <!ENTITY Ctr_newversion		"新バージョンをチェック">
 
@@ -255,9 +279,17 @@
 <!ENTITY Ctr_openInPrivateWindow	"Open in a New Private Window">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
+
+<!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+
+<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
+<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">

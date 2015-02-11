@@ -31,6 +31,15 @@
 	   <command id="CtrExtension:ToggleCtrAddonBar" oncommand="classicthemerestorerjs.ctr.toggleCtrAddonBar();"/>
 	</commandset>
 	
+	<!-- CyberCTR Feature -->
+	 <popupset>
+	  <menupopup  id="ApplyCTRpreferences">
+		<menuitem label="&ctr_applyCTRPrefFile.label;" oncommand="classicthemerestorerjs.ctr.ctrPrefRestart();"/>
+		<menuitem label="&ctr_restoreCTRPrefFile.label;" oncommand="classicthemerestorerjs.ctr.restoreBackupCTRpreferences();"/>
+	  </menupopup>
+	</popupset>	
+	<!-- CyberCTR Feature -->	
+	
 	<keyset id="mainKeyset">
 	  <key id="ctraddon_key_toggleCtrAddonBar" command="CtrExtension:ToggleCtrAddonBar" key="/" modifiers="accel"/>
 	</keyset>
@@ -38,23 +47,24 @@
 	<!--### add new buttons to customizing area ###-->
 	<hbox id="customization-container">
 	  <vbox id="customization-palette-container">
-		<hbox id="ctraddon_cuibuttonsbox" ordinal="999999" collapsed="true">
-		
-		<grid>
-		  <rows>
-			<row>
-			  <button label="&Ctr_cuibuttons;" id="ctraddon_cuibuttons_main" class="ctraddon_cuibutlabel customizationmode-button"/>
-			  <button label="&Ctr_cuibutnormal;" id="ctraddon_cui-smallnavbut-button1" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',false);classicthemerestorerjs.ctr.prefs.setBoolPref('bfurlbarfix',false);"/>
-			  <button label="&Ctr_cuibutsmall;" id="ctraddon_cui-smallnavbut-button2" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',true);classicthemerestorerjs.ctr.prefs.setBoolPref('bfurlbarfix',true);"/>
-			  <label value=" "/>
-			  <button label="&Ctr_cuimode;" class="ctraddon_cuibutlabel customizationmode-button"/>
-			  <button label="&Ctr_cuiico;" id="ctraddon_cui-icons-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'icons');"/>
-			  <button label="&Ctr_cuiicotxt;" id="ctraddon_cui-iconstext-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'iconstxt');"/>
-			  <button label="&Ctr_cuitxt;" id="ctraddon_cui-textonly-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'txtonly');"/>
-			</row>
-		  </rows>
-		</grid>
-		</hbox>
+		 <hbox id="ctraddon_cuibuttonsbox" ordinal="1000" collapsed="true">
+			<grid>
+			  <rows>
+				<row>
+				  <button label="&Ctr_cuibuttons;" id="ctraddon_cuibuttons_main" class="ctraddon_cuibutlabel customizationmode-button"/>
+				  <button label="&Ctr_cuibutnormal;" id="ctraddon_cui-smallnavbut-button1" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',false);classicthemerestorerjs.ctr.prefs.setBoolPref('bfurlbarfix',false);"/>
+				  <button label="&Ctr_cuibutsmall;" id="ctraddon_cui-smallnavbut-button2" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',true);classicthemerestorerjs.ctr.prefs.setBoolPref('bfurlbarfix',true);"/>
+				  <label value=" "/>
+				  <button label="&Ctr_cuimode;" class="ctraddon_cuibutlabel customizationmode-button"/>
+				  <button label="&Ctr_cuiico;" id="ctraddon_cui-icons-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'icons');"/>
+				  <button label="&Ctr_cuiicotxt;" id="ctraddon_cui-iconstext-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'iconstxt');"/>
+				  <button label="&Ctr_cuitxt;" id="ctraddon_cui-textonly-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'txtonly');"/>
+				  <label value=" "/>
+				  <button label="&Ctr_cuitabsnontop;" id="ctraddon_cui-tabsnontop" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefTabsNontop();"/>
+				</row>
+			  </rows>
+			</grid>
+		 </hbox>
 	  </vbox>
 	</hbox>
 	
@@ -842,7 +852,7 @@
                    customizableui-areatype="toolbar"
 				   align="center"
 				   pack="center"
-				   onclick="classicthemerestorerjs.ctr.openAThrobberUrl();"
+				   onclick="if(event.button=='0') classicthemerestorerjs.ctr.openAThrobberUrl();"
 				   overflows="false"
                    removable="true"/>
 	  
@@ -858,6 +868,7 @@
 						 onmousedown="classicthemerestorerjs.ctr.ctrBackMenuShow(this);"
 						 onclick="checkForMiddleClick(this, event);"
                          tooltip="back-button-tooltip"
+						 wrap="true"
                          context="backForwardMenu"/>
           <toolbarbutton id="ctraddon_forward-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
                          label="&forwardCmd.label;"
@@ -865,6 +876,7 @@
 						 onmousedown="classicthemerestorerjs.ctr.ctrBackMenuShow(this);"
 						 onclick="checkForMiddleClick(this, event);"
                          tooltip="forward-button-tooltip"
+						 wrap="true"
                          context="backForwardMenu"/>
       </toolbaritem>
 	  
@@ -872,7 +884,7 @@
 	  <toolbarbutton id="ctraddon_back-forward-dropmarker" type="menu" 
 			disabled="false"
 			label="&backCmd.label; &forwardCmd.label;"
-			class="toolbarbutton-1 chromeclass-toolbar-additional tabs-alltabs-button ctraddon-toolbarbutton"
+			class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
 			onbroadcast="if (this.disabled) this.disabled =
 			document.getElementById('Browser:Back').hasAttribute('disabled') &amp;&amp;
 			document.getElementById('Browser:Forward').hasAttribute('disabled');">

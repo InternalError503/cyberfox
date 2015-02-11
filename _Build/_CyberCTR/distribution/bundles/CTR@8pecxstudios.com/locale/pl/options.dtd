@@ -1,4 +1,16 @@
-﻿<!ENTITY Ctr_title			"Customize Cyberfox">
+﻿<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
+	   controls the use of (&brandShortName;) this gets replaced at run time
+	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
+	   in firefox (&brandShortName;) says firefox, This item can not be edited or
+	   errors may occur.
+-->
+<!-- Do not edit -->
+<!ENTITY % brandDTD
+    SYSTEM "chrome://branding/locale/brand.dtd">
+  %brandDTD;
+<!-- Do not edit above this message-->  
+ 
+<!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Pasek dodatków">
 <!ENTITY Ctr_statusbar		"Pasek statusu">
@@ -18,6 +30,7 @@
 <!ENTITY Ctr_cuiico			"Ikony">
 <!ENTITY Ctr_cuiicotxt		"Ikony i tekst">
 <!ENTITY Ctr_cuitxt			"Tekst">
+<!ENTITY Ctr_cuitabsnontop	"Karty nie na górze">
 
 <!ENTITY Ctr_tnot			"(karty nie na górze)">
 
@@ -40,11 +53,13 @@
 <!ENTITY Ctr_tabwidthdef	"(domyślne)">
 <!ENTITY Ctr_tabwidthcla	"(klasyczne)">
 <!ENTITY Ctr_tabminheight	"Wysokość:">
+<!ENTITY Ctr_tabheightinfo	"Niskie wartości spowodują błędy w trybie zmaksymalizowanym!">
 <!ENTITY Ctr_tabmaxwidth	"Maksymalna szerokość:">
 <!ENTITY Ctr_tabminwidth	"Minimalna szerokość:">
 <!ENTITY Ctr_tabwidthinfo	"Szerokość karty jest kontrolowana przez TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Szerokość karty jest kontrolowana przez TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Wartości poniżej 48 pikseli w większości przypadków spowodują błędy!">
+<!ENTITY Ctr_tabinsertion	"Wstaw powiązaną kartę za kartą bieżącą (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Przywróć pustą ikonę ulubionych (jeżeli strona nie zaoferuje żadnej)">
 <!ENTITY Ctr_noemptypticon	"Usuń pustą ikonę ulubionych z przypiętej karty">
 <!ENTITY Ctr_e10stab_notd	"Karty E10s: usuń podkreślenie">
@@ -57,18 +72,19 @@
 <!ENTITY Ctr_closetab_hfot	"Ukryj na jednej widocznej karcie">
 <!ENTITY Ctr_closealt		"Ikona alternatywna">
 <!ENTITY Ctr_closeonleft	"Alternatywna pozycja na karcie">
-<!ENTITY Ctr_close_wwltab	"Zamykaj okno z ostatnią, widoczną kartą (about:config)">
+<!ENTITY Ctr_close_wwltab	"Zamykaj okno z ostatnią widoczną kartą (about:config)">
 
 <!ENTITY Ctr_appbutton		"Przycisk aplikacji">
 <!ENTITY Ctr_appbutton0		"Przycisk wyłączony">
 <!ENTITY Ctr_appbutton1		"Przycisk na pasku narzędzi">
 <!ENTITY Ctr_appbutton1wt	"Przycisk na pasku narzędzi (tylko tekst)">
-<!ENTITY Ctr_appbutton2		"Przycisk na pasku narzędzi [Cyberfox]">
-<!ENTITY Ctr_appbutton2io	"Przycisk na pasku narzędzi [Cyberfox] (tylko ikona)">
+<!ENTITY Ctr_appbutton2		"Przycisk na pasku narzędzi [&brandShortName;]">
+<!ENTITY Ctr_appbutton2h	"Przycisk na pasku narzędzi [&brandShortName;] (ukryty)">
+<!ENTITY Ctr_appbutton2io	"Przycisk na pasku narzędzi [&brandShortName;] (tylko ikona)">
 <!ENTITY Ctr_paneluibtweak	"Pomarańczowy przycisk menu panelu na pasku kart">
 <!ENTITY Ctr_appbuttonc_o	"Pomarańczowy kolor przycisku (domyślny)">
 <!ENTITY Ctr_appbuttonc_a	"Błękitny kolor przycisku (Aurora)">
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (default)">
 <!ENTITY Ctr_appbuttonc_n	"Czarny kolor przycisku (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Przezroczysty przycisk">
 <!ENTITY Ctr_appbuttonc_r	"Czerwony kolor przycisku">
@@ -125,6 +141,7 @@
 <!ENTITY Ctr_cpanelmenus	"Menu panelu: widok kompaktowy (zakładki, historia itp.)">
 <!ENTITY Ctr_hidezoomres	"Kontrolki powiększenia na pasku narzędzi: ukryj przycisk resetu powiększenia">
 <!ENTITY Ctr_alt_newtabp	"Strona nowej karty: wygląd alternatywny">
+<!ENTITY Ctr_noresizerxp	"Usuń zmieniacz rozmiaru (Windows XP)">
 <!ENTITY Ctr_pmhidelabels	"Wyskakujące okno menu panelu: ukryj etykiety przycisku">
 <!ENTITY Ctr_menupopupscr	"Menu kontekstowe: pokaż pasek przewijania zamiast strzałek przewijania">
 
@@ -180,9 +197,9 @@
 <!ENTITY Ctr_extrabar		"Dodatkowe paski narzędzi">
 <!ENTITY Ctr_extrabar0		"Dodatkowy pasek (dodatkowe paski) narzędzi">
 <!ENTITY Ctr_extrabar1		"Dodatkowy pasek narzędzi">
-<!ENTITY Ctr_extrabarinfo	"Przełączanie pomiędzy trybami 'karty na górze' a 'karty nie na górze' losowo zmienia układ dodatkowych pasków narzędzi. Cyberfox musi zostać zrestartowany, aby rozwiązać ten problem.">
+<!ENTITY Ctr_extrabarinfo	"Przełączanie pomiędzy trybami 'karty na górze' a 'karty nie na górze' losowo zmienia układ dodatkowych pasków narzędzi. &brandShortName; musi zostać zrestartowany, aby rozwiązać ten problem.">
 
-<!ENTITY Ctr_invicons		"Ikony odwrócone">
+<!ENTITY Ctr_invicons		"Odwrócone kolory ikon">
 <!ENTITY Ctr_menubar		"Pasek menu">
 <!ENTITY Ctr_tabstoolbar	"Pasek kart">
 <!ENTITY Ctr_navbar			"Pasek nawigacji">
@@ -200,15 +217,18 @@
 <!ENTITY Ctr_notabbg		"Usuń kolor tła (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Zredukuj przestrzeń powyżej paska narzędzi (jeżeli możliwe)">
 <!ENTITY Ctr_alttabstb		"Alternatywny kolor tła">
+<!ENTITY Ctr_alttabstb2		"W trybie zmaksymalizowanym (karty na górze)">
 
 <!ENTITY Ctr_altmenubar		"Dodaj kolor tła (systemowy pasek tytuły)">
 <!ENTITY Ctr_altmenubarpos	"Alternatywna pozycja (poniżej paska tytułu Cyberfoksa)">
 <!ENTITY Ctr_menubarnofog	"Usuń kolor tła i mgłę (Windows AeroGlass/8)">
 
-<!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
+<!ENTITY Ctr_aerocolors		"Niebieskie kolory Aero głównych pasków narzędzi i kart">
 <!ENTITY Ctr_hidenavbar		"Pasek nawigacji: ukryj pasek narzędzi">
 <!ENTITY Ctr_nobookbarbg	"Pasek zakładek: usuń kolor tła">
 <!ENTITY Ctr_nonavbarbg		"Pasek nawigacji: usuń kolor tła">
+<!ENTITY Ctr_nonavbarbg1	"Dotyczy dodatkowych pasków narzędzi tego dodatku oraz innych górnych pasków narzędzi.">
+<!ENTITY Ctr_nonavbarbg2	"Dotyczy wszystkich pasków narzędzi Slim Chrome z dodatku 'The Fox, Only Better'.">
 <!ENTITY Ctr_nonavborder	"Pasek zakładek: dodaj obramowanie na górze paska">
 <!ENTITY Ctr_nonavtbborder	"Górne paski: usuń obramowanie paska">
 <!ENTITY Ctr_hidesbclose	"Paski boczne: ukryj przycisk zamknięcia paska bocznego">
@@ -216,6 +236,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Usuń przycisk zamknięcia paska dodatków">
 <!ENTITY Ctr_highaddonsbar	"Zwiększ wysokość">
+<!ENTITY Ctr_addonbarfs		"W trybie pełnoekranowym">
 
 <!ENTITY Ctr_animation		"Animacje">
 <!ENTITY Ctr_throbberalt	"Alternatywna animacja ładowania wskaźnika aktywności karty">
@@ -232,12 +253,15 @@
 <!ENTITY Ctr_otherctroptns	"Inne ustawienia">
 <!ENTITY Ctr_cuibotbuttons	"Dodatkowe przyciski w trybie 'dostosowywania'">
 <!ENTITY Ctr_bookmarkoinpw	"Pozycja 'Otwórz w nowym oknie prywatnym' w menu kontekstowym zakładek">
+<!ENTITY Ctr_nodevtheme		"Zapobiegaj włączeniu 'motywu twórcy'">
 
 
 <!ENTITY Ctr_experttweaks	"Poprawki eksperckie">
 <!ENTITY Ctr_fx33layers		"Gecko 33+ wprowadził 'nowe funkcje renderowania' odpowiedzialne obecnie za 'zawieszanie się kart' w niektórych systemach. Odznaczenie tego ustawienia rozwiązuje ten problem.">
 <!ENTITY Ctr_fx34search		"Gecko 34+ wprowadził 'nowy interfejs wyszukiwania'. Odznaczenie tego ustawienia przywraca 'stary interfejs wyszukiwania'.">
 <!ENTITY Ctr_fx34loop		"Gecko 34+ wprowadził funkcje 'dzwonienia i konwersacji'. Odznaczenie tego ustawienia usunie je.">
+<!ENTITY Ctr_fx35devtheme	"Gecko 35+ wprowadził nowy 'motyw twórcy'. Odznaczenie tych ustawień wyłącza 'motyw twórcy' oraz jego przycisk w trybie dostosowywania.">
+<!ENTITY Ctr_fx36prefs		"Gecko 36+ wprowadził opcje w karcie. Odznaczenie tego ustawienia przywraca stare okno opcji.">
 
 
 <!ENTITY Ctr_pw_settings	"Ustawienia">
@@ -263,3 +287,10 @@
 <!ENTITY ctr_Support_forums	"Support Forum">
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
+
+<!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+
+<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
+<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">

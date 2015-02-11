@@ -1,4 +1,16 @@
-<!ENTITY Ctr_title 			"Customize Cyberfox">
+<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
+	   controls the use of (&brandShortName;) this gets replaced at run time
+	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
+	   in firefox (&brandShortName;) says firefox, This item can not be edited or
+	   errors may occur.
+-->
+<!-- Do not edit -->
+<!ENTITY % brandDTD
+    SYSTEM "chrome://branding/locale/brand.dtd">
+  %brandDTD;
+<!-- Do not edit above this message-->  
+ 
+<!ENTITY Ctr_title 			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Barra dei componenti aggiuntivi">
 <!ENTITY Ctr_statusbar		"Barra di stato">
@@ -9,7 +21,7 @@
 <!ENTITY Ctr_navthrobber	"Activity Indicator">
 <!ENTITY Ctr_sidebarbutton	"Sidebar">
 <!ENTITY Ctr_windowcontrols	"Min/max/close (Fullscreen)">
-<!ENTITY Ctr_rr				"Riavviare Cyberfox!">
+<!ENTITY Ctr_rr				"Riavviare &brandShortName;!">
 
 <!ENTITY Ctr_cuibuttons		"Pulsanti">
 <!ENTITY Ctr_cuibutnormal	"Normali">
@@ -18,6 +30,7 @@
 <!ENTITY Ctr_cuiico			"Icone">
 <!ENTITY Ctr_cuiicotxt		"Icone e testo">
 <!ENTITY Ctr_cuitxt			"Testo">
+<!ENTITY Ctr_cuitabsnontop	"Schede in basso">
 
 <!ENTITY Ctr_tnot			"(schede in basso)">
 
@@ -40,11 +53,13 @@
 <!ENTITY Ctr_tabwidthdef	"(predefinita)">
 <!ENTITY Ctr_tabwidthcla	"(stile classico)">
 <!ENTITY Ctr_tabminheight	"Height:">
+<!ENTITY Ctr_tabheightinfo	"Low values will cause glitches in maximized mode!">
 <!ENTITY Ctr_tabmaxwidth	"Larghezza massima:">
 <!ENTITY Ctr_tabminwidth	"Larghezza minima:">
 <!ENTITY Ctr_tabwidthinfo	"La larghezza minima e massima delle schede è definita da TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"La larghezza minima e massima delle schede è definita da TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Values below 48px will cause glitches in most cases!">
+<!ENTITY Ctr_tabinsertion	"Insert related tab after current tab (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Nei siti che non hanno una favicon usa la vecchia favicon vuota">
 <!ENTITY Ctr_noemptypticon	"Remove empty favicon from pinned tab">
 <!ENTITY Ctr_e10stab_notd	"E10s tabs: remove underline">
@@ -64,11 +79,12 @@
 <!ENTITY Ctr_appbutton1		"Pulsante nella barra degli strumenti">
 <!ENTITY Ctr_appbutton1wt	"Pulsante nella barra degli strumenti (solo testo)">
 <!ENTITY Ctr_appbutton2		"Pulsante nella barra del titolo">
+<!ENTITY Ctr_appbutton2h	"Pulsante nella barra del titolo (hidden)">
 <!ENTITY Ctr_appbutton2io	"Pulsante nella barra del titolo (solo icona)">
 <!ENTITY Ctr_paneluibtweak	"Pulsante pannello menu arancione nella barra delle schede">
 <!ENTITY Ctr_appbuttonc_o	"Pulsante arancione (predefinito)">
 <!ENTITY Ctr_appbuttonc_a	"Pulsante blu (Aurora)">
-<!ENTITY Ctr_appbuttonc_d	"cyberfox button color (Default)">
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (Default)">
 <!ENTITY Ctr_appbuttonc_n	"Pulsante nero (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Pulsante trasparente">
 <!ENTITY Ctr_appbuttonc_r	"Pulsante rosso">
@@ -125,6 +141,7 @@
 <!ENTITY Ctr_cpanelmenus	"Pannello menu unificato (Segnalibri, Cronologia, ecc..)">
 <!ENTITY Ctr_hidezoomres	"Nascondi il pulsante per ripristinare il livello di zoom dalla barra degli strumenti">
 <!ENTITY Ctr_alt_newtabp	"New tab page: alternative appearance">
+<!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
 <!ENTITY Ctr_pmhidelabels	"Mostra solo icone nel pannello menu">
 <!ENTITY Ctr_menupopupscr	"Utilizza barra di scorrimento al posto delle frecce nei menu di popup">
 
@@ -180,7 +197,7 @@
 <!ENTITY Ctr_extrabar		"Additional Toolbars">
 <!ENTITY Ctr_extrabar0		"Additional Toolbar(s)">
 <!ENTITY Ctr_extrabar1		"Barra degli strumenti aggiuntiva">
-<!ENTITY Ctr_extrabarinfo	"Switching between 'tabs on top' and 'tabs not on top' modes randomly alters additional toolbars order. Cyberfox has to be restarted to solve this issue.">
+<!ENTITY Ctr_extrabarinfo	"Switching between 'tabs on top' and 'tabs not on top' modes randomly alters additional toolbars order. &brandShortName; has to be restarted to solve this issue.">
 
 <!ENTITY Ctr_invicons		"Icone invertite">
 <!ENTITY Ctr_menubar		"Barra dei menu">
@@ -200,6 +217,7 @@
 <!ENTITY Ctr_notabbg		"Rimuovi colore di sfondo (Windows AeroGlass e Win8)">
 <!ENTITY Ctr_hightabpos		"Quando possibile, riduci lo spazio sopra">
 <!ENTITY Ctr_alttabstb		"Colore di sfondo alternativo">
+<!ENTITY Ctr_alttabstb2		"In maximized mode (tabs on top)">
 
 <!ENTITY Ctr_altmenubar		"Aggiungi colore di sfondo (Barra del titolo di sistema)">
 <!ENTITY Ctr_altmenubarpos	"Posizione alternativa (sotto la barra del titolo)">
@@ -209,6 +227,8 @@
 <!ENTITY Ctr_hidenavbar		"Nascondi barra di navigazione">
 <!ENTITY Ctr_nobookbarbg	"Rimuovi colore di sfondo dalla barra dei segnalibri">
 <!ENTITY Ctr_nonavbarbg		"Rimuovi colore di sfondo dalla barra di navigazione">
+<!ENTITY Ctr_nonavbarbg1	"This add-on's additional toolbars and other top toolbars are affected.">
+<!ENTITY Ctr_nonavbarbg2	"All toolbars in 'The Fox, Only Better' add-on's Slim Chrome are affected.">
 <!ENTITY Ctr_nonavborder	"Aggiungi bordo superiore alla barra dei segnalibri">
 <!ENTITY Ctr_nonavtbborder	"Rimuovi i bordi alle barre degli strumenti posizionate in alto">
 <!ENTITY Ctr_hidesbclose	"Sidebars: hide sidebar close button">
@@ -216,6 +236,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Nascondi pulsante di chiusura">
 <!ENTITY Ctr_highaddonsbar	"Aumenta l’altezza">
+<!ENTITY Ctr_addonbarfs		"In fullscreen mode">
 
 <!ENTITY Ctr_animation		"Icone animate">
 <!ENTITY Ctr_throbberalt	"Throbber di caricamento scheda alternativo">
@@ -232,11 +253,14 @@
 <!ENTITY Ctr_otherctroptns	"Other settings">
 <!ENTITY Ctr_cuibotbuttons	"Aggiungi pulsanti in modalità personalizzazione">
 <!ENTITY Ctr_bookmarkoinpw	"'Open in a new private window' entry in bookmarks context menu">
+<!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
 <!ENTITY Ctr_experttweaks	"Advanced">
 <!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
 <!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
 <!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
+<!ENTITY Ctr_fx35devtheme	"Gecko 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
+<!ENTITY Ctr_fx36prefs		"Gecko 36+ introduced preferences in a tab. Unchecking this preference restores the old preference window.">
 
 
 <!ENTITY Ctr_pw_settings	"Impostazioni">
@@ -255,9 +279,17 @@
 <!ENTITY Ctr_openInPrivateWindow	"Open in a New Private Window">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
+
+<!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+
+<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
+<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
