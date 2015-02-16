@@ -1,0 +1,21 @@
+[Registry]
+#if Arch == "i368"
+Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
+Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
+#elif Arch == "amd64"
+Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
+Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
+#endif
+Root: "HKCR"; Subkey: "{#MyAppName}HTML"; ValueType: none; Flags: dontcreatekey uninsdeletekey
+Root: "HKCR"; Subkey: "{#MyAppName}URL"; ValueType: none; Flags: dontcreatekey uninsdeletekey
+Root: "HKLM"; Subkey: "SOFTWARE\Clients\StartMenuInternet\{#MyAppExeName}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
+#if Arch == "amd64"
+Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\Clients\StartMenuInternet\{#MyAppExeName}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
+#endif
+Root: "HKCU"; Subkey: "SOFTWARE\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
