@@ -1,0 +1,11 @@
+app.config
+setup.inc
+languages.inc
+messages.inc
+customMessages.64.inc
+tasks.inc
+files.inc
+icons.inc
+registry.registry
+code.inc
+run.inc
