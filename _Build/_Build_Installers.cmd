@@ -11,7 +11,7 @@ echo.Packaging CyberCTR!
 timeout 2 >nul
 ::---- 
 if exist "%BuildFolderPath%_CyberCTR\distribution.7z" del "%BuildFolderPath%_CyberCTR\distribution.7z"
-%zip% a -mx9 -t7z "%BuildFolderPath%_CyberCTR\distribution.7z" "%CyberCTRPath%"
+"%zip%" a -mx9 -t7z "%BuildFolderPath%_CyberCTR\distribution.7z" "%CyberCTRPath%"
 if exist "%BuildFolderPath%_CyberCTR\distribution.7z" copy /y "%BuildFolderPath%_CyberCTR\distribution.7z" "%BuildFolderPath%_Installer\{content}\ThirdParty\"
 echo. 
 ::----
