@@ -1,0 +1,1 @@
+_Installer\BuildInstallScript.exe --prelist=_Installer\preprocessor.txt --output=_Installer\installscript.iss
