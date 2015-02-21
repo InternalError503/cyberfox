@@ -1,4 +1,4 @@
-[CustomMessages]
+﻿[CustomMessages]
 ;English
 en.ProcessName={#MyAppName}
 en.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
