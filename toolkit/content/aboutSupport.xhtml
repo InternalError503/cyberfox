@@ -29,7 +29,7 @@
 
   <body dir="&locale.dir;">
 
-    <div id="reset-box">
+    <div id="reset-box" style="visibility: visible">
       <h3>&refreshProfile.title;</h3>
       <button id="reset-box-button">
         &refreshProfile.button.label;
@@ -378,6 +378,17 @@
         </tbody>
       </table>
       <!-- - - - - - - - - - - - - - - - - - - - - -->
+
+#if defined(XP_LINUX) && defined(MOZ_SANDBOX)
+      <h2 class="major-section" id="sandbox">
+	&aboutSupport.sandboxTitle;
+      </h2>
+
+      <table>
+	<tbody id="sandbox-tbody">
+	</tbody>
+      </table>
+#endif
 
     </div>
 

@@ -138,9 +138,6 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  // bug 925459, bitguard crashes
 	  { "bitguard.dll", ALL_VERSIONS },
 	  
-	  // microsoft lync crashes Check-in
-	  //{ "npmeetingjoinpluginoc.dll", ALL_VERSIONS },
-
 	  // bug 812683 - crashes in Windows library when Asus Gamer OSD is installed
 	  // Software is discontinued/unsupported
 	  { "atkdx11disp.dll", ALL_VERSIONS },
@@ -207,6 +204,12 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  //Regards less of Mozilla's choice we are hard blocking until resolved.
 	  { "nptnt2.dll", ALL_VERSIONS },
 	  { "nptnt2ghost.dll", ALL_VERSIONS },
+
+  // Startup crashes with Lenovo Onekey Theater, bug 1123778
+  { "activedetect32.dll", UNVERSIONED },
+  { "activedetect64.dll", UNVERSIONED },
+  { "windowsapihookdll32.dll", UNVERSIONED },
+  { "windowsapihookdll64.dll", UNVERSIONED },
  
 	  { nullptr, 0 }
 };

@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-pref("startup.homepage_override_url","https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-%VERSION%");
-pref("startup.homepage_welcome_url","https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-%VERSION%");
+ //Since the beta does not have a release notes page we will disable this.
+pref("startup.homepage_override_url","");
+pref("startup.homepage_welcome_url","");
 
 //We have no manual update url.
 pref("app.update.url.manual", ""); 
@@ -22,7 +23,8 @@ pref("app.update.autocheck", false);
 //Disable check browser version (Since we are not ready globally disable)
 pref("app.update.check.enabled", false);
 
-pref("app.releaseNotesURL", "https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-%VERSION%");
+ //Since the beta does not have a release notes page we will disable this.
+pref("app.releaseNotesURL", "");
 pref("app.vendorURL", "https://8pecxstudios.com/");
 
 //Disable default browser we don't want beta versions as default browser!.

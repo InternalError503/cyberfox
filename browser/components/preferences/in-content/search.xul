@@ -15,14 +15,15 @@
     <script type="application/javascript"
             src="chrome://browser/content/preferences/in-content/search.js"/>
 
-<hbox id="header-search"
-      class="header"
-      hidden="true"
-      data-category="paneSearch">
-  <image class="header-icon"/>		  
-  <label class="header-name">&paneSearch.title;</label>
-</hbox>
+    <stringbundle id="engineManagerBundle" src="chrome://browser/locale/engineManager.properties"/>
 
+    <hbox id="header-search"
+          class="header"
+          hidden="true"
+          data-category="paneSearch">
+      <image class="header-icon"/>
+      <label class="header-name">&paneSearch.title;</label>
+    </hbox>
 
     <!-- Default Search Engine -->
     <groupbox id="defaultEngineGroup" align="start" data-category="paneSearch">

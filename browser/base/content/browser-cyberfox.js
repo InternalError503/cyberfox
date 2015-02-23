@@ -81,7 +81,7 @@ var gCyberfoxCustom = {
 			//Send list to clipboard.				
 			const gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
 										   .getService(Components.interfaces.nsIClipboardHelper);
-			gClipboardHelper.copyString(urlList);
+			gClipboardHelper.copyString(urlList.trim());
 			
 			//Reset the array.
 			urlArray = {
@@ -130,7 +130,33 @@ var gCyberfoxCustom = {
 				console.log("Were sorry but something has gone wrong with '_ElementState' " + e);
 		}			 
   },
-
+  
+  toggleTabJavascript : function(){
+	try{	
+	
+			if(gBrowser.docShell.allowJavascript){		
+				gBrowser.docShell.allowJavascript = false;	
+				
+				var delayedTrigger = setTimeout(function(){
+					gBrowser.reload();
+				},10);
+			
+			}else{		
+				gBrowser.docShell.allowJavascript = true;	
+				
+				var delayedTrigger = setTimeout(function(){
+					gBrowser.reload();
+				},10);
+			
+			}
+			
+		}catch (e){
+				//Catch any nasty errors and output to console
+				console.log("Were sorry but something has gone wrong with 'toggleTabJavascript' " + e);
+		}		
+  
+  },
+ 
   //When a user triggers the about:config menu item if the page is about:home or about:newtab then utilize that tab else open a new tab.
   openAboutConfig : function(){
 	try{
@@ -195,10 +221,17 @@ document.getElementById("contentAreaContextMenu")
 		}else{
 				gCyberfoxCustom._ElementState("context-sendLink", true);
 		}
+		//Toggle JS
+		if (Services.prefs.getBoolPref("browser.context.togglejavascript")){		
+				gCyberfoxCustom._ElementState("context-javascript", false);
+		}else{
+				gCyberfoxCustom._ElementState("context-javascript", true);
+		}		
+		
 		
 	}catch (e){
 		//Catch any nasty errors and output to console
-		console.log("Were sorry but something has gone wrong with 'browser.context.emaillink' " + e);
+		console.log("Were sorry but something has gone wrong with 'browser.context.emaillink' | 'browser.context.togglejavascript' " + e);
 	}
 	
   

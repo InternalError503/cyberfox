@@ -4,22 +4,9 @@
 
 "use strict";
 
-// The process of adding a new default snippet involves:
-//   * add a new entity to aboutHome.dtd
-//   * add a <span/> for it in aboutHome.xhtml
-//   * add an entry here in the proper ordering (based on spans)
-// The <a/> part of the snippet will be linked to the corresponding url.
-const DEFAULT_SNIPPETS_URLS = [
-  "https://www.mozilla.org/firefox/features/?utm_source=snippet&utm_medium=snippet&utm_campaign=default+feature+snippet"
-, "https://addons.mozilla.org/firefox/?utm_source=snippet&utm_medium=snippet&utm_campaign=addons"
-];
-
-const SNIPPETS_UPDATE_INTERVAL_MS = 86400000; // 1 Day.
-
 // IndexedDB storage constants.
 const DATABASE_NAME = "abouthome";
 const DATABASE_VERSION = 1;
-const SNIPPETS_OBJECTSTORE_NAME = "snippets";
 
 // This global tracks if the page has been set up before, to prevent double inits
 let gInitialized = false;

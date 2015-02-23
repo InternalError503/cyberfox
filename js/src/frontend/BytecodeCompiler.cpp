@@ -55,6 +55,7 @@ static bool
 SetSourceMap(ExclusiveContext *cx, TokenStream &tokenStream, ScriptSource *ss)
 {
     if (tokenStream.hasSourceMapURL()) {
+        MOZ_ASSERT(!ss->hasSourceMapURL());
         if (!ss->setSourceMapURL(cx, tokenStream.sourceMapURL()))
             return false;
     }
@@ -234,6 +235,7 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
      */
     MOZ_ASSERT_IF(evalCaller, options.compileAndGo);
     MOZ_ASSERT_IF(evalCaller, options.forEval);
+    MOZ_ASSERT_IF(evalCaller && evalCaller->strict(), options.strictOption);
     MOZ_ASSERT_IF(staticLevel != 0, evalCaller);
 
     if (!CheckLength(cx, srcBuf))
@@ -264,6 +266,9 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
                              /* foldConstants = */ false,
                              (Parser<SyntaxParseHandler> *) nullptr,
                              (LazyScript *) nullptr);
+
+        if (!syntaxParser->checkOptions())
+            return nullptr;
     }
 
     Parser<FullParseHandler> parser(cx, alloc, options, srcBuf.get(), srcBuf.length(),
@@ -271,6 +276,9 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
                                     canLazilyParse ? syntaxParser.ptr() : nullptr, nullptr);
     parser.sct = sct;
     parser.ss = ss;
+
+    if (!parser.checkOptions())
+        return nullptr;
 
     Directives directives(options.strictOption);
     GlobalSharedContext globalsc(cx, scopeChain, directives, options.extraWarningsOption);
@@ -307,10 +315,6 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
     if (!pc->init(parser.tokenStream))
         return nullptr;
 
-    /* If this is a direct call to eval, inherit the caller's strictness.  */
-    if (evalCaller && evalCaller->strict())
-        globalsc.strict = true;
-
     if (savedCallerFun) {
         /*
          * An eval script in a caller frame needs to have its enclosing
@@ -318,7 +322,8 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
          * wishes to decompile it while it's running.
          */
         JSFunction *fun = evalCaller->functionOrCallerFunction();
-        Directives directives(/* strict = */ fun->strict());
+        MOZ_ASSERT_IF(fun->strict(), options.strictOption);
+        Directives directives(/* strict = */ options.strictOption);
         ObjectBox *funbox = parser.newFunctionBox(/* fn = */ nullptr, fun, pc.ptr(),
                                                   directives, fun->generatorKind());
         if (!funbox)
@@ -328,13 +333,11 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
 
     bool canHaveDirectives = true;
     for (;;) {
-        TokenKind tt = parser.tokenStream.peekToken(TokenStream::Operand);
-        if (tt <= TOK_EOF) {
-            if (tt == TOK_EOF)
-                break;
-            MOZ_ASSERT(tt == TOK_ERROR);
+        TokenKind tt;
+        if (!parser.tokenStream.peekToken(&tt, TokenStream::Operand))
             return nullptr;
-        }
+        if (tt == TOK_EOF)
+            break;
 
         TokenStream::Position pos(parser.keepAtoms);
         parser.tokenStream.tell(&pos);
@@ -387,6 +390,9 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
         if (!NameFunctions(cx, pn))
             return nullptr;
 
+        if (!bce.updateLocalsToFrameSlots())
+            return nullptr;
+
         if (!EmitTree(cx, &bce, pn))
             return nullptr;
 
@@ -407,6 +413,13 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
      * header) override any source map urls passed as comment pragmas.
      */
     if (options.sourceMapURL()) {
+        // Warn about the replacement, but use the new one.
+        if (ss->hasSourceMapURL()) {
+            if(!parser.report(ParseWarning, false, nullptr, JSMSG_ALREADY_HAS_PRAGMA,
+                              ss->filename(), "//# sourceMappingURL"))
+                return nullptr;
+        }
+
         if (!ss->setSourceMapURL(cx, options.sourceMapURL()))
             return nullptr;
     }
@@ -424,7 +437,7 @@ frontend::CompileScript(ExclusiveContext *cx, LifoAlloc *alloc, HandleObject sco
     // frame.
     InternalHandle<Bindings*> bindings(script, &script->bindings);
     if (!Bindings::initWithTemporaryStorage(cx, bindings, 0, 0, 0,
-                                            pc->blockScopeDepth, nullptr))
+                                            pc->blockScopeDepth, 0, 0, nullptr))
     {
         return nullptr;
     }
@@ -467,6 +480,8 @@ frontend::CompileLazyFunction(JSContext *cx, Handle<LazyScript*> lazy, const cha
 
     Parser<FullParseHandler> parser(cx, &cx->tempLifoAlloc(), options, chars, length,
                                     /* foldConstants = */ true, nullptr, lazy);
+    if (!parser.checkOptions())
+        return false;
 
     uint32_t staticLevel = lazy->staticLevel(cx);
 
@@ -494,8 +509,8 @@ frontend::CompileLazyFunction(JSContext *cx, Handle<LazyScript*> lazy, const cha
 
     if (lazy->directlyInsideEval())
         script->setDirectlyInsideEval();
-	if (lazy->usesArgumentsApplyAndThis())
-		script->setUsesArgumentsApplyAndThis();
+    if (lazy->usesArgumentsApplyAndThis())
+        script->setUsesArgumentsApplyAndThis();
     if (lazy->hasBeenCloned())
         script->setHasBeenCloned();
 
@@ -548,6 +563,8 @@ CompileFunctionBody(JSContext *cx, MutableHandleFunction fun, const ReadOnlyComp
                              /* foldConstants = */ false,
                              (Parser<SyntaxParseHandler> *) nullptr,
                              (LazyScript *) nullptr);
+        if (!syntaxParser->checkOptions())
+            return false;
     }
 
     MOZ_ASSERT(!options.forEval);
@@ -558,6 +575,9 @@ CompileFunctionBody(JSContext *cx, MutableHandleFunction fun, const ReadOnlyComp
                                     canLazilyParse ? syntaxParser.ptr() : nullptr, nullptr);
     parser.sct = &sct;
     parser.ss = ss;
+
+    if (!parser.checkOptions())
+        return false;
 
     MOZ_ASSERT(fun);
     MOZ_ASSERT(fun->isTenured());

@@ -49,10 +49,12 @@ let gSearch = {
   if(isSearchEnabled){ 
     let panel = this._nodes.panel;
     let logo = this._nodes.logo;
+    panel.hidden = false;
     panel.openPopup(logo);
     logo.setAttribute("active", "true");
     panel.addEventListener("popuphidden", function onHidden() {
       panel.removeEventListener("popuphidden", onHidden);
+      panel.hidden = true;
       logo.removeAttribute("active");
      });
     }
@@ -254,12 +256,11 @@ if(isSearchEnabled){
 
       if (uri) {
         this._nodes.logo.style.backgroundImage = "url(" + uri + ")";
-        this._nodes.text.placeholder = "";
       }
       else {
         this._nodes.logo.style.backgroundImage = "";
-        this._nodes.text.placeholder = engine.name;
       }
+      this._nodes.text.placeholder = engine.placeholder;
     }
 
     // Set up the suggestion controller.

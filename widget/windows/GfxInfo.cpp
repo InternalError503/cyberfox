@@ -194,17 +194,6 @@ static nsresult GetKeyValue(const WCHAR* keyLocation, const WCHAR* keyName, nsAS
   return retval;
 }
 
-// The driver ID is a string like PCI\VEN_15AD&DEV_0405&SUBSYS_040515AD, possibly
-// followed by &REV_XXXX.  We uppercase the string, and strip the &REV_ part
-// from it, if found.
-static void normalizeDriverId(nsString& driverid) {
-  ToUpperCase(driverid);
-  int32_t rev = driverid.Find(NS_LITERAL_CSTRING("&REV_"));
-  if (rev != -1) {
-    driverid.Cut(rev, driverid.Length());
-  }
-}
-
 // The device ID is a string like PCI\VEN_15AD&DEV_0405&SUBSYS_040515AD
 // this function is used to extract the id's out of it
 uint32_t
@@ -867,13 +856,7 @@ GfxInfo::GetGfxDriverInfo()
       (nsAString&) GfxDriverInfo::GetDeviceVendor(VendorAMD), GfxDriverInfo::allDevices,
       GfxDriverInfo::allFeatures, nsIGfxInfo::FEATURE_BLOCKED_DRIVER_VERSION,
       DRIVER_LESS_THAN, V(8,62,0,0), "9.6" );
-	  
-	// Bug 1099252
-	APPEND_TO_DRIVER_BLOCKLIST2( DRIVER_OS_WINDOWS_7,
-		(nsAString&) GfxDriverInfo::GetDeviceVendor(VendorATI), GfxDriverInfo::allDevices,
-		GfxDriverInfo::allFeatures, nsIGfxInfo::FEATURE_BLOCKED_DRIVER_VERSION,
-		DRIVER_EQUAL, V(8,832,0,0));
-		
+
     /*
      * Bug 783517 - crashes in AMD driver on Windows 8
      */
@@ -1044,6 +1027,11 @@ GfxInfo::GetGfxDriverInfo()
     APPEND_TO_DRIVER_BLOCKLIST2(DRIVER_OS_ALL,
       (nsAString&)GfxDriverInfo::GetDeviceVendor(VendorNVIDIA), (GfxDeviceFamily*)GfxDriverInfo::GetDeviceFamily(Nvidia310M),
       nsIGfxInfo::FEATURE_DIRECT2D, nsIGfxInfo::FEATURE_BLOCKED_DEVICE,
+      DRIVER_LESS_THAN, GfxDriverInfo::allDriverVersions);
+
+    APPEND_TO_DRIVER_BLOCKLIST2(DRIVER_OS_ALL,
+      (nsAString&)GfxDriverInfo::GetDeviceVendor(VendorATI), (GfxDeviceFamily*)GfxDriverInfo::GetDeviceFamily(AMDRadeonHD5800),
+      nsIGfxInfo::FEATURE_DXVA, nsIGfxInfo::FEATURE_BLOCKED_DEVICE,
       DRIVER_LESS_THAN, GfxDriverInfo::allDriverVersions);
   }
   return *mDriverInfo;

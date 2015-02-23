@@ -26,11 +26,11 @@
   <preference id="browser.safebrowsing.enabled"
               name="browser.safebrowsing.enabled"
               type="bool"/>
-			  
+#ifndef HAVE_64BIT_BUILD			  
   <preference id="dom.ipc.plugins.flash.disable-protected-mode"
               name="dom.ipc.plugins.flash.disable-protected-mode"
               type="bool"/>
-				  
+#endif				  
   <!-- Passwords -->
   <preference id="signon.rememberSignons" name="signon.rememberSignons" type="bool"/>
 
@@ -72,14 +72,14 @@
               preference="browser.safebrowsing.enabled" />
   </vbox>
 </groupbox>
-
+#ifndef HAVE_64BIT_BUILD
     <groupbox id="flashGroup" orient="vertical" data-category="paneSecurity" hidden="true">
       <caption label="&disableflashprotectgroup.label;"/>	
       <checkbox id="dom.ipc.plugins.flash.disable-protected-mode"
                 label="&disableflashprotect.label;"
                 preference="dom.ipc.plugins.flash.disable-protected-mode" />	  
     </groupbox>	
-
+#endif
 <!-- Passwords -->
 <groupbox id="passwordsGroup" orient="vertical" data-category="paneSecurity" hidden="true">
   <caption><label>&passwords.label;</label></caption>

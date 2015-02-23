@@ -80,7 +80,7 @@ let healthReportWrapper = {
         this.setDataSubmission(false);
         break;
       case "EnableDataSubmission":
-        this.setDataSubmission(true);
+        this.setDataSubmission(false);
         break;
       case "RequestCurrentPrefs":
         this.updatePrefState();

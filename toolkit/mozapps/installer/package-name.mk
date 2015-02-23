@@ -19,6 +19,7 @@ ifndef MOZ_PKG_PLATFORM
 MOZ_PKG_PLATFORM := $(TARGET_OS)-$(TARGET_CPU)
 
 # TARGET_OS/TARGET_CPU may be unintuitive, so we hardcode some special formats
+# Keep -$(TARGET_CPU) on win64 we want to keep "win64-x86_64" we don't want "win64"
 ifeq ($(OS_ARCH),WINNT)
 ifeq ($(TARGET_CPU),x86_64)
 MOZ_PKG_PLATFORM := win64-$(TARGET_CPU)

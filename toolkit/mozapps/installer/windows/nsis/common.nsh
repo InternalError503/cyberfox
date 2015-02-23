@@ -2144,17 +2144,17 @@
 * above and to verify existence if necessary.
 *
 * Examples:
-* In:  C:\PROGRA~1\Cyber~1\Cyberfox.EXE -flag "%1"
-* In:  C:\PROGRA~1\Cyber~1\Cyberfox.EXE,0
-* In:  C:\PROGRA~1\Cyber~1\Cyberfox.EXE
-* In:  "C:\PROGRA~1\Cyber~1\Cyberfox.EXE"
-* In:  "C:\PROGRA~1\Cyber~1\Cyberfox.EXE" -flag "%1"
-* Out: C:\PROGRA~1\Cyber~1\Cyberfox.EXE
+* In:  C:\PROGRA~1\MOZILL~1\FIREFOX.EXE -flag "%1"
+* In:  C:\PROGRA~1\MOZILL~1\FIREFOX.EXE,0
+* In:  C:\PROGRA~1\MOZILL~1\FIREFOX.EXE
+* In:  "C:\PROGRA~1\MOZILL~1\FIREFOX.EXE"
+* In:  "C:\PROGRA~1\MOZILL~1\FIREFOX.EXE" -flag "%1"
+* Out: C:\PROGRA~1\MOZILL~1\FIREFOX.EXE
 *
-* In:  "C:\Program Files\Cyberfox\Cyberfox.exe" -flag "%1"
-* In:  C:\Program Files\Cyberfox\Cyberfox.exe,0
-* In:  "C:\Program Files\Cyberfox\Cyberfox.exe"
-* Out: C:\Program Files\Cyberfox\Cyberfox.exe
+* In:  "C:\Program Files\Mozilla Firefox\firefox.exe" -flag "%1"
+* In:  C:\Program Files\Mozilla Firefox\firefox.exe,0
+* In:  "C:\Program Files\Mozilla Firefox\firefox.exe"
+* Out: C:\Program Files\Mozilla Firefox\firefox.exe
 *
 * @param   _IN_PATH
 *          The string containing the path.
@@ -5091,7 +5091,7 @@
 
       !ifdef HAVE_64BIT_BUILD
         ${Unless} ${RunningX64}
-        ${OrUnless} ${AtLeastWinVista}
+        ${OrUnless} ${AtLeastWin7}
           MessageBox MB_OK|MB_ICONSTOP "$R9" IDOK
           ; Nothing initialized so no need to call OnEndCommon
           Quit
@@ -6111,8 +6111,10 @@
         ${LogMsg} "OS Name    : Windows 7"
       ${ElseIf} ${IsWin8}
         ${LogMsg} "OS Name    : Windows 8"
-      ${ElseIf} ${AtLeastWin8}
-        ${LogMsg} "OS Name    : Above Windows 8"
+      ${ElseIf} ${IsWin8.1}
+        ${LogMsg} "OS Name    : Windows 8.1"
+      ${ElseIf} ${AtLeastWin8.1}
+        ${LogMsg} "OS Name    : Above Windows 8.1"
       ${Else}
         ${LogMsg} "OS Name    : Unable to detect"
       ${EndIf}

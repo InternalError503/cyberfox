@@ -10,7 +10,7 @@
                                             hsla(92,81%,16%,.2) 35%,
                                             hsla(92,81%,16%,.2) 65%,
                                             hsla(92,81%,16%,0));
-%include identity-intel.inc
+%include identity-beta.inc
 }
 
 

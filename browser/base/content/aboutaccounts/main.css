@@ -5,16 +5,16 @@
 }
 
 html {
-  background-color: #F2F2F2;
+  background-color: #fefefe;
   height: 100%;
 }
 
 body {
-  color: #424f59;
+  color: #424242;
   font: message-box;
-  background-color: rgb(229,229,229);
+  background-color: rgb(222,222,222);
   background-image: url(chrome://browser/skin/newtab/noise.png),
-                    linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.2)); 
+                    linear-gradient(rgba(222,222,222,.5), rgba(222,222,222,.2)); 
   font-size: 14px;
   height: 100%;
 }
@@ -38,10 +38,10 @@ a.no-underline {
 }
 
 #stage {
-  background:#fff;
-  background-color: rgb(245,245,245);
+  background:#dedede;
+  background-color: rgb(239,239,239);
   background-image: url(chrome://browser/skin/newtab/noise.png),
-                    linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.2));   
+                    linear-gradient(rgba(239,239,239.5), rgba(239,239,239,.2));   
   border-radius: 5px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
   margin: 0 auto;

@@ -534,6 +534,8 @@
                   <menuitem id="menu_browserToolbox"
                             observes="devtoolsMenuBroadcaster_BrowserToolbox"
                             accesskey="&browserToolboxMenu.accesskey;"/>
+                  <menuitem id="menu_browserContentToolbox"
+                            observes="devtoolsMenuBroadcaster_BrowserContentToolbox"/>
                   <menuitem id="menu_browserConsole"
                             observes="devtoolsMenuBroadcaster_BrowserConsole"
                             accesskey="&browserConsoleCmd.accesskey;"/>
