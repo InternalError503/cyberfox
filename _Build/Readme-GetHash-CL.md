@@ -12,4 +12,5 @@ For more information on a specific commands, See below
 --HELP | Shows helpful information.
 
 For items marked with `*` are required template parameters all parameters must be set.
+
 For items marked with ^ are required to be used together one can't be used without the other.
