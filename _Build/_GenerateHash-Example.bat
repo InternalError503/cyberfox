@@ -1,0 +1,1 @@
+GetHash-CL.exe --file=license.txt --sum=SHA512 --b --replace --output=license.txt.sha
