@@ -1315,7 +1315,7 @@ pref("browser.devedition.theme.showCustomizeButton", false);
 
 // Developer edition promo preferences
 pref("devtools.devedition.promo.shown", false);
-pref("devtools.devedition.promo.url", "https://mozilla.org/firefox/developer");
+pref("devtools.devedition.promo.url", "https://www.mozilla.org/firefox/developer");
 
 // Only potentially show in beta release
 #if MOZ_UPDATE_CHANNEL == beta
@@ -1490,9 +1490,9 @@ pref("devtools.gcli.hideIntro", false);
 pref("devtools.gcli.eagerHelper", 2);
 
 // Alias to the script URLs for inject command.
-pref("devtools.gcli.jquerySrc", "http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js");
-pref("devtools.gcli.lodashSrc", "http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js");
-pref("devtools.gcli.underscoreSrc", "http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js");
+pref("devtools.gcli.jquerySrc", "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js");
+pref("devtools.gcli.lodashSrc", "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js");
+pref("devtools.gcli.underscoreSrc", "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js");
 
 // Remember the Web Console filters
 pref("devtools.webconsole.filter.network", true);
@@ -1638,7 +1638,8 @@ pref("image.mem.max_decoded_image_kb", 256000);
 #else
 pref("image.mem.max_decoded_image_kb", 512000);
 #endif
-pref("loop.enabled", true);
+//Disable by default.
+pref("loop.enabled", false);
 pref("loop.server", "https://loop.services.mozilla.com/v0");
 pref("loop.seenToS", "unseen");
 pref("loop.gettingStarted.seen", false);

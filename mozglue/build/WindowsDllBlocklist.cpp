@@ -144,6 +144,7 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 
 	  // Topcrash with Conduit SearchProtect, bug 944542
 	  { "spvc32.dll", ALL_VERSIONS },
+ 	  { "spvc32loader.dll", ALL_VERSIONS },
 	  { "sprotector.dll", ALL_VERSIONS },
 
 
