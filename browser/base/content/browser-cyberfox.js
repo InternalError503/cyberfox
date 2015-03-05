@@ -314,6 +314,16 @@ document.getElementById("menu_FilePopup")
 			
   }, false); 
   
+  //If windows vista x64 disable Hardware acceleration.
+  var osWin = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS=="WINNT"	
+	if (osWin){
+		if(/6.0; Win64/.test(window.navigator.oscpu)){
+			Services.prefs.setBoolPref("gfx.direct2d.disabled", true);
+			Services.prefs.setBoolPref("gfx.direct2d.use1_1", false);	
+			Services.prefs.setBoolPref("layers.acceleration.disabled", true);
+			Services.prefs.setBoolPref("gfx.direct2d.force-enabled", false);
+		}	
+	}  
 },	
 
 

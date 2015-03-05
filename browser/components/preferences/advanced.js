@@ -37,7 +37,13 @@ var gAdvancedPane = {
 		Services.prefs.setBoolPref("app.update.autocheck", false);
 		Services.prefs.setBoolPref("app.update.check.enabled", false);		
 	}	
-	
+  //If windows vista x64 hide Hardware acceleration.
+  var osWin = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS=="WINNT";
+  if (osWin){
+	  if(/6.0; Win64/.test(window.navigator.oscpu)){
+		  document.getElementById('allowHWAccel').hidden=true;
+	  }	
+  }	
     var extraArgs = window.arguments[1];
     if (extraArgs && extraArgs["advancedTab"]){
       advancedPrefs.selectedTab = document.getElementById(extraArgs["advancedTab"]);
