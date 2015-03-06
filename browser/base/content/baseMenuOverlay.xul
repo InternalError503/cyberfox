@@ -53,7 +53,7 @@
                   />
 #endif
         <menuitem id="menu_keyboardShortcuts"
-                  oncommand="openHelpLink('keyboard-shortcuts')"
+                  oncommand="openUILink('http://mzl.la/16NAhwz')"
                   onclick="checkForMiddleClick(this, event);"
                   label="&helpKeyboardShortcuts.label;"
                   accesskey="&helpKeyboardShortcuts.accesskey;"/>
