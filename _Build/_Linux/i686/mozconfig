@@ -13,17 +13,22 @@ ac_add_options --with-app-basename=Cyberfox
 ac_add_options --prefix=/usr
 ac_add_options --libexecdir=/usr/lib/cyberfox 
 
-mk_add_options MOZ_MAKE_FLAGS=-j8
+#Auto parallel compiling
+Cparallel=$(( `grep processor /proc/cpuinfo | wc -l` + 2 ))
+mk_add_options MOZ_MAKE_FLAGS="-j$Cparallel"
 mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/../obj32
 mk_add_options MOZILLA_DIR=@TOPSRCDIR@
 
 
 #Enable wanted features
-ac_add_options --enable-optimize
+ac_add_options --enable-optimize=-O3
 ac_add_options --enable-jemalloc
 ac_add_options --enable-release
 ac_add_options --enable-gio
-
+ac_add_options --enable-stdcxx-compat
+ac_add_options --with-pthreads
+ac_add_options --enable-strip
+ac_add_options --enable-install-strip
 
 #Disable unwanted features
 ac_add_options --disable-pay
