@@ -35,16 +35,76 @@ a {
   -moz-box-flex: 1;
 }
 
+	.headerbar {
+		min-height: 55px;
+		max-height:70px;
+		width: 100%;
+	}
+
+	.hmenubar  {
+		text-align: center;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		background-color: hsla(0,0%,0%,.03);
+		border-bottom: 1px solid hsla(0,0%,0%,.03);
+		box-shadow: 0 1px 2px hsla(0,0%,0%,.02) inset,
+					  0 -1px 0 hsla(0,0%,100%,.25);
+		font-size: 0px;
+		letter-spacing: 0px;
+		word-spacing: 0px;					  
+	}
+
+	.hmenubar li  {
+		min-height:55px;
+		margin: 0;
+		padding: 0;
+		display: inline-block;
+		position: relative;
+		left:auto;
+		right:auto;
+	}
+
+	.hmenubar li a  {
+		display: block;
+		margin: 0;
+		padding-top: 15px;
+		padding-left:5px;
+		padding-right:5px;
+		padding-bottom: 20px;
+		line-height: 19px;
+		font-weight: bold;
+		text-decoration: none;
+		text-transform: none;
+		text-align: center;
+		width: auto;
+		min-width: 73px;
+		color: #525c66;
+		height: 55;
+		font-size: 14px;
+	}
+
+	.hmenubar li a:hover {
+	  color: #00adee;
+	}
+
+	.hmenubar li a:active {
+	   color: #555555;		
+	}
+
+	.hmenubar li a.clicked {
+	   color: #555555;
+	}
 #topSection {
   text-align: center;
 }
 
 #brandLogo {
-  height: 192px;
-  width: 192px;
+  height: 154px;
+  width: 154px;
   margin: 22px auto 31px;
   background-image: url("chrome://branding/content/about-logo.png");
-  background-size: 192px auto;
+  background-size: 154px auto;
   background-position: center center;
   background-repeat: no-repeat;
 }
