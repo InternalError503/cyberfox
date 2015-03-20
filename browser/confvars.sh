@@ -57,7 +57,7 @@ MOZ_WEBAPP_RUNTIME=1
 MOZ_MEDIA_NAVIGATOR=1
 MOZ_WEBGL_CONFORMANT=1
 # Enable navigator.mozPay
-MOZ_PAY=0
+MOZ_PAY=
 # Enable activities. These are used for FxOS developers currently.
 MOZ_ACTIVITIES=1
 MOZ_JSDOWNLOADS=1
