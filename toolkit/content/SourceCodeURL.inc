@@ -1,4 +1,4 @@
 # -*- Mode: HTML -*-
-<p>Built from <a href="ftp://ftp.mozilla.org/pub/firefox/candidates/36.0-candidates/build2/source/firefox-36.0.source.tar.bz2">firefox-36.0.source.tar.bz2</a></p>
-<p>DD5D9C3A4F355CCCDF324AAA2E23FB733D0A3E22C0F20E2F5436808EE80BAFBD18A41DB6A5216168D3622438E66DAFE531CCD361F06FC9DF6CC7928998D8F04C</p>
+<p>Built from <a href="ftp://ftp.mozilla.org/pub/firefox/candidates/36.0.3-candidates/build1/source/firefox-36.0.3.source.tar.bz2">firefox-36.0.3.source.tar.bz2</a></p>
+<p>6870ED16790EB368E49A637AABEDB865E18219694749F302C9E42F67B60A53E01E6D92047BFF409592D3FE3F2ACE34DEC1D713B4B8F38A7C6E745CE5658B9231</p>
 <p>Get Cyberfox source code <a href="https://github.com/InternalError503/cyberfox">https://github.com/</a></P>
