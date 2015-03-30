@@ -7,9 +7,11 @@
 
 <!DOCTYPE overlay [
 <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+<!ENTITY % advancedDTD SYSTEM "chrome://browser/locale/preferences/advanced.dtd">
 <!ENTITY % privacyDTD SYSTEM "chrome://browser/locale/preferences/privacy.dtd">
 <!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
 %brandDTD;
+%advancedDTD;
 %privacyDTD;
 %browserDTD;
 ]>
@@ -100,7 +102,19 @@
     <stringbundle id="bundlePreferences" src="chrome://browser/locale/preferences/preferences.properties"/>
     
     <script type="application/javascript" src="chrome://browser/content/preferences/privacy.js"/>
+	
+    <tabbox id="privacyPrefs" flex="1">	
 
+      <tabs id="tabsElement">	
+        <tab id="generalTab" label="&generalTab.label;"/>
+		<tab id="featuresTab" label="&FeaturesTabLabel;"/> 
+      </tabs>
+
+      <tabpanels flex="1">
+
+    <!-- General -->
+    <tabpanel id="generalTab" orient="vertical">
+		
     <!-- Tracking -->
     <groupbox id="trackingGroup" align="start">
       <caption label="&tracking.label;"/>
@@ -138,45 +152,6 @@
       </vbox>
 
     </groupbox>
-	<hbox flex="1">
-	<!-- Tracking Geo Location -->
-	  <groupbox id="geoLocationEnabled"  flex="1">
-	  <caption label="&geographicalLocation.label;"/>
-		  <vbox align="start">
-              <checkbox id="isGeoEnabled" label="&disableGeolocation.label;"
-                      preference="geo.enabled"/>
-		</vbox>
-		</groupbox>	
-		
-	<!-- sendRefererHeader -->
-	  <groupbox id="sendRefererHeader">
-	  <caption label="&sendRefererHeader.label;"/>		
-		<vbox>
-		        <label id="historyModeLabel"
-               control="historyMode">&historyHeader.pre.label;</label>
-<menulist id="doNotsendSecureXSiteReferrer"
-                  preference="network.http.sendRefererHeader">
-		 <menupopup>		  
-        <menuitem id="srhno" value="0" label="&sendRefererHeaderopt0.label;" />
-        <menuitem id="srhyes" value="1" label="&sendRefererHeaderopt1.label;" />
-        <menuitem  id="srhdef" value="2" label="&sendRefererHeaderopt2.label;"/>
-		 </menupopup>		
-      </menulist>
-		</vbox>
-		</groupbox>		
-</hbox>
-
-	<!-- WebRTC peer2peer -->	
-	<hbox flex="1" id="webrtcp2p">
-	  <groupbox id="webrtcp2penabled"  flex="1">
-	  <caption label="&webrtcp2group.description;"/>	
-		  <vbox align="start">
-              <checkbox id="media.peerconnection.enabled" label="&webrtcp2preference.label;"
-                      preference="media.peerconnection.enabled"/>
-		</vbox>
-		<label class="text-link" href="https://bugzilla.mozilla.org/show_bug.cgi?id=959893" value="&doNotTrackInfo.label;"/>		
-		</groupbox>		
-	</hbox>			
 
     <!-- History -->
     <groupbox id="historyGroup">
@@ -336,7 +311,54 @@
                   preference="browser.urlbar.suggest.openpage"/>
       </vbox>
     </groupbox>
+        </tabpanel>
+		
+		<tabpanel id="featuresTab" orient="vertical">
 
+	<!-- Tracking Geolocation -->		
+	<hbox>
+	  <groupbox id="geoLocationEnabled"  flex="1">
+	  <caption label="&geographicalLocation.label;"/>
+		  <vbox align="start">
+              <checkbox id="isGeoEnabled" label="&disableGeolocation.label;"
+                      preference="geo.enabled"/>
+		</vbox>
+		</groupbox>		
+		</hbox>
+		
+	<!-- sendRefererHeader -->
+	<hbox>	
+	  <groupbox id="sendRefererHeader" flex="1">
+	  <caption label="&sendRefererHeader.label;"/>
+		        <label id="historyModeLabel"
+               control="historyMode">&historyHeader.pre.label;</label>
+		<menulist id="doNotsendSecureXSiteReferrer"
+						  preference="network.http.sendRefererHeader">
+				 <menupopup>		  
+				<menuitem id="srhno" value="0" label="&sendRefererHeaderopt0.label;" />
+				<menuitem id="srhyes" value="1" label="&sendRefererHeaderopt1.label;" />
+				<menuitem  id="srhdef" value="2" label="&sendRefererHeaderopt2.label;"/>
+				 </menupopup>		
+			  </menulist>
+				</groupbox>		
+		</hbox>		
+
+		<!-- WebRTC peer2peer -->	
+		<hbox id="webrtcp2p">
+		  <groupbox id="webrtcp2penabled"  flex="1">
+		  <caption label="&webrtcp2group.description;"/>	
+			  <vbox align="start">
+				  <checkbox id="media.peerconnection.enabled" label="&webrtcp2preference.label;"
+						  preference="media.peerconnection.enabled"/>
+			</vbox>
+			<label class="text-link" href="https://bugzilla.mozilla.org/show_bug.cgi?id=959893" value="&doNotTrackInfo.label;"/>		
+			</groupbox>		
+		</hbox>			
+		
+        </tabpanel>		
+		
+    </tabpanels>
+    </tabbox>	  
   </prefpane>
 
 </overlay>
