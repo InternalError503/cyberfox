@@ -1,0 +1,4 @@
+Cyberfox source code can be found https://github.com/InternalError503/cyberfox based from Mozilla Firefox source code.
+
+The original portable installer source code is available from the Firefox Portable page:
+http://portableapps.com/apps/internet/firefox_portable
