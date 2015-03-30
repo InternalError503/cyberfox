@@ -54,7 +54,7 @@ mkdir "%BuildFolderPath%_CyberfoxPortable\logs"
 echo. Building Intel 86 bit portable package
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt" (
-del /y"%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt"
+del "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt"
 )
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe" (
@@ -90,7 +90,7 @@ timeout 1 >nul
 echo. Building Amd 86 bit portable package!
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt" (
-del /y"%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt"
+del "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt"
 )
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe" (
@@ -222,7 +222,7 @@ echo.
 echo. 
 echo.Compilation Complete!
 ::----
-goto :top
+goto :exit
 ::----
 ::----
 ::----
