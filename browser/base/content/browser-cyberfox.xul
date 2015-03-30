@@ -1,42 +1,56 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://browser/content/browser-cyberfox.css" type="text/css"?>
-	<!DOCTYPE overlay [
-	<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
+<!DOCTYPE overlay [
+	
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
 		%browserDTD;
 	]>
-
-<overlay id="toolbarCustomButtonOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
-	<toolbarpalette id="BrowserToolbarPalette">	
-			<toolbarbutton id="toolbar_restartBrowser" 
+<overlay id="toolbarCustomButtonOverlay"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <toolbarpalette id="BrowserToolbarPalette">
+        <toolbarbutton id="toolbar_restartBrowser" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"
 									  label="&restartBrowserButton.label;"	
 									  tooltiptext="&restartBrowserButton.label;"  
-									  oncommand="gCyberfoxCustom.restartBrowser();" />     
-			<toolbarbutton id="tbar-clonenewtab" 
+									  oncommand="gCyberfoxCustom.restartBrowser();" />
+        <toolbarbutton id="tbar-clonenewtab" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
 									  tooltiptext="&cloneCurrentTab.label;" 
 									  label="&cloneCurrentTab.label;"
-									  oncommand="gCyberfoxCustom.CloneCurrent('tab');"/>      
-			<toolbarbutton id="tbar-clonenewwindow" 
+									  oncommand="gCyberfoxCustom.CloneCurrent('tab');"/>
+        <toolbarbutton id="tbar-clonenewwindow" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
 									  tooltiptext="&cloneInNewWindow.label;"  
 									  label="&cloneInNewWindow.label;" 
 									  oncommand="gCyberfoxCustom.CloneCurrent('window');"/>
-			<toolbarbutton id="downloads-button-additional" class="toolbarbutton-1 chromeclass-toolbar-additional"
+        <toolbarbutton id="downloads-button-additional" class="toolbarbutton-1 chromeclass-toolbar-additional"
 									  key="key_openDownloads"
 									  command="Tools:Downloads"
 									  label="&downloads.label;"
 									  removable="true"
 									  tooltiptext="&downloads.label;"/>
-			<toolbarbutton id="tbar-copycurrenttaburl" 
+        <toolbarbutton id="tbar-copycurrenttaburl" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
 									  tooltiptext="&copyTabURL.label;"  
 									  label="&copyTabURL.label;" 
 									  oncommand="gCyberfoxCustom.CopyCurrentTabUrl();"/>
-			<toolbarbutton id="tbar_browserconsole" 
+        <toolbarbutton id="tbar-copyalltaburl" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
+									  tooltiptext="&copyAllTabUrls.label;"  
+									  label="&copyAllTabUrls.label;" 
+									  oncommand="gCyberfoxCustom.CopyAllTabUrls();"/>
+        <toolbarbutton id="tbar_browserconsole" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"							  
 									  tooltiptext="&browserConsoleCmd.label;"  
 									  label="&browserConsoleCmd.label;" 
-									  oncommand="HUDService.toggleBrowserConsole();"/>										  
-	</toolbarpalette>						   
+									  oncommand="HUDService.toggleBrowserConsole();"/>
+    </toolbarpalette>
+    <panel id="PanelUI-footer-inner">
+        <toolbarbutton id="panelUI_menu_restartBrowser"
+					label="&restartBrowserButton.label;"
+					oncommand="gCyberfoxCustom.restartBrowser();"
+					insertbefore="PanelUI-quit"
+				    tooltiptext="&restartBrowserButton.label;"/>
+        <toolbarseparator insertbefore="PanelUI-quit"/>
+    </panel>
 </overlay>

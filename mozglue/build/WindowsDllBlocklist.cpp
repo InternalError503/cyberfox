@@ -206,11 +206,19 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  { "nptnt2.dll", ALL_VERSIONS },
 	  { "nptnt2ghost.dll", ALL_VERSIONS },
 
-  // Startup crashes with Lenovo Onekey Theater, bug 1123778
-  { "activedetect32.dll", UNVERSIONED },
-  { "activedetect64.dll", UNVERSIONED },
-  { "windowsapihookdll32.dll", UNVERSIONED },
-  { "windowsapihookdll64.dll", UNVERSIONED },
+	  // Startup crashes with Lenovo Onekey Theater, bug 1123778
+	  { "activedetect32.dll", UNVERSIONED },
+	  { "activedetect64.dll", UNVERSIONED },
+	  { "windowsapihookdll32.dll", UNVERSIONED },
+	  { "windowsapihookdll64.dll", UNVERSIONED },
+	  
+	  // Flash crashes with RealNetworks RealDownloader, bug 1132663
+	  { "rndlnpshimswf.dll", ALL_VERSIONS },
+	  { "rndlmainbrowserrecordplugin.dll", ALL_VERSIONS },
+	  
+	  // Crashes with CyberLink YouCam, bug 1136968
+	  { "ycwebcamerasource.ax", MAKE_VERSION(2, 0, 0, 1611) },
+
  
 	  { nullptr, 0 }
 };

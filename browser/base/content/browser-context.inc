@@ -462,3 +462,10 @@
       <menuitem id="context-javascript"
                 label="&togglescriptintab.label;"
                 oncommand="gCyberfoxCustom.toggleTabJavascript();"/>
+      <menuseparator id="context-media-eme-separator" hidden="true"/>
+      <menuitem id="context-media-eme-learnmore"
+                class="menuitem-iconic"
+                hidden="true"
+                label="Learn more about DRM"
+                accesskey="D"
+                onclick="gContextMenu.drmLearnMore(event);"/>

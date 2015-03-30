@@ -7,7 +7,7 @@
 <script type="application/javascript"
         src="chrome://browser/content/preferences/in-content/advanced.js"/>
 
-<preferences id="advancedPreferences">
+<preferences id="advancedPreferences" hidden="true" data-category="paneAdvanced">
   <preference id="browser.preferences.advanced.selectedTabIndex"
               name="browser.preferences.advanced.selectedTabIndex"
               type="int"/>
@@ -91,7 +91,13 @@
 						   type="bool"/>
 	  <preference id="browser.tabs.copyallurls" 
 						   name="browser.tabs.copyallurls" 
-						   type="bool"/>               					
+						   type="bool"/>  
+ 	  <preference id="browser.restart.showpanelmenubtn" 
+						   name="browser.restart.showpanelmenubtn" 
+						   type="bool"/>
+ 	  <preference id="browser.restart.smallpanelmenubtn" 
+						   name="browser.restart.smallpanelmenubtn" 
+						   type="bool"/>							   
 <!-- Cyberfeatures -->
    			  
 #ifdef MOZ_TELEMETRY_REPORTING
@@ -189,12 +195,14 @@
   <tabs id="tabsElement">
     <tab id="generalTab" label="&generalTab.label;"/>
 #ifdef MOZ_DATA_REPORTING
-    <tab id="dataChoicesTab" label="&dataChoicesTab.label;" hidden="true"/>
+    <tab id="dataChoicesTab" label="&dataChoicesTab.label;"/>
 #endif
     <tab id="networkTab" label="&networkTab.label;"/>
     <tab id="updateTab" label="&updateTab.label;"/>
     <tab id="encryptionTab" label="&certificateTab.label;"/>
     <tab id="features" label="&FeaturesTabLabel;"/>
+    <tab id="menuFeaturesTab" label="&menuFeaturesTab.label;"/>
+    <tab id="restartFeaturesTab" label="&restartBrowser.label;"/>		
   </tabs>
 
   <tabpanels flex="1">
@@ -475,43 +483,21 @@
         </hbox>
     </tabpanel>
 		<tabpanel id="features" orient="vertical">
-			
-			<groupbox id="alternateOptions" orient="vertical">
-				<caption label="&cyberfoxOptions.label;"/>				
-					<checkbox id="enableCleanRamCache" label="&turnOnCleanRam.label;"
-							preference="clean.ram.cache"/>	
-					<checkbox id="enableCloneIt" label="&turnonclone.label;"
-							preference="browser.tabs.clonetab"/>
-					<checkbox id="browser.tabs.copyurl" label="&copyTabURLOptions.label;"
-							preference="browser.tabs.copyurl"/>
-					<checkbox id="browser.tabs.copyallurls" label="&copyAllTabUrlsOptions.label;"
-							preference="browser.tabs.copyallurls"/>                            
-					<checkbox id="browser.context.emaillink" label="&turnoffemaillink.label;"
-							preference="browser.context.emaillink"/>
-					<checkbox id="browser.context.aboutconfig" label="&turnoffcontextabout.label;"
-							preference="browser.context.aboutconfig"/>
-					<checkbox id="browser.menu.aboutconfig" label="&turnoffmenuabout.label;"
-							preference="browser.menu.aboutconfig"/>              	
+		
+			<!-- General Settings -->
+			<groupbox id="alternateOptionsGeneral" orient="vertical">
+				<caption label="&cyberfoxOptions.label;"/>				          	              	
 					<checkbox id="browser.preferences.inContent" label="&incontent.label;"
 							preference="browser.preferences.inContent"/>
-					<checkbox id="browser.context.classic" label="&contextNavigationClassic.label;"
-							preference="browser.context.classic"/>	
  					<checkbox id="browser.search.showOneOffButtons" label="&turnoffoneclicksearch.label;"
 							preference="browser.search.showOneOffButtons" 
-							tooltiptext="&restartRequiredMSG.label;" />
+							tooltiptext="&restartRequiredMSG.label;" />		
  					<checkbox id="loop.enabled" label="&enablehellochat.label;"
 							preference="loop.enabled" 
-							tooltiptext="&restartRequiredMSG.label;" />							
+							tooltiptext="&restartRequiredMSG.label;" />								
 			</groupbox>
 			
-			<groupbox id="alternateOptionsRestart" orient="vertical">
-				<caption label="&restartOptions.label;"/>
-					<checkbox id="enableRestartBrowser" label="&turnOnRestart.label;"
-							preference="browser.restart.enabled"/>
-					<checkbox id="browser.restart.purgecache" label="&cleanFastRestartCache.label;"
-							preference="browser.restart.purgecache"/>
-				</groupbox>			
-
+			<!-- Update Settings -->
 			<groupbox id="updateOptions" orient="vertical">
 				<caption label="&updateoptions.label;"/>
 					<checkbox id="app.update.autocheck" label="&updateautocheck.label;"
@@ -519,7 +505,8 @@
 					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
 							preference="app.update.check.enabled"/>								
 				</groupbox>
-			
+
+			<!-- Download Settings -->				
 		    <groupbox id="browserDownload.useToolkitUI">
 				<caption label="&toolKitUi.title;"/>
 		  <row id="iBrowserDownload.useToolkitUI">
@@ -529,7 +516,51 @@
 				</vbox>
 		 </row>		
 			</groupbox> 	
-						
+								
 			</tabpanel>
+			
+        <!-- Menu Features -->
+        <tabpanel id="menuFeaturesTab" orient="vertical">
+		
+			<!-- Context \ Browser Menu Settings -->
+			<groupbox id="alternateOptions" orient="vertical">
+				<caption label="&menuFeaturesTab.label;"/>				
+					<checkbox id="enableCleanRamCache" label="&turnOnCleanRam.label;"
+							preference="clean.ram.cache"/>	
+					<checkbox id="enableCloneIt" label="&turnonclone.label;"
+							preference="browser.tabs.clonetab"/>
+					<checkbox id="browser.tabs.copyurl" label="&copyTabURLOptions.label;"
+							preference="browser.tabs.copyurl"/>
+					<checkbox id="browser.tabs.copyallurls" label="&copyAllTabUrlsOptions.label;"
+							preference="browser.tabs.copyallurls"/>
+				    <checkbox id="browser.context.emaillink" label="&turnoffemaillink.label;"
+							preference="browser.context.emaillink"/>
+ 					<checkbox id="browser.context.aboutconfig" label="&turnoffcontextabout.label;"
+							preference="browser.context.aboutconfig"/>
+					<checkbox id="browser.menu.aboutconfig" label="&turnoffmenuabout.label;"
+							preference="browser.menu.aboutconfig"/>             	              	
+ 					<checkbox id="browser.context.classic" label="&contextNavigationClassic.label;"
+							preference="browser.context.classic"/>							
+			</groupbox>	
+			
+		</tabpanel>
+
+        <!-- Restart Browser Feature -->
+        <tabpanel id="menuFeaturesTab" orient="vertical">
+		
+			<!-- Restart Browser Settings -->
+			<groupbox id="alternateOptionsRestart" orient="vertical">
+				<caption label="&restartOptions.label;"/>
+					<checkbox id="enableRestartBrowser" label="&turnOnRestart.label;"
+							preference="browser.restart.enabled"/>
+					<checkbox id="browser.restart.showpanelmenubtn" label="Add button to PanelUI"
+							preference="browser.restart.showpanelmenubtn"/>
+					<checkbox id="browser.restart.smallpanelmenubtn" label="Use small button on panel UI."
+							preference="browser.restart.smallpanelmenubtn"/>							
+					<checkbox id="browser.restart.purgecache" label="&cleanFastRestartCache.label;"
+							preference="browser.restart.purgecache"/>
+				</groupbox>		
+			
+		</tabpanel>
   </tabpanels>
 </tabbox>

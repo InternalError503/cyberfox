@@ -154,9 +154,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "SafeBrowsing",
   "resource://gre/modules/SafeBrowsing.jsm");
 #endif
 
-XPCOMUtils.defineLazyModuleGetter(this, "gBrowserNewTabPreloader",
-  "resource:///modules/BrowserNewTabPreloader.jsm", "BrowserNewTabPreloader");
-
 XPCOMUtils.defineLazyModuleGetter(this, "gCustomizationTabPreloader",
   "resource:///modules/CustomizationTabPreloader.jsm", "CustomizationTabPreloader");
 
@@ -208,20 +205,21 @@ let gInitialPages = [
 ];
 
 #include browser-addons.js
+#include browser-ctrlTab.js
 #include browser-customization.js
 #include browser-devedition.js
+#include browser-eme.js
 #include browser-feeds.js
 #include browser-fullScreen.js
 #include browser-fullZoom.js
+#include browser-gestureSupport.js
 #include browser-loop.js
 #include browser-places.js
 #include browser-plugins.js
 #include browser-safebrowsing.js
 #include browser-social.js
-#include browser-tabPreviews.js
 #include browser-tabview.js
 #include browser-thumbnails.js
-#include browser-gestureSupport.js
 
 #ifdef MOZ_DATA_REPORTING
 #include browser-data-submission-info-bar.js
@@ -262,10 +260,10 @@ XPCOMUtils.defineLazyServiceGetter(this, "gCrashReporter",
                                    "nsICrashReporter");
 #endif
 
-XPCOMUtils.defineLazyGetter(this, "PageMenu", function() {
+XPCOMUtils.defineLazyGetter(this, "PageMenuParent", function() {
   let tmp = {};
   Cu.import("resource://gre/modules/PageMenu.jsm", tmp);
-  return new tmp.PageMenu();
+  return new tmp.PageMenuParent();
 });
 
 /**
@@ -912,7 +910,7 @@ var gBrowserInit = {
         .getService(Ci.nsIEventListenerService)
         .addSystemEventListener(gBrowser, "click", contentAreaClick, true);
     } else {
-      gBrowser.updateBrowserRemoteness(gBrowser.mCurrentBrowser, true);
+      gBrowser.updateBrowserRemoteness(gBrowser.selectedBrowser, true);
     }
 
     // hook up UI through progress listener
@@ -1728,7 +1726,7 @@ function HandleAppCommandEvent(evt) {
     saveDocument(gBrowser.selectedBrowser.contentDocumentAsCPOW);
     break;
   case "SendMail":
-    MailIntegration.sendLinkForWindow(window.content);
+    MailIntegration.sendLinkForBrowser(gBrowser.selectedBrowser);
     break;
   default:
     return;
@@ -2049,17 +2047,11 @@ function BrowserTryToCloseWindow()
 }
 
 function loadURI(uri, referrer, postData, allowThirdPartyFixup) {
-  if (postData === undefined)
-    postData = null;
-
-  var flags = nsIWebNavigation.LOAD_FLAGS_NONE;
-  if (allowThirdPartyFixup) {
-    flags |= nsIWebNavigation.LOAD_FLAGS_ALLOW_THIRD_PARTY_FIXUP;
-    flags |= nsIWebNavigation.LOAD_FLAGS_FIXUP_SCHEME_TYPOS;
-  }
-
   try {
-    gBrowser.loadURIWithFlags(uri, flags, referrer, null, postData);
+    openLinkIn(uri, "current",
+               { referrerURI: referrer,
+                 postData: postData,
+                 allowThirdPartyFixup: allowThirdPartyFixup });
   } catch (e) {}
 }
 
@@ -2078,7 +2070,7 @@ function getShortcutOrURIAndPostData(aURL, aCallback) {
 
   let engine = Services.search.getEngineByAlias(keyword);
   if (engine) {
-    let submission = engine.getSubmission(param);
+    let submission = engine.getSubmission(param, null, "keyword");
     postData = submission.postData;
     aCallback({ postData: submission.postData, url: submission.uri.spec,
                 mayInheritPrincipal: mayInheritPrincipal });
@@ -2509,9 +2501,9 @@ let gMenuButtonUpdateBadge = {
         updateButtonText = gNavigatorBundle.getFormattedString(stringId,
                                                                [brandShortName]);
 
-        updateButton.label = updateButtonText;
-        updateButton.hidden = false;
+        updateButton.setAttribute("label", updateButtonText);
         updateButton.setAttribute("update-status", "succeeded");
+        updateButton.hidden = false;
 
         PanelUI.panel.addEventListener("popupshowing", this, true);
 
@@ -2524,9 +2516,9 @@ let gMenuButtonUpdateBadge = {
         stringId = "appmenu.updateFailed.description";
         updateButtonText = gNavigatorBundle.getString(stringId);
 
-        updateButton.label = updateButtonText;
-        updateButton.hidden = false;
+        updateButton.setAttribute("label", updateButtonText);
         updateButton.setAttribute("update-status", "failed");
+        updateButton.hidden = false;
 
         PanelUI.panel.addEventListener("popupshowing", this, true);
 
@@ -2922,6 +2914,36 @@ function BrowserFullScreen()
 {
   window.fullScreen = !window.fullScreen;
 }
+
+function mirrorShow(popup) {
+  let services = [];
+  if (Services.prefs.getBoolPref("browser.casting.enabled")) {
+    services = CastingApps.getServicesForMirroring();
+  }
+  popup.ownerDocument.getElementById("menu_mirrorTabCmd").hidden = !services.length;
+}
+
+function mirrorMenuItemClicked(event) {
+  gBrowser.selectedBrowser.messageManager.sendAsyncMessage("SecondScreen:tab-mirror",
+                                                           {service: event.originalTarget._service});
+}
+
+function populateMirrorTabMenu(popup) {
+  popup.innerHTML = null;
+  if (!Services.prefs.getBoolPref("browser.casting.enabled")) {
+    return;
+  }
+  let videoEl = this.target;
+  let doc = popup.ownerDocument;
+  let services = CastingApps.getServicesForMirroring();
+  services.forEach(service => {
+    let item = doc.createElement("menuitem");
+    item.setAttribute("label", service.friendlyName);
+    item._service = service;
+    item.addEventListener("command", mirrorMenuItemClicked);
+    popup.appendChild(item);
+  });
+};
 
 function _checkDefaultAndSwitchToMetro() {
 #ifdef HAVE_SHELL_SERVICE
@@ -3739,8 +3761,11 @@ function toJavaScriptConsole()
 
 function BrowserDownloadsUI()
 {
-  Cc["@mozilla.org/download-manager-ui;1"].
-  getService(Ci.nsIDownloadManagerUI).show(window);
+  if (PrivateBrowsingUtils.isWindowPrivate(window)) {
+    openUILinkIn("about:downloads", "tab");
+  } else {
+    PlacesCommandHook.showPlacesOrganizer("Downloads");
+  }
 }
 
 function toOpenWindowByType(inType, uri, features)
@@ -5649,9 +5674,11 @@ function handleLinkClick(event, href, linkNode) {
   }
 
   urlSecurityCheck(href, doc.nodePrincipal);
-  openLinkIn(href, where, { referrerURI: referrerURI,
-                            charset: doc.characterSet,
-                            allowMixedContent: persistAllowMixedContentInChildTab });
+  let params = { charset: doc.characterSet,
+                 allowMixedContent: persistAllowMixedContentInChildTab,
+                 referrerURI: referrerURI,
+                 noReferrer: BrowserUtils.linkHasNoReferrer(linkNode) };
+  openLinkIn(href, where, params);
   event.preventDefault();
   return true;
 }
@@ -6458,9 +6485,8 @@ function warnAboutClosingWindow() {
 }
 
 var MailIntegration = {
-  sendLinkForWindow: function (aWindow) {
-    this.sendMessage(aWindow.location.href,
-                     aWindow.document.title);
+  sendLinkForBrowser: function (aBrowser) {
+    this.sendMessage(aBrowser.currentURI.spec, aBrowser.contentTitle);
   },
 
   sendMessage: function (aBody, aSubject) {
@@ -6709,7 +6735,7 @@ function isTabEmpty(aTab) {
   if (!gMultiProcessBrowser && browser.contentWindow.opener)
     return false;
 
-  if (browser.sessionHistory && browser.sessionHistory.count >= 2)
+  if (browser.canGoForward || browser.canGoBack)
     return false;
 
   return true;
@@ -6937,7 +6963,7 @@ var gIdentityHandler = {
 
     // Chrome URIs however get special treatment. Some chrome URIs are
     // whitelisted to provide a positive security signal to the user.
-    let whitelist = /^about:(accounts|addons|app-manager|config|customizing|home|license|newaddon|permissions|preferences|privatebrowsing|rights|sessionrestore|support|welcomeback)/i;
+    let whitelist = /^about:(accounts|addons|app-manager|buildconfig|cache|config|customizing|downloads|home|license|logo|memory|networking|newaddon|permissions|plugins|preferences|privatebrowsing|rights|sessionrestore|support|welcomeback)/i;
     let isChromeUI = uri.schemeIs("about") && whitelist.test(uri.spec);
     if (isChromeUI) {
       this.setMode(this.IDENTITY_MODE_CHROMEUI);
@@ -6972,8 +6998,6 @@ var gIdentityHandler = {
          nsIWebProgressListener.STATE_BLOCKED_TRACKING_CONTENT     |
          nsIWebProgressListener.STATE_LOADED_TRACKING_CONTENT)) {
       this.showBadContentDoorhanger(state);
-    } else {
-      // We didn't show the shield
     }
   },
 
@@ -7434,6 +7458,7 @@ function switchToTabHavingURI(aURI, aOpenNew, aOpenParams={}) {
   // Certain URLs can be switched to irrespective of the source or destination
   // window being in private browsing mode:
   const kPrivateBrowsingWhitelist = new Set([
+    "about:addons",
     "about:customizing",
   ]);
 
@@ -7445,6 +7470,7 @@ function switchToTabHavingURI(aURI, aOpenNew, aOpenParams={}) {
   // not be used as a parameter for the new load.
   delete aOpenParams.ignoreFragment;
   delete aOpenParams.ignoreQueryString;
+  delete aOpenParams.replaceQueryString;
 
   // This will switch to the tab in aWindow having aURI, if present.
   function switchIfURIInWindow(aWindow) {
@@ -7695,7 +7721,8 @@ XPCOMUtils.defineLazyGetter(ResponsiveUI, "ResponsiveUIManager", function() {
 });
 
 function openEyedropper() {
-  var eyedropper = new this.Eyedropper(this);
+  var eyedropper = new this.Eyedropper(this, { context: "menu",
+                                               copyOnSelect: true });
   eyedropper.open();
 }
 

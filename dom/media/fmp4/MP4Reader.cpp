@@ -15,8 +15,14 @@
 #include "Layers.h"
 #include "SharedThreadPool.h"
 #include "mozilla/Preferences.h"
+#ifdef MOZ_TELEMETRY_REPORTING
+#include "mozilla/Telemetry.h"
+#endif
 #include "mozilla/dom/TimeRanges.h"
+#include "mp4_demuxer/AnnexB.h"
+#include "mp4_demuxer/H264.h"
 #include "SharedDecoderManager.h"
+#include <algorithm>
 
 #ifdef MOZ_EME
 #include "mozilla/CDMProxy.h"
@@ -64,6 +70,42 @@ TrackTypeToStr(TrackType aTrack)
 }
 #endif
 
+#ifdef MOZ_TELEMETRY_REPORTING
+bool
+AccumulateSPSTelemetry(const ByteBuffer* aExtradata)
+{
+  SPSData spsdata;
+  if (H264::DecodeSPSFromExtraData(aExtradata, spsdata)) {
+   uint8_t constraints = (spsdata.constraint_set0_flag ? (1 << 0) : 0) |
+                         (spsdata.constraint_set1_flag ? (1 << 1) : 0) |
+                         (spsdata.constraint_set2_flag ? (1 << 2) : 0) |
+                         (spsdata.constraint_set3_flag ? (1 << 3) : 0) |
+                         (spsdata.constraint_set4_flag ? (1 << 4) : 0) |
+                         (spsdata.constraint_set5_flag ? (1 << 5) : 0);
+    Telemetry::Accumulate(Telemetry::VIDEO_DECODED_H264_SPS_CONSTRAINT_SET_FLAG,
+                          constraints);
+
+    // Collect profile_idc values up to 244, otherwise 0 for unknown.
+    Telemetry::Accumulate(Telemetry::VIDEO_DECODED_H264_SPS_PROFILE,
+                          spsdata.profile_idc <= 244 ? spsdata.profile_idc : 0);
+
+    // Make sure level_idc represents a value between levels 1 and 5.2,
+    // otherwise collect 0 for unknown level.
+    Telemetry::Accumulate(Telemetry::VIDEO_DECODED_H264_SPS_LEVEL,
+                          (spsdata.level_idc >= 10 && spsdata.level_idc <= 52) ?
+                          spsdata.level_idc : 0);
+
+    // max_num_ref_frames should be between 0 and 16, anything larger will
+    // be treated as invalid.
+    Telemetry::Accumulate(Telemetry::VIDEO_H264_SPS_MAX_NUM_REF_FRAMES,
+                          std::min(spsdata.max_num_ref_frames, 17u));
+
+    return true;
+  }
+
+  return false;
+}
+#endif
 // MP4Demuxer wants to do various blocking reads, which cause deadlocks while
 // mDemuxerMonitor is held. This stuff should really be redesigned, but we don't
 // have time for that right now. So in order to get proper synchronization while
@@ -114,6 +156,9 @@ MP4Reader::MP4Reader(AbstractMediaDecoder* aDecoder)
   , mLastReportedNumDecodedFrames(0)
   , mLayersBackendType(layers::LayersBackend::LAYERS_NONE)
   , mDemuxerInitialized(false)
+#ifdef MOZ_TELEMETRY_REPORTING
+  , mFoundSPSForTelemetry(false)
+#endif
   , mIsEncrypted(false)
   , mIndexReady(false)
   , mDemuxerMonitor("MP4 Demuxer")
@@ -206,14 +251,13 @@ MP4Reader::Init(MediaDecoderReader* aCloneDonor)
   MOZ_ASSERT(NS_IsMainThread(), "Must be on main thread.");
   PlatformDecoderModule::Init();
   mStream = new MP4Stream(mDecoder->GetResource());
-  mTimestampOffset = GetDecoder()->GetTimestampOffset();
 
   InitLayersBackendType();
 
-  mAudio.mTaskQueue = new MediaTaskQueue(GetMediaDecodeThreadPool());
+  mAudio.mTaskQueue = new FlushableMediaTaskQueue(GetMediaDecodeThreadPool());
   NS_ENSURE_TRUE(mAudio.mTaskQueue, NS_ERROR_FAILURE);
 
-  mVideo.mTaskQueue = new MediaTaskQueue(GetMediaDecodeThreadPool());
+  mVideo.mTaskQueue = new FlushableMediaTaskQueue(GetMediaDecodeThreadPool());
   NS_ENSURE_TRUE(mVideo.mTaskQueue, NS_ERROR_FAILURE);
 
   static bool sSetupPrefCache = false;
@@ -342,7 +386,7 @@ MP4Reader::PreReadMetadata()
 bool
 MP4Reader::InitDemuxer()
 {
-  mDemuxer = new MP4Demuxer(mStream, mTimestampOffset, &mDemuxerMonitor);
+  mDemuxer = new MP4Demuxer(mStream, &mDemuxerMonitor);
   return mDemuxer->Init();
 }
 
@@ -365,7 +409,7 @@ MP4Reader::ReadMetadata(MediaInfo* aInfo,
     {
       MonitorAutoUnlock unlock(mDemuxerMonitor);
       ReentrantMonitorAutoEnter mon(mDecoder->GetReentrantMonitor());
-      mIsEncrypted = mDemuxer->Crypto().valid;
+      mInfo.mIsEncrypted = mIsEncrypted = mDemuxer->Crypto().valid;
     }
 
     // Remember that we've initialized the demuxer, so that if we're decoding
@@ -380,14 +424,12 @@ MP4Reader::ReadMetadata(MediaInfo* aInfo,
 
   if (mDemuxer->Crypto().valid) {
 #ifdef MOZ_EME
-    if (!sIsEMEEnabled) {
-      // TODO: Need to signal DRM/EME required somehow...
-      return NS_ERROR_FAILURE;
-    }
-
     // We have encrypted audio or video. We'll need a CDM to decrypt and
     // possibly decode this. Wait until we've received a CDM from the
-    // JavaScript player app.
+    // JavaScript player app. Note: we still go through the motions here
+    // even if EME is disabled, so that if script tries and fails to create
+    // a CDM, we can detect that and notify chrome and show some UI explaining
+    // that we failed due to EME being disabled.
     nsRefPtr<CDMProxy> proxy;
     nsTArray<uint8_t> initData;
     ExtractCryptoInitData(initData);
@@ -411,8 +453,7 @@ MP4Reader::ReadMetadata(MediaInfo* aInfo,
 
     mPlatform = PlatformDecoderModule::CreateCDMWrapper(proxy,
                                                         HasAudio(),
-                                                        HasVideo(),
-                                                        GetTaskQueue());
+                                                        HasVideo());
     NS_ENSURE_TRUE(mPlatform, NS_ERROR_FAILURE);
 #else
     // EME not supported.
@@ -447,7 +488,9 @@ MP4Reader::ReadMetadata(MediaInfo* aInfo,
     mInfo.mVideo.mDisplay =
       nsIntSize(video.display_width, video.display_height);
     mVideo.mCallback = new DecoderCallback(this, kVideo);
-    if (mSharedDecoderManager) {
+    if (!mIsEncrypted && mSharedDecoderManager && mPlatform->SupportsSharedDecoders(video)) {
+      // Note: Don't use SharedDecoderManager in EME content, as it doesn't
+      // handle reiniting the decoder properly yet.
       mVideo.mDecoder =
         mSharedDecoderManager->CreateVideoDecoder(mPlatform,
                                                   video,
@@ -465,6 +508,13 @@ MP4Reader::ReadMetadata(MediaInfo* aInfo,
     NS_ENSURE_TRUE(mVideo.mDecoder != nullptr, NS_ERROR_FAILURE);
     nsresult rv = mVideo.mDecoder->Init();
     NS_ENSURE_SUCCESS(rv, rv);
+    mInfo.mVideo.mIsHardwareAccelerated = mVideo.mDecoder->IsHardwareAccelerated();
+#ifdef MOZ_TELEMETRY_REPORTING
+    // Collect telemetry from h264 AVCC SPS.
+    if (!mFoundSPSForTelemetry) {
+      mFoundSPSForTelemetry = AccumulateSPSTelemetry(video.extra_data);
+    }
+#endif
   }
 
   // Get the duration, and report it to the decoder if we have it.
@@ -531,6 +581,26 @@ MP4Reader::GetNextKeyframeTime()
   return mDemuxer->GetNextKeyframeTime();
 }
 
+void
+MP4Reader::DisableHardwareAcceleration()
+{
+  if (HasVideo() && !mIsEncrypted && mSharedDecoderManager) {
+    mPlatform->DisableHardwareAcceleration();
+
+    const VideoDecoderConfig& video = mDemuxer->VideoConfig();
+    if (!mSharedDecoderManager->Recreate(mPlatform, video, mLayersBackendType, mDecoder->GetImageContainer())) {
+      MonitorAutoLock mon(mVideo.mMonitor);
+      mVideo.mError = true;
+      if (mVideo.HasPromise()) {
+        mVideo.RejectPromise(DECODE_ERROR, __func__);
+      }
+    } else {
+      MonitorAutoLock lock(mVideo.mMonitor);
+      ScheduleUpdate(kVideo);
+    }
+  }
+}
+
 bool
 MP4Reader::ShouldSkip(bool aSkipToNextKeyframe, int64_t aTimeThreshold)
 {
@@ -556,10 +626,7 @@ MP4Reader::RequestVideoData(bool aSkipToNextKeyframe,
 
   if (mShutdown) {
     NS_WARNING("RequestVideoData on shutdown MP4Reader!");
-    MonitorAutoLock lock(mVideo.mMonitor);
-    nsRefPtr<VideoDataPromise> p = mVideo.mPromise.Ensure(__func__);
-    p->Reject(CANCELED, __func__);
-    return p;
+    return VideoDataPromise::CreateAndReject(CANCELED, __func__);
   }
 
   MOZ_ASSERT(HasVideo() && mPlatform && mVideo.mDecoder);
@@ -571,12 +638,14 @@ MP4Reader::RequestVideoData(bool aSkipToNextKeyframe,
     if (!eos && NS_FAILED(mVideo.mDecoder->Flush())) {
       NS_WARNING("Failed to skip/flush video when skipping-to-next-keyframe.");
     }
-    mDecoder->NotifyDecodedFrames(parsed, 0);
+    mDecoder->NotifyDecodedFrames(parsed, 0, parsed);
   }
 
   MonitorAutoLock lock(mVideo.mMonitor);
   nsRefPtr<VideoDataPromise> p = mVideo.mPromise.Ensure(__func__);
-  if (eos) {
+  if (mVideo.mError) {
+    mVideo.mPromise.Reject(DECODE_ERROR, __func__);
+  } else if (eos) {
     mVideo.mPromise.Reject(END_OF_STREAM, __func__);
   } else {
     ScheduleUpdate(kVideo);
@@ -590,14 +659,14 @@ MP4Reader::RequestAudioData()
 {
   MOZ_ASSERT(GetTaskQueue()->IsCurrentThreadIn());
   VLOG("RequestAudioData");
+  if (mShutdown) {
+    NS_WARNING("RequestAudioData on shutdown MP4Reader!");
+    return AudioDataPromise::CreateAndReject(CANCELED, __func__);
+  }
+
   MonitorAutoLock lock(mAudio.mMonitor);
   nsRefPtr<AudioDataPromise> p = mAudio.mPromise.Ensure(__func__);
-  if (!mShutdown) {
-    ScheduleUpdate(kAudio);
-  } else {
-    NS_WARNING("RequestAudioData on shutdown MP4Reader!");
-    p->Reject(CANCELED, __func__);
-  }
+  ScheduleUpdate(kAudio);
   return p;
 }
 
@@ -645,8 +714,7 @@ MP4Reader::Update(TrackType aTrack)
 
   // Record number of frames decoded and parsed. Automatically update the
   // stats counters using the AutoNotifyDecoded stack-based class.
-  uint32_t parsed = 0, decoded = 0;
-  AbstractMediaDecoder::AutoNotifyDecoded autoNotify(mDecoder, parsed, decoded);
+  AbstractMediaDecoder::AutoNotifyDecoded a(mDecoder);
 
   bool needInput = false;
   bool needOutput = false;
@@ -661,7 +729,7 @@ MP4Reader::Update(TrackType aTrack)
     }
     if (aTrack == kVideo) {
       uint64_t delta = decoder.mNumSamplesOutput - mLastReportedNumDecodedFrames;
-      decoded = static_cast<uint32_t>(delta);
+      a.mDecoded = static_cast<uint32_t>(delta);
       mLastReportedNumDecodedFrames = decoder.mNumSamplesOutput;
     }
     if (decoder.HasPromise()) {
@@ -685,10 +753,17 @@ MP4Reader::Update(TrackType aTrack)
 
   if (needInput) {
     MP4Sample* sample = PopSample(aTrack);
+#ifdef MOZ_TELEMETRY_REPORTING
+    // Collect telemetry from h264 Annex B SPS.
+    if (!mFoundSPSForTelemetry && sample && AnnexB::HasSPS(sample)) {
+      nsRefPtr<ByteBuffer> extradata = AnnexB::ExtractExtraData(sample);
+      mFoundSPSForTelemetry = AccumulateSPSTelemetry(extradata);
+    }
+#endif
     if (sample) {
       decoder.mDecoder->Input(sample);
       if (aTrack == kVideo) {
-        parsed++;
+        a.mParsed++;
       }
     } else {
       {
@@ -1043,7 +1118,9 @@ void MP4Reader::NotifyResourcesStatusChanged()
 void
 MP4Reader::SetIdle()
 {
-  if (mSharedDecoderManager && mVideo.mDecoder) {
+  if (!mIsEncrypted && mSharedDecoderManager && mVideo.mDecoder) {
+    // Note: Don't use SharedDecoderManager in EME content, as it doesn't
+    // handle reiniting the decoder properly yet.
     mSharedDecoderManager->SetIdle(mVideo.mDecoder);
     NotifyResourcesStatusChanged();
   }

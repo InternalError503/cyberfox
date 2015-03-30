@@ -9,15 +9,15 @@ MOZ_UPDATER=
 MOZ_PHOENIX=1
 
 if test "$OS_ARCH" = "WINNT"; then
-  MOZ_MAINTENANCE_SERVICE=1
-  MOZ_VERIFY_MAR_SIGNATURE=0
+  MOZ_MAINTENANCE_SERVICE=
+  MOZ_VERIFY_MAR_SIGNATURE=
   if ! test "$HAVE_64BIT_BUILD"; then
     if test "$MOZ_UPDATE_CHANNEL" = "nightly" -o \
             "$MOZ_UPDATE_CHANNEL" = "aurora" -o \
             "$MOZ_UPDATE_CHANNEL" = "beta" -o \
             "$MOZ_UPDATE_CHANNEL" = "release"; then
       if ! test "$MOZ_DEBUG"; then
-        MOZ_STUB_INSTALLER=0
+        MOZ_STUB_INSTALLER=
       fi
     fi
   fi
@@ -62,5 +62,3 @@ MOZ_PAY=
 MOZ_ACTIVITIES=1
 MOZ_JSDOWNLOADS=1
 MOZ_WEBM_ENCODER=1
-# Enable generational GC on desktop.
-export JSGC_GENERATIONAL=1

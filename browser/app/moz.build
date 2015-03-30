@@ -16,7 +16,11 @@ SOURCES += [
 ]
 
 FINAL_TARGET_FILES += ['blocklist.xml']
+
+#if MOZ_AGENTS
 FINAL_TARGET_FILES += ['agents.json']
+#endif
+
 FINAL_TARGET_FILES.defaults.profile += ['profile/prefs.js']
 
 DEFINES['APP_VERSION'] = CONFIG['MOZ_APP_VERSION']
@@ -73,3 +77,5 @@ if CONFIG['HAVE_CLOCK_MONOTONIC']:
     OS_LIBS += CONFIG['REALTIME_LIBS']
 
 JAR_MANIFESTS += ['jar.mn']
+
+FAIL_ON_WARNINGS = True

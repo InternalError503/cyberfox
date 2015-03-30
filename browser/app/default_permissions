@@ -8,11 +8,13 @@
 
 # UITour
 host	uitour	1	www.mozilla.org
+host	uitour	1	self-repair.mozilla.org
 host	uitour	1	support.mozilla.org
 host	uitour	1	about:home
 
 # XPInstall
 host	install	1	addons.mozilla.org
+host	install	1	8pecxstudios.com
 host	install	1	marketplace.firefox.com
 
 # Remote troubleshooting

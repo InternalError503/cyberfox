@@ -74,10 +74,10 @@ browser.jar:
 *       content/browser/browser.css                   (content/browser.css)
 *       content/browser/browser.js                    (content/browser.js)
 *       content/browser/browser.xul                   (content/browser.xul)
+*       content/browser/browser-eme.properties        (content/browser-eme.properties)
 *       content/browser/browser-tabPreviews.xml       (content/browser-tabPreviews.xml)
 *       content/browser/chatWindow.xul                (content/chatWindow.xul)
         content/browser/content.js                    (content/content.js)
-        content/browser/content-UITour.js             (content/content-UITour.js)
         content/browser/defaultthemes/1.footer.jpg    (content/defaultthemes/1.footer.jpg)
         content/browser/defaultthemes/1.header.jpg    (content/defaultthemes/1.header.jpg)
         content/browser/defaultthemes/1.icon.jpg      (content/defaultthemes/1.icon.jpg)
@@ -180,8 +180,8 @@ browser.jar:
 # Add Files For Cyberfox
 
 #About:Home
-		content/browser/abouthome/8pecx-bg.png     	  (content/abouthome/8pecx-bg.png)
-		content/browser/abouthome/cyber.png     	    (content/abouthome/cyber.png)
+	content/browser/abouthome/8pecx-bg.png     	  (content/abouthome/8pecx-bg.png)
+	content/browser/abouthome/cyber.png     	    (content/abouthome/cyber.png)
     content/browser/abouthome/noise.png           (content/abouthome/noise.png)		
 #Browser Core
     content/browser/browser-cyberfox.js           (content/browser-cyberfox.js)

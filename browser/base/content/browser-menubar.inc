@@ -472,7 +472,8 @@
 
             <menu id="tools-menu"
                   label="&toolsMenu.label;"
-                  accesskey="&toolsMenu.accesskey;">
+                  accesskey="&toolsMenu.accesskey;"
+                  onpopupshowing="mirrorShow(this)">
               <menupopup id="menu_ToolsPopup"
 #ifdef MOZ_SERVICES_SYNC
 # We have to use setTimeout() here to avoid a flickering menu bar when opening
@@ -491,10 +492,6 @@
                         accesskey="&addons.accesskey;"
                         key="key_openAddons"
                         command="Tools:Addons"/>
-              <menuitem id="menu_openApps"
-                        label="&webapps.label;"
-                        accesskey="&webapps.accesskey;"
-                        oncommand="BrowserOpenApps();"/>
 #ifdef MOZ_SERVICES_SYNC
               <!-- only one of sync-setup or sync-menu will be showing at once -->
               <menuitem id="sync-setup"
@@ -569,6 +566,13 @@
                         key="key_viewInfo"
 #endif
                         command="View:PageInfo"/>
+              <menu id="menu_mirrorTabCmd"
+                    hidden="true"
+                    accesskey="&mirrorTabCmd.accesskey;"
+                    label="&mirrorTabCmd.label;">
+                <menupopup id="menu_mirrorTab-popup"
+                           onpopupshowing="populateMirrorTabMenu(this)"/>
+              </menu>
 				 <menuitem id="minimizeMemoryUsage"
 						            label="&minimizeMemoryCache.label;"
 						            oncommand="Cu.forceGC();"/>		  

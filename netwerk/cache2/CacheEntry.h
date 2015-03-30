@@ -123,8 +123,8 @@ private:
   virtual ~CacheEntry();
 
   // CacheFileListener
-  NS_IMETHOD OnFileReady(nsresult aResult, bool aIsNew);
-  NS_IMETHOD OnFileDoomed(nsresult aResult);
+  NS_IMETHOD OnFileReady(nsresult aResult, bool aIsNew) MOZ_OVERRIDE;
+  NS_IMETHOD OnFileDoomed(nsresult aResult) MOZ_OVERRIDE;
 
   // Keep the service alive during life-time of an entry
   nsRefPtr<CacheStorageService> mService;
@@ -265,7 +265,11 @@ private:
   nsCOMPtr<nsICacheEntryDoomCallback> mDoomCallback;
 
   nsRefPtr<CacheFile> mFile;
-  nsresult mFileStatus;
+  
+  // Using ReleaseAcquire since we only control access to mFile with this.
+  // When mFileStatus is read and found success it is ensured there is mFile and
+  // that it is after a successful call to Init().
+  ::mozilla::Atomic<nsresult, ::mozilla::ReleaseAcquire> mFileStatus;
   nsCOMPtr<nsIURI> mURI;
   nsCString mEnhanceID;
   nsCString mStorageID;

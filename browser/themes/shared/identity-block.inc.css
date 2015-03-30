@@ -5,12 +5,42 @@
 %endif
 
 :root {
-  --identity-box-verified-color: hsl(92,100%,30%);
-  --identity-box-verified-background-image: linear-gradient(hsla(92,81%,16%,0),
-                                            hsla(92,81%,16%,.2) 35%,
-                                            hsla(92,81%,16%,.2) 65%,
-                                            hsla(92,81%,16%,0));
-%include identity-intel.inc
+	 --identity-box-verified-color: hsl(92,100%,30%);
+	 --identity-box-verified-background-image: linear-gradient(hsla(92,81%,16%,0),
+										hsla(92,81%,16%,.2) 35%,
+										hsla(92,81%,16%,.2) 65%,
+										hsla(92,81%,16%,0));
+%ifdef IDENTITY_BRANDING_BETA
+	--identity-box-chrome-color: rgb(252,183,0);
+	--identity-box-chrome-background-image: linear-gradient(rgba(252,183,0,0),
+										rgba(252,183,0,.5) 35%,
+										rgba(252,183,0,.5) 65%,
+										rgba(252,183,0,0));
+%elif IDENTITY_BRANDING_AMD
+	--identity-box-chrome-color: rgb(236,24,24);
+	--identity-box-chrome-background-image: linear-gradient(rgba(236,24,24,0),
+										rgba(236,24,24,.5) 35%,
+										rgba(236,24,24,.5) 65%,
+										rgba(236,24,24,0));
+%elif IDENTITY_BRANDING_LINUX
+	--identity-box-chrome-color: rgb(3,81,1);
+	--identity-box-chrome-background-image: linear-gradient(rgba(3,81,1,0),
+										rgba(3,81,1,.5) 35%,
+										rgba(3,81,1,.5) 65%,
+										rgba(3,81,1,0));
+%elif IDENTITY_BRANDING_INTEL
+	--identity-box-chrome-color: rgb(24,147,236);
+	--identity-box-chrome-background-image: linear-gradient(rgba(24,147,236,0),
+										rgba(24,147,236,.5) 35%,
+										rgba(24,147,236,.5) 65%,
+										rgba(24,147,236,0));
+%else
+	  --identity-box-chrome-color: rgb(229,115,0);
+	  --identity-box-chrome-background-image: linear-gradient(rgba(229,114,0,0),
+										rgba(229,114,0,.5) 35%,
+										rgba(229,114,0,.5) 65%,
+										rgba(229,114,0,0));
+%endif
 }
 
 

@@ -10,21 +10,23 @@ XPCSHELL_TESTS_MANIFESTS += [
 ]
 
 EXTRA_JS_MODULES += [
-    'BrowserNewTabPreloader.jsm',
     'BrowserUITelemetry.jsm',
     'CastingApps.jsm',
     'Chat.jsm',
     'ContentLinkHandler.jsm',
+    'ContentObservers.jsm',
     'ContentWebRTC.jsm',
     'CustomizationTabPreloader.jsm',
     'E10SUtils.jsm',
     'Feeds.jsm',
     'FormSubmitObserver.jsm',
     'FormValidationHandler.jsm',
+    'HiddenFrame.jsm',
     'NetworkPrioritizer.jsm',
     'offlineAppCache.jsm',
     'PanelFrame.jsm',
     'RemotePrompt.jsm',
+    'SelfSupportBackend.jsm',
     'SitePermissions.jsm',
     'Social.jsm',
     'TabCrashReporter.jsm',
@@ -48,7 +50,6 @@ EXTRA_PP_JS_MODULES += [
     'ContentSearch.jsm',
     'PluginContent.jsm',
     'RecentWindow.jsm',
-    'UITour.jsm',
     'webrtcUI.jsm',
 ]
 

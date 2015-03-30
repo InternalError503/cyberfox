@@ -313,7 +313,6 @@ selfhosting:: selfhosted.out.h
 
 selfhosting_srcs := \
   $(srcdir)/builtin/Utilities.js \
-  $(srcdir)/builtin/ParallelUtilities.js \
   $(srcdir)/builtin/Array.js \
   $(srcdir)/builtin/Date.js \
   $(srcdir)/builtin/Error.js \
@@ -326,6 +325,7 @@ selfhosting_srcs := \
   $(srcdir)/builtin/Object.js \
   $(srcdir)/builtin/String.js \
   $(srcdir)/builtin/Set.js \
+  $(srcdir)/builtin/TypedArray.js \
   $(srcdir)/builtin/TypedObject.js \
   $(srcdir)/builtin/WeakSet.js \
   $(NULL)

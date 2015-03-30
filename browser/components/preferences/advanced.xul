@@ -89,7 +89,13 @@
 						   type="bool"/>
  	  <preference id="browser.tabs.copyallurls" 
 						   name="browser.tabs.copyallurls" 
-						   type="bool"/>                  							   
+						   type="bool"/> 
+ 	  <preference id="browser.restart.showpanelmenubtn" 
+						   name="browser.restart.showpanelmenubtn" 
+						   type="bool"/>
+ 	  <preference id="browser.restart.smallpanelmenubtn" 
+						   name="browser.restart.smallpanelmenubtn" 
+						   type="bool"/>						   
       <!-- Data Choices tab -->
 
 #ifdef MOZ_TELEMETRY_REPORTING
@@ -164,7 +170,9 @@
         <tab id="networkTab" label="&networkTab.label;"/>
         <tab id="updateTab" label="&updateTab.label;"/>
         <tab id="encryptionTab" label="&certificateTab.label;"/>
-		    <tab id="features" label="&FeaturesTabLabel;"/>
+		<tab id="features" label="&FeaturesTabLabel;"/>
+        <tab id="menuFeaturesTab" label="&menuFeaturesTab.label;"/>
+        <tab id="restartFeaturesTab" label="&restartBrowser.label;"/>	
       </tabs>
 
       <tabpanels flex="1">
@@ -462,9 +470,48 @@
         </tabpanel>
 		
 		<tabpanel id="features" orient="vertical">
+		
+			<!-- General Settings -->
+			<groupbox id="alternateOptionsGeneral" orient="vertical">
+				<caption label="&cyberfoxOptions.label;"/>				          	              	
+					<checkbox id="browser.preferences.inContent" label="&incontent.label;"
+							preference="browser.preferences.inContent"/>
+ 					<checkbox id="browser.search.showOneOffButtons" label="&turnoffoneclicksearch.label;"
+							preference="browser.search.showOneOffButtons" 
+							tooltiptext="&restartRequiredMSG.label;" />		
+ 					<checkbox id="loop.enabled" label="&enablehellochat.label;"
+							preference="loop.enabled" 
+							tooltiptext="&restartRequiredMSG.label;" />								
+			</groupbox>
 			
+			<!-- Update Settings -->
+			<groupbox id="updateOptions" orient="vertical">
+				<caption label="&updateoptions.label;"/>
+					<checkbox id="app.update.autocheck" label="&updateautocheck.label;"
+							preference="app.update.autocheck"/>
+					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
+							preference="app.update.check.enabled"/>								
+				</groupbox>
+
+			<!-- Download Settings -->				
+		    <groupbox id="browserDownload.useToolkitUI">
+				<caption label="&toolKitUi.title;"/>
+		  <row id="iBrowserDownload.useToolkitUI">
+				<vbox align="start">
+				 <checkbox id="browser.download.useToolkitUI" label="&toolKitUi.label;"                    
+						  preference="browser.download.useToolkitUI"/>
+				</vbox>
+		 </row>		
+			</groupbox> 	
+								
+			</tabpanel>
+			
+        <!-- Menu Features -->
+        <tabpanel id="menuFeaturesTab" orient="vertical">
+		
+			<!-- Context \ Browser Menu Settings -->
 			<groupbox id="alternateOptions" orient="vertical">
-				<caption label="&cyberfoxOptions.label;"/>				
+				<caption label="&menuFeaturesTab.label;"/>				
 					<checkbox id="enableCleanRamCache" label="&turnOnCleanRam.label;"
 							preference="clean.ram.cache"/>	
 					<checkbox id="enableCloneIt" label="&turnonclone.label;"
@@ -479,45 +526,29 @@
 							preference="browser.context.aboutconfig"/>
 					<checkbox id="browser.menu.aboutconfig" label="&turnoffmenuabout.label;"
 							preference="browser.menu.aboutconfig"/>             	              	
-					<checkbox id="browser.preferences.inContent" label="&incontent.label;"
-							preference="browser.preferences.inContent"/>
  					<checkbox id="browser.context.classic" label="&contextNavigationClassic.label;"
-							preference="browser.context.classic"/>
- 					<checkbox id="browser.search.showOneOffButtons" label="&turnoffoneclicksearch.label;"
-							preference="browser.search.showOneOffButtons" 
-							tooltiptext="&restartRequiredMSG.label;" />		
- 					<checkbox id="loop.enabled" label="&enablehellochat.label;"
-							preference="loop.enabled" 
-							tooltiptext="&restartRequiredMSG.label;" />								
-			</groupbox>
+							preference="browser.context.classic"/>							
+			</groupbox>	
 			
+		</tabpanel>
+
+        <!-- Restart Browser Feature -->
+        <tabpanel id="menuFeaturesTab" orient="vertical">
+		
+			<!-- Restart Browser Settings -->
 			<groupbox id="alternateOptionsRestart" orient="vertical">
 				<caption label="&restartOptions.label;"/>
 					<checkbox id="enableRestartBrowser" label="&turnOnRestart.label;"
 							preference="browser.restart.enabled"/>
+					<checkbox id="browser.restart.showpanelmenubtn" label="Add button to PanelUI"
+							preference="browser.restart.showpanelmenubtn"/>
+					<checkbox id="browser.restart.smallpanelmenubtn" label="Use small button on panel UI."
+							preference="browser.restart.smallpanelmenubtn"/>							
 					<checkbox id="browser.restart.purgecache" label="&cleanFastRestartCache.label;"
 							preference="browser.restart.purgecache"/>
-				</groupbox>			
-
-			<groupbox id="updateOptions" orient="vertical">
-				<caption label="&updateoptions.label;"/>
-					<checkbox id="app.update.autocheck" label="&updateautocheck.label;"
-							preference="app.update.autocheck"/>
-					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
-							preference="app.update.check.enabled"/>								
-				</groupbox>
+				</groupbox>		
 			
-		    <groupbox id="browserDownload.useToolkitUI">
-				<caption label="&toolKitUi.title;"/>
-		  <row id="iBrowserDownload.useToolkitUI">
-				<vbox align="start">
-				 <checkbox id="browser.download.useToolkitUI" label="&toolKitUi.label;"                    
-						  preference="browser.download.useToolkitUI"/>
-				</vbox>
-		 </row>		
-			</groupbox> 	
-						
-			</tabpanel>
+		</tabpanel>
       </tabpanels>
     </tabbox>
   </prefpane>

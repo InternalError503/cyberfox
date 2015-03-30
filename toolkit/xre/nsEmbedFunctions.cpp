@@ -69,15 +69,16 @@
 
 #include "mozilla/ipc/TestShellParent.h"
 #include "mozilla/ipc/XPCShellEnvironment.h"
+#include "mozilla/WindowsDllBlocklist.h"
 
 #include "GMPProcessChild.h"
 #include "GMPLoader.h"
 
 #include "GeckoProfiler.h"
 
-#if defined(MOZ_CONTENT_SANDBOX) && defined(XP_WIN)
+#if defined(MOZ_SANDBOX) && defined(XP_WIN)
 #define TARGET_SANDBOX_EXPORTS
-#include "mozilla/warnonlysandbox/wosCallbacks.h"
+#include "mozilla/sandboxing/loggingCallbacks.h"
 #endif
 
 #ifdef MOZ_IPDL_TESTS
@@ -299,6 +300,10 @@ XRE_InitChildProcess(int aArgc,
   NS_ENSURE_ARG_MIN(aArgc, 2);
   NS_ENSURE_ARG_POINTER(aArgv);
   NS_ENSURE_ARG_POINTER(aArgv[0]);
+  
+#ifdef HAS_DLL_BLOCKLIST
+  DllBlocklist_Initialize();
+#endif 
 
 #if !defined(MOZ_WIDGET_ANDROID) && !defined(MOZ_WIDGET_GONK)
   // On non-Fennec Gecko, the GMPLoader code resides in plugin-container,
@@ -497,6 +502,9 @@ XRE_InitChildProcess(int aArgc,
       // Content processes need the XPCOM/chromium frankenventloop
       uiLoopType = MessageLoop::TYPE_MOZILLA_CHILD;
       break;
+  case GeckoProcessType_GMPlugin:
+      uiLoopType = MessageLoop::TYPE_DEFAULT;
+      break;
   default:
       uiLoopType = MessageLoop::TYPE_UI;
       break;
@@ -562,10 +570,10 @@ XRE_InitChildProcess(int aArgc,
         return NS_ERROR_FAILURE;
       }
 
-#if defined(MOZ_CONTENT_SANDBOX) && defined(XP_WIN)
+#if defined(MOZ_SANDBOX) && defined(XP_WIN)
       // We need to do this after the process has been initialised, as
-      // InitIfRequired needs access to prefs.
-      mozilla::warnonlysandbox::InitIfRequired();
+      // InitLoggingIfRequired may need access to prefs.
+      mozilla::sandboxing::InitLoggingIfRequired();
 #endif
 
       // Run the UI event loop on the main thread.
@@ -745,7 +753,7 @@ struct RunnableMethodTraits<ContentChild>
 void
 XRE_ShutdownChildProcess()
 {
-  NS_ABORT_IF_FALSE(MessageLoopForUI::current(), "Wrong thread!");
+  NS_ABORT_IF_FALSE(NS_IsMainThread(), "Wrong thread!");
 
   mozilla::DebugOnly<MessageLoop*> ioLoop = XRE_GetIOMessageLoop();
   NS_ABORT_IF_FALSE(!!ioLoop, "Bad shutdown order");
