@@ -409,6 +409,9 @@ pref("browser.search.context.loadInBackground", false);
 
 pref("browser.search.showOneOffButtons", false);
 
+// comma seperated list of of engines to hide in the search panel.
+pref("browser.search.hiddenOneOffs", "");
+
 // Never show the new search highlight on Firefox 37.
 pref("browser.search.highlightCount", 0);
 
