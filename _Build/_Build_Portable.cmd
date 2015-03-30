@@ -6,7 +6,12 @@ set BuildFolderPath=%~DP0
 ::The /V followed numbers between 0 and 4 sets the verbosity of output. (0=no output, 1=errors only, 2=warnings and errors, 3=info, warnings, and errors, 4=all output).
 set NSISCompiler="%BuildFolderPath%_NSISPortable\app\nsis\makensis" 
 set Argos=/V4
-echo. 
+::----
+if not exist "%BuildFolderPath%_NSISPortable\app\nsis\makensis.exe" (
+echo.The NSIS compiler was not found!
+echo.Exiting
+goto :exit
+) 
 ::----
 ECHO.
 ECHO.
