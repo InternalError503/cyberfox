@@ -890,6 +890,7 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!ENTITY restartOptions.label "Restart Options">
 <!ENTITY restart_paneluibtn.label "Add button to PanelUI">
 <!ENTITY restart_panelbtnsmall.label "Use small button on panel UI.">
+<!ENTITY restart_reqconfirmation.label "Require restart confirmation.">
 <!-- End Restart Browser Tweak -->
 
 <!ENTITY FeaturesTabLabel "Features">

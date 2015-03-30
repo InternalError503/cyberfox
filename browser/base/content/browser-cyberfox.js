@@ -16,16 +16,30 @@ let urlArray = {
 
 var gCyberfoxCustom = {
 
+    //Note: We are using pre-existing strings for the message to reduce edits to language packs.
+    RestartMsg: Services.strings.createBundle("chrome://browser/locale/browser.properties"),
+    Branding: Services.strings.createBundle("chrome://branding/locale/brand.properties").GetStringFromName("brandShortName"),
+
     restartBrowser: function(e) {
         //Added in some general error handling by encapsulating it in try catch statements
         try {
-            //Minified its to fall in-line with restart my fox
-            if (Services.prefs.getBoolPref("browser.restart.purgecache")) {
-
-                Services.appinfo.invalidateCachesOnRestart();
-                Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
+            if (Services.prefs.getBoolPref("browser.restart.requireconfirm")) {
+                if (Services.prompt.confirm(null, this.RestartMsg.formatStringFromName("appmenu.restartBrowserButton.label", [this.Branding], 1),
+                        this.RestartMsg.GetStringFromName("addonInstallRestartButton"))) {
+                    if (Services.prefs.getBoolPref("browser.restart.purgecache")) {
+                        Services.appinfo.invalidateCachesOnRestart();
+                        Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
+                    } else {
+                        Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
+                    }
+                }
             } else {
-                Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
+                if (Services.prefs.getBoolPref("browser.restart.purgecache")) {
+                    Services.appinfo.invalidateCachesOnRestart();
+                    Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
+                } else {
+                    Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
+                }
             }
         } catch (e) {
             //Catch any nasty errors and output to console

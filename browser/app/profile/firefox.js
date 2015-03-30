@@ -1820,7 +1820,10 @@ pref("browser.restart.purgecache", false);
 pref("browser.restart.showpanelmenubtn", false);
 pref("browser.restart.smallpanelmenubtn", false);
 
-//set bool pref for restart browser enabled
+//Set bool pref for restart browser confirmation ---New Cyberfox 37.0 ---
+pref("browser.restart.requireconfirm", true);
+
+//set bool pref for clean ram cache enabled
 
 pref("clean.ram.cache", true);
 
