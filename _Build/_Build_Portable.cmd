@@ -63,6 +63,8 @@ del "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.
 echo.CyberfoxPortable.exe not found!
 )
 ::----
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel86\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
+::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox" (
 rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
 )
@@ -98,6 +100,8 @@ del "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.ex
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
+::----
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd86\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\"
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox" (
 rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
@@ -146,7 +150,7 @@ del "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.
 echo.CyberfoxPortable.exe not found!
 )
 ::----
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel64\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo"
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel64\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox" (
 rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
@@ -184,7 +188,7 @@ del "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.ex
 echo.CyberfoxPortable.exe not found!
 )
 ::----
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo"
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\"
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox" (
 rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
