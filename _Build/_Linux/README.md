@@ -249,6 +249,8 @@ Then your all set.
 
 To use the script just open the terminal then supply the path to it for example
 
-```~/Desktop/build_cyberfox.sh```
+```
+~/Desktop/build_cyberfox.sh
+```
 
 Note: Don't edit build_cyberfox.sh on windows as windows adds \r or \r\n to line endings to assimilate carriage returns this will just cause error messages in the script or cause it not to work.
