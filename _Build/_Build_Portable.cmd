@@ -54,11 +54,11 @@ mkdir "%BuildFolderPath%_CyberfoxPortable\logs"
 echo. Building Intel 86 bit portable package
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt" (
-del "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt"
+del /q /f "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt"
 )
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe" (
-del "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe"
+del /q /f "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
@@ -92,11 +92,11 @@ timeout 1 >nul
 echo. Building Amd 86 bit portable package!
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt" (
-del "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt"
+del /q /f "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt"
 )
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe" (
-del "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe"
+del /q /f "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
@@ -145,7 +145,7 @@ break>"%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\wi
 )
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe" (
-del "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe"
+del /q /f "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
@@ -183,7 +183,7 @@ break>"%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win6
 )
 ::----
 if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe" (
-del "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe"
+del /q /f "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
