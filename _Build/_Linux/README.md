@@ -190,15 +190,19 @@ done
 
 What it does is the following
 
-First sets the working directory to __"~/Documents"__ by default so if you use a different directory then change it.
+First sets the working directory to "__~/Documents__" by default so if you use a different directory then change it.
 
 To change it
 
-```WORKDIR=~/Documents```
+```
+WORKDIR=~/Documents
+```
 
-simply replace __"~/Documents"__ so an example of this is
+simply replace "__~/Documents__" so an example of this is
 
-```WORKDIR=~/Downloads```
+```
+WORKDIR=~/Downloads
+```
 
 
 It then checks if git is install if not it will it will prompt you to install it, You can install it by selecting the option when prompt or not install it and then manually install it
