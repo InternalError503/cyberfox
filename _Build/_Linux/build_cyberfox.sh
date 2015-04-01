@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 1.1
+# Version: 1.2
 # Release channel
 
 #!/bin/bash
@@ -51,7 +51,17 @@ fi
 echo "Do you wish to build cyberfox now?"
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) ./mach build; break;;
+        Yes ) 
+	  if [ -d $WORKDIR/obj64 ]; then
+	    echo "Old ojb64 build output found! would you like to remove it now ?"
+	      select yn in "Yes" "No"; do
+		  case $yn in
+		      Yes ) rm -rvf $WORKDIR/obj64; break;;
+		      No ) break;;
+		  esac
+	      done
+	  fi
+        ./mach build; break;;
         No ) break;;
     esac
 done

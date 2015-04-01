@@ -122,7 +122,7 @@ Script version: *1.1*
 
 ```
 # Cyberfox quick build script
-# Version: 1.1
+# Version: 1.2
 # Release channel
 
 #!/bin/bash
@@ -130,15 +130,15 @@ Script version: *1.1*
 # Set working directory default is ~/Documents
 WORKDIR=~/Documents
 
-command -v git >/dev/null 2>&1 || {
+command -v git >/dev/null 2>&1 || { 
     echo "I require git but it's not installed would you like to install it now!."
     select yn in "Yes" "No"; do
-   case $yn in
-       Yes )
-         xterm -e sudo apt-get install git
-       break;;
-       No ) echo "I require git but it's not installed type 'sudo apt-get install git' to manually install it then run me again!." && exit;;
-   esac
+	case $yn in
+	    Yes )
+	      xterm -e sudo apt-get install git
+	    break;;
+	    No ) echo "I require git but it's not installed type 'sudo apt-get install git' to manually install it then run me again!." && exit;;
+	esac
     done   
  }
 
@@ -152,11 +152,11 @@ if [ -d "cyberfox" ]; then
   git pull
   echo "Setting branding identity to linux"
   sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
-  sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
+  sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh 
   cd ..
   #Need to redo chmod and set permsissions every pull.
   echo "Changing chmod of cyberfox repository to 777"
-  chmod -R 777 cyberfox
+  chmod -R 777 cyberfox 
   cd cyberfox
 else
   echo "Downloading cyberfox source repository"
@@ -174,7 +174,17 @@ fi
 echo "Do you wish to build cyberfox now?"
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) ./mach build; break;;
+        Yes ) 
+	  if [ -d $WORKDIR/obj64 ]; then
+	    echo "Old ojb64 build output found! would you like to remove it now ?"
+	      select yn in "Yes" "No"; do
+		  case $yn in
+		      Yes ) rm -rvf $WORKDIR/obj64; break;;
+		      No ) break;;
+		  esac
+	      done
+	  fi
+        ./mach build; break;;
         No ) break;;
     esac
 done
@@ -217,6 +227,9 @@ It will automatically set the branding identity to Linux so not need to edit tha
 It will then change the permissions to *777*
 
 Then prompt to build cyberfox
+It will check if a existing obj64 directory then prompt if you would like to remove it
+__Note:__ This is the default name from our supplied configuration file.
+If you don't remove the old build output it will want to do a clobber build you will have to manually do this.
 
 If cyberfox repository does not exist then it will clone the repository in the __$WORKDIR__
 
@@ -225,9 +238,11 @@ It will then change the permissions to *777*
 It will automatically set the branding identity to Linux so not need to edit that file manually
 
 Then prompt to build cyberfox
+It will check if a existing obj64 directory then prompt if you would like to remove it
+__Note:__ This is the default name from our supplied configuration file.
+If you don't remove the old build output it will want to do a clobber build you will have to manually do this.
 
 Once cyberfox has been built it will prompt if you would like to package it.
-
 The prompts are numeric so for an example
 
 ```
