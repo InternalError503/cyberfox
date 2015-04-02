@@ -1821,7 +1821,7 @@ pref("browser.restart.showpanelmenubtn", false);
 pref("browser.restart.smallpanelmenubtn", false);
 
 //Set bool pref for restart browser confirmation ---New Cyberfox 37.0 ---
-pref("browser.restart.requireconfirm", true);
+pref("browser.restart.requireconfirm", false);
 
 //set bool pref for clean ram cache enabled
 
