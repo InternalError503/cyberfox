@@ -2,6 +2,8 @@
 :top
 ::----
 set BuildFolderPath=%~DP0
+set BuildFolderPathIntel=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable
+set BuildFolderPathAmd=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable
 ::set NSISCompiler="%BuildFolderPath%_NSISPortable\NSISPortable.exe"  can't be used if /V0 flag is as the NSISPortable does not recognise the command.
 ::The /V followed numbers between 0 and 4 sets the verbosity of output. (0=no output, 1=errors only, 2=warnings and errors, 3=info, warnings, and errors, 4=all output).
 set NSISCompiler="%BuildFolderPath%_NSISPortable\app\nsis\makensis" 
@@ -59,36 +61,36 @@ mkdir "%BuildFolderPath%_CyberfoxPortable\logs"
 ::----
 echo. Building Intel 86 bit portable package
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt" (
-del /q /f "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt"
+if exist "%BuildFolderPathIntel%Other\Source\win64.txt" (
+del /q /f "%BuildFolderPathIntel%Other\Source\win64.txt"
 )
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe" (
-del /q /f "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe"
+if exist "%BuildFolderPathIntel%CyberfoxPortable.exe" (
+del /q /f "%BuildFolderPathIntel%CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
 ::----
 copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel86\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox" (
-rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
+if exist "%BuildFolderPathIntel%App\Cyberfox" (
+rmdir /q /s "%BuildFolderPathIntel%App\Cyberfox"
 )
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
+mkdir "%BuildFolderPathIntel%App\Cyberfox"
 ::----
 @echo on
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel86" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
 @echo off
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox\distribution"
+mkdir "%BuildFolderPathIntel%App\Cyberfox\distribution"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox\distribution"
+xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathIntel%App\Cyberfox\distribution"
 @echo off
 ::----
 @echo on
-%NSISCompiler% %Argos% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log"
+%NSISCompiler% %Argos% "%BuildFolderPathIntel%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log"
 @echo off
 ::----
 echo. Build Intel 86 bit portable package complete!
@@ -97,36 +99,36 @@ timeout 1 >nul
 ::----
 echo. Building Amd 86 bit portable package!
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt" (
-del /q /f "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt"
+if exist "%BuildFolderPathAmd%Other\Source\win64.txt" (
+del /q /f "%BuildFolderPathAmd%Other\Source\win64.txt"
 )
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe" (
-del /q /f "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe"
+if exist "%BuildFolderPathAmd%CyberfoxPortable.exe" (
+del /q /f "%BuildFolderPathAmd%CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
 ::----
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd86\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\"
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd86\UpdateConfig.ini" "%BuildFolderPathAmd%App\AppInfo\"
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox" (
-rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
+if exist "%BuildFolderPathAmd%App\Cyberfox" (
+rmdir /q /s "%BuildFolderPathAmd%App\Cyberfox"
 )
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
+mkdir "%BuildFolderPathAmd%App\Cyberfox"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd86" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
+xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd86" "%BuildFolderPathAmd%App\Cyberfox"
 @echo off
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox\distribution"
+mkdir "%BuildFolderPathAmd%App\Cyberfox\distribution"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox\distribution"
+xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathAmd%App\Cyberfox\distribution"
 @echo off
 ::----
 @echo on
-%NSISCompiler% %Argos% "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log"
+%NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log"
 @echo off
 ::----
 echo. Build Amd 86 bit portable package complete!
@@ -146,36 +148,36 @@ mkdir "%BuildFolderPath%_CyberfoxPortable\logs"
 ::----
 echo. Building Intel 64 bit portable package!
 ::----
-if not exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt" (
-break>"%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\win64.txt"
+if not exist "%BuildFolderPathIntel%Other\Source\win64.txt" (
+break>"%BuildFolderPathIntel%Other\Source\win64.txt"
 )
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe" (
-del /q /f "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\CyberfoxPortable.exe"
+if exist "%BuildFolderPathIntel%CyberfoxPortable.exe" (
+del /q /f "%BuildFolderPathIntel%CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
 ::----
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel64\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel64\UpdateConfig.ini" "%BuildFolderPathIntel%App\AppInfo\"
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox" (
-rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
+if exist "%%BuildFolderPathIntel%App\Cyberfox" (
+rmdir /q /s "%BuildFolderPathIntel%App\Cyberfox"
 )
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
+mkdir "%BuildFolderPathIntel%App\Cyberfox"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel64" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
+xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel64" "%BuildFolderPathIntel%App\Cyberfox"
 @echo off
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox\distribution"
+mkdir "%BuildFolderPathIntel%App\Cyberfox\distribution"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox\distribution"
+xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathIntel%App\Cyberfox\distribution"
 @echo off
 ::----
 @echo on
-%NSISCompiler% %Argos% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log"
+%NSISCompiler% %Argos% "%BuildFolderPathIntel%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log"
 @echo off
 ::----
 echo. Build Intel 64 bit portable package complete!
@@ -184,36 +186,36 @@ timeout 1 >nul
 ::----
 echo. Building Amd 64 bit portable package!
 ::----
-if not exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt" (
-break>"%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\win64.txt"
+if not exist "%BuildFolderPathAmd%Other\Source\win64.txt" (
+break>"%BuildFolderPathAmd%Other\Source\win64.txt"
 )
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe" (
-del /q /f "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\CyberfoxPortable.exe"
+if exist "%BuildFolderPathAmd%CyberfoxPortable.exe" (
+del /q /f "%BuildFolderPathAmd%CyberfoxPortable.exe"
 ) else (
 echo.CyberfoxPortable.exe not found!
 )
 ::----
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\"
+copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" "%BuildFolderPathAmd%App\AppInfo\"
 ::----
-if exist "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox" (
-rmdir /q /s "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
+if exist "%BuildFolderPathAmd%App\Cyberfox" (
+rmdir /q /s "%BuildFolderPathAmd%App\Cyberfox"
 )
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
+mkdir "%BuildFolderPathAmd%App\Cyberfox"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd64" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox"
+xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd64" "%BuildFolderPathAmd%App\Cyberfox"
 @echo off
 ::----
-mkdir "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox\distribution"
+mkdir "%BuildFolderPathAmd%App\Cyberfox\distribution"
 ::----
 @echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\Cyberfox\distribution"
+xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathAmd%App\Cyberfox\distribution"
 @echo off
 ::----
 @echo on
-%NSISCompiler% %Argos% "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" 
+%NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" 
 @echo off
 ::----
 echo. Build Amd 64 bit portable package complete!
