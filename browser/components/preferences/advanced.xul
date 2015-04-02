@@ -543,9 +543,9 @@
 				<caption label="&restartOptions.label;"/>
 					<checkbox id="enableRestartBrowser" label="&turnOnRestart.label;"
 							preference="browser.restart.enabled"/>
-					<checkbox id="browser.restart.showpanelmenubtn" label="Add button to PanelUI"
+					<checkbox id="browser.restart.showpanelmenubtn" label="&restart_paneluibtn.label;"
 							preference="browser.restart.showpanelmenubtn"/>
-					<checkbox id="browser.restart.smallpanelmenubtn" label="Use small button on panel UI."
+					<checkbox id="browser.restart.smallpanelmenubtn" label="&restart_panelbtnsmall.label;"
 							preference="browser.restart.smallpanelmenubtn"/>							
 					<checkbox id="browser.restart.purgecache" label="&cleanFastRestartCache.label;"
 							preference="browser.restart.purgecache"/>
