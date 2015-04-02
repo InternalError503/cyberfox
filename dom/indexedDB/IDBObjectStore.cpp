@@ -1282,9 +1282,8 @@ IDBObjectStore::AddOrPut(JSContext* aCx,
     }
   }
 
-  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
-
-  mTransaction->StartRequest(actor, params);
+  BackgroundRequestChild* actor = mTransaction->StartRequest(request, params);
+  MOZ_ASSERT(actor);
 
   if (!fileInfosToKeepAlive.IsEmpty()) {
     nsTArray<nsRefPtr<FileInfo>> fileInfos;
@@ -1368,9 +1367,7 @@ IDBObjectStore::GetAllInternal(bool aKeysOnly,
                  IDB_LOG_STRINGIFY(aLimit));
   }
 
-  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
-
-  mTransaction->StartRequest(actor, params);
+  mTransaction->StartRequest(request, params);
 
   return request.forget();
 }
@@ -1406,9 +1403,7 @@ IDBObjectStore::Clear(ErrorResult& aRv)
                IDB_LOG_STRINGIFY(mTransaction),
                IDB_LOG_STRINGIFY(this));
 
-  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
-
-  mTransaction->StartRequest(actor, params);
+  mTransaction->StartRequest(request, params);
 
   return request.forget();
 }
@@ -1603,9 +1598,7 @@ IDBObjectStore::Get(JSContext* aCx,
                IDB_LOG_STRINGIFY(this),
                IDB_LOG_STRINGIFY(keyRange));
 
-  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
-
-  mTransaction->StartRequest(actor, params);
+  mTransaction->StartRequest(request, params);
 
   return request.forget();
 }
@@ -1660,9 +1653,7 @@ IDBObjectStore::DeleteInternal(JSContext* aCx,
                  IDB_LOG_STRINGIFY(keyRange));
   }
 
-  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
-
-  mTransaction->StartRequest(actor, params);
+  mTransaction->StartRequest(request, params);
 
   return request.forget();
 }
@@ -1902,9 +1893,7 @@ IDBObjectStore::Count(JSContext* aCx,
                IDB_LOG_STRINGIFY(this),
                IDB_LOG_STRINGIFY(keyRange));
 
-  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
-
-  mTransaction->StartRequest(actor, params);
+  mTransaction->StartRequest(request, params);
 
   return request.forget();
 }
