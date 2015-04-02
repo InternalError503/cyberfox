@@ -2,8 +2,8 @@
 :top
 ::----
 set BuildFolderPath=%~DP0
-set BuildFolderPathIntel=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable
-set BuildFolderPathAmd=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable
+set BuildFolderPathIntel=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable\
+set BuildFolderPathAmd=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable\
 ::set NSISCompiler="%BuildFolderPath%_NSISPortable\NSISPortable.exe"  can't be used if /V0 flag is as the NSISPortable does not recognise the command.
 ::The /V followed numbers between 0 and 4 sets the verbosity of output. (0=no output, 1=errors only, 2=warnings and errors, 3=info, warnings, and errors, 4=all output).
 set NSISCompiler="%BuildFolderPath%_NSISPortable\app\nsis\makensis" 
