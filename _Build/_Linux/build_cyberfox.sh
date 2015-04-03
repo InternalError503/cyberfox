@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 1.2
+# Version: 1.3
 # Release channel
 
 #!/bin/bash
@@ -21,32 +21,39 @@ command -v git >/dev/null 2>&1 || {
 
 cd $WORKDIR
 
-if [ -d "cyberfox" ]; then
-  echo "Auto purge uncommited untracked changes"
-  cd cyberfox
-  git checkout -- .
-  echo "Cloning latest cyberfox source files"
-  git pull
-  echo "Setting branding identity to linux"
-  sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
-  sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh 
-  cd ..
-  #Need to redo chmod and set permsissions every pull.
-  echo "Changing chmod of cyberfox repository to 777"
-  chmod -R 777 cyberfox 
-  cd cyberfox
-else
-  echo "Downloading cyberfox source repository"
-  git clone https://github.com/InternalError503/cyberfox.git
-  echo "Changing chmod of cyberfox repository to 777"
-  chmod -R 777 cyberfox
-  echo "mozconfig does not exist copying pre-configured to cyberfox root"
-  cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
-  echo "Setting branding identity to linux"
-  sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
-  sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
-  cd cyberfox
-fi
+echo "Do you wish to setup or update cyberfox source repository now?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes )	  
+	  if [ -d "cyberfox" ]; then
+	    echo "Auto purge uncommited untracked changes"
+	    cd cyberfox
+	    git checkout -- .
+	    echo "Cloning latest cyberfox source files"
+	    git pull
+	    echo "Setting branding identity to linux"
+	      sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
+	      sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh 
+	    cd ..
+	    #Need to redo chmod and set permsissions every pull.
+	    echo "Changing chmod of cyberfox repository to 777"
+	    chmod -R 777 cyberfox 
+	    cd cyberfox
+	  else
+	    echo "Downloading cyberfox source repository"
+	    git clone https://github.com/InternalError503/cyberfox.git
+	    echo "Changing chmod of cyberfox repository to 777"
+	    chmod -R 777 cyberfox
+	    echo "mozconfig does not exist copying pre-configured to cyberfox root"
+	    cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
+	    echo "Setting branding identity to linux"
+	      sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
+	      sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
+	    cd cyberfox
+	  fi; break;;
+        No ) break;;
+    esac
+done
 
 echo "Do you wish to build cyberfox now?"
 select yn in "Yes" "No"; do
@@ -66,10 +73,30 @@ select yn in "Yes" "No"; do
     esac
 done
 
+echo "Do you wish to test cyberfox now?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes )
+	  if [ -d $WORKDIR/obj64/dist/bin ]; then
+	      cd cyberfox
+	      ./mach run
+	  else
+	      echo "Unable to start cyberfox $WORKDIR/obj64/dist/bin does not exist!"
+	  fi; break;;
+        No ) break;;
+    esac
+done
+
 echo "Do you wish to package cyberfox now?"
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) ./mach package; break;;
+        Yes )
+	  if [ -d $WORKDIR/obj64/dist/bin ]; then
+	    cd cyberfox
+	    ./mach package
+	  else
+	    echo "Unable to package cyberfox $WORKDIR/obj64/dist/bin does not exist!"
+	  fi; break;;  
         No ) break;;
     esac
 done
