@@ -1,6 +1,6 @@
 # Cyberfox quick build script
-# Version: 1.3
-# Release channel
+# Version: 1.5
+# Release channel linux
 
 #!/bin/bash
 
@@ -27,25 +27,25 @@ select yn in "Yes" "No"; do
         Yes )	  
 	  if [ -d "cyberfox" ]; then
 	    echo "Auto purge uncommited untracked changes"
-	    cd cyberfox
-	    git checkout -- .
+	      cd cyberfox
+	      git checkout -- .
 	    echo "Cloning latest cyberfox source files"
-	    git pull
+	      git pull
 	    echo "Setting branding identity to linux"
 	      sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
 	      sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh 
-	    cd ..
+	      cd ..
 	    #Need to redo chmod and set permsissions every pull.
 	    echo "Changing chmod of cyberfox repository to 777"
-	    chmod -R 777 cyberfox 
-	    cd cyberfox
+	      chmod -R 777 cyberfox 
+	      cd cyberfox
 	  else
 	    echo "Downloading cyberfox source repository"
-	    git clone https://github.com/InternalError503/cyberfox.git
+	      git clone https://github.com/InternalError503/cyberfox.git
 	    echo "Changing chmod of cyberfox repository to 777"
-	    chmod -R 777 cyberfox
+	      chmod -R 777 cyberfox
 	    echo "mozconfig does not exist copying pre-configured to cyberfox root"
-	    cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
+	      cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
 	    echo "Setting branding identity to linux"
 	      sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
 	      sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
@@ -68,7 +68,11 @@ select yn in "Yes" "No"; do
 		  esac
 	      done
 	  fi
-        ./mach build; break;;
+	  if [ -f $WORKDIR/cyberfox/mozconfig ]; then
+		./mach build
+	  else
+		 echo "Were sorry but we can't build cyberfox the mozconfig is missing!" && exit
+	  fi; break;;       
         No ) break;;
     esac
 done
@@ -100,3 +104,15 @@ select yn in "Yes" "No"; do
         No ) break;;
     esac
 done
+
+Dir=$(cd "$(dirname "$0")" && pwd)
+if [ -f $Dir/bundle_cyberctr.sh ]; then
+  echo "Do you wish to package CyberCTR into cyberfox now?"
+  select yn in "Yes" "No"; do
+      case $yn in
+	  Yes )	  
+	    $Dir/bundle_cyberctr.sh; break;;  
+	  No ) break;;
+      esac
+  done
+fi
