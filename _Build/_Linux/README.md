@@ -106,7 +106,7 @@ its a simple system 1 equals enabled (true) and blank disabled (false) for brand
 
 So on linux it would look like the following
 
-```
+```ini
 # Set the browser branding identity color
 IDENTITY_BRANDING_AMD=
 IDENTITY_BRANDING_BETA=
@@ -118,12 +118,12 @@ IDENTITY_BRANDING_INTEL=
 
 Here is a quick build script for cyberfox on Linux that will expand over time, This will allow you to automate most of the manual tasks mentioned above.
 
-Script version: *1.1*
+Script version: *1.5*
 
-```
+```bash
 # Cyberfox quick build script
-# Version: 1.2
-# Release channel
+# Version: 1.5
+# Release channel linux
 
 #!/bin/bash
 
@@ -144,32 +144,39 @@ command -v git >/dev/null 2>&1 || {
 
 cd $WORKDIR
 
-if [ -d "cyberfox" ]; then
-  echo "Auto purge uncommited untracked changes"
-  cd cyberfox
-  git checkout -- .
-  echo "Cloning latest cyberfox source files"
-  git pull
-  echo "Setting branding identity to linux"
-  sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
-  sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh 
-  cd ..
-  #Need to redo chmod and set permsissions every pull.
-  echo "Changing chmod of cyberfox repository to 777"
-  chmod -R 777 cyberfox 
-  cd cyberfox
-else
-  echo "Downloading cyberfox source repository"
-  git clone https://github.com/InternalError503/cyberfox.git
-  echo "Changing chmod of cyberfox repository to 777"
-  chmod -R 777 cyberfox
-  echo "mozconfig does not exist copying pre-configured to cyberfox root"
-  cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
-  echo "Setting branding identity to linux"
-  sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
-  sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
-  cd cyberfox
-fi
+echo "Do you wish to setup or update cyberfox source repository now?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes )	  
+	  if [ -d "cyberfox" ]; then
+	    echo "Auto purge uncommited untracked changes"
+	      cd cyberfox
+	      git checkout -- .
+	    echo "Cloning latest cyberfox source files"
+	      git pull
+	    echo "Setting branding identity to linux"
+	      sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
+	      sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh 
+	      cd ..
+	    #Need to redo chmod and set permsissions every pull.
+	    echo "Changing chmod of cyberfox repository to 777"
+	      chmod -R 777 cyberfox 
+	      cd cyberfox
+	  else
+	    echo "Downloading cyberfox source repository"
+	      git clone https://github.com/InternalError503/cyberfox.git
+	    echo "Changing chmod of cyberfox repository to 777"
+	      chmod -R 777 cyberfox
+	    echo "mozconfig does not exist copying pre-configured to cyberfox root"
+	      cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
+	    echo "Setting branding identity to linux"
+	      sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
+	      sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
+	    cd cyberfox
+	  fi; break;;
+        No ) break;;
+    esac
+done
 
 echo "Do you wish to build cyberfox now?"
 select yn in "Yes" "No"; do
@@ -184,7 +191,25 @@ select yn in "Yes" "No"; do
 		  esac
 	      done
 	  fi
-        ./mach build; break;;
+	  if [ -f $WORKDIR/cyberfox/mozconfig ]; then
+		./mach build
+	  else
+		 echo "Were sorry but we can't build cyberfox the mozconfig is missing!" && exit
+	  fi; break;;       
+        No ) break;;
+    esac
+done
+
+echo "Do you wish to test cyberfox now?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes )
+	  if [ -d $WORKDIR/obj64/dist/bin ]; then
+	      cd cyberfox
+	      ./mach run
+	  else
+	      echo "Unable to start cyberfox $WORKDIR/obj64/dist/bin does not exist!"
+	  fi; break;;
         No ) break;;
     esac
 done
@@ -192,10 +217,28 @@ done
 echo "Do you wish to package cyberfox now?"
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) ./mach package; break;;
+        Yes )
+	  if [ -d $WORKDIR/obj64/dist/bin ]; then
+	    cd cyberfox
+	    ./mach package
+	  else
+	    echo "Unable to package cyberfox $WORKDIR/obj64/dist/bin does not exist!"
+	  fi; break;;  
         No ) break;;
     esac
 done
+
+Dir=$(cd "$(dirname "$0")" && pwd)
+if [ -f $Dir/bundle_cyberctr.sh ]; then
+  echo "Do you wish to package CyberCTR into cyberfox now?"
+  select yn in "Yes" "No"; do
+      case $yn in
+	  Yes )	  
+	    $Dir/bundle_cyberctr.sh; break;;  
+	  No ) break;;
+      esac
+  done
+fi
 ```
 
 What it does is the following
@@ -220,7 +263,7 @@ then run the script again.
 
 If git is installed then it checks if the cyberfox repository exist in the __$WORKDIR__ if it does then it will auto purge all changes
 
-Then download the latest build files
+Then asks you if you would like to download the latest build files for the first time or download the latest.
 
 It will automatically set the branding identity to Linux so not need to edit that file manually
 
@@ -269,3 +312,5 @@ To use the script just open the terminal then supply the path to it for example
 ```
 
 Note: Don't edit build_cyberfox.sh on windows as windows adds \r or \r\n to line endings to assimilate carriage returns this will just cause error messages in the script or cause it not to work.
+
+If bundle_cyberctr.sh is in the root folder where build_cyberfox.sh is then it will offer to repackage the build with CyberCTR addon.
