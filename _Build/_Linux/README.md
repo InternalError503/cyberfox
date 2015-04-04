@@ -118,11 +118,11 @@ IDENTITY_BRANDING_INTEL=
 
 Here is a quick build script for cyberfox on Linux that will expand over time, This will allow you to automate most of the manual tasks mentioned above.
 
-Script version: *1.5*
+Script version: *1.6*
 
 ```bash
 # Cyberfox quick build script
-# Version: 1.5
+# Version: 1.6
 # Release channel linux
 
 #!/bin/bash
@@ -192,6 +192,7 @@ select yn in "Yes" "No"; do
 	      done
 	  fi
 	  if [ -f $WORKDIR/cyberfox/mozconfig ]; then
+	  	cd $WORKDIR/cyberfox
 		./mach build
 	  else
 		 echo "Were sorry but we can't build cyberfox the mozconfig is missing!" && exit
