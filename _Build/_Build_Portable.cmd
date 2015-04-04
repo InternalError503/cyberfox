@@ -1,10 +1,10 @@
 @echo Off
-title Build Cyberfox Portable V1.4
+title Build Cyberfox Portable V1.5
 :top
 
 set BuildFolderPath=%~DP0
 set BuildFolderPathIntel=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable\
-set BuildFolderPathAmd=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable\
+set BuildFolderPathAmd=%~DP0_CyberfoxPortable\Amd\CyberfoxPortable\
 set Delete=%BuildFolderPath%_Build_Portable\_Func_Delete.cmd
 set DeleteDir=%BuildFolderPath%_Build_Portable\_Func_Delete_Dir.cmd
 ::set NSISCompiler="%BuildFolderPath%_NSISPortable\NSISPortable.exe"  can't be used if /V0 flag is as the NSISPortable does not recognise the command.
@@ -59,7 +59,7 @@ if not exist "%BuildFolderPath%_CyberfoxPortable\logs" (
 mkdir "%BuildFolderPath%_CyberfoxPortable\logs"
 )
 echo. Building Intel 86 bit portable package
-call %Delete% "%BuildFolderPathAmd%Other\Source\win64.txt" "win64.txt not found!"
+call %Delete% "%BuildFolderPathIntel%Other\Source\win64.txt" "win64.txt not found!"
 call %Delete% "%BuildFolderPathIntel%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
 copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel86\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
 call %DeleteDir% "%BuildFolderPathIntel%App\Cyberfox" "%BuildFolderPathIntel%App\Cyberfox not found!"
@@ -78,7 +78,7 @@ echo. Build Intel 86 bit portable package complete!
 
 echo. Building Amd 86 bit portable package!
 call %Delete% "%BuildFolderPathAmd%Other\Source\win64.txt" "win64.txt not found!"
-call %Delete% "%BuildFolderPathIntel%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
+call %Delete% "%BuildFolderPathAmd%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
 copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd86\UpdateConfig.ini" "%BuildFolderPathAmd%App\AppInfo\"
 call %DeleteDir% "%BuildFolderPathAmd%App\Cyberfox" "%BuildFolderPathAmd%App\Cyberfox not found!"
 mkdir "%BuildFolderPathAmd%App\Cyberfox"
@@ -124,7 +124,7 @@ echo. Building Amd 64 bit portable package!
 if not exist "%BuildFolderPathAmd%Other\Source\win64.txt" (
 break>"%BuildFolderPathAmd%Other\Source\win64.txt"
 )
-call %Delete% "%BuildFolderPathIntel%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
+call %Delete% "%BuildFolderPathAmd%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
 copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" "%BuildFolderPathAmd%App\AppInfo\"
 call %DeleteDir% "%BuildFolderPathAmd%App\Cyberfox" "%BuildFolderPathAmd%App\Cyberfox not found!"
 mkdir "%BuildFolderPathAmd%App\Cyberfox"
@@ -200,15 +200,16 @@ goto :completed
 
 :Compile-Package-64-Portable
 echo. Compilation of %Version% portable installation medium is starting!
-echo. Building Amd 64 bit portable package!
-%PortableAppsInstaller% "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable"
-echo. Build Amd 64 bit package complete!
 if not exist "%BuildFolderPath%_Installation" (
 mkdir "%BuildFolderPath%_Installation"
 )
+echo. Building Amd 64 bit portable package!
+%PortableAppsInstaller% "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable"
+echo. Build Amd 64 bit package complete!
 ren "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable_%Version%_English.paf.exe"  "CyberfoxPortable_%Version%_English.Amd.paf.exe"
 copy /y "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable_%Version%_English.Amd.paf.exe" "%PortableAppsInstallerOutput%"
 call %Delete% "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable_%Version%_English.Amd.paf.exe" "CyberfoxPortable_%Version%_English.Amd.paf.exe not found!"
+
 echo. Building intel 64 bit portable package
 %PortableAppsInstaller% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable"
 echo. Build intel64 bit portable package complete!
