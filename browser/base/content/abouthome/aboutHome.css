@@ -89,7 +89,7 @@ a {
 	}
 
 	.hmenubar li a:hover {
-	  color:  var(--main-highlight-color)!important;
+	  color:  var(--main-highlight-color);
 	}
 
 	.hmenubar li a:active {
@@ -152,7 +152,7 @@ a {
 #searchIcon[active],
 #searchIcon:hover {
   background-color: #e9e9e9;
-  border-color: var(--main-highlight-color)!important;
+  border-color: var(--main-highlight-color);
   border-radius: 2.5px;
 }
 
@@ -187,7 +187,7 @@ html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
 
 #searchText:focus,
 #searchText[autofocus] {
-  border-color: var(--main-highlight-color)!important;
+  border-color: var(--main-highlight-color);
 }
 
 #searchSubmit {
@@ -282,7 +282,7 @@ html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
 }
 
 #snippets a:hover {
- color: var(--main-highlight-color)!important;
+ color: var(--main-highlight-color);
 }
 
 #launcher {
@@ -328,9 +328,9 @@ body[narrow] #launcher[session] > .launchButton {
 }
 
 .launchButton:hover {
-  color:var(--main-highlight-color)!important;
+  color:var(--main-highlight-color);
   background-color: hsla(211,79%,6%,.03);
-  border-color: var(--main-highlight-color)!important;
+  border-color: var(--main-highlight-color);
 }
 
 .launchButton:hover:active {
