@@ -325,31 +325,25 @@ IDBTransaction::SetBackgroundActor(BackgroundTransactionChild* aBackgroundActor)
   mBackgroundActor.mNormalBackgroundActor = aBackgroundActor;
 }
 
-BackgroundRequestChild*
-IDBTransaction::StartRequest(IDBRequest* aRequest, const RequestParams& aParams)
+void
+IDBTransaction::StartRequest(BackgroundRequestChild* aBackgroundActor,
+                             const RequestParams& aParams)
 {
   AssertIsOnOwningThread();
-  MOZ_ASSERT(aRequest);
+  MOZ_ASSERT(aBackgroundActor);
   MOZ_ASSERT(aParams.type() != RequestParams::T__None);
-
-  BackgroundRequestChild* actor = new BackgroundRequestChild(aRequest);
 
   if (mMode == VERSION_CHANGE) {
     MOZ_ASSERT(mBackgroundActor.mVersionChangeBackgroundActor);
 
     mBackgroundActor.mVersionChangeBackgroundActor->
-      SendPBackgroundIDBRequestConstructor(actor, aParams);
+      SendPBackgroundIDBRequestConstructor(aBackgroundActor, aParams);
   } else {
     MOZ_ASSERT(mBackgroundActor.mNormalBackgroundActor);
 
     mBackgroundActor.mNormalBackgroundActor->
-      SendPBackgroundIDBRequestConstructor(actor, aParams);
+      SendPBackgroundIDBRequestConstructor(aBackgroundActor, aParams);
   }
-
-  // Balanced in BackgroundRequestChild::Recv__delete__().
-  OnNewRequest();
-
-  return actor;
 }
 
 void
@@ -408,7 +402,7 @@ IDBTransaction::OnNewRequest()
 }
 
 void
-IDBTransaction::OnRequestFinished(bool aActorDestroyedNormally)
+IDBTransaction::OnRequestFinished()
 {
   AssertIsOnOwningThread();
   MOZ_ASSERT(mPendingRequestCount);
@@ -418,24 +412,10 @@ IDBTransaction::OnRequestFinished(bool aActorDestroyedNormally)
   if (!mPendingRequestCount && !mDatabase->IsInvalidated()) {
     mReadyState = COMMITTING;
 
-    if (aActorDestroyedNormally) {
-      if (NS_SUCCEEDED(mAbortCode)) {
-        SendCommit();
-      } else {
-        SendAbort(mAbortCode);
-      }
+    if (NS_SUCCEEDED(mAbortCode)) {
+      SendCommit();
     } else {
-      // Don't try to send any more messages to the parent if the request actor
-      // was killed.
-#ifdef DEBUG
-      MOZ_ASSERT(!mSentCommitOrAbort);
-      mSentCommitOrAbort = true;
-#endif
-      IDB_LOG_MARK("IndexedDB %s: Child  Transaction[%lld]: "
-                     "Request actor was killed, transaction will be aborted",
-                   "IndexedDB %s: C T[%lld]: IDBTransaction abort",
-                   IDB_LOG_ID_STRING(),
-                   LoggingSerialNumber());
+      SendAbort(mAbortCode);
     }
   }
 }

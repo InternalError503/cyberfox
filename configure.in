@@ -429,19 +429,19 @@ fi
 AC_SUBST(CRTDLLVERSION)
 AC_SUBST(CRTEXPDLLVERSION)
 
-# Target the Windows 8.0 SDK by default
-WINSDK_TARGETVER=602
+# Target the Windows 8.1 SDK by default
+WINSDK_TARGETVER=603
 WINVER=502
 
 MOZ_ARG_WITH_STRING(windows-version,
 [  --with-windows-version=WINSDK_TARGETVER
-                          Windows SDK version to target. Win8.0 (602) is
+                          Windows SDK version to target. Win8.1 (603) is
                           currently the minimum supported version.],
   WINSDK_TARGETVER=$withval)
 
-# Currently only version 602 is allowed
+# Currently only version 603 is allowed
 case "$WINSDK_TARGETVER" in
-602)
+603)
     MOZ_WINSDK_TARGETVER=0${WINSDK_TARGETVER}0000
     ;;
 
@@ -491,19 +491,14 @@ case "$target" in
         AC_DEFINE(_CRT_SECURE_NO_WARNINGS)
         AC_DEFINE(_CRT_NONSTDC_NO_WARNINGS)
 
-        if test "$_CC_MAJOR_VERSION" = "17" -a "$_CC_BUILD_VERSION" -ge "61030"; then
-            _CC_SUITE=11
-            MSVS_VERSION=2012
-            MSVC_C_RUNTIME_DLL=msvcr110.dll
-            MSVC_CXX_RUNTIME_DLL=msvcp110.dll
-        elif test "$_CC_MAJOR_VERSION" = "18" -a "$_CC_BUILD_VERSION" -ge "30723"; then
+        if test "$_CC_MAJOR_VERSION" = "18" -a "$_CC_BUILD_VERSION" -ge "30723"; then
             _CC_SUITE=12
             MSVS_VERSION=2013
             MSVC_C_RUNTIME_DLL=msvcr120.dll
             MSVC_CXX_RUNTIME_DLL=msvcp120.dll
         else
             AC_MSG_ERROR([This version (${_CC_MAJOR_VERSION}.${_CC_MINOR_VERSION}.${_CC_BUILD_VERSION}) of the MSVC compiler is unsupported.
-You must install Visual C++ 2012 Update 4 or newer in order to build.
+You must install Visual C++ 2013 Update 3 or newer in order to build.
 See https://developer.mozilla.org/en/Windows_Build_Prerequisites.])
         fi
         AC_SUBST(MSVS_VERSION)
@@ -5918,10 +5913,6 @@ if test -n "$MOZ_ANGLE_RENDERER"; then
   0x0603*)
     MOZ_D3DCOMPILER_VISTA_DLL=d3dcompiler_47.dll
     AC_MSG_RESULT([Found D3D compiler in Windows SDK 8.1.])
-  ;;
-  0x0602*)
-    MOZ_D3DCOMPILER_VISTA_DLL=d3dcompiler_46.dll
-    AC_MSG_RESULT([Found D3D compiler in Windows SDK 8.0.])
   ;;
   esac
 

@@ -292,7 +292,9 @@ IDBIndex::GetInternal(bool aKeyOnly,
                  IDB_LOG_STRINGIFY(keyRange));
   }
 
-  transaction->StartRequest(request, params);
+  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
+
+  transaction->StartRequest(actor, params);
 
   return request.forget();
 }
@@ -373,7 +375,9 @@ IDBIndex::GetAllInternal(bool aKeysOnly,
                  IDB_LOG_STRINGIFY(aLimit));
   }
 
-  transaction->StartRequest(request, params);
+  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
+
+  transaction->StartRequest(actor, params);
 
   return request.forget();
 }
@@ -523,7 +527,9 @@ IDBIndex::Count(JSContext* aCx,
                IDB_LOG_STRINGIFY(this),
                IDB_LOG_STRINGIFY(keyRange));
 
-  transaction->StartRequest(request, params);
+  BackgroundRequestChild* actor = new BackgroundRequestChild(request);
+
+  transaction->StartRequest(actor, params);
 
   return request.forget();
 }

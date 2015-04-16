@@ -49,9 +49,6 @@ class IDBTransaction MOZ_FINAL
   : public IDBWrapperCache
   , public nsIRunnable
 {
-  friend class BackgroundCursorChild;
-  friend class BackgroundRequestChild;
-
   class WorkerFeature;
   friend class WorkerFeature;
 
@@ -153,8 +150,9 @@ public:
     }
   }
 
-  BackgroundRequestChild*
-  StartRequest(IDBRequest* aRequest, const RequestParams& aParams);
+  void
+  StartRequest(BackgroundRequestChild* aBackgroundActor,
+               const RequestParams& aParams);
 
   void
   OpenCursor(BackgroundCursorChild* aBackgroundActor,
@@ -162,6 +160,12 @@ public:
 
   void
   RefreshSpec(bool aMayDelete);
+
+  void
+  OnNewRequest();
+
+  void
+  OnRequestFinished();
 
   bool
   IsOpen() const;
@@ -310,12 +314,6 @@ private:
 
   void
   SendAbort(nsresult aResultCode);
-
-  void
-  OnNewRequest();
-
-  void
-  OnRequestFinished(bool aActorDestroyedNormally);
 };
 
 } // namespace indexedDB

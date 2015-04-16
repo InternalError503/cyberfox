@@ -348,19 +348,19 @@ if test -n "$MOZ_METRO"; then
     AC_DEFINE(MOZ_METRO)
 fi
 
-# Target the Windows 8.0 SDK by default
-WINSDK_TARGETVER=602
+# Target the Windows 8.1 SDK by default
+WINSDK_TARGETVER=603
 WINVER=502
 
 MOZ_ARG_WITH_STRING(windows-version,
 [  --with-windows-version=WINSDK_TARGETVER
-                          Windows SDK version to target. Win8.0 (602) is
+                          Windows SDK version to target. Win8.1 (603) is
                           currently the minimum supported version.],
   WINSDK_TARGETVER=$withval)
 
-# Currently only version 602 is allowed
+# Currently only version 603 is allowed
 case "$WINSDK_TARGETVER" in
-602)
+603)
     MOZ_WINSDK_TARGETVER=0${WINSDK_TARGETVER}0000
     ;;
 
@@ -417,9 +417,7 @@ case "$target" in
         AC_DEFINE(_CRT_SECURE_NO_WARNINGS)
         AC_DEFINE(_CRT_NONSTDC_NO_WARNINGS)
 
-        if test "$_CC_MAJOR_VERSION" = "17"; then
-            _CC_SUITE=11
-        elif test "$_CC_MAJOR_VERSION" = "18"; then
+        if test "$_CC_MAJOR_VERSION" = "18"; then
             _CC_SUITE=12
         else
             AC_MSG_ERROR([This version ($CC_VERSION) of the MSVC compiler is unsupported. See https://developer.mozilla.org/en/Windows_Build_Prerequisites.])

@@ -561,43 +561,43 @@ class BackgroundRequestChild MOZ_FINAL
 {
   friend class BackgroundTransactionChild;
   friend class BackgroundVersionChangeTransactionChild;
-  friend class IDBTransaction;
 
   nsRefPtr<IDBTransaction> mTransaction;
   nsTArray<nsRefPtr<FileInfo>> mFileInfos;
 
 public:
+  explicit BackgroundRequestChild(IDBRequest* aRequest);
+
   void
   HoldFileInfosUntilComplete(nsTArray<nsRefPtr<FileInfo>>& aFileInfos);
 
 private:
-  // Only created by IDBTransaction.
-  explicit
-  BackgroundRequestChild(IDBRequest* aRequest);
-
   // Only destroyed by BackgroundTransactionChild or
   // BackgroundVersionChangeTransactionChild.
   ~BackgroundRequestChild();
 
   void
+  MaybeFinishTransactionEarly();
+
+  bool
   HandleResponse(nsresult aResponse);
 
-  void
+  bool
   HandleResponse(const Key& aResponse);
 
-  void
+  bool
   HandleResponse(const nsTArray<Key>& aResponse);
 
-  void
+  bool
   HandleResponse(const SerializedStructuredCloneReadInfo& aResponse);
 
-  void
+  bool
   HandleResponse(const nsTArray<SerializedStructuredCloneReadInfo>& aResponse);
 
-  void
+  bool
   HandleResponse(JS::Handle<JS::Value> aResponse);
 
-  void
+  bool
   HandleResponse(uint64_t aResponse);
 
   // IPDL methods are only called by IPDL.
