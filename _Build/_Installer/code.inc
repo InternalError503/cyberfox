@@ -59,6 +59,65 @@ procedure CurStepChanged(CurStep: TSetupStep);
 				end
 
 end;
+//Get the uninstall string;
+function GetUninstallString: string;
+	var
+		sUnInstPath: string;
+		sUnInstallString: String;
+	begin
+		Result := '';
+		sUnInstPath := ExpandConstant('{#UNINSTKEY}');
+		sUnInstallString := '';
+	if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
+		RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
+	Result := sUnInstallString;
+end;
+//Check if install exists of not disable clean install check-box
+procedure CurPageChanged(CurPageID: Integer);
+	begin
+		if CurPageID = wpSelectTasks then
+	begin
+		if not RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then 
+			begin
+				WizardForm.TasksList.Checked[1] := False;
+				WizardForm.TasksList.ItemEnabled[0] := False;
+				WizardForm.TasksList.ItemEnabled[1] := False;
+		end
+		else begin
+				WizardForm.TasksList.Checked[1] := False;
+		end;
+	end;
+end;	
+
+//Check if cleanInstall has been selected
+function NextButtonClick(CurPageID: Integer): Boolean;
+	var
+		iResultCode: Integer;
+		sUnInstallString: string;
+	begin
+		Result := True;
+	if CurPageID = wpSelectTasks then
+	begin
+		if WizardForm.TasksList.Checked[1] then
+			//Perform clean install and uninstall existing installation.
+			if RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then
+				begin
+					sUnInstallString := GetUninstallString();
+					sUnInstallString :=  RemoveQuotes(sUnInstallString);
+					Wizardform.NextButton.Enabled := False;
+					Wizardform.BackButton.Enabled := False;
+					WizardForm.CancelButton.Enabled := False;
+			if Exec(ExpandConstant(sUnInstallString), '/VERYSILENT', '', SW_SHOW, ewWaitUntilTerminated, iResultCode) then
+			begin
+				//Sleep for 2 seconds to ensure IO operations have completed.
+				sleep(2000)
+			end
+			else begin
+							
+			end
+		end
+	end;
+end;
 //Initialize uninstaller run check for process
 function InitializeUninstall(): Boolean;
 begin

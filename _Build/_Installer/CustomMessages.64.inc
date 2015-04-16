@@ -12,6 +12,8 @@ en.DeleteProfileData=Do you want to delete your profile data?
 en.ConfirmDeleteProfileData=Are you sure this can not be undone!
 en.InstallingDocumentation=CyberCTR Files
 en.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+en.CleanInstallDescription=Perform clean installation.
+en.CleanInstallGroupDescription=Installation Options
 ;Albanian
 al.ProcessName={#MyAppName}
 al.IsAppRunning= tashmë është i rrjedhshëm, Ju lutemi mbyllni {#MyAppName} pastaj të drejtuar installer përsëri.
@@ -25,6 +27,8 @@ al.DeleteProfileData=A dëshironi të fshini të dhënat e profilit tuaj?
 al.ConfirmDeleteProfileData=A jeni i sigurt se kjo nuk mund të zhbëhet!
 al.InstallingDocumentation=CyberCTR Files
 al.InstallingDocumentationStatus=Instalimi CyberCTR Files. Kjo mund të zgjasë disa minuta ...
+al.CleanInstallDescription=Perform clean installation.
+al.CleanInstallGroupDescription=Installation Options
 ;Afrikaans
 af.ProcessName={#MyAppName}
 af.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -38,6 +42,8 @@ af.DeleteProfileData=Do you want to delete your profile data?
 af.ConfirmDeleteProfileData=Are you sure this can not be undone!
 af.InstallingDocumentation=CyberCTR Files
 af.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+af.CleanInstallDescription=Perform clean installation.
+af.CleanInstallGroupDescription=Installation Options
 ;Arabic
 ar.ProcessName={#MyAppName}
 ar.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -51,6 +57,8 @@ ar.DeleteProfileData=Do you want to delete your profile data?
 ar.ConfirmDeleteProfileData=Are you sure this can not be undone!
 ar.InstallingDocumentation=CyberCTR Files
 ar.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+ar.CleanInstallDescription=Perform clean installation.
+ar.CleanInstallGroupDescription=Installation Options
 ;Bengali
 be.ProcessName={#MyAppName}
 be.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -64,6 +72,8 @@ be.DeleteProfileData=Do you want to delete your profile data?
 be.ConfirmDeleteProfileData=Are you sure this can not be undone!
 be.InstallingDocumentation=CyberCTR Files
 be.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+be.CleanInstallDescription=Perform clean installation.
+be.CleanInstallGroupDescription=Installation Options
 ;Bosnian
 bo.ProcessName={#MyAppName}
 bo.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -77,6 +87,8 @@ bo.DeleteProfileData=Do you want to delete your profile data?
 bo.ConfirmDeleteProfileData=Are you sure this can not be undone!
 bo.InstallingDocumentation=CyberCTR Files
 bo.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+bo.CleanInstallDescription=Perform clean installation.
+bo.CleanInstallGroupDescription=Installation Options
 ;BrazilianPortuguese
 br_pt.ProcessName={#MyAppName}
 br_pt.IsAppRunning= já está em execução, feche {#MyAppName} em seguida, execute o instalador novamente.
@@ -89,6 +101,8 @@ br_pt.DeleteProfileData=Você quer apagar os dados do perfil?
 br_pt.ConfirmDeleteProfileData=Você está certo de que este não pode ser desfeita!
 br_pt.InstallingDocumentation=CyberCTR Arquivos
 br_pt.InstallingDocumentationStatus=Instalando arquivos CyberCTR. Isso pode demorar alguns minutos ...
+br_pt.CleanInstallDescription=Perform clean installation.
+br_pt.CleanInstallGroupDescription=Installation Options
 ;Catalan
 ca.ProcessName={#MyAppName}
 ca.IsAppRunning= ja s'està executant, tancament{#MyAppName} a continuació, executeu el programa d'instal · lació de nou.
@@ -102,6 +116,8 @@ ca.DeleteProfileData=Vols eliminar les seves dades del perfil?
 ca.ConfirmDeleteProfileData=Està vostè segur que això no es pot desfer!
 ca.InstallingDocumentation=CyberCTR Arxius
 ca.InstallingDocumentationStatus=Instal · lació CyberCTR Arxius. Això pot trigar diversos minuts ...
+ca.CleanInstallDescription=Perform clean installation.
+ca.CleanInstallGroupDescription=Installation Options
 ;Chinese (Simplified)
 cns.ProcessName={#MyAppName}
 cns.IsAppRunning= 已经在运行，请关闭 {#MyAppName} 然后再次运行安装程序。
@@ -115,6 +131,8 @@ cns.DeleteProfileData=你想删除您的个人资料数据？
 cns.ConfirmDeleteProfileData=你确定这不能撤消！
 cns.InstallingDocumentation=CyberCTR文件
 cns.InstallingDocumentationStatus=安装CyberCTR文件。这可能需要几分钟...
+cns.CleanInstallDescription=Perform clean installation.
+cns.CleanInstallGroupDescription=Installation Options
 ;Corsican
 cr.ProcessName={#MyAppName}
 cr.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -128,6 +146,8 @@ cr.DeleteProfileData=Do you want to delete your profile data?
 cr.ConfirmDeleteProfileData=Are you sure this can not be undone!
 cr.InstallingDocumentation=CyberCTR Files
 cr.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+cr.CleanInstallDescription=Perform clean installation.
+cr.CleanInstallGroupDescription=Installation Options
 ;Croatian
 cro.ProcessName={#MyAppName}
 cro.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -141,6 +161,8 @@ cro.DeleteProfileData=Do you want to delete your profile data?
 cro.ConfirmDeleteProfileData=Are you sure this can not be undone!
 cro.InstallingDocumentation=CyberCTR Files
 cro.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+cro.CleanInstallDescription=Perform clean installation.
+cro.CleanInstallGroupDescription=Installation Options
 ;Czech
 cz.ProcessName={#MyAppName}
 cz.IsAppRunning= je již spuštěna, prosím zavřete {#MyAppName} spusťte instalační program znovu.
@@ -154,6 +176,8 @@ cz.DeleteProfileData=Chcete-li odstranit data profilu?
 cz.ConfirmDeleteProfileData=Jsi si jistý, že to nelze vrátit zpět!
 cz.InstallingDocumentation=CyberCTR souborů
 cz.InstallingDocumentationStatus=Instalace CyberCTR souborů. Tento proces může trvat několik minut ...
+cz.CleanInstallDescription=Perform clean installation.
+cz.CleanInstallGroupDescription=Installation Options
 ;Danish
 da.ProcessName={#MyAppName}
 da.IsAppRunning= allerede kører, Luk {#MyAppName} derefter køre installationsprogrammet igen.
@@ -167,6 +191,8 @@ da.DeleteProfileData=Ønsker du at slette din profil data?
 da.ConfirmDeleteProfileData=Er du sikker på, det kan ikke fortrydes!
 da.InstallingDocumentation=CyberCTR filer
 da.InstallingDocumentationStatus=Installation CyberCTR Files. Dette kan tage flere minutter ...
+da.CleanInstallDescription=Perform clean installation.
+da.CleanInstallGroupDescription=Installation Options
 ;German
 de.ProcessName={#MyAppName}
 de.IsAppRunning= läuft noch. Bitte schliessen sie {#MyAppName} und starten sie den Installationsprozess erneut.
@@ -180,6 +206,8 @@ de.DeleteProfileData=Möchten Sie Ihre Profildaten löschen?
 de.ConfirmDeleteProfileData=Sind Sie sicher, das kann nicht rückgängig gemacht werden!
 de.InstallingDocumentation=CyberCTR Dateien
 de.InstallingDocumentationStatus=Installieren CyberCTR Dateien. Dies kann einige Minuten dauern ...
+de.CleanInstallDescription=Perform clean installation.
+de.CleanInstallGroupDescription=Installation Options
 ;Dutch
 nl.ProcessName={#MyAppName}
 nl.IsAppRunning= wordt al uitgevoerd, Sluit {#MyAppName} dan weer het installatieprogramma.
@@ -193,6 +221,8 @@ nl.DeleteProfileData=Wilt u uw profiel gegevens te verwijderen?
 nl.ConfirmDeleteProfileData=Bent u zeker dat dit kan niet ongedaan gemaakt worden!
 nl.InstallingDocumentation=CyberCTR Bestanden
 nl.InstallingDocumentationStatus=Installeren CyberCTR Files. Dit kan enkele minuten duren ...
+nl.CleanInstallDescription=Perform clean installation.
+nl.CleanInstallGroupDescription=Installation Options
 ;Finnish
 fi.ProcessName={#MyAppName}
 fi.IsAppRunning= on jo käynnissä, sulje {#MyAppName} suorita sitten asennusohjelma uudelleen.
@@ -206,6 +236,8 @@ fi.DeleteProfileData=Haluatko poistaa profiilisi tietoja?
 fi.ConfirmDeleteProfileData=Oletko varma, että tämä ei voi perua!
 fi.InstallingDocumentation=CyberCTR tiedostot
 fi.InstallingDocumentationStatus=Asentaminen CyberCTR tiedostot. Tämä voi kestää useita minuutteja ...
+fi.CleanInstallDescription=Perform clean installation.
+fi.CleanInstallGroupDescription=Installation Options
 ;French
 fr.ProcessName={#MyAppName}
 fr.IsAppRunning= est en cours d’exécution. Veuillez fermer {#MyAppName} puis redémarrer de nouveau le programme d’installation.
@@ -219,6 +251,8 @@ fr.DeleteProfileData=Voulez-vous effacer les données personnelles de votre prof
 fr.ConfirmDeleteProfileData=Êtes-vous certain ? Cette opération ne peut être annulée !
 fr.InstallingDocumentation=Fichiers de CyberCTR
 fr.InstallingDocumentationStatus=Installation des fichiers de CyberCTR. Cela peut prendre quelques minutes…
+fr.CleanInstallDescription=Perform clean installation.
+fr.CleanInstallGroupDescription=Installation Options
 ;Greek
 gr.ProcessName={#MyAppName}
 gr.IsAppRunning= εκτελείται ήδη, παρακαλώ κλείστε {#MyAppName} Στη συνέχεια, εκτελέστε ξανά το πρόγραμμα εγκατάστασης.
@@ -232,6 +266,8 @@ gr.DeleteProfileData=Μήπως θέλετε να διαγράψετε τα δε
 gr.ConfirmDeleteProfileData=Είσαι σίγουρος ότι αυτό δεν μπορεί να αναιρεθεί!
 gr.InstallingDocumentation=CyberCTR αρχεία
 gr.InstallingDocumentationStatus=Εγκατάσταση CyberCTR αρχεία. Αυτό μπορεί να διαρκέσει αρκετά λεπτά ...
+gr.CleanInstallDescription=Perform clean installation.
+gr.CleanInstallGroupDescription=Installation Options
 ;Hebrew
 he.ProcessName={#MyAppName}
 he.IsAppRunning= כבר פועל, אנא סגור {#MyAppName} לאחר מכן הפעל שוב את תוכנית ההתקנה.
@@ -245,6 +281,8 @@ he.DeleteProfileData=האם ברצונך למחוק את נתוני הפרופי
 he.ConfirmDeleteProfileData=האם אתה בטוח שזה לא ניתן לבטל!
 he.InstallingDocumentation=CyberCTR קבצים
 he.InstallingDocumentationStatus=התקנת CyberCTR קבצים. זה עשוי לקחת מספר דקות ...
+he.CleanInstallDescription=Perform clean installation.
+he.CleanInstallGroupDescription=Installation Options
 ;Hindi
 hi.ProcessName={#MyAppName}
 hi.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -258,6 +296,8 @@ hi.DeleteProfileData=Do you want to delete your profile data?
 hi.ConfirmDeleteProfileData=Are you sure this can not be undone!
 hi.InstallingDocumentation=CyberCTR Files
 hi.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+hi.CleanInstallDescription=Perform clean installation.
+hi.CleanInstallGroupDescription=Installation Options
 ;Hungarian
 hu.ProcessName={#MyAppName}
 hu.IsAppRunning= már fut, zárja {#MyAppName} majd futtassa újra a telepítőt.
@@ -271,6 +311,8 @@ hu.DeleteProfileData=Szeretné törölni a profil adatait?
 hu.ConfirmDeleteProfileData=Biztos benne, hogy ez nem lehet visszavonni!
 hu.InstallingDocumentation=CyberCTR Fájlok
 hu.InstallingDocumentationStatus=Telepítése CyberCTR fájlok. Ez eltarthat pár percig ...
+hu.CleanInstallDescription=Perform clean installation.
+hu.CleanInstallGroupDescription=Installation Options
 ;Indonesian
 in.ProcessName={#MyAppName}
 in.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -284,6 +326,8 @@ in.DeleteProfileData=Do you want to delete your profile data?
 in.ConfirmDeleteProfileData=Are you sure this can not be undone!
 in.InstallingDocumentation=CyberCTR Files
 in.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+in.CleanInstallDescription=Perform clean installation.
+in.CleanInstallGroupDescription=Installation Options
 ;Italian
 it.ProcessName={#MyAppName}
 it.IsAppRunning= è già in esecuzione, chiudere {#MyAppName} quindi eseguire nuovamente il programma di installazione.
@@ -297,6 +341,8 @@ it.DeleteProfileData=Vuoi eliminare i dati del tuo profilo?
 it.ConfirmDeleteProfileData=Sei sicuro che questo non può essere annullata!
 it.InstallingDocumentation=CyberCTR Files
 it.InstallingDocumentationStatus=Installazione di CyberCTR Files. Questo potrebbe richiedere alcuni minuti ...
+it.CleanInstallDescription=Perform clean installation.
+it.CleanInstallGroupDescription=Installation Options
 ;Korean
 kor.ProcessName={#MyAppName}
 kor.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -310,6 +356,8 @@ kor.DeleteProfileData=Do you want to delete your profile data?
 kor.ConfirmDeleteProfileData=Are you sure this can not be undone!
 kor.InstallingDocumentation=CyberCTR Files
 kor.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+kor.CleanInstallDescription=Perform clean installation.
+kor.CleanInstallGroupDescription=Installation Options
 ;Japanese
 ja.ProcessName={#MyAppName}
 ja.IsAppRunning= はすでに実行されています。{#MyAppName} を閉じて、もう一度インストーラーを実行してください。
@@ -323,6 +371,8 @@ ja.DeleteProfileData=プロファイル データを削除しますか？
 ja.ConfirmDeleteProfileData=元に戻すことはできませんがよろしいですか？
 ja.InstallingDocumentation=CyberCTR ファイル
 ja.InstallingDocumentationStatus=CyberCTR のファイルをインストールしています。これには数分かかる場合があります...
+ja.CleanInstallDescription=クリーン インストールを実行する
+ja.CleanInstallGroupDescription=インストール オプション
 ;Norwegian
 nr.ProcessName={#MyAppName}
 nr.IsAppRunning= er allerede i gang, Vennligst lukk {#MyAppName} deretter kjøre installasjonsprogrammet på nytt.
@@ -336,6 +386,8 @@ nr.DeleteProfileData=Ønsker du å slette din profil data?
 nr.ConfirmDeleteProfileData=Er du sikker på at dette kan ikke angres!
 nr.InstallingDocumentation=CyberCTR filer
 nr.InstallingDocumentationStatus=Installere CyberCTR filer. Dette kan ta flere minutter ...
+nr.CleanInstallDescription=Perform clean installation.
+nr.CleanInstallGroupDescription=Installation Options
 ;Polish
 pl.ProcessName={#MyAppName}
 pl.IsAppRunning= już działa, proszę zamknąć {#MyAppName} następnie ponownie uruchom program instalacyjny.
@@ -349,6 +401,8 @@ pl.DeleteProfileData=Czy chcesz usunąć swoje dane w profilu użytkownika?
 pl.ConfirmDeleteProfileData=Czy jesteś pewien, że to nie może być cofnięte!
 pl.InstallingDocumentation=CyberCTR pliki
 pl.InstallingDocumentationStatus=Instalacja CyberCTR pliki. Może to potrwać kilka minut ...
+pl.CleanInstallDescription=Perform clean installation.
+pl.CleanInstallGroupDescription=Installation Options
 ;Portuguese
 pt.ProcessName={#MyAppName}
 pt.IsAppRunning= já está em execução, feche {#MyAppName} em seguida, execute o instalador novamente.
@@ -362,6 +416,8 @@ pt.DeleteProfileData=Você quer apagar os dados do perfil?
 pt.ConfirmDeleteProfileData=Você está certo de que este não pode ser desfeita!
 pt.InstallingDocumentation=Arquivos CyberCTR
 pt.InstallingDocumentationStatus=Instalando arquivos CyberCTR. Isso pode demorar alguns minutos ...
+pt.CleanInstallDescription=Perform clean installation.
+pt.CleanInstallGroupDescription=Installation Options
 ;Russian
 ru.ProcessName={#MyAppName}
 ru.IsAppRunning= уже запущен, закройте {#MyAppName} и запустите программу установки повторно.
@@ -375,6 +431,8 @@ ru.DeleteProfileData=Вы ходите удалить Ваши личные да
 ru.ConfirmDeleteProfileData=Вы уверены? Эта операция не может быть отменена!
 ru.InstallingDocumentation=Файлы CyberCTR
 ru.InstallingDocumentationStatus=Устанавливаются файлы CyberCTR, это может занять несколько минут...
+ru.CleanInstallDescription=Выполнить чистую установку.
+ru.CleanInstallGroupDescription=Настройки установки
 ;SerbianCyrillic
 sbc.ProcessName={#MyAppName}
 sbc.IsAppRunning= је већ покренут, затворите Молимо {#MyAppName} затим покрените инсталер поново.
@@ -388,6 +446,8 @@ sbc.DeleteProfileData=Да ли желите да избришете подат�
 sbc.ConfirmDeleteProfileData=Да ли сте сигурни да не може да се опозове!
 sbc.InstallingDocumentation=CyberCTR Фајлови
 sbc.InstallingDocumentationStatus=Инсталирање ЦиберЦТР датотеке. Ово може потрајати неколико минута ...
+sbc.CleanInstallDescription=Perform clean installation.
+sbc.CleanInstallGroupDescription=Installation Options
 ;SerbianLatin
 sbl.ProcessName={#MyAppName}
 sbl.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -401,6 +461,8 @@ sbl.DeleteProfileData=Do you want to delete your profile data?
 sbl.ConfirmDeleteProfileData=Are you sure this can not be undone!
 sbl.InstallingDocumentation=CyberCTR Files
 sbl.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+sbl.CleanInstallDescription=Perform clean installation.
+sbl.CleanInstallGroupDescription=Installation Options
 ;Slovenian
 sl.ProcessName={#MyAppName}
 sl.IsAppRunning= že teče, Prosimo, zaprite {#MyAppName} nato ponovno zaženite namestitveni program.
@@ -414,6 +476,8 @@ sl.DeleteProfileData=Ali želite izbrisati podatke profila?
 sl.ConfirmDeleteProfileData=Ali ste prepričani, da to ni mogoče razveljaviti!
 sl.InstallingDocumentation=CyberCTR datoteke
 sl.InstallingDocumentationStatus=Namestitev CyberCTR pila. To lahko traja nekaj minut ...
+sl.CleanInstallDescription=Perform clean installation.
+sl.CleanInstallGroupDescription=Installation Options
 ;Swedish
 sw.ProcessName={#MyAppName}
 sw.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -427,6 +491,8 @@ sw.DeleteProfileData=Do you want to delete your profile data?
 sw.ConfirmDeleteProfileData=Are you sure this can not be undone!
 sw.InstallingDocumentation=CyberCTR Files
 sw.InstallingDocumentationStatus=Installing CyberCTR Files. This may take several minutes...
+sw.CleanInstallDescription=Perform clean installation.
+sw.CleanInstallGroupDescription=Installation Options
 ;Turkish
 tr.ProcessName={#MyAppName}
 tr.IsAppRunning= zaten çalışıyor, Lütfen {#MyAppName} kapatın ve kurulumu tekrar çalıştırın.
@@ -440,6 +506,8 @@ tr.DeleteProfileData=Profil verilerinizi de silmek istiyor musunuz?
 tr.ConfirmDeleteProfileData=Emin misiniz bu işlem geri alınamaz!
 tr.InstallingDocumentation=CyberCTR Dosyaları
 tr.InstallingDocumentationStatus=CyberCTR Dosyaları yükleniyor. Bu işlem biraz zaman alabilir...
+tr.CleanInstallDescription=Perform clean installation.
+tr.CleanInstallGroupDescription=Installation Options
 ;Spanish
 en_es.ProcessName={#MyAppName}
 en_es.IsAppRunning= ya se está ejecutando, cierre {#MyAppName} a continuación, ejecute el programa de instalación de nuevo.
@@ -453,6 +521,8 @@ en_es.DeleteProfileData=¿Quieres eliminar sus datos del perfil?
 en_es.ConfirmDeleteProfileData=¿Está usted seguro de que esto no se puede deshacer!
 en_es.InstallingDocumentation=CyberCTR Archivos
 en_es.InstallingDocumentationStatus=Instalación CyberCTR Archivos. Esto puede tardar varios minutos ...
+en_es.CleanInstallDescription=Perform clean installation.
+en_es.CleanInstallGroupDescription=Installation Options
 ;Ukrainian
 ukr.ProcessName={#MyAppName}
 ukr.IsAppRunning= вже запущений, закрийте {#MyAppName} потім запустити програму установки ще раз.
@@ -466,3 +536,5 @@ ukr.DeleteProfileData=Ви хочете видалити дані профілю
 ukr.ConfirmDeleteProfileData=Are you sure this can not be undone!
 ukr.InstallingDocumentation=CyberCTR файли
 ukr.InstallingDocumentationStatus=Установка CyberCTR файлів. Це може зайняти кілька хвилин ...
+ukr.CleanInstallDescription=Perform clean installation.
+ukr.CleanInstallGroupDescription=Installation Options

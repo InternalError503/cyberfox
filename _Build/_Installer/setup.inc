@@ -2,17 +2,21 @@
 #if Arch == "i368"
 #if PackageType == "beta86"
 AppId={{A7689C89-E92D-4051-A3B7-92C92DA5D1DF}
+#define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\{{A7689C89-E92D-4051-A3B7-92C92DA5D1DF}_is1"
 AppName={#MyAppName} (x86)
 #else
 AppId={{DA42BA39-9916-4F32-83AC-27AAE5CFA09E}
+#define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\{{DA42BA39-9916-4F32-83AC-27AAE5CFA09E}_is1"
 AppName={#MyAppName} (x86)
 #endif
 #elif Arch == "amd64"
 #if PackageType == "beta64"
 AppId={{A7689C89-E92D-4051-A3B7-92C92DA5D1DF}
+#define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\{{A7689C89-E92D-4051-A3B7-92C92DA5D1DF}_is1"
 AppName={#MyAppName}
 #else
 AppId={{5EFB52C0-4EC9-46B4-80EB-8432C6599641}
+#define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\{{5EFB52C0-4EC9-46B4-80EB-8432C6599641}_is1"
 AppName={#MyAppName}
 #endif
 #endif
