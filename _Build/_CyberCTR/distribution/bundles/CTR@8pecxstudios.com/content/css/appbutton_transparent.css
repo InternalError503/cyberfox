@@ -1,19 +1,24 @@
 @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
 
-@-moz-document url(chrome://browser/content/browser.xul) {
+@-moz-document url(chrome://browser/content/browser.xul){
 
+	/* appbutton on titlebar*/
+	
 	#ctraddon_appbutton2:not(:hover):not(:active):not([open]){
 	  background-image: linear-gradient(rgba(255,255,255,.0), rgba(255,255,255,.0)) !important;
 	  border-color: hsla(214,89%,21%,.9) !important;
 	  box-shadow: 0 1px 0 hsla(0,0%,100%,.2) inset,
 				  0 0 2px 1px hsla(0,0%,100%,.25) inset !important;
 	}
+	
+	/* appbutton on tabs toolbar */
 	#TabsToolbar #ctraddon_appbutton{
 	  background: rgba(255,255,255,.0) !important;
 	  border-color: hsla(214,89%,21%,.9) !important;
 	  box-shadow: 0 1px 0 hsla(0,0%,100%,.2) inset,
 				  0 0 2px 1px hsla(0,0%,100%,.25) inset !important;
 	}
+
 	#TabsToolbar #ctraddon_appbutton:hover:not(:active):not([open]),
 	#ctraddon_appbutton2:hover:not(:active):not([open]){
 	  background-image: radial-gradient(farthest-side at center bottom, hsla(0,0%,100%,.5) 10%, hsla(0,0%,100%,0) 70%),

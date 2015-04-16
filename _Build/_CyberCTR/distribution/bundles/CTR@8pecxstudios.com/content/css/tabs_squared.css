@@ -7,6 +7,24 @@
 	  margin-left:-2px !important;
 	}
 
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(ltr):not(:-moz-lwtheme)::before,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(rtl):not(:-moz-lwtheme)::before ,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(ltr):not(:-moz-lwtheme)::before,
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(rtl):not(:-moz-lwtheme)::before,
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(ltr)::after,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(rtl)::after,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(ltr)::after,
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(rtl)::after,
+	.tab-background-middle[visuallyselected=true],
+	.tab-background-middle[visuallyselected=true]:-moz-lwtheme,
+	.tab-background-start[visuallyselected=true]:-moz-lwtheme::before,
+	.tab-background-end[visuallyselected=true]:-moz-lwtheme::before,
+	.tabbrowser-tab:hover > .tab-stack > .tab-background:not([visuallyselected=true]),
+	.tabbrowser-tab[pinned][titlechanged]:not([visuallyselected="true"]) > .tab-stack > .tab-content,
+	#tabbrowser-tabs::before {
+	  background-image: none !important;
+	}
+
 	.tabbrowser-tab:hover > .tab-stack > .tab-background > .tab-background-middle:not([selected=true]),
 	.tabbrowser-tab:hover > .tab-stack > .tab-background > .tab-background-start:not([selected=true]),
 	.tabbrowser-tab:hover > .tab-stack > .tab-background > .tab-background-end:not([selected=true]),
@@ -22,6 +40,36 @@
 	.tab-background-start[selected=true]:-moz-locale-dir(rtl)::after,
 	.tab-background-end[selected=true]:-moz-locale-dir(ltr)::after{
 	  content:none !important;
+	}
+
+	.tab-background-middle {
+	  border-left-width: 0 !important;
+	  border-right-width: 0 !important;
+	  margin: 0 !important;
+	}
+
+	.tab-background {
+	  -moz-margin-end: 0 !important;
+	  -moz-margin-start: 0 !important;
+	}
+
+	.tab-background-start::after,
+	.tab-background-start::before,
+	.tab-background-start[visuallyselected=true]::after,
+	.tab-background-start[visuallyselected=true]::before,
+	.tab-background-start,
+	.tab-background-end,
+	.tab-background-end::after,
+	.tab-background-end::before,
+	.tab-background-end[visuallyselected=true]::after,
+	.tab-background-end[visuallyselected=true]::before {
+	  width: 0 !important;
+	}
+
+	.tab-background-start,.tab-background-end,
+	.tab-background-start[visuallyselected=true]::after,
+	.tab-background-end[visuallyselected=true]::after {
+	  -moz-margin-start: 0 !important;
 	}
 
 	.tabs-newtab-button {
@@ -136,23 +184,31 @@
 	  color: inherit !important;
 	}
 	
-	.tabs-newtab-button:-moz-lwtheme,
+	/*.tabs-newtab-button:-moz-lwtheme,
 	.tabbrowser-tab:-moz-lwtheme,
 	.tabbrowser-tab[pinned]:-moz-lwtheme{
 	  background-size: calc(100% - 1px) calc(100% - 3px) !important;
-	}
+	}*/
 	
+	/*@media all and (-moz-windows-glass) {
+		.tabs-newtab-button:-moz-lwtheme,
+		.tabbrowser-tab:-moz-lwtheme,
+		.tabbrowser-tab[pinned]:-moz-lwtheme{
+		  background-size: calc(100% - 1px) calc(100% - 3px) !important;
+		}
+	}*/
+
 	.tabs-newtab-button:-moz-lwtheme{
 	  background-image: linear-gradient(rgba(255,255,255,.7), rgba(255,255,255,.5) 50%) !important;
 	}
 	
-	@media all and (-moz-windows-glass) {
+	/*@media all and (-moz-windows-glass) {
 		.tabs-newtab-button:-moz-lwtheme,		
 		.tabbrowser-tab:-moz-lwtheme,
 		.tabbrowser-tab[pinned]:-moz-lwtheme {
 		  background-size: calc(100% - 1px) calc(100% - 4px) !important;
 		}
-	}
+	}*/
 
 	.tabbrowser-tab:not([selected=true]):hover:-moz-lwtheme-brighttext,
 	.tabs-newtab-button:-moz-lwtheme-brighttext:hover {
@@ -196,8 +252,6 @@
 
 	.tabbrowser-tab[pinned]{
 	  min-width: 32px !important;
-	  /*width: 32px !important;
-	  max-width: 32px !important;*/
 	  background-position: 0px 2px !important;
 	  background-size: calc(100% - 0px) calc(100% - 1px) !important;
 	}
@@ -212,8 +266,8 @@
 	
 	/* trick to use code for win8+*/
 	@media all and (-moz-windows-compositor) {
-	@media  not all and (-moz-os-version: windows-vista){
-	@media  not all and (-moz-os-version: windows-win7){
+	@media not all and (-moz-os-version: windows-vista){
+	@media not all and (-moz-os-version: windows-win7){
 		#TabsToolbar[tabsontop="false"] .tabbrowser-tab[pinned] {
 		  background-size: calc(100% - 0px) calc(100% - 4px) !important;
 		}
@@ -276,16 +330,17 @@
  	.tabbrowser-tab[pinned]:not([locked]):not([pinned]) image{
 	  -moz-margin-start:0px !important;
 	}
+	
+	/* pinned tabs fix (Fx38+) */
+	#main-window[fx38plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab .tab-content[pinned] {
+	  -moz-padding-end: 0px !important;
+	}
 
 	/* remove ridiculous clipping */
 	#main-window[tabsintitlebar]:not([sizemode="maximized"]):not([inFullscreen]) #toolbar-menubar:-moz-any([autohide="true"][inactive],:not([autohide])) + #TabsToolbar .tab-background-middle:not([selected=true]) {
 	  clip-path: none !important;
 	}
-	
-	/*ColorfulTabs extension*/
-	#navigator-toolbox[tabsontop="false"] #colorfulTabsStack {
-	  margin-top: -1px !important;
-	}
+
 	/* Private Tab extension */
 	.tabs-newtab-button + .tabs-newtab-button {
 	  -moz-margin-start: 15px !important;
@@ -293,13 +348,19 @@
 	#TabsToolbar #privateTab-afterTabs-openNewPrivateTab image{
 	  margin-top:-1px !important;
 	}
-	/* TMP progress tweak */
-	#main-window[tabmix_lwt="true"] .tabbrowser-tab progressmeter.tab-progress,
-	#main-window[tabmix_lwt="false"] .tabbrowser-tab progressmeter.tab-progress {
+	/* TabMixPlus extras */
+	#TabsToolbar[currentset*="tabmixScrollBox"]  .tabbrowser-tab progressmeter.tab-progress,
+	#TabsToolbar[currentset*="tabmixScrollBox"]  .tabbrowser-tab progressmeter.tab-progress {
 	  margin-top: 2.5px !important;
 	  height: 3px !important;
 	}
+	#TabsToolbar[currentset*="tabmixScrollBox"] #tabbrowser-tabs .tabbrowser-tab[selected] .tab-stack .tab-background {
+		background:none !important;
+	}
 	/* ColorfulTabs tweak*/
+	#navigator-toolbox[tabsontop="false"] #colorfulTabsStack {
+	  margin-top: -1px !important;
+	}
 	#main-window[colorfultabs="true"] #TabsToolbar .tabbrowser-tab{
 	  border-top:0 !important;
 	  border-left:0 !important;

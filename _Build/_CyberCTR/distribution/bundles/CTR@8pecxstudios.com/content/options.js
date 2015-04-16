@@ -16,15 +16,23 @@ classicthemerestorerjso.ctr = {
   prefs:			Services.prefs.getBranch("extensions.classicthemerestorer."),
   fxdefaulttheme:	Services.prefs.getBranch("general.skins.").getCharPref("selectedSkin") == 'classic/1.0',
   appversion:		parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")),
-  oswindows:		Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS=="WINNT",
+  oswindows:		Services.appinfo.OS=="WINNT",
   needsRestart: 	false,
+  tmp_tu_active:	false,
 
   initprefwindow: function() {
   
 	// adds a new global attribute 'defaultfxtheme' -> better parting css for default and non-default themes
 	try{
 		if (this.fxdefaulttheme) document.getElementById("ClassicTRoptionsPane").setAttribute('defaultfxtheme',true);
-		  else document.getElementById("ClassicTRoptionsPane").removeAttribute('defaultfxtheme');
+		  else {
+			var thirdpartytheme = Services.prefs.getBranch("general.skins.").getCharPref("selectedSkin");
+			if(thirdpartytheme=="Tangerinefox" || thirdpartytheme=="Tangofox") {
+			  this.fxdefaulttheme=true;
+			  document.getElementById("ClassicTRoptionsPane").setAttribute('defaultfxtheme',true);
+			}
+		  
+		  }
 	} catch(e){}
 	
 	// restore last selected categories/tabs
@@ -70,6 +78,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_nbcompact').disabled = true;
 		document.getElementById('ctraddon_pw_tabc_act_tb').disabled = true;
 		document.getElementById('ctraddon_pw_aerocolors').disabled = true;
+		document.getElementById('ctraddon_pw_tbsep_winc').disabled = true;
 
 		document.getElementById('ctraddon_abhigher').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_smallnavbut').style.visibility = 'collapse';
@@ -111,10 +120,12 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_nbcompact').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabc_act_tb').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_aerocolors').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_tbsep_winc').style.visibility = 'collapse';
 	} else {
 		document.getElementById('ctraddon_pw_special_info2').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_special_font').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
+		document.getElementById('ctraddon_coltabsinfo').style.visibility = 'collapse';
 	};
 
 	//Custom Button Color Text Color
@@ -165,9 +176,35 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_pw_tabwidthinfo2').style.visibility = 'collapse';
 	document.getElementById('ctraddon_pw_tabwidthinfo3').style.visibility = 'collapse';
 	
+	// HCTP add-on extra labels
+	document.getElementById('ctraddon_hctpinfotab').style.visibility = 'collapse';
+	document.getElementById('ctraddon_hctpinfoab').style.visibility = 'collapse';
+			
+	
+	//Custom search bar width
+	if (this.prefs.getBoolPref("customsearchbarwidth")){
+		document.getElementById('ctraddon_searchbarwidth').disabled = false;
+		document.getElementById('ctraddon_searchbarwidthl').disabled = false;
+	}else{
+		document.getElementById('ctraddon_searchbarwidth').disabled = true;
+		document.getElementById('ctraddon_searchbarwidthl').disabled = true;
+	}
+		
+	Application.prefs.get("extensions.classicthemerestorer.customsearchbarwidth").events.addListener("change", function(aEvent){	
+	if (Services.prefs.getBoolPref("extensions.classicthemerestorer.customsearchbarwidth")){
+		document.getElementById('ctraddon_searchbarwidth').disabled = false;
+		document.getElementById('ctraddon_searchbarwidthl').disabled = false;
+	}else{
+		document.getElementById('ctraddon_searchbarwidth').disabled = true;
+		document.getElementById('ctraddon_searchbarwidthl').disabled = true;
+	}});
+	
 	// extra checks to not enable tab width settings while 'TabMixPlus' or 'TabUtilities' is enabled
 	AddonManager.getAddonByID('{dc572301-7619-498c-a57d-39143191b318}', function(addon) {
 	  if(addon && addon.isActive) {
+		  
+		classicthemerestorerjso.ctr.tmp_tu_active = true;
+		
 	  	document.getElementById('ctraddon_pw_tabMinWidth').disabled = true;
 		document.getElementById('ctraddon_pw_tabMaxWidth').disabled = true;
 		document.getElementById('ctraddon_pw_tabMinWidth_L1').disabled = true;
@@ -182,6 +219,9 @@ classicthemerestorerjso.ctr = {
 	
 	AddonManager.getAddonByID('tabutils@ithinc.cn', function(addon) {
 	  if(addon && addon.isActive) {
+
+		classicthemerestorerjso.ctr.tmp_tu_active = true;
+
 		document.getElementById('ctraddon_pw_tabMinWidth').disabled = true;
 		document.getElementById('ctraddon_pw_tabMaxWidth').disabled = true;
 		document.getElementById('ctraddon_pw_tabMinWidth_L1').disabled = true;
@@ -191,6 +231,13 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_tabwidthinfo').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabwidthinfo2').style.visibility = 'visible';
 		document.getElementById('ctraddon_pw_tabwidthinfo3').style.visibility = 'collapse';
+	  }
+	});
+	
+	//Colorful Tabs add-on extra info
+	AddonManager.getAddonByID('{0545b830-f0aa-4d7e-8820-50a4629a56fe}', function(addon) {
+	  if(addon && addon.isActive) {
+		document.getElementById('ctraddon_coltabsinfo').style.visibility = 'visible';
 	  }
 	});
 	
@@ -243,12 +290,34 @@ classicthemerestorerjso.ctr = {
 	  }
 	});
 	
+	//HCTP add-on extra info
+	AddonManager.getAddonByID('hidecaptionplus-dp@dummy.addons.mozilla.org', function(addon) {
+	  if(addon && addon.isActive) {
+		document.getElementById('ctraddon_hctpinfotab').style.visibility = 'visible';
+		document.getElementById('ctraddon_hctpinfoab').style.visibility = 'visible';
+	  }
+	});
+	var HCTPListener = {
+	   onEnabled: function(addon) {
+		  if(addon.id == 'hidecaptionplus-dp@dummy.addons.mozilla.org') {
+			document.getElementById('ctraddon_hctpinfotab').style.visibility = 'visible';
+			document.getElementById('ctraddon_hctpinfoab').style.visibility = 'visible';
+		  }
+	   },
+	   onDisabled: function(addon) {
+		  if(addon.id == 'hidecaptionplus-dp@dummy.addons.mozilla.org') {
+			document.getElementById('ctraddon_hctpinfotab').style.visibility = 'collapse';
+			document.getElementById('ctraddon_hctpinfoab').style.visibility = 'collapse';
+		  }
+	   }
+	};
+	AddonManager.addAddonListener(HCTPListener);
+
 	// disable bookmark animation checkbox, if 'star button in urlbar' is used
 	if (this.prefs.getBoolPref('starinurl')) document.getElementById('ctraddon_pw_bmanimation').disabled = true;
 	
 	// hide settings, if unsupported by Cyberfox versions
 	if (this.appversion < 31) {
-	  document.getElementById('ctraddon_pw_pananimation').disabled = true;
 	  document.getElementById('ctraddon_pw_pananimation').style.visibility = 'collapse';
 	  
 	  document.getElementById('ctraddon_closetab_pw_act').style.visibility = 'collapse';
@@ -257,41 +326,26 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_closetab_pw_end').style.visibility = 'collapse';
 	}
 	if (this.appversion < 32) {
-	  document.getElementById('ctraddon_pw_noconicons').disabled = true;
 	  document.getElementById('ctraddon_pw_noconicons').style.visibility = 'collapse';
 	}
 	if (this.appversion < 33) {
 	  document.getElementById('ctraddon_experttweakstab').style.visibility = 'collapse';
-	  
-	  document.getElementById('ctraddon_pw_f33layers').disabled = true;
-	  document.getElementById('ctraddon_pw_f33layers').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_f33layersdescr').disabled = true;
-	  document.getElementById('ctraddon_pw_f33layersdescr').style.visibility = 'collapse';
 	}
 	if (this.appversion < 34) {
-	  document.getElementById('ctraddon_pw_oldsearch').disabled = true;
-	  document.getElementById('ctraddon_pw_oldsearch').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_oldsearchdescr').disabled = true;
-	  document.getElementById('ctraddon_pw_oldsearchdescr').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_loopcall').disabled = true;
-	  document.getElementById('ctraddon_pw_loopcall').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_loopcalldescr').disabled = true;
-	  document.getElementById('ctraddon_pw_loopcalldescr').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_oldsearchgb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_loopcallgb').style.visibility = 'collapse';
 	}
-	if (this.appversion < 35) {
-	  document.getElementById('ctraddon_pw_devtheme').disabled = true;
-	  document.getElementById('ctraddon_pw_devtheme').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_devthemeb').disabled = true;
-	  document.getElementById('ctraddon_pw_devthemeb').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_devthemedescr').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_nodevtheme').disabled = true;
-	  document.getElementById('ctraddon_nodevtheme').style.visibility = 'collapse';
+	if (this.appversion < 35 || this.appversion > 39.9) {
+	  document.getElementById('ctraddon_pw_devthemegb').style.visibility = 'collapse';
 	}
 	if (this.appversion < 36) {
-	  document.getElementById('ctraddon_pw_oldprefs').disabled = true;
-	  document.getElementById('ctraddon_pw_oldprefs').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_oldprefsdescr').disabled = true;
-	  document.getElementById('ctraddon_pw_oldprefsdescr').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_oldprefsgb').style.visibility = 'collapse';
+	}
+	if (this.appversion < 38) {
+	  document.getElementById('ctraddon_pw_readermodegb').style.visibility = 'collapse';
+	}
+	if (this.appversion > 37) {
+	  document.getElementById('ctraddon_pw_bmarkoinpw').style.visibility = 'collapse';
 	}
 
 	function PrefListener(branch_name, callback) {
@@ -433,6 +487,115 @@ classicthemerestorerjso.ctr = {
 			document.getElementById('ctraddon_titleintitlebar').disabled = false;
 		}
 
+		//Hide no links start page check-box in firefox.	
+		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase()) {
+			document.getElementById('nolinks').hidden = true;
+		}	
+
+		//Hide no snippets start page check-box in Cyberfox as there are removed by default.	
+		if (Services.appinfo.name.toLowerCase() === "Cyberfox".toLowerCase()) {
+			document.getElementById('nosnippets').hidden = true;	
+		}
+		
+		//Disable no links & custom highlight color option on simplicity theme(s)
+		if (this.prefs.getCharPref("abouthome") === "simplicityred" || 
+			this.prefs.getCharPref("abouthome") === "simplicityblue"|| 
+			this.prefs.getCharPref("abouthome") === "simplicitygreen" || 
+			this.prefs.getCharPref("abouthome") === "simplicityyellow"){
+			document.getElementById('noicons').disabled = true;
+			document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
+			document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
+			document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
+			document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
+			this.prefs.setBoolPref("abouthomehighlight", false);	
+		}else{
+			document.getElementById('noicons').disabled = false;
+			document.getElementById('ctraddon_ctabouthomecusthltck').disabled = false;
+			document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = false;
+			document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = false;
+			document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = false;
+		}
+		
+		if (this.prefs.getCharPref("abouthome") === "simplicitycustom"){
+			document.getElementById('noicons').disabled = true;
+		}	
+
+		Application.prefs.get("extensions.classicthemerestorer.abouthome").events.addListener("change", function(aEvent){
+			if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicityred" || 
+				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicityblue"|| 
+				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicitygreen"|| 
+				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicityyellow"){
+				document.getElementById('noicons').disabled = true;
+				//Disable custom highlight color on pre-sets.
+				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
+				document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
+				document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
+				document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
+				Services.prefs.setBoolPref("extensions.classicthemerestorer.abouthomehighlight", false);
+			}else{
+				document.getElementById('noicons').disabled = false;
+				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = false;
+				document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = false;
+				document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = false;
+				document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = false;
+			}
+			if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicitycustom"){
+				document.getElementById('noicons').disabled = true;
+			}
+		});
+		
+		// Replace whiteSpace and backslash in custom background urls	
+		Application.prefs.get("extensions.classicthemerestorer.abouthomecustomurl").events.addListener("change", function(aEvent){				
+		try{
+			Services.prefs.setCharPref("extensions.classicthemerestorer.abouthomecustomurl", document.getElementById('ctraddon_ctabouthome_bg_urlbox').value.trim().replace(/ /g, "%20").replace(/\\/g,"/"));
+		} catch (e){ }
+		});
+		
+		//Disable custom background image on Light|dark theme styles.
+		if (this.prefs.getCharPref("abouthome") === "dark" || 
+			this.prefs.getCharPref("abouthome") === "light"){
+			document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
+			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
+			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;		
+			this.prefs.setBoolPref("abouthomecustombg", false);
+			
+		}else{
+			document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
+			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
+			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
+		}
+
+		Application.prefs.get("extensions.classicthemerestorer.abouthome").events.addListener("change", function(aEvent){
+				if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "dark" || 
+					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "light"){
+				document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
+				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
+				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
+				Services.prefs.setBoolPref("extensions.classicthemerestorer.abouthomecustombg", false);
+			}else{
+				document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
+				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
+				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
+			}
+			//Disable custom highlight colors on default theme in firefox.	
+			if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && 
+				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "default") {
+					document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
+					document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
+					document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
+					document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
+					this.prefs.setBoolPref("abouthomehighlight", false);
+			}
+		});
+		//Disable custom highlight colors on default theme in firefox.	
+		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && this.prefs.getCharPref("abouthome") === "default") {
+				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
+				document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
+				document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
+				document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
+				this.prefs.setBoolPref("abouthomehighlight", false);
+		}
+		
 			this.hideThemeInfoForTabs();
   },
   
@@ -440,23 +603,26 @@ classicthemerestorerjso.ctr = {
      when preference window gets closed */
   unloadprefwindow: function() {
 
-	var app        	 = Components.classes["@mozilla.org/toolkit/app-startup;1"].getService(Components.interfaces.nsIAppStartup);
 	var cancelQuit   = Components.classes["@mozilla.org/supports-PRBool;1"].createInstance(Components.interfaces.nsISupportsPRBool);
 	var observerSvc  = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
-	var promptSvc  	 = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
-	var stringBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService)
-						.createBundle("chrome://classic_theme_restorer/locale/messages.file");
+	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
+						
+	var brandName	 = '';
+
+	try {
+	  brandName = Services.strings.createBundle("chrome://branding/locale/brand.properties").GetStringFromName("brandShortName");
+	} catch(e) {}
 
 	if (this.needsRestart &&
-		promptSvc.confirm(null,
-			stringBundle.GetStringFromName("popup.title"),
-			stringBundle.GetStringFromName("popup.msg.restart")
+		Services.prompt.confirm(null,
+			stringBundle.formatStringFromName("popup.title", [brandName], 1),
+			stringBundle.formatStringFromName("popup.msg.restart", [brandName], 1)
 		)) {
 		observerSvc.notifyObservers(cancelQuit, "quit-application-requested", "restart");
 		if(cancelQuit.data) { // The quit request has been cancelled.
 			return false;
 		};
-		app.quit(app.eAttemptQuit | app.eRestart);
+		Services.startup.quit(Services.startup.eRestart | Services.startup.eAttemptQuit);
 	}
 	
 	// save last selected categories/tabs
@@ -472,22 +638,31 @@ classicthemerestorerjso.ctr = {
   },
   
   resetPrefsForDevTheme: function(){
-	var currenttabs=this.prefs.getCharPref('tabs');
 	
 	// reset Tab appearance, but keep last knows preference
 	setTimeout(function(){
 	  classicthemerestorerjso.ctr.prefs.setCharPref('tabs','tabs_default');
 	},50);
 	setTimeout(function(){
-	  classicthemerestorerjso.ctr.prefs.setCharPref('tabs',currenttabs);
+	  classicthemerestorerjso.ctr.prefs.setCharPref('tabs','tabs_squared');
 	},100);
 	
-	// disable aeroblue toolbars preference
+	// disable Aero (blue) toolbars preference
 	if(this.prefs.getBoolPref('aerocolors'))
 	  this.prefs.setBoolPref('aerocolors',false);
-  
+ 
 	this.hideThemeInfoForTabs();
+	this.unsetTabColorsAndMore();
 
+  },
+  
+  //only reset prefs for dev theme, if it is enabled
+  resetPrefsForDevTheme2: function(){
+	try {
+	  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
+		classicthemerestorerjso.ctr.resetPrefsForDevTheme();
+	  }
+	} catch(e) {}
   },
   
   ctrShowE10sPrefForWindowPrefs: function() {
@@ -548,24 +723,54 @@ classicthemerestorerjso.ctr = {
   },
   
   ctrpwBFextra: function(which) {
-    if(which==true) which=false; else which=true;
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false;
+	  itemvis = 'visible';
+	} else {
+	  which=true;
+	  itemvis = 'collapse';
+	}
+	
     document.getElementById('ctraddon_pw_hide_bf_popup').disabled = which;
 	document.getElementById('ctraddon_pw_bf_space').disabled = which;
+	document.getElementById('ctraddon_pw_hide_bf_popup').style.visibility = itemvis;
+	document.getElementById('ctraddon_pw_bf_space').style.visibility = itemvis;
 	if(classicthemerestorerjso.ctr.prefs.getBoolPref('smallnavbut')==false){
 	  document.getElementById('ctraddon_pw_nbcompact').disabled = which;
+	  document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
 	}
   },
   
    ctrpwSNextra: function(which) {
     if(classicthemerestorerjso.ctr.prefs.getBoolPref('backforward')){
-      if(which==true) which=false; else which=true;
+	  var itemvis = 'collapse';
+	
+      if(which==true) {
+		which=false; itemvis = 'visible';
+	  } else {
+		which=true; itemvis = 'collapse';
+	  }
 	  document.getElementById('ctraddon_pw_nbcompact').disabled = which;
+	  document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
 	}
   },
   
   ctrpwHidetbwotExtra: function(which) {
-    if(which==true) which=false; else which=true;
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
     document.getElementById('ctraddon_pw_hidetbwote').disabled = which;
+	document.getElementById('ctraddon_pw_hidetbwote2').disabled = which;
+	document.getElementById('ctraddon_pw_hidetbwote').style.visibility = itemvis;
+	document.getElementById('ctraddon_pw_hidetbwote_winc').style.visibility = itemvis;
+	document.getElementById('ctraddon_pw_hidetbwote2').style.visibility = itemvis;
   },
   
   ctrpwDisableDevThemePrefsExtra: function(which) {
@@ -577,8 +782,15 @@ classicthemerestorerjso.ctr = {
   
   altTabsToolbarBgExtra: function(which) {
 	if (this.fxdefaulttheme) {
-	  if(which==true) which=false; else which=true;
+	
+	  var itemvis = 'collapse';
+      if(which==true) {
+		which=false; itemvis = 'visible';
+	  } else {
+		which=true; itemvis = 'collapse';
+	  }
       document.getElementById('ctraddon_pw_alttabstb2').disabled = which;
+	  document.getElementById('ctraddon_pw_alttabstb2').style.visibility = itemvis;
 	}
   },
   
@@ -615,7 +827,7 @@ classicthemerestorerjso.ctr = {
   var tabsintitlebar = Services.prefs.getBranch("browser.tabs.").getBoolPref("drawInTitlebar");
   
 	if (which=="appbutton_v1" && this.fxdefaulttheme){
-	  document.getElementById('ctraddon_alt_abicons').disabled = false;
+	  document.getElementById('ctraddon_altabico_list').disabled = false;
 	  document.getElementById('ctraddon_abhigher').disabled = false;
 	  document.getElementById('ctraddon_appbutbdl').disabled = false;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
@@ -624,7 +836,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
 	} else if (which=="appbutton_v1wt" && this.fxdefaulttheme){
-	  document.getElementById('ctraddon_alt_abicons').disabled = true;
+	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = false;
 	  document.getElementById('ctraddon_appbutbdl').disabled = false;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
@@ -633,7 +845,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
 	} else if (which=="appbutton_v1" && !this.fxdefaulttheme){
-	  document.getElementById('ctraddon_alt_abicons').disabled = false;
+	  document.getElementById('ctraddon_altabico_list').disabled = false;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
 	  document.getElementById('ctraddon_appbutbdl').disabled = false;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
@@ -642,7 +854,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
 	} else if (which=="appbutton_v1wt" && !this.fxdefaulttheme){
-	  document.getElementById('ctraddon_alt_abicons').disabled = false;
+	  document.getElementById('ctraddon_altabico_list').disabled = false;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
 	  document.getElementById('ctraddon_appbutbdl').disabled = false;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
@@ -651,7 +863,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
 	} else if (which=="appbutton_off" || which=="appbutton_pm" || which=="appbutton_v2h"){
-	  document.getElementById('ctraddon_alt_abicons').disabled = true;
+	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
 	  document.getElementById('ctraddon_appbutbdl').disabled = true;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = true;
@@ -660,7 +872,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = true;
 	} else if (which=="appbutton_v2io" || which=="appbutton_v2io2") {
-	  document.getElementById('ctraddon_alt_abicons').disabled = true;
+	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
 	  document.getElementById('ctraddon_appbutbdl').disabled = false;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
@@ -673,7 +885,7 @@ classicthemerestorerjso.ctr = {
 		Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
 	  }
 	} else {
-	  document.getElementById('ctraddon_alt_abicons').disabled = true;
+	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
 	  document.getElementById('ctraddon_appbutbdl').disabled = false;
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
@@ -787,7 +999,7 @@ classicthemerestorerjso.ctr = {
   classicCTRpreferences: function() {
 	this.resetCTRpreferences();
 	
-	this.prefs.setIntPref("ctabwidth",250);
+	if(classicthemerestorerjso.ctr.tmp_tu_active==false) classicthemerestorerjso.ctr.prefs.setIntPref("ctabwidth",250);
 	this.prefs.setBoolPref("panelmenucol",true);
 	this.prefs.setBoolPref("verifiedcolors",true);
 	this.prefs.setCharPref("findbar",'findbar_bottoma');
@@ -798,7 +1010,8 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("faviconurl",true);
 	this.prefs.setBoolPref("bmanimation",true);
 	this.prefs.setBoolPref("pananimation",true);
-	
+	this.prefs.setBoolPref("alt_newtabp",true);
+
 	if (contexts.getBoolPref("classic")){}else{
 		this.prefs.setBoolPref("noconicons",true);
 	}
@@ -808,7 +1021,8 @@ classicthemerestorerjso.ctr = {
 		classicthemerestorerjso.ctr.prefs.setBoolPref("feedinurl",true);
 	},1350);
 	
-	if (this.oswindows) this.prefs.setBoolPref("dblclnewtab",true);
+	if (this.oswindows && classicthemerestorerjso.ctr.tmp_tu_active==false)
+		classicthemerestorerjso.ctr.prefs.setBoolPref("dblclnewtab",true);
 	
 	this.needsBrowserRestart();
 
@@ -820,190 +1034,93 @@ classicthemerestorerjso.ctr = {
 	CustomizableUI.moveWidgetWithinArea("bookmarks-menu-button",5);
 	this.prefs.setCharPref("appbutton",'appbutton_off');	
 	this.prefs.setCharPref("tabs",'tabs_default');
-  this.prefs.setBoolPref("cuibuttons",false);
-	this.prefs.setBoolPref("statusbar",false);
+  this.prefs.setBoolPref("statusbar",false);
 	this.prefs.setBoolPref("activndicat",false);
+  this.prefs.setBoolPref("toolsitem",false);
+  this.prefs.setBoolPref("cuibuttons",false);
+	if (this.oswindows) this.prefs.setBoolPref("dblclnewtab",true);
   Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
 	this.needsBrowserRestart();
 
   },
 
-  /* export CTR settings */
+  /* export CTR settings Text */
   exportCTRpreferences: function() {
+	  
+	  
+	var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
 
-	var patterns = [	  
-	"CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers",
-	"tabs:"+this.prefs.getCharPref("tabs"),
-	"tabsontop:"+this.prefs.getCharPref("tabsontop"),
-	"ctabwidth~"+this.prefs.getIntPref("ctabwidth"),
-	"ctabmwidth~"+this.prefs.getIntPref("ctabmwidth"),
-	"closetab:"+this.prefs.getCharPref("closetab"),
-	"appbutton:"+this.prefs.getCharPref("appbutton"),
-	"appbuttonc:"+this.prefs.getCharPref("appbuttonc"),
-	"alttbappb="+this.prefs.getBoolPref("alttbappb"),
-	"appbutmhi="+this.prefs.getBoolPref("appbutmhi"),
-	"appbutbdl="+this.prefs.getBoolPref("appbutbdl"),	
-	"nbiconsize:"+this.prefs.getCharPref("nbiconsize"),
-	"smallnavbut="+this.prefs.getBoolPref("smallnavbut"),
-	"hidenavbar="+this.prefs.getBoolPref("hidenavbar"),
-	"backforward="+this.prefs.getBoolPref("backforward"),
-	"wincontrols="+this.prefs.getBoolPref("wincontrols"),
-	"starinurl="+this.prefs.getBoolPref("starinurl"),
-	"statusbar="+this.prefs.getBoolPref("statusbar"),
-	"hideurelstop="+this.prefs.getBoolPref("hideurelstop"),
-	"combrelstop="+this.prefs.getBoolPref("combrelstop"),
-	"panelmenucol="+this.prefs.getBoolPref("panelmenucol"),
-	"verifiedcolors="+this.prefs.getBoolPref("verifiedcolors"),
-	"findbar:"+this.prefs.getCharPref("findbar"),
-	"nav_txt_ico:"+this.prefs.getCharPref("nav_txt_ico"),		
-	"ctab1:"+this.prefs.getCharPref("ctab1"),
-	"ctab2:"+this.prefs.getCharPref("ctab2"),
-	"ctabhov1:"+this.prefs.getCharPref("ctabhov1"),
-	"ctabhov2:"+this.prefs.getCharPref("ctabhov2"),
-	"ctabact1:"+this.prefs.getCharPref("ctabact1"),
-	"ctabact2:"+this.prefs.getCharPref("ctabact2"),
-	"ctabpen1:"+this.prefs.getCharPref("ctabpen1"),
-	"ctabpen2:"+this.prefs.getCharPref("ctabpen2"),
-	"ctabunr1:"+this.prefs.getCharPref("ctabunr1"),
-	"ctabunr2:"+this.prefs.getCharPref("ctabunr2"),
-	"cntab1:"+this.prefs.getCharPref("cntab1"),
-	"cntab2:"+this.prefs.getCharPref("cntab2"),
-	"cntabhov1:"+this.prefs.getCharPref("cntabhov1"),
-	"cntabhov2:"+this.prefs.getCharPref("cntabhov2"),
-	"ctabt:"+this.prefs.getCharPref("ctabt"),
-	"ctabhovt:"+this.prefs.getCharPref("ctabhovt"),
-	"ctabactt:"+this.prefs.getCharPref("ctabactt"),
-	"ctabpent:"+this.prefs.getCharPref("ctabpent"),
-	"ctabunrt:"+this.prefs.getCharPref("ctabunrt"),
-	"ctabtsh:"+this.prefs.getCharPref("ctabtsh"),
-	"ctabhovtsh:"+this.prefs.getCharPref("ctabhovtsh"),
-	"ctabacttsh:"+this.prefs.getCharPref("ctabacttsh"),
-	"ctabpentsh:"+this.prefs.getCharPref("ctabpentsh"),
-	"ctabunrtsh:"+this.prefs.getCharPref("ctabunrtsh"),		
-	"tabcolor_def="+this.prefs.getBoolPref("tabcolor_def"),
-	"tabtextc_def="+this.prefs.getBoolPref("tabtextc_def"),
-	"tabtextsh_def="+this.prefs.getBoolPref("tabtextsh_def"),
-	"tabcolor_act="+this.prefs.getBoolPref("tabcolor_act"),
-	"tabtextc_act="+this.prefs.getBoolPref("tabtextc_act"),
-	"tabtextsh_act="+this.prefs.getBoolPref("tabtextsh_act"),
-	"tabcolor_hov="+this.prefs.getBoolPref("tabcolor_hov"),
-	"tabtextc_hov="+this.prefs.getBoolPref("tabtextc_hov"),
-	"tabtextsh_hov="+this.prefs.getBoolPref("tabtextsh_hov"),
-	"tabcolor_pen="+this.prefs.getBoolPref("tabcolor_pen"),
-	"tabtextc_pen="+this.prefs.getBoolPref("tabtextc_pen"),
-	"tabtextsh_pen="+this.prefs.getBoolPref("tabtextsh_pen"),
-	"tabcolor_unr="+this.prefs.getBoolPref("tabcolor_unr"),
-	"tabtextc_unr="+this.prefs.getBoolPref("tabtextc_unr"),
-	"tabtextsh_unr="+this.prefs.getBoolPref("tabtextsh_unr"),
-	"ntabcolor_def="+this.prefs.getBoolPref("ntabcolor_def"),
-	"ntabcolor_hov="+this.prefs.getBoolPref("ntabcolor_hov"),		
-	"tabfbold_def="+this.prefs.getBoolPref("tabfbold_def"),
-	"tabfbold_act="+this.prefs.getBoolPref("tabfbold_act"),
-	"tabfbold_pen="+this.prefs.getBoolPref("tabfbold_pen"),
-	"tabfbold_unr="+this.prefs.getBoolPref("tabfbold_unr"),
-	"tabfbold_hov="+this.prefs.getBoolPref("tabfbold_hov"),
-	"tabfita_def="+this.prefs.getBoolPref("tabfita_def"),
-	"tabfita_act="+this.prefs.getBoolPref("tabfita_act"),
-	"tabfita_pen="+this.prefs.getBoolPref("tabfita_pen"),
-	"tabfita_unr="+this.prefs.getBoolPref("tabfita_unr"),
-	"tabfita_hov="+this.prefs.getBoolPref("tabfita_hov"),		
-	"highaddonsbar="+this.prefs.getBoolPref("highaddonsbar"),
-	"hightabpososx="+this.prefs.getBoolPref("hightabpososx"),
-	"altmenubar="+this.prefs.getBoolPref("altmenubar"),
-	"altmenubarpos="+this.prefs.getBoolPref("altmenubarpos"),
-	"altmenubarpos2="+this.prefs.getBoolPref("altmenubarpos2"),
-	"menubarnofog="+this.prefs.getBoolPref("menubarnofog"),
-	"noaddonbarbg="+this.prefs.getBoolPref("noaddonbarbg"),
-	"notabfog="+this.prefs.getBoolPref("notabfog"),
-	"notabbg="+this.prefs.getBoolPref("notabbg"),
-	"nobookbarbg="+this.prefs.getBoolPref("nobookbarbg"),
-	"nonavbarbg="+this.prefs.getBoolPref("nonavbarbg"),
-	"nonavborder="+this.prefs.getBoolPref("nonavborder"),
-	"nonavtbborder="+this.prefs.getBoolPref("nonavtbborder"),
-	"alttabstb="+this.prefs.getBoolPref("alttabstb"),
-	"cpanelmenus="+this.prefs.getBoolPref("cpanelmenus"),
-	"bfurlbarfix="+this.prefs.getBoolPref("bfurlbarfix"),
-	"emptyfavicon="+this.prefs.getBoolPref("emptyfavicon"),
-	"emptyfavicon2="+this.prefs.getBoolPref("emptyfavicon2"),
-	"hidezoomres="+this.prefs.getBoolPref("hidezoomres"),
-	"pmhidelabels="+this.prefs.getBoolPref("pmhidelabels"),
-	"menupopupscr="+this.prefs.getBoolPref("menupopupscr"),
-	"hideprivmask="+this.prefs.getBoolPref("hideprivmask"),		
-	"invicomenubar="+this.prefs.getBoolPref("invicomenubar"),
-	"invicotabsbar="+this.prefs.getBoolPref("invicotabsbar"),
-	"inviconavbar="+this.prefs.getBoolPref("inviconavbar"),
-	"invicoextrabar="+this.prefs.getBoolPref("invicoextrabar"),
-	"invicobookbar="+this.prefs.getBoolPref("invicobookbar"),
-	"invicoaddonbar="+this.prefs.getBoolPref("invicoaddonbar"),		
-	"tabmokcolor="+this.prefs.getBoolPref("tabmokcolor"),
-	"tabmokcolor2="+this.prefs.getBoolPref("tabmokcolor2"),
-	"tabmokcolor3="+this.prefs.getBoolPref("tabmokcolor3"),
-	"dblclnewtab="+this.prefs.getBoolPref("dblclnewtab"),
-	"hidetbwot="+this.prefs.getBoolPref("hidetbwot"),
-	"faviconurl="+this.prefs.getBoolPref("faviconurl"),
-	"padlock:"+this.prefs.getCharPref("padlock"),
-	"dblclclosefx="+this.prefs.getBoolPref("dblclclosefx"),
-	"hide_bf_popup="+this.prefs.getBoolPref("hide_bf_popup"),		
-	"throbberalt="+this.prefs.getBoolPref("throbberalt"),
-	"bmanimation="+this.prefs.getBoolPref("bmanimation"),
-	"pananimation="+this.prefs.getBoolPref("pananimation"),		
-	"closeabarbut="+this.prefs.getBoolPref("closeabarbut"),
-	"toolsitem="+this.prefs.getBoolPref("toolsitem"),
-	"appmenuitem="+this.prefs.getBoolPref("appmenuitem"),
-	"contextitem="+this.prefs.getBoolPref("contextitem"),
-	"cuibuttons="+this.prefs.getBoolPref("cuibuttons"),	
-	"padlockex="+this.prefs.getBoolPref("padlockex"),
-	"closetabhfl="+this.prefs.getBoolPref("closetabhfl"),
-	"noemptypticon="+this.prefs.getBoolPref("noemptypticon"),
-	"feedinurl="+this.prefs.getBoolPref("feedinurl"),
-	"noconicons="+this.prefs.getBoolPref("noconicons"),
-	"closealt="+this.prefs.getBoolPref("closealt"),
-	"closeonleft="+this.prefs.getBoolPref("closeonleft"),
-	"hidetbwote="+this.prefs.getBoolPref("hidetbwote"),
-	"puictrbutton="+this.prefs.getBoolPref("puictrbutton"),
-	"hideprbutton="+this.prefs.getBoolPref("hideprbutton"),
-	"hidesbclose="+this.prefs.getBoolPref("hidesbclose"),
-	"athrobberurl:"+this.prefs.getCharPref("athrobberurl"),
-	"bmarkoinpw="+this.prefs.getBoolPref("bmarkoinpw"),
-	"appbclmmenus="+this.prefs.getBoolPref("appbclmmenus"),
-	"chevronfix="+this.prefs.getBoolPref("chevronfix"),
-	"bf_space="+this.prefs.getBoolPref("bf_space"),
-	"tabc_hov_unr="+this.prefs.getBoolPref("tabc_hov_unr"),
-	"tabc_hov_unl="+this.prefs.getBoolPref("tabc_hov_unl"),
-	"iat_notf_vt="+this.prefs.getBoolPref("iat_notf_vt"),
-	"tabmokcolor4="+this.prefs.getBoolPref("tabmokcolor4"),
-	"am_extrabars~"+this.prefs.getIntPref("am_extrabars"),
-	"activndicat="+this.prefs.getBoolPref("activndicat"),
-	"urlbardropm="+this.prefs.getBoolPref("urlbardropm"),
-	"mbarposition:"+this.prefs.getCharPref("mbarposition"),
-	"nbisizedelay~"+this.prefs.getIntPref("nbisizedelay"),
-	"appbuttontxt:"+this.prefs.getCharPref("appbuttontxt"),
-	"alt_newtabp="+this.prefs.getBoolPref("alt_newtabp"),
-	"mbarforceleft="+this.prefs.getBoolPref("mbarforceleft"),
-	"mbarforceright="+this.prefs.getBoolPref("mbarforceright"),
-	"ctabheight~"+this.prefs.getIntPref("ctabheight"),
-	"ctabheightcb="+this.prefs.getBoolPref("ctabheightcb"),
-	"tabc_act_tb="+this.prefs.getBoolPref("tabc_act_tb"),
-	"cappbutc1:"+this.prefs.getCharPref("cappbutc1"),
-	"cappbutcm:"+this.prefs.getCharPref("cappbutcm"),	
-	"cappbutc2:"+this.prefs.getCharPref("cappbutc2"),
-	"cappbutcpercent:"+this.prefs.getCharPref("cappbutcpercent"),	
-	"svgfilters="+this.prefs.getBoolPref("svgfilters"),
-	"aerocolors="+this.prefs.getBoolPref("aerocolors"),
-	"addonbarfs="+this.prefs.getBoolPref("addonbarfs"),
-	"alttabstb2="+this.prefs.getBoolPref("alttabstb2"),
-	"nodevtheme="+this.prefs.getBoolPref("nodevtheme"),
-	"e10stab_notd="+this.prefs.getBoolPref("e10stab_notd"),
-	"nbcompact="+this.prefs.getBoolPref("nbcompact"),
-	"icopageinfo="+this.prefs.getBoolPref("icopageinfo"),
-	"personanoshadow="+this.prefs.getBoolPref("personanoshadow"),
-	"cappbutcm="+this.prefs.getBoolPref("cappbutcm"),
-	"cappbuttxtc="+this.prefs.getBoolPref("cappbuttxtc"),
-	"cappbutcpercent="+this.prefs.getBoolPref("cappbutcpercent"),
-	"cappbutnotxtsh="+this.prefs.getBoolPref("cappbutnotxtsh")];
+	let preferenceArray = [];
+		 
+	// Add filter header
+	preferenceArray.push("CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers");	
 
+		// Exclude all preferences we don't want to export/import.
+		let blacklist = [
+		"extensions.classicthemerestorer.pref_actindx",
+		"extensions.classicthemerestorer.pref_actindx2",
+		"extensions.classicthemerestorer.ctrreset",
+		"extensions.classicthemerestorer.compatibility.treestyle",
+		"extensions.classicthemerestorer.compatibility.treestyle.disable",
+		"extensions.classicthemerestorer.compatibility.tabmix",
+		"extensions.classicthemerestorer.ctrpref.firstrun",
+		"extensions.classicthemerestorer.ctrpref.lastmod",
+		"extensions.classicthemerestorer.ctrpref.lastmodapply",
+		"extensions.classicthemerestorer.ctrpref.updatekey",
+		"extensions.classicthemerestorer.version",
+		"extensions.classicthemerestorer.features.firstrun",
+		"extensions.classicthemerestorer.ctrpref.lastmod.backup"
+		];
 
-	saveToFile(patterns);
+	// Filter preference type and return its value.
+	function prefValue(pref){
+
+	  switch (Services.prefs.getPrefType(pref)){
+		case 32:	return Services.prefs.getCharPref(pref);	break;
+		case 64:	return Services.prefs.getIntPref(pref);		break;
+		case 128:	return Services.prefs.getBoolPref(pref);	break;	
+	  }
+
+	}	
+	
+	//Filter preference type and return its filter value.	
+	function prefType(pref){
+
+	  switch (Services.prefs.getPrefType(pref)){
+		case 32:	return ":";	break;
+		case 64:	return "~";	break;
+		case 128:	return "=";	break;	
+	  }
+
+	}
+
+	for (var i=0; i < preflist.length; i++) {
+
+	  try {
+		// Run Blacklist filter. Exclude all preferences we don't want to export/import.
+		var index = preflist.indexOf(blacklist[i]);
+
+		if (index > -1) {
+		  preflist.splice(index, 1);
+		}
+
+		// Filter extensions.classicthemerestorer.*
+		var sliceNdice = preflist[i].replace("extensions.classicthemerestorer.", "");
+		
+		// Populate array	
+		preferenceArray.push(
+		  sliceNdice+prefType(preflist[i])+prefValue(preflist[i]) 
+		);
+
+	  } catch(e) {
+		// Report errors to console
+		Components.utils.reportError(e);
+	  }
+
+	}	  
+	  
+	// Use new less bulky export for text.
+	saveToFile(preferenceArray);
 	  
 	function saveToFile(patterns) {
 
@@ -1039,8 +1156,7 @@ classicthemerestorerjso.ctr = {
   /* import CTR settings */
   importCTRpreferences: function() {
  
-	var stringBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService)
-	                    .createBundle("chrome://classic_theme_restorer/locale/messages.file");
+	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
   
 	var pattern = loadFromFile();
 
@@ -1112,9 +1228,7 @@ classicthemerestorerjso.ctr = {
   /* import CTR settings JSON*/
   importCTRpreferencesJSON: function() {
  
-	var stringBundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
-						.getService(Components.interfaces.nsIStringBundleService)
-							.createBundle("chrome://classic_theme_restorer/locale/messages.file");
+	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
 
 	var parjson = loadFromFile();
 
@@ -1138,12 +1252,12 @@ classicthemerestorerjso.ctr = {
 		}
 
 	  } catch(e) {
-		//Catch any nasty errors and output to dialogue
+		// Report errors to console
 		Components.utils.reportError(e);
 	  }
 	}	
 
-	//Need to check if json is valid, If json not valid don't continue and show error.
+	// Need to check if json is valid. If json not valid. don't continue and show error.
 	function IsJsonValid(text) {
 
 	  try { JSON.parse(text); }
@@ -1198,7 +1312,7 @@ classicthemerestorerjso.ctr = {
 	  value: []
 	};
 
-		//Preference Filter all preferences we don't want to export\import..
+		// Exclude all preferences we don't want to export/import.
 		let blacklist = [
 		"extensions.classicthemerestorer.pref_actindx",
 		"extensions.classicthemerestorer.pref_actindx2",
@@ -1210,7 +1324,6 @@ classicthemerestorerjso.ctr = {
 		"extensions.classicthemerestorer.ctrpref.lastmod",
 		"extensions.classicthemerestorer.ctrpref.lastmodapply",
 		"extensions.classicthemerestorer.ctrpref.updatekey",
-		"extensions.classicthemerestorer.titleintitlebar",
 		"extensions.classicthemerestorer.version",
 		"extensions.classicthemerestorer.features.firstrun",
 		"extensions.classicthemerestorer.ctrpref.lastmod.backup"
@@ -1220,7 +1333,7 @@ classicthemerestorerjso.ctr = {
 
 	  switch (Services.prefs.getPrefType(pref)){
 		case 32:	return Services.prefs.getCharPref(pref);	break;
-		case 64:	return Services.prefs.getIntPref(pref);	break;
+		case 64:	return Services.prefs.getIntPref(pref);		break;
 		case 128:	return Services.prefs.getBoolPref(pref);	break;	
 	  }
 
@@ -1229,7 +1342,7 @@ classicthemerestorerjso.ctr = {
 	for (var i=0; i < preflist.length; i++) {
 
 	  try {
-		//Run Blacklist filter, Here we filter out all preferences we don't want exported|imported.
+		// 'Blacklist' filter. Exclude all preferences we don't want to export/import.
 		var index = preflist.indexOf(blacklist[i]);
 
 		if (index > -1) {
@@ -1242,7 +1355,7 @@ classicthemerestorerjso.ctr = {
 		});
 
 	  } catch(e) {
-		//Catch any nasty errors and output to dialogue
+		// Report errors to console
 		Components.utils.reportError(e);
 	  }
 

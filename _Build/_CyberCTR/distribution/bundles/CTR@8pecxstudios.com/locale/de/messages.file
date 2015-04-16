@@ -1,6 +1,8 @@
-popup.title=Cyberfox anpassen
-popup.msg.restart=Änderungen werden erst nach einem Neustart übernommen.\nSoll Cyberfox jetzt neu gestartet werden?
-import.error=FEHLER: Falsche oder modifizierte Datei gefunden!\nEs konnte nichts importiert werden!
+# LOCALIZATION NOTE (popup.title, popup.msg.restart):
+# %S will be replaced by brandShortName
+popup.title=%S anpassen
+popup.msg.restart=Änderungen werden erst nach einem Neustart übernommen.\n\nSoll %S jetzt neugestartet werden?
+import.error=FEHLER: Falsche oder modifizierte Datei gefunden!\nEinstellungen konnten nicht importiert werden!
 import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=Extraleiste
 ctr_actthrobber=Aktivitätsanzeige

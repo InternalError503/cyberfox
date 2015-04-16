@@ -1,0 +1,10 @@
+@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document url("about:home") {
+    #downloads::before, #bookmarks::before, #history::before, #apps::before, #addons::before, #sync::before, #settings::before, #aboutMozilla::before, #restorePreviousSession::before, #searchEngineLogo {
+        display: none!important;
+    }
+    #restorePreviousSessionSeparator,
+    body[narrow] #restorePreviousSessionSeparator {
+        background-image: none!important;
+    }
+}

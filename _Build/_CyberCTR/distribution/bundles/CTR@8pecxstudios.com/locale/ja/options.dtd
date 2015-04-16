@@ -1,15 +1,8 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
- 
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
 <!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"アドオンバー">
@@ -43,13 +36,14 @@
 <!ENTITY Ctr_tabs2			"丸いタブ (別バージョン)">
 <!ENTITY Ctr_tabs3			"丸いタブ (別バージョン Aero)">
 <!ENTITY Ctr_tabforminfo	"タブの見栄えは現在のテーマで制御されます。">
+<!ENTITY Ctr_coltabsinfo	"Tab appearance is not fully compatible to 'ColorfulTabs' add-on!">
 <!ENTITY Ctr_tabsontop0		"タブを上にする (デフォルト)">
 <!ENTITY Ctr_tabsontop1		"タブを上にする --- [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"タブを下にする (v1) --- [tabsontop=false]">
 <!ENTITY Ctr_tabsontop3		"タブを下にする (v2) --- [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 is for some add-ons and complete themes only!">
 <!ENTITY Ctr_tabsontopI1	"以下に属性[tabsontop=true/false]を加える">
-<!ENTITY Ctr_tabsintitlebar	"&brandShortName;タイトルバー (about:config設定)">
+<!ENTITY Ctr_tabsintitlebar	"&brandShortName; タイトルバー (about:config設定)">
 <!ENTITY Ctr_tabwidthdef	"(デフォルト)">
 <!ENTITY Ctr_tabwidthcla	"(クラシック)">
 <!ENTITY Ctr_tabminheight	"高さ:">
@@ -74,6 +68,9 @@
 <!ENTITY Ctr_closeonleft	"別の位置に表示">
 <!ENTITY Ctr_close_wwltab	"最後の可視タブをもつウィンドウを閉じる (about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Some tab variations are not compatible to 'Hide Caption Titlebar Plus' add-on.">
+<!ENTITY Ctr_hctpinfoab		"Button on titlebar is not compatible to 'Hide Caption Titlebar Plus' add-on.">
+
 <!ENTITY Ctr_appbutton		"アプリケーションボタン">
 <!ENTITY Ctr_appbutton0		"ボタンを無効にする">
 <!ENTITY Ctr_appbutton1		"ツールバーに表示">
@@ -97,7 +94,6 @@
 <!ENTITY Ctr_appbuttonI1	"再起動を推奨">
 <!ENTITY Ctr_appbuttonI1e	"WindowsのOSタイトルバーには表示されません。&brandShortName;タイトルバー上のみです。">
 <!ENTITY Ctr_appbuttonI2	"ボタン色はタイトルバーとタブツールバーのみに表示されます。">
-<!ENTITY Ctr_alttbappb		"別バージョンのアイコンにする">
 <!ENTITY Ctr_appbutmhi		"高い位置に表示 (タブツールバーに表示した時のみ)">
 <!ENTITY Ctr_appbutbdl		"ボーダーと背景色を隠す">
 <!ENTITY Ctr_dblclclosefx	"ダブルクリックで現在のウィンドウを閉じる">
@@ -141,7 +137,13 @@
 <!ENTITY Ctr_cpanelmenus	"パネルメニュー：コンパクトビュー (ブックマーク、履歴など)">
 <!ENTITY Ctr_hidezoomres	"ツールバーのズームコントロール: ズームリセットボタンを隠す">
 <!ENTITY Ctr_alt_newtabp	"New tab page: alternative appearance">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
+<!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Open additional location bar (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"パネルメニューポップアップ：ボタンのラベルを隠す">
 <!ENTITY Ctr_menupopupscr	"メニューポップアップ: 矢印の代わりにスクロールバーを表示する">
 
@@ -213,6 +215,8 @@
 <!ENTITY Ctr_dblclnewtab	" ダブルクリックで'新しい'タブを開く (browser.newtab.url を使用)">
 <!ENTITY Ctr_hidetbwot		"1つのタブでタブツールバーを隠す">
 <!ENTITY Ctr_hidetbwote		"Reduce hiding delay on startup">
+<!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
+<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
 <!ENTITY Ctr_notabfog		"背景のぼかしを取り除く (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"背景色を取り除く (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"ツールバーの上の間隔を減らす (可能ならば)">
@@ -220,7 +224,7 @@
 <!ENTITY Ctr_alttabstb2		"In maximized mode (tabs on top)">
 
 <!ENTITY Ctr_altmenubar		"背景色を加える (OS タイトルバー)">
-<!ENTITY Ctr_altmenubarpos	"別の位置 &brandShortName;タイトルバーの下)">
+<!ENTITY Ctr_altmenubarpos	"別の位置 (&brandShortName;タイトルバーの下)">
 <!ENTITY Ctr_menubarnofog	"背景色とぼかしを取り除く (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Blue Aero colors for main toolbars and tabs">
@@ -232,7 +236,9 @@
 <!ENTITY Ctr_nonavborder	"ブックマークツールバー: ツールバーに上ボーダーを加える">
 <!ENTITY Ctr_nonavtbborder	"ツールバー: 上ボーダーを取り除く">
 <!ENTITY Ctr_hidesbclose	"Sidebars: hide sidebar close button">
+<!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
 <!ENTITY Ctr_chevronfix		"Navigation toolbar: hide double arrow ('chevron') at toolbars end">
+<!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
 
 <!ENTITY Ctr_closeabarbut	"アドオンバーの閉じるボタンを隠す">
 <!ENTITY Ctr_highaddonsbar	"高さを増やす">
@@ -256,11 +262,18 @@
 <!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
 <!ENTITY Ctr_experttweaks	"拡張設定">
-<!ENTITY Ctr_fx33layers		"Gecko 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
-<!ENTITY Ctr_fx34search		"Gecko 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
-<!ENTITY Ctr_fx34loop		"Gecko 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
-<!ENTITY Ctr_fx35devtheme	"Gecko 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
-<!ENTITY Ctr_fx36prefs		"Gecko 36+ introduced preferences in a tab. Unchecking this preference restores the old preference window.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ introduced 'preferences in tab'. Unchecking this preference restores the old preference window.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_e_searchui		"Search appearance">
+<!ENTITY Ctr_e_loop			"Calling and conversation">
+<!ENTITY Ctr_e_deved		"Developer Edition Theme">
+<!ENTITY Ctr_e_prefsui		"Preferences in tab">
+<!ENTITY Ctr_e_readermode	"Reader mode">
 
 
 <!ENTITY Ctr_pw_settings	"設定">
@@ -280,6 +293,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "B">
+<!ENTITY forwardCmd.accesskey         "F">
+<!ENTITY reloadCmd.accesskey          "R">
+<!ENTITY stopCmd.accesskey            "S">
+<!ENTITY bookmarkPageCmd2.accesskey   "M">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -290,6 +316,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

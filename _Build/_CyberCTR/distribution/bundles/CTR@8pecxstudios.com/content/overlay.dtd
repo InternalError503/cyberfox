@@ -1,4 +1,16 @@
-<!ENTITY brandShortName				"Cyberfox">
+<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
+	   controls the use of (&brandShortName;) this gets replaced at run time
+	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
+	   in firefox (&brandShortName;) says firefox, This item can not be edited or
+	   errors may occur.
+-->
+<!-- Do not edit -->
+<!ENTITY % brandDTD
+    SYSTEM "chrome://branding/locale/brand.dtd">
+  %brandDTD;
+<!-- Do not edit above this message-->  
+
+<!ENTITY brandShortName				"&brandShortName;">
 <!ENTITY appmenu.tooltip			"Open menu">
 <!ENTITY tabCmd.label				"New Tab">
 <!ENTITY tabCmd.accesskey			"T">
@@ -50,7 +62,7 @@
 <!ENTITY quitApplicationCmdWin.accesskey	"x">
 <!ENTITY quitApplicationCmd.label		"Quit">
 <!ENTITY quitApplicationCmd.accesskey	"Q">
-<!ENTITY quitApplicationCmdMac.label	"Quit Cyberfox">
+<!ENTITY quitApplicationCmdMac.label	"Quit &brandShortName;">
 <!ENTITY quitApplicationCmd.accesskey	"Q">
 <!ENTITY bookmarksMenu.label			"Bookmarks">
 <!ENTITY showAllBookmarks2.label		"Show All Bookmarks">
@@ -60,6 +72,8 @@
 <!ENTITY addCurPagesCmd.label			"Bookmark All Tabs…">
 <!ENTITY personalbarCmd.label			"Bookmarks Toolbar">
 <!ENTITY unsortedBookmarksCmd.label		"Unsorted Bookmarks">
+<!ENTITY readingList.label				"Reading List">
+<!ENTITY readingList.showSidebar.label	"Show Reading List Sidebar">
 <!ENTITY historyMenu.label				"History">
 <!ENTITY showAllHistoryCmd2.label		"Show All History">
 <!ENTITY clearRecentHistory.label		"Clear Recent History…">
@@ -76,12 +90,12 @@
 <!ENTITY viewCustomizeToolbar.label		"Customize…">
 <!ENTITY viewCustomizeToolbar.accesskey	"C">
 <!ENTITY helpMenuWin.label				"Help">
-<!ENTITY productHelp.label				"Cyberfox Help">
+<!ENTITY productHelp.label				"&brandShortName; Help">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
 <!ENTITY productHelp.accesskey			"H">
 <!ENTITY helpKeyboardShortcuts.label	"Keyboard Shortcuts">
 <!ENTITY helpKeyboardShortcuts.accesskey	"K">
-<!ENTITY healthReport.label				"Cyberfox Health Report">
+<!ENTITY healthReport.label				"&brandShortName; Health Report">
 <!ENTITY healthReport.accesskey			"e">
 <!ENTITY helpTroubleshootingInfo.accesskey	"T">
 <!ENTITY helpTroubleshootingInfo.label	"Troubleshooting Information">
@@ -90,7 +104,7 @@
 <!ENTITY helpSafeMode.accesskey			"R">
 <!ENTITY helpSafeMode.label				"Restart with Add-ons Disabled…">
 <!ENTITY aboutProduct.accesskey			"A">
-<!ENTITY aboutProduct.label				"About Cyberfox">
+<!ENTITY aboutProduct.label				"About &brandShortName;">
 <!ENTITY bookmarksMenuButton.label		"Bookmarks">
 <!ENTITY bookmarksButton.tooltip		"Display your bookmarks">
 <!ENTITY viewBookmarksToolbar.label		"View Bookmarks Toolbar">
@@ -114,6 +128,7 @@
 <!ENTITY helpShowTour.label				"Firefox Tour">
 <!ENTITY helpShowTour.accesskey			"o">
 <!ENTITY eyedropper.accesskey			"y">
+<!ENTITY navbarCmd.label				"Navigation Toolbar">
 
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Clean Ram Cache">

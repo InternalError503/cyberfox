@@ -1,0 +1,418 @@
+/* simplicity theme (Core)*/
+
+@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document url("about:home") {
+    :root {
+        --main-highlight-color: #fe634a;
+    }
+    html {
+        font: message-box;
+        font-size: 100%;
+        background-color: #2d2d2d!important;
+        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/simplicity_theme_background.jpg");
+        background-size: 100% 100%!important;
+        color: #000;
+        height: 100%;
+    }
+    body {
+        margin: 0;
+        display: -moz-box;
+        -moz-box-orient: vertical;
+        width: 100%;
+        height: 100%;
+    }
+    input,
+    button {
+        font-size: inherit;
+        font-family: inherit;
+    }
+    a {
+        color: -moz-nativehyperlinktext;
+        text-decoration: none;
+    }
+    .spacer {
+        -moz-box-flex: 1;
+    }
+    .headerbar {
+        min-height: 55px;
+        max-height: 70px;
+        width: 100%;
+    }
+    .hmenubar {
+        text-align: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background-color: transparent!important;
+        border-bottom: none!important;
+        font-size: 0px;
+        letter-spacing: 0px;
+        word-spacing: 0px;
+    }
+    .hmenubar li {
+        min-height: 55px;
+        margin: 0;
+        padding: 0;
+        display: inline-block;
+        position: relative;
+        left: auto;
+        right: auto;
+    }
+    .hmenubar li a {
+        display: block;
+        margin: 0;
+        padding-top: 15px;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-bottom: 20px;
+        line-height: 19px;
+        font-weight: bold;
+        text-decoration: none;
+        text-transform: none;
+        text-align: center;
+        width: auto;
+        min-width: 73px;
+        color: #fff!important;
+        height: 55;
+        font-size: 14px;
+    }
+    .hmenubar li a:hover {
+        color: var(--main-highlight-color)!important;
+    }
+    .hmenubar li a:active {
+        color: #555555;
+    }
+    .hmenubar li a.clicked {
+        color: #555555;
+    }
+    #topSection {
+        text-align: center;
+    }
+    #brandLogo {
+        height: 154px;
+        width: 154px;
+        margin: 22px auto 31px;
+        background-image: url("chrome://branding/content/about-logo.png");
+        background-size: 154px auto;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    #searchForm,
+    #snippets {
+        width: 470px;
+    }
+    #searchForm {
+        display: -moz-box;
+    }
+    #searchLogoContainer {
+        display: none!important;
+    }
+    #searchLogoContainer[hidden] {
+        display: none;
+    }
+    #searchEngineLogo {
+        display: inline-block;
+        height: 28px;
+        width: 70px;
+        min-width: 70px;
+    }
+    #searchIcon {
+        border: 1px solid transparent;
+        -moz-margin-end: 5px;
+        height: 38px;
+        width: 38px;
+        background-image: url("chrome://browser/skin/magnifier.png") !important;
+        background-size: 26px;
+    }
+    #searchIcon[active],
+    #searchIcon:hover {
+        background-color: transparent!important;
+        border-color: var(--main-highlight-color)!important;
+        border-radius: 2.5px;
+    }
+    html[searchUIConfiguration="oldsearchui"] #searchIcon {
+        display: none;
+    }
+    html:not([searchUIConfiguration="oldsearchui"]) #searchText::-moz-placeholder {
+        color: transparent;
+    }
+    html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
+        display: none;
+    }
+    #searchText {
+        -moz-box-flex: 1;
+        padding: 6px 8px;
+        background: #1a1a1a padding-box!important;
+        border: 1px solid;
+        border-color: #fff!important;
+        box-shadow: 0 1px 0 hsla(180, 45%, 9%, .02) inset, 0 0 2px hsla(180, 45%, 9%, .1) inset, 0 1px 0 hsla(0, 0%, 100%, .3);
+        border-radius: 2.5px 0 0 2.5px;
+        color: #fff!important;
+    }
+    #searchText:hover {
+        border: 1px solid;
+        border-color: var(--main-highlight-color)!important;
+    }
+    #searchText:-moz-dir(rtl) {
+        border-radius: 0 2.5px 2.5px 0;
+    }
+    #searchText:focus,
+    #searchText[autofocus] {
+        background: #2d2d2d!important;
+        border-color: var(--main-highlight-color)!important;
+    }
+    #searchSubmit {
+        -moz-margin-start: -1px;
+        background: #1d1d1d!important;
+        padding: 0 9px;
+        border: 1px solid #fff!important;
+        border-radius: 0 2.5px 2.5px 0;
+        box-shadow: none!important;
+        color: #fff!important;
+        cursor: pointer;
+        transition-duration: 150ms;
+    }
+    #searchSubmit:-moz-dir(rtl) {
+        border-radius: 2.5px 0 0 2.5px;
+    }
+    #searchText:focus + #searchSubmit,
+    #searchText + #searchSubmit:hover,
+    #searchText[autofocus] + #searchSubmit {
+        background: #2d2d2d!important;
+        background-image: #2d2d2d!important;
+        border-color: var(--main-highlight-color)!important;
+        color: var(--main-highlight-color)!important;
+    }
+    #searchText:focus + #searchSubmit,
+    #searchText[autofocus] + #searchSubmit {
+        background-image: #333!important;
+        box-shadow: 0 1px 0 hsla(0, 0%, 100%, .2) inset, 0 0 0 1px hsla(0, 0%, 100%, .1) inset, 0 1px 0 hsla(210, 54%, 20%, .03);
+    }
+    #searchText + #searchSubmit:hover {
+        background-image: #222!important;
+        box-shadow: 0 1px 0 hsla(0, 0%, 100%, .2) inset, 0 0 0 1px hsla(0, 0%, 100%, .1) inset, 0 1px 0 hsla(210, 54%, 20%, .03), 0 0 4px hsla(206, 100%, 20%, .2);
+    }
+    #searchText + #searchSubmit:hover:active {
+        box-shadow: 0 1px 1px hsla(211, 79%, 6%, .1) inset, 0 0 1px hsla(211, 79%, 6%, .2) inset;
+        transition-duration: 0ms;
+    }
+    #defaultSnippet1,
+    #defaultSnippet2,
+    #rightsSnippet {
+        display: block;
+        min-height: 38px;
+        background: 30px center no-repeat;
+        padding: 6px 0;
+        -moz-padding-start: 79px;
+    }
+    #rightsSnippet[hidden] {
+        display: none;
+    }
+    #defaultSnippet1:-moz-dir(rtl),
+    #defaultSnippet2:-moz-dir(rtl),
+    #rightsSnippet:-moz-dir(rtl) {
+        background-position: right 30px center;
+    }
+    #defaultSnippet1 {
+        background-image: url("chrome://browser/content/abouthome/snippet1.png");
+    }
+    #defaultSnippet2 {
+        background-image: url("chrome://browser/content/abouthome/snippet2.png");
+    }
+    #snippets {
+        display: inline-block;
+        text-align: start;
+        margin: 12px 0;
+        color: #FFF!important;
+        font-size: 75%;
+        /* 12px is the computed font size, 15px the computed line height of the snippets
+		 with Segoe UI on a default Windows 7 setup. The 15/12 multiplier approximately
+		 converts em from units of font-size to units of line-height. The goal is to
+		 preset the height of a three-line snippet to avoid visual moving/flickering as
+		 the snippets load. */
+        
+        min-height: calc(15/12 * 3em);
+    }
+    #snippets a {
+        color: var(--main-highlight-color)!important;
+    }
+    #snippets a:hover {
+        color: #3c3c3c!important;
+    }
+    #launcher {
+        display: -moz-box;
+        -moz-box-align: center;
+        -moz-box-pack: center;
+        width: 100%;
+        max-height: 45px;
+        background-color: transparent!important;
+        border-top: 1px solid transparent!important;
+        box-shadow: none!important;
+    }
+    #launcher:not([session]),
+    body[narrow] #launcher[session] {
+        display: block;
+        /* display separator and restore button on separate lines */
+        
+        text-align: center;
+        white-space: nowrap;
+        /* prevent navigational buttons from wrapping */
+    }
+    .launchButton {
+        display: -moz-box;
+        -moz-box-orient: vertical;
+        margin: 16px 1px;
+        padding: 14px 6px;
+        min-width: 88px;
+        max-width: 176px;
+        max-height: 45px;
+        vertical-align: top;
+        white-space: normal;
+        background: transparent padding-box;
+        border: 1px solid transparent;
+        border-radius: 2.5px;
+        color: #fff !important;
+        font-size: 75%;
+        cursor: pointer;
+        transition-property: background-color, border-color, box-shadow;
+        transition-duration: 150ms;
+    }
+    body[narrow] #launcher[session] > .launchButton {
+        margin: 4px 1px;
+    }
+    .launchButton:hover {
+        color: var(--main-highlight-color)!important;
+        background-color: hsla(211, 79%, 6%, .03);
+        border-color: var(--main-highlight-color)!important;
+    }
+    .launchButton:hover:active {
+        background-image: linear-gradient(hsla(211, 79%, 6%, .02), hsla(211, 79%, 6%, .05));
+        border-color: var(--main-highlight-color)!important;
+        box-shadow: 0 1px 1px hsla(211, 79%, 6%, .05) inset, 0 0 1px hsla(211, 79%, 6%, .1) inset;
+        transition-duration: 0ms;
+    }
+    .launchButton[hidden],
+    #launcher:not([session]) > #restorePreviousSessionSeparator,
+    #launcher:not([session]) > #restorePreviousSession {
+        display: none;
+    }
+    #restorePreviousSessionSeparator {
+        width: 3px;
+        height: 116px;
+        margin: 0 10px;
+        background-image: none!important;
+        background-position: left top, center, right bottom;
+        background-size: 1px auto;
+        background-repeat: no-repeat;
+    }
+    body[narrow] #restorePreviousSessionSeparator {
+        margin: 0 auto;
+        width: 512px;
+        height: 3px;
+        background-image: none!important;
+        background-size: auto 1px;
+    }
+    #restorePreviousSession {
+        max-width: none;
+        font-size: 90%;
+    }
+    body[narrow] #restorePreviousSession {
+        font-size: 80%;
+    }
+    .launchButton::before {
+        display: block;
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 6px;
+        line-height: 0;
+        /* remove extra vertical space due to non-zero font-size */
+    }
+    #downloads::before,
+    #bookmarks::before,
+    #history::before,
+    #apps::before,
+    #addons::before,
+    #sync::before,
+    #settings::before {
+        display: none!important;
+    }
+    #restorePreviousSession::before {
+        display: none!important;
+        height: 48px;
+        width: 48px;
+        display: inline-block;
+        /* display on same line as text label */
+        
+        vertical-align: middle;
+        margin-bottom: 0;
+        -moz-margin-end: 8px;
+    }
+    #restorePreviousSession:-moz-dir(rtl)::before {
+        transform: scaleX(-1);
+    }
+    body[narrow] #restorePreviousSession::before {
+        height: 32px;
+        width: 32px;
+    }
+    #aboutMozilla {
+        display: block;
+        position: relative;
+        /* pin wordmark to edge of document, not of viewport */
+        
+        -moz-box-ordinal-group: 0;
+        opacity: .5;
+        transition: opacity 150ms;
+    }
+    #aboutMozilla:hover {
+        opacity: 1;
+    }
+    #aboutMozilla::before {
+        display: none!important;
+    }
+    @media not all and (max-resolution: 1dppx) {
+        #brandLogo {
+            display: none!important;
+        }
+        #searchIcon {
+            background-image: url("chrome://browser/skin/magnifier@2x.png");
+        }
+        #defaultSnippet1,
+        #defaultSnippet2,
+        #rightsSnippet {
+            background-size: 40px;
+        }
+        #defaultSnippet1 {
+            background-image: url("chrome://browser/content/abouthome/snippet1@2x.png");
+        }
+        #defaultSnippet2 {
+            background-image: url("chrome://browser/content/abouthome/snippet2@2x.png");
+        }
+        .launchButton::before,
+        #aboutMozilla::before {
+            transform: scale(.5);
+            transform-origin: 0 0;
+        }
+        .launchButton:-moz-dir(rtl)::before,
+        #aboutMozilla:-moz-dir(rtl)::before {
+            transform: scale(.5) translateX(32px);
+        }
+        #downloads::before,
+        #bookmarks::before,
+        #history::before,
+        #apps::before,
+        #addons::before,
+        #sync::before,
+        #settings::before,
+        #restorePreviousSession::before,
+        body[narrow] #restorePreviousSession::before {
+            display: none!important;
+        }
+        #restorePreviousSession:-moz-dir(rtl)::before {
+            transform: scale(-0.5, 0.5) translateX(24px);
+            transform-origin: top center;
+        }
+        #aboutMozilla::before {
+            display: none!important;
+        }
+    }
+}

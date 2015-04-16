@@ -48,5 +48,19 @@
 	#main-window[tabsintitlebar][customizing][sizemode="maximized"][tabsontop="false"] #titlebar:not([hidden]) ~ * #toolbar-menubar {
 	  -moz-margin-start: 26px !important;
 	}
+	
+	/* Fix up application button in title bar for nautipolis theme */
+	#main-window[currenttheme^="nautipolis"] #ctraddon_appbutton2 {
+		  -moz-padding-start: 50px !important;
+	}
+	
+	#main-window[currenttheme^="nautipolis"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #TabsToolbar {
+		margin-top: -5px!important;
+		padding-top: 8px!important;
+	}
+	
+	#main-window[currenttheme^="nautipolis"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #ctraddon_appbutton2 {
+		margin-top: 7px!important;
+	}	
 
 }

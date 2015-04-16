@@ -1,9 +1,11 @@
-popup.title=Customize Cyberfox
-popup.msg.restart=Cyberfox musy se znowego startowaś, aby se změny wustatkowali.\nNěnto znowego startowaś?
-import.error=ZMÓLKA: Wopacna abo změnjona dataja namakana!\nJo móžno, až se nic njeimportěrujo!
+# LOCALIZATION NOTE (popup.title, popup.msg.restart):
+# %S will be replaced by brandShortName
+popup.title=Customize %S
+popup.msg.restart=%S musy se znowego startowaś, aby se změny wustatkowali.\n\nNěnto znowego startowaś?
+import.error=ZMÓLKA: Wopacna abo změnjona dataja jo se namakała!\nJo móžno, až nastajenja se njeimportěruju!
 import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=Pśidatna symbolowa rědka
-ctr_actthrobber=Activity Indicator
+ctr_actthrobber=Pokazka aktiwity
 notification_msg_firstrun=CTRpreferences has been found select restart to apply
 notification_button_firstrun=Restart
 notification_msg_change=Your pre-set CTRpreferences has been modified 

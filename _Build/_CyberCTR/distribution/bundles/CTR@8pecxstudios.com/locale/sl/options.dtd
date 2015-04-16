@@ -1,16 +1,9 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
- 
-<!ENTITY Ctr_title			"Customize &brandShortName;a">
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
+<!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Vrstica dodatkov">
 <!ENTITY Ctr_statusbar		"Vrstica stanja">
@@ -43,6 +36,7 @@
 <!ENTITY Ctr_tabs2			"Zaokroženi zavihki (nadomestni)">
 <!ENTITY Ctr_tabs3			"Zaokroženi zavihki (nadomestni Aero)">
 <!ENTITY Ctr_tabforminfo	"Videz zavihkov nadzira trenutna tema.">
+<!ENTITY Ctr_coltabsinfo	"Videz zavihkov ni v celoti združljiv z dodatkom 'ColorfulTabs'!">
 <!ENTITY Ctr_tabsontop0		"Zavihki na vrhu (privzeto)">
 <!ENTITY Ctr_tabsontop1		"Zavihki na vrhu --- atribut [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"Zavihki niso na vrhu (v1) --- atribut [tabsontop=false]">
@@ -74,6 +68,9 @@
 <!ENTITY Ctr_closeonleft	"Nadomestni položaj na zavihku">
 <!ENTITY Ctr_close_wwltab	"Zapri okno z nazadje vidnim zavihkom (nastavitev about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Nekatere različice niso združljive z dodatkom 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_hctpinfoab		"Gumb na nazivni vrstici ni združljiv z dodatkom 'Hide Caption Titlebar Plus'.">
+
 <!ENTITY Ctr_appbutton		"Programski gumb">
 <!ENTITY Ctr_appbutton0		"Gumb je onemogočen">
 <!ENTITY Ctr_appbutton1		"Gumb na orodni vrstici">
@@ -97,7 +94,6 @@
 <!ENTITY Ctr_appbuttonI1	"Priporočen je ponovni zagon">
 <!ENTITY Ctr_appbuttonI1e	"Ni viden na orodni vrstici OS-a Windows, samo na orodni vrstici &brandShortName;a!">
 <!ENTITY Ctr_appbuttonI2	"Barve gumba so vidne samo na nazivni vrstici in vrstici zavihkov!">
-<!ENTITY Ctr_alttbappb		"Nadomestne ikone brez spustne puščice">
 <!ENTITY Ctr_appbutmhi		"Višji položaj (če se nahaja na orodni vrstici zavihkov)">
 <!ENTITY Ctr_appbutbdl		"Skrij obrobe in barve ozadja">
 <!ENTITY Ctr_dblclclosefx	"Dvojni klik zapre trenutno okno">
@@ -141,7 +137,13 @@
 <!ENTITY Ctr_cpanelmenus	"Ploščasti meniji: strnjen pogled (zaznamki, zgodovina itd.)">
 <!ENTITY Ctr_hidezoomres	"Nadzorni gumbi za povečavo na orodni vrstici: skrij gumb za ponastavitev povečave">
 <!ENTITY Ctr_alt_newtabp	"Stran novega zavihka: nadomestni videz">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Gumb menija zaznamkov: videz ploščastega menija">
+<!ENTITY Ctr_bmbutnotext	"Gumb menija zaznamkov: skrij oznako na vrstici zaznamkov">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Skrij spremenilnik velikosti (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Odpri dodatno naslovno vrstico (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Pojavno okno ploščastega menija: skrij oznake gumbov">
 <!ENTITY Ctr_menupopupscr	"Pojavna okna menijev: prikaži drsnike namesto drsnih puščic">
 
@@ -213,6 +215,8 @@
 <!ENTITY Ctr_dblclnewtab	"Dvojni klik odpre 'nov' zavihek (z uporabo nastavitve browser.newtab.url)">
 <!ENTITY Ctr_hidetbwot		"Skrij orodno vrstico zavihkov okna s samo enim zavihkom">
 <!ENTITY Ctr_hidetbwote		"Zmanjšaj zakasnitev skritja ob zagonu">
+<!ENTITY Ctr_hidetbwote_i	"Lahko povzroči napake na vrstici zavihkov">
+<!ENTITY Ctr_hidetbwote2	"Ohrani nazivno vrstico (zavihki na vrhu)">
 <!ENTITY Ctr_notabfog		"Odstrani meglo ozadja (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Odstrani barvo ozadja (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Zmanjšaj prostor nad orodno vrstico (če je možno)">
@@ -232,7 +236,9 @@
 <!ENTITY Ctr_nonavborder	"Orodna vrstica zaznamkov: dodaj zgornjo obrobo orodni vrstici">
 <!ENTITY Ctr_nonavtbborder	"Orodne vrstice na vrhu: odstrani obrobe orodnih vrstic">
 <!ENTITY Ctr_hidesbclose	"Stranske vrstice: skrij gumb Zapri stranske vrstice">
+<!ENTITY Ctr_notextshadow	"Orodne vrstice: skrij senco besedila orodnih vrstic in zavihkov">
 <!ENTITY Ctr_chevronfix		"Orodna vrstica za krmarjenje: skrij dvojno puščico ('chevron') na koncu orodne vrstice">
+<!ENTITY Ctr_tbsep_winc		"Zgornje orodne vrstice: dodatna ločila orodnih vrstic">
 
 <!ENTITY Ctr_closeabarbut	"Skrij gumb Zapri vrstice dodatkov">
 <!ENTITY Ctr_highaddonsbar	"Povečaj višino">
@@ -256,11 +262,18 @@
 <!ENTITY Ctr_nodevtheme		"Prepreči namestitev teme 'Developer Theme'">
 
 <!ENTITY Ctr_experttweaks	"Napredno">
-<!ENTITY Ctr_fx33layers		"Geko 33+ je vpeljal 'nove možnosti izrisa', ki na nekaterih sistemih povzročajo 'zamrznitev zavihkov'. Odznačitev te nastavitve bo rešila to težavo.">
-<!ENTITY Ctr_fx34search		"Geko 34+ je vpeljal 'nov ui za iskanje'. Odznačitev te nastavitve povrne 'stari ui za iskanje'.">
-<!ENTITY Ctr_fx34loop		"Geko 34+ je vpeljal možnosti 'klicanja in pogovorov'. Odznačitev te nastavitve jih odstrani.">
-<!ENTITY Ctr_fx35devtheme	"Geko 35+ je vpeljal novo temo 'Developer theme'. Odznačitev teh nastavitev to temo in pripadajoči gumb v načinu prilagoditve onemogoči.">
-<!ENTITY Ctr_fx36prefs		"Geko 36+ je vpeljal nastavitve v zavihku. Odznačitev te nastavitve obnovi staro okno nastavitev.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ je vpeljal 'nove možnosti izrisa', ki na nekaterih sistemih povzročajo 'zamrznitev zavihkov'. Odznačitev te nastavitve bo rešila to težavo.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ je vpeljal 'nov ui za iskanje'. Odznačitev te nastavitve povrne 'stari ui za iskanje'.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ je vpeljal možnosti 'klicanja in pogovorov'. Odznačitev te nastavitve jih odstrani.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ je vpeljal novo temo 'Developer theme'. Odznačitev teh nastavitev to temo in pripadajoči gumb v načinu prilagoditve onemogoči.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ je vpeljal nastavitve v zavihku. Odznačitev te nastavitve obnovi staro okno nastavitev.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ je vpeljal nov 'način za branje'. Odznačitev teh nastavitev ga onemogoči in odstrani njegovo ikono iz naslovne vrstice.">
+<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_e_searchui		"Videz iskanja">
+<!ENTITY Ctr_e_loop			"Klicanje in pogovori">
+<!ENTITY Ctr_e_deved		"Tema Developer Edition">
+<!ENTITY Ctr_e_prefsui		"Nastavitve v zavihku">
+<!ENTITY Ctr_e_readermode	"Način za branje">
 
 
 <!ENTITY Ctr_pw_settings	"Nastavitve">
@@ -280,6 +293,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey "Z">
 <!ENTITY appMenuGettingStarted.label "Začetek">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "N">
+<!ENTITY forwardCmd.accesskey         "p">
+<!ENTITY reloadCmd.accesskey          "P">
+<!ENTITY stopCmd.accesskey            "s">
+<!ENTITY bookmarkPageCmd2.accesskey   "m">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -290,6 +316,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

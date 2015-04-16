@@ -1,0 +1,63 @@
+/* theme animation */
+@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document url("about:home") {
+    @-moz-keyframes brandLogo {
+        0% {
+            -moz-transform: rotate(0deg);
+            left: 0px;
+        }
+        25% {
+            -moz-transform: rotate(20deg);
+            left: 0px;
+        }
+        50% {
+            -moz-transform: rotate(0deg);
+            left: 500px;
+        }
+        55% {
+            -moz-transform: rotate(0deg);
+            left: 500px;
+        }
+        70% {
+            -moz-transform: rotate(0deg);
+            left: 500px;
+        }
+        90% {
+            -moz-transform: rotate(0deg);
+            left: 500px;
+        }
+        100% {
+            -moz-transform: rotate(-360deg);
+            left: 0px;
+        }
+    }
+	
+    @-moz-keyframes pop-in {
+        0% {
+            opacity: 0;
+            -moz-transform: scale(0.5);
+        }
+        100% {
+            opacity: 1;
+            -moz-transform: scale(1);
+        }
+    }
+	
+    @-moz-keyframes searchForm {
+        0% {
+            width: 0px
+        }
+    }	
+	
+    #brandLogo {
+        -moz-animation: brandLogo 3.5s 1;
+	}
+	
+    #searchForm {
+        -moz-animation: searchForm 1s 1;
+    }
+	
+    #snippets {
+        -moz-animation: pop-in 0.6s;
+    }
+}

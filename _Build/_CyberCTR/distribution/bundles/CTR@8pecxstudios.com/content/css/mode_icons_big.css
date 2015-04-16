@@ -1,4 +1,5 @@
 @import url(chrome://ctraddon_os_special/skin/mode_icons_big_extra.css);
+@import url(chrome://classic_theme_restorer/content/css/mode_icons_big_cyberfox.css);
 @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
 
 @-moz-document url(chrome://browser/content/browser.xul) {
@@ -182,37 +183,7 @@
 	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
 	  -moz-image-region: rect(0px, 286px, 32px, 256px) !important;
 	}
-	
-	#nav-bar #tbar-clonenewtab {
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
-	  -moz-image-region: rect(0px, 320px, 32px, 286px) !important;
-	}	
 
-	#nav-bar #tbar-clonenewwindow {
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
-	  -moz-image-region: rect(0px, 352px, 32px, 320px) !important;
-	}	
-	
-	#nav-bar #toolbar_restartBrowser {
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
-	  -moz-image-region: rect(0px, 384px, 32px, 352px) !important;
-	}
-
-	#nav-bar #toolbar_openLangageManager {
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
-	  -moz-image-region: rect(0px, 416px, 32px, 384px) !important;
-	}	
-	
-	#nav-bar #tbar-copycurrenttaburl {
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
-	  -moz-image-region: rect(0px, 448px, 32px, 416px) !important;
-	}	
-
-	#nav-bar #downloads-button-additional[cui-areatype="toolbar"] {
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/download-summary.png")!important;
-	   -moz-image-region: rect(0px, 32px, 32px,  0px) !important;
-	}		
-	
 	/* fixes bug with tabview buttons wrong panel icon */
 	#nav-bar #tabview-button[cui-areatype="toolbar"],
 	#tabview-button[cui-areatype="menu-panel"],

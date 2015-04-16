@@ -54,18 +54,21 @@
 	  -moz-padding-start: 0px !important;
 	}
 	
-	#main-window[colorfultabs="true"] #TabsToolbar:not([orient="vertical"]) .tabs-newtab-button + .tabs-newtab-button,
-	#TabsToolbar:not([currentset*="tabbrowser-tabs,new-tab-button"]):not([orient="vertical"]) .tabs-newtab-button + .tabs-newtab-button{
+	#main-window[colorfultabs="true"] #TabsToolbar:not([orient="vertical"]) .tabs-newtab-button + .tabs-newtab-button{
       -moz-margin-start: 0px !important;
 	}
 	
-	#TabsToolbar:not([currentset*="tabbrowser-tabs,new-tab-button"]):not([orient="vertical"]) .tabs-newtab-button{
+	#TabsToolbar[currentset*="tabbrowser-tabs,tabmixScrollBox"]:not([orient="vertical"]) .tabs-newtab-button + .tabs-newtab-button{
+	  -moz-margin-start: 0px !important;
+	}
+	#TabsToolbar[currentset*="tabbrowser-tabs,tabmixScrollBox"]:not([orient="vertical"]) .tabs-newtab-button{
 	  -moz-margin-end: 0px !important;
 	}
+
 	#TabsToolbar:not([currentset*="tabbrowser-tabs,new-tab-button"]):not([orient="vertical"]) #tabbrowser-tabs:not([overflow]) {
 	  -moz-margin-end: -15px !important;
 	}
-
+	
 	#TabsToolbar[currentset*="tabbrowser-tabs,search-container"]:not([orient="vertical"]) #tabbrowser-tabs:not([overflow]),
 	#TabsToolbar[currentset*="tabbrowser-tabs,urlbar-container"]:not([orient="vertical"]) #tabbrowser-tabs:not([overflow]) {
 	  -moz-margin-end: -15px !important;
@@ -126,6 +129,12 @@
 	
 	#main-window #navigator-toolbox #TabsToolbar:-moz-lwtheme{
 	  border-bottom: 1px solid transparent !important;
+	}
+	
+	#TabsToolbar #tabbrowser-tabs .tabs-newtab-button:-moz-lwtheme,
+	#TabsToolbar #tabbrowser-tabs .tabbrowser-tab:-moz-lwtheme,
+	#TabsToolbar #tabbrowser-tabs .tabbrowser-tab[pinned]:-moz-lwtheme{
+	  background-size: calc(100% - 1px) calc(100% - 3px) !important;
 	}
 	
 }

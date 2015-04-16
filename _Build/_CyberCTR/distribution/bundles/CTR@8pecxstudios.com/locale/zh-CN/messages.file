@@ -1,5 +1,7 @@
-popup.title=Customize Cyebrfox
-popup.msg.restart=Cyberfox 需要重启才能生效。\n现在就重启吗?
+# LOCALIZATION NOTE (popup.title, popup.msg.restart):
+# %S will be replaced by brandShortName
+popup.title=Customize %S
+popup.msg.restart=%S 需要重启才能生效。\n现在就重启吗?
 import.error=错误：发现修改的或者是错误的文件。\n无法被导入！
 import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=附加工具栏

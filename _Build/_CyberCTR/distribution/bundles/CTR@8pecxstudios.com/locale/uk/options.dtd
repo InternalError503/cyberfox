@@ -1,14 +1,7 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
 
 <!ENTITY Ctr_title			"Customize &brandShortName;">
 
@@ -43,6 +36,7 @@
 <!ENTITY Ctr_tabs2			"Вигнуті вкладки (альтернативні)">
 <!ENTITY Ctr_tabs3			"Вигнуті вкладки (альтернативні Aero)">
 <!ENTITY Ctr_tabforminfo	"Вигляд вкладки контролюється поточною темою.">
+<!ENTITY Ctr_coltabsinfo	"Вигляд вкладки не повністю сумісний з додатком ColorfulTabs!">
 <!ENTITY Ctr_tabsontop0		"Вкладки нагорі (типово)">
 <!ENTITY Ctr_tabsontop1		"Вкладки нагорі --- встановлено [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"Вкладки не нагорі (v1) --- встановлено [tabsontop=false]">
@@ -74,6 +68,9 @@
 <!ENTITY Ctr_closeonleft	"Альтернативна позиція на вкладці">
 <!ENTITY Ctr_close_wwltab	"Закрити вікно з останньою видимою вкладкою (about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Деякі різновиди вкладок не сумісні з додатком Hide Caption Titlebar Plus.">
+<!ENTITY Ctr_hctpinfoab		"Кнопка на панелі заголовку не сумісна з додатком Hide Caption Titlebar Plus.">
+
 <!ENTITY Ctr_appbutton		"Кнопка програми">
 <!ENTITY Ctr_appbutton0		"Кнопка вимкнена">
 <!ENTITY Ctr_appbutton1		"Кнопка на панелі">
@@ -83,7 +80,7 @@
 <!ENTITY Ctr_appbutton2io	"Кнопка на [&brandShortName;] панелі заголовку (тільки іконка)">
 <!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (default)">
 <!ENTITY Ctr_paneluibtweak	"Оранжева кнопка меню на панелі вкладок">
-<!ENTITY Ctr_appbuttonc_o	"Оранжева кнопка (за умовчанням)">
+<!ENTITY Ctr_appbuttonc_o	"Оранжева кнопка (типово)">
 <!ENTITY Ctr_appbuttonc_a	"Синя кнопка (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Чорна кнопка (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Прозора кнопка">
@@ -97,7 +94,6 @@
 <!ENTITY Ctr_appbuttonI1	"рекомендовано перезапуск">
 <!ENTITY Ctr_appbuttonI1e	"Не видно в рядку заголовку Windows OS, тільки в &brandShortName; заголовку!">
 <!ENTITY Ctr_appbuttonI2	"Кольори кнопок видимі тільки на панелях заголовку і вкладок!">
-<!ENTITY Ctr_alttbappb		"Альтернативні іконки">
 <!ENTITY Ctr_appbutmhi		"Вища позиція (якщо на панелі вкладок)">
 <!ENTITY Ctr_appbutbdl		"Сховати рамки та кольори тла">
 <!ENTITY Ctr_dblclclosefx	"Подвійний клік закриває поточне вікно">
@@ -141,7 +137,13 @@
 <!ENTITY Ctr_cpanelmenus	"Панель меню: компактний вигляд (закладки, історія тощо)">
 <!ENTITY Ctr_hidezoomres	"Управління масштабом на панелі: приховати кнопку скидання масштабу">
 <!ENTITY Ctr_alt_newtabp	"Сторінка нової вкладки: альтернативний вигляд">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Кнопка меню закладок: вигляд меню панелі">
+<!ENTITY Ctr_bmbutnotext	"Кнопка меню закладок: приховати ярлик на панелі закладок">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Приховати «Індикатор зміни розміру» (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Відкрити додаткову панель адреси (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Спливаюче вікно панелі меню: приховати написи на кнопках">
 <!ENTITY Ctr_menupopupscr	"Спливаючі вікна меню: показувати полоси прокручування замість стрілки прокручування">
 
@@ -213,6 +215,8 @@
 <!ENTITY Ctr_dblclnewtab	"Подвійний клік відкриває нову вкладку (використовує адресу нової вкладки браузера)">
 <!ENTITY Ctr_hidetbwot		"Приховувати панель вкладок з одною вкладкою">
 <!ENTITY Ctr_hidetbwote		"Зменшити затримки приховування при запуску">
+<!ENTITY Ctr_hidetbwote_i	"Може викликати збої на панелі вкладок">
+<!ENTITY Ctr_hidetbwote2	"Утримувати панель заголовку (вкладки нагорі)">
 <!ENTITY Ctr_notabfog		"Прибрати затуманення тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Прибрати колір тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Зменшити простір над панеллю інструментів (якщо можливо)">
@@ -232,7 +236,9 @@
 <!ENTITY Ctr_nonavborder	"Панель закладок: додати верхню межу для панелі інструментів">
 <!ENTITY Ctr_nonavtbborder	"Верхні панелі інструментів: прибрати межі панелі">
 <!ENTITY Ctr_hidesbclose	"Бокові панелі: приховати кнопку «Закрити» бокової панелі">
+<!ENTITY Ctr_notextshadow	"Панелі: приховати тінь тексту панелі та тексту вкладки">
 <!ENTITY Ctr_chevronfix		"Панель навігації: приховати подвійну стрілку («шеврон») в кінці панелі">
+<!ENTITY Ctr_tbsep_winc		"Верхні панелі: розділювачі додаткових панелей">
 
 <!ENTITY Ctr_closeabarbut	"Приховати кнопку закривання панелі додатків">
 <!ENTITY Ctr_highaddonsbar	"Збільшити висоту">
@@ -256,11 +262,18 @@
 <!ENTITY Ctr_nodevtheme		"Запобігти увімкненню «Теми розробника»">
 
 <!ENTITY Ctr_experttweaks	"Розширені опції">
-<!ENTITY Ctr_fx33layers		"В Gecko 33+ введено «нові візуальні особливості», які в даний час відповідають за «зависання» вкладок на деяких системах. Вимкнення цього параметра вирішує цю проблему.">
-<!ENTITY Ctr_fx34search		"В Gecko 34+ введено «новий пошуковий інтерфейс». Вимкнення цього параметра поверне  «старий пошуковий інтерфейс».">
-<!ENTITY Ctr_fx34loop		"В Gecko 34+ введені особливості «виклику та сеансу зв’язку». Вимкнення цього параметру видалить їх.">
-<!ENTITY Ctr_fx35devtheme	"В Gecko 35+ введено нову «тему» від розробника. Вимкнення цих налаштувань вимикає цю «тему» і її кнопку в ручному режимі налаштувань.">
-<!ENTITY Ctr_fx36prefs		"В Gecko 36+ введено нове налаштування у вкладці. Вимкнення цього пункту відновлює вікно зі старими налаштуванням.">
+<!ENTITY Ctr_fx33layers		"В &brandShortName; 33+ введено «нові візуальні особливості», які в даний час відповідають за «зависання» вкладок на деяких системах. Вимкнення цього параметра вирішує цю проблему.">
+<!ENTITY Ctr_fx34search		"В &brandShortName; 34+ введено «новий пошуковий інтерфейс». Вимкнення цього параметра поверне  «старий пошуковий інтерфейс».">
+<!ENTITY Ctr_fx34loop		"В &brandShortName; 34+ введені особливості «виклику та сеансу зв’язку». Вимкнення цього параметру видалить їх.">
+<!ENTITY Ctr_fx35devtheme	"В &brandShortName; 35+ введено нову «тему» від розробника. Вимкнення цих налаштувань вимикає цю «тему» і її кнопку в ручному режимі налаштувань.">
+<!ENTITY Ctr_fx36prefs		"В &brandShortName; 36+ введено нове налаштування у вкладці. Вимкнення цього пункту відновлює вікно зі старими налаштуванням.">
+<!ENTITY Ctr_fx38reader		"В &brandShortName; 38+ введено новий «режим читання». Вимкнення цього пункту вимикає цей режим та прибирає його іконку з панелі навігації.">
+<!ENTITY Ctr_e_omtc			"OMTC / проблеми завислих вкладок">
+<!ENTITY Ctr_e_searchui		"Вигляд панелі Пошук">
+<!ENTITY Ctr_e_loop			"Виклик та сеанс зв’язку">
+<!ENTITY Ctr_e_deved		"Тема від розробника">
+<!ENTITY Ctr_e_prefsui		"Налаштування у вкладці">
+<!ENTITY Ctr_e_readermode	"Reader mode">
 
 
 <!ENTITY Ctr_pw_settings	"Налаштування">
@@ -280,6 +293,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Початок роботи">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "Н">
+<!ENTITY forwardCmd.accesskey         "В">
+<!ENTITY reloadCmd.accesskey          "О">
+<!ENTITY stopCmd.accesskey            "З">
+<!ENTITY bookmarkPageCmd2.accesskey   "з">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -290,6 +316,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

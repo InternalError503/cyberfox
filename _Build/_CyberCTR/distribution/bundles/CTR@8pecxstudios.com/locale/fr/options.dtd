@@ -1,14 +1,8 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+ 
 
 <!ENTITY Ctr_title			"Personnaliser &brandShortName;">
 
@@ -43,6 +37,7 @@
 <!ENTITY Ctr_tabs2			"Onglets arrondis (alternatifs)">
 <!ENTITY Ctr_tabs3			"Onglets arrondis (alternatifs Aero)">
 <!ENTITY Ctr_tabforminfo	"L’aspect des onglets est déterminé par le thème sélectionné.">
+<!ENTITY Ctr_coltabsinfo	"Tab appearance is not fully compatible to 'ColorfulTabs' add-on!">
 <!ENTITY Ctr_tabsontop0		"Onglets en haut (valeur par défaut)">
 <!ENTITY Ctr_tabsontop1		"Onglets en haut --- réglage [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"Onglets position basse (v1) --- réglage [tabsontop=false]">
@@ -74,6 +69,9 @@
 <!ENTITY Ctr_closeonleft	"Position alternative sur l’onglet">
 <!ENTITY Ctr_close_wwltab	"Fermer la fenêtre à la fermeture du dernier onglet (about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Some tab variations are not compatible to 'Hide Caption Titlebar Plus' add-on.">
+<!ENTITY Ctr_hctpinfoab		"Button on titlebar is not compatible to 'Hide Caption Titlebar Plus' add-on.">
+
 <!ENTITY Ctr_appbutton		"Bouton d’applications">
 <!ENTITY Ctr_appbutton0		"Bouton désactivé">
 <!ENTITY Ctr_appbutton1		"Bouton sur une barre d’outils">
@@ -97,7 +95,6 @@
 <!ENTITY Ctr_appbuttonI1	"Redémarrage recommandé">
 <!ENTITY Ctr_appbuttonI1e	"Non visible sur la barre de titre de l'OS">
 <!ENTITY Ctr_appbuttonI2	"Bouton coloré uniquement sur la barre de titre ou sur la barre d'onglets!">
-<!ENTITY Ctr_alttbappb		"Icône alternative">
 <!ENTITY Ctr_appbutmhi		"Position plus élevée (si sur la barre d’onglets)">
 <!ENTITY Ctr_appbutbdl		"Masquer les bordures et les couleurs de fond">
 <!ENTITY Ctr_dblclclosefx	"Un double clic ferme la fenêtre courante">
@@ -141,7 +138,13 @@
 <!ENTITY Ctr_cpanelmenus	"Compacter le menu du panneau latéral (marque-pages, historique, etc)">
 <!ENTITY Ctr_hidezoomres	"Boutons de zoom (si sur une barre d’outils) : cacher le bouton « Réinitialiser le niveau de zoom »">
 <!ENTITY Ctr_alt_newtabp	"Page Nouvel onglet : aspect alternatif">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
+<!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Open additional location bar (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Menu du panneau latéral : icônes seules">
 <!ENTITY Ctr_menupopupscr	"Menus pop-up : afficher des ascenseurs au lieu des flèches de défilement">
 
@@ -213,6 +216,8 @@
 <!ENTITY Ctr_dblclnewtab	"Double-cliquer pour ouvrir un nouvel onglet (browser.newtab.url)">
 <!ENTITY Ctr_hidetbwot		"Cacher la barre d’onglets quand un seul onglet est ouvert">
 <!ENTITY Ctr_hidetbwote		"Diminuer le délai pour cacher la barre au démarrage">
+<!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
+<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Réduire l’espace supérieur (si possible)">
@@ -228,11 +233,13 @@
 <!ENTITY Ctr_nobookbarbg	"Barre personnelle : enlever l’arrière-plan">
 <!ENTITY Ctr_nonavbarbg		"Barre de navigation : enlever l’arrière-plan">
 <!ENTITY Ctr_nonavbarbg1	"Affecte les barres d’outils additionnelles de cette extension, ainsi que d’autres barres d’onglets au-dessus.">
-<!ENTITY Ctr_nonavbarbg2	"All toolbars in 'The Fox, Only Better' add-on's Slim Chrome are affected.">
+<!ENTITY Ctr_nonavbarbg2	"Toutes les barres de l’interface réduite de « The Fox, Only Better » sont affectées.">
 <!ENTITY Ctr_nonavborder	"Barre personnelle : ajouter une bordure en haut de la barre">
 <!ENTITY Ctr_nonavtbborder	"Barres d’outils en haut : enlever les bordures">
 <!ENTITY Ctr_hidesbclose	"Panneaux latéraux : masquer le bouton de fermeture">
+<!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
 <!ENTITY Ctr_chevronfix		"Barre de navigation : masquer le chevron à la fin de la barre">
+<!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
 
 <!ENTITY Ctr_closeabarbut	"Masquer le bouton de fermeture">
 <!ENTITY Ctr_highaddonsbar	"Augmenter la hauteur">
@@ -256,11 +263,18 @@
 <!ENTITY Ctr_nodevtheme		"Empêche l’activation du « thème développeur »">
 
 <!ENTITY Ctr_experttweaks	"Expert">
-<!ENTITY Ctr_fx33layers		"Gecko 33+ introduit de nouvelles fonctions de rendu, lesquelles sont responsables de bugs avec les onglets sur certains systèmes (pas de réaction, onglets gelés). Ce problème est résolu en décochant cette option.">
-<!ENTITY Ctr_fx34search		"Gecko 34+ introduit une nouvelle barre de recherche. Si cette option est décochée, l’ancienne barre de recherche est activée.">
-<!ENTITY Ctr_fx34loop		"Gecko 34+ introduit la possibilité d’inviter quelqu’un à discuter. Cette possibilité est desactivée en décochant cette option.">
-<!ENTITY Ctr_fx35devtheme	"Gecko 35+ introduit un nouveau « thème développeur ». Si cette option est décochée, ce thème et le bouton correspondant sont désactivés.">
-<!ENTITY Ctr_fx36prefs		"Gecko 36+ place les préférences dans un onglet. Si cette option est décochée, l’ancienne fenêtre de préférences est utilisée.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ – introduit de nouvelles fonctions de rendu, lesquelles sont responsables de bugs avec les onglets sur certains systèmes (pas de réaction, onglets gelés). Ce problème est résolu en décochant cette option.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ – introduit une nouvelle barre de recherche. Si cette option est décochée, l’ancienne barre de recherche est activée.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ – introduit la possibilité d’inviter quelqu’un à discuter. Cette possibilité est desactivée en décochant cette option.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ – introduit un nouveau « thème développeur ». Si cette option est décochée, ce thème et le bouton correspondant sont désactivés.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ – place les préférences dans un onglet. Si cette option est décochée, l’ancienne fenêtre de préférences est utilisée.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_e_searchui		"Search appearance">
+<!ENTITY Ctr_e_loop			"Calling and conversation">
+<!ENTITY Ctr_e_deved		"Developer Edition Theme">
+<!ENTITY Ctr_e_prefsui		"Preferences in tab">
+<!ENTITY Ctr_e_readermode	"Reader mode">
 
 
 <!ENTITY Ctr_pw_settings	"Réglages">
@@ -280,6 +294,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Pour démarrer">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "d">
+<!ENTITY forwardCmd.accesskey         "a">
+<!ENTITY reloadCmd.accesskey          "c">
+<!ENTITY stopCmd.accesskey            "r">
+<!ENTITY bookmarkPageCmd2.accesskey   "M">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!ENTITY helpMenu.label		"Aide">
 <!ENTITY helpMenuWin.label		"Aide">
 
@@ -293,6 +320,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Appliquer les changements">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restaurer la copie de sauvegarde">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
-<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
-<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+<!ENTITY ctr_appbuttoncusttextcolor	"Couleur de texte du bouton d’application.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Enlever l’ombre du texte du bouton d’application.">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

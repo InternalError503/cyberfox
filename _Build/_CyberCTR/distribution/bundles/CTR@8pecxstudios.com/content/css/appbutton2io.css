@@ -91,7 +91,7 @@
 	  }
 	}
 	
-	/* for LavaFox themes lol*/
+	/* for LavaFox themes */
 	#main-window[currenttheme^="LavaFox"][tabsintitlebar][chromehidden~="menubar"][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar ~ #TabsToolbar,
 	#main-window[currenttheme^="LavaFox"][tabsintitlebar][sizemode="normal"]:not([inFullscreen]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
 	  margin-top: 0px !important;
@@ -102,6 +102,20 @@
 	#main-window[currenttheme^="LavaFox"][tabsintitlebar][chromehidden~="menubar"][sizemode="maximized"]:not([tabsontop="false"]) #toolbar-menubar ~ #TabsToolbar,
 	#main-window[currenttheme^="LavaFox"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
 	 -moz-margin-start: 32px !important;
+	}
+	
+	/* Fix up application button in title bar for nautipolis theme */
+	#main-window[currenttheme^="nautipolis"] #ctraddon_appbutton2 {
+		  -moz-padding-start: 13px !important;
+	}
+	
+	#main-window[currenttheme^="nautipolis"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #TabsToolbar {
+		margin-top: -5px!important;
+		padding-top: 8px!important;
+	}
+	
+	#main-window[currenttheme^="nautipolis"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #ctraddon_appbutton2 {
+		margin-top: 7px!important;
 	}
 
 }

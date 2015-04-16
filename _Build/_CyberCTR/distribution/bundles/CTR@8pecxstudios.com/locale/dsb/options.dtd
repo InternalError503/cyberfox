@@ -1,14 +1,8 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
 
 <!ENTITY Ctr_title			"Customize &brandShortName;">
 
@@ -43,6 +37,7 @@
 <!ENTITY Ctr_tabs2			"Wukulowaśone rejtarki (alternatiwny)">
 <!ENTITY Ctr_tabs3			"Wukulowaśone rejtarki (alternatiwa Aero)">
 <!ENTITY Ctr_tabforminfo	"Naglěd rejtarkow wótwisujo wót aktualneje drastwy.">
+<!ENTITY Ctr_coltabsinfo	"Naglěd rejtarka njejo połnje kompatibelny z rozšěrjenim 'ColorfulTabs'!">
 <!ENTITY Ctr_tabsontop0		"Rejtarki górjejce (standard)">
 <!ENTITY Ctr_tabsontop1		"Rejtarki górjejce --- stajśo [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"Rejtarki nic górjejce (v1) --- stajśo [tabsontop=false]">
@@ -71,8 +66,11 @@
 <!ENTITY Ctr_closetab_5		"Na wšych rejtarkach (wunuźony)">
 <!ENTITY Ctr_closetab_hfot	"Za jaden widobny rejtar schowaś">
 <!ENTITY Ctr_closealt		"Alternatiwny symbol">
-<!ENTITY Ctr_closeonleft	"Alternatiwna pozcija na rejtarku">
+<!ENTITY Ctr_closeonleft	"Alternatiwna pozicija na rejtarku">
 <!ENTITY Ctr_close_wwltab	"Wokno ze slědnym widobnym rejtarkom zacyniś (about:config)">
+
+<!ENTITY Ctr_hctpinfotab	"Někotare rejtarkowe warianty njejsu kompatibelne z rozšyrjenim 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_hctpinfoab		"Tłocašk na titelowej rědce njejo kompatibelny z rozšyrjenim 'Hide Caption Titlebar Plus'.">
 
 <!ENTITY Ctr_appbutton		"Nałožeński tłocašk">
 <!ENTITY Ctr_appbutton0		"Tłocašk znjemóžnjony">
@@ -97,7 +95,6 @@
 <!ENTITY Ctr_appbuttonI1	"Nowy start dopórucony">
 <!ENTITY Ctr_appbuttonI1e	"Njejo widobny w titelowej rědce Windows!">
 <!ENTITY Ctr_appbuttonI2	"Tłocaškowe barwy su jano widobne na titelowej rědce a rejtarkowej rědce!">
-<!ENTITY Ctr_alttbappb		"Alternatiwne symbole">
 <!ENTITY Ctr_appbutmhi		"Wuša pozicija (jolic jo na rejtarkowej rědce)">
 <!ENTITY Ctr_appbutbdl		"Ramiki a slězynowe barwy schowaś">
 <!ENTITY Ctr_dblclclosefx	"Dwójne kliknjenje zacynja aktualne wokno">
@@ -141,7 +138,13 @@
 <!ENTITY Ctr_cpanelmenus	"Kompaktne pólowe menije (cytańske znamjenja, historija atd.)">
 <!ENTITY Ctr_hidezoomres	"Skalěrowańske elementy na symbolowej rědce: Tłocašk za slědkstajenje skalěrowanja schowaś">
 <!ENTITY Ctr_alt_newtabp	"Bok nowego rejtarka: alternatiwne wuglědanje">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Tłocašk menija cytańskich znamjenjow: naglěd dialogowego menija">
+<!ENTITY Ctr_bmbutnotext	"Tłocašk menija cytańskich znamjenjow: tekst na rědce cytańskich znamjenjow schowaś">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Pśeměnjak wjelikosći schowaś (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Pśidatne adresowe pólo wócyniś (Cmd/Strg+">
 <!ENTITY Ctr_pmhidelabels	"Pólowy meni: Tekst tłocaškow schowaś">
 <!ENTITY Ctr_menupopupscr	"Wuskokujuce menije: suwate rědki město suwatych šypkow pokazaś">
 
@@ -213,6 +216,8 @@
 <!ENTITY Ctr_dblclnewtab	"Dwójne kliknjenje wócynja 'nowy' rejtark (z pomocu browser.newtab.url)">
 <!ENTITY Ctr_hidetbwot		"Rejtarkowu rědku z jano jadnym rejtarkom schowaś">
 <!ENTITY Ctr_hidetbwote		"Wokomuźenje pśi startowanju reducěrowaś">
+<!ENTITY Ctr_hidetbwote_i	"To by mógło brachi na rejtarkowej rědce zawinowaś">
+<!ENTITY Ctr_hidetbwote2	"Titelowu rědku wobchowaś (rejtarki górjejce)">
 <!ENTITY Ctr_notabfog		"Slězynowu młu wótpóraś (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Slězynowu barwu wótpóraś (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Mjazyrum wušej symboloweje rědki reducěrowaś (jolic móžno)">
@@ -232,7 +237,9 @@
 <!ENTITY Ctr_nonavborder	"Rědka cytańskich znamjenjow: górny ramik symbolowej rědce pśidaś">
 <!ENTITY Ctr_nonavtbborder	"Górne symbolowe rědki: ramiki symboloweje rědki wótpóraś">
 <!ENTITY Ctr_hidesbclose	"Bócnice: Tłocašk 'Zacyniś' bócnice schowaś">
+<!ENTITY Ctr_notextshadow	"Symbolowe rědki: seń za tekst symboloweje rědki a rejtarki schowaś">
 <!ENTITY Ctr_chevronfix		"Nawigaciska rědka: dwójnu šypku ('chevron') na kóńcu rědki schowaś">
+<!ENTITY Ctr_tbsep_winc		"Górjejcne symbolowe rědki: pśidatne źěleńske linije">
 
 <!ENTITY Ctr_closeabarbut	"Tłocašk 'Zacyniś' na rědce dodankow schowaś">
 <!ENTITY Ctr_highaddonsbar	"Wusokosć symboloweje rědki pówětšyś">
@@ -256,11 +263,18 @@
 <!ENTITY Ctr_nodevtheme		"Zmóžnjenjeju 'wuwijarskeje drastwy' zajźowaś">
 
 <!ENTITY Ctr_experttweaks	"Rozšyrjone">
-<!ENTITY Ctr_fx33layers		"Gecko 33+ jo 'nowe kresleńske funkcije' zawjadł, kótarež su tuchylu zagronite za 'njereagěrujuce rejtarki' na někotarych systemach. Gaž znjemóžnijośo toś to nastajenje, rozwěžośo toś ten problem.">
-<!ENTITY Ctr_fx34search		"Gecko 34+ jo 'nowy pytański pówjerch' zawjadł. Gaž znjemóžnijośo toś to nastajenje, wótnowijośo 'stary pytański pówjerch'.">
-<!ENTITY Ctr_fx34loop		"Gecko 34+ jo 'telefoněrowańske a konwersaciske' funkcije zawjadł. Gaž znjemóžnijośo toś to nastajenje, se wótpóraju.">
-<!ENTITY Ctr_fx35devtheme	"Gecko 35+ jo nowu 'wuwijarsku drastwu' zawjadł. Gaž znjemóžnijośo toś te nastajenja, se 'wuwijarska drastwa' a jeje tłocašk w pśiměrjeńskem modusu znjemóžnjatej.">
-<!ENTITY Ctr_fx36prefs		"Gecko 36+ jo nastajenja w rejtarku zawjadł. Gaž znjemóžnijośo toś to nastajenje, se stare wokno nastajenjow wótnowijo..">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ jo 'nowe kresleńske funkcije' zawjadł, kótarež su tuchylu zagronite za 'njereagěrujuce rejtarki' na někotarych systemach. Gaž znjemóžnijośo toś to nastajenje, rozwěžośo toś ten problem.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ jo 'nowy pytański pówjerch' zawjadł. Gaž znjemóžnijośo toś to nastajenje, wótnowijośo 'stary pytański pówjerch'.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ jo 'telefoněrowańske a konwersaciske' funkcije zawjadł. Gaž znjemóžnijośo toś to nastajenje, se wótpóraju.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ jo nowu 'wuwijarsku drastwu' zawjadł. Gaž znjemóžnijośo toś te nastajenja, se 'wuwijarska drastwa' a jeje tłocašk w pśiměrjeńskem modusu znjemóžnjatej.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ jo 'nastajenja w rejtarku' zawjadł. Gaž znjemóžnijośo toś to nastajenje, se stare wokno nastajenjow wótnowijo.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ jo nowy 'cytański modus' zawjadł. Gaž toś te nastajenja se wótwoliju, znjemóžnijo se a jogo symbol wótpórajo se z adresowego póla.">
+<!ENTITY Ctr_e_omtc			"OMTC / problem z wisecymi rejtarkami">
+<!ENTITY Ctr_e_searchui		"Pytański pówjerch">
+<!ENTITY Ctr_e_loop			"Telefoněrowanje a konwersacija">
+<!ENTITY Ctr_e_deved		"Drastwa wuwijarskeje edicije">
+<!ENTITY Ctr_e_prefsui		"Nastajenja w rejtarku">
+<!ENTITY Ctr_e_readermode	"Cytański modus">
 
 
 <!ENTITY Ctr_pw_settings	"Nastajenja">
@@ -280,6 +294,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Prědne kšace">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "S">
+<!ENTITY forwardCmd.accesskey         "D">
+<!ENTITY reloadCmd.accesskey          "Z">
+<!ENTITY stopCmd.accesskey            "t">
+<!ENTITY bookmarkPageCmd2.accesskey   "c">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -290,6 +317,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

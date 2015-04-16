@@ -93,7 +93,7 @@
 	    }
 	}
 	
-	/* for LavaFox themes lol*/
+	/* for LavaFox themes */
 	#main-window[currenttheme^="LavaFox"][tabsintitlebar]:not([inFullscreen])[sizemode="normal"] #navigator-toolbox #toolbar-menubar[autohide="true"][inactive="true"]{
 	  margin-top: 0px !important;
 	}

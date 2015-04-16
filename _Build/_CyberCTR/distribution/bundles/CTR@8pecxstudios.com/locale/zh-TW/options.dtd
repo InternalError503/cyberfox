@@ -1,15 +1,8 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->
-  
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
 <!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"附加元件列">
@@ -18,9 +11,9 @@
 <!ENTITY Ctr_space			"空白">
 <!ENTITY Ctr_separator		"分隔線">
 <!ENTITY Ctr_puibseparator	"面板按鈕分隔線">
-<!ENTITY Ctr_navthrobber	"Activity Indicator">
+<!ENTITY Ctr_navthrobber	"進度指示器">
 <!ENTITY Ctr_sidebarbutton	"側邊欄">
-<!ENTITY Ctr_windowcontrols	"Min/max/close (Fullscreen)">
+<!ENTITY Ctr_windowcontrols	"最小化/最大化/關閉 (全螢幕)">
 <!ENTITY Ctr_rr				"需重啟 &brandShortName;!">
 
 <!ENTITY Ctr_cuibuttons		"按鈕">
@@ -43,6 +36,7 @@
 <!ENTITY Ctr_tabs2			"弧形分頁 (非傳統風格)">
 <!ENTITY Ctr_tabs3			"弧形分頁 (Aero 風格)">
 <!ENTITY Ctr_tabforminfo	"分頁外觀由目前的佈景主題控制">
+<!ENTITY Ctr_coltabsinfo	"Tab appearance is not fully compatible to 'ColorfulTabs' add-on!">
 <!ENTITY Ctr_tabsontop0		"分頁列置頂 (預設值)">
 <!ENTITY Ctr_tabsontop1		"分頁列置頂 --- 設定 [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"分頁列不置頂 (v1) --- 設定 [tabsontop=false]">
@@ -74,13 +68,16 @@
 <!ENTITY Ctr_closeonleft	"關閉按鈕置於分頁左側">
 <!ENTITY Ctr_close_wwltab	"關閉最後一個分頁時，也關閉視窗 (about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Some tab variations are not compatible to 'Hide Caption Titlebar Plus' add-on.">
+<!ENTITY Ctr_hctpinfoab		"Button on titlebar is not compatible to 'Hide Caption Titlebar Plus' add-on.">
+
 <!ENTITY Ctr_appbutton		"應用程式按鈕 (火狐橙按鈕)">
 <!ENTITY Ctr_appbutton0		"不顯示">
 <!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (Default)">
 <!ENTITY Ctr_appbutton1		"顯示在工具列">
 <!ENTITY Ctr_appbutton1wt	"顯示在工具列 (僅文字)">
 <!ENTITY Ctr_appbutton2		"顯示在標題列">
-<!ENTITY Ctr_appbutton2h	"顯示在標題列 (hidden)">
+<!ENTITY Ctr_appbutton2h	"顯示在標題列 (隱藏)">
 <!ENTITY Ctr_appbutton2io	"顯示在標題列 (僅圖示)">
 <!ENTITY Ctr_paneluibtweak	"橘色面板選單按鈕顯示在分頁列">
 <!ENTITY Ctr_appbuttonc_o	"橙色按鈕 (預設值)">
@@ -93,11 +90,10 @@
 <!ENTITY Ctr_appbuttonc_gr	"灰色按鈕">
 <!ENTITY Ctr_appbuttonc_pu	"紫色按鈕">
 <!ENTITY Ctr_appbuttonc_wh	"白色按鈕">
-<!ENTITY Ctr_appbuttonc_cu	"Custom button color">
+<!ENTITY Ctr_appbuttonc_cu	"自訂按鈕顏色">
 <!ENTITY Ctr_appbuttonI1	"建議重啟瀏覽器!">
 <!ENTITY Ctr_appbuttonI1e	"在作業系統標題列上不可見">
 <!ENTITY Ctr_appbuttonI2	"此項設定僅生效於標題列與分頁列!">
-<!ENTITY Ctr_alttbappb		"替代圖示">
 <!ENTITY Ctr_appbutmhi		"提高位置 (當顯示於分頁列時)">
 <!ENTITY Ctr_appbutbdl		"隱藏邊框和背景顏色">
 <!ENTITY Ctr_dblclclosefx	"在標題列的火狐橙上連按兩下，則關閉目前的視窗">
@@ -141,9 +137,16 @@
 <!ENTITY Ctr_cpanelmenus	"緊湊的面板選單(書籤、歷史等等.)">
 <!ENTITY Ctr_hidezoomres	"當縮放控制按鈕置於工具列上時，隱藏工具列上的縮放重設按鈕">
 <!ENTITY Ctr_alt_newtabp	"新分頁(九宮頁面): 換個外觀">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
+<!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Open additional location bar (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"面板選單: 隱藏按鈕文字標籤">
 <!ENTITY Ctr_menupopupscr	"彈出式選單: 用捲軸取代捲動箭頭">
+
 <!ENTITY Ctr_fxmockup		"&brandShortName; 樣式">
 <!ENTITY Ctr_tabmokcolor	"白色分頁按鈕 (關閉、新增、分頁群組、列出所有分頁)">
 <!ENTITY Ctr_tabmokcolor2	"非目前的分頁，其字型使用白色文字，並加上文字陰影">
@@ -212,6 +215,8 @@
 <!ENTITY Ctr_dblclnewtab	"在分頁列上連按兩下，則開啟新分頁(分頁網址由 browser.newtab.url 設定)">
 <!ENTITY Ctr_hidetbwot		"當只有一個分頁時，隱藏分頁工具列">
 <!ENTITY Ctr_hidetbwote		"減少啟動時的隱藏延遲時間">
+<!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
+<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
 <!ENTITY Ctr_notabfog		"移除背景模糊 (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"移除背景色彩 (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"縮小分頁列上方空間 (如有可能)">
@@ -231,7 +236,9 @@
 <!ENTITY Ctr_nonavborder	"書籤列: 顯示上邊框">
 <!ENTITY Ctr_nonavtbborder	"上方工具列: 移除工具列邊框">
 <!ENTITY Ctr_hidesbclose	"側邊欄: 隱藏側邊欄關閉按鈕">
+<!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
 <!ENTITY Ctr_chevronfix		"瀏覽工具列: 隱藏工具列末端的雙右箭頭 (「更多工具...」按鈕)">
+<!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
 
 <!ENTITY Ctr_closeabarbut	"隱藏附加元件關閉按鈕">
 <!ENTITY Ctr_highaddonsbar	"增加附加元件列高度">
@@ -255,15 +262,22 @@
 <!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
 <!ENTITY Ctr_experttweaks	"進階">
-<!ENTITY Ctr_fx33layers		"Gecko 33+ 啟用了「OMTC」，目的是改善瀏覽器響應速度，但某些硬體組合環境下可能造成故障。取消勾選這個核取方塊 ，可解決相關問題。">
-<!ENTITY Ctr_fx34search		"Gecko  34+ 引入了「新搜尋列介面」。取消勾選這個核取方塊 ，則可恢復為「舊式搜尋列介面」。">
-<!ENTITY Ctr_fx34loop		"Gecko  34+ 實作了「Gecko  Hello 即時通訊」功能。取消勾選這個核取方塊 ，則可移除這項功能。">
-<!ENTITY Ctr_fx35devtheme	"Gecko  35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
-<!ENTITY Ctr_fx36prefs		"Gecko  36+ introduced preferences in a tab. Unchecking this preference restores the old preference window.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ 啟用了「OMTC」，目的是改善瀏覽器響應速度，但某些硬體組合環境下可能造成故障。取消勾選這個核取方塊 ，可解決相關問題。">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ 引入了「新搜尋列介面」。取消勾選這個核取方塊 ，則可恢復為「舊式搜尋列介面」。">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ 實作了「&brandShortName; Hello 即時通訊」功能。取消勾選這個核取方塊 ，則可移除這項功能。">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ introduced 'preferences in tab'. Unchecking this preference restores the old preference window.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_e_searchui		"Search appearance">
+<!ENTITY Ctr_e_loop			"Calling and conversation">
+<!ENTITY Ctr_e_deved		"Developer Edition Theme">
+<!ENTITY Ctr_e_prefsui		"Preferences in tab">
+<!ENTITY Ctr_e_readermode	"Reader mode">
 
 
 <!ENTITY Ctr_pw_settings	"設定">
-<!ENTITY Ctr_pw_set_reset	"恢復預設值">
+<!ENTITY Ctr_pw_set_reset	"套件預設值">
 <!ENTITY Ctr_pw_set_predef	"經典設定值">
 <!ENTITY Ctr_pw_set_export	"匯出設定值">
 <!ENTITY Ctr_pw_set_import	"匯入設定值">
@@ -279,6 +293,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "B">
+<!ENTITY forwardCmd.accesskey         "F">
+<!ENTITY reloadCmd.accesskey          "R">
+<!ENTITY stopCmd.accesskey            "S">
+<!ENTITY bookmarkPageCmd2.accesskey   "m">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -289,6 +316,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

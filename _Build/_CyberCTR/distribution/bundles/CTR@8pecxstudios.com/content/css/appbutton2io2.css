@@ -63,9 +63,18 @@
 	  -moz-margin-start: 0px !important;
 	}
 
-	/*#main-window[tabsintitlebar][chromehidden~="menubar"][sizemode="maximized"][tabsontop="false"] #toolbar-menubar ~ #TabsToolbar,
-	#main-window[tabsintitlebar][sizemode="maximized"][tabsontop="false"] #toolbar-menubar[autohide="true"][inactive] ~ #TabsToolbar {
-	  -moz-margin-start: 32px;
-	}*/
+	/* Fix up application button in title bar for nautipolis theme */
+	#main-window[currenttheme^="nautipolis"] #ctraddon_appbutton2 {
+		  -moz-padding-start: 13px !important;
+	}
+	
+	#main-window[currenttheme^="nautipolis"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #TabsToolbar {
+		margin-top: -5px!important;
+		padding-top: 8px!important;
+	}
+	
+	#main-window[currenttheme^="nautipolis"][tabsintitlebar][sizemode="maximized"]:not([tabsontop="false"]) #ctraddon_appbutton2 {
+		margin-top: 7px!important;
+	}
 
 }

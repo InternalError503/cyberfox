@@ -1,5 +1,7 @@
-popup.title=Klasik Arayüz Getirici
-popup.msg.restart=Değişikliklerin geçerli olması için Cyberfox yeniden başlatılmalı.\nYeniden başlatılsın mı?
+# LOCALIZATION NOTE (popup.title, popup.msg.restart):
+# %S will be replaced by brandShortName
+popup.title=Customize %S
+popup.msg.restart=Değişikliklerin geçerli olması için %S yeniden başlatılmalı.\nYeniden başlatılsın mı?
 import.error=ERROR: Yanlış ve ya değiştirilmiş bir dosya bulundu!\nHiçbirşey aktarılamadı!
 import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=Ek Araç Çubuğu

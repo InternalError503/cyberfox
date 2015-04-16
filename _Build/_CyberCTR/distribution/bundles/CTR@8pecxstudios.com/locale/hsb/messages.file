@@ -1,6 +1,8 @@
-popup.title=Customize Cyberfox
-popup.msg.restart=Cyberfox dyrbi so znowa startować, zo bychu so změny wuskutkowali.\nNětko znowa startować?
-import.error=ZMYLK: Wopačna abo změnjena dataja je so namakała!\nJe móžno, zo so ničo njeimportuje!
+# LOCALIZATION NOTE (popup.title, popup.msg.restart):
+# %S will be replaced by brandShortName
+popup.title=Customize %S
+popup.msg.restart=%S dyrbi so znowa startować, zo bychu so změny wuskutkowali.\n\nNětko znowa startować?
+import.error=ZMYLK: Wopačna abo změnjena dataja je so namakała!\nJe móžno, zo so nastajenja njeimportuja!
 import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=Přidatna symbolowa lajsta
 ctr_actthrobber=Wozjewjenje aktiwity

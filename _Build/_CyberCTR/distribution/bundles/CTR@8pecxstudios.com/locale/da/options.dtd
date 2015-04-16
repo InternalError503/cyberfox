@@ -1,14 +1,8 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
 
 <!ENTITY Ctr_title			"Customize &brandShortName;">
 
@@ -43,6 +37,7 @@
 <!ENTITY Ctr_tabs2			"Afrundede faneblade (alternativ)">
 <!ENTITY Ctr_tabs3			"Afrundede faneblade (alternativ Aero)">
 <!ENTITY Ctr_tabforminfo	"Fanebladenes udseende styres af det aktuelle tema.">
+<!ENTITY Ctr_coltabsinfo	"Tab appearance is not fully compatible to 'ColorfulTabs' add-on!">
 <!ENTITY Ctr_tabsontop0		"Faneblade øverst (standard)">
 <!ENTITY Ctr_tabsontop1		"Faneblade øverst --- [tabsontop=true] attribut">
 <!ENTITY Ctr_tabsontop2		"Faneblade skal ikke være øverst (v1) --- [tabsontop=false] attribut">
@@ -74,6 +69,9 @@
 <!ENTITY Ctr_closeonleft	"Alternativ placering på faneblad">
 <!ENTITY Ctr_close_wwltab	"Luk vindue med det sidste synlige faneblad (about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Some tab variations are not compatible to 'Hide Caption Titlebar Plus' add-on.">
+<!ENTITY Ctr_hctpinfoab		"Button on titlebar is not compatible to 'Hide Caption Titlebar Plus' add-on.">
+
 <!ENTITY Ctr_appbutton		"&brandShortName;-menuknap">
 <!ENTITY Ctr_appbutton0		"Deaktiver knap">
 <!ENTITY Ctr_appbutton1		"Knap på værktøjslinje">
@@ -97,7 +95,6 @@
 <!ENTITY Ctr_appbuttonI1	"Genstart anbefales">
 <!ENTITY Ctr_appbuttonI1e	"Ikke synlig i Windows OS titellinjen, kun i &brandShortName; titellinjen!">
 <!ENTITY Ctr_appbuttonI2	"Farverne på knapperne er kun synlige i titellinjen og fanebladslinjen!">
-<!ENTITY Ctr_alttbappb		"Alternative ikoner uden rullemenu-pil">
 <!ENTITY Ctr_appbutmhi		"Højere placering (hvis på fanebladslinje)">
 <!ENTITY Ctr_appbutbdl		"Skjul kanter og baggrundsfarver">
 <!ENTITY Ctr_dblclclosefx	"Dobbeltklik lukker aktuelt vindue">
@@ -141,7 +138,13 @@
 <!ENTITY Ctr_cpanelmenus	"Panelmenuer: kompakt visning (bogmærker, historik, osv.)">
 <!ENTITY Ctr_hidezoomres	"Zoom knapper på værktøjslinje: skjul zoom-nulstil knapper">
 <!ENTITY Ctr_alt_newtabp	"Nyt faneblad side: alternativt udseende">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
+<!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Open additional location bar (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Panelmenu popup: skjul mærkater på knapper">
 <!ENTITY Ctr_menupopupscr	"Menupopups: vis rullepaneler i stedet for rullepile">
 
@@ -213,6 +216,8 @@
 <!ENTITY Ctr_dblclnewtab	"Dobbeltlik åbner et 'nyt' faneblad (bruger browser.newtab.url)">
 <!ENTITY Ctr_hidetbwot		"Skjul fanebladslinjen når der kun er ét faneblad">
 <!ENTITY Ctr_hidetbwote		"Reducer forsinkelse ved skjulning under opstart">
+<!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
+<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
 <!ENTITY Ctr_notabfog		"Fjern baggrundståge (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Fjern baggrundsfarve (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Reducer mellem over værktøjslinje (hvis det er muligt)">
@@ -232,7 +237,9 @@
 <!ENTITY Ctr_nonavborder	"Bogmærkelinje: tilføj kant for oven på værktøjslinjen">
 <!ENTITY Ctr_nonavtbborder	"Øverste værktøjslinjer: fjern kanten på værktøjsline">
 <!ENTITY Ctr_hidesbclose	"Sidepaneler: skjul luk knappen på sidepanel">
+<!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
 <!ENTITY Ctr_chevronfix		"Navigationslinje: skjul dobbelt-pil på værktøjslinjernes slutning">
+<!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
 
 <!ENTITY Ctr_closeabarbut	"Skjul luk-knap på tilføjelseslinjer">
 <!ENTITY Ctr_highaddonsbar	"Gør højere">
@@ -256,11 +263,18 @@
 <!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
 <!ENTITY Ctr_experttweaks	"Avanceret">
-<!ENTITY Ctr_fx33layers		"Gecko 33+ introducerede 'nye renderingsfunktioner' som i øjeblikket er skyld i 'faneblade som hænger' på nogle systemer. Fjern markeringen for at rette problem.">
-<!ENTITY Ctr_fx34search		"Gecko 34+ introducerede 'en ny brugerflade til søgning'. Fjern markeringen for at vende tilbage til den 'gamle brugerflade'.">
-<!ENTITY Ctr_fx34loop		"Gecko 34+ introducerede 'opkald og samtaler'. Fjern markeringen ved denne indstilling for at fjerne funktionen.">
-<!ENTITY Ctr_fx35devtheme	"Gecko 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
-<!ENTITY Ctr_fx36prefs		"Gecko 36+ introduced preferences in a tab. Unchecking this preference restores the old preference window.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ introducerede 'nye renderingsfunktioner' som i øjeblikket er skyld i 'faneblade som hænger' på nogle systemer. Fjern markeringen for at rette problem.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ introducerede 'en ny brugerflade til søgning'. Fjern markeringen for at vende tilbage til den 'gamle brugerflade'.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ introducerede 'opkald og samtaler'. Fjern markeringen ved denne indstilling for at fjerne funktionen.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ introduced 'preferences in tab'. Unchecking this preference restores the old preference window.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_e_searchui		"Search appearance">
+<!ENTITY Ctr_e_loop			"Calling and conversation">
+<!ENTITY Ctr_e_deved		"Developer Edition Theme">
+<!ENTITY Ctr_e_prefsui		"Preferences in tab">
+<!ENTITY Ctr_e_readermode	"Reader mode">
 
 
 <!ENTITY Ctr_pw_settings	"Indstillinger">
@@ -280,6 +294,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Kom i gang">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "T">
+<!ENTITY forwardCmd.accesskey         "F">
+<!ENTITY reloadCmd.accesskey          "G">
+<!ENTITY stopCmd.accesskey            "S">
+<!ENTITY bookmarkPageCmd2.accesskey   "b">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -290,6 +317,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">

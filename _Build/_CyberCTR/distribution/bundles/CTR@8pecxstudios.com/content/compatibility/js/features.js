@@ -1,17 +1,17 @@
-var Cc = Components.classes;
-var Ci = Components.interfaces;
-var Cu = Components.utils;
-var Prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.classicthemerestorer.");
+//Import services use one service for preferences.
+Components.utils.import("resource://gre/modules/Services.jsm");
+
+if (typeof cyberctrFeatures == "undefined") {var cyberctrFeatures  = {};};
+if (!cyberctrFeatures) {cyberctrFeatures  = {};};
 
 cyberctrFeatures = {
 
 	initialize_features: function() {
 	
-		if (!Prefs.getBoolPref("features.firstrun")){
+		if (!Services.prefs.getBoolPref("extensions.classicthemerestorer.features.firstrun")){
 			document.getElementById("first_run_message").hidden = false;
-			Prefs.setBoolPref("features.firstrun", true);
+			Services.prefs.setBoolPref("extensions.classicthemerestorer.features.firstrun", true);
  		}
-		
 	},
 	
 get_localized_document: function(){

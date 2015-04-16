@@ -16,7 +16,7 @@ pref("extensions.classicthemerestorer.closealt",false);
 //Appbutton settings
 pref("extensions.classicthemerestorer.appbutton",'appbutton_v1');
 pref("extensions.classicthemerestorer.appbuttonc",'appbuttonc_default');
-pref("extensions.classicthemerestorer.alttbappb",false);
+pref("extensions.classicthemerestorer.altabico",'altabico_white');
 pref("extensions.classicthemerestorer.appbutmhi",false);
 pref("extensions.classicthemerestorer.appbutbdl",false);
 pref("extensions.classicthemerestorer.dblclclosefx",false);
@@ -53,6 +53,9 @@ pref("extensions.classicthemerestorer.panelmenucol",false);
 pref("extensions.classicthemerestorer.cpanelmenus",false);
 pref("extensions.classicthemerestorer.hidezoomres",false);
 pref("extensions.classicthemerestorer.alt_newtabp",false);
+pref("extensions.classicthemerestorer.bmbutpanelm",false);
+pref("extensions.classicthemerestorer.bmbutnotext",false);
+pref("extensions.classicthemerestorer.skipprintpr",false);
 pref("extensions.classicthemerestorer.noresizerxp",false);
 pref("extensions.classicthemerestorer.pmhidelabels",false);
 pref("extensions.classicthemerestorer.menupopupscr",false);
@@ -72,6 +75,18 @@ pref("extensions.classicthemerestorer.invicoaddonbar",false);
 
 pref("extensions.classicthemerestorer.athrobberurl","");
 
+//Custom about:home style
+pref("extensions.classicthemerestorer.abouthome", "dark");
+pref("extensions.classicthemerestorer.abouthomenobar", false);
+pref("extensions.classicthemerestorer.abouthomenologo", false);
+pref("extensions.classicthemerestorer.abouthomenoicons", false);
+pref("extensions.classicthemerestorer.abouthomenosnippets", false);
+pref("extensions.classicthemerestorer.abouthomecustombg", false);
+pref("extensions.classicthemerestorer.abouthomecustomurl", "");
+pref("extensions.classicthemerestorer.abouthomehighlight", false);
+pref("extensions.classicthemerestorer.abouthomecustomhighlightcolor", "#fe634a");
+pref("extensions.classicthemerestorer.abouthomeanimate", false);
+
 // Urlbar
 pref("extensions.classicthemerestorer.starinurl",false);
 pref("extensions.classicthemerestorer.feedinurl",false);
@@ -85,6 +100,8 @@ pref("extensions.classicthemerestorer.padlock","padlock_default");
 pref("extensions.classicthemerestorer.padlockex",true);
 pref("extensions.classicthemerestorer.icopageinfo",false);
 
+pref("extensions.classicthemerestorer.extraurlkeycb",false);
+
 // Toolbar settings
 pref("extensions.classicthemerestorer.aerocolors",false);
 pref("extensions.classicthemerestorer.nbiconsize",'small');
@@ -95,11 +112,14 @@ pref("extensions.classicthemerestorer.nonavbarbg",false);
 pref("extensions.classicthemerestorer.nonavborder",false);
 pref("extensions.classicthemerestorer.nonavtbborder",false);
 pref("extensions.classicthemerestorer.hidesbclose",false);
+pref("extensions.classicthemerestorer.notextshadow",false);
 pref("extensions.classicthemerestorer.chevronfix",false);
+pref("extensions.classicthemerestorer.tbsep_winc",false);
 
 pref("extensions.classicthemerestorer.dblclnewtab",false);
 pref("extensions.classicthemerestorer.hidetbwot",false);
 pref("extensions.classicthemerestorer.hidetbwote",true);
+pref("extensions.classicthemerestorer.hidetbwote2",true);
 pref("extensions.classicthemerestorer.notabfog",false);
 pref("extensions.classicthemerestorer.notabbg",false);
 pref("extensions.classicthemerestorer.hightabpososx",false);
@@ -109,6 +129,7 @@ pref("extensions.classicthemerestorer.alttabstb2",true);
 pref("extensions.classicthemerestorer.altmenubar",false);
 pref("extensions.classicthemerestorer.altmenubarpos",false);
 pref("extensions.classicthemerestorer.altmenubarpos2",false);
+pref("extensions.classicthemerestorer.menubarfs",false);
 pref("extensions.classicthemerestorer.menubarnofog",false);
 
 pref("extensions.classicthemerestorer.closeabarbut",false);
@@ -121,6 +142,10 @@ pref("extensions.classicthemerestorer.mbarposition","toolbar-menubar");
 pref("extensions.classicthemerestorer.mbarpositionl","toolbar-menubar");
 pref("extensions.classicthemerestorer.mbarforceleft",false);
 pref("extensions.classicthemerestorer.mbarforceright",false);
+
+pref("extensions.classicthemerestorer.customsearchbarwidth", false);
+pref("extensions.classicthemerestorer.searchbarwidth", 150);
+pref("extensions.classicthemerestorer.colapsesearchaddons", false);
 
 // Animation
 pref("extensions.classicthemerestorer.throbberalt",false);
@@ -224,11 +249,8 @@ pref("extensions.classicthemerestorer.ctrpref.updatekey", false);
 //CyberCTR Add tab title to titlebar
 pref("extensions.classicthemerestorer.titleintitlebar", false);
 
-//CyberCTR No text shadow on persona themes.
-pref("extensions.classicthemerestorer.personanoshadow", false);
-
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.2.1");
+pref("extensions.classicthemerestorer.version", "1.2.9");
 
 //Features
 pref("extensions.classicthemerestorer.features.firstrun", false);

@@ -1,20 +1,13 @@
-<!-- LOCALIZATION NOTE (<!ENTITY % brandDTD) must not be edited as it  
-	   controls the use of (&brandShortName;) this gets replaced at run time
-	   with the browsers name so in cyberfox (&brandShortName;) says cyberfox
-	   in firefox (&brandShortName;) says firefox, This item can not be edited or
-	   errors may occur.
--->
-<!-- Do not edit -->
-<!ENTITY % brandDTD
-    SYSTEM "chrome://branding/locale/brand.dtd">
-  %brandDTD;
-<!-- Do not edit above this message-->  
-  
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
 <!ENTITY Ctr_title			"Customize &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Barra de Complementos">
 <!ENTITY Ctr_statusbar		"Barra de Status">
-<!ENTITY Ctr_flexspace		"Espaço flexível">
+<!ENTITY Ctr_flexspace		"Espaço Flexível">
 <!ENTITY Ctr_space			"Espaço">
 <!ENTITY Ctr_separator		"Separador">
 <!ENTITY Ctr_puibseparator	"Separador do Botão do Painel da Interface do Usuário">
@@ -43,6 +36,7 @@
 <!ENTITY Ctr_tabs2			"Abas Arredondadas (Alternativas)">
 <!ENTITY Ctr_tabs3			"Abas Arredondadas (Alternativas Aero)">
 <!ENTITY Ctr_tabforminfo	"A Aparência da Aba é controlada pelo Tema atual.">
+<!ENTITY Ctr_coltabsinfo	"Tab appearance is not fully compatible to 'ColorfulTabs' add-on!">
 <!ENTITY Ctr_tabsontop0		"Abas no Topo (Padrão)">
 <!ENTITY Ctr_tabsontop1		"Abas no Topo --- Definida [tabsontop=true]">
 <!ENTITY Ctr_tabsontop2		"Abas Embaixo (v1) --- Definida [tabsontop=false]">
@@ -74,6 +68,9 @@
 <!ENTITY Ctr_closeonleft	"Posição Alternativa na Aba">
 <!ENTITY Ctr_close_wwltab	"Fechar a Janela com a Última Aba Visível (about:config)">
 
+<!ENTITY Ctr_hctpinfotab	"Some tab variations are not compatible to 'Hide Caption Titlebar Plus' add-on.">
+<!ENTITY Ctr_hctpinfoab		"Button on titlebar is not compatible to 'Hide Caption Titlebar Plus' add-on.">
+
 <!ENTITY Ctr_appbutton		"Botão do Aplicativo">
 <!ENTITY Ctr_appbutton0		"Botão Desativado">
 <!ENTITY Ctr_appbutton1		"Botão na Barra de Ferramentas">
@@ -97,7 +94,6 @@
 <!ENTITY Ctr_appbuttonI1	"Recomenda-se Reiniciar">
 <!ENTITY Ctr_appbuttonI1e	"Invisível na Barra de Título do Sistema Operacional">
 <!ENTITY Ctr_appbuttonI2	"Colorido só nas Barras de Título e de Abas!">
-<!ENTITY Ctr_alttbappb		"Ícones Alternativos">
 <!ENTITY Ctr_appbutmhi		"Posição No Topo (Se na Barra de Abas)">
 <!ENTITY Ctr_appbutbdl		"Ocultar as Bordas e Cores do Fundo">
 <!ENTITY Ctr_dblclclosefx	"Clicar Duas Vezes para Fechar a Janela Atual">
@@ -141,7 +137,13 @@
 <!ENTITY Ctr_cpanelmenus	"Menus do Painel Compacto (Favoritos, Histórico, etc.)">
 <!ENTITY Ctr_hidezoomres	"Controles de Ampliação na Barra de Ferramentas: Ocultar o Botão Redefinir Ampliação">
 <!ENTITY Ctr_alt_newtabp	"Página Nova Aba: Aparência Alternativa">
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
+<!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
+<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_noresizerxp	"Ocultar o Redimensionamento (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Open additional location bar: Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Menu do Painel: Ocultar Rótulos do Botão">
 <!ENTITY Ctr_menupopupscr	"Pop-ups do Menu: Exibir Barras de Rolagem em vez das Setas de Rolagem">
 
@@ -206,13 +208,15 @@
 <!ENTITY Ctr_bookbar		"Barra de Favoritos">
 <!ENTITY Ctr_notoolbar		"Ocultar (Não Exibir os Itens do Menu)">
 
-<!ENTITY Ctr_mbarforceleft	"First element">
-<!ENTITY Ctr_mbarforceright	"Last element">
+<!ENTITY Ctr_mbarforceleft	"Primeiro Elemento">
+<!ENTITY Ctr_mbarforceright	"Último Elemento">
 
 <!ENTITY Ctr_toolbars		"Barras de Ferramentas">
 <!ENTITY Ctr_dblclnewtab	"Clicar Duas Vezes para Abrir a 'Nova' Aba (Usando navegador.novaguia.URL)">
 <!ENTITY Ctr_hidetbwot		"Ocultar as Barras de Abas com uma Aba">
 <!ENTITY Ctr_hidetbwote		"Reduzir o Atraso ao Ocultar na Inicialização">
+<!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
+<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
 <!ENTITY Ctr_notabfog		"Remover a Névoa do Fundo (Windows AeroGlass/Win8)">
 <!ENTITY Ctr_notabbg		"Remover a Cor do Fundo (Windows AeroGlass/Win8)">
 <!ENTITY Ctr_hightabpos		"Reduzir o Espaço Acima da Barra (Se Possível)">
@@ -232,7 +236,9 @@
 <!ENTITY Ctr_nonavborder	"Barra de Favoritos: Adicionar Borda no Topo da Barra">
 <!ENTITY Ctr_nonavtbborder	"Barras superiores: Remover Bordas da Barra">
 <!ENTITY Ctr_hidesbclose	"Barras laterais: Ocultar o Botão Fechar da Barra Lateral">
+<!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
 <!ENTITY Ctr_chevronfix		"Barra de Ferramentas Navegação: Ocultar a Seta Dupla ('chevron') no Final das Barras de Ferramentas">
+<!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
 
 <!ENTITY Ctr_closeabarbut	"Ocultar o Botão Fechar">
 <!ENTITY Ctr_highaddonsbar	"Aumentar a Altura">
@@ -256,11 +262,18 @@
 <!ENTITY Ctr_nodevtheme		"Evitar Habilitar o 'Tema do Desenvolvedor'">
 
 <!ENTITY Ctr_experttweaks	"Avançado">
-<!ENTITY Ctr_fx33layers		"O Gecko 33+ Introduziu 'Novos Recursos de Renderização', Atualmente Responsáveis por 'Suspender Abas' em Alguns Sistemas. Desmarque esta Opção para Resolver este Problema.">
-<!ENTITY Ctr_fx34search		"O Gecko 34+ Introduziu uma 'Nova Interface de Usuário de Pesquisa'. Desmarque esta Opção para Retornar à 'Antiga Interface de Usuário de Pesquisa'.">
-<!ENTITY Ctr_fx34loop		"O Gecko 34+ Introduziu Recursos de 'Chamada e Conversação'. Desmarque esta Opção para Removê-los.">
-<!ENTITY Ctr_fx35devtheme	"O Gecko 35+ Introduziu um Novo 'Tema do Desenvolvedor'. Desmarque estas Opções para Desabilitar o 'Tema do Desenvolvedor' e o seu Botão em Modo de Personalização.">
-<!ENTITY Ctr_fx36prefs		"O Gecko 36+ Introduziu as Preferências em uma Nova Aba. Desmarque esta Opção para Retornar à Antiga Janela de Preferências.">
+<!ENTITY Ctr_fx33layers		"O &brandShortName; 33+ Introduziu 'Novos Recursos de Renderização', Atualmente Responsáveis por 'Suspender Abas' em Alguns Sistemas. Desmarque esta Opção para Resolver este Problema.">
+<!ENTITY Ctr_fx34search		"O &brandShortName; 34+ Introduziu uma 'Nova Interface de Usuário de Pesquisa'. Desmarque esta Opção para Retornar à 'Antiga Interface de Usuário de Pesquisa'.">
+<!ENTITY Ctr_fx34loop		"O &brandShortName; 34+ Introduziu Recursos de 'Chamada e Conversação'. Desmarque esta Opção para Removê-los.">
+<!ENTITY Ctr_fx35devtheme	"O &brandShortName; 35+ Introduziu um Novo 'Tema do Desenvolvedor'. Desmarque estas Opções para Desabilitar o 'Tema do Desenvolvedor' e o seu Botão em Modo de Personalização.">
+<!ENTITY Ctr_fx36prefs		"O &brandShortName; 36+ Introduziu as Preferências em uma Nova Aba. Desmarque esta Opção para Retornar à Antiga Janela de Preferências.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_e_searchui		"Search appearance">
+<!ENTITY Ctr_e_loop			"Calling and conversation">
+<!ENTITY Ctr_e_deved		"Developer Edition Theme">
+<!ENTITY Ctr_e_prefsui		"Preferences in tab">
+<!ENTITY Ctr_e_readermode	"Reader mode">
 
 
 <!ENTITY Ctr_pw_settings	"Configurações">
@@ -280,6 +293,19 @@
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Guia Rápido">
 
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey            "V">
+<!ENTITY forwardCmd.accesskey         "A">
+<!ENTITY reloadCmd.accesskey          "R">
+<!ENTITY stopCmd.accesskey            "P">
+<!ENTITY bookmarkPageCmd2.accesskey   "d">
+
+<!-- DONT-EDIT! Start Fallback entities. Leave empty! DONT-EDIT! -->
+<!ENTITY openCmd.commandkey			"">
+<!ENTITY urlbar.accesskey			"">
+<!ENTITY urlbar.placeholder2		"">
+<!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
+
 <!-- Extra CyberCTR Additions -->
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
@@ -290,6 +316,26 @@
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
-<!ENTITY ctr_personanoshadow	"Remove text shadow on persona themes">
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+
+<!ENTITY ctr_abouthome.caption "Change about:home page style">
+<!ENTITY ctr_abouthome.default "Default about:home style">
+<!ENTITY ctr_abouthome.light "Light about:home style">
+<!ENTITY ctr_abouthome.dark "Dark about:home style">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
+<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
+<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
+<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.animate "Use animations on about:home page">
