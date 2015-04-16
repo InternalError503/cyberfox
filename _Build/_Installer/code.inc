@@ -113,7 +113,7 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 				sleep(2000)
 			end
 			else begin
-							
+				if UninstallSilent() then begin ExitProcess(11); end; // Our Exit code for clean install fail.			
 			end
 		end
 	end;
