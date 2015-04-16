@@ -77,18 +77,27 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 	begin
 		if CurUninstallStep = usPostUninstall then
 	begin
-		if FileOrDirExists(ExpandConstant('{app}\distribution')) then
-			DelTree(ExpandConstant('{app}'), True, True, True);
+	
+	if not UninstallSilent() then
+		begin
+			if FileOrDirExists(ExpandConstant('{app}\distribution')) then
+				DelTree(ExpandConstant('{app}'), True, True, True);
 		
-		if MsgBox(ExpandConstant('{cm:DeleteProfileData}'), mbConfirmation, MB_YESNO) = IDYES  then begin
-		if MsgBox(ExpandConstant('{cm:ConfirmDeleteProfileData}'),mbConfirmation, MB_YESNO) = IDYES then begin
-			begin
-				if FileOrDirExists(ExpandConstant('{localappdata}\{#MyAppPublisher}\{#MyAppName}')) then
-					DelTree(ExpandConstant('{localappdata}\{#MyAppPublisher}\{#MyAppName}'), True, True, True);
-				if FileOrDirExists(ExpandConstant('{userappdata}\{#MyAppPublisher}')) then
-					DelTree(ExpandConstant('{userappdata}\{#MyAppPublisher}'), True, True, True);
-				end
-			end	
+			if MsgBox(ExpandConstant('{cm:DeleteProfileData}'), mbConfirmation, MB_YESNO) = IDYES  then begin
+			if MsgBox(ExpandConstant('{cm:ConfirmDeleteProfileData}'),mbConfirmation, MB_YESNO) = IDYES then begin
+				begin
+					if FileOrDirExists(ExpandConstant('{localappdata}\{#MyAppPublisher}\{#MyAppName}')) then
+						DelTree(ExpandConstant('{localappdata}\{#MyAppPublisher}\{#MyAppName}'), True, True, True);
+					if FileOrDirExists(ExpandConstant('{userappdata}\{#MyAppPublisher}')) then
+						DelTree(ExpandConstant('{userappdata}\{#MyAppPublisher}'), True, True, True);
+					end
+				end	
+			end
 		end
+		else
+			if FileOrDirExists(ExpandConstant('{app}\distribution')) then
+			begin
+				DelTree(ExpandConstant('{app}'), True, True, True);
+		end				
 	end
 end;
