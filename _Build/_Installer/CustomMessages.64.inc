@@ -92,6 +92,7 @@ bo.CleanInstallGroupDescription=Installation Options
 ;BrazilianPortuguese
 br_pt.ProcessName={#MyAppName}
 br_pt.IsAppRunning= já está em execução, feche {#MyAppName} em seguida, execute o instalador novamente.
+br_pt.IsAppRunningUninstall= is already running, Please close {#MyAppName} then run the uninstaller again.
 br_pt.Isx64BitOS=We are sorry!, But you can not install {#MyAppName} x64 bit on windows x86 OS.
 br_pt.AustralisDescription=Instale CyberCTR ou manter australis padrão (opcional)
 br_pt.AustralisGroupDescription=Australis UI
