@@ -422,10 +422,142 @@ var gCyberfoxCustom = {
             console.log("Were sorry but something has gone wrong with 'customDownloadsOverlay' " + e);
         }
 
-    }
+    },
+	
+    compareVersions: function(_Installed, _Required) {
+
+        try {
+            var _Installed_Version = _Installed.split('.');
+            var _Required_Version = _Required.split('.');
+
+            for (var i = 0; i < _Installed_Version.length; ++i) {
+                _Installed_Version[i] = Number(_Installed_Version[i]);
+            }
+            for (var i = 0; i < _Required_Version.length; ++i) {
+                _Required_Version[i] = Number(_Required_Version[i]);
+            }
+            if (_Installed_Version.length == 2) {
+                _Installed_Version[2] = 0;
+            }
+
+            if (_Installed_Version[0] > _Required_Version[0]) return true;
+            if (_Installed_Version[0] < _Required_Version[0]) return false;
+
+            if (_Installed_Version[1] > _Required_Version[1]) return true;
+            if (_Installed_Version[1] < _Required_Version[1]) return false;
+
+            if (_Installed_Version[2] > _Required_Version[2]) return true;
+            if (_Installed_Version[2] < _Required_Version[2]) return false;
+
+            return true;
+
+        } catch (rv) {
+            //Show error
+            Components.utils.reportError(rv);
+        }
+    },
+	
+	startupUpdateCheck: function(){
+		
+		//We are skipping update checks entirely if cyberfox beta for now.
+        if (Services.prefs.getCharPref("app.update.channel.type") === "beta") {
+            return;
+        }
+		
+        if (Services.prefs.getBoolPref("app.update.autocheck")) {
+
+            try {
+
+                //Set Global to disable update checks entirely 
+                if (Services.prefs.getBoolPref("app.update.check.enabled")) {
+
+                    //Get Latest Browser Version
+                    //Unfortunately same origin policy's prevent us using HTTPS here.
+                    let url = Services.prefs.getCharPref("app.update.check.url");
+                    let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                        .createInstance(Components.interfaces.nsIXMLHttpRequest);
+
+                    request.onload = function(aEvent) {
+
+                        let text = aEvent.target.responseText;
+
+                        //Need to check if json is valid, If json not valid don't continue and show error.
+                        function IsJsonValid(text) {
+                            try {
+                                JSON.parse(text);
+                            } catch (e) {
+                                return false;
+                            }
+                            return true;
+                        }
+                        let jsObject;
+                        let currentVersion;
+                        if (!IsJsonValid(text)) { 
+                            //Throw error message	
+                            console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
+                            //Return error
+                            return;
+                        } else {
+                            jsObject = JSON.parse(text);
+                        }
+
+                        switch (Services.prefs.getCharPref("app.update.channel.type")) {
+                            case "release": currentVersion = jsObject.release; break;
+                            case "beta":currentVersion = jsObject.beta;break;
+                            case "esr":currentVersion = jsObject.esr;break;
+                        }
+
+                        if (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()) === false) {
+							window.setTimeout(function(){	
+								var message = "New Cyberfox "+ currentVersion.toString() + " update available!";
+								var nb = gBrowser.getNotificationBox();
+								const priority = nb.PRIORITY_WARNING_HIGH;
+									nb.appendNotification(message, 'cyberfoxupdate', 'chrome://branding/content/icon16.png', priority, null);
+								},6000);
+                        }
+
+                    };
+
+                    request.ontimeout = function(aEvent) {
+                        //Log return failed check message for request time-out!
+                        console.log("Update Check Failed!" + " " + "Were sorry something has gone wrong! The check for update has failed Please check your internet connection or if cyberfox is not being blocked by a firewall!");
+                    };
+
+                    request.onerror = function(aEvent) {
+                        //Marked to add better error handling and messages.
+                        switch (aEvent.target.status) {
+                            case 0:
+                                //Log return failed request message for status 0 unsent
+                                console.log("Update Check Failed!" + " " + 
+								"Were sorry something has gone wrong! The request for update check was unable to be sent! Please check your internet connection or if cyberfox is not being blocked by a firewall!");break;
+                            case 1: console.log("Error Status: " + this.target.status);break;
+                            case 2:console.log("Error Status: " + this.target.status);break;
+							case 3:console.log("Error Status: " + this.target.status);break;
+							case 4:console.log("Error Status: " + this.target.status);break;
+							default:console.log("Error Status: " + this.target.status);break;
+                        }
+                    };
+
+                    //Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
+                    request.timeout = 5000;
+                    request.open("GET", url, true);
+                    request.setRequestHeader("Content-Type", "application/json");
+                    request.send(null);
+
+                }
+
+            } catch (eve) {
+                //Show error
+                Components.utils.reportError(eve);
+            }
+
+        }
+		
+	}	
 
 }
 
 window.addEventListener("load", function() {
     gCyberfoxCustom.customPrefSettings();
+	gCyberfoxCustom.startupUpdateCheck();
 }, false);

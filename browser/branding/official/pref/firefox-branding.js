@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-pref("startup.homepage_override_url","https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-%VERSION%");
-pref("startup.homepage_welcome_url","https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-%VERSION%");
+pref("startup.homepage_override_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%&oldversion=%OLD_VERSION%");
+pref("startup.homepage_welcome_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 
 #ifdef HAVE_64BIT_BUILD
-pref("app.update.url.manual", "https://8pecxstudios.com/cyberfox-web-browser"); 
-pref("app.update.url.details", "https://8pecxstudios.com/cyberfox-web-browser");
+pref("app.update.url.manual", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64/?downloadID=intel64"); 
+pref("app.update.url.details", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64");
 #else
-pref("app.update.url.manual", "https://8pecxstudios.com/cyberfox-web-browser-x32bit"); 
-pref("app.update.url.details", "https://8pecxstudios.com/cyberfox-web-browser-x32bit");
+pref("app.update.url.manual", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x86?downloadID=intel86"); 
+pref("app.update.url.details", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x86");
 #endif
 
 pref("app.update.check.url", "http://download.8pecxstudios.com/current_version/update.json");
@@ -20,7 +20,7 @@ pref("app.update.check.url", "http://download.8pecxstudios.com/current_version/u
 // esr current esr channel version (Note: only if applicable meaning only if we release cyberfox esr with this setting enabled)
 pref("app.update.channel.type", "release");
 
-pref("app.releaseNotesURL", "https://8pecxstudios.com/hooray-your-cyberfox-is-up-to-date-%VERSION%");
+pref("app.releaseNotesURL", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 pref("app.vendorURL", "https://8pecxstudios.com/");
 
 // Number of usages of the web console or scratchpad.

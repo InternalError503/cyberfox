@@ -30,7 +30,7 @@
   </xul:panel>
 
   <xul:panel id="newtab-customize-panel" orient="vertical" type="arrow"
-             noautohide="true">
+             noautohide="true" hidden="true">
     <xul:hbox id="newtab-customize-classic" class="newtab-customize-panel-item">
       <xul:label>&newtab.customize.classic;</xul:label>
     </xul:hbox>

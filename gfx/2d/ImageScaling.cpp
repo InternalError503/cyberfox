@@ -204,6 +204,9 @@ ImageHalfScaler::HalfImage2D_C(uint8_t *aSource, int32_t aSourceStride,
                                const IntSize &aSourceSize, uint8_t *aDest,
                                uint32_t aDestStride)
 {
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
   for (int y = 0; y < aSourceSize.height; y += 2) {
     uint32_t *storage = (uint32_t*)(aDest + (y / 2) * aDestStride);
     for (int x = 0; x < aSourceSize.width; x += 2) {
@@ -221,6 +224,9 @@ ImageHalfScaler::HalfImageVertical_C(uint8_t *aSource, int32_t aSourceStride,
                                      const IntSize &aSourceSize, uint8_t *aDest,
                                      uint32_t aDestStride)
 {
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
   for (int y = 0; y < aSourceSize.height; y += 2) {
     uint32_t *storage = (uint32_t*)(aDest + (y / 2) * aDestStride);
     for (int x = 0; x < aSourceSize.width; x++) {
@@ -237,6 +243,9 @@ ImageHalfScaler::HalfImageHorizontal_C(uint8_t *aSource, int32_t aSourceStride,
                                        const IntSize &aSourceSize, uint8_t *aDest,
                                        uint32_t aDestStride)
 {
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
   for (int y = 0; y < aSourceSize.height; y++) {
     uint32_t *storage = (uint32_t*)(aDest + y * aDestStride);
     for (int x = 0; x < aSourceSize.width;  x+= 2) {

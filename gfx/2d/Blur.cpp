@@ -17,6 +17,10 @@
 #include "DataSurfaceHelpers.h"
 #include "Tools.h"
 
+#ifdef BUILD_ARM_NEON
+#include "mozilla/arm.h"
+#endif
+
 using namespace std;
 
 namespace mozilla {
@@ -66,6 +70,9 @@ BoxBlurHorizontal(unsigned char* aInput,
         }
 
         uint32_t alphaSum = 0;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
         for (int32_t i = 0; i < boxSize; i++) {
             int32_t pos = i - aLeftLobe;
             // See assertion above; if aWidth is zero, then we would have no
@@ -86,6 +93,9 @@ BoxBlurHorizontal(unsigned char* aInput,
                 // Recalculate the neighbouring alpha values for
                 // our new point on the surface.
                 alphaSum = 0;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
                 for (int32_t i = 0; i < boxSize; i++) {
                     int32_t pos = x + i - aLeftLobe;
                     // See assertion above; if aWidth is zero, then we would have no
@@ -141,6 +151,9 @@ BoxBlurVertical(unsigned char* aInput,
         }
 
         uint32_t alphaSum = 0;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
         for (int32_t i = 0; i < boxSize; i++) {
             int32_t pos = i - aTopLobe;
             // See assertion above; if aRows is zero, then we would have no
@@ -157,6 +170,9 @@ BoxBlurVertical(unsigned char* aInput,
                     break;
 
                 alphaSum = 0;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
                 for (int32_t i = 0; i < boxSize; i++) {
                     int32_t pos = y + i - aTopLobe;
                     // See assertion above; if aRows is zero, then we would have no
@@ -263,6 +279,9 @@ SpreadHorizontal(unsigned char* aInput,
             int32_t sMin = max(x - aRadius, 0);
             int32_t sMax = min(x + aRadius, aWidth - 1);
             int32_t v = 0;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
             for (int32_t s = sMin; s <= sMax; ++s) {
                 v = max<int32_t>(v, aInput[aStride * y + s]);
             }
@@ -308,6 +327,9 @@ SpreadVertical(unsigned char* aInput,
             int32_t sMin = max(y - aRadius, 0);
             int32_t sMax = min(y + aRadius, aRows - 1);
             int32_t v = 0;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
             for (int32_t s = sMin; s <= sMax; ++s) {
                 v = max<int32_t>(v, aInput[aStride * s + x]);
             }
@@ -544,6 +566,7 @@ AlphaBoxBlur::Blur(uint8_t* aData)
       if (!integralImage) {
         return;
       }
+
 #ifdef USE_SSE2
       if (Factory::HasSSE2()) {
         BoxBlur_SSE2(aData, horizontalLobes[0][0], horizontalLobes[0][1], verticalLobes[0][0],
@@ -551,6 +574,16 @@ AlphaBoxBlur::Blur(uint8_t* aData)
         BoxBlur_SSE2(aData, horizontalLobes[1][0], horizontalLobes[1][1], verticalLobes[1][0],
                      verticalLobes[1][1], integralImage, integralImageStride);
         BoxBlur_SSE2(aData, horizontalLobes[2][0], horizontalLobes[2][1], verticalLobes[2][0],
+                     verticalLobes[2][1], integralImage, integralImageStride);
+      } else
+#endif
+#ifdef BUILD_ARM_NEON
+      if (mozilla::supports_neon()) {
+        BoxBlur_NEON(aData, horizontalLobes[0][0], horizontalLobes[0][1], verticalLobes[0][0],
+                     verticalLobes[0][1], integralImage, integralImageStride);
+        BoxBlur_NEON(aData, horizontalLobes[1][0], horizontalLobes[1][1], verticalLobes[1][0],
+                     verticalLobes[1][1], integralImage, integralImageStride);
+        BoxBlur_NEON(aData, horizontalLobes[2][0], horizontalLobes[2][1], verticalLobes[2][0],
                      verticalLobes[2][1], integralImage, integralImageStride);
       } else
 #endif
@@ -688,6 +721,9 @@ AlphaBoxBlur::BoxBlur_C(uint8_t* aData,
   IntRect skipRect = mSkipRect;
   uint8_t *data = aData;
   int32_t stride = mStride;
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
   for (int32_t y = 0; y < size.height; y++) {
     bool inSkipRectY = y > skipRect.y && y < skipRect.YMost();
 

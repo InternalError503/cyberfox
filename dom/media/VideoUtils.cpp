@@ -12,9 +12,7 @@
 #include "SharedThreadPool.h"
 #include "mozilla/Preferences.h"
 #include "mozilla/Base64.h"
-#ifdef MOZ_TELEMETRY_REPORTING
 #include "mozilla/Telemetry.h"
-#endif
 #include "nsIRandomGenerator.h"
 #include "nsIServiceManager.h"
 #include "MediaTaskQueue.h"
@@ -235,7 +233,12 @@ ExtractH264CodecDetails(const nsAString& aCodec,
   aLevel = PromiseFlatString(Substring(aCodec, 9, 2)).ToInteger(&rv, 16);
   NS_ENSURE_SUCCESS(rv, false);
 
-#ifdef MOZ_TELEMETRY_REPORTING
+  if (aLevel == 9) {
+    aLevel = H264_LEVEL_1_b;
+  } else if (aLevel <= 5) {
+    aLevel *= 10;
+  }
+
   // Capture the constraint_set flag value for the purpose of Telemetry.
   // We don't NS_ENSURE_SUCCESS here because ExtractH264CodecDetails doesn't
   // care about this, but we make sure constraints is above 4 (constraint_set5_flag)
@@ -254,7 +257,6 @@ ExtractH264CodecDetails(const nsAString& aCodec,
   Telemetry::Accumulate(Telemetry::VIDEO_CANPLAYTYPE_H264_LEVEL,
                         (aLevel >= 10 && aLevel <= 52) ? aLevel : 0);
 
-#endif
   return true;
 }
 

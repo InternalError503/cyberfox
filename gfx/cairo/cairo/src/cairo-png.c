@@ -75,7 +75,9 @@ static void
 unpremultiply_data (png_structp png, png_row_infop row_info, png_bytep data)
 {
     unsigned int i;
-
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < row_info->rowbytes; i += 4) {
         uint8_t *b = &data[i];
         uint32_t pixel;
@@ -99,7 +101,9 @@ static void
 convert_data_to_bytes (png_structp png, png_row_infop row_info, png_bytep data)
 {
     unsigned int i;
-
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < row_info->rowbytes; i += 4) {
         uint8_t *b = &data[i];
         uint32_t pixel;
@@ -200,7 +204,9 @@ write_png (cairo_surface_t	*surface,
 	status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
 	goto BAIL2;
     }
-
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < clone->height; i++)
 	rows[i] = (png_byte *) clone->data + i * clone->stride;
 
@@ -650,7 +656,9 @@ read_png (struct png_read_closure_t *png_closure)
 	surface = _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 	goto BAIL;
     }
-
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < png_height; i++)
         row_pointers[i] = &data[i * stride];
 

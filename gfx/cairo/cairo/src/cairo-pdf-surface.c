@@ -663,6 +663,9 @@ _cairo_pdf_surface_clear (cairo_pdf_surface_t *surface)
     cairo_pdf_smask_group_t *group;
 
     size = _cairo_array_num_elements (&surface->page_patterns);
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < size; i++) {
 	pattern = (cairo_pdf_pattern_t *) _cairo_array_index (&surface->page_patterns, i);
 	cairo_pattern_destroy (pattern->pattern);
@@ -670,6 +673,9 @@ _cairo_pdf_surface_clear (cairo_pdf_surface_t *surface)
     _cairo_array_truncate (&surface->page_patterns, 0);
 
     size = _cairo_array_num_elements (&surface->page_surfaces);
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < size; i++) {
 	src_surface = (cairo_pdf_source_surface_t *) _cairo_array_index (&surface->page_surfaces, i);
 	cairo_surface_destroy (src_surface->surface);
@@ -677,6 +683,9 @@ _cairo_pdf_surface_clear (cairo_pdf_surface_t *surface)
     _cairo_array_truncate (&surface->page_surfaces, 0);
 
     size = _cairo_array_num_elements (&surface->smask_groups);
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
     for (i = 0; i < size; i++) {
 	_cairo_array_copy_element (&surface->smask_groups, i, &group);
 	_cairo_pdf_smask_group_destroy (group);

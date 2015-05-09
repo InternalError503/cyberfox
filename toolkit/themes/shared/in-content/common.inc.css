@@ -7,7 +7,8 @@
 @namespace xul "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 html|body,
-xul|page {
+xul|page,
+xul|window {
   font: message-box;
   -moz-appearance: none;
   color: #737980;
@@ -24,8 +25,14 @@ html|h1 {
   font-size: 2.5em;
   font-weight: lighter;
   line-height: 1.2;
+  color: #333;
   margin: 0;
   margin-bottom: .5em;
+}
+
+html|hr {
+  border-style: solid none none none;
+  border-color: #c1c1c1;
 }
 
 xul|caption {
@@ -33,6 +40,7 @@ xul|caption {
   margin: 0;
 }
 
+xul|caption > xul|checkbox,
 xul|caption > xul|label {
   font-size: 1.3rem;
   font-weight: bold;
@@ -40,8 +48,15 @@ xul|caption > xul|label {
   margin: 0 !important;
 }
 
+xul|description {
+  -moz-margin-start: 0;
+}
+
 *|*.main-content {
-  padding: 40px 48px 48px;
+  padding-top: 40px;
+  -moz-padding-end: 44px; /* compensate the 4px margin of child elements */
+  padding-bottom: 48px;
+  -moz-padding-start: 48px;
   overflow: auto;
 }
 
@@ -54,9 +69,7 @@ xul|prefpane > xul|*.content-box {
 xul|groupbox {
   -moz-appearance: none;
   border: none;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  -moz-margin-end: 0;
+  margin: 15px 0 0;
   -moz-padding-start: 0;
   -moz-padding-end: 0;
   font-size: 1.25rem;
@@ -77,6 +90,7 @@ xul|tabpanels {
   border: none;
   padding: 0;
   background-color: transparent;
+  color: inherit;
 }
 
 xul|tabs {
@@ -94,7 +108,7 @@ xul|*.tabs-right {
 xul|tab {
   -moz-appearance: none;
   margin-top: 0;
-  padding: 0 20px;
+  padding: 4px 20px;
   min-height: 44px;
   color: #424f5a;
   background-color: #fbfbfb;
@@ -108,6 +122,7 @@ xul|tab:hover {
 
 xul|tab[selected] {
   background-color: #ebebeb;
+  padding-bottom: 0; /* compensate the 4px border */
   box-shadow: inset 0 -4px 0 0 #ff9500;
 }
 
@@ -165,6 +180,22 @@ xul|menulist[disabled="true"] {
   opacity: 0.5;
 }
 
+*|button.primary {
+  background-color: #0095dd;
+  border-color: transparent;
+  color: #fff;
+}
+
+html|button.primary:enabled:hover,
+xul|button.primary:not([disabled="true"]):hover {
+  background-color: #008acb;
+}
+
+html|button.primary:enabled:hover:active,
+xul|button.primary:not([disabled="true"]):hover:active {
+  background-color: #006b9d;
+}
+
 xul|colorpicker[type="button"] {
   padding: 6px;
   width: 50px;
@@ -176,7 +207,7 @@ xul|menulist > xul|*.menulist-label-box {
   padding-left: 10px !important;
 }
 
-xul|menulist > xul|*.menulist-label-box > xul|*.menulist-icon {
+xul|menulist > xul|*.menulist-label-box > xul|*.menulist-icon[src] {
   -moz-margin-end: 5px;
 }
 
@@ -311,6 +342,8 @@ xul|button[type="menu"] > xul|menupopup xul|menuitem {
   line-height: 22px;
   height: 40px;
   color: #333;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
   -moz-padding-start: 10px;
   -moz-padding-end: 30px;
 }
@@ -374,8 +407,8 @@ xul|textbox[disabled="true"] {
 /* Links */
 
 html|a,
-xul|*.text-link,
-xul|*.inline-link {
+.text-link,
+.inline-link {
   font-size: 1.25rem;
   line-height: 22px;
   color: #0095dd;
@@ -383,26 +416,44 @@ xul|*.inline-link {
 }
 
 html|a:hover,
-xul|*.text-link:hover,
-xul|*.inline-link:hover {
+.text-link:hover,
+.inline-link:hover {
   color: #4cb1ff;
   text-decoration: none;
 }
 
 html|a:hover:active,
-xul|*.text-link:hover:active,
-xul|*.inline-link:hover:active {
+.text-link:hover:active,
+.inline-link:hover:active {
   color: #ff9500;
   text-decoration: none;
 }
 
 /* Checkboxes and radio buttons */
 
+/* Hide the actual checkbox */
+html|input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+}
+
+/* Create a box to style as the checkbox */
+html|input[type="checkbox"] + html|label:before {
+  display: inline-block;
+  content: "";
+  vertical-align: middle;
+}
+
+html|input[type="checkbox"] + html|label {
+  line-height: 0px;
+}
+
 xul|checkbox {
   -moz-margin-start: 0;
 }
 
-xul|*.checkbox-check {
+xul|*.checkbox-check,
+html|input[type="checkbox"] + html|label:before {
   -moz-appearance: none;
   width: 23px;
   height: 23px;
@@ -411,13 +462,14 @@ xul|*.checkbox-check {
   -moz-margin-end: 10px;
   background-color: #f1f1f1;
   /* !important needed to override toolkit checked !important rule */
-  background-image: linear-gradient(#fff, rgba(255,255,255,0.8))!important;
+  background-image: linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
   background-position: center center;
   background-repeat: no-repeat;
   box-shadow: 0 1px 1px 0 #fff, inset 0 2px 0 0 rgba(0,0,0,0.03);
 }
 
-xul|checkbox:not([disabled="true"]):hover > xul|*.checkbox-check {
+xul|checkbox:not([disabled="true"]):hover > xul|*.checkbox-check,
+html|input[type="checkbox"]:not(:disabled) + html|label:hover:before {
   border-color: #0095dd;
 }
 
@@ -427,7 +479,12 @@ xul|*.checkbox-check[checked] {
                     linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
 }
 
-xul|checkbox[disabled="true"] > xul|*.checkbox-check {
+html|input[type="checkbox"]:checked + html|label:before {
+  background-image: url("chrome://global/skin/in-content/check.png"), linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
+}
+
+xul|checkbox[disabled="true"] > xul|*.checkbox-check,
+html|input[type="checkbox"]:disabled + html|label {
   opacity: 0.5;
 }
 
@@ -446,6 +503,10 @@ xul|*.checkbox-label-box {
 
 xul|richlistitem > xul|*.checkbox-check {
   margin: 3px 6px;
+}
+
+xul|radio {
+  -moz-margin-start: 0;
 }
 
 xul|*.radio-check {
@@ -488,6 +549,7 @@ xul|*#categories {
   background-color: #424f5a;
   padding-top: 39px;
   margin: 0;
+  border-width: 0;
 }
 
 xul|*.category {
@@ -507,6 +569,7 @@ xul|*.category:hover {
 xul|*.category[selected] {
   background-color: #343f48;
   color: #f2f2f2;
+  -moz-padding-start: 11px; /* compensate the 4px border */
   box-shadow: inset 4px 0 0 0 #ff9500;
 }
 
@@ -521,6 +584,7 @@ xul|*#categories[keyboard-navigation="true"]:-moz-focusring > xul|*.category[cur
   padding-bottom: 2px;
   -moz-padding-start: 9px;
   margin: 0;
+  -moz-user-select: none;
 }
 
 *|*.category-icon {
@@ -532,6 +596,7 @@ xul|*#categories[keyboard-navigation="true"]:-moz-focusring > xul|*.category[cur
 
 *|*.header {
   border-bottom: 1px solid #c8c8c8;
+  -moz-margin-end: 4px; /* add the 4px end-margin of other elements */
   margin-bottom: 15px;
   padding-bottom: 15px;
 }
@@ -541,6 +606,7 @@ xul|*#categories[keyboard-navigation="true"]:-moz-focusring > xul|*.category[cur
   font-weight: normal;
   line-height: 40px;
   margin: 0;
+  -moz-user-select: none;
 }
 
 /* File fields */
@@ -626,6 +692,11 @@ xul|tree {
   border: 1px solid #c1c1c1;
 }
 
+xul|tree:-moz-focusring,
+xul|richlistbox:-moz-focusring {
+  border: 1px dotted #0095dd;
+}
+
 xul|listheader,
 xul|treecols {
   -moz-appearance: none;
@@ -643,7 +714,7 @@ xul|treecolpicker {
   padding: 5px 10px;
 }
 
-xul|treecol:not([hideheader="true"]):hover,
+xul|treecol:not([hideheader="true"]):not([sortable="false"]):hover,
 xul|treecolpicker:hover {
   background-color: #dadada;
   color: #333;
@@ -657,19 +728,13 @@ xul|treecolpicker {
 }
 
 xul|treecol:not([hideheader="true"]) > xul|*.treecol-sortdirection[sortDirection] {
-  list-style-image: url("chrome://global/skin/in-content/sorter.png");
-  width: 12px;
-  height: 8px;
+  list-style-image: url("chrome://global/skin/in-content/dropdown.png");
+  width: 18px;
+  height: 18px;
 }
 
-xul|treecol:not([hideheader="true"]) > xul|*.treecol-sortdirection[sortDirection="descending"] {
+xul|treecol:not([hideheader="true"]) > xul|*.treecol-sortdirection[sortDirection="ascending"] {
   transform: scaleY(-1);
-}
-
-@media (min-resolution: 2dppx) {
-  xul|treecol:not([hideheader="true"]) > xul|*.treecol-sortdirection[sortDirection] {
-    list-style-image: url("chrome://global/skin/in-content/sorter@2x.png");
-  }
 }
 
 /* This is the only way to increase the height of a tree row unfortunately */

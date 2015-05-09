@@ -2294,6 +2294,9 @@ pixman_fill8 (uint32_t *bits,
 
     while (height--)
     {
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
 	for (i = 0; i < width; ++i)
 	    dst[i] = v;
 
@@ -2320,6 +2323,9 @@ pixman_fill16 (uint32_t *bits,
 
     while (height--)
     {
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
 	for (i = 0; i < width; ++i)
 	    dst[i] = v;
 
@@ -2342,6 +2348,9 @@ pixman_fill32 (uint32_t *bits,
 
     while (height--)
     {
+#ifdef _OPENMP
+	#pragma omp parallel for
+#endif
 	for (i = 0; i < width; ++i)
 	    bits[i] = filler;
 

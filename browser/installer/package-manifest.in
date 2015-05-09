@@ -100,6 +100,12 @@
 #if MOZ_PACKAGE_MSVC_DLLS
 @BINPATH@/@MSVC_C_RUNTIME_DLL@
 @BINPATH@/@MSVC_CXX_RUNTIME_DLL@
+#ifdef MSVC_APPCRT_DLL
+@BINPATH@/@MSVC_APPCRT_DLL@
+#endif
+#ifdef MSVC_DESKTOPCRT_DLL
+@BINPATH@/@MSVC_DESKTOPCRT_DLL@
+#endif
 #endif
 #endif
 #ifndef MOZ_NATIVE_ICU
@@ -178,6 +184,7 @@
 @RESPATH@/components/chrome.xpt
 @RESPATH@/components/commandhandler.xpt
 @RESPATH@/components/commandlines.xpt
+@RESPATH@/components/compartments.xpt
 @RESPATH@/components/composer.xpt
 @RESPATH@/components/content_events.xpt
 @RESPATH@/components/content_html.xpt
@@ -242,6 +249,7 @@
 #ifdef MOZ_PAY
 @RESPATH@/components/dom_payment.xpt
 #endif
+@RESPATH@/components/dom_presentation.xpt
 @RESPATH@/components/downloads.xpt
 @RESPATH@/components/editor.xpt
 @RESPATH@/components/embed_base.xpt
@@ -260,7 +268,6 @@
 @RESPATH@/components/htmlparser.xpt
 @RESPATH@/components/identity.xpt
 @RESPATH@/components/imglib2.xpt
-@RESPATH@/components/imgicon.xpt
 @RESPATH@/components/inspector.xpt
 @RESPATH@/components/intl.xpt
 @RESPATH@/components/jar.xpt
@@ -380,9 +387,6 @@
 @RESPATH@/browser/components/nsBrowserGlue.js
 @RESPATH@/browser/components/nsSetDefaultBrowser.manifest
 @RESPATH@/browser/components/nsSetDefaultBrowser.js
-@RESPATH@/browser/components/BrowserDownloads.manifest
-@RESPATH@/browser/components/DownloadsStartup.js
-@RESPATH@/browser/components/BrowserPlaces.manifest
 @RESPATH@/browser/components/devtools-clhandler.manifest
 @RESPATH@/browser/components/devtools-clhandler.js
 @RESPATH@/browser/components/webideCli.js
@@ -400,6 +404,7 @@
 @RESPATH@/components/toolkitsearch.manifest
 @RESPATH@/components/nsSearchService.js
 @RESPATH@/components/nsSearchSuggestions.js
+@RESPATH@/components/nsSidebar.js
 @RESPATH@/components/passwordmgr.manifest
 @RESPATH@/components/nsLoginInfo.js
 @RESPATH@/components/nsLoginManager.js
@@ -419,8 +424,6 @@
 @RESPATH@/components/nsHelperAppDlg.js
 @RESPATH@/components/NetworkGeolocationProvider.manifest
 @RESPATH@/components/NetworkGeolocationProvider.js
-@RESPATH@/browser/components/nsSidebar.manifest
-@RESPATH@/browser/components/nsSidebar.js
 @RESPATH@/components/extensions.manifest
 @RESPATH@/components/addonManager.js
 @RESPATH@/components/amContentHandler.js
@@ -457,7 +460,6 @@
 @RESPATH@/components/UnifiedComplete.manifest
 @RESPATH@/components/UnifiedComplete.js
 @RESPATH@/components/nsPlacesExpiration.js
-@RESPATH@/browser/components/PlacesProtocolHandler.js
 @RESPATH@/components/PlacesCategoriesStarter.js
 @RESPATH@/components/ColorAnalyzer.js
 @RESPATH@/components/PageThumbsProtocol.js
@@ -549,6 +551,10 @@
 @RESPATH@/components/htmlMenuBuilder.js
 @RESPATH@/components/htmlMenuBuilder.manifest
 
+@RESPATH@/components/RequestSync.manifest
+@RESPATH@/components/RequestSyncManager.js
+@RESPATH@/components/RequestSyncScheduler.js
+
 @RESPATH@/components/PermissionSettings.js
 @RESPATH@/components/PermissionSettings.manifest
 @RESPATH@/components/ContactManager.js
@@ -579,6 +585,7 @@
 @RESPATH@/components/TCPSocket.manifest
 
 #ifdef MOZ_ACTIVITIES
+@RESPATH@/components/SystemMessageCache.js
 @RESPATH@/components/SystemMessageInternal.js
 @RESPATH@/components/SystemMessageManager.js
 @RESPATH@/components/SystemMessageManager.manifest
@@ -612,6 +619,9 @@
 
 @RESPATH@/components/nsAsyncShutdown.manifest
 @RESPATH@/components/nsAsyncShutdown.js
+
+@RESPATH@/components/PresentationDeviceInfoManager.manifest
+@RESPATH@/components/PresentationDeviceInfoManager.js
 
 ; InputMethod API
 @RESPATH@/components/MozKeyboard.js
@@ -748,7 +758,10 @@
 @RESPATH@/res/fonts/*
 @RESPATH@/res/dtd/*
 @RESPATH@/res/html/*
+#if defined(XP_MACOSX) || defined(XP_WIN)
+; For SafariProfileMigrator.js.
 @RESPATH@/res/langGroups.properties
+#endif
 @RESPATH@/res/language.properties
 @RESPATH@/res/entityTables/*
 #ifdef XP_MACOSX
@@ -899,10 +912,6 @@ bin/libfreebl_32int64_3.so
 @RESPATH@/components/DataStore.manifest
 @RESPATH@/components/DataStoreImpl.js
 @RESPATH@/components/dom_datastore.xpt
-
-; Shutdown Terminator
-@RESPATH@/components/nsTerminatorTelemetry.js
-@RESPATH@/components/terminator.manifest
 
 #if defined(CLANG_CXX)
 #if defined(MOZ_ASAN) || defined(MOZ_TSAN)

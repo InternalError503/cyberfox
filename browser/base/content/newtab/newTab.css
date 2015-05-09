@@ -394,9 +394,21 @@ input[type=button] {
   margin: 0;
 }
 
+.newtab-customize-panel-item:not([selected]) {
+  color: #919191;
+}
+
 .newtab-customize-panel-item[selected],
 .newtab-search-panel-engine[selected] {
   background: url("chrome://global/skin/menu/shared-menu-check.png") center left 4px no-repeat transparent;
+  background-size: 16px 16px;
+}
+
+@media (min-resolution: 2dppx) {
+  .newtab-customize-panel-item[selected],
+  .newtab-search-panel-engine[selected] {
+    background-image: url("chrome://global/skin/menu/shared-menu-check@2x.png");
+  }
 }
 
 .searchSuggestionTable {

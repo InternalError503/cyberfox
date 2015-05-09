@@ -95,7 +95,7 @@ td {
   overflow: hidden;
 }
 
-#reset-box {
+#action-box {
   background-color: -moz-Dialog;
   color: -moz-DialogText;
   float: right;
@@ -112,10 +112,16 @@ td {
   border-top: 6px solid rgb(55, 55, 55); 			  
   border-bottom: 1px solid rgb(155, 155, 155, .3);
   border-left: 1px solid rgb(155, 155, 155, .3); 
-  border-right: 1px solid rgb(155, 155, 155, .3);     
+  border-right: 1px solid rgb(155, 155, 155, .3); 
 }
 
-#reset-box:-moz-dir(rtl) {
+#action-box,
+#reset-box,
+#safe-mode-box {
+  display: none;
+}
+
+#action-box:-moz-dir(rtl) {
   float: left;
 }
 
@@ -123,7 +129,7 @@ td {
   margin-top: 0;
 }
 
-#reset-box > button {
+#action-box button {
   display: block;
   margin: auto;
 }
