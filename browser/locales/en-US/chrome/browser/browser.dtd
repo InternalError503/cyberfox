@@ -1010,6 +1010,7 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!-- Update check options -->
 <!ENTITY updateoptions.label "Cyberfox Update Options">
 <!ENTITY updateautocheck.label "Automatically check for updates in about cyberfox">
+<!ENTITY updatestartupcheck.label "Automatically check for updates when cyberfox starts.">
 <!ENTITY updatecheckenabled.label "Enable update check.">
 
 <!-- Copy tab URL Tweak -->

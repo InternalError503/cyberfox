@@ -99,6 +99,9 @@
  	  <preference id="browser.restart.requireconfirm" 
 						   name="browser.restart.requireconfirm" 
 						   type="bool"/>
+ 	  <preference id="app.update.startup.check" 
+						   name="app.update.startup.check" 
+						   type="bool"/>
       <!-- Data Choices tab -->
 
 #ifdef MOZ_TELEMETRY_REPORTING
@@ -491,6 +494,8 @@
 				<caption label="&updateoptions.label;"/>
 					<checkbox id="app.update.autocheck" label="&updateautocheck.label;"
 							preference="app.update.autocheck"/>
+					<checkbox id="app.update.startup.check" label="&updatestartupcheck.label;"
+							preference="app.update.startup.check"/>
 					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
 							preference="app.update.check.enabled"/>								
 				</groupbox>

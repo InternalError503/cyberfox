@@ -459,6 +459,10 @@ var gCyberfoxCustom = {
 	
 	startupUpdateCheck: function(){
 		
+		if (Services.prefs.getBoolPref("app.update.startup.check") === false) {
+			return;
+		}	
+		
 		//We are skipping update checks entirely if cyberfox beta for now.
         if (Services.prefs.getCharPref("app.update.channel.type") === "beta") {
             return;
@@ -560,4 +564,5 @@ var gCyberfoxCustom = {
 window.addEventListener("load", function() {
     gCyberfoxCustom.customPrefSettings();
 	gCyberfoxCustom.startupUpdateCheck();
+	window.removeEventListener("load",gCyberfoxCustom.startupUpdateCheck(), false);
 }, false);

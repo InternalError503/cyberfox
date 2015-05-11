@@ -1969,6 +1969,9 @@ pref("app.update.autocheck", true);
 //Update check browser version
 pref("app.update.check.enabled", true);
 
+//Auto check browser version on startup
+pref("app.update.startup.check", true);
+
 //set bool pref for copy tab url enabled
 pref("browser.tabs.copyurl", true);
 
