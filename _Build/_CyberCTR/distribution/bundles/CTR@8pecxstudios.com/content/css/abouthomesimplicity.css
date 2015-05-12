@@ -9,8 +9,7 @@
         font: message-box;
         font-size: 100%;
         background-color: #2d2d2d!important;
-        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/simplicity_theme_background.jpg");
-        background-size: 100% 100%!important;
+        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/simplicity_theme_background.jpg");       
         color: #000;
         height: 100%;
     }

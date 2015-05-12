@@ -143,6 +143,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Lesezeichen-Menüschaltfläche: 'Panel-Aufklappmenü'-Darstellung">
 <!ENTITY Ctr_bmbutnotext	"Lesezeichen-Menüschaltfläche: Text auf der Lesezeichenleiste verstecken">
 <!ENTITY Ctr_skipprintpr	"Drucken-Schaltfläche: Druckvorschau überspringen">
+<!ENTITY Ctr_tbconmenu		"Leisten-Kontextmenü: Verstecke 'In Menü verschieben', 'Aus Symbolleiste entfernen', 'Alle Tabs neu laden', 'Lesezeichen für alle Tabs hinzufügen...' und 'Geschlossenen Tab wiederherstellen'">
 <!ENTITY Ctr_noresizerxp	"'Resizer' verstecken (Windows XP/2000)">
 <!ENTITY Ctr_extraurlkeycb	"Öffne weitere Adressleiste (Cmd/Strg+">
 <!ENTITY Ctr_pmhidelabels	"Menüschaltflächen-Aufklappmenü: verstecke Schaltflächen-Text">
@@ -340,3 +341,12 @@
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
+<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY cssClassId.description "Hide element classes - element ids">
+<!ENTITY cssClassId.label "Enter a class or id:">
+<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
+<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
+<!ENTITY add.label "ADD">
+<!ENTITY clear.label "Clear Filter">
+<!ENTITY copy.label "Copy Filter">

@@ -16,7 +16,10 @@ Services.prefs.QueryInterface(Ci.nsIPrefBranch);
 
 if (typeof classicthemerestorerjs == "undefined") {var classicthemerestorerjs = {};};
 if (!classicthemerestorerjs.ctr) {classicthemerestorerjs.ctr = {};};
-window.addEventListener("load", function () { classicthemerestorerjs.ctr.customCTRPrefSettings(); }, false);  
+window.addEventListener("load", function () { 
+	window.removeEventListener("load", classicthemerestorerjs.ctr.customCTRPrefSettings(), false); 
+	classicthemerestorerjs.ctr.customCTRPrefSettings(); 
+}, false);  
 var treeStyleCompatMode;
 classicthemerestorerjs.ctr = {
  
@@ -59,7 +62,9 @@ classicthemerestorerjs.ctr = {
   cuiButtonssheet:		Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null),
   searchbarsheet: 		Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null),
   abouthome_bg: 		Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null),
+  abouthome_bg_strech: 		Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null),
   abouthome_custcolor: 		Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null),
+  hideElements: 		Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null),
   
   prefs:				Services.prefs.getBranch("extensions.classicthemerestorer."),
   
@@ -1634,6 +1639,11 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("bmbutnotext",false);
 		  break;
 
+		  case "tbconmenu":
+			if (branch.getBoolPref("tbconmenu")) classicthemerestorerjs.ctr.loadUnloadCSS("tbconmenu",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("tbconmenu",false);
+		  break;
+
 		  case "noresizerxp":
 			if (branch.getBoolPref("noresizerxp")) classicthemerestorerjs.ctr.loadUnloadCSS("noresizerxp",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("noresizerxp",false);
@@ -1918,6 +1928,16 @@ classicthemerestorerjs.ctr = {
 					}	
 				} catch(e){}			
 		  break;	
+
+		   case "abouthomebgstretch":
+			  	try{		  
+					if (branch.getBoolPref("abouthomebgstretch")) {				
+							classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg_strech",true);
+					}else{
+						classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg_strech",false);
+					}	
+				} catch(e){}			
+		  break;
 		  
 		  case "abouthomehighlight": case "abouthomecustomhighlightcolor":
 			  	try{		  
@@ -1938,7 +1958,16 @@ classicthemerestorerjs.ctr = {
 					}	
 				} catch(e){}			
 		  break;
-		  
+
+		   case "hidexulelements": case "hidexulfilter":
+			  	try{		  
+					if (branch.getBoolPref("hidexulelements")) {				
+							classicthemerestorerjs.ctr.loadUnloadCSS("hideElements",true);
+					}else{
+						classicthemerestorerjs.ctr.loadUnloadCSS("hideElements",false);
+					}	
+				} catch(e){}			
+		  break;		  
 		  
 		}
 	  }
@@ -2037,26 +2066,40 @@ classicthemerestorerjs.ctr = {
   },
    
   // show backForwardMenu popup for CTRs movable back/forward buttons 'mouse hold event'
-  ctrBackMenuShow: function(anchorElem) {
+  ctrBackMenuShow: function(anchorElem,event) {
   
    if(this.prefs.getBoolPref("hide_bf_popup")==false) {
 	var timeoutID;
 	
-	timeoutID = window.setTimeout(
-	  function(){
+	// mouse pointers current Y position
+	var positionY = event.clientY;
+	
+	timeoutID = window.setTimeout(function(){
+	  document.getElementById("backForwardMenu").openPopupAtScreen(anchorElem.boxObject.screenX, anchorElem.boxObject.screenY+anchorElem.boxObject.height-1, false);
+	  anchorElem.onmouseleave = function(event) {}
+	}, 600);
+		
+	anchorElem.onmouseleave = function(event) {
+	  window.clearTimeout(timeoutID);
+	  
+	  // if mouse pointer position changes vertically, display popup menu without timeout
+	  if(event.clientY > positionY+5) {
 		document.getElementById("backForwardMenu").openPopupAtScreen(anchorElem.boxObject.screenX, anchorElem.boxObject.screenY+anchorElem.boxObject.height-1, false);
-	  }, 700);
-
+	  }
+	  anchorElem.onmouseleave = function(event) {}
+	}
 	anchorElem.onmouseup = function() {
 	  window.clearTimeout(timeoutID);
+	  anchorElem.onmouseleave = function(event) {}
 	}
+
    }
   },
   
   // Appbutton in titlebar
   createTitlebarButton: function() {
   
-	// this button can only be places on Firefox titlebar using Windows OS
+	// this button can only be placed on Firefox titlebar using Windows OS
 	if(classicthemerestorerjs.ctr.osstring == "WINNT"){
 
   //If in rome do what the romans do use the browsers name.
@@ -2072,10 +2115,13 @@ classicthemerestorerjs.ctr = {
 		var buttontitle = brandName; // init with default title
 		var custombuttontitle = classicthemerestorerjs.ctr.prefs.getCharPref('appbuttontxt');
 		
-		if(custombuttontitle!='') buttontitle = custombuttontitle;
+		var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
+		converter.charset = 'UTF-8';
+		
+		if(custombuttontitle!='') buttontitle = converter.ConvertToUnicode(custombuttontitle);
 		else {
 			try{
-			  // make sure appbutton will get correct title
+			  // make sure appbutton gets correct title
 			  buttontitle = document.getElementById("main-window").getAttribute("title_normal");
 			  if(buttontitle=="Mozilla Firefox") buttontitle="Firefox";
 			  else if(buttontitle=="Firefox Developer Edition") buttontitle="DevFox";
@@ -2511,19 +2557,11 @@ classicthemerestorerjs.ctr = {
 	setTimeout(function(){
 	  try{
 		if(classicthemerestorerjs.ctr.prefs.getBoolPref('skipprintpr')) {
-		  document.getElementById("print-button").setAttribute("command",'cmd_print');
-		  document.getElementById("print-button").removeAttribute("oncommand");
+		  classicthemerestorerjs.ctr.ctrGetId("print-button").setAttribute("command",'cmd_print');
+		  classicthemerestorerjs.ctr.ctrGetId("print-button").removeAttribute("oncommand");
 		}
 	  } catch(e){}
 	},1000);
-	setTimeout(function(){
-	  try{
-		if(classicthemerestorerjs.ctr.prefs.getBoolPref('skipprintpr')) {
-		  document.getElementById("print-button").setAttribute("command",'cmd_print');
-		  document.getElementById("print-button").removeAttribute("oncommand");
-		}
-	  } catch(e){}
-	},5000);
   },
   
   updateTabWidth: function() {
@@ -2553,12 +2591,7 @@ classicthemerestorerjs.ctr = {
 		document.styleSheets[1].cssRules[ruleEndPosition].style.maxWidth=""+maxWidthValue+"px";
 	  } catch(e){}
 	}
-	
-	/* logging */
-	/*try {
-		var style_rules = document.styleSheets[1].cssRules;
-		console.log(style_rules);
-	} catch(e) {}*/
+
   },
 
   // adds busy attribute to activity throbber
@@ -2997,6 +3030,7 @@ classicthemerestorerjs.ctr = {
 		case "alt_newtabp": 		manageCSS("alt_newtabpage.css");		break;
 		case "bmbutpanelm": 		manageCSS("bmbut_pmenu.css");			break;
 		case "bmbutnotext": 		manageCSS("bmbut_no_label.css");		break;
+		case "tbconmenu": 			manageCSS("tbconmenu.css");				break;
 		case "noresizerxp": 		manageCSS("no_resizer_xp.css");			break;
 		case "pmhidelabels": 		manageCSS("panelmenu_nolabels.css");	break;
 		case "menupopupscr": 		manageCSS("menupopupscrollbar.css");	break;
@@ -4633,12 +4667,31 @@ classicthemerestorerjs.ctr = {
 					@-moz-document url("about:home") {\
 						html{\
 							background-image: url('+ this.prefs.getCharPref("abouthomecustomurl") +')!important;\
-							background-size: 100% 100%!important;\
 						}\
 					}\
 				'), null, null);
 				
 				applyNewSheet(this.abouthome_bg);
+			}
+
+		break;
+
+		case "abouthome_bg_strech":
+
+			removeOldSheet(this.abouthome_bg_strech);
+			
+			if(enable==true && this.prefs.getBoolPref("abouthomebgstretch")){
+	
+				this.abouthome_bg_strech=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					@namespace url(http://www.w3.org/1999/xhtml);\
+					@-moz-document url("about:home") {\
+						html{\
+							background-size: 100% 100%!important;\
+						}\
+					}\
+				'), null, null);
+				
+				applyNewSheet(this.abouthome_bg_strech);
 			}
 
 		break;
@@ -4662,6 +4715,30 @@ classicthemerestorerjs.ctr = {
 			}
 
 		break;
+		
+		case "hideElements":
+
+			removeOldSheet(this.hideElements);
+			
+			if(enable==true && this.prefs.getBoolPref("hidexulelements")){
+				
+			var elementData = this.prefs.getCharPref("hidexulfilter").replace(/,\s*$/, "");
+
+				//Check for empty array so we don't create a style with no data.
+				if(elementData !== ""){
+				this.hideElements=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					/*AGENT_SHEET*/\
+					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
+					@-moz-document url(chrome://browser/content/browser.xul) {\
+						'+elementData+'{\
+							display:none!important;\
+						}\
+					}\
+				'), null, null);
+		
+				applyNewSheet(this.hideElements);
+				}
+			}
 		
 	}
 	
@@ -4868,15 +4945,19 @@ try{
 			alert("Were sorry something has gone wrong removing Appmenu Items" + e);
 	}	
 			
-  }, false);	
-  
-  document.getElementById("ctraddon_appbutton2")
-        .addEventListener("DOMContentLoaded", function (e) {		
-	try{		
-			classicthemerestorerjs.ctr.fixThatTreeStyleBro();
-		}catch (e){}	
-			
   }, false);
+
+  if(classicthemerestorerjs.ctr.osstring=="WINNT"){
+	  document.getElementById("ctraddon_appbutton2")
+	        .addEventListener("DOMContentLoaded", function (e) {
+	        	document.getElementById("ctraddon_appbutton2")
+	        		.removeEventListener("DOMContentLoaded", load, false);		
+		try{		
+				classicthemerestorerjs.ctr.fixThatTreeStyleBro();
+			}catch (e){}	
+				
+	  }, false);
+  }
   
 //Add listener for tree style tab  
 window.addEventListener("DOMWindowCreated", function load(event){ 

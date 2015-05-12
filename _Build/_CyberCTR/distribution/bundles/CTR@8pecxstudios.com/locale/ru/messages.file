@@ -10,3 +10,5 @@ notification_msg_firstrun=Обнаружен набор опций CTRpreference
 notification_button_firstrun=Перезапуск
 notification_msg_change=Набор опций CTRpreferences был изменен
 notification_button_change=Опции
+clearFilter.title=Подтверждение очистки фильтра.
+clearFilter.msg=Вы действительно хотите очистить фильтр?

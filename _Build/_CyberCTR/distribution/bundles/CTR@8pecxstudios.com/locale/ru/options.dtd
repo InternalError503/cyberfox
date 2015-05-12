@@ -141,7 +141,8 @@
 <!ENTITY Ctr_alt_newtabrow	"Страница новой вкладки: ряды">
 <!ENTITY Ctr_bmbutpanelm	"Кнопка меню закладок: стиль отображения меню">
 <!ENTITY Ctr_bmbutnotext	"Кнопка меню закладок: скрыть метку на панели закладок">
-<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
+<!ENTITY Ctr_skipprintpr	"Кнопка печати: пропускать предварительный просмотр">
+<!ENTITY Ctr_tbconmenu		"Контекстное меню панели инструментов: скрыть «Переместить в меню», «Удалить с панели инструментов», «Обновить/В закладки все вкладки», «Восстановить закрытую вкладку»">
 <!ENTITY Ctr_noresizerxp	"Скрыть «Resizer» (Windows XP/2000)">
 <!ENTITY Ctr_extraurlkeycb	"Открыть дополнительную адресную строку (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Панель меню: спрятать надписи на кнопках">
@@ -262,12 +263,12 @@
 <!ENTITY Ctr_nodevtheme		"Предотвращение активации «Тема разработчика»">
 
 <!ENTITY Ctr_experttweaks	"Продвинутые">
-<!ENTITY Ctr_fx33layers		"В &brandShortName; версий 33 и выше введены новые возможности визуализации, на некоторых системах вызывает ошибки с вкладками (нет реакции, вкладки заморожены). Отключение этой опции решает проблему.">
-<!ENTITY Ctr_fx34search		"В &brandShortName; версий 34 и выше введена новая панель поиска. Отключение этой опции позволяет вернуть старую панель поиска.">
-<!ENTITY Ctr_fx34loop		"В &brandShortName; версий 34 и выше добавлен клиент для связи в режиме реального времени. Отключение параметра удаляет эту функцию.">
-<!ENTITY Ctr_fx35devtheme	"В &brandShortName; версий 35 и выше введена новая «Тема разработчика». Отключение параметра удаляет её и соответствующую кнопку в режиме «Настройка».">
-<!ENTITY Ctr_fx36prefs		"В &brandShortName; версий 36 и выше настройки отображаются в новой вкладке. Если отключить этот параметр, восстанавливается старое окно настроек.">
-<!ENTITY Ctr_fx38reader		"В &brandShortName; версий 38 и выше представлен новый «режим чтения». Отключение этой опции выключает его и убирает иконку с адресной панели.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; версий 33 и выше введены новые возможности визуализации, на некоторых системах вызывает ошибки с вкладками (нет реакции, вкладки заморожены). Отключение этой опции решает проблему.">
+<!ENTITY Ctr_fx34search		"&brandShortName; версий 34 и выше введена новая панель поиска. Отключение этой опции позволяет вернуть старую панель поиска.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; версий 34 и выше добавлен клиент для связи в режиме реального времени. Отключение параметра удаляет эту функцию.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; версий 35 и выше введена новая «Тема разработчика». Отключение параметра удаляет её и соответствующую кнопку в режиме «Настройка».">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; версий 36 и выше настройки отображаются в новой вкладке. Если отключить этот параметр, восстанавливается старое окно настроек.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; версий 38 и выше представлен новый «режим чтения». Отключение этой опции выключает его и убирает иконку с адресной панели.">
 <!ENTITY Ctr_e_omtc			"OMTC / проблема с зависанием вкладок">
 <!ENTITY Ctr_e_searchui		"Внешний вид панели поиска">
 <!ENTITY Ctr_e_loop			"Вызовы и разговоры">
@@ -295,7 +296,7 @@
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "Н">
-<!ENTITY forwardCmd.accesskey         "в">
+<!ENTITY forwardCmd.accesskey         "В">
 <!ENTITY reloadCmd.accesskey          "н">
 <!ENTITY stopCmd.accesskey            "т">
 <!ENTITY bookmarkPageCmd2.accesskey   "б">
@@ -322,7 +323,7 @@
 <!ENTITY ctr_toolbarsearchbar.description	"Панель инструментов поиска">
 <!ENTITY ctr_toolbarsearchbarcustwidth.label	"Разрешить изменение максимальной ширины">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Максимальная ширина панели поиска: ">
-<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Сворачиваемая панель поиска дополнений на странице about:addons">
 
 <!ENTITY ctr_abouthome.caption "Стиль домашней страницы (about:home)">
 <!ENTITY ctr_abouthome.default "Стиль по умолчанию">
@@ -338,4 +339,13 @@
 <!ENTITY ctr_abouthome.custombgurlph "Ссылка/путь к фоновому изображению">
 <!ENTITY ctr_abouthome.customhighlight "Использовать свой цвет подсветки ">
 <!ENTITY ctr_abouthome.customhighlightcol "Изменение цвета подсветки">
-<!ENTITY ctr_abouthome.animate "Use animations on about:home page">
+<!ENTITY ctr_abouthome.animate "Использовать анимации на домашней странице (about:home)">
+<!ENTITY ctr_abouthome.custombgstretch "Растянуть фоновое изображение на весь размер окна (по умолчанию).">
+
+<!ENTITY cssClassId.description "Скрытие классов по названию и id">
+<!ENTITY cssClassId.label "Введите название класса или id:">
+<!ENTITY useFilterElement.label "Использовать свой фильтр для скрытия элементов по названиям классов или id">
+<!ENTITY filterElement.placehold "Вы можете указать классы или id элементов.">
+<!ENTITY add.label "Добавить">
+<!ENTITY clear.label "Очистить фильтр">
+<!ENTITY copy.label "Копировать фильтр">

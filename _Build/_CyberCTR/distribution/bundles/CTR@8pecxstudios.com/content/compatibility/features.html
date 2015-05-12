@@ -11,9 +11,13 @@
 	<link rel="stylesheet"
 			 href="css/uikit.gradient.min.css"  
 			 type="text/css" />
+	<link rel="stylesheet"
+			 href="css/tooltip.gradient.css"  
+			 type="text/css" />
 	<script src="js/jquery-2.1.1.min.js"></script>
 	<script src="js/uikit.min.js"></script>
-	<script src="js/features.js"></script>		
+	<script src="js/tooltip.min.js"></script>
+	<script src="js/features.js"></script>
  </head>
  <body>
 	<div class="uk-container uk-container-center">
@@ -23,9 +27,8 @@
 <nav class="uk-navbar uk-animation-slide-top">
 <a class="uk-navbar-brand uk-hidden-small"><i class="uk-icon-cubes uk-icon-small"></i> <span class="uk-text-primary uk-text-bold">Cyber</span><span class="uk-text-bold">CTR</span></a>
     <ul class="uk-navbar-nav uk-hidden-small">		
-		<li><a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475" 
-					title="CyberCTR Update Package" 
-					target="_blank"><i class="uk-icon-cloud-download uk-icon-medium"></i> CyberCTR Update Package</a></li>
+		<li id="up-check"><a title="Check For Updates"
+					onclick="cyberctrFeatures.updateCheck(true);"><i class="uk-icon-cloud-download uk-icon-medium"></i> Check For Updates</a></li>
 		<li><a title="Documentation" 
 					onclick="cyberctrFeatures.get_localized_document();" 
 					target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>
@@ -47,6 +50,22 @@
 	<div class="uk-alert uk-alert-success" data-uk-alert="">
 			<a href="" class="uk-alert-close uk-close"></a>
 			<p class="uk-text uk-text-center"><i class="uk-icon-info-circle uk-icon-medium"></i> Welcome to features and information, Here you will find useful information and links to help improve your browsing experience.</p>
+	</div>
+</div>
+<div id="update_message" hidden="true">
+	<div class="uk-alert uk-alert-danger" data-uk-alert="">
+			<p class="uk-text uk-text-center">
+				<i class="uk-icon-download uk-icon-medium"></i> A newer version of CyberCTR is available for download!,
+					Click <a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#download">here</a> to visit the download section, 
+					Click <a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#release-notes">here</a> to visit the release notes section.
+			</p>
+	</div>
+</div>
+<div id="update_message_nou" hidden="true">
+	<div class="uk-alert uk-alert-success" data-uk-alert="">
+			<a href="" class="uk-alert-close uk-close"></a>
+			<p class="uk-text uk-text-center">
+				<i class="uk-icon-info-circle uk-icon-medium"></i> No CyberCTR updates available, Your using the latest version.</p>
 	</div>
 </div>
 <div class="uk-panel uk-panel-box uk-animation-slide-bottom">
@@ -118,7 +137,11 @@
 			<li>Hide logo on about:home page.</li>
 			<li>Hide snippets (Ads) on about:home page <span class="uk-text-primary">(Firefox Only)</span></li>
 			<li>Remove links on about:home page <span class="uk-text-primary">(Cyberfox Only)</span></li>
-			<li>Change highlight color of about:home page links, search-bar and buttons.</li>			
+			<li>Change highlight color of about:home page links, search-bar and buttons.</li>
+			<li>Hide elements by class or id with css using the elements filter.  See list of <a href="https://github.com/InternalError503/CyberCTR/blob/master/ID_List.md" 
+				  target="_blank" 
+				  data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
+				  title="Filter List">elements</a></li>
 		</ul>		
 <p>Plus many under the hood changes and many more visual changes to come.</p>					
 	<h2>Main features (on options window)</h2>
@@ -256,9 +279,8 @@ Toolbar: [something]...[stop-button][reload-button]...[something]</p>
 						<a class="uk-navbar-brand"><i class="uk-icon-cubes uk-icon-small" style="color:#f8f8f8;"></i> <span class="uk-text-bold" style="color:#f8f8f8;">CyberCTR</span></a>
                 </div>			
                 <ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav="">
-					<li><a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475" 
-								title="CyberCTR Update Package" 
-								target="_blank" ><i class="uk-icon-cloud-download uk-icon-medium"></i> CyberCTR Update Package</a></li>
+					<li id="up-check-oc"><a title="Check For Updates"
+					onclick="cyberctrFeatures.updateCheck(true); UIkit.offcanvas.hide();"><i class="uk-icon-cloud-download uk-icon-medium"></i> Check For Updates</a></li>
 					<li><a title="Documentation" 
 								onclick="cyberctrFeatures.get_localized_document();"  
 								target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>					

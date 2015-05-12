@@ -190,6 +190,7 @@
 		<preference id="ctraddon_bmbutpanelm"	name="extensions.classicthemerestorer.bmbutpanelm"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bmbutnotext"	name="extensions.classicthemerestorer.bmbutnotext"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_skipprintpr"	name="extensions.classicthemerestorer.skipprintpr"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_tbconmenu"		name="extensions.classicthemerestorer.tbconmenu"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_noresizerxp"	name="extensions.classicthemerestorer.noresizerxp"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_pmhidelabels"	name="extensions.classicthemerestorer.pmhidelabels"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_menupopupscr"	name="extensions.classicthemerestorer.menupopupscr"	 type="bool"	instantApply="true"/>
@@ -256,7 +257,11 @@
 	<preference id="ctraddon_ctabouthome_bg"	name="extensions.classicthemerestorer.abouthomecustomurl"	type="string"	instantApply="true"/>
 	<preference id="ctraddon_ctabouthomecustomhighlight"	name="extensions.classicthemerestorer.abouthomehighlight"	type="bool"	instantApply="true"/>	
 	<preference id="ctraddon_ctabouthome_highlight_color"	name="extensions.classicthemerestorer.abouthomecustomhighlightcolor"	type="string"	instantApply="true"/>
-	<preference id="ctraddon_ctabouthomeanimate"	name="extensions.classicthemerestorer.abouthomeanimate"	type="bool"	instantApply="true"/>		
+	<preference id="ctraddon_ctabouthomeanimate"	name="extensions.classicthemerestorer.abouthomeanimate"	type="bool"	instantApply="true"/>
+	<preference id="ctraddon_ctabouthome_bg_stretch"	name="extensions.classicthemerestorer.abouthomebgstretch"	type="bool"	instantApply="true"/>	
+	
+	<preference id="ctraddon_cthidexulelements"	name="extensions.classicthemerestorer.hidexulelements"	type="bool"	instantApply="true"/>
+	
 	</preferences>
 
 
@@ -766,6 +771,7 @@
 		<checkbox label="&Ctr_bmbutpanelm;"		preference="ctraddon_bmbutpanelm" id="ctraddon_pw_bmbutpanelm"/>
 		<checkbox label="&Ctr_bmbutnotext;"		preference="ctraddon_bmbutnotext" id="ctraddon_pw_bmbutnotext"/>
 		<checkbox label="&Ctr_skipprintpr;"		preference="ctraddon_skipprintpr" id="ctraddon_pw_skipprintpr" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<checkbox label="&Ctr_tbconmenu;"		preference="ctraddon_tbconmenu"	  id="ctraddon_pw_tbconmenu"/>
 		<checkbox label="&Ctr_noresizerxp;"		preference="ctraddon_noresizerxp" id="ctraddon_pw_noresizerxp"/>
 	  </groupbox>
 	  
@@ -796,7 +802,8 @@
 						  size="auto" 
 						  flex="1" 
 						  placeholder="&ctr_abouthome.custombgurlph;"/>
-			</hbox>	
+			</hbox>
+			<checkbox label="&ctr_abouthome.custombgstretch;"	preference="ctraddon_ctabouthome_bg_stretch" id="ctraddon_ctabouthome_custbgstretch"/>			
 			<checkbox label="&ctr_abouthome.customhighlight;" preference="ctraddon_ctabouthomecustomhighlight" id="ctraddon_ctabouthomecusthltck"/>
 		<hbox>
 			<label value="&ctr_abouthome.customhighlightcol;" id="ctraddon_ctabouthomecusthltlb"/>
@@ -805,6 +812,33 @@
 		</hbox>			
 	  </groupbox>	  
 
+	<groupbox>
+		<caption  label="&cssClassId.description;" class="ctraddon_topic"/>
+  <vbox class="contentPane" flex="1">
+  	<checkbox label="&useFilterElement.label;" preference="ctraddon_cthidexulelements"/>
+    <separator class="thin"/>
+	<hbox flex="1">
+    <label id="cssclid" control="css" value="&cssClassId.label;"/>
+	<label id="cssidlist" class="text-link" value="ID_List" href="https://github.com/InternalError503/CyberCTR/blob/master/ID_List.md"/>
+	</hbox>
+    <hbox align="start">
+      <textbox id="css"
+					  placeholder="&filterElement.placehold;"
+					  flex="1" 
+					  oninput="classicthemerestorerjso.ctr.onCssInput(event.target);"
+                      onkeypress="classicthemerestorerjso.ctr.onCssKeyPress(event);"/>
+    </hbox>
+    <hbox pack="end">
+      <button id="btnADD" disabled="true" label="&add.label;" default="true"
+              oncommand="classicthemerestorerjso.ctr.addCss();"/>
+      <button id="btnCopy" label="&copy.label;"
+              oncommand="classicthemerestorerjso.ctr.copyCss();"/>
+      <button id="btnClear" label="&clear.label;"
+              oncommand="classicthemerestorerjso.ctr.clearCss(true);"/>
+    </hbox>
+	</vbox>
+	</groupbox>
+	  
 	</box>
 
 	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_generaluibox2">

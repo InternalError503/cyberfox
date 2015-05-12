@@ -56,6 +56,7 @@ pref("extensions.classicthemerestorer.alt_newtabp",false);
 pref("extensions.classicthemerestorer.bmbutpanelm",false);
 pref("extensions.classicthemerestorer.bmbutnotext",false);
 pref("extensions.classicthemerestorer.skipprintpr",false);
+pref("extensions.classicthemerestorer.tbconmenu",false);
 pref("extensions.classicthemerestorer.noresizerxp",false);
 pref("extensions.classicthemerestorer.pmhidelabels",false);
 pref("extensions.classicthemerestorer.menupopupscr",false);
@@ -86,6 +87,7 @@ pref("extensions.classicthemerestorer.abouthomecustomurl", "");
 pref("extensions.classicthemerestorer.abouthomehighlight", false);
 pref("extensions.classicthemerestorer.abouthomecustomhighlightcolor", "#fe634a");
 pref("extensions.classicthemerestorer.abouthomeanimate", false);
+pref("extensions.classicthemerestorer.abouthomebgstretch", true);
 
 // Urlbar
 pref("extensions.classicthemerestorer.starinurl",false);
@@ -231,6 +233,9 @@ pref("extensions.classicthemerestorer.tabc_hov_unl",false);
 // first run/reset preference
 pref("extensions.classicthemerestorer.ctrreset",true);
 
+pref("extensions.classicthemerestorer.hidexulelements", false);
+pref("extensions.classicthemerestorer.hidexulfilter", "");
+
 //Compatibility 
 
 //Tree Style Tab
@@ -250,7 +255,9 @@ pref("extensions.classicthemerestorer.ctrpref.updatekey", false);
 pref("extensions.classicthemerestorer.titleintitlebar", false);
 
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.2.9");
+pref("extensions.classicthemerestorer.version", "1.3.1");
 
 //Features
 pref("extensions.classicthemerestorer.features.firstrun", false);
+pref("extensions.classicthemerestorer.features.updatecheck", true);
+pref("extensions.classicthemerestorer.features.lastcheck", "");

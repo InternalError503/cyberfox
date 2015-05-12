@@ -142,7 +142,8 @@
 <!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
 <!ENTITY Ctr_bmbutpanelm	"Tłóčatko menija zapołožkow: napohlad dialogoweho menija">
 <!ENTITY Ctr_bmbutnotext	"Tłóčatko menija zapołožkow: tekst na lajśce zapołožkow schować">
-<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
+<!ENTITY Ctr_skipprintpr	"Ćišćerske tłóčatko: ćišćerski přehlad přeskočić">
+<!ENTITY Ctr_tbconmenu		"Kontekstowy meni symboloweje lajsty: 'Do menija přesunyć', 'Ze symboloweje lajsty wotstronić', 'Wšě rajtarki znowa začitać/jako zapołožki składować' a 'Začinjenje rajtarka cofnyć' schować">
 <!ENTITY Ctr_noresizerxp	"Přeměnjowak wulkosće schować (Windows XP)">
 <!ENTITY Ctr_extraurlkeycb	"Přidatne adresowe polo wočinić (Cmd/Strg+">
 <!ENTITY Ctr_pmhidelabels	"Pólny meni: Tekst tłóčatkow schować">
@@ -340,3 +341,12 @@
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
+<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY cssClassId.description "Hide element classes - element ids">
+<!ENTITY cssClassId.label "Enter a class or id:">
+<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
+<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
+<!ENTITY add.label "ADD">
+<!ENTITY clear.label "Clear Filter">
+<!ENTITY copy.label "Copy Filter">

@@ -10,3 +10,5 @@ notification_msg_firstrun=CTR trcihlerinde değişiklikler bulundu uygulamak iç
 notification_button_firstrun=Yeniden Başlat
 notification_msg_change=Önceden tanımlı CTRpreferences ayarlarınız değiştirildi
 notification_button_change=Ayarlar
+clearFilter.title=Confirm clear filter.
+clearFilter.msg=Are you sure you want to clear the filter?

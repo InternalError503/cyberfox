@@ -141,7 +141,8 @@
 <!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
 <!ENTITY Ctr_bmbutpanelm	"Przycisk menu zakładek: wygląd menu panelu">
 <!ENTITY Ctr_bmbutnotext	"Przycisk menu zakładek: ukryj etykietę na pasku zakładek">
-<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
+<!ENTITY Ctr_skipprintpr	"Przycisk drukowania: pomiń podgląd wydruku">
+<!ENTITY Ctr_tbconmenu		"Menu kontekstowe paska narzędzi: ukryj 'Przenieś do menu', 'Usuń z paska narzędzi', 'Odśwież wszystkie karty', 'Dodaj zakładki do wszystkich kart...' oraz 'Przywróć zamkniętą kartę'">
 <!ENTITY Ctr_noresizerxp	"Usuń zmieniacz rozmiaru (Windows XP)">
 <!ENTITY Ctr_extraurlkeycb	"Otwórz dodatkowy pasek adresu (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Wyskakujące okno menu panelu: ukryj etykiety przycisku">
@@ -340,3 +341,12 @@
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
+<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY cssClassId.description "Hide element classes - element ids">
+<!ENTITY cssClassId.label "Enter a class or id:">
+<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
+<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
+<!ENTITY add.label "ADD">
+<!ENTITY clear.label "Clear Filter">
+<!ENTITY copy.label "Copy Filter">

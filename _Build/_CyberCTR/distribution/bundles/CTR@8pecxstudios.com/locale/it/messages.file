@@ -10,3 +10,5 @@ notification_msg_firstrun=CTRpreferences has been found select restart to apply
 notification_button_firstrun=Restart
 notification_msg_change=Your pre-set CTRpreferences has been modified 
 notification_button_change=Options
+clearFilter.title=Confirm clear filter.
+clearFilter.msg=Are you sure you want to clear the filter?

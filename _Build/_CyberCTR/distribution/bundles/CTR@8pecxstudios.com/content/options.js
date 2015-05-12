@@ -556,13 +556,15 @@ classicthemerestorerjso.ctr = {
 			this.prefs.getCharPref("abouthome") === "light"){
 			document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
 			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
-			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;		
+			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
+			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;			
 			this.prefs.setBoolPref("abouthomecustombg", false);
 			
 		}else{
 			document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
 			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
 			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
+			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
 		}
 
 		Application.prefs.get("extensions.classicthemerestorer.abouthome").events.addListener("change", function(aEvent){
@@ -571,11 +573,13 @@ classicthemerestorerjso.ctr = {
 				document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
 				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
 				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
+			    document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;
 				Services.prefs.setBoolPref("extensions.classicthemerestorer.abouthomecustombg", false);
 			}else{
 				document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
 				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
 				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
+				document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
 			}
 			//Disable custom highlight colors on default theme in firefox.	
 			if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && 
@@ -596,6 +600,7 @@ classicthemerestorerjso.ctr = {
 				this.prefs.setBoolPref("abouthomehighlight", false);
 		}
 		
+			document.getElementById("css").value = Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter");
 			this.hideThemeInfoForTabs();
   },
   
@@ -1010,12 +1015,13 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("faviconurl",true);
 	this.prefs.setBoolPref("bmanimation",true);
 	this.prefs.setBoolPref("pananimation",true);
-	this.prefs.setBoolPref("alt_newtabp",true);
-
-	if (contexts.getBoolPref("classic")){}else{
+  if (contexts.getBoolPref("classic")){}else{
 		this.prefs.setBoolPref("noconicons",true);
 	}
-
+	this.prefs.setBoolPref("alt_newtabp",true);
+	this.prefs.setBoolPref("skipprintpr",true);
+	this.prefs.setBoolPref("tbconmenu",true);
+	
 	setTimeout(function(){
 		classicthemerestorerjso.ctr.prefs.setBoolPref("starinurl",true);
 		classicthemerestorerjso.ctr.prefs.setBoolPref("feedinurl",true);
@@ -1461,6 +1467,43 @@ classicthemerestorerjso.ctr = {
 			//Catch any nasty errors and output to dialogue
 			alert("We are sorry but something has gone wrong! " + e);	
 		}		
-	}
-  
+	},
+	
+	onCssInput: function (aCssField){
+		if (aCssField.value.trim().length !== Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter").length){
+		document.getElementById("btnADD").disabled = false;
+		}else{
+			document.getElementById("btnADD").disabled = true;
+		}	
+	}, 
+
+	onCssKeyPress: function (aEvent){
+		if (aEvent.keyCode == KeyEvent.DOM_VK_RETURN)
+		document.getElementById("btnADD").click();
+	},
+	
+	addCss: function (){
+		 var textbox = document.getElementById("css");
+		 var textboxCss = textbox.value.trim().replace(/,\s*$/, ""); // trim space start and end, Remove any comas on the end.
+		 Services.prefs.setCharPref("extensions.classicthemerestorer.hidexulfilter", textboxCss);
+		this.onCssInput(textbox);
+	},
+	
+	clearCss: function (event) {
+		if(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter").length === 0){return;}
+		var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
+		if (event === true && Services.prompt.confirm(null, stringBundle.GetStringFromName("clearFilter.title"), 
+		stringBundle.GetStringFromName("clearFilter.msg"))) {
+			document.getElementById("css").value="";
+			Services.prefs.clearUserPref("extensions.classicthemerestorer.hidexulfilter");
+			Services.prefs.setBoolPref("extensions.classicthemerestorer.hidexulelements", false);
+		}	
+	},
+	
+	copyCss: function () {
+			if(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter").length === 0){return;}
+            var gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper);
+            gClipboardHelper.copyString(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter"));
+	}	
+	
 };

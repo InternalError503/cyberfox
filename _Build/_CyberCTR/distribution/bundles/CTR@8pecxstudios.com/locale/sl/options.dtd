@@ -142,6 +142,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Gumb menija zaznamkov: videz ploščastega menija">
 <!ENTITY Ctr_bmbutnotext	"Gumb menija zaznamkov: skrij oznako na vrstici zaznamkov">
 <!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
+<!ENTITY Ctr_tbconmenu		"Toolbar context menu: hide 'move to menu', 'remove from toolbar', 'reload/bookmark all tabs' and 'undo close tab'">
 <!ENTITY Ctr_noresizerxp	"Skrij spremenilnik velikosti (Windows XP)">
 <!ENTITY Ctr_extraurlkeycb	"Odpri dodatno naslovno vrstico (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Pojavno okno ploščastega menija: skrij oznake gumbov">
@@ -339,3 +340,12 @@
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
+<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY cssClassId.description "Hide element classes - element ids">
+<!ENTITY cssClassId.label "Enter a class or id:">
+<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
+<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
+<!ENTITY add.label "ADD">
+<!ENTITY clear.label "Clear Filter">
+<!ENTITY copy.label "Copy Filter">
