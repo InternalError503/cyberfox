@@ -921,7 +921,7 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!-- End Restart Browser Tweak -->
 
 <!ENTITY FeaturesTabLabel "Features">
-<!ENTITY cyberfoxOptions.label "Cyberfox Features">
+<!ENTITY cyberfoxOptions.label "&brandShortName; Features">
 <!ENTITY menuFeaturesTab.label "Context \ Menus">
 
 <!-- Clone Current Tab Tweak -->
@@ -1008,9 +1008,9 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!ENTITY showOptionsAgentOverride.label "Show Options">
 
 <!-- Update check options -->
-<!ENTITY updateoptions.label "Cyberfox Update Options">
-<!ENTITY updateautocheck.label "Automatically check for updates in about cyberfox">
-<!ENTITY updatestartupcheck.label "Automatically check for updates when cyberfox starts.">
+<!ENTITY updateoptions.label "&brandShortName; Update Options">
+<!ENTITY updateautocheck.label "Automatically check for updates in about &brandShortName;">
+<!ENTITY updatestartupcheck.label "Automatically check for updates when &brandShortName; starts.">
 <!ENTITY updatecheckenabled.label "Enable update check.">
 
 <!-- Copy tab URL Tweak -->
