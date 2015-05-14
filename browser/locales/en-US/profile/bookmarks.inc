@@ -14,7 +14,7 @@
 #define bookmarks_toolbarfolder_description Add bookmarks to this folder to see them displayed on the Bookmarks Toolbar
 
 # LOCALIZATION NOTE (getting_started):
-# link title for https://8pecxstudios.com/
+# link title for https://cyberfox.8pecxstudios.com/
 #define getting_started Getting Started
 
 # LOCALIZATION NOTE (firefox_heading):
@@ -34,7 +34,7 @@
 #define firefox_community Get Involved
 
 # LOCALIZATION NOTE (firefox_about):
-# link title for https://8pecxstudios.com/about-us
+# link title for https://cyberfox.8pecxstudios.com/about-us
 #define firefox_about About Us
 
 # LOCALIZATION NOTE (firefox_feedback):

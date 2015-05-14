@@ -206,7 +206,7 @@ let gEMEHandler = {
     let options = {
       dismissed: true,
       eventCallback: aTopic => aTopic == "swapping",
-      learnMoreURL: Services.urlFormatter.formatURLPref("app.support.baseURL") + "drm-content",
+      learnMoreURL: Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "drm-content",
     };
     PopupNotifications.show(browser, "drmContentPlaying", message, anchorId, mainAction, null, options);
   },
