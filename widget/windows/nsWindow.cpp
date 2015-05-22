@@ -400,7 +400,7 @@ nsWindow::nsWindow() : nsWindowBase()
   } // !sInstanceCount
 
   mIdleService = nullptr;
-  
+
   ::InitializeCriticalSection(&mPresentLock);
 
   sInstanceCount++;
@@ -4690,7 +4690,8 @@ nsWindow::ProcessMessage(UINT msg, WPARAM& wParam, LPARAM& lParam,
         *aRetValue = CallWindowProcW(GetPrevWindowProc(), mWnd,
                                      msg, wParam, lParam);
         SetWindowLong(mWnd, GWL_STYLE, style);
-		LeaveCriticalSection(&mPresentLock);
+        LeaveCriticalSection(&mPresentLock);
+
         return true;
       }
 

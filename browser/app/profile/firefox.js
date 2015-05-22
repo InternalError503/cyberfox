@@ -1792,12 +1792,12 @@ pref("ui.key.menuAccessKeyFocuses", true);
 pref("browser.eme.ui.enabled", false);
 
 #if !defined(MOZ_UPDATE_CHANNEL) || MOZ_UPDATE_CHANNEL != esr
-pref("media.eme.enabled", true);
-pref("media.eme.apiVisible", true);
+pref("media.eme.enabled", false);
+pref("media.eme.apiVisible", false);
 
 #ifdef XP_WIN
-pref("media.gmp-eme-adobe.enabled", true);
-pref("browser.eme.ui.enabled", true);
+pref("media.gmp-eme-adobe.enabled", false);
+pref("browser.eme.ui.enabled", false);
 #endif
 
 #else // MOZ_UPDATE_CHANNEL == esr
@@ -1867,14 +1867,21 @@ pref("dom.ipc.reportProcessHangs", false);
 pref("dom.ipc.reportProcessHangs", true);
 #endif
 
-pref("reader.parse-on-load.enabled", false);
 pref("browser.readinglist.enabled", false);
 pref("browser.readinglist.sidebarEverOpened", false);
 pref("readinglist.scheduler.enabled", false);
 pref("readinglist.server", "https://readinglist.services.mozilla.com/v1");
 
+pref("browser.reader.detectedFirstArticle", false);
 // Don't limit how many nodes we care about on desktop:
 pref("reader.parse-node-limit", 0);
+
+pref("browser.pocket.enabled", true);
+pref("browser.pocket.api", "api.getpocket.com");
+pref("browser.pocket.site", "getpocket.com");
+pref("browser.pocket.oAuthConsumerKey", "40249-e88c401e1b1f2242d9e441c4");
+pref("browser.pocket.useLocaleList", true);
+pref("browser.pocket.enabledLocales", "en-US de es-ES ja ja-JP-mac ru");
 
 //Minimize ram useage on browser minimizes to taskbar
 pref("config.trim_on_minimize", true);

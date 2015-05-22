@@ -11,7 +11,7 @@
         name="Mozilla.WebAppRT"
         type="win32"
 />
-<description>Mozilla Webapp Runtime</description>
+<description>8pecxstudios Webapp Runtime</description>
 <dependency>
         <dependentAssembly>
                 <assemblyIdentity

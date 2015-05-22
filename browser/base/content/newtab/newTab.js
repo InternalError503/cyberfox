@@ -19,9 +19,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
   "resource://gre/modules/PrivateBrowsingUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "UpdateChannel",
   "resource://gre/modules/UpdateChannel.jsm");
-XPCOMUtils.defineLazyGetter(this, "gPrefService", function() {
-  return Services.prefs;
-}); 
+
 let {
   links: gLinks,
   allPages: gAllPages,

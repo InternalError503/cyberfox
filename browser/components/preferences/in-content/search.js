@@ -243,7 +243,8 @@ Application.prefs.get("browser.search.showOneOffButtons").events.addListener("ch
       if (!engine.shown)
         hiddenList.push(engine.name);
     }
-    document.getElementById("browser.search.hiddenOneOffs").value = hiddenList.join(",");
+    document.getElementById("browser.search.hiddenOneOffs").value =
+      hiddenList.join(",");
   },
 
   setDefaultEngine: function () {

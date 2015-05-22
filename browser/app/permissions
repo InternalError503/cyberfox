@@ -14,8 +14,8 @@ host	uitour	1	about:home
 
 # XPInstall
 host	install	1	addons.mozilla.org
-host	install	1	8pecxstudios.com
 host	install	1	cyberfox.8pecxstudios.com
+host	install	1	download.8pecxstudios.com
 host	install	1	marketplace.firefox.com
 
 # Remote troubleshooting

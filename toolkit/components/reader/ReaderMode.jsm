@@ -20,6 +20,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "Task", "resource://gre/modules/Task.jsm
 
 XPCOMUtils.defineLazyGetter(this, "Readability", function() {
   let scope = {};
+  scope.dump = this.dump;
   Services.scriptloader.loadSubScript("resource://gre/modules/reader/Readability.js", scope);
   return scope["Readability"];
 });
@@ -106,13 +107,39 @@ this.ReaderMode = {
    * @return boolean Whether or not we should show the reader mode button.
    */
   isProbablyReaderable: function(doc) {
-    let uri = Services.io.newURI(doc.location.href, null, null);
+    // Only care about 'real' HTML documents:
+    if (doc.mozSyntheticDocument || !(doc instanceof doc.defaultView.HTMLDocument)) {
+      return false;
+    }
 
+    let uri = Services.io.newURI(doc.location.href, null, null);
     if (!this._shouldCheckUri(uri)) {
       return false;
     }
 
-    return new Readability(uri, doc).isProbablyReaderable();
+    let utils = this.getUtilsForWin(doc.defaultView);
+    // We pass in a helper function to determine if a node is visible, because
+    // it uses gecko APIs that the engine-agnostic readability code can't rely
+    // upon.
+    // NB: we need to do a flush the first time we call this, so we keep track of
+    // this using a property:
+    this._needFlushForVisibilityCheck = true;
+    return new Readability(uri, doc).isProbablyReaderable(this.isNodeVisible.bind(this, utils));
+  },
+
+  isNodeVisible: function(utils, node) {
+    let bounds;
+    if (this._needFlushForVisibilityCheck) {
+      bounds = node.getBoundingClientRect();
+      this._needFlushForVisibilityCheck = false;
+    } else {
+      bounds = utils.getBoundsWithoutFlushing(node);
+    }
+    return bounds.height > 0 && bounds.width > 0;
+  },
+
+  getUtilsForWin: function(win) {
+    return win.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
   },
 
   /**
@@ -142,7 +169,9 @@ this.ReaderMode = {
    */
   downloadAndParseDocument: Task.async(function* (url) {
     let uri = Services.io.newURI(url, null, null);
-    let doc = yield this._downloadDocument(url);
+    let doc = yield this._downloadDocument(url).catch(e => {
+      throw e;
+    });
     return yield this._readerParse(uri, doc);
   }),
 
@@ -159,6 +188,10 @@ this.ReaderMode = {
         }
 
         let doc = xhr.responseXML;
+        if (!doc) {
+          reject("Reader mode XHR didn't return a document");
+          return;
+        }
 
         // Manually follow a meta refresh tag if one exists.
         let meta = doc.querySelector("meta[http-equiv=refresh]");
@@ -231,14 +264,33 @@ this.ReaderMode = {
       dump("Reader: " + msg);
   },
 
+  _blockedHosts: [
+    "twitter.com",
+    "mail.google.com",
+    "github.com",
+    "reddit.com",
+  ],
+
   _shouldCheckUri: function (uri) {
-    if ((uri.prePath + "/") === uri.spec) {
-      this.log("Not parsing home page: " + uri.spec);
+    if (!(uri.schemeIs("http") || uri.schemeIs("https") || uri.schemeIs("file"))) {
+      this.log("Not parsing URI scheme: " + uri.scheme);
       return false;
     }
 
-    if (!(uri.schemeIs("http") || uri.schemeIs("https") || uri.schemeIs("file"))) {
-      this.log("Not parsing URI scheme: " + uri.scheme);
+    try {
+      uri.QueryInterface(Ci.nsIURL);
+    } catch (ex) {
+      // If this doesn't work, presumably the URL is not well-formed or something
+      return false;
+    }
+    // Sadly, some high-profile pages have false positives, so bail early for those:
+    let asciiHost = uri.asciiHost;
+    if (this._blockedHosts.some(blockedHost => asciiHost.endsWith(blockedHost))) {
+      return false;
+    }
+
+    if (!uri.filePath || uri.filePath == "/") {
+      this.log("Not parsing home page: " + uri.spec);
       return false;
     }
 
@@ -273,7 +325,7 @@ this.ReaderMode = {
 
     let serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].
                      createInstance(Ci.nsIDOMSerializer);
-    let serializedDoc = yield Promise.resolve(serializer.serializeToString(doc));
+    let serializedDoc = serializer.serializeToString(doc);
 
     let article = null;
     try {
