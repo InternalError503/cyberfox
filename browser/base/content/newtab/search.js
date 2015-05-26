@@ -32,7 +32,7 @@ let gSearch = {
  try{
 	  let searchFormElement = document.getElementById("newtab-search-form");
 	  let searchPanelElement = document.getElementById("newtab-search-panel");
-			if (searchFormElement === null){return;}
+			if (searchFormElement === null || searchPanelElement === null){return;}
 					searchFormElement.parentNode.removeChild(searchFormElement);
 					searchPanelElement.parentNode.removeChild(searchPanelElement);
 		}catch (e){
