@@ -473,8 +473,8 @@ tr.DeleteProfileData=Profil verilerinizi de silmek istiyor musunuz?
 tr.ConfirmDeleteProfileData=Emin misiniz bu işlem geri alınamaz!
 tr.InstallingDocumentation=CyberCTR Dosyaları
 tr.InstallingDocumentationStatus=CyberCTR Dosyaları yükleniyor. Bu işlem biraz zaman alabilir...
-tr.CleanInstallDescription=Perform clean installation.
-tr.CleanInstallGroupDescription=Installation Options
+tr.CleanInstallDescription=Temiz Bir Kurulum Gerçekleştir.
+tr.CleanInstallGroupDescription=Kurulum Seçenekleri
 ;Spanish
 en_es.ProcessName={#MyAppName}
 en_es.IsAppRunning= ya se está ejecutando, cierre {#MyAppName} a continuación, ejecute el programa de instalación de nuevo.
