@@ -174,7 +174,7 @@ SocialUI = {
   },
 
   showLearnMore: function() {
-    let url = Services.urlFormatter.formatURLPref("app.support.baseURL") + "social-api";
+    let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "social-api";
     openUILinkIn(url, "tab");
   },
 

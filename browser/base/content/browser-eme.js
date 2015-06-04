@@ -29,7 +29,7 @@ let gEMEHandler = {
   },
   getLearnMoreLink: function(msgId) {
     let text = gNavigatorBundle.getString("emeNotifications." + msgId + ".learnMoreLabel");
-    let baseURL = Services.urlFormatter.formatURLPref("app.support.baseURL");
+    let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
     return "<label class='text-link' href='" + baseURL + "drm-content'>" +
            text + "</label>";
   },

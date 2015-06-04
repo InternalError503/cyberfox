@@ -528,7 +528,7 @@ Migrator.prototype = {
 
   get learnMoreLink() {
     try {
-      var url = Services.prefs.getCharPref("app.support.baseURL");
+      var url = Services.prefs.getCharPref("app.helpdoc.baseURI");
     } catch (err) {
       return null;
     }

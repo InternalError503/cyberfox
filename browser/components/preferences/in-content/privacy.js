@@ -25,7 +25,7 @@ var gPrivacyPane = {
     }
 
     let link = document.getElementById("trackingProtectionLearnMore");
-    let url = Services.urlFormatter.formatURLPref("app.support.baseURL") + "tracking-protection";
+    let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "tracking-protection";
     link.setAttribute("href", url);
 
     document.getElementById("trackingprotectionbox").hidden = false;

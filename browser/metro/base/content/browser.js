@@ -724,7 +724,7 @@ var Browser = {
       }
       case "report-phishing": {
         // It's a phishing site, just link to the generic information page
-        let url = Services.urlFormatter.formatURLPref("app.support.baseURL");
+        let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
         this.loadURI(url + "phishing-malware");
         break;
       }

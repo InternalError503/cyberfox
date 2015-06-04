@@ -1732,7 +1732,7 @@ nsContextMenu.prototype = {
   },
 
   drmLearnMore: function(aEvent) {
-    let drmInfoURL = Services.urlFormatter.formatURLPref("app.support.baseURL") + "drm-content";
+    let drmInfoURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "drm-content";
     let dest = whereToOpenLink(aEvent);
     // Don't ever want this to open in the same tab as it'll unload the
     // DRM'd video, which is going to be a bad idea in most cases.

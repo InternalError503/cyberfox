@@ -18,7 +18,7 @@ window.onload = function() {
   // the in-product link.
   let anchor = document.getElementById("linkMoreTroubleshooting");
   if (anchor) {
-    let baseURL = Services.urlFormatter.formatURLPref("app.support.baseURL");
+    let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
     anchor.setAttribute("href", baseURL + "troubleshooting");
   }
 

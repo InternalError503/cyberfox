@@ -731,7 +731,7 @@ function openNewWindowWith(aURL, aDocument, aPostData, aAllowThirdPartyFixup,
 function openHelpLink(aHelpTopic, aCalledFromModal, aWhere) {
   var url = Components.classes["@mozilla.org/toolkit/URLFormatterService;1"]
                       .getService(Components.interfaces.nsIURLFormatter)
-                      .formatURLPref("app.support.baseURL");
+                      .formatURLPref("app.helpdoc.baseURI");
   url += aHelpTopic;
 
   var where = aWhere;
