@@ -18,7 +18,8 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <prefpane id="paneContent" 
-            onpaneload="gContentPane.init();">
+            onpaneload="gContentPane.init();"
+            helpTopic="prefs-content">
 
     <preferences id="contentPreferences">
       <!--XXX buttons prefs -->

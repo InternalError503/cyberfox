@@ -20,7 +20,8 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
            
   <prefpane id="paneMain" 
-            onpaneload="gMainPane.init();">
+            onpaneload="gMainPane.init();"
+            helpTopic="prefs-main">
 
     <script type="application/javascript" src="chrome://browser/content/preferences/main.js"/>
 

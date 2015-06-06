@@ -21,7 +21,8 @@
          xmlns:html="http://www.w3.org/1999/xhtml">
 
   <prefpane id="panePrivacy"
-            onpaneload="gPrivacyPane.init();">
+            onpaneload="gPrivacyPane.init();"
+            helpTopic="prefs-privacy">
 
     <preferences id="privacyPreferences">
   

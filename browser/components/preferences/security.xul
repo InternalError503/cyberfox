@@ -18,7 +18,8 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <prefpane id="paneSecurity"
-            onpaneload="gSecurityPane.init();">
+            onpaneload="gSecurityPane.init();"
+            helpTopic="prefs-security">
 
     <preferences id="securityPreferences">
       <!-- XXX buttons -->

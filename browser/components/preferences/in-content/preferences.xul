@@ -19,20 +19,24 @@
 <!DOCTYPE page [
 <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
 <!ENTITY % globalPreferencesDTD SYSTEM "chrome://global/locale/preferences.dtd">
-<!ENTITY % preferencesDTD SYSTEM "chrome://browser/locale/preferences/preferences.dtd">
+<!ENTITY % preferencesDTD SYSTEM
+  "chrome://browser/locale/preferences/preferences.dtd">
 <!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd">
 <!ENTITY % privacyDTD SYSTEM "chrome://browser/locale/preferences/privacy.dtd">
 <!ENTITY % tabsDTD SYSTEM "chrome://browser/locale/preferences/tabs.dtd">
 <!ENTITY % searchDTD SYSTEM "chrome://browser/locale/preferences/search.dtd">
 <!ENTITY % syncBrandDTD SYSTEM "chrome://browser/locale/syncBrand.dtd">
 <!ENTITY % syncDTD SYSTEM "chrome://browser/locale/preferences/sync.dtd">
-<!ENTITY % securityDTD SYSTEM "chrome://browser/locale/preferences/security.dtd">
+<!ENTITY % securityDTD SYSTEM
+  "chrome://browser/locale/preferences/security.dtd">
 <!ENTITY % sanitizeDTD SYSTEM "chrome://browser/locale/sanitize.dtd">
 <!ENTITY % mainDTD SYSTEM "chrome://browser/locale/preferences/main.dtd">
 <!ENTITY % aboutHomeDTD SYSTEM "chrome://browser/locale/aboutHome.dtd">
 <!ENTITY % contentDTD SYSTEM "chrome://browser/locale/preferences/content.dtd">
-<!ENTITY % applicationsDTD SYSTEM "chrome://browser/locale/preferences/applications.dtd">
-<!ENTITY % advancedDTD SYSTEM "chrome://browser/locale/preferences/advanced.dtd">
+<!ENTITY % applicationsDTD SYSTEM
+  "chrome://browser/locale/preferences/applications.dtd">
+<!ENTITY % advancedDTD SYSTEM
+  "chrome://browser/locale/preferences/advanced.dtd">
 %brandDTD;
 %globalPreferencesDTD;
 %preferencesDTD;
@@ -90,6 +94,7 @@
       <richlistitem id="category-general"
                     class="category"
                     value="paneGeneral"
+                    helpTopic="prefs-main"
                     tooltiptext="&paneGeneral.title;"
                     align="center">
         <image class="category-icon"/>
@@ -99,6 +104,7 @@
       <richlistitem id="category-search"
                     class="category"
                     value="paneSearch"
+                    helpTopic="prefs-search"
                     tooltiptext="&paneSearch.title;"
                     align="center">
         <image class="category-icon"/>
@@ -108,6 +114,7 @@
       <richlistitem id="category-content"
                     class="category"
                     value="paneContent"
+                    helpTopic="prefs-content"
                     tooltiptext="&paneContent.title;"
                     align="center">
         <image class="category-icon"/>
@@ -117,6 +124,7 @@
       <richlistitem id="category-application"
                     class="category"
                     value="paneApplications"
+                    helpTopic="prefs-applications"
                     tooltiptext="&paneApplications.title;"
                     align="center">
         <image class="category-icon"/>
@@ -126,6 +134,7 @@
       <richlistitem id="category-privacy"
                     class="category"
                     value="panePrivacy"
+                    helpTopic="prefs-privacy"
                     tooltiptext="&panePrivacy.title;"
                     align="center">
         <image class="category-icon"/>
@@ -135,6 +144,7 @@
       <richlistitem id="category-security"
                     class="category"
                     value="paneSecurity"
+                    helpTopic="prefs-security"
                     tooltiptext="&paneSecurity.title;"
                     align="center">
         <image class="category-icon"/>
@@ -145,6 +155,7 @@
       <richlistitem id="category-sync"
                     class="category"
                     value="paneSync"
+                    helpTopic="prefs-weave"
                     tooltiptext="&paneSync.title;"
                     align="center">
         <image class="category-icon"/>
@@ -155,6 +166,7 @@
       <richlistitem id="category-advanced"
                     class="category"
                     value="paneAdvanced"
+                    helpTopic="prefs-advanced-general"
                     tooltiptext="&paneAdvanced.title;"
                     align="center">
         <image class="category-icon"/>
@@ -175,6 +187,11 @@
 #include sync.xul
 #endif
       </prefpane>
+      <hbox pack="end">
+        <button id="help-button"
+                class="help-button"
+                aria-label="&helpButton.label;"/>
+      </hbox>
     </vbox>
 
   </hbox>

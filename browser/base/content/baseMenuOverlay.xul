@@ -43,7 +43,7 @@
 #endif
       <menupopup id="menu_HelpPopup" onpopupshowing="buildHelpMenu();">
         <menuitem id="menu_openHelp"
-                  oncommand="openHelpLink('/index.php')"
+                  oncommand="openUILink('https://8pecxstudios.com/Forums/index.php')"
                   onclick="checkForMiddleClick(this, event);"
                   label="&productHelp2.label;"
                   accesskey="&productHelp2.accesskey;"
@@ -53,7 +53,7 @@
                   />
 #endif
         <menuitem id="menu_keyboardShortcuts"
-                  oncommand="openUILink('http://mzl.la/16NAhwz')"
+                  oncommand="openHelpLink('keyboard-shortcuts')"
                   onclick="checkForMiddleClick(this, event);"
                   label="&helpKeyboardShortcuts.label;"
                   accesskey="&helpKeyboardShortcuts.accesskey;"/>

@@ -15,8 +15,8 @@
 <prefwindow id="ColorsDialog" type="child"
             xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
             title="&colorsDialog.title;"
-            dlgbuttons="accept,cancel"
-
+            dlgbuttons="accept,cancel,help"
+            ondialoghelp="openPrefsHelp()"
 #ifdef XP_MACOSX
             style="width: &window.macWidth; !important;">
 #else
@@ -24,7 +24,8 @@
 #endif
 
   <script type="application/javascript" src="chrome://browser/content/utilityOverlay.js"/>
-  <prefpane id="ColorsDialogPane">
+  <prefpane id="ColorsDialogPane"
+            helpTopic="prefs-fonts-and-colors">
   
     <preferences>
       <preference id="browser.display.document_color_use"   name="browser.display.document_color_use"   type="int"/>

@@ -18,6 +18,7 @@
          xmlns:html="http://www.w3.org/1999/xhtml">
 
   <prefpane id="paneSync"
+            helpTopic="prefs-weave"
             onpaneload="gSyncPane.init()">
 
     <preferences id="syncEnginePrefs">
