@@ -6,7 +6,7 @@
 
 :root {
 	--main-highlight-color:#00aaee;
-	--main-text-color:#525c66;
+	--main-text-colorb:#525c66;
 }
 
 html {
@@ -84,7 +84,7 @@ a {
 		text-align: center;
 		width: auto;
 		min-width: 73px;
-		color: var(--main-text-color);
+		color: var(--main-text-colorb);
 		height: 55;
 		font-size: 14px;
 	}
@@ -94,11 +94,11 @@ a {
 	}
 
 	.hmenubar li a:active {
-	   color: var(--main-text-color);	
+	   color: var(--main-text-colorb);	
 	}
 
 	.hmenubar li a.clicked {
-	   color: var(--main-text-color);
+	   color: var(--main-text-colorb);
 	}
 #topSection {
   text-align: center;
@@ -179,7 +179,7 @@ html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
               0 0 2px hsla(210,65%,9%,.1) inset,
               0 1px 0 hsla(0,0%,100%,.2);
   border-radius: 2.5px 0 0 2.5px;
-  color: var(--main-text-color);
+  color: var(--main-text-colorb);
 }
 
 #searchText:-moz-dir(rtl) {
@@ -201,7 +201,7 @@ html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
   border-radius: 0 2.5px 2.5px 0;
   box-shadow: 0 0 2px hsla(0,0%,100%,.5) inset,
               0 1px 0 hsla(0,0%,100%,.2);
-  color: var(--main-text-color);
+  color: var(--main-text-colorb);
   cursor: pointer;
   transition-property: background-color, border-color, box-shadow;
   transition-duration: 150ms;
@@ -272,7 +272,7 @@ html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
   display: inline-block;
   text-align: start;
   margin: 12px 0;
-  color: var(--main-text-color);
+  color: var(--main-text-colorb);
   font-size: 75%;
   /* 12px is the computed font size, 15px the computed line height of the snippets
      with Segoe UI on a default Windows 7 setup. The 15/12 multiplier approximately
@@ -317,7 +317,7 @@ body[narrow] #launcher[session] {
   background: transparent padding-box;
   border: 1px solid transparent;
   border-radius: 2.5px;
-  color: var(--main-text-color);
+  color: var(--main-text-colorb);
   font-size: 75%;
   cursor: pointer;
   transition-property: background-color, border-color, box-shadow;
