@@ -38,6 +38,16 @@ let gPage = {
     gCustomize.init();
 
   },
+  /**
+	* Focuses the search bar if pre-load newtab disabled
+	*/
+  focus: function(){	 
+	//focus search
+	var aFocus = document.getElementById('newtab-search-text');
+		if (aFocus &&  typeof(aFocus)  != "undefined" || aFocus  != null){
+			aFocus.focus();
+		}	  
+  },
 
   /**
    * Listens for notifications specific to this page.
