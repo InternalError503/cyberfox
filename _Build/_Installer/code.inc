@@ -109,8 +109,7 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 					WizardForm.CancelButton.Enabled := False;
 			if Exec(ExpandConstant(sUnInstallString), '/VERYSILENT', '', SW_SHOW, ewWaitUntilTerminated, iResultCode) then
 			begin
-				//Sleep for 2 seconds to ensure IO operations have completed.
-				sleep(2000)
+				//All IO operations have completed.
 			end
 			else begin
 				if UninstallSilent() then begin ExitProcess(11); end; // Our Exit code for clean install fail.			

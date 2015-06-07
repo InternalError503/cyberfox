@@ -54,7 +54,11 @@ VersionInfoProductTextVersion={#MyAppVersion}
 SignTool=__SIGNTOOL__
 SignedUnInstaller=yes
 #endif
+#if Arch == "i368"
 InternalCompressLevel=ultra
+#else
+InternalCompressLevel=ultra64
+#endif
 AppCopyright={#MyAppPublisher}
 AppComments={#MyAppDescriptionB}
 AppContact={#MyAppContact}
