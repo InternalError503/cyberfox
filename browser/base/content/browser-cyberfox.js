@@ -592,11 +592,11 @@ var gCyberfoxCustom = {
                                 //Log return failed request message for status 0 unsent
                                 console.log("Update Check Failed!" + " " + 
 								"Were sorry something has gone wrong! The request for update check was unable to be sent! Please check your internet connection or if cyberfox is not being blocked by a firewall!");break;
-                            case 1: console.log("Error Status: " + this.target.status);break;
-                            case 2:console.log("Error Status: " + this.target.status);break;
-							case 3:console.log("Error Status: " + this.target.status);break;
-							case 4:console.log("Error Status: " + this.target.status);break;
-							default:console.log("Error Status: " + this.target.status);break;
+                            case 1: console.log("Error Status: " + aEvent.target.status);break;
+                            case 2:console.log("Error Status: " + aEvent.target.status);break;
+							case 3:console.log("Error Status: " + aEvent.target.status);break;
+							case 4:console.log("Error Status: " + aEvent.target.status);break;
+							default:console.log("Error Status: " + aEvent.target.status);break;
                         }
                     };
 
