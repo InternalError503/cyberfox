@@ -278,7 +278,8 @@ var gCyberfoxCustom = {
 
             }, false);
 			
-		if (document.getElementById("nav-bar")){
+		var nav = document.getElementById("nav-bar");	
+		if (nav &&  typeof(nav)  != "undefined" || nav  != null){
 			var BMB_Book = document.getElementById("BMB_bookmarksPopup");
 				if (BMB_Book &&  typeof(BMB_Book)  != "undefined" || BMB_Book  != null){
 				document.getElementById("BMB_bookmarksPopup")
@@ -299,8 +300,18 @@ var gCyberfoxCustom = {
 						}
 
 					}, false);
-			}
+			}	
 		}
+		Application.prefs.get("browser.pocket.enabled").events.addListener("change", function(aEvent){
+			var pocket = document.getElementById("pocket-button");
+			if (nav &&  typeof(nav)  != "undefined" || nav  != null){
+				if (pocket &&  typeof(pocket)  != "undefined" || pocket  != null){
+					if (Services.prefs.getBoolPref("browser.pocket.enabled") === false) {
+						CustomizableUI.removeWidgetFromArea("pocket-button", CustomizableUI.TYPE_TOOLBAR);
+					}
+				}
+			}
+		});
 		
         document.getElementById("menu_ToolsPopup")
             .addEventListener("popupshowing", function(e) {
