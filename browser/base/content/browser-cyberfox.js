@@ -512,7 +512,7 @@ var gCyberfoxCustom = {
         }
     },
 	
-	startupUpdateCheck: function(){
+	startupUpdateCheck: function(aBoolean){
 		
 		if (Services.prefs.getBoolPref("app.update.startup.check") === false) {
 			return;
@@ -566,13 +566,16 @@ var gCyberfoxCustom = {
                             case "esr":currentVersion = jsObject.esr;break;
                         }
 
-                        if (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()) === false) {
-							window.setTimeout(function(){	
-								var message = "New Cyberfox "+ currentVersion.toString() + " update available!";
-								var nb = gBrowser.getNotificationBox();
-								const priority = nb.PRIORITY_WARNING_HIGH;
+                        if (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()) === false && aBoolean === true) {
+							var message = "New Cyberfox "+ currentVersion.toString() + " update available!";
+							var nb = gBrowser.getNotificationBox();
+							const priority = nb.PRIORITY_WARNING_HIGH;
+							var updateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
+								if (updateNotification) {
+									return;
+								}else{
 									nb.appendNotification(message, 'cyberfoxupdate', 'chrome://branding/content/icon16.png', priority, null);
-								},6000);
+								}	
                         }
 
                     };
@@ -618,6 +621,8 @@ var gCyberfoxCustom = {
 
 window.addEventListener("load", function() {
     gCyberfoxCustom.customPrefSettings();
-	gCyberfoxCustom.startupUpdateCheck();
 	window.removeEventListener("load",gCyberfoxCustom.startupUpdateCheck(), false);
+	window.setTimeout(function(){
+		gCyberfoxCustom.startupUpdateCheck(true);
+	},6000);
 }, false);
