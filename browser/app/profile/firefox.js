@@ -1899,7 +1899,7 @@ pref("browser.restart.enabled", true);
 
 //set bool pref for restart browser purgecache enabled ----New Cyberfox 29 + with new cache system------
 
-pref("browser.restart.purgecache", false);
+pref("browser.restart.purgecache", true);
 
 //Set bool pref for restart browser panelUI button ---New Cyberfox 37.0 ---
 pref("browser.restart.showpanelmenubtn", false);
