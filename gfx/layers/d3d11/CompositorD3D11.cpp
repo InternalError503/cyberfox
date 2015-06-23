@@ -825,7 +825,7 @@ CompositorD3D11::DrawQuad(const gfx::Rect& aRect,
     if (Failed(hr)) {
       // XXX - There's a chance we won't be able to render anything, should we
       // just crash release builds?
-	  gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 1";
+	  gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 1";
       return;
     }
 
@@ -895,7 +895,7 @@ CompositorD3D11::DrawQuad(const gfx::Rect& aRect,
       if (Failed(hr)) {
         // XXX - There's a chance we won't be able to render anything, should we
         // just crash release builds?
-		gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 3";
+		gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 3";
         return;
       }
 
@@ -945,21 +945,21 @@ CompositorD3D11::DrawQuad(const gfx::Rect& aRect,
       hr = mDevice->CreateShaderResourceView(sourceY->GetD3D11Texture(),
                                              nullptr, byRef(views[0]));
       if (Failed(hr)) {
-		gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 3";  
+		gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 3";  
         return;
       }
 
       hr = mDevice->CreateShaderResourceView(sourceCb->GetD3D11Texture(),
                                              nullptr, byRef(views[1]));
       if (Failed(hr)) {
-		gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 4";  
+		gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 4";  
         return;
       }
 
       hr = mDevice->CreateShaderResourceView(sourceCr->GetD3D11Texture(),
                                              nullptr, byRef(views[2]));
       if (Failed(hr)) {
-		gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 5";  
+		gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 5";  
         return;
       }
 
@@ -994,12 +994,12 @@ CompositorD3D11::DrawQuad(const gfx::Rect& aRect,
 
       hr = mDevice->CreateShaderResourceView(sourceOnBlack->GetD3D11Texture(), nullptr, byRef(views[0]));
       if (Failed(hr)) {
-		gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 6";  
+		gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 6";  
         return;
       }
       hr = mDevice->CreateShaderResourceView(sourceOnWhite->GetD3D11Texture(), nullptr, byRef(views[1]));
       if (Failed(hr)) {
-		gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 7";  
+		gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in DrawQuad 7";  
         return;
       }
 
@@ -1438,7 +1438,7 @@ CompositorD3D11::PaintToTarget()
 
   hr = mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)backBuf.StartAssignment());
   if (Failed(hr)) {
-	gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in PaintToTarget 1";  
+	gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in PaintToTarget 1";  
     return;
   }
 
@@ -1455,7 +1455,7 @@ CompositorD3D11::PaintToTarget()
 
   hr = mDevice->CreateTexture2D(&softDesc, nullptr, getter_AddRefs(readTexture));
   if (Failed(hr)) {
-	gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in PaintToTarget 2";  
+	gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in PaintToTarget 2";  
     return;
   }
   mContext->CopyResource(readTexture, backBuf);
@@ -1463,7 +1463,7 @@ CompositorD3D11::PaintToTarget()
   D3D11_MAPPED_SUBRESOURCE map;
   hr = mContext->Map(readTexture, 0, D3D11_MAP_READ, 0, &map);
   if (Failed(hr)) {
-	gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Failed in PaintToTarget 3";  
+	gfxCriticalError(gfxCriticalError::DefaultOptions(false)) << "Failed in PaintToTarget 3";  
     return;
   }
   RefPtr<DataSourceSurface> sourceSurface =
