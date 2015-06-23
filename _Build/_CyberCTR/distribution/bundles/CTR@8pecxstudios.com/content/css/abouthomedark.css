@@ -5,6 +5,7 @@
 
 	:root {
 		--main-highlight-color:#00adee;
+		--main-text-color:#efefef;
 	}
 
     html {
@@ -82,7 +83,7 @@
         text-align: center;
         width: auto;
         min-width: 73px;
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         text-shadow: -1px -1px #111 !important;
         height: 55;
         font-size: 14px;
@@ -107,7 +108,7 @@
         border-radius: 0px 0px 5px 5px;
     }
     .hmenubar li a:active {
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         background-color: rgb(37, 37, 39);
         background-image: linear-gradient(rgb(16, 16, 18), rgb(37, 37, 39) 30%, rgb(37, 38, 40));
         border-top: 6px solid rgb(35, 35, 35);
@@ -125,7 +126,7 @@
         border-radius: 0px 0px 5px 5px;
     }
     .hmenubar li a.clicked {
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         font-weight: bold;
         background: #3a3b3c !important;
         border-radius: 0px 0px 5px 5px;
@@ -191,7 +192,7 @@
     #searchText {
         -moz-box-flex: 1;
         padding: 6px 8px;
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         background-color: #333 !important;
         background-image: -moz-linear-gradient(rgb(37, 38, 40), rgb(37, 38, 40) 95%, rgb(25, 25, 25)) !important;
         box-shadow: 1px 3px 3px hsla(0, 0%, 0%, .100) inset, 1px 3px 3px hsla(0, 0%, 0%, .100) inset !important;
@@ -213,7 +214,7 @@
     }
     #searchSubmit {
         -moz-margin-start: -1px;
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         background: linear-gradient(hsla(0, 0%, 100%, .8), hsla(0, 0%, 100%, .1)) padding-box !important;
         padding: 0 9px;
         border: 1px solid !important;
@@ -236,7 +237,7 @@
         /*border-color: -moz-linear-gradient(#4cb1ff, #1793e5) !important;*/
         
         background-image: url(chrome://classic_theme_restorer/content/images/abouthome/noise.png) !important;
-        color: white !important;
+        color: var(--main-text-color)!important;
     }
     #searchText:focus + #searchSubmit,
     #searchText[autofocus] + #searchSubmit {
@@ -286,7 +287,7 @@
         display: inline-block;
         text-align: start;
         margin: 12px 0;
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         font-size: 75%;
         /* 12px is the computed font size, 15px the computed line height of the snippets
 		 with Segoe UI on a default Windows 7 setup. The 15/12 multiplier approximately
@@ -300,7 +301,7 @@
         color: var(--main-highlight-color)!important;
     }
     #snippets a:hover {
-        color: #efefef!important;
+        color: var(--main-text-color)!important;
     }
     #launcher {
         display: -moz-box;
@@ -334,7 +335,7 @@
         background: transparent padding-box;
         border: 1px solid #1a1a1a !important;
         border-radius: 12px 12px 12px 12px;
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         text-shadow: -1px -1px #111 !important;
         font-size: 75%;
         cursor: pointer;
@@ -354,7 +355,7 @@
         -moz-transition: .1s ease-in;
     }
     .launchButton:hover:active {
-        color: #efefef !important;
+        color: var(--main-text-color)!important;
         background-color: rgb(15, 15, 13) !important;
         background-image: linear-gradient(rgb(6, 6, 8), rgb(17, 17, 19) 30%, rgb(17, 18, 10)) !important;
         box-shadow: 1px 4px 4px hsla(0, 0%, 0%, .95) inset, 1px 4px 4px hsla(0, 0%, 0%, .95) inset !important;

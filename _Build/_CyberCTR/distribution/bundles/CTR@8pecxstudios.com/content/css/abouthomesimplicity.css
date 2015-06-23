@@ -4,6 +4,7 @@
 @-moz-document url("about:home") {
     :root {
         --main-highlight-color: #fe634a;
+		--main-text-color:#fff;
     }
     html {
         font: message-box;
@@ -71,7 +72,7 @@
         text-align: center;
         width: auto;
         min-width: 73px;
-        color: #fff!important;
+        color: var(--main-text-color)!important;
         height: 55;
         font-size: 14px;
     }
@@ -143,10 +144,10 @@
         padding: 6px 8px;
         background: #1a1a1a padding-box!important;
         border: 1px solid;
-        border-color: #fff!important;
+        border-color: var(--main-text-color)!important;
         box-shadow: 0 1px 0 hsla(180, 45%, 9%, .02) inset, 0 0 2px hsla(180, 45%, 9%, .1) inset, 0 1px 0 hsla(0, 0%, 100%, .3);
         border-radius: 2.5px 0 0 2.5px;
-        color: #fff!important;
+        color: var(--main-text-color)!important;
     }
     #searchText:hover {
         border: 1px solid;
@@ -164,10 +165,10 @@
         -moz-margin-start: -1px;
         background: #1d1d1d!important;
         padding: 0 9px;
-        border: 1px solid #fff!important;
+        border: 1px solid var(--main-text-color)!important;
         border-radius: 0 2.5px 2.5px 0;
         box-shadow: none!important;
-        color: #fff!important;
+        color: var(--main-text-color)!important;
         cursor: pointer;
         transition-duration: 150ms;
     }
@@ -222,7 +223,7 @@
         display: inline-block;
         text-align: start;
         margin: 12px 0;
-        color: #FFF!important;
+        color: var(--main-text-color)!important;
         font-size: 75%;
         /* 12px is the computed font size, 15px the computed line height of the snippets
 		 with Segoe UI on a default Windows 7 setup. The 15/12 multiplier approximately
@@ -270,7 +271,7 @@
         background: transparent padding-box;
         border: 1px solid transparent;
         border-radius: 2.5px;
-        color: #fff !important;
+        color: var(--main-text-color)!important;
         font-size: 75%;
         cursor: pointer;
         transition-property: background-color, border-color, box-shadow;

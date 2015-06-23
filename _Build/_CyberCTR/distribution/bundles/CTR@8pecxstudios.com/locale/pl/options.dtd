@@ -50,6 +50,8 @@
 <!ENTITY Ctr_tabheightinfo	"Niskie wartości spowodują błędy w trybie zmaksymalizowanym!">
 <!ENTITY Ctr_tabmaxwidth	"Maksymalna szerokość:">
 <!ENTITY Ctr_tabminwidth	"Minimalna szerokość:">
+<!ENTITY Ctr_tabclipwidth	"Clip-width:">
+<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"Szerokość karty jest kontrolowana przez TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Szerokość karty jest kontrolowana przez TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Wartości poniżej 48 pikseli w większości przypadków spowodują błędy!">
@@ -137,6 +139,12 @@
 <!ENTITY Ctr_cpanelmenus	"Menu panelu: widok kompaktowy (zakładki, historia itp.)">
 <!ENTITY Ctr_hidezoomres	"Kontrolki powiększenia na pasku narzędzi: ukryj przycisk resetu powiększenia">
 <!ENTITY Ctr_alt_newtabp	"Strona nowej karty: wygląd alternatywny">
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_alt_addonsp	"Strona dodatków 'więcej informacji': wygląd alternatywny">
 <!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
 <!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
 <!ENTITY Ctr_bmbutpanelm	"Przycisk menu zakładek: wygląd menu panelu">
@@ -270,12 +278,15 @@
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ wprowadził nowy 'motyw dewelopera'. Odznaczenie tych ustawień wyłącza 'motyw dewelopera' oraz jego przycisk w trybie dostosowywania.">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ wprowadził opcje w karcie. Odznaczenie tego ustawienia przywraca stare okno opcji.">
 <!ENTITY Ctr_fx38reader		"&brandShortName; 38+ wprowadził nowy 'tryb czytnika'. Odznaczenie tych ustawień wyłączy go oraz usunie jego ikonę z paska adresu.">
+<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ wprowadził funkcję 'Pocket'. Odznaczenie tego ustawienia wyłączy ją oraz usunie jej ikonę z pasków narzędzi.">
+<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
 <!ENTITY Ctr_e_omtc			"Problem z OMTC/zawieszonymi kartami">
 <!ENTITY Ctr_e_searchui		"Wygląd wyszukiwania">
 <!ENTITY Ctr_e_loop			"Dzwonienie i konwersacja">
 <!ENTITY Ctr_e_deved		"Motyw Edycji Deweloperskiej">
 <!ENTITY Ctr_e_prefsui		"Ustawienia w karcie">
 <!ENTITY Ctr_e_readermode	"Tryb czytnika">
+<!ENTITY Ctr_e_pocket		"Pocket">
 
 
 <!ENTITY Ctr_pw_settings	"Ustawienia">
@@ -283,6 +294,8 @@
 <!ENTITY Ctr_pw_set_predef	"Klasyczne ustawienia">
 <!ENTITY Ctr_pw_set_export	"Eksportuj ustawienia">
 <!ENTITY Ctr_pw_set_import	"Importuj ustawienia">
+<!ENTITY Ctr_pw_set_syncon	"Dodaj do Sync">
+<!ENTITY Ctr_pw_set_syncoff	"Usuń z Sync">
 
 <!ENTITY Ctr_special_font	"Ustawienia koloru tła są tylko dla domyślnego stylu!">
 <!ENTITY Ctr_special_info	"Niektóre opcje mogą nie oferować widocznych zmian we wszystkich przypadkach">
@@ -315,6 +328,8 @@
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
 
+<!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
+
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
@@ -326,6 +341,10 @@
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
 
+<!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
+<!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">
+<!ENTITY ctr_cbookmarkfontsize.label	"Bookmarks font size: ">
+
 <!ENTITY ctr_abouthome.caption "Change about:home page style">
 <!ENTITY ctr_abouthome.default "Default about:home style">
 <!ENTITY ctr_abouthome.light "Light about:home style">
@@ -336,12 +355,17 @@
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
 <!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgbrowse "Browse">
 <!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
 <!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.custombase "Use custom text color">
+<!ENTITY ctr_abouthome.custombasecol "Change base text color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
 <!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY ctr_aboutnewtab.caption "Change about:newtab page style">
 
 <!ENTITY cssClassId.description "Hide element classes - element ids">
 <!ENTITY cssClassId.label "Enter a class or id:">
@@ -350,3 +374,8 @@
 <!ENTITY add.label "ADD">
 <!ENTITY clear.label "Clear Filter">
 <!ENTITY copy.label "Copy Filter">
+
+<!ENTITY movableurlbar.label "Movable URL-Bar (Allows you to move the url-bar)">
+<!ENTITY movableurlbar.warning0 "Warning: This is a high level feature, If you move the URL-Bar to the panel UI menu or customize window and restart, It will break the browser.">
+<!ENTITY movableurlbar.warning1 "You must restore the URL-Bar to its default position before disabling.">
+<!ENTITY movableurlbar.warning2 "Use this feature with caution and at own risk.">

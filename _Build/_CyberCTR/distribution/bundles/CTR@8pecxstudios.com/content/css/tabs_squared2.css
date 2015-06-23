@@ -6,7 +6,32 @@
 	#main-window[tabsintitlebar][sizemode="normal"] #toolbar-menubar[autohide="true"][inactive="true"]:not([customizing="true"]) ~ #TabsToolbar #ctraddon_appbutton{
 	  margin-left:-2px !important;
 	}
-
+	
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(ltr):not(:-moz-lwtheme)::before,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(rtl):not(:-moz-lwtheme)::before,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(ltr):not(:-moz-lwtheme)::before,
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(rtl):not(:-moz-lwtheme)::before,
+	.tab-background-start[visuallyselected=true]:-moz-lwtheme::before,
+	.tab-background-end[visuallyselected=true]:-moz-lwtheme::before {
+	  background-image: unset !important;
+	}
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(ltr):-moz-lwtheme::before,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(rtl):-moz-lwtheme::before,
+	.tab-background-end[visuallyselected=true]:-moz-locale-dir(ltr):-moz-lwtheme::before,
+	.tab-background-start[visuallyselected=true]:-moz-locale-dir(rtl):-moz-lwtheme::before {
+	  clip-path: unset !important;
+	}
+	.tab-background-middle[visuallyselected=true],
+	.tab-background-middle[visuallyselected=true]:-moz-lwtheme {
+	  background-color: unset !important;
+	  background-image: unset !important;
+	}
+	.tab-background-start[visuallyselected=true]:-moz-lwtheme::before,
+	.tab-background-end[visuallyselected=true]:-moz-lwtheme::before,
+	.tab-background-middle[visuallyselected=true]:-moz-lwtheme {
+	  background-color: unset !important;
+	}
+	
 	.tab-background-start[visuallyselected=true]:-moz-locale-dir(ltr):not(:-moz-lwtheme)::before,
 	.tab-background-end[visuallyselected=true]:-moz-locale-dir(rtl):not(:-moz-lwtheme)::before ,
 	.tab-background-end[visuallyselected=true]:-moz-locale-dir(ltr):not(:-moz-lwtheme)::before,
@@ -356,6 +381,12 @@
 	  border-top:0 !important;
 	  border-left:0 !important;
 	  border-right:0 !important;
+	}
+	
+	/*Faviconise tab add-on */
+	#tabbrowser-tabs .tabbrowser-tab[faviconized="true"] .tab-icon-image{
+	  -moz-margin-start:2px !important;
+	  -moz-margin-end:1px !important;
 	}
 }
 

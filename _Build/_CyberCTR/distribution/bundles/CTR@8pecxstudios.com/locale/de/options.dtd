@@ -51,6 +51,8 @@
 <!ENTITY Ctr_tabheightinfo	"Niedrige Werte sorgen für eine fehlerhafte Darstellung im maximierten Fenster!">
 <!ENTITY Ctr_tabmaxwidth	"Maximalbreite:">
 <!ENTITY Ctr_tabminwidth	"Minimalbreite:">
+<!ENTITY Ctr_tabclipwidth	"Clip-Breite:">
+<!ENTITY Ctr_tabclipwidthI	"Setze die 'Clip-Breite' manuell auf '1'!">
 <!ENTITY Ctr_tabwidthinfo	"Die Minimal- und Maximalbreite von Tabs wird von 'TabMixPlus' kontrolliert">
 <!ENTITY Ctr_tabwidthinfo2	"Die Minimal- und Maximalbreite von Tabs wird von 'TabUtilities' kontrolliert">
 <!ENTITY Ctr_tabwidthinfo3	"Werte unter 48px sorgen meistens für eine fehlerhafte Darstellung!">
@@ -138,6 +140,12 @@
 <!ENTITY Ctr_cpanelmenus	"Kompakte 'Panel-Aufklappmenüs' (Lesezeichen, Chronik etc.)">
 <!ENTITY Ctr_hidezoomres	"Zoom-Schaltflächen auf Leisten: verstecke Schaltfläche 'Normalgröße'">
 <!ENTITY Ctr_alt_newtabp	"Seite 'Neuer Tab': alternative Darstellung">
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_alt_addonsp	"Add-on-Seite 'Mehr Info': alternative Darstellung">
 <!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
 <!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
 <!ENTITY Ctr_bmbutpanelm	"Lesezeichen-Menüschaltfläche: 'Panel-Aufklappmenü'-Darstellung">
@@ -261,21 +269,24 @@
 <!ENTITY Ctr_otherctroptns	"Andere Einstellungen">
 <!ENTITY Ctr_cuibotbuttons	"Einstellungsschaltflächen im Modus 'Anpassen'">
 <!ENTITY Ctr_bookmarkoinpw	"'In neuem privaten Fenster öffnen'-Eintrag im Kontextmenu eines Lesezeichens">
-<!ENTITY Ctr_nodevtheme		"Verhindere die Aktivierung des 'Entwickler Themas'">
+<!ENTITY Ctr_nodevtheme		"Aktivierung des 'Entwickler-Themas' unterbinden">
 
 <!ENTITY Ctr_experttweaks	"Erweitert">
-<!ENTITY Ctr_fx33layers		"Mit &brandShortName; 33+ wurden neue 'Render-Funktionen' eingeführt, die zurzeit für 'nicht reagierende und einfrierende Tabs' auf einigen Systemen sorgen. Das Deaktivieren dieser Option löst das Problem.">
+<!ENTITY Ctr_fx33layers		"Mit &brandShortName; 33+ wurden neue 'Render-Funktionen' eingeführt, die zurzeit für 'nicht reagierende und einfrierende Tabs' auf einigen Systemen sorgen. Das Deaktivieren dieser Option kann das Problem lösen.">
 <!ENTITY Ctr_fx34search		"Mit &brandShortName; 34+ wurde eine neue 'Suchoberfläche' eingeführt. Das Deaktivieren dieser Option stellt die 'alte Suchoberfläche' wieder her.">
 <!ENTITY Ctr_fx34loop		"Mit &brandShortName; 34+ wurden 'Anruf- und Konversations-Funktionen' eingeführt. Das Deaktivieren dieser Option entfernt diese Funktionen.">
-<!ENTITY Ctr_fx35devtheme	"Mit &brandShortName; 35+ wurde ein neues 'Entwickler-Thema' eingeführt. Das Deaktivieren dieser Optionen enfernt es und die zugehörige Schaltfläche im 'Anpassen' Modus.">
-<!ENTITY Ctr_fx36prefs		"Mit &brandShortName; 36+ wurden 'Einstellungen im Tab' eingeführt. Das Deaktivieren dieser Option stellt das alte Einstellungsfenster wieder her.">
-<!ENTITY Ctr_fx38reader		"Mit &brandShortName; 38+ wurde ein neuer 'Reader Modus' eingeführt. Das Deaktivieren dieser Optionen unterbindet diesen Modus und entfernt die zugehörige Schaltfläche von der Adressleiste.">
+<!ENTITY Ctr_fx35devtheme	"Mit &brandShortName; 35+ wurde ein neues 'Entwickler-Thema' eingeführt. Das Deaktivieren dieser Optionen stellt das 'Standard-Thema' wieder her und entfernt die zugehörige Schaltfläche im Modus 'Anpassen'.">
+<!ENTITY Ctr_fx36prefs		"Mit &brandShortName; 36+ wurden 'Einstellungen im Tab' eingeführt. Das Deaktivieren dieser Option stellt das 'alte' Einstellungsfenster wieder her.">
+<!ENTITY Ctr_fx38reader		"Mit &brandShortName; 38+ wurde ein neuer 'Lese-Modus' eingeführt. Das Deaktivieren dieser Optionen deaktiviert diesen Modus und entfernt die zugehörige Schaltfläche von der Adressleiste.">
+<!ENTITY Ctr_fx38pocket		"Mit &brandShortName; 38.0.5+ wurde die 'Pocket'-Funktion eingeführt. Das Deaktivieren dieser Option entfernt diese Funktion und deren Leisten-Schaltfläche.">
+<!ENTITY Ctr_fx38pocket2	"Info: Das Verschieben der 'Pocket'-Schaltfläche zu den nicht verwendeten Schaltflächen im 'Anpassen Modus' vor der Deaktivierung dieser Option, entfernt zusätzlich die 'Pocket'-Einträge aus den Lesezeichen- und 'Lese'-Bereichen.">
 <!ENTITY Ctr_e_omtc			"OMTC / Problem mit 'einfrierenden Tabs'">
 <!ENTITY Ctr_e_searchui		"Suchoberfläche">
 <!ENTITY Ctr_e_loop			"Anruf- und Konversations-Funktionen">
 <!ENTITY Ctr_e_deved		"Entwickler-Thema">
 <!ENTITY Ctr_e_prefsui		"Einstellungen im Tab">
-<!ENTITY Ctr_e_readermode	"Reader Modus">
+<!ENTITY Ctr_e_readermode	"Lese-Modus">
+<!ENTITY Ctr_e_pocket		"Pocket">
 
 
 <!ENTITY Ctr_pw_settings	"Einstellungen">
@@ -283,6 +294,8 @@
 <!ENTITY Ctr_pw_set_predef	"Klassische Vorgabe">
 <!ENTITY Ctr_pw_set_export	"Exportiere Einstellungen">
 <!ENTITY Ctr_pw_set_import	"Importiere Einstellungen">
+<!ENTITY Ctr_pw_set_syncon	"Zu Sync hinzufügen">
+<!ENTITY Ctr_pw_set_syncoff	"Aus Sync entfernen">
 
 <!ENTITY Ctr_special_font	"Hintergrundfarbeinstellungen sind nur für das Standard-Thema vorhanden!">
 <!ENTITY Ctr_special_info	"Einige Optionen haben nur in bestimmten Fällen sichtbare Auswirkungen!">
@@ -315,6 +328,8 @@
 <!ENTITY ctr_help_features	"Funktionen &amp; Informationen">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
 
+<!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
+
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
@@ -326,6 +341,10 @@
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
 
+<!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
+<!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">
+<!ENTITY ctr_cbookmarkfontsize.label	"Bookmarks font size: ">
+
 <!ENTITY ctr_abouthome.caption "Change about:home page style">
 <!ENTITY ctr_abouthome.default "Default about:home style">
 <!ENTITY ctr_abouthome.light "Light about:home style">
@@ -336,12 +355,17 @@
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
 <!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgbrowse "Browse">
 <!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
 <!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.custombase "Use custom text color">
+<!ENTITY ctr_abouthome.custombasecol "Change base text color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
 <!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY ctr_aboutnewtab.caption "Change about:newtab page style">
 
 <!ENTITY cssClassId.description "Hide element classes - element ids">
 <!ENTITY cssClassId.label "Enter a class or id:">
@@ -350,3 +374,8 @@
 <!ENTITY add.label "ADD">
 <!ENTITY clear.label "Clear Filter">
 <!ENTITY copy.label "Copy Filter">
+
+<!ENTITY movableurlbar.label "Movable URL-Bar (Allows you to move the url-bar)">
+<!ENTITY movableurlbar.warning0 "Warning: This is a high level feature, If you move the URL-Bar to the panel UI menu or customize window and restart, It will break the browser.">
+<!ENTITY movableurlbar.warning1 "You must restore the URL-Bar to its default position before disabling.">
+<!ENTITY movableurlbar.warning2 "Use this feature with caution and at own risk.">

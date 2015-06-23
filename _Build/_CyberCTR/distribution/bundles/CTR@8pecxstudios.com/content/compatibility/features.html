@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="uk-notouch" lang="en-us" dir="ltr">
  <head>
-<!-- Last updated 28.11.2014 --> 
+<!-- Last updated 27.5.2015 --> 
   <meta charset="utf-8" />
   <title id="windowtitle">CyberCTR Features</title>
 	<link rel="icon" 
@@ -12,9 +12,9 @@
 			 href="css/uikit.gradient.min.css"  
 			 type="text/css" />
 	<link rel="stylesheet"
-			 href="css/tooltip.gradient.css"  
+			 href="css/tooltip.gradient.min.css"  
 			 type="text/css" />
-	<script src="js/jquery-2.1.1.min.js"></script>
+	<script src="js/jquery-2.1.4.min.js"></script>
 	<script src="js/uikit.min.js"></script>
 	<script src="js/tooltip.min.js"></script>
 	<script src="js/features.js"></script>
@@ -27,20 +27,15 @@
 <nav class="uk-navbar uk-animation-slide-top">
 <a class="uk-navbar-brand uk-hidden-small"><i class="uk-icon-cubes uk-icon-small"></i> <span class="uk-text-primary uk-text-bold">Cyber</span><span class="uk-text-bold">CTR</span></a>
     <ul class="uk-navbar-nav uk-hidden-small">		
-		<li id="up-check"><a title="Check For Updates"
-					onclick="cyberctrFeatures.updateCheck(true);"><i class="uk-icon-cloud-download uk-icon-medium"></i> Check For Updates</a></li>
-		<li><a title="Documentation" 
-					onclick="cyberctrFeatures.get_localized_document();" 
-					target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>
+		<li id="up-check"><a onclick="cyberctrFeatures.updateCheck(true);"><i class="uk-icon-cloud-download uk-icon-medium"></i> <span id="btn-check-update">Check For Updates</span></a></li>
+		<li><a onclick="cyberctrFeatures.get_localized_document();" 
+					target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> <span id="btn-Documentation">Documentation</span></a></li>
         <li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8" 
-					title="Cyberfox FAQ" 
-					target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> Frequently Ask Questions</a></li>		
-        <li><a href="https://8pecxstudios.com/Forums/index.php" 
-					title="8pecxstudios support forums" 
-					target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> Support Forums</a></li>
-        <li><a href="https://8pecxstudios.com/contact-us" 
-					title="Contact Us" 
-					target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> Contact Us</a></li>
+					target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> <span id="btn-faq">Frequently Ask Questions</span></a></li>		
+        <li><a href="https://8pecxstudios.com/Forums/index.php"
+					target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> <span id="btn-support-forums">Support Forums</span></a></li>
+        <li><a href="https://cyberfox.8pecxstudios.com/contact-us"
+					target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> <span id="btn-contact-us">Contact Us</span></a></li>
     </ul>
 		<a class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas="{target:'#small-menu'}" href="#"></a>	
 </nav>
@@ -49,15 +44,15 @@
 <div id="first_run_message" hidden="true">
 	<div class="uk-alert uk-alert-success" data-uk-alert="">
 			<a href="" class="uk-alert-close uk-close"></a>
-			<p class="uk-text uk-text-center"><i class="uk-icon-info-circle uk-icon-medium"></i> Welcome to features and information, Here you will find useful information and links to help improve your browsing experience.</p>
+			<p class="uk-text uk-text-center"><i class="uk-icon-info-circle uk-icon-medium"></i> <span id="msg-firstrun-welcome">Welcome to features and information, Here you will find useful information and links to help improve your browsing experience.</span></p>
 	</div>
 </div>
 <div id="update_message" hidden="true">
 	<div class="uk-alert uk-alert-danger" data-uk-alert="">
 			<p class="uk-text uk-text-center">
-				<i class="uk-icon-download uk-icon-medium"></i> A newer version of CyberCTR is available for download!,
-					Click <a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#download">here</a> to visit the download section, 
-					Click <a href="https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#release-notes">here</a> to visit the release notes section.
+				<i class="uk-icon-download uk-icon-medium"></i> <span id="msg-new-version-blob">A newer version of CyberCTR is available for download!,
+					Click <a id="url-new-download">here</a> to visit the download section, 
+					Click <a id="url-new-notes">here</a> to visit the release notes section.</span>
 			</p>
 	</div>
 </div>
@@ -65,7 +60,7 @@
 	<div class="uk-alert uk-alert-success" data-uk-alert="">
 			<a href="" class="uk-alert-close uk-close"></a>
 			<p class="uk-text uk-text-center">
-				<i class="uk-icon-info-circle uk-icon-medium"></i> No CyberCTR updates available, Your using the latest version.</p>
+				<i class="uk-icon-info-circle uk-icon-medium"></i> <span id="msg-no-new-version">No CyberCTR updates available, You have the latest version.</span></p>
 	</div>
 </div>
 <div class="uk-panel uk-panel-box uk-animation-slide-bottom">
@@ -138,10 +133,15 @@
 			<li>Hide snippets (Ads) on about:home page <span class="uk-text-primary">(Firefox Only)</span></li>
 			<li>Remove links on about:home page <span class="uk-text-primary">(Cyberfox Only)</span></li>
 			<li>Change highlight color of about:home page links, search-bar and buttons.</li>
+			<li>Change default text color of about:home page text.</li>
 			<li>Hide elements by class or id with css using the elements filter.  See list of <a href="https://github.com/InternalError503/CyberCTR/blob/master/ID_List.md" 
 				  target="_blank" 
 				  data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
 				  title="Filter List">elements</a></li>
+			<li>Alternate about:newtab page style</li>
+			<li>Change highlight color of about:newtab page elements</li>
+			<li>Change default text color of about:newtab page text and grid color.</li>
+			<li>Set custom font size for bookmark-bar tool-bar (Range 2px - 30px)</li>
 		</ul>		
 <p>Plus many under the hood changes and many more visual changes to come.</p>					
 	<h2>Main features (on options window)</h2>
@@ -279,20 +279,15 @@ Toolbar: [something]...[stop-button][reload-button]...[something]</p>
 						<a class="uk-navbar-brand"><i class="uk-icon-cubes uk-icon-small" style="color:#f8f8f8;"></i> <span class="uk-text-bold" style="color:#f8f8f8;">CyberCTR</span></a>
                 </div>			
                 <ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav="">
-					<li id="up-check-oc"><a title="Check For Updates"
-					onclick="cyberctrFeatures.updateCheck(true); UIkit.offcanvas.hide();"><i class="uk-icon-cloud-download uk-icon-medium"></i> Check For Updates</a></li>
-					<li><a title="Documentation" 
-								onclick="cyberctrFeatures.get_localized_document();"  
-								target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> Documentation</a></li>					
-					<li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8" 
-								 title="Cyberfox FAQ" 
-								 target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> Frequently Ask Questions</a></li>		
-					<li><a href="https://8pecxstudios.com/Forums/index.php" 
-								title="8pecxstudios support forums" 
-								target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> Support Forums</a></li>
-					<li><a href="https://8pecxstudios.com/contact-us" 
-								title="Contact Us" 
-								target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> Contact Us</a></li>	
+					<li id="up-check-oc"><a onclick="cyberctrFeatures.updateCheck(true); UIkit.offcanvas.hide();"><i class="uk-icon-cloud-download uk-icon-medium"></i> <span id="btn-check-update-oc">Check For Updates</span></a></li>
+					<li><a onclick="cyberctrFeatures.get_localized_document();"  
+								target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> <span id="btn-Documentation-oc">Documentation</span></a></li>					
+					<li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8"
+								 target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> <span id="btn-faq-oc">Frequently Ask Questions</span></a></li>		
+					<li><a href="https://8pecxstudios.com/Forums/index.php"
+								target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> <span id="btn-support-forums-oc">Support Forums</span></a></li>
+					<li><a href="https://cyberfox.8pecxstudios.com/contact-us"
+								target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> <span id="btn-contact-us-oc">Contact Us</span></a></li>	
                     </ul>
             </div>
         </div>

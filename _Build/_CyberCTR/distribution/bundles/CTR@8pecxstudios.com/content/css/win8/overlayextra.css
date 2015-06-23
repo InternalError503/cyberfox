@@ -68,6 +68,40 @@
 	  -moz-padding-end: 14px !important;
 	}
 	
+	@media (min-resolution: 1.1dppx) {
+		#main-window[defaultfxtheme="true"][fx40plus="true"] :-moz-any(#ctraddon_history-button,#ctraddon_history-menu-toolbar-button,#ctraddon_back-button,#ctraddon_forward-button,#ctraddon_stop-button,#ctraddon_reload-button) {
+		  list-style-image: url("chrome://browser/skin/Toolbar@2x.png");
+		}
+		
+		#main-window[defaultfxtheme="true"][fx40plus="true"] :-moz-any(#ctraddon_history-button,#ctraddon_history-menu-toolbar-button,#ctraddon_back-button,#ctraddon_forward-button,#ctraddon_stop-button,#ctraddon_reload-button):-moz-lwtheme-brighttext {
+		  list-style-image: url("chrome://browser/skin/Toolbar-inverted@2x.png");
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #ctraddon_history-menu-toolbar-button,
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #ctraddon_history-button {
+		  -moz-image-region: rect(0, 360px, 36px, 324px);
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #ctraddon_back-button {
+		  -moz-image-region: rect(0, 108px, 36px, 72px);
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #ctraddon_forward-button {
+		  -moz-image-region: rect(0, 144px, 36px, 108px);
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #ctraddon_reload-button {
+		  -moz-image-region: rect(0, 180px, 36px, 144px);
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #ctraddon_stop-button {
+		  -moz-image-region: rect(0, 216px, 36px, 180px);
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] #nav-bar :-moz-any(#ctraddon_history-button,#ctraddon_history-menu-toolbar-button,#ctraddon_back-button,#ctraddon_forward-button,#ctraddon_stop-button,#ctraddon_reload-button) .toolbarbutton-icon {
+		  width: 32px !important;
+		  height: 24px !important;
+		}
+		#main-window[defaultfxtheme="true"][fx40plus="true"] :-moz-any(#ctraddon_history-button,#ctraddon_history-menu-toolbar-button,#ctraddon_back-button,#ctraddon_forward-button,#ctraddon_stop-button,#ctraddon_reload-button) .toolbarbutton-icon {
+		  width: 18px !important;
+		  height: 18px !important;
+		}
+	}
+	
 	#PanelUI-menu-button{
 	  margin: 0px !important;
 	}
@@ -334,14 +368,6 @@
 		}
 	
 	  }
-	}
-	
-	/* Fix icon sizes on Fx40+ */
-	#main-window[fx40plus="true"] #nav-bar toolbarbutton[cui-areatype="toolbar"] > :-moz-any(#zoom-out-button, #zoom-reset-button, #zoom-in-button, #cut-button, #copy-button, #paste-button) > .toolbarbutton-icon,
-	#main-window[fx40plus="true"] #nav-bar :-moz-any(#back-button, #forward-button, #home-button, #print-button, #downloads-button, #bookmarks-menu-button, #new-tab-button, #new-window-button, #fullscreen-button, #sync-button, #feed-button, #tabview-button, #social-share-button, #open-file-button, #find-button, #developer-button, #preferences-button, #privatebrowsing-button, #save-page-button, #switch-to-metro-button, #add-ons-button, #history-panelmenu, #nav-bar-overflow-button, #PanelUI-menu-button, #characterencoding-button, #email-link-button, #sidebar-button, #zoom-out-button, #zoom-reset-button, #zoom-in-button, #cut-button, #copy-button, #paste-button, #e10s-button, #panic-button, #web-apps-button, #webide-button, #loop-button):-moz-any([cui-areatype="toolbar"],:not([cui-areatype])) > .toolbarbutton-icon,
-	#main-window[fx40plus="true"] #nav-bar :-moz-any(#back-button, #forward-button, #home-button, #print-button, #downloads-button, #bookmarks-menu-button, #new-tab-button, #new-window-button, #fullscreen-button, #sync-button, #feed-button, #tabview-button, #social-share-button, #open-file-button, #find-button, #developer-button, #preferences-button, #privatebrowsing-button, #save-page-button, #switch-to-metro-button, #add-ons-button, #history-panelmenu, #nav-bar-overflow-button, #PanelUI-menu-button, #characterencoding-button, #email-link-button, #sidebar-button, #zoom-out-button, #zoom-reset-button, #zoom-in-button, #cut-button, #copy-button, #paste-button, #e10s-button, #panic-button, #web-apps-button, #webide-button, #loop-button):-moz-any([cui-areatype="toolbar"],:not([cui-areatype])) > .toolbarbutton-menubutton-button > .toolbarbutton-icon,
-	#main-window[fx40plus="true"] #nav-bar #bookmarks-menu-button[cui-areatype="toolbar"] > .toolbarbutton-menubutton-dropmarker > .dropmarker-icon {
-	  width: unset !important;;
 	}
 
 }

@@ -159,7 +159,7 @@
 	<button id="customization-reset-button" onclick="if (event.button=='0') classicthemerestorerjs.ctr.resetCTRtoolbarConf();"/>
 
 	<!--### moveable urlbar & buttons ###-->
-	<toolbaritem id="urlbar-container" style="min-width:200px !important;" removable="true"/>
+	<toolbaritem id="urlbar-container" style="min-width:200px !important;"/>
 	<toolbarbutton id="alltabs-button" removable="true"/>
 	<toolbarbutton id="webrtc-status-button" removable="true"/>
 	<toolbarbutton id="social-share-button" removable="true"/>
@@ -446,8 +446,8 @@
 				        oncommand="gCyberfoxCustom.restartBrowser();"/>					  
 			<menuitem id="appmenu-quit"
 					  class="menuitem-iconic ctraddon_windowsonly"
-					  label="&quitApplicationCmdWin.label;"
-					  accesskey="&quitApplicationCmdWin.accesskey;"
+					  label="&quitApplicationCmdWin.label;&quitApplicationCmdWin2.label;"
+					  accesskey="&quitApplicationCmdWin.accesskey;&quitApplicationCmdWin2.accesskey;"
 					  command="cmd_quitApplication"/>
 			<menuitem id="appmenu-quit"
 					  class="menuitem-iconic ctraddon_linuxonly"
@@ -478,7 +478,8 @@
 							   openInTabs="children"
 							   oncommand="BookmarksEventHandler.onCommand(event, this.parentNode._placesView);"
 							   onclick="BookmarksEventHandler.onClick(event, this.parentNode._placesView);"
-							   onpopupshowing="PlacesCommandHook.updateBookmarkAllTabsCommand();
+							   onpopupshowing="BookmarkingUI.onMainMenuPopupShowing(event);
+                               BookmarkingUI.updatePocketItemVisibility('menu_');
 											   if (!this.parentNode._placesView)
 												 new PlacesMenu(event, 'place:folder=BOOKMARKS_MENU');"
 							   tooltip="bhTooltip" popupsinherittooltip="true">
@@ -486,7 +487,11 @@
 								label="&showAllBookmarks2.label;"
 								command="Browser:ShowAllBookmarks"
 								key="manBookmarkKb"/>
-					  <menuseparator/>
+					<menuseparator/>
+					<menuitem id="menu_pocket" label="&pocketMenuitem.label;"
+								class="menuitem-iconic"
+								oncommand="window.pktUI.openTabWithUrl(Pocket.listURL);"/>
+					  <menuseparator id="menu_pocketSeparator"/>
 					  <menuitem id="appmenu_bookmarkThisPage"
 				                class="menuitem-iconic"					  
 								label="&bookmarkThisPageCmd.label;"
@@ -671,14 +676,14 @@
 					onclick="if(classicthemerestorerjs.ctr.prefs.getBoolPref('appbclmmenus')
 								&amp;&amp; event.button=='0'
 								&amp;&amp; event.originalTarget.getAttribute('splitmenu')=='true')
-								{openHelpLink('/index.php');document.getElementById('appmenu-popup').hidePopup();}"
+								{openUILink('https://8pecxstudios.com/Forums/index.php');document.getElementById('appmenu-popup').hidePopup();}"
 					class="menu-iconic">
 				  <menupopup id="appmenu_helpMenupopup" onpopupshowing="buildHelpMenu();">
 					<menuitem id="appmenu_openHelp"
-							  oncommand="openHelpLink('/index.php')"
+							  oncommand="openUILink('https://8pecxstudios.com/Forums/index.php')"
 							  onclick="checkForMiddleClick(this, event);"
-							  label="&productHelp.label;"
-							  accesskey="&productHelp.accesskey;"/>
+						  label="&productHelp.label;&productHelp2.label;"
+						  accesskey="&productHelp.accesskey;&productHelp2.accesskey;"/>
 					<menuitem id="appmenu_gettingStarted"
 							  label="&appMenuGettingStarted.label;"
 							  oncommand="gBrowser.loadOneTab('https://8pecxstudios.com/', {inBackground: false});"
@@ -705,8 +710,8 @@
 							  oncommand="safeModeRestart();"/>
 					<menuseparator/>
 					<menuitem id="appmenu_about"
-							  accesskey="&aboutProduct.accesskey;"
-							  label="&aboutProduct.label;"
+						  accesskey="&aboutProduct.accesskey;&aboutProduct2.accesskey;"
+						  label="&aboutProduct.label;&aboutProduct2.label;"
 							  oncommand="openAboutDialog();"/>
 				  </menupopup>
 				</menu>

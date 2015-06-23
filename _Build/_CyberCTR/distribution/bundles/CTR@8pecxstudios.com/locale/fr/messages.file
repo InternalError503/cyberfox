@@ -10,5 +10,5 @@ notification_msg_firstrun=Le fichier de préférences CTRpreferences a été tro
 notification_button_firstrun=Redémarrer
 notification_msg_change=Le fichier de préférences préconfiguré CTRpreferences a été modifié 
 notification_button_change=Options
-clearFilter.title=Confirm clear filter.
-clearFilter.msg=Are you sure you want to clear the filter?
+clearFilter.title=Confirmer l’effacement du filtre.
+clearFilter.msg=Êtes-vous certain de vouloir effacer le filtre ?

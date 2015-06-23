@@ -1,5 +1,10 @@
 @echo Off
-title Build Cyberfox Portable V1.5
+title Build Cyberfox Portable V1.6
+ECHO.
+ECHO.Package Version *(Required)
+echo. Must be same as version been package
+set /P verdata=Enter Version Number (27.0.1.0)? 
+set Version=%verdata%
 :top
 
 set BuildFolderPath=%~DP0
@@ -146,11 +151,6 @@ goto :completed
 set BuildFolderPath=%~DP0
 set PortableAppsInstaller="%BuildFolderPath%_PortableApps.comInstaller\PortableApps.comInstaller.exe"
 set PortableAppsInstallerOutput="%BuildFolderPath%_Installation"
-ECHO.
-ECHO.Package Version *(Required)
-echo. Must be same as version been package
-set /P verdata=Enter Version Number (27.0.1.0)? 
-set Version=%verdata%
 :top-Installer-Package
 ECHO.
 ECHO.                                                         			   
@@ -224,16 +224,7 @@ set BuildFolderPath=%~DP0
 if not exist "%BuildFolderPath%_7ZipPortable\App\7-Zip\7za.exe" goto :bye
 set SevenZip=%BuildFolderPath%_7ZipPortable\App\7-Zip\7za.exe
 set PortableAppsZippedOutput="%BuildFolderPath%_Installation"
-ECHO.
-ECHO.Package Version *(Required)
-echo. Must be same as version been package
-set /P verdata=Enter Version Number (27.0.1.0)? 
-if /i {%verdata%}=={E} (goto :exit)
-if /i {%verdata%}=={Exit} (goto :exit)
-if /i {%verdata%}=={EXIT} (goto :exit)
-if /i {%verdata%}=={e} (goto :exit)
-if /i {%verdata%}=={exit} (goto :exit)
-set Version=%verdata%
+
 :top-Zipped-Package
 ECHO.
 ECHO.                                                         			   

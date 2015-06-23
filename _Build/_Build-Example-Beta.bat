@@ -1,2 +1,5 @@
-BuildISS.exe --configIn=_InstallerConfig\app.config --configOut=_Installer\app.config --arch=i368 --package=beta86 --version=36.0.0.0 --build
-BuildISS.exe --configIn=_InstallerConfig\app.config --configOut=_Installer\app.config --arch=amd64 --package=beta64 --version=36.0.0.0 --build
+set releaseVer=00.0.0.0
+set smallVer=00.0
+set betaVer=b0
+BuildISS.exe --configIn=_InstallerConfig\app.config --configOut=_Installer\app.config --arch=i368 --package=beta86 --version=%releaseVer% --sversion=%smallVer%%betaVer% --build
+BuildISS.exe --configIn=_InstallerConfig\app.config --configOut=_Installer\app.config --arch=amd64 --package=beta64 --version=%releaseVer% --sversion=%smallVer%%betaVer% --build

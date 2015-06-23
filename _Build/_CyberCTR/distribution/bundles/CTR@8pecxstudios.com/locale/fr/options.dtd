@@ -14,7 +14,7 @@
 <!ENTITY Ctr_puibseparator	"Séparateur de boutons du menu">
 <!ENTITY Ctr_navthrobber	"Indicateur d’activité">
 <!ENTITY Ctr_sidebarbutton	"(Panneau latéral)">
-<!ENTITY Ctr_windowcontrols	"Réduire/Restaurer/Fermer (Plein écran)">
+<!ENTITY Ctr_windowcontrols	"Réduire/Restaurer/Fermer (plein écran)">
 <!ENTITY Ctr_rr				"Redémarrer &brandShortName; !">
 
 <!ENTITY Ctr_cuibuttons		"Boutons">
@@ -37,11 +37,11 @@
 <!ENTITY Ctr_tabs2			"Onglets arrondis (alternatifs)">
 <!ENTITY Ctr_tabs3			"Onglets arrondis (alternatifs Aero)">
 <!ENTITY Ctr_tabforminfo	"L’aspect des onglets est déterminé par le thème sélectionné.">
-<!ENTITY Ctr_coltabsinfo	"Tab appearance is not fully compatible to 'ColorfulTabs' add-on!">
+<!ENTITY Ctr_coltabsinfo	"La configuration de l’aspect des onglets n’est pas entièrement compatible avec l’extension « ColorfulTabs ».">
 <!ENTITY Ctr_tabsontop0		"Onglets en haut (valeur par défaut)">
-<!ENTITY Ctr_tabsontop1		"Onglets en haut --- réglage [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Onglets position basse (v1) --- réglage [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Onglets position basse (v2) --- réglage [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Onglets en haut – réglage [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Onglets position basse (v1) – réglage [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Onglets position basse (v2) – réglage [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 est seulement pour quelques modules complémentaires et thèmes complets.">
 <!ENTITY Ctr_tabsontopI1	"L’attribut [tabsontop=true/false] est assigné à">
 <!ENTITY Ctr_tabsintitlebar	"Barre de titre &brandShortName; (about:config)">
@@ -51,9 +51,11 @@
 <!ENTITY Ctr_tabheightinfo	"Une valeur trop petite causera des problèmes lorsque la fenêtre est maximisée.">
 <!ENTITY Ctr_tabmaxwidth	"Largeur maximale :">
 <!ENTITY Ctr_tabminwidth	"Largeur minimale :">
+<!ENTITY Ctr_tabclipwidth	"Largeur min. pour bouton de ferm. :">
+<!ENTITY Ctr_tabclipwidthI	"Saisir « 1 » dans « largeur min. pour bouton de ferm. »">
 <!ENTITY Ctr_tabwidthinfo	"Onglets : les largeurs mini et maxi sont controlées par TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Onglets : les largeurs mini et maxi sont controlées par TabUtilities">
-<!ENTITY Ctr_tabwidthinfo3	"Les valeurs en dessous de 48px causent des problèmes dans la majorité des cas!">
+<!ENTITY Ctr_tabwidthinfo3	"Les valeurs en dessous de 48px causent des problèmes dans la majorité des cas.">
 <!ENTITY Ctr_tabinsertion	"Placer l’onglet apparenté après l’onglet courant (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Restaurer le favicon vide sur les onglets (sites ne possédant pas de favicon)">
 <!ENTITY Ctr_noemptypticon	"Enlever les favicons vides des onglets épinglés">
@@ -64,20 +66,20 @@
 <!ENTITY Ctr_closetab_3		"À la fin de la barre d’onglets">
 <!ENTITY Ctr_closetab_4		"Au début de la barre d’onglets">
 <!ENTITY Ctr_closetab_5		"Sur tous les onglets (forcé)">
-<!ENTITY Ctr_closetab_hfot	"Cacher si un seul onglet est visible">
+<!ENTITY Ctr_closetab_hfot	"Masquer si un seul onglet est visible">
 <!ENTITY Ctr_closealt		"Icône alternative">
 <!ENTITY Ctr_closeonleft	"Position alternative sur l’onglet">
 <!ENTITY Ctr_close_wwltab	"Fermer la fenêtre à la fermeture du dernier onglet (about:config)">
 
-<!ENTITY Ctr_hctpinfotab	"Some tab variations are not compatible to 'Hide Caption Titlebar Plus' add-on.">
-<!ENTITY Ctr_hctpinfoab		"Button on titlebar is not compatible to 'Hide Caption Titlebar Plus' add-on.">
+<!ENTITY Ctr_hctpinfotab	"Certaines dispositions d’onglets ne sont pas compatibles avec l’extension « Hide Caption Titlebar Plus ».">
+<!ENTITY Ctr_hctpinfoab		"Le bouton sur la barre de titre n’est pas compatible avec l’extension « Hide Caption Titlebar Plus ».">
 
 <!ENTITY Ctr_appbutton		"Bouton d’applications">
 <!ENTITY Ctr_appbutton0		"Bouton désactivé">
 <!ENTITY Ctr_appbutton1		"Bouton sur une barre d’outils">
 <!ENTITY Ctr_appbutton1wt	"Bouton sur une barre d’outils (texte seul)">
 <!ENTITY Ctr_appbutton2		"Bouton sur la barre de titre [&brandShortName;]">
-<!ENTITY Ctr_appbutton2h	"Bouton sur la barre de titre [&brandShortName;] (hidden)">
+<!ENTITY Ctr_appbutton2h	"Bouton sur la barre de titre [&brandShortName;] (caché)">
 <!ENTITY Ctr_appbutton2io	"Bouton sur la barre de titre [&brandShortName;] (icône seule)">
 <!ENTITY Ctr_paneluibtweak	"Bouton orange sur la barre d’onglets">
 <!ENTITY Ctr_appbuttonc_o	"Bouton orange">
@@ -93,8 +95,8 @@
 <!ENTITY Ctr_appbuttonc_wh	"Bouton blanc">
 <!ENTITY Ctr_appbuttonc_cu	"Bouton avec couleurs personnalisées">
 <!ENTITY Ctr_appbuttonI1	"Redémarrage recommandé">
-<!ENTITY Ctr_appbuttonI1e	"Non visible sur la barre de titre de l'OS">
-<!ENTITY Ctr_appbuttonI2	"Bouton coloré uniquement sur la barre de titre ou sur la barre d'onglets!">
+<!ENTITY Ctr_appbuttonI1e	"Non visible sur la barre de titre de l’OS">
+<!ENTITY Ctr_appbuttonI2	"Bouton coloré uniquement sur la barre de titre ou sur la barre d’onglets!">
 <!ENTITY Ctr_appbutmhi		"Position plus élevée (si sur la barre d’onglets)">
 <!ENTITY Ctr_appbutbdl		"Masquer les bordures et les couleurs de fond">
 <!ENTITY Ctr_dblclclosefx	"Un double clic ferme la fenêtre courante">
@@ -107,7 +109,7 @@
 <!ENTITY Ctr_smallnavbut	"Petits boutons sur la barre de navigation">
 <!ENTITY Ctr_bfurlbarfix 	"Corriger le rayon de courbure de la barre d’adresse">
 <!ENTITY Ctr_backforward	"Bouton avancer / reculer déplaçable">
-<!ENTITY Ctr_nbcompact		"Diminuer la hauteur des barres de navigations">
+<!ENTITY Ctr_nbcompact		"Diminuer la hauteur des barres de navigation">
 <!ENTITY Ctr_hide_bf_popup	"Cacher le menu historique lors du clic droit">
 <!ENTITY Ctr_bf_space		"Réduire l’espacement des boutons (si possible)">
 <!ENTITY Ctr_noconicons		"Remplacer les icônes du menu contextuel de la page par du texte (Page précédente, Page suivante, Arrêter/Actualiser, Marquer cette page)">
@@ -123,7 +125,7 @@
 <!ENTITY Ctr_stoprel1		"Barres d’outils : placer le bouton actualiser après le bouton stop.">
 <!ENTITY Ctr_panelmenucol	"Couleur de fond alternative pour les panneaux">
 <!ENTITY Ctr_hideprivmask	"Navigation privée : cacher le masque">
-<!ENTITY Ctr_nbisizedelay	"Délai d’exécution en millisecondes (1000 ms = 1 sec)">
+<!ENTITY Ctr_nbisizedelay	"Délai d’exécution en millisecondes (1000 ms = 1 s)">
 <!ENTITY Ctr_findbar		"Barre de recherche">
 <!ENTITY Ctr_findbar_def	"Position par défaut">
 <!ENTITY Ctr_findbar_top	"En haut">
@@ -138,14 +140,20 @@
 <!ENTITY Ctr_cpanelmenus	"Compacter le menu du panneau latéral (marque-pages, historique, etc)">
 <!ENTITY Ctr_hidezoomres	"Boutons de zoom (si sur une barre d’outils) : cacher le bouton « Réinitialiser le niveau de zoom »">
 <!ENTITY Ctr_alt_newtabp	"Page Nouvel onglet : aspect alternatif">
-<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
-<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
-<!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
-<!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
-<!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
-<!ENTITY Ctr_tbconmenu		"Toolbar context menu: hide 'move to menu', 'remove from toolbar', 'reload/bookmark all tabs' and 'undo close tab'">
-<!ENTITY Ctr_noresizerxp	"Hide Resizer (Windows XP)">
-<!ENTITY Ctr_extraurlkeycb	"Open additional location bar (Cmd/Ctrl+">
+<!ENTITY Ctr_alt_newtabpalt	"Page Nouvel onglet : aspect stylisé">
+<!ENTITY ctr_aboutnewtab.customhighlight 	"Utiliser une couleur de surlignement personnalisée">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Définir cette couleur">
+<!ENTITY ctr_aboutnewtab.custombase 	"Utiliser une couleur de texte personnalisée">
+<!ENTITY ctr_aboutnewtab.custombasecol 	"Changer la couleur de base du texte">
+<!ENTITY Ctr_alt_addonsp	"Pages « plus de détails » de la page des modules complémentaires : autre aspect">
+<!ENTITY Ctr_alt_newtabcol	"Page Nouvel onglet : nombre de colonnes">
+<!ENTITY Ctr_alt_newtabrow	"Page Nouvel onglet : nombre de rangées">
+<!ENTITY Ctr_bmbutpanelm	"Bouton du menu des marque-pages : aspect du panneau de menus">
+<!ENTITY Ctr_bmbutnotext	"Bouton du menu des marque-pages : masquer l’étiquette sur la barre personnelle">
+<!ENTITY Ctr_skipprintpr	"Bouton Imprimer : masquer « Aperçu avant l’impression »">
+<!ENTITY Ctr_tbconmenu		"Menu contextuel de la barre d’outils : masquer « déplacer au menu », « enlever de la barre d’outils », « recharger / marquer tous les onglets » et « annuler fermer l’onglet »">
+<!ENTITY Ctr_noresizerxp	"Masquer l’outil de redimensionnement (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Ouvrir une barre d’adresse supplémentaire (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Menu du panneau latéral : icônes seules">
 <!ENTITY Ctr_menupopupscr	"Menus pop-up : afficher des ascenseurs au lieu des flèches de défilement">
 
@@ -195,7 +203,7 @@
 <!ENTITY Ctr_padlock_cla	"Cadenas (classique)">
 <!ENTITY Ctr_padlock_mod	"Cadenas (moderne)">
 <!ENTITY Ctr_padlock_ext	"Icônes de sécurité">
-<!ENTITY Ctr_icopageinfo	"Cliquer sur l’icône affiche la fenêtre d’informations sur la page">
+<!ENTITY Ctr_icopageinfo	"Cliquer sur l’icône pour afficher la fenêtre d’informations de la page">
 
 <!ENTITY Ctr_menubar_items	"Position de la barre de menus">
 <!ENTITY Ctr_extrabar		"Barres d’outils supplémentaires">
@@ -215,10 +223,10 @@
 
 <!ENTITY Ctr_toolbars		"Barres d’outils">
 <!ENTITY Ctr_dblclnewtab	"Double-cliquer pour ouvrir un nouvel onglet (browser.newtab.url)">
-<!ENTITY Ctr_hidetbwot		"Cacher la barre d’onglets quand un seul onglet est ouvert">
+<!ENTITY Ctr_hidetbwot		"Masquer la barre d’onglets quand un seul onglet est ouvert">
 <!ENTITY Ctr_hidetbwote		"Diminuer le délai pour cacher la barre au démarrage">
-<!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
-<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
+<!ENTITY Ctr_hidetbwote_i	"Peut occasionner des disfonctionnements pour la barre d’onglets">
+<!ENTITY Ctr_hidetbwote2	"Conserver la barre de titre (onglets en haut)">
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Réduire l’espace supérieur (si possible)">
@@ -238,9 +246,9 @@
 <!ENTITY Ctr_nonavborder	"Barre personnelle : ajouter une bordure en haut de la barre">
 <!ENTITY Ctr_nonavtbborder	"Barres d’outils en haut : enlever les bordures">
 <!ENTITY Ctr_hidesbclose	"Panneaux latéraux : masquer le bouton de fermeture">
-<!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
+<!ENTITY Ctr_notextshadow	"Barres d’outils : enlever l’ombre du texte des barres d’onglets et d’outils">
 <!ENTITY Ctr_chevronfix		"Barre de navigation : masquer le chevron à la fin de la barre">
-<!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
+<!ENTITY Ctr_tbsep_winc		"Barres d’outils en haut : séparateurs de barres d’outils supplémentaires">
 
 <!ENTITY Ctr_closeabarbut	"Masquer le bouton de fermeture">
 <!ENTITY Ctr_highaddonsbar	"Augmenter la hauteur">
@@ -264,18 +272,21 @@
 <!ENTITY Ctr_nodevtheme		"Empêche l’activation du « thème développeur »">
 
 <!ENTITY Ctr_experttweaks	"Expert">
-<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ – introduit de nouvelles fonctions de rendu, lesquelles sont responsables de bugs avec les onglets sur certains systèmes (pas de réaction, onglets gelés). Ce problème est résolu en décochant cette option.">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ – introduit une nouvelle barre de recherche. Si cette option est décochée, l’ancienne barre de recherche est activée.">
-<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ – introduit la possibilité d’inviter quelqu’un à discuter. Cette possibilité est desactivée en décochant cette option.">
-<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ – introduit un nouveau « thème développeur ». Si cette option est décochée, ce thème et le bouton correspondant sont désactivés.">
+<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ – offre de nouvelles fonctions de rendu, lesquelles sont responsables de bugs avec les onglets sur certains systèmes (aucune réaction, onglets gelés). Ce problème est résolu en décochant cette option.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ – offre une nouvelle barre de recherche. Si cette option est décochée, l’ancienne barre de recherche est activée.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ – offre la possibilité d’inviter quelqu’un à discuter. Cette possibilité est désactivée en décochant cette option.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ – offre un nouveau « thème développeur ». Si cette option est décochée, ce thème et le bouton correspondant sont désactivés.">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ – place les préférences dans un onglet. Si cette option est décochée, l’ancienne fenêtre de préférences est utilisée.">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
-<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
-<!ENTITY Ctr_e_searchui		"Search appearance">
-<!ENTITY Ctr_e_loop			"Calling and conversation">
-<!ENTITY Ctr_e_deved		"Developer Edition Theme">
-<!ENTITY Ctr_e_prefsui		"Preferences in tab">
-<!ENTITY Ctr_e_readermode	"Reader mode">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ offre un mode de lecture d’articles. Si cette option est décochée, ce mode est désactivé et l’icône est enlevée de la barre d’adresse.">
+<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ offre le mode « sac de rangement » (« Pocket »). Si cette option est décochée, ce mode est désactivé et l’icône est enlevée des barres d’outils.">
+<!ENTITY Ctr_fx38pocket2	"Note: Déplacer le bouton « Sac » vers la fenêtre de personnalisation avant de désactiver cette fonction permet également d’enlever le sac de rangement des marque-pages et du menu de lecture.">
+<!ENTITY Ctr_e_omtc			"Problèmes de composition asynchrone (« OMTC »)">
+<!ENTITY Ctr_e_searchui		"Apparence et fonctionnement de la recherche">
+<!ENTITY Ctr_e_loop			"Appels et conversations">
+<!ENTITY Ctr_e_deved		"Thème de l’édition de développement">
+<!ENTITY Ctr_e_prefsui		"Préférences dans un onglet">
+<!ENTITY Ctr_e_readermode	"Mode de lecture d’articles">
+<!ENTITY Ctr_e_pocket		"Sac de rangement (« Pocket »)">
 
 
 <!ENTITY Ctr_pw_settings	"Réglages">
@@ -283,9 +294,11 @@
 <!ENTITY Ctr_pw_set_predef	"Préréglage classique">
 <!ENTITY Ctr_pw_set_export	"Exporter les préférences">
 <!ENTITY Ctr_pw_set_import	"Importer les préférences">
+<!ENTITY Ctr_pw_set_syncon	"Ajouter à la synchronisation">
+<!ENTITY Ctr_pw_set_syncoff	"Enlever de la synchronisation">
 
 <!ENTITY Ctr_special_font	"La configuration de la couleur de fond est réservée au thème par défaut">
-<!ENTITY Ctr_special_info	"Certaines options ne fonctionnent que dans certains cas !">
+<!ENTITY Ctr_special_info	"Certaines options ne fonctionnent que dans certains cas.">
 <!ENTITY Ctr_special_info2	"Options prévues pour le thème par défaut. Certaines options peuvent ne pas fonctionner pas avec les autres thèmes.">
 <!ENTITY Ctr_support		"Forum d’assistance">
 <!ENTITY Ctr_newversion		"Nouvelle version ?">
@@ -312,44 +325,60 @@
 <!ENTITY helpMenuWin.label		"Aide">
 
 <!-- Extra CyberCTR Additions -->
-<!ENTITY Ctr_classic_elements		"Préréglage classique">
+<!ENTITY Ctr_classic_elements	"Préréglage classique">
 <!ENTITY Ctr_pw_set_preaust		"Préréglage Australis">
-<!ENTITY ctr_Support_forums	"Forum d’assistance">
-<!ENTITY ctr_help_features	"Fonctionnalités et renseignements">
+<!ENTITY ctr_Support_forums		"Forum d’assistance">
+<!ENTITY ctr_help_features		"Fonctionnalités et renseignements">
 <!ENTITY ctr_tabtitleintitlebar	"Afficher le titre de l’onglet dans la barre de titre">
 
-<!ENTITY ctr_applyCTRPrefFile.label	"Appliquer les changements">
+<!ENTITY Ctr_custtabfontsize.label	"Taille de la police des onglets : ">
+
+<!ENTITY ctr_applyCTRPrefFile.label		"Appliquer les changements">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restaurer la copie de sauvegarde">
 
-<!ENTITY ctr_appbuttoncusttextcolor	"Couleur de texte du bouton d’application.">
+<!ENTITY ctr_appbuttoncusttextcolor		"Couleur de texte du bouton d’application.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Enlever l’ombre du texte du bouton d’application.">
 
-<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
-<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
-<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
-<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY ctr_toolbarsearchbar.description	"Barre d’outils de la barre de recherche">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Permettre de personnaliser la largeur maximale">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Largeur maximale de la barre de recherche : ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Barre de recherche de about:addons compressible">
 
-<!ENTITY ctr_abouthome.caption "Change about:home page style">
-<!ENTITY ctr_abouthome.default "Default about:home style">
-<!ENTITY ctr_abouthome.light "Light about:home style">
-<!ENTITY ctr_abouthome.dark "Dark about:home style">
-<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
-<!ENTITY ctr_abouthome.links "No links on about:home page">
-<!ENTITY ctr_abouthome.logo "No logo on about:home page">
-<!ENTITY ctr_abouthome.icons "No icons on about:home page">
-<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
-<!ENTITY ctr_abouthome.custombg "Use custom background image">
-<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
-<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
-<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
-<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_abouthome.animate "Use animations on about:home page">
-<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+<!ENTITY ctr_bookmarkfontsize.description	"Barre personnelle">
+<!ENTITY ctr_custombookmarkfontsize.label	"Permettre de déterminer la taille de la police utilisée sur la barre personnelle">
+<!ENTITY ctr_cbookmarkfontsize.label	"Taille de la police des marque-pages : ">
 
-<!ENTITY cssClassId.description "Hide element classes - element ids">
-<!ENTITY cssClassId.label "Enter a class or id:">
-<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
-<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
-<!ENTITY add.label "ADD">
-<!ENTITY clear.label "Clear Filter">
-<!ENTITY copy.label "Copy Filter">
+<!ENTITY ctr_abouthome.caption "Modifier le style de la page about:home">
+<!ENTITY ctr_abouthome.default "Style de la page « about:home » : par défaut">
+<!ENTITY ctr_abouthome.light "Style de la page « about:home » : pâle">
+<!ENTITY ctr_abouthome.dark "Style de la page « about:home » : foncé">
+<!ENTITY ctr_abouthome.simplicity  "Style de la page « about:home » : Simplicité">
+<!ENTITY ctr_abouthome.links "Aucun lien sur la page about:home">
+<!ENTITY ctr_abouthome.logo "Aucun logo sur la page about:home">
+<!ENTITY ctr_abouthome.icons "Aucune icône sur la page about:home">
+<!ENTITY ctr_abouthome.snippets "Aucun extrait sur la page about:home">
+<!ENTITY ctr_abouthome.custombg "Personnaliser l’image d’arrière-plan">
+<!ENTITY ctr_abouthome.custombgbrowse "Naviguer">
+<!ENTITY ctr_abouthome.custombgurl "Saisir l’adresse ou le chemin ">
+<!ENTITY ctr_abouthome.custombgurlph "Adresse de l’image ou chemin du fichier d’image">
+<!ENTITY ctr_abouthome.customhighlight "Utiliser une couleur de surlignement personnalisée">
+<!ENTITY ctr_abouthome.customhighlightcol "Définir cette couleur">
+<!ENTITY ctr_abouthome.custombase "Utiliser une couleur de texte personnalisée">
+<!ENTITY ctr_abouthome.custombasecol "Modifier la couleur de base du texte">
+<!ENTITY ctr_abouthome.animate "Utiliser des animations sur la page « about:home »">
+<!ENTITY ctr_abouthome.custombgstretch "Étirer l’image d’arrière-plan à la taille de la fenêtre (par défaut).">
+
+<!ENTITY ctr_aboutnewtab.caption "Modifier le style de la page « about:newtab »">
+
+<!ENTITY cssClassId.description "Masquer les classes et les ID des éléments">
+<!ENTITY cssClassId.label "Saisir une classe ou une ID :">
+<!ENTITY useFilterElement.label "Utiliser un filtre personnalisé pour masquer des classes ou des IDs d’éléments">
+<!ENTITY filterElement.placehold "Vous pouvez spécifier quelles classes ou IDs d’éléments.">
+<!ENTITY add.label "Ajouter">
+<!ENTITY clear.label "Effacer le filtre">
+<!ENTITY copy.label "Copier le filtre">
+
+<!ENTITY movableurlbar.label "Barre d’adresse déplaçable (ceci permet de la déplacer)">
+<!ENTITY movableurlbar.warning0 "Attention, paramètre dangereux ! Si vous déplacez la barre d’adresse dans le panneau de menu ou que vous personnalisez la fenêtre et que vous redémarrez, le navigateur sera corrompu.">
+<!ENTITY movableurlbar.warning1 "Vous devez deplacer la barre d'adresse à sa position par défaut avant de désactiver.">
+<!ENTITY movableurlbar.warning2 "Utilisez cette fonction avec prudence et à vos risques this feature with caution and at own risk.">

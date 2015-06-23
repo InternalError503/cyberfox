@@ -9,7 +9,7 @@ if (!cyberctrFeatures) {
 };
 
 cyberctrFeatures = {
-
+			getMessage: Services.strings.createBundle("chrome://classic_theme_restorer/locale/features.file"),
     initialize_features: function() {
 
         if (!Services.prefs.getBoolPref("extensions.classicthemerestorer.features.firstrun")) {
@@ -22,7 +22,27 @@ cyberctrFeatures = {
 		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase()) {
 			document.getElementById("up-check").hidden = true;
 			document.getElementById("up-check-oc").hidden = true;
-		}	
+		}
+		
+		//Localize UI elements.
+		document.getElementById("btn-check-update").textContent =cyberctrFeatures.i18n("btn-check-update");
+		document.getElementById("btn-Documentation").textContent =cyberctrFeatures.i18n("btn-Documentation");
+		document.getElementById("btn-faq").textContent =cyberctrFeatures.i18n("btn-faq");
+		document.getElementById("btn-support-forums").textContent =cyberctrFeatures.i18n("btn-support-forums");
+		document.getElementById("btn-contact-us").textContent =cyberctrFeatures.i18n("btn-contact-us");
+		//Off canvas
+		document.getElementById("btn-check-update-oc").textContent =cyberctrFeatures.i18n("btn-check-update");
+		document.getElementById("btn-Documentation-oc").textContent =cyberctrFeatures.i18n("btn-Documentation");
+		document.getElementById("btn-faq-oc").textContent =cyberctrFeatures.i18n("btn-faq");
+		document.getElementById("btn-support-forums-oc").textContent =cyberctrFeatures.i18n("btn-support-forums");
+		document.getElementById("btn-contact-us-oc").textContent =cyberctrFeatures.i18n("btn-contact-us");
+		//Updates
+		document.getElementById("msg-firstrun-welcome").textContent =cyberctrFeatures.i18n("msg-firstrun-welcome");
+		document.getElementById("msg-new-version-blob").innerHTML = cyberctrFeatures.i18n("msg-new-version-blob");
+		document.getElementById("url-new-download").setAttribute('href', 'https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#download');
+		document.getElementById("url-new-notes").setAttribute('href', 'https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#release-notes');
+		document.getElementById("msg-no-new-version").textContent =cyberctrFeatures.i18n("msg-no-new-version");
+
     },
 	
 	updateCheck: function (manual) {
@@ -96,28 +116,28 @@ cyberctrFeatures = {
 
                         case 0:
                             //log return failed request message for status 0 unsent
-                            console.log("Request failed " + this.target.status);
+                            console.log("Request failed " + aEvent.target.status);
                             break;
 
                         case 1:
-                            console.log("Error Status: " + this.target.status);
+                            console.log("Error Status: " + aEvent.target.status);
                             break;
 
                         case 2:
-                            console.log("Error Status: " + this.target.status);
+                            console.log("Error Status: " + aEvent.target.status);
                             break;
 
                         case 3:
-                            console.log("Error Status: " + this.target.status);
+                            console.log("Error Status: " + aEvent.target.status);
                             break;
 
                         case 4:
-                            console.log("Error Status: " + this.target.status);
+                            console.log("Error Status: " + aEvent.target.status);
                             break;
 
                         default:
                             aEvent.target.status
-                            console.log("Error Status: " + this.target.status);
+                            console.log("Error Status: " + aEvent.target.status);
                             break;
 
                     }
@@ -137,6 +157,15 @@ cyberctrFeatures = {
             //Show error
             Components.utils.reportError(eve);
         }
+	},	
+	
+	i18n: function(message_id){
+		
+		if (!document.getElementById(message_id)){
+			return;
+		}	
+		
+		return this.getMessage.GetStringFromName(message_id);
 	},	
 
     get_localized_document: function() {

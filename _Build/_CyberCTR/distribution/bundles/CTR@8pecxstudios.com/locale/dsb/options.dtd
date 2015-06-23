@@ -51,6 +51,8 @@
 <!ENTITY Ctr_tabheightinfo	"Niske gódnoty zawinuju zwobraznjeńske zmólki w maksiměrowanem naglěźe!">
 <!ENTITY Ctr_tabmaxwidth	"Maksimalna šyrokosć:">
 <!ENTITY Ctr_tabminwidth	"Minimalna šyrokosć:">
+<!ENTITY Ctr_tabclipwidth	"Clip-width:">
+<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"Maksimalna a minimalna šyrokosć wótwisujotej wót TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Maksimalna a minimalna šyrokosć wótwisujotej wót TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Gódnoty pód 48px zawinuju zwětšego zmólki w pśedstajenju!">
@@ -138,6 +140,12 @@
 <!ENTITY Ctr_cpanelmenus	"Kompaktne pólowe menije (cytańske znamjenja, historija atd.)">
 <!ENTITY Ctr_hidezoomres	"Skalěrowańske elementy na symbolowej rědce: Tłocašk za slědkstajenje skalěrowanja schowaś">
 <!ENTITY Ctr_alt_newtabp	"Bok nowego rejtarka: alternatiwne wuglědanje">
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_alt_addonsp	"Bok 'wěcej info' dodankow: alternatiwny naglěd">
 <!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
 <!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
 <!ENTITY Ctr_bmbutpanelm	"Tłocašk menija cytańskich znamjenjow: naglěd dialogowego menija">
@@ -270,12 +278,15 @@
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ jo nowu 'wuwijarsku drastwu' zawjadł. Gaž znjemóžnijośo toś te nastajenja, se 'wuwijarska drastwa' a jeje tłocašk w pśiměrjeńskem modusu znjemóžnjatej.">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ jo 'nastajenja w rejtarku' zawjadł. Gaž znjemóžnijośo toś to nastajenje, se stare wokno nastajenjow wótnowijo.">
 <!ENTITY Ctr_fx38reader		"&brandShortName; 38+ jo nowy 'cytański modus' zawjadł. Gaž toś te nastajenja se wótwoliju, znjemóžnijo se a jogo symbol wótpórajo se z adresowego póla.">
+<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ jo funkciju 'Pocket' zawjadł. Gaž toś to nastajenje se wótwolijo, se wóna znjemóžnijo a jeje tłocašk wótpórajo se ze symbolowych rědkow.">
+<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
 <!ENTITY Ctr_e_omtc			"OMTC / problem z wisecymi rejtarkami">
 <!ENTITY Ctr_e_searchui		"Pytański pówjerch">
 <!ENTITY Ctr_e_loop			"Telefoněrowanje a konwersacija">
 <!ENTITY Ctr_e_deved		"Drastwa wuwijarskeje edicije">
 <!ENTITY Ctr_e_prefsui		"Nastajenja w rejtarku">
 <!ENTITY Ctr_e_readermode	"Cytański modus">
+<!ENTITY Ctr_e_pocket		"Pocket">
 
 
 <!ENTITY Ctr_pw_settings	"Nastajenja">
@@ -283,6 +294,8 @@
 <!ENTITY Ctr_pw_set_predef	"Klasiske standardne gódnoty">
 <!ENTITY Ctr_pw_set_export	"Nastajenja eksportěrowaś">
 <!ENTITY Ctr_pw_set_import	"Nastajenja importěrowaś">
+<!ENTITY Ctr_pw_set_syncon	"K Sync pśidaś">
+<!ENTITY Ctr_pw_set_syncoff	"Ze Sync pśidaś">
 
 <!ENTITY Ctr_special_font	"Nastajenja za slězynowu barwu su jano za standardnu drastwu!">
 <!ENTITY Ctr_special_info	"Někotare nastajenja njepóbituju wizuelne změny we wšych padach!">
@@ -315,6 +328,8 @@
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
 
+<!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
+
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
@@ -326,6 +341,10 @@
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
 
+<!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
+<!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">
+<!ENTITY ctr_cbookmarkfontsize.label	"Bookmarks font size: ">
+
 <!ENTITY ctr_abouthome.caption "Change about:home page style">
 <!ENTITY ctr_abouthome.default "Default about:home style">
 <!ENTITY ctr_abouthome.light "Light about:home style">
@@ -336,12 +355,17 @@
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
 <!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgbrowse "Browse">
 <!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
 <!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.custombase "Use custom text color">
+<!ENTITY ctr_abouthome.custombasecol "Change base text color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
 <!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY ctr_aboutnewtab.caption "Change about:newtab page style">
 
 <!ENTITY cssClassId.description "Hide element classes - element ids">
 <!ENTITY cssClassId.label "Enter a class or id:">
@@ -350,3 +374,8 @@
 <!ENTITY add.label "ADD">
 <!ENTITY clear.label "Clear Filter">
 <!ENTITY copy.label "Copy Filter">
+
+<!ENTITY movableurlbar.label "Movable URL-Bar (Allows you to move the url-bar)">
+<!ENTITY movableurlbar.warning0 "Warning: This is a high level feature, If you move the URL-Bar to the panel UI menu or customize window and restart, It will break the browser.">
+<!ENTITY movableurlbar.warning1 "You must restore the URL-Bar to its default position before disabling.">
+<!ENTITY movableurlbar.warning2 "Use this feature with caution and at own risk.">

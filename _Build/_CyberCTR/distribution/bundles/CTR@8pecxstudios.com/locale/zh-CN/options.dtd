@@ -50,6 +50,8 @@
 <!ENTITY Ctr_tabheightinfo	"较小的值在最大化模式下可能出现问题!">
 <!ENTITY Ctr_tabmaxwidth	"最大宽度:">
 <!ENTITY Ctr_tabminwidth	"最小宽度:">
+<!ENTITY Ctr_tabclipwidth	"Clip-width:">
+<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"标签页的最小宽度和最大宽度由 TabMixPlus 所控制">
 <!ENTITY Ctr_tabwidthinfo2	"标签页的最小宽度和最大宽度由 TabUtilities 所控制">
 <!ENTITY Ctr_tabwidthinfo3	"小于48px的值在多数情况下可能出现问题!">
@@ -137,12 +139,18 @@
 <!ENTITY Ctr_cpanelmenus	"面板菜单: 更紧凑的视图 (书签、历史等等)">
 <!ENTITY Ctr_hidezoomres	"当缩放控制按钮在工具栏上时: 隐藏重置缩放按钮">
 <!ENTITY Ctr_alt_newtabp	"新标签页页面: 备选的外观">
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_alt_addonsp	"附加组件“更多”页面: 备选的外观">
 <!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
 <!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
 <!ENTITY Ctr_bmbutpanelm	"书签菜单按钮: 面板式菜单外观">
 <!ENTITY Ctr_bmbutnotext	"书签菜单按钮: 隐藏书签工具栏上的文本标签">
 <!ENTITY Ctr_skipprintpr	"打印按钮: 跳过打印预览">
-<!ENTITY Ctr_tbconmenu		"Toolbar context menu: hide 'move to menu', 'remove from toolbar', 'reload/bookmark all tabs' and 'undo close tab'">
+<!ENTITY Ctr_tbconmenu		"工具栏右键菜单: 隐藏 “移动到菜单”, “从工具栏移除”, “重新载入所有标签页/将全部标签页加为书签” 与 “恢复关闭的标签页”">
 <!ENTITY Ctr_noresizerxp	"隐藏调整大小控件 (Windows XP)">
 <!ENTITY Ctr_extraurlkeycb	"打开附加地址栏(Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"面板菜单: 隐藏按钮标签文本">
@@ -269,12 +277,15 @@
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ 引入新的“开发者版本主题”。不选中此项以禁用“开发者版本主题”以及定制模式下它的一些按钮。">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ 引入在标签页中显示选项设置。不选中此项以使用旧选项窗口。">
 <!ENTITY Ctr_fx38reader		"&brandShortName; 38+ 引入新的“阅读模式”。不选中此项以禁用它并从地址栏移除图标。">
+<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ 引入“Pocket”功能。不选中此项以禁用它并从地址栏移除图标。">
+<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
 <!ENTITY Ctr_e_omtc			"OMTC / 卡死标签页的问题">
 <!ENTITY Ctr_e_searchui		"搜索栏外观">
 <!ENTITY Ctr_e_loop			"呼叫与会话">
 <!ENTITY Ctr_e_deved		"开发者版本主题">
 <!ENTITY Ctr_e_prefsui		"标签页中显示选项设置">
 <!ENTITY Ctr_e_readermode	"阅读模式">
+<!ENTITY Ctr_e_pocket		"Pocket">
 
 
 <!ENTITY Ctr_pw_settings	"设置">
@@ -282,6 +293,8 @@
 <!ENTITY Ctr_pw_set_predef	"经典主题预设">
 <!ENTITY Ctr_pw_set_export	"导出选项设置">
 <!ENTITY Ctr_pw_set_import	"导入选项设置">
+<!ENTITY Ctr_pw_set_syncon	"添加到同步">
+<!ENTITY Ctr_pw_set_syncoff	"从同步中移除">
 
 <!ENTITY Ctr_special_font	"只有默认主题才能设置背景颜色!">
 <!ENTITY Ctr_special_info	"一些选项可能无法在所有情况下提供视觉变化!">
@@ -314,6 +327,8 @@
 <!ENTITY ctr_help_features	"Features &amp; Information">
 <!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
 
+<!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
+
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
 
@@ -325,6 +340,10 @@
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
 
+<!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
+<!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">
+<!ENTITY ctr_cbookmarkfontsize.label	"Bookmarks font size: ">
+
 <!ENTITY ctr_abouthome.caption "Change about:home page style">
 <!ENTITY ctr_abouthome.default "Default about:home style">
 <!ENTITY ctr_abouthome.light "Light about:home style">
@@ -335,12 +354,17 @@
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
 <!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgbrowse "Browse">
 <!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
 <!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
 <!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
 <!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_abouthome.custombase "Use custom text color">
+<!ENTITY ctr_abouthome.custombasecol "Change base text color">
 <!ENTITY ctr_abouthome.animate "Use animations on about:home page">
 <!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+
+<!ENTITY ctr_aboutnewtab.caption "Change about:newtab page style">
 
 <!ENTITY cssClassId.description "Hide element classes - element ids">
 <!ENTITY cssClassId.label "Enter a class or id:">
@@ -349,3 +373,8 @@
 <!ENTITY add.label "ADD">
 <!ENTITY clear.label "Clear Filter">
 <!ENTITY copy.label "Copy Filter">
+
+<!ENTITY movableurlbar.label "Movable URL-Bar (Allows you to move the url-bar)">
+<!ENTITY movableurlbar.warning0 "Warning: This is a high level feature, If you move the URL-Bar to the panel UI menu or customize window and restart, It will break the browser.">
+<!ENTITY movableurlbar.warning1 "You must restore the URL-Bar to its default position before disabling.">
+<!ENTITY movableurlbar.warning2 "Use this feature with caution and at own risk.">

@@ -1,0 +1,5 @@
+# Data directories
+/data*/
+
+# CyberfoxPortable.exe
+CyberfoxPortable/*.exe

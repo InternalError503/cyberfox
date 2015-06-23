@@ -19,9 +19,36 @@ classicthemerestorerjso.ctr = {
   oswindows:		Services.appinfo.OS=="WINNT",
   needsRestart: 	false,
   tmp_tu_active:	false,
+  
+  // Exclude all preferences we don't want to synced or export/import.
+	blacklist: [
+		"extensions.classicthemerestorer.pref_actindx",
+		"extensions.classicthemerestorer.pref_actindx2",
+		"extensions.classicthemerestorer.ctrreset",
+		"extensions.classicthemerestorer.compatibility.treestyle",
+		"extensions.classicthemerestorer.compatibility.treestyle.disable",
+		"extensions.classicthemerestorer.compatibility.tabmix",
+		"extensions.classicthemerestorer.ctrpref.firstrun",
+		"extensions.classicthemerestorer.features.firstrun",
+		"extensions.classicthemerestorer.features.lastcheck",
+		"extensions.classicthemerestorer.features.updatecheck",
+		"extensions.classicthemerestorer.ctrpref.lastmod",
+		"extensions.classicthemerestorer.ctrpref.lastmodapply",
+		"extensions.classicthemerestorer.ctrpref.updatekey",
+		"extensions.classicthemerestorer.version",
+		"extensions.classicthemerestorer.features.firstrun",
+		"extensions.classicthemerestorer.ctrpref.lastmod.backup"
+		],	
 
   initprefwindow: function() {
-  
+
+	// Movable url-bar (Note: If user moves url-bar to panel UI or customize pallet then restart it will break browser).
+	try{  
+		Application.prefs.get("extensions.classicthemerestorer.movableurlbar").events.addListener("change", function(aEvent){			
+			classicthemerestorerjso.ctr.needsBrowserRestart();						
+		});
+	} catch(e){}	  
+	
 	// adds a new global attribute 'defaultfxtheme' -> better parting css for default and non-default themes
 	try{
 		if (this.fxdefaulttheme) document.getElementById("ClassicTRoptionsPane").setAttribute('defaultfxtheme',true);
@@ -33,6 +60,12 @@ classicthemerestorerjso.ctr = {
 			}
 		  
 		  }
+	} catch(e){}
+	
+	try{
+	  if (this.appversion >= 40)
+		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org')
+		  this.fxdefaulttheme=false;
 	} catch(e){}
 	
 	// restore last selected categories/tabs
@@ -58,7 +91,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_tabmokcolor4').disabled = true;
 		document.getElementById('ctraddon_pw_panelmenucolor').disabled = true;
 		document.getElementById('ctraddon_pw_nobookbarbg').disabled = true;
-		document.getElementById('ctraddon_pw_nonavbarbg').disabled = true;
 		document.getElementById('ctraddon_pw_nonavborder').disabled = true;
 		document.getElementById('ctraddon_pw_nonavtbborder').disabled = true;
 		document.getElementById('ctraddon_pw_alttabstb').disabled = true;
@@ -74,7 +106,7 @@ classicthemerestorerjso.ctr = {
 		}
 		
 		document.getElementById('ctraddon_pw_closeonleft').disabled = true;
-		document.getElementById('ctraddon_pw_closealt').disabled = true;
+		//document.getElementById('ctraddon_pw_closealt').disabled = true;
 		document.getElementById('ctraddon_pw_nbcompact').disabled = true;
 		document.getElementById('ctraddon_pw_tabc_act_tb').disabled = true;
 		document.getElementById('ctraddon_pw_aerocolors').disabled = true;
@@ -106,6 +138,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_notabfog').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_notabbg').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nonavbarbg').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_nonavbarbg1').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nonavborder').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nonavtbborder').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nobookbarbg').style.visibility = 'collapse';
@@ -116,7 +149,7 @@ classicthemerestorerjso.ctr = {
 		}
 		
 		document.getElementById('ctraddon_pw_closeonleft').style.visibility = 'collapse';
-		document.getElementById('ctraddon_pw_closealt').style.visibility = 'collapse';
+		//document.getElementById('ctraddon_pw_closealt').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nbcompact').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabc_act_tb').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_aerocolors').style.visibility = 'collapse';
@@ -125,7 +158,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_special_info2').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_special_font').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
-		document.getElementById('ctraddon_coltabsinfo').style.visibility = 'collapse';
 	};
 
 	//Custom Button Color Text Color
@@ -161,11 +193,12 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_cappbutnotxtsh').disabled = true;
 	
 	//pref e10s tabs
-	document.getElementById('ctraddon_pw_e10stab_notd').disabled = true;
-	document.getElementById('ctraddon_pw_e10stab_notd').style.visibility = 'collapse';
 	document.getElementById('ctraddon_pw_e10stabs').disabled = true;
 	document.getElementById('ctraddon_pw_e10stabs').style.visibility = 'collapse';
 	document.getElementById('ctraddon_pw_e10stabsdescr').style.visibility = 'collapse';
+	
+	//ColorfulTabs info label
+	document.getElementById('ctraddon_coltabsinfo').style.visibility = 'collapse';
 
 	// radio restart label
 	document.getElementById('ctraddon_pw_radiorestart').style.visibility = 'collapse';
@@ -335,7 +368,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_oldsearchgb').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_loopcallgb').style.visibility = 'collapse';
 	}
-	if (this.appversion < 35 || this.appversion > 39.9) {
+	if (this.appversion < 35) {
 	  document.getElementById('ctraddon_pw_devthemegb').style.visibility = 'collapse';
 	}
 	if (this.appversion < 36) {
@@ -343,10 +376,21 @@ classicthemerestorerjso.ctr = {
 	}
 	if (this.appversion < 38) {
 	  document.getElementById('ctraddon_pw_readermodegb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_pocketgb').style.visibility = 'collapse';
 	}
 	if (this.appversion > 37) {
 	  document.getElementById('ctraddon_pw_bmarkoinpw').style.visibility = 'collapse';
 	}
+	if (this.appversion > 39) {
+	  document.getElementById('ctraddon_pw_devtheme').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_devthemeb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_devthemedescr').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_nodevtheme1').style.visibility = 'collapse';
+	}
+	if (this.appversion < 40) {
+	  document.getElementById('ctraddon_pw_nodevtheme2').style.visibility = 'collapse';
+	}
+
 
 	function PrefListener(branch_name, callback) {
 	  // Keeping a reference to the observed preference branch or it will get
@@ -444,7 +488,6 @@ classicthemerestorerjso.ctr = {
 	this.altTabsToolbarBgExtra(this.prefs.getBoolPref("alttabstb"));
 	this.ctrpwModeextra(this.prefs.getCharPref("nav_txt_ico"));
 	this.ctrpwDisableDevThemePrefsExtra(this.prefs.getBoolPref("nodevtheme"));
-	this.ctrShowE10sPrefForWindowPrefs();
 
 	
 	var closetab_value = this.prefs.getCharPref("closetab");
@@ -465,17 +508,7 @@ classicthemerestorerjso.ctr = {
 	}
 
 	this.onCtrPanelSelect();
-	
-	// if e10s is used show CTRs option to disable tab underlining
-	try{
-	  if (Services.prefs.getBranch("browser.tabs.remote.").getBoolPref("autostart") || 
-			Services.prefs.getBranch("browser.tabs.remote.autostart.").getBoolPref("1")) {
-		document.getElementById('ctraddon_pw_e10stab_notd').disabled = false;
-		document.getElementById('ctraddon_pw_e10stab_notd').style.visibility = 'visible';
-	  }
-	} catch(e) {}
 
-		
 		if (contexts.getBoolPref("classic")){
 			document.getElementById('ctraddon_pw_noconicons').disabled = true;
 		}else{
@@ -553,7 +586,9 @@ classicthemerestorerjso.ctr = {
 		
 		//Disable custom background image on Light|dark theme styles.
 		if (this.prefs.getCharPref("abouthome") === "dark" || 
-			this.prefs.getCharPref("abouthome") === "light"){
+			this.prefs.getCharPref("abouthome") === "darkalt" ||
+			this.prefs.getCharPref("abouthome") === "light" ||
+			this.prefs.getCharPref("abouthome") === "lightalt"){
 			document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
 			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
 			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
@@ -569,7 +604,9 @@ classicthemerestorerjso.ctr = {
 
 		Application.prefs.get("extensions.classicthemerestorer.abouthome").events.addListener("change", function(aEvent){
 				if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "dark" || 
-					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "light"){
+					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "darkalt" ||
+					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "light" ||
+					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "lightalt"){
 				document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
 				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
 				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
@@ -599,6 +636,57 @@ classicthemerestorerjso.ctr = {
 				document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
 				this.prefs.setBoolPref("abouthomehighlight", false);
 		}
+		
+		//Alternate about:newtab page style 		
+			if(this.prefs.getBoolPref("alt_newtabpalt") === true){
+				document.getElementById('ctraddon_pw_alt_newtabp').disabled = true;
+				this.prefs.setBoolPref("alt_newtabp", false);
+				document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = false;
+			}else{
+				document.getElementById('ctraddon_pw_alt_newtabp').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = true;
+			}		
+		
+		
+		//Alternate about:newtab page style listener
+		Application.prefs.get("extensions.classicthemerestorer.alt_newtabpalt").events.addListener("change", function(aEvent){
+			if(Services.prefs.getBoolPref("extensions.classicthemerestorer.alt_newtabpalt") === true){
+				document.getElementById('ctraddon_pw_alt_newtabp').disabled = true;
+				Services.prefs.setBoolPref("extensions.classicthemerestorer.alt_newtabp", false);
+				document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = false;
+			}else{
+				document.getElementById('ctraddon_pw_alt_newtabp').disabled = false;
+				document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = true;
+				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = true;
+			}	
+		});
 		
 			document.getElementById("css").value = Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter");
 			this.hideThemeInfoForTabs();
@@ -646,10 +734,10 @@ classicthemerestorerjso.ctr = {
 	
 	// reset Tab appearance, but keep last knows preference
 	setTimeout(function(){
-	  classicthemerestorerjso.ctr.prefs.setCharPref('tabs','tabs_default');
+	  Services.prefs.getBranch("extensions.classicthemerestorer.").setCharPref('tabs','tabs_default');
 	},50);
 	setTimeout(function(){
-	  classicthemerestorerjso.ctr.prefs.setCharPref('tabs','tabs_squared');
+	  Services.prefs.getBranch("extensions.classicthemerestorer.").setCharPref('tabs','tabs_squared');
 	},100);
 	
 	// disable Aero (blue) toolbars preference
@@ -669,38 +757,36 @@ classicthemerestorerjso.ctr = {
 	  }
 	} catch(e) {}
   },
-  
-  ctrShowE10sPrefForWindowPrefs: function() {
-	try{
-	setTimeout(function(){
-	  if(Services.prefs.getBranch("app.update.").getCharPref("channel")=='nightly'
-			&& Services.prefs.getBranch("browser.preferences.").getBoolPref("inContent")==false) {
-		document.getElementById('ctraddon_pw_e10stabs').disabled = false;
-		document.getElementById('ctraddon_pw_e10stabs').style.visibility = 'visible';
-		document.getElementById('ctraddon_pw_e10stabsdescr').style.visibility = 'visible';
-	  } else {
-		document.getElementById('ctraddon_pw_e10stabs').disabled = true;
-		document.getElementById('ctraddon_pw_e10stabs').style.visibility = 'collapse';
-		document.getElementById('ctraddon_pw_e10stabsdescr').style.visibility = 'collapse';
-	  }
-	},100);
-	} catch(e) {}
-  },
-  
+ 
   hideThemeInfoForTabs: function(){
 	setTimeout(function(){
-		try {
-		  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
-			document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'visible';
-			document.getElementById('ctraddon_pw_tabmenulist').disabled = true;
-		  } else if(classicthemerestorerjso.ctr.fxdefaulttheme) {
-			  document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
-			  document.getElementById('ctraddon_pw_tabmenulist').disabled = false;
+		//try {
+		  if(classicthemerestorerjso.ctr.appversion < 40) {
+			try {
+			  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
+				document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'visible';
+				document.getElementById('ctraddon_pw_tabmenulist').disabled = true;
+			  } else if(classicthemerestorerjso.ctr.fxdefaulttheme) {
+				document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
+				document.getElementById('ctraddon_pw_tabmenulist').disabled = false;
+			  }
+			} catch(e) {}
+		  } else {
+			  try {
+				if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'){
+				  document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'visible';
+				  document.getElementById('ctraddon_pw_tabmenulist').disabled = true;
+				} else if(classicthemerestorerjso.ctr.fxdefaulttheme) {
+				  document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
+				  document.getElementById('ctraddon_pw_tabmenulist').disabled = false;
+				}
+			  } catch(e) {}
+			  
 		  }
-		} catch(e) {}
+		//} catch(e) {}
 	},100);
   },
-  
+
   unsetTabColorsAndMore: function() {
 	this.prefs.setBoolPref('tabcolor_def',false);
 	this.prefs.setBoolPref('tabcolor_act',false);
@@ -713,7 +799,7 @@ classicthemerestorerjso.ctr = {
 	if(this.prefs.getBoolPref('closeonleft')) {
 	  this.prefs.setBoolPref('closeonleft',false);
 	  setTimeout(function(){
-		classicthemerestorerjso.ctr.prefs.setBoolPref('closeonleft',true);
+		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref('closeonleft',true);
 	  },20);
 	}
   },
@@ -742,14 +828,14 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_pw_bf_space').disabled = which;
 	document.getElementById('ctraddon_pw_hide_bf_popup').style.visibility = itemvis;
 	document.getElementById('ctraddon_pw_bf_space').style.visibility = itemvis;
-	if(classicthemerestorerjso.ctr.prefs.getBoolPref('smallnavbut')==false){
+	if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref('smallnavbut')==false){
 	  document.getElementById('ctraddon_pw_nbcompact').disabled = which;
 	  document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
 	}
   },
   
    ctrpwSNextra: function(which) {
-    if(classicthemerestorerjso.ctr.prefs.getBoolPref('backforward')){
+    if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref('backforward')){
 	  var itemvis = 'collapse';
 	
       if(which==true) {
@@ -973,7 +1059,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById("ctraddon_pw_starinurl").style.listStyleImage="unset";
 		document.getElementById("ctraddon_pw_feedinurl").style.listStyleImage="unset";
 		
-		if (classicthemerestorerjso.ctr.prefs.getBoolPref('starinurl'))
+		if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref('starinurl'))
 		  document.getElementById('ctraddon_pw_bmanimation').disabled = true;
 		else document.getElementById('ctraddon_pw_bmanimation').disabled = false;
 	},1350);
@@ -1004,7 +1090,7 @@ classicthemerestorerjso.ctr = {
   classicCTRpreferences: function() {
 	this.resetCTRpreferences();
 	
-	if(classicthemerestorerjso.ctr.tmp_tu_active==false) classicthemerestorerjso.ctr.prefs.setIntPref("ctabwidth",250);
+	if(classicthemerestorerjso.ctr.tmp_tu_active==false) Services.prefs.getBranch("extensions.classicthemerestorer.").setIntPref("ctabwidth",250);
 	this.prefs.setBoolPref("panelmenucol",true);
 	this.prefs.setBoolPref("verifiedcolors",true);
 	this.prefs.setCharPref("findbar",'findbar_bottoma');
@@ -1023,12 +1109,12 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("tbconmenu",true);
 	
 	setTimeout(function(){
-		classicthemerestorerjso.ctr.prefs.setBoolPref("starinurl",true);
-		classicthemerestorerjso.ctr.prefs.setBoolPref("feedinurl",true);
+		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("starinurl",true);
+		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("feedinurl",true);
 	},1350);
 	
 	if (this.oswindows && classicthemerestorerjso.ctr.tmp_tu_active==false)
-		classicthemerestorerjso.ctr.prefs.setBoolPref("dblclnewtab",true);
+		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("dblclnewtab",true);
 	
 	this.needsBrowserRestart();
 
@@ -1049,6 +1135,28 @@ classicthemerestorerjso.ctr = {
 	this.needsBrowserRestart();
 
   },
+  
+  enableSyncCTRprefs: function() {
+	
+	var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
+	
+	try {
+	  for (var i=0; i < preflist.length; i++) {
+		var index = preflist.indexOf(this.blacklist[i]);
+
+		if (index > -1) {
+		  preflist.splice(index, 1);
+		}
+		Services.prefs.getBranch("services.sync.prefs.sync.").setBoolPref(preflist[i],'true');
+	  }
+	} catch(e) {}
+  },
+  
+  disableSyncCTRprefs: function() {
+	try {
+	  Services.prefs.getBranch("services.sync.prefs.sync.extensions.classicthemerestorer.").deleteBranch("");
+	} catch(e) {}
+  },
 
   /* export CTR settings Text */
   exportCTRpreferences: function() {
@@ -1060,23 +1168,6 @@ classicthemerestorerjso.ctr = {
 		 
 	// Add filter header
 	preferenceArray.push("CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers");	
-
-		// Exclude all preferences we don't want to export/import.
-		let blacklist = [
-		"extensions.classicthemerestorer.pref_actindx",
-		"extensions.classicthemerestorer.pref_actindx2",
-		"extensions.classicthemerestorer.ctrreset",
-		"extensions.classicthemerestorer.compatibility.treestyle",
-		"extensions.classicthemerestorer.compatibility.treestyle.disable",
-		"extensions.classicthemerestorer.compatibility.tabmix",
-		"extensions.classicthemerestorer.ctrpref.firstrun",
-		"extensions.classicthemerestorer.ctrpref.lastmod",
-		"extensions.classicthemerestorer.ctrpref.lastmodapply",
-		"extensions.classicthemerestorer.ctrpref.updatekey",
-		"extensions.classicthemerestorer.version",
-		"extensions.classicthemerestorer.features.firstrun",
-		"extensions.classicthemerestorer.ctrpref.lastmod.backup"
-		];
 
 	// Filter preference type and return its value.
 	function prefValue(pref){
@@ -1104,7 +1195,7 @@ classicthemerestorerjso.ctr = {
 
 	  try {
 		// Run Blacklist filter. Exclude all preferences we don't want to export/import.
-		var index = preflist.indexOf(blacklist[i]);
+		var index = preflist.indexOf(this.blacklist[i]);
 
 		if (index > -1) {
 		  preflist.splice(index, 1);
@@ -1126,36 +1217,8 @@ classicthemerestorerjso.ctr = {
 	}	  
 	  
 	// Use new less bulky export for text.
-	saveToFile(preferenceArray);
-	  
-	function saveToFile(patterns) {
-
-	  const nsIFilePicker = Components.interfaces.nsIFilePicker;
-	  var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	  var stream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
-
-	  fp.init(window, null, nsIFilePicker.modeSave);
-	  fp.defaultExtension = "txt";
-	  fp.defaultString = "CTRpreferences.txt";
-	  fp.appendFilters(nsIFilePicker.filterText);
-
-	  if (fp.show() != nsIFilePicker.returnCancel) {
-		let file = fp.file;
-		if (!/\.txt$/.test(file.leafName.toLowerCase()))
-		  file.leafName += ".txt";
-		if (file.exists())
-		  file.remove(true);
-		file.create(file.NORMAL_FILE_TYPE, parseInt("0666", 8));
-		stream.init(file, 0x02, 0x200, null);
-
-		for (var i = 0; i < patterns.length ; i++) {
-		  patterns[i]=patterns[i]+"\n";
-		  stream.write(patterns[i], patterns[i].length);
-		}
-		stream.close();
-	  }
-	}
-	  
+	classicthemerestorerjso.ctr.saveToFile(preferenceArray, "txt");
+  
 	return true;
   },
   
@@ -1164,7 +1227,7 @@ classicthemerestorerjso.ctr = {
  
 	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
   
-	var pattern = loadFromFile();
+	var pattern = classicthemerestorerjso.ctr.loadFromFile("txt");
 
 	if (!pattern) return false;
 	   
@@ -1200,32 +1263,7 @@ classicthemerestorerjso.ctr = {
 		 this.prefs.setIntPref(''+prefName+'',prefValue);
 	  }
 	}
-	   
-	function loadFromFile() {
 
-	   const nsIFilePicker = Components.interfaces.nsIFilePicker;
-	   var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	   var stream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
-	   var streamIO = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
-
-	   fp.defaultExtension = "txt";
-	   fp.defaultString = "CTRpreferences.txt";
-	   fp.init(window, null, nsIFilePicker.modeOpen);
-	   fp.appendFilters(nsIFilePicker.filterText);
-
-	   if (fp.show() != nsIFilePicker.returnCancel) {
-		  stream.init(fp.file, 0x01, parseInt("0444", 8), null);
-		  streamIO.init(stream);
-		  var input = streamIO.read(stream.available());
-		  streamIO.close();
-		  stream.close();
-
-		  var linebreak = input.match(/(((\n+)|(\r+))+)/m)[1];
-		  return input.split(linebreak);
-	   }
-	   return null;
-	}
-	
 	this.needsBrowserRestart();
 	
 	return true;
@@ -1234,9 +1272,7 @@ classicthemerestorerjso.ctr = {
   /* import CTR settings JSON*/
   importCTRpreferencesJSON: function() {
  
-	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
-
-	var parjson = loadFromFile();
+	var parjson = classicthemerestorerjso.ctr.loadFromFile("json");
 
 	if (!parjson) return false;
 	
@@ -1254,7 +1290,10 @@ classicthemerestorerjso.ctr = {
 	  try {
 
 		if(parjson[i].preference.match(/extensions.classicthemerestorer./g)){
+			//To import previously generated preference export.
 			setPrefValue(parjson[i].preference, parjson[i].value);
+		} else{
+			setPrefValue('extensions.classicthemerestorer.' + parjson[i].preference, parjson[i].value);
 		}
 
 	  } catch(e) {
@@ -1263,46 +1302,6 @@ classicthemerestorerjso.ctr = {
 	  }
 	}	
 
-	// Need to check if json is valid. If json not valid. don't continue and show error.
-	function IsJsonValid(text) {
-
-	  try { JSON.parse(text); }
-	  catch (e) { return false; }
-	  return true;
-
-	}				
-	 
-	function loadFromFile() {
-
-	   const nsIFilePicker = Components.interfaces.nsIFilePicker;
-	   var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	   var stream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
-	   var streamIO = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
-
-	   fp.defaultExtension = "json";
-	   fp.defaultString = "CTRpreferences.json";
-	   fp.init(window, null, nsIFilePicker.modeOpen);
-	   fp.appendFilters(nsIFilePicker.filterAll);
-
-	   if (fp.show() != nsIFilePicker.returnCancel) {
-		  stream.init(fp.file, 0x01, parseInt("0444", 8), null);
-		  streamIO.init(stream);
-		  var input = streamIO.read(stream.available());
-		  streamIO.close();
-		  stream.close();
-
-		 var text = input;
-
-		  if(!IsJsonValid(text)){
-			  alert(stringBundle.GetStringFromName("import.errorJSON"));
-			  return false;
-		  } else{
-			return JSON.parse(input);
-		  }
-	   }
-	   return null;
-	}
-	
 	this.needsBrowserRestart();
 	
 	return true;
@@ -1318,22 +1317,6 @@ classicthemerestorerjso.ctr = {
 	  value: []
 	};
 
-		// Exclude all preferences we don't want to export/import.
-		let blacklist = [
-		"extensions.classicthemerestorer.pref_actindx",
-		"extensions.classicthemerestorer.pref_actindx2",
-		"extensions.classicthemerestorer.ctrreset",
-		"extensions.classicthemerestorer.compatibility.treestyle",
-		"extensions.classicthemerestorer.compatibility.treestyle.disable",
-		"extensions.classicthemerestorer.compatibility.tabmix",
-		"extensions.classicthemerestorer.ctrpref.firstrun",
-		"extensions.classicthemerestorer.ctrpref.lastmod",
-		"extensions.classicthemerestorer.ctrpref.lastmodapply",
-		"extensions.classicthemerestorer.ctrpref.updatekey",
-		"extensions.classicthemerestorer.version",
-		"extensions.classicthemerestorer.features.firstrun",
-		"extensions.classicthemerestorer.ctrpref.lastmod.backup"
-		];
 
 	function prefValue(pref){
 
@@ -1349,14 +1332,14 @@ classicthemerestorerjso.ctr = {
 
 	  try {
 		// 'Blacklist' filter. Exclude all preferences we don't want to export/import.
-		var index = preflist.indexOf(blacklist[i]);
+		var index = preflist.indexOf(this.blacklist[i]);
 
 		if (index > -1) {
 		  preflist.splice(index, 1);
 		}
 
 		preferenceArray.preference.push({
-		  "preference" : preflist[i],
+		  "preference" : preflist[i].replace("extensions.classicthemerestorer.", ""),
 		  "value" : prefValue(preflist[i])
 		});
 
@@ -1367,39 +1350,126 @@ classicthemerestorerjso.ctr = {
 
 	}
 
-	saveToFile(preferenceArray);
-	  
-	function saveToFile(patterns) {
-
-	  const nsIFilePicker = Components.interfaces.nsIFilePicker;
-	  var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	  var stream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
-
-	  fp.init(window, null, nsIFilePicker.modeSave);
-	  fp.defaultExtension = "json";
-	  fp.defaultString = "CTRpreferences.json";
-	  fp.appendFilters(nsIFilePicker.filterAll);
-
-	  if (fp.show() != nsIFilePicker.returnCancel) {
-		let file = fp.file;
-		if (!/\.json$/.test(file.leafName.toLowerCase()))
-		  file.leafName += ".json";
-		if (file.exists())
-		  file.remove(true);
-		file.create(file.NORMAL_FILE_TYPE, parseInt("0666", 8));
-		stream.init(file, 0x02, 0x200, null);
-
-		var patternItems = JSON.stringify(patterns.preference);
-
-		stream.write(patternItems, patternItems.length)
-
-		stream.close();
-	  }
-	}
+	classicthemerestorerjso.ctr.saveToFile(preferenceArray, "json");
 
 	return true;
 
   }, 
+  
+	// Need to check if json is valid. If json not valid. don't continue and show error.
+	IsJsonValid: function (aData) {
+	  try { 
+			JSON.parse(aData); 
+		}catch (e) { 
+			return false; 
+		}
+	  return true;
+	},	
+  
+	saveToFile: function(aPattern, aType) {
+		try{
+			if (aType === "txt" || aType === "json") {} else {
+			  return false;
+			}
+
+			const nsIFilePicker = Components.interfaces.nsIFilePicker;
+			var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+			var stream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+
+			fp.init(window, null, nsIFilePicker.modeSave);
+			fp.defaultExtension = aType;
+			fp.defaultString = "CTRpreferences." + aType;
+
+			if (aType === "txt") {
+			  fp.appendFilters(nsIFilePicker.filterText);
+			} else if (aType === "json") {
+			  fp.appendFilters(nsIFilePicker.filterAll);
+			}
+
+			if (fp.show() != nsIFilePicker.returnCancel) {
+			  let file = fp.file;
+			  if (aType === "txt") {
+				if (!/\.txt$/.test(file.leafName.toLowerCase()))
+				  file.leafName += ".txt";
+			  } else if (aType === "json") {
+				if (!/\.json$/.test(file.leafName.toLowerCase()))
+				  file.leafName += ".json";
+			  }
+			  if (file.exists())
+				file.remove(true);
+			  file.create(file.NORMAL_FILE_TYPE, parseInt("0666", 8));
+			  stream.init(file, 0x02, 0x200, null);
+
+			  switch (aType) {
+				case "txt":
+				  for (var i = 0; i < aPattern.length; i++) {
+					aPattern[i] = aPattern[i] + "\n";
+					stream.write(aPattern[i], aPattern[i].length);
+				  }
+				  break;
+				case "json":
+				  var patternItems = JSON.stringify(aPattern.preference);
+				  stream.write(patternItems, patternItems.length)
+				  break;
+			  }
+			  stream.close();
+			}
+			return true;
+		  } catch(e) {
+			Components.utils.reportError(e);
+		  }
+	  },
+
+	  loadFromFile: function(aType) {
+		  try{
+			if (aType === "txt" || aType === "json") {} else {
+			  return false;
+			}
+			
+			var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
+			const nsIFilePicker = Components.interfaces.nsIFilePicker;
+			var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+			var stream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+			var streamIO = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
+
+			fp.defaultExtension = aType;
+			fp.defaultString = "CTRpreferences." + aType;
+			fp.init(window, null, nsIFilePicker.modeOpen);
+			if (aType === "txt") {
+			  fp.appendFilters(nsIFilePicker.filterText);
+			} else if (aType === "json") {
+			  fp.appendFilters(nsIFilePicker.filterAll);
+			}
+
+			if (fp.show() != nsIFilePicker.returnCancel) {
+			  stream.init(fp.file, 0x01, parseInt("0444", 8), null);
+			  streamIO.init(stream);
+			  var input = streamIO.read(stream.available());
+			  streamIO.close();
+			  stream.close();
+
+			  switch (aType) {
+				case "txt":
+				  var linebreak = input.match(/(((\n+)|(\r+))+)/m)[1];
+				  return input.split(linebreak);
+				  break;
+				case "json":
+				  var text = input;
+				  if (!classicthemerestorerjso.ctr.IsJsonValid(text)) {
+					alert(stringBundle.GetStringFromName("import.errorJSON"));
+					return false;
+				  } else {
+					return JSON.parse(input);
+				  }
+				  break;
+			  }
+
+			}
+			return null;
+		  } catch(e) {
+			Components.utils.reportError(e);
+		  }
+	  },
  
   onCtrPanelSelect: function() {
     let ctrAddonPrefBoxTab = document.getElementById("CtrRadioGroup");
@@ -1504,6 +1574,29 @@ classicthemerestorerjso.ctr = {
 			if(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter").length === 0){return;}
             var gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper);
             gClipboardHelper.copyString(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter"));
-	}	
+	},
+
+	selectBG: function() {
+		try{
+		   const nsIFilePicker = Components.interfaces.nsIFilePicker;
+		   var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+		   var stream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+		   var IOpath = "";
+
+		   fp.init(window, null, nsIFilePicker.modeOpen);
+		   fp.appendFilter("Image Files (*.jpg,*.png,*.gif)","*.jpg","*.png,","*.gif");
+
+		   if (fp.show() != nsIFilePicker.returnCancel) {
+			   IOpath = fp.file.path;
+			   stream.close();
+			   if (IOpath === ""){return null;}
+			  document.getElementById('ctraddon_ctabouthome_bg_urlbox').value = "file:" + IOpath ;
+			  Services.prefs.setCharPref("extensions.classicthemerestorer.abouthomecustomurl", "file:" + IOpath);
+			  
+			  return true;
+		   }
+		   return null;
+		}catch(e){}
+	}
 	
 };

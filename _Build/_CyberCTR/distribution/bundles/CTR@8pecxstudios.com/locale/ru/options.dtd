@@ -50,6 +50,8 @@
 <!ENTITY Ctr_tabheightinfo	"Низкое значение вызовет сбои в развёрнутом режиме!">
 <!ENTITY Ctr_tabmaxwidth	"Макс. ширина:">
 <!ENTITY Ctr_tabminwidth	"Мин. ширина:">
+<!ENTITY Ctr_tabclipwidth	"Clip-width:">
+<!ENTITY Ctr_tabclipwidthI	"Вручную присвоить 'clip width' значение '1' !">
 <!ENTITY Ctr_tabwidthinfo	"Минимальная и максимальная ширина вкладок изменяются расширением TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Минимальная и максимальная ширина вкладок изменяются расширением TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Значения ниже 48px часто приводят к сбоям!">
@@ -137,6 +139,12 @@
 <!ENTITY Ctr_cpanelmenus	"Компактная панель меню (закладки, история и т. д.)">
 <!ENTITY Ctr_hidezoomres	"Кнопки масштаба: скрыть сброс масштабирования">
 <!ENTITY Ctr_alt_newtabp	"Страница новой вкладки: альтернативный вид">
+<!ENTITY Ctr_alt_newtabpalt	"Стиль представления страницы новой вкладки">
+<!ENTITY ctr_aboutnewtab.customhighlight "Использовать свой цвет подсветки ">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Изменение цвета подсветки">
+<!ENTITY ctr_aboutnewtab.custombase "Использовать свой цвет текста">
+<!ENTITY ctr_aboutnewtab.custombasecol "Изменить цвет текста">
+<!ENTITY Ctr_alt_addonsp	"Альтернативное представление страницы дополнительной информации о дополнениях">
 <!ENTITY Ctr_alt_newtabcol	"Страница новой вкладки: столбцы">
 <!ENTITY Ctr_alt_newtabrow	"Страница новой вкладки: ряды">
 <!ENTITY Ctr_bmbutpanelm	"Кнопка меню закладок: стиль отображения меню">
@@ -269,12 +277,15 @@
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; версий 35 и выше введена новая «Тема разработчика». Отключение параметра удаляет её и соответствующую кнопку в режиме «Настройка».">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; версий 36 и выше настройки отображаются в новой вкладке. Если отключить этот параметр, восстанавливается старое окно настроек.">
 <!ENTITY Ctr_fx38reader		"&brandShortName; версий 38 и выше представлен новый «режим чтения». Отключение этой опции выключает его и убирает иконку с адресной панели.">
+<!ENTITY Ctr_fx38pocket      "В &brandShortName; версий 38.0.5 и выше введена новая функция 'Карман'. Отключение данной настройки отключает эту функцию и удаляет кнопку с панели инструментов.">
+<!ENTITY Ctr_fx38pocket2	"Заметка: Перемещение кнопки 'Pocket' в 'персонализацию палитры' до отключения этой опции также удаляет вхождения 'Pocket' из закладок и меню читателя.">
 <!ENTITY Ctr_e_omtc			"OMTC / проблема с зависанием вкладок">
 <!ENTITY Ctr_e_searchui		"Внешний вид панели поиска">
 <!ENTITY Ctr_e_loop			"Вызовы и разговоры">
 <!ENTITY Ctr_e_deved		"Тема оформления для разработчиков">
 <!ENTITY Ctr_e_prefsui		"Настройки в виде вкладки">
-<!ENTITY Ctr_e_readermode	"Режим ридера">
+<!ENTITY Ctr_e_readermode	"Режим чтения">
+<!ENTITY Ctr_e_pocket		"Карман">
 
 
 <!ENTITY Ctr_pw_settings	"Настройки">
@@ -282,6 +293,8 @@
 <!ENTITY Ctr_pw_set_predef	"Классическое оформление">
 <!ENTITY Ctr_pw_set_export	"Экспорт настроек">
 <!ENTITY Ctr_pw_set_import	"Импорт настроек">
+<!ENTITY Ctr_pw_set_syncon	"Добавить в синхронизацию">
+<!ENTITY Ctr_pw_set_syncoff	"Убрать из синхронизации">
 
 <!ENTITY Ctr_special_font	"Настройки цвета фона — только для темы по умолчанию!">
 <!ENTITY Ctr_special_info	"Некоторые варианты могут предложить визуальные изменения только в определенных случаях!">
@@ -311,8 +324,10 @@
 <!ENTITY Ctr_classic_elements		"Классическое оформление">
 <!ENTITY Ctr_pw_set_preaust		"Оформление Australis">
 <!ENTITY ctr_Support_forums	"Форум поддержки">
-<!ENTITY ctr_help_features	"Информация о возможностях &amp;">
+<!ENTITY ctr_help_features	"Информация и возможности">
 <!ENTITY ctr_tabtitleintitlebar	"Добавить название вкладки в заголовок окна">
+
+<!ENTITY Ctr_custtabfontsize.label   "Размер шрифта вкладок: ">
 
 <!ENTITY ctr_applyCTRPrefFile.label	"Применить изменения">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Восстановление из резервной копии">
@@ -325,6 +340,10 @@
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Максимальная ширина панели поиска: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Сворачиваемая панель поиска дополнений на странице about:addons">
 
+<!ENTITY ctr_bookmarkfontsize.description   "Панель закладок">
+<!ENTITY ctr_custombookmarkfontsize.label   "Изменить размер шрифта панели закладок">
+<!ENTITY ctr_cbookmarkfontsize.label   "Размер шрифта закладок: ">
+
 <!ENTITY ctr_abouthome.caption "Стиль домашней страницы (about:home)">
 <!ENTITY ctr_abouthome.default "Стиль по умолчанию">
 <!ENTITY ctr_abouthome.light "Светлая страница about:home">
@@ -335,12 +354,17 @@
 <!ENTITY ctr_abouthome.icons "Убрать иконки со стартовой страницы about:home">
 <!ENTITY ctr_abouthome.snippets "Убрать сниппеты со стартовой страницы about:home">
 <!ENTITY ctr_abouthome.custombg "Использовать свое фоновое изображение">
+<!ENTITY ctr_abouthome.custombgbrowse "Обзор">
 <!ENTITY ctr_abouthome.custombgurl "Введите ссылку или путь к файлу">
 <!ENTITY ctr_abouthome.custombgurlph "Ссылка/путь к фоновому изображению">
 <!ENTITY ctr_abouthome.customhighlight "Использовать свой цвет подсветки ">
 <!ENTITY ctr_abouthome.customhighlightcol "Изменение цвета подсветки">
+<!ENTITY ctr_abouthome.custombase "Использовать свой цвет текста">
+<!ENTITY ctr_abouthome.custombasecol "Изменить цвет текста">
 <!ENTITY ctr_abouthome.animate "Использовать анимации на домашней странице (about:home)">
 <!ENTITY ctr_abouthome.custombgstretch "Растянуть фоновое изображение на весь размер окна (по умолчанию).">
+
+<!ENTITY ctr_aboutnewtab.caption "Изменение стиля страницы about:newtab">
 
 <!ENTITY cssClassId.description "Скрытие классов по названию и id">
 <!ENTITY cssClassId.label "Введите название класса или id:">
@@ -349,3 +373,8 @@
 <!ENTITY add.label "Добавить">
 <!ENTITY clear.label "Очистить фильтр">
 <!ENTITY copy.label "Копировать фильтр">
+
+<!ENTITY movableurlbar.label "Открепить адресную строку (позволяет перемещать строку адреса)">
+<!ENTITY movableurlbar.warning0 "Внимание! Это высокоуровневая функция: если переместить адресную строку в панель меню или окно персонализации, а затем перезапустить браузер, возникнут серьезные неполадки в работе браузера.">
+<!ENTITY movableurlbar.warning1 "Перед отключением необходимо вернуть адресную строку на место.">
+<!ENTITY movableurlbar.warning2 "Используйте эту функцию осторожно, на свой страх и риск.">
