@@ -791,6 +791,30 @@ _setNewTabPageToBookmarkClosed: function(rv, aEvent) {
    *   occurs at startup, false otherwise
    */
 
+   /**
+    * Firefox can attempt to set itself as the default application
+    * for all related filetypes or just for HTML. Some platforms
+    * such as Windows have terrible UIs for all filetypes. In those
+    * platforms, Firefox only attempts to associate itself with HTML.
+    */
+   shouldClaimAllTypes: function()
+   {
+    let claimAllTypes = true;
+    try {
+      if (AppConstants.platform == "win") {
+        // In Windows 10+, the UI for selecting default protocol is much
+        // nicer than the UI for setting file type associations. So we
+        // only show the protocol association screen on Windows 10+.
+        // Windows 8.1 is version 6.3. The startup code still uses
+        // the default protocol dialog, but the preferences is more "advanced"
+        // and as such uses the file type associations.
+        let version = Services.sysinfo.getProperty("version");
+        claimAllTypes = (parseFloat(version) <= 6.3);
+      }
+    } catch (ex) {}
+    return claimAllTypes;
+   },
+
   /**
    * Show button for setting browser as default browser or information that
    * browser is already the default browser.
@@ -804,7 +828,8 @@ _setNewTabPageToBookmarkClosed: function(rv, aEvent) {
       return;
     }
     let setDefaultPane = document.getElementById("setDefaultPane");
-    let selectedIndex = shellSvc.isDefaultBrowser(false, true) ? 1 : 0;
+    let claimAllTypes = gMainPane.shouldClaimAllTypes();
+    let selectedIndex = shellSvc.isDefaultBrowser(false, claimAllTypes) ? 1 : 0;
     setDefaultPane.selectedIndex = selectedIndex;
   },
 
@@ -818,7 +843,8 @@ _setNewTabPageToBookmarkClosed: function(rv, aEvent) {
     if (!shellSvc)
       return;
     try {
-      shellSvc.setDefaultBrowser(true, false);
+      let claimAllTypes = gMainPane.shouldClaimAllTypes();
+      shellSvc.setDefaultBrowser(claimAllTypes, false);
     } catch (ex) {
       Cu.reportError(ex);
       return;

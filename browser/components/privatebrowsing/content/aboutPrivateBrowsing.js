@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
                      .formatURLPref("app.learn.more.baseURI");
   let learnMore = document.getElementById("learnMore");
   if (learnMore) {
-    learnMore.setAttribute("href", learnMoreURL);
+    learnMore.setAttribute("href", learnMoreURL + "private-browsing");
   }
   
   let startPrivateBrowsing = document.getElementById("startPrivateBrowsing");

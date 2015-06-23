@@ -2868,10 +2868,14 @@ Engine.prototype = {
   },
 
   get searchForm() {
+    return this._getSearchFormWithPurpose();
+  },
+
+  _getSearchFormWithPurpose(aPurpose = "") {
     // First look for a <Url rel="searchform">
     var searchFormURL = this._getURLOfType(URLTYPE_SEARCH_HTML, "searchform");
     if (searchFormURL) {
-      let submission = searchFormURL.getSubmission("", this);
+      let submission = searchFormURL.getSubmission("", this, aPurpose);
 
       // If the rel=searchform URL is not type="get" (i.e. has postData),
       // ignore it, since we can only return a URL.
@@ -2954,7 +2958,7 @@ Engine.prototype = {
 
     if (!aData) {
       // Return a dummy submission object with our searchForm attribute
-      return new Submission(makeURI(this.searchForm), null);
+      return new Submission(makeURI(this._getSearchFormWithPurpose(aPurpose)), null);
     }
 
     LOG("getSubmission: In data: \"" + aData + "\"; Purpose: \"" + aPurpose + "\"");
@@ -4710,7 +4714,7 @@ SearchService.prototype = {
     try {
       terms = gTextToSubURI.UnEscapeAndConvert(
                                        mapEntry.engine.queryCharset,
-                                       encodedTerms.replace("+", " ", "g"));
+                                       encodedTerms.replace(/\+/g, " "));
     } catch (ex) {
       // Decoding errors will cause this match to be ignored.
       LOG("Parameter decoding failed. Charset: " +

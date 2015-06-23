@@ -188,7 +188,7 @@ Site.prototype = {
   /**
    * Handles site click events.
    */
-    onClick: function Site_onClick(aEvent) {
+  onClick: function Site_onClick(aEvent) {
     let action;
     let pinned = this.isPinned();
     let tileIndex = this.cell.index;
