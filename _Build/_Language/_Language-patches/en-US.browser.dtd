@@ -1,0 +1,207 @@
+<!-- cyberfox unused australis-->
+
+<!-- LOCALIZATION NOTE: the following strings are unused in Australis, they're
+     kept here to avoid warnings from l10n tools like compare-locales on
+     l10n-central. They will be definitely removed when Australis is ready
+     for mozilla-aurora. -->
+
+<!ENTITY navbarCmd.accesskey           "N">
+<!ENTITY addonBarCmd.label             "Add-on Bar">
+<!ENTITY addonBarCmd.accesskey         "A">
+<!ENTITY throbberItem.title            "Activity Indicator">
+<!ENTITY appMenuButton.label           "Menu">
+<!ENTITY appMenuButton.tooltip         "Open &brandShortName; menu">
+<!ENTITY feedButton.label              "Subscribe">
+<!ENTITY feedButton.tooltip            "Subscribe to this page…">
+<!ENTITY bookmarksButton.tooltip       "Display your bookmarks">
+<!ENTITY historyButton.tooltip         "Display pages you've viewed recently">
+<!ENTITY viewTabsOnTop.label           "Tabs on Top">
+<!ENTITY viewTabsOnTop.accesskey       "T">
+<!ENTITY appMenuEdit.label             "Edit">
+<!ENTITY appMenuToolbarLayout.label    "Toolbar Layout…">
+<!ENTITY appMenuFind.label             "Find…">
+<!ENTITY appMenuUnsorted.label         "Unsorted Bookmarks">
+<!ENTITY appMenuWebDeveloper.label     "Web Developer">
+<!ENTITY appMenuGettingStarted.label   "Getting Started">
+<!ENTITY appMenuSafeMode.label         "Restart with Add-ons Disabled…">
+<!ENTITY appMenuSafeMode.accesskey     "R">
+<!ENTITY cutButton.tooltip             "Cut">
+<!ENTITY copyButton.tooltip            "Copy">
+<!ENTITY pasteButton.tooltip           "Paste">
+<!ENTITY zoomOutButton.tooltip         "Zoom out">
+<!ENTITY zoomInButton.tooltip          "Zoom in">
+<!ENTITY zoomControls.label            "Zoom Controls">
+<!ENTITY addonBarCloseButton.tooltip   "Close Add-on Bar">
+<!ENTITY toggleAddonBarCmd.key         "/">
+<!ENTITY backForwardItem.title         "Back/Forward">
+<!ENTITY viewBookmarksSidebar.label    "Show in Sidebar">
+<!ENTITY bookmarksItem.title           "Bookmarks">
+<!ENTITY openLocationCmd.label         "Open Location…">
+<!ENTITY openLocationCmd.accesskey     "L">
+<!ENTITY bookmarksMenuButton.tooltip   "Display your bookmarks">
+
+<!-- cyberfox -->
+<!ENTITY tabGroupsButton.tooltip       "Group your tabs">
+<!-- end of strings to be removed post-Australis -->
+<!ENTITY mixedContentBlocked.helplink "Learn more">
+<!-- Purge RAM browser tweak -->
+<!ENTITY minimizeMemoryCache.label "Clean Ram Cache">
+<!ENTITY turnOnCleanRam.label "Turn on clean ram cache menu item.">
+<!-- End Purge RAM browser tweak -->
+
+<!-- Restart Browser Tweak -->
+<!ENTITY restartBrowser.label "Restart Browser">
+<!ENTITY restartBrowserButton.label "Restart Browser">
+<!ENTITY turnOnRestart.label "Turn on restart browser menu item.">
+<!ENTITY cleanFastRestartCache.label "Clear fast restart cache on browser restart.">
+<!ENTITY restartOptions.label "Restart Options">
+<!ENTITY restart_paneluibtn.label "Add button to PanelUI">
+<!ENTITY restart_panelbtnsmall.label "Use small button on panel UI.">
+<!ENTITY restart_reqconfirmation.label "Require restart confirmation.">
+<!-- End Restart Browser Tweak -->
+
+<!ENTITY FeaturesTabLabel "Features">
+<!ENTITY cyberfoxOptions.label "&brandShortName; Features">
+<!ENTITY menuFeaturesTab.label "Context \ Menus">
+
+<!-- Clone Current Tab Tweak -->
+<!ENTITY turnonclone.label "Turn on clone tab feature.">
+<!ENTITY cloneCurrentTab.label "Clone Current Tab">
+<!ENTITY cloneInNewWindow.label "Clone In New Window">
+<!-- End Clone Current Tab Tweak -->
+
+<!-- Features Tab Tweak -->
+<!ENTITY warnOnQuit.label "Warn me when quitting window">
+<!ENTITY newtabsoptions.label "New tab options">
+<!ENTITY newtabenabled.label "Enable newtab page.">
+<!ENTITY newtabpreload.label "Enable preload newtab.">
+<!ENTITY newtabsearch.label "Enable search bar on NewTab. (Reload Page)">
+<!ENTITY newtabpage.label "NewTab Page:">
+<!ENTITY newtabthumbnail.label "Disable thumbnail capturing on newtab page.">
+<!ENTITY aboutnewtab.pageTitle "About:NewTab">
+<!ENTITY incontent.label "Show preferences in tab.">
+<!-- End Features Tab Tweak -->
+
+<!-- Tabs Features -->
+<!ENTITY tabsAnimation.label "Enable browser tab animations">
+
+<!-- End Tabs Features -->
+
+<!-- Click 2 Play Via Checkbox Tweak -->
+<!ENTITY  enableClickToPlay.label     "Enable click to play">
+<!-- End Click 2 Play Via Checkbox Tweak -->
+
+<!-- Geo Location Via Checkbox Tweak -->
+<!ENTITY  geographicalLocation.label            "Geographical Location">
+<!ENTITY  disableGeolocation.label            "Enable Geolocation">
+<!-- End Geo Location Via Checkbox Tweak -->
+
+<!-- Tracking sendRefererHeader Tweak -->
+<!ENTITY  sendRefererHeader.label            "Suppress HTTP Referrer Header">
+<!ENTITY  sendRefererHeaderopt0.label            "Never send the referrer header">
+<!ENTITY  sendRefererHeaderopt1.label            "Send the referrer header (Page going to)">
+<!ENTITY  sendRefererHeaderopt2.label            "Send the referrer header (Default)">
+
+<!-- End Tracking sendRefererHeader Tweak -->
+
+<!-- ToolKitUi Browser Tweak -->
+<!ENTITY  toolKitUi.label "Enable alternate download user interface">
+<!ENTITY  toolKitUi.title "Download Options">
+<!-- End ToolKitUi Browser Tweak -->
+
+<!-- Disable Javascript & Block Images Feature Dont Remove -->
+<!ENTITY  loadImages.label            "Load images automatically">
+<!ENTITY  loadImages.accesskey        "I">
+<!ENTITY  exceptions.label            "Exceptions…">
+<!ENTITY  exceptions.accesskey        "x">
+
+<!ENTITY  enableJavaScript.label      "Enable JavaScript">
+<!ENTITY  enableJavaScript.accesskey  "J">
+<!ENTITY  advancedJS.label            "Advanced…">
+<!ENTITY  advancedJS.accesskey        "v">
+
+<!ENTITY  enableJava.label            "Enable Java">
+<!ENTITY  enableJava.accesskey        "n">
+<!ENTITY showTabBar.label             "Always show the tab bar">
+<!ENTITY showTabBar.accesskey         "b">
+
+<!ENTITY advancedJSDialog.title         "Advanced JavaScript Settings">
+<!ENTITY window.width                   "37em">
+
+<!ENTITY allowScripts.label             "Allow scripts to:">
+
+<!ENTITY moveResizePopupWindows.label     "Move or resize popup windows">
+<!ENTITY moveResizePopupWindows.accesskey "M">
+<!ENTITY raiseLowerWindows.label        "Raise or lower windows">
+<!ENTITY raiseLowerWindows.accesskey    "R">
+<!ENTITY disableContextMenus.label      "Disable or replace context menus">
+<!ENTITY disableContextMenus.accesskey  "D">
+<!-- End Disable Javascript & Block Images Feature Dont Remove -->
+
+<!-- User Agent Feature -->
+<!ENTITY userAgentOverride.label     "User-agent Override Options">
+<!ENTITY selectUserAgentMenuItem.label     "Select UserAgent Item">
+<!ENTITY clearUserAgentButton.label     "Clear User-agent">
+<!ENTITY enterAgentManually.label     "Enter Agent Manually:">
+<!ENTITY enterAgentApplyButton.label "Apply">
+<!ENTITY enterAgentClearButton.label "Clear">
+<!ENTITY showOptionsAgentOverride.label "Show Options">
+
+<!-- Update check options -->
+<!ENTITY updateoptions.label "&brandShortName; Update Options">
+<!ENTITY updateautocheck.label "Automatically check for updates in about &brandShortName;">
+<!ENTITY updatestartupcheck.label "Automatically check for updates when &brandShortName; starts.">
+<!ENTITY updatecheckenabled.label "Enable update check.">
+
+<!-- Copy tab URL Tweak -->
+<!ENTITY copyTabURL.label "Copy Tab URL">
+<!ENTITY copyTabURLOptions.label "Turn on copy tab url menu item.">
+<!ENTITY copyAllTabUrls.label "Copy All Tab URLS">
+<!ENTITY copyAllTabUrlsOptions.label "Turn on copy all tab urls menu item.">
+
+<!-- Classic Context Menu Tweak -->
+<!ENTITY contextNavigationClassic.label "Use classic context menu.">
+
+<!-- Email Link Context Menu Tweak -->
+<!ENTITY turnoffemaillink.label "Turn on email link context menu item.">
+
+<!-- about:config Context Menu Tweak -->
+<!ENTITY turnoffcontextabout.label "Turn on about:config context menu item.">
+<!-- about:config Menu Tweak -->
+<!ENTITY turnoffmenuabout.label "Turn on about:config menu item.">
+<!-- one click search Tweak -->
+<!ENTITY turnoffoneclicksearch.label "Turn on one click search.">
+
+<!-- Loop Toggle Tweak -->
+<!ENTITY enablehellochat.label "Enable hello chat.">
+
+<!-- Helpful ToolTips -->
+<!ENTITY restartRequiredMSG.label "Browser Restart Required.">
+
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
+<!ENTITY disableflashprotect.label "Disable flash player protection mode">
+
+<!-- Toggle JavaScript in tab feature -->
+<!ENTITY togglescriptintab.label "Toggle JavaScript">
+
+<!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
+<!ENTITY webrtcp2group.description "WebRTC peer connection">
+<!ENTITY webrtcp2preference.label "Enable WebRTC peer connection">
+
+<!-- about:home localization Tweak -->
+<!ENTITY abouthome.google.label "Google">
+<!ENTITY abouthome.google.url "https://www.google.com/">
+<!ENTITY abouthome.youtube.label "YouTube">
+<!ENTITY abouthome.youtube.url "https://www.youtube.com/">
+<!ENTITY abouthome.facebook.label "FaceBook">
+<!ENTITY abouthome.facebook.url "https://www.facebook.com/">
+<!ENTITY abouthome.twitter.label "Twitter">
+<!ENTITY abouthome.twitter.url "https://www.twitter.com/">
+<!ENTITY abouthome.support.label "Support">
+<!ENTITY abouthome.support.url "https://8pecxstudios.com/Forums/index.php">
+<!ENTITY abouthome.feedback.label "Feedback">
+<!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
+<!ENTITY abouthome.addons.label "Addons">
+<!ENTITY abouthome.addons.url "https://addons.mozilla.org/en-US/firefox/">
+

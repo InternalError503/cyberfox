@@ -1,9 +1,9 @@
 @echo off
-title XPI Language Compy Bookmarks Version: 2.0.2
+title XPI Language Copy Bookmarks Version: 2.0.3
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
-ECHO.#              Copyright(c) 2014 8pecxstudios             #
+ECHO.#              Copyright(c) 2015 8pecxstudios             #
 ECHO.#         ---------------------------------------         #
 ECHO.#                                                         #
 ECHO.#                      8pecxstudios                       #

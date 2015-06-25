@@ -1,6 +1,5 @@
 @echo off
 
-:top
 title XPI Language Modifiy appstrings.properties Version: 1.1 
 ECHO.
 ECHO.###########################################################

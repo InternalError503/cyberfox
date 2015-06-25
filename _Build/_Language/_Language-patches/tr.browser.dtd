@@ -1,0 +1,206 @@
+<!-- cyberfox unused australis-->
+
+<!-- LOCALIZATION NOTE: the following strings are unused in Australis, they're
+     kept here to avoid warnings from l10n tools like compare-locales on
+     l10n-central. They will be definitely removed when Australis is ready
+     for mozilla-aurora. -->
+
+
+<!ENTITY navbarCmd.accesskey           "t">
+<!ENTITY addonBarCmd.label             "Eklenti çubuğu">
+<!ENTITY addonBarCmd.accesskey         "E">
+<!ENTITY throbberItem.title            "Etkinlik göstergesi">
+<!ENTITY appMenuButton.label           "Menü">
+<!ENTITY appMenuButton.tooltip         "&brandShortName; menüsünü aç">
+<!ENTITY feedButton.label              "Abone ol">
+<!ENTITY feedButton.tooltip            "Bu sayfaya abone ol…">
+<!ENTITY bookmarksButton.tooltip       "Yer imlerini göster">
+<!ENTITY historyButton.tooltip         "Yakında bakılan sayfaları göster">
+<!ENTITY viewTabsOnTop.label           "Sekmeler tepede">
+<!ENTITY viewTabsOnTop.accesskey       "t">
+<!ENTITY appMenuEdit.label             "Düzen">
+<!ENTITY appMenuToolbarLayout.label    "Araç çubuğu düzeni…">
+<!ENTITY appMenuFind.label             "Bul…">
+<!ENTITY appMenuUnsorted.label         "Sıralanmamış yer imleri">
+<!ENTITY appMenuWebDeveloper.label     "Web geliştirici">
+<!ENTITY appMenuGettingStarted.label   "İlk adım">
+<!ENTITY appMenuSafeMode.label         "Eklentileri devre dışı bırakıp başlat…">
+<!ENTITY appMenuSafeMode.accesskey     "d">
+<!ENTITY cutButton.tooltip             "Kes">
+<!ENTITY copyButton.tooltip            "Kopyala">
+<!ENTITY pasteButton.tooltip           "Yapıştır">
+<!ENTITY zoomOutButton.tooltip         "Uzaklaş">
+<!ENTITY zoomInButton.tooltip          "Yaklaş">
+<!ENTITY zoomControls.label            "Yakınlaşma ayarları">
+<!ENTITY addonBarCloseButton.tooltip   "Eklenti çubuğunu kapat">
+<!ENTITY toggleAddonBarCmd.key         "/">
+<!ENTITY backForwardItem.title         "Geri/İleri">
+<!ENTITY viewBookmarksSidebar.label    "Kenar çubuğunda göster">
+<!ENTITY bookmarksItem.title           "Yer imleri">
+<!ENTITY openLocationCmd.label         "Konumu aç…">
+<!ENTITY openLocationCmd.accesskey     "K">
+<!ENTITY bookmarksMenuButton.tooltip   "Yer imlerini göster">
+
+<!-- cyberfox -->
+<!ENTITY tabGroupsButton.tooltip       "Sekmelerini grupla">
+<!-- end of strings to be removed post-Australis -->
+<!ENTITY mixedContentBlocked.helplink "Daha fazla bilgi">
+<!-- Purge RAM browser tweak -->
+<!ENTITY minimizeMemoryCache.label "Ram Önbelleğini Temizle">
+<!ENTITY turnOnCleanRam.label "Ram Önbelleği Temizle menü öğesini aç.">
+<!-- End Purge RAM browser tweak -->
+
+<!-- Restart Browser Tweak -->
+<!ENTITY restartBrowser.label "Tarayıcıyı yeniden başlat">
+<!ENTITY restartBrowserButton.label "Tarayıcıyı yeniden başlat">
+<!ENTITY turnOnRestart.label "Tarayıcı yeniden başlat menü öğesini aç.">
+<!ENTITY cleanFastRestartCache.label "Tarayıcı başlatılırken hızlı başlatma önbelleğini temizle.">
+<!ENTITY restartOptions.label "Yeniden başlatma Seçenekleri">
+<!ENTITY restart_paneluibtn.label "Add button to PanelUI">
+<!ENTITY restart_panelbtnsmall.label "Use small button on panel UI.">
+<!ENTITY restart_reqconfirmation.label "Require restart confirmation.">
+<!-- End Restart Browser Tweak -->
+
+<!ENTITY FeaturesTabLabel "Özellikler">
+<!ENTITY cyberfoxOptions.label "&brandShortName; Özellikler">
+<!ENTITY menuFeaturesTab.label "Context \ Menus">
+
+<!-- Clone Current Tab Tweak -->
+<!ENTITY turnonclone.label "Klon Sekme özelliğini aç.">
+<!ENTITY cloneCurrentTab.label "Mevcut sekmeyi klonla">
+<!ENTITY cloneInNewWindow.label "Yeni sekmeye klonla">
+<!-- End Clone Current Tab Tweak -->
+
+<!-- Features Tab Tweak -->
+<!ENTITY warnOnQuit.label "Pencereden çıkarken beni uyar">
+<!ENTITY newtabsoptions.label "Yeni sekme seçenekleri">
+<!ENTITY newtabenabled.label "Yeni sekme sayfasını etkinleştir.">
+<!ENTITY newtabpreload.label "Yeni sekme önyüklemesini etkinleştirin.">
+<!ENTITY newtabsearch.label "Yeni sekme sayfasında arama çubuğuna izin ver. (sekmeyi yenileyin)">
+<!ENTITY newtabpage.label "NewTab Sayfası:">
+<!ENTITY newtabthumbnail.label "Yeni sekme sayfasında küçük resim yakalamayı devre dışı bırakın.">
+<!ENTITY aboutnewtab.pageTitle "About:NewTab">
+<!ENTITY incontent.label "Seçenekleri sekmede göster.">
+<!-- End Features Tab Tweak -->
+
+<!-- Tabs Features -->
+<!ENTITY tabsAnimation.label "Tarayıcıda sekme animasyonlarını etkinleştir">
+<!-- End Tabs Features -->
+
+<!-- Click 2 Play Via Checkbox Tweak -->
+<!ENTITY  enableClickToPlay.label     "Oynatmak için tıklayın'ı etkinleştir">
+<!-- End Click 2 Play Via Checkbox Tweak -->
+
+<!-- Geo Location Via Checkbox Tweak -->
+<!ENTITY  geographicalLocation.label            "Coğrafi Konum">
+<!ENTITY  disableGeolocation.label            "Coğrafi Konum'u Etkinleştir">
+<!-- End Geo Location Via Checkbox Tweak -->
+
+<!-- Tracking sendRefererHeader Tweak -->
+<!ENTITY  sendRefererHeader.label            "HTTP Yönlendirme başlığını önle">
+<!ENTITY  sendRefererHeaderopt0.label            "Yönlendirme başlığını asla gönderme">
+<!ENTITY  sendRefererHeaderopt1.label            "Yönlendirme başlığı gönder (Gidilen sayfaya)">
+<!ENTITY  sendRefererHeaderopt2.label            "Yönlendirme başlığı gönder (Varsayılan)">
+
+<!-- End Tracking sendRefererHeader Tweak -->
+
+<!-- ToolKitUi Browser Tweak -->
+<!ENTITY  toolKitUi.label "Alternatif İndirme Kullanıcı Arabirimini Etkinleştir">
+<!ENTITY  toolKitUi.title "İndirme Seçenekleri">
+<!-- End ToolKitUi Browser Tweak -->
+
+<!-- Disable Javascript & Block Images Feature Dont Remove -->
+<!ENTITY  loadImages.label            "Görüntüleri otomatik olarak yükle">
+<!ENTITY  loadImages.accesskey        "I">
+<!ENTITY  exceptions.label            "Hariç tutulanlar…">
+<!ENTITY  exceptions.accesskey        "x">
+
+<!ENTITY  enableJavaScript.label      "JavaScript Etkinleştir">
+<!ENTITY  enableJavaScript.accesskey  "J">
+<!ENTITY  advancedJS.label            "Gelişmiş…">
+<!ENTITY  advancedJS.accesskey        "v">
+
+<!ENTITY  enableJava.label            "Java Etkinleştir">
+<!ENTITY  enableJava.accesskey        "n">
+<!ENTITY showTabBar.label             "Sekme çubuğunu her zaman göster">
+<!ENTITY showTabBar.accesskey         "b">
+
+<!ENTITY advancedJSDialog.title         "Gelişmiş JavaScript Ayarları">
+<!ENTITY window.width                   "37em">
+
+<!ENTITY allowScripts.label             "İzin komutu için:">
+
+<!ENTITY moveResizePopupWindows.label     "Pop-up pencerelerini taşı ve ya yeniden boyutlandır">
+<!ENTITY moveResizePopupWindows.accesskey "M">
+<!ENTITY raiseLowerWindows.label        "Pencereleri yükselt ve ya alçalt">
+<!ENTITY raiseLowerWindows.accesskey    "R">
+<!ENTITY disableContextMenus.label      "Bağlam menülerini kapat ve ya yerlerini değiştirin">
+<!ENTITY disableContextMenus.accesskey  "D">
+<!-- End Disable Javascript & Block Images Feature Dont Remove -->
+
+<!-- User Agent Feature -->
+<!ENTITY userAgentOverride.label     "User-agent Override Options">
+<!ENTITY selectUserAgentMenuItem.label     "Select UserAgent Item">
+<!ENTITY clearUserAgentButton.label     "Clear User-agent">
+<!ENTITY enterAgentManually.label     "Enter Agent Manually:">
+<!ENTITY enterAgentApplyButton.label "Onayla">
+<!ENTITY enterAgentClearButton.label "Temizle">
+<!ENTITY showOptionsAgentOverride.label "Show Options">
+
+<!-- Update check options -->
+<!ENTITY updateoptions.label "&brandShortName; Güncelleme Seçenekleri">
+<!ENTITY updateautocheck.label "Güncellemeleri &brandShortName; hakkında bölümünde otomatik kontrol et">
+<!ENTITY updatestartupcheck.label "Automatically check for updates when &brandShortName; starts.">
+<!ENTITY updatecheckenabled.label "Enable update check.">
+
+<!-- Copy tab URL Tweak -->
+<!ENTITY copyTabURL.label "Sekme bağlantısını kopyala">
+<!ENTITY copyTabURLOptions.label "Sekme bağlantısı kopyalama özelliğini aç">
+<!ENTITY copyAllTabUrls.label "Copy All Tab URLS">
+<!ENTITY copyAllTabUrlsOptions.label "Turn on copy all tab urls menu item.">
+
+<!-- Classic Context Menu Tweak -->
+<!ENTITY contextNavigationClassic.label "Use classic context menu.">
+
+<!-- Email Link Context Menu Tweak -->
+<!ENTITY turnoffemaillink.label "Turn on email link context menu item.">
+
+<!-- about:config Context Menu Tweak -->
+<!ENTITY turnoffcontextabout.label "Turn on about:config context menu item.">
+<!-- about:config Menu Tweak -->
+<!ENTITY turnoffmenuabout.label "Turn on about:config menu item.">
+<!-- one click search Tweak -->
+<!ENTITY turnoffoneclicksearch.label "Turn on one click search.">
+
+<!-- Loop Toggle Tweak -->
+<!ENTITY enablehellochat.label "Enable hello chat.">
+
+<!-- Helpful ToolTips -->
+<!ENTITY restartRequiredMSG.label "Browser Restart Required.">
+
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
+<!ENTITY disableflashprotect.label "Disable flash player protection mode">
+
+<!-- Toggle JavaScript in tab feature -->
+<!ENTITY togglescriptintab.label "Toggle JavaScript">
+
+<!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
+<!ENTITY webrtcp2group.description "WebRTC peer connection">
+<!ENTITY webrtcp2preference.label "Enable WebRTC peer connection">
+
+<!-- about:home localization Tweak -->
+<!ENTITY abouthome.google.label "Google">
+<!ENTITY abouthome.google.url "https://www.google.com/">
+<!ENTITY abouthome.youtube.label "YouTube">
+<!ENTITY abouthome.youtube.url "https://www.youtube.com/">
+<!ENTITY abouthome.facebook.label "FaceBook">
+<!ENTITY abouthome.facebook.url "https://www.facebook.com/">
+<!ENTITY abouthome.twitter.label "Twitter">
+<!ENTITY abouthome.twitter.url "https://www.twitter.com/">
+<!ENTITY abouthome.support.label "Support">
+<!ENTITY abouthome.support.url "https://8pecxstudios.com/Forums/index.php">
+<!ENTITY abouthome.feedback.label "Feedback">
+<!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
+<!ENTITY abouthome.addons.label "Addons">
+<!ENTITY abouthome.addons.url "https://addons.mozilla.org/en-US/firefox/">

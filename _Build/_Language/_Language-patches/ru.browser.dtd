@@ -1,0 +1,206 @@
+<!-- cyberfox unused australis-->
+
+<!-- LOCALIZATION NOTE: the following strings are unused in Australis, they're
+     kept here to avoid warnings from l10n tools like compare-locales on
+     l10n-central. They will be definitely removed when Australis is ready
+     for mozilla-aurora. -->
+
+<!ENTITY navbarCmd.accesskey           "N">
+<!ENTITY addonBarCmd.label             "Панель дополнений">
+<!ENTITY addonBarCmd.accesskey         "A">
+<!ENTITY throbberItem.title            "Индикатор активности">
+<!ENTITY appMenuButton.label           "Меню">
+<!ENTITY appMenuButton.tooltip         "Открыть меню &brandShortName;">
+<!ENTITY feedButton.label              "Подписаться">
+<!ENTITY feedButton.tooltip            "Подписаться на эту страницу…">
+<!ENTITY bookmarksButton.tooltip       "Показать Ваши закладки">
+<!ENTITY historyButton.tooltip         "Показать последние просмотренные страницы">
+<!ENTITY viewTabsOnTop.label           "Вкладки сверху">
+<!ENTITY viewTabsOnTop.accesskey       "T">
+<!ENTITY appMenuEdit.label             "Редактировать">
+<!ENTITY appMenuToolbarLayout.label    "Раскладка панели инструментов…">
+<!ENTITY appMenuSidebars.label         "Боковые панели">
+<!ENTITY appMenuFind.label             "Найти…">
+<!ENTITY appMenuUnsorted.label         "Неподшитые закладки">
+<!ENTITY appMenuWebDeveloper.label     "Веб-разработчик">
+<!ENTITY appMenuGettingStarted.label   "Приступая к работе">
+<!ENTITY appMenuSafeMode.label         "Перезапустить с отключенными дополнениями…">
+<!ENTITY appMenuSafeMode.accesskey     "R">
+<!ENTITY cutButton.tooltip             "Вырезать">
+<!ENTITY copyButton.tooltip            "Копировать">
+<!ENTITY pasteButton.tooltip           "Вставить">
+<!ENTITY zoomOutButton.tooltip         "Уменьшить">
+<!ENTITY zoomInButton.tooltip          "Увеличить">
+<!ENTITY zoomControls.label            "Управление масштабом">
+<!ENTITY addonBarCloseButton.tooltip   "Закрыть панель дополнений">
+<!ENTITY toggleAddonBarCmd.key         "/">
+<!ENTITY backForwardItem.title         "Назад/Вперед">
+<!ENTITY viewBookmarksSidebar.label    "Показать на боковой панели">
+<!ENTITY bookmarksItem.title           "Закладки">
+<!ENTITY openLocationCmd.label         "Открыть адрес…">
+<!ENTITY openLocationCmd.accesskey     "L">
+<!ENTITY bookmarksMenuButton.tooltip   "Показать Ваши закладки">
+
+<!-- cyberfox -->
+<!ENTITY tabGroupsButton.tooltip       "Group your tabs">
+<!-- end of strings to be removed post-Australis -->
+<!ENTITY mixedContentBlocked.helplink "Learn more">
+<!-- Purge RAM browser tweak -->
+<!ENTITY minimizeMemoryCache.label "Очистить кэш памяти">
+<!ENTITY turnOnCleanRam.label "Включить опцию очистки кэша памяти.">
+<!-- End Purge RAM browser tweak -->
+
+<!-- Restart Browser Tweak -->
+<!ENTITY restartBrowser.label "Перезапуск браузера">
+<!ENTITY restartBrowserButton.label "Перезапуск браузера">
+<!ENTITY turnOnRestart.label "Включить опцию перезапуска браузера.">
+<!ENTITY cleanFastRestartCache.label "Очистить кэш быстрого запуска при перезапуске браузера.">
+<!ENTITY restartOptions.label "Опции перезапуска">
+<!ENTITY restart_paneluibtn.label "Добавить кнопку на пользовательскую панель.">
+<!ENTITY restart_panelbtnsmall.label "Маленькая кнопка на пользовательской панели.">
+<!ENTITY restart_reqconfirmation.label "Запрашивать подтверждение перезапуска.">
+<!-- End Restart Browser Tweak -->
+
+<!ENTITY FeaturesTabLabel "Возможности">
+<!ENTITY cyberfoxOptions.label "Возможности &brandShortName;">
+<!ENTITY menuFeaturesTab.label "Контекстные меню">
+
+<!-- Clone Current Tab Tweak -->
+<!ENTITY turnonclone.label "Включить опцию клонирования вкладки.">
+<!ENTITY cloneCurrentTab.label "Клонировать вкладку">
+<!ENTITY cloneInNewWindow.label "Клонировать в новом окне">
+<!-- End Clone Current Tab Tweak -->
+
+<!-- Features Tab Tweak -->
+<!ENTITY warnOnQuit.label "Предупреждение о закрытии окна">
+<!ENTITY newtabsoptions.label "Опции новой вкладки">
+<!ENTITY newtabenabled.label "Разрешить страницу быстрого доступа.">
+<!ENTITY newtabpreload.label "Разрешить предзагрузку страницы быстрого доступа.">
+<!ENTITY newtabsearch.label "Включить поиск на странице новой вкладки. (Обновите страницу)">
+<!ENTITY newtabpage.label "Страница быстрого доступа:">
+<!ENTITY newtabthumbnail.label "Отключить создание миниатюр на странице новой вкладки.">
+<!ENTITY aboutnewtab.pageTitle "About:NewTab">
+<!ENTITY incontent.label "Показывать настройки в виде вкладки.">
+<!-- End Features Tab Tweak -->
+
+<!-- Tabs Features -->
+<!ENTITY tabsAnimation.label "Включить анимации вкладок">
+<!-- End Tabs Features -->
+
+<!-- Click 2 Play Via Checkbox Tweak -->
+<!ENTITY  enableClickToPlay.label     "Включить click to play">
+<!-- End Click 2 Play Via Checkbox Tweak -->
+
+<!-- Geo Location Via Checkbox Tweak -->
+<!ENTITY  geographicalLocation.label            "Геолокация">
+<!ENTITY  disableGeolocation.label            "Разрешить геолокацию">
+<!-- End Geo Location Via Checkbox Tweak -->
+
+<!-- Tracking sendRefererHeader Tweak -->
+<!ENTITY  sendRefererHeader.label            "Отправка HTTP Referrer Header">
+<!ENTITY  sendRefererHeaderopt0.label            "Никогда не отправлять referrer header">
+<!ENTITY  sendRefererHeaderopt1.label            "Отправка referrer header (Page going to)">
+<!ENTITY  sendRefererHeaderopt2.label            "Отправка referrer header (по умолчанию)">
+
+<!-- End Tracking sendRefererHeader Tweak -->
+
+<!-- ToolKitUi Browser Tweak -->
+<!ENTITY  toolKitUi.label "Использовать альтернативный интерфейс загрузок">
+<!ENTITY  toolKitUi.title "Настройки загрузок">
+<!-- End ToolKitUi Browser Tweak -->
+
+<!-- Disable Javascript & Block Images Feature Dont Remove -->
+<!ENTITY  loadImages.label            "Автоматически загружать изображения">
+<!ENTITY  loadImages.accesskey        "I">
+<!ENTITY  exceptions.label            "Исключения">
+<!ENTITY  exceptions.accesskey        "x">
+
+<!ENTITY  enableJavaScript.label      "Включить JavaScript">
+<!ENTITY  enableJavaScript.accesskey  "J">
+<!ENTITY  advancedJS.label            "Дополнительно…">
+<!ENTITY  advancedJS.accesskey        "v">
+
+<!ENTITY  enableJava.label            "Включить Java">
+<!ENTITY  enableJava.accesskey        "n">
+<!ENTITY showTabBar.label             "Всегда отображать панель вкладок">
+<!ENTITY showTabBar.accesskey         "b">
+
+<!ENTITY advancedJSDialog.title         "Расширенные настройки JavaScript">
+<!ENTITY window.width                   "37em">
+
+<!ENTITY allowScripts.label             "Разрешения для скриптов:">
+
+<!ENTITY moveResizePopupWindows.label     "Изменение размера и перемещение всплывающих окон">
+<!ENTITY moveResizePopupWindows.accesskey "M">
+<!ENTITY raiseLowerWindows.label        "Поднять или опустить окна">
+<!ENTITY raiseLowerWindows.accesskey    "R">
+<!ENTITY disableContextMenus.label      "Отключение или замена контекстных меню">
+<!ENTITY disableContextMenus.accesskey  "D">
+<!-- End Disable Javascript & Block Images Feature Dont Remove -->
+
+<!-- User Agent Feature -->
+<!ENTITY userAgentOverride.label     "Настройки изменения User-agent">
+<!ENTITY selectUserAgentMenuItem.label     "Выбор UserAgent">
+<!ENTITY clearUserAgentButton.label     "Очистить User-agent">
+<!ENTITY enterAgentManually.label     "Задать User-Agent вручную:">
+<!ENTITY enterAgentApplyButton.label "Применить">
+<!ENTITY enterAgentClearButton.label "Очистить">
+<!ENTITY showOptionsAgentOverride.label "Показать опции">
+
+<!-- Update check options -->
+<!ENTITY updateoptions.label "Настройки обновления &brandShortName;">
+<!ENTITY updateautocheck.label "Автоматически проверять обновления в окне 'О &brandShortName;'">
+<!ENTITY updatestartupcheck.label "Автоматически проверять наличие обновлений при запуске &brandShortName;.">
+<!ENTITY updatecheckenabled.label "Разрешить проверку обновлений.">
+
+<!-- Copy tab URL Tweak -->
+<!ENTITY copyTabURL.label "Копировать адрес страницы">
+<!ENTITY copyTabURLOptions.label "Включить опцию копирования адреса страницы.">
+<!ENTITY copyAllTabUrls.label "Копировать URL всех вкладок в буфер обмена">
+<!ENTITY copyAllTabUrlsOptions.label "Включить опцию копирования URL всех вкладок">
+
+<!-- Classic Context Menu Tweak -->
+<!ENTITY contextNavigationClassic.label "Использовать классическое контекстное меню.">
+
+<!-- Email Link Context Menu Tweak -->
+<!ENTITY turnoffemaillink.label "Включить в контекстном меню опцию отправки ссылки по электронной почте.">
+
+<!-- about:config Context Menu Tweak -->
+<!ENTITY turnoffcontextabout.label "Включить доступ к about:config в контекстном меню.">
+<!-- about:config Menu Tweak -->
+<!ENTITY turnoffmenuabout.label "Включить доступ к about:config в меню.">
+<!-- one click search Tweak -->
+<!ENTITY turnoffoneclicksearch.label "Включить поиск по одному щелчку мыши.">
+
+<!-- Loop Toggle Tweak -->
+<!ENTITY enablehellochat.label "Включить чат hello">
+
+<!-- Helpful ToolTips -->
+<!ENTITY restartRequiredMSG.label "Требуется перезапуск браузера">
+
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
+<!ENTITY disableflashprotect.label "Отключить режим защиты проигрывателя flash">
+
+<!-- Toggle JavaScript in tab feature -->
+<!ENTITY togglescriptintab.label "Включить/выключить JavaScript">
+
+<!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
+<!ENTITY webrtcp2group.description "Соединение WebRTC">
+<!ENTITY webrtcp2preference.label "Разрешить соединение WebRTC">
+
+<!-- about:home localization Tweak -->
+<!ENTITY abouthome.google.label "Google">
+<!ENTITY abouthome.google.url "https://www.google.ru/">
+<!ENTITY abouthome.youtube.label "YouTube">
+<!ENTITY abouthome.youtube.url "https://www.youtube.ru/">
+<!ENTITY abouthome.facebook.label "FaceBook">
+<!ENTITY abouthome.facebook.url "https://www.facebook.com/">
+<!ENTITY abouthome.twitter.label "Twitter">
+<!ENTITY abouthome.twitter.url "https://www.twitter.com/">
+<!ENTITY abouthome.support.label "Поддержка">
+<!ENTITY abouthome.support.url "https://8pecxstudios.com/Forums/index.php">
+<!ENTITY abouthome.feedback.label "Отзывы">
+<!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
+<!ENTITY abouthome.addons.label "Дополнения">
+<!ENTITY abouthome.addons.url "https://addons.mozilla.org/ru/firefox/">

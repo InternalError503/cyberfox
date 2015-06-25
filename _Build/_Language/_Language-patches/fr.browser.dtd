@@ -1,0 +1,213 @@
+<!-- cyberfox unused australis-->
+
+<!-- LOCALIZATION NOTE: the following strings are unused in Australis, they're
+     kept here to avoid warnings from l10n tools like compare-locales on
+     l10n-central. They will be definitely removed when Australis is ready
+     for mozilla-aurora. -->
+
+<!ENTITY navbarCmd.accesskey           "N">
+<!ENTITY addonBarCmd.label             "Add-on Bar">
+<!ENTITY addonBarCmd.accesskey         "A">
+<!ENTITY throbberItem.title            "Activity Indicator">
+<!ENTITY appMenuButton.label           "Menu">
+<!ENTITY appMenuButton.tooltip         "Open &brandShortName; menu">
+<!ENTITY feedButton.label              "Subscribe">
+<!ENTITY feedButton.tooltip            "Subscribe to this page…">
+<!ENTITY bookmarksButton.tooltip       "Display your bookmarks">
+<!ENTITY historyButton.tooltip         "Display pages you've viewed recently">
+<!ENTITY viewTabsOnTop.label           "Tabs on Top">
+<!ENTITY viewTabsOnTop.accesskey       "T">
+<!ENTITY appMenuEdit.label             "Edit">
+<!ENTITY appMenuToolbarLayout.label    "Toolbar Layout…">
+<!ENTITY appMenuFind.label             "Find…">
+<!ENTITY appMenuUnsorted.label         "Unsorted Bookmarks">
+<!ENTITY appMenuWebDeveloper.label     "Web Developer">
+<!ENTITY appMenuGettingStarted.label   "Getting Started">
+<!ENTITY appMenuSafeMode.label         "Restart with Add-ons Disabled…">
+<!ENTITY appMenuSafeMode.accesskey     "R">
+<!ENTITY cutButton.tooltip             "Cut">
+<!ENTITY copyButton.tooltip            "Copy">
+<!ENTITY pasteButton.tooltip           "Paste">
+<!ENTITY zoomOutButton.tooltip         "Zoom out">
+<!ENTITY zoomInButton.tooltip          "Zoom in">
+<!ENTITY zoomControls.label            "Zoom Controls">
+<!ENTITY addonBarCloseButton.tooltip   "Close Add-on Bar">
+<!ENTITY toggleAddonBarCmd.key         "/">
+<!ENTITY backForwardItem.title         "Back/Forward">
+<!ENTITY viewBookmarksSidebar.label    "Show in Sidebar">
+<!ENTITY bookmarksItem.title           "Bookmarks">
+<!ENTITY openLocationCmd.label         "Open Location…">
+<!ENTITY openLocationCmd.accesskey     "L">
+<!ENTITY bookmarksMenuButton.tooltip   "Display your bookmarks">
+
+<!-- cyberfox -->
+<!ENTITY tabGroupsButton.tooltip       "Grouper les onglets">
+<!-- end of strings to be removed post-Australis -->
+<!ENTITY mixedContentBlocked.helplink "En apprendre davantage">
+<!-- Purge RAM browser tweak -->
+<!ENTITY minimizeMemoryCache.label  "Nettoyer le cache mémoire">
+<!ENTITY turnOnCleanRam.label       "Activer la fonction « Nettoyer le cache mémoire ».">
+<!-- End Purge RAM browser tweak -->
+
+<!-- Restart Browser Tweak -->
+
+	<!--LOCALIZATION NOTE: (restartBrowserButton.label): Use of &brandShortName; 
+		  within this entity causes a entity not defined (entité non définie) for the restart browser 
+		  toolbar button, Also preventing the creation of the clone current tab and clone current tab to new 
+		  window buttons.
+	-->
+
+
+<!ENTITY restartBrowser.label       "Redémarrer &brandShortName;">
+<!ENTITY restartBrowserButton.label "Redémarrer Cyberfox">
+<!ENTITY turnOnRestart.label        "Activer la fonction « Redémarrer &brandShortName; ».">
+<!ENTITY cleanFastRestartCache.label 	"Effacer le cache de redémarrage rapide au redémarrage du navigateur.">
+<!ENTITY restartOptions.label 			"Options de redémarrage">
+<!ENTITY restart_paneluibtn.label 		"Ajouter le bouton au panneau de personnalisation">
+<!ENTITY restart_panelbtnsmall.label 	"Utiliser un petit bouton dans le panneau de personnalisation.">
+<!ENTITY restart_reqconfirmation.label 	"Confirmer le redémarrage.">
+<!-- End Restart Browser Tweak -->
+
+<!ENTITY FeaturesTabLabel 			"Fonctions spécifiques">
+<!ENTITY cyberfoxOptions.label 		"Fonctions de &brandShortName;">
+<!ENTITY menuFeaturesTab.label "Contexte et menus">
+
+<!-- Clone Current Tab Tweak -->
+<!ENTITY turnonclone.label          "Activer la fonction Dupliquer l’onglet ».">
+<!ENTITY cloneCurrentTab.label      "Dupliquer cet onglet">
+<!ENTITY cloneInNewWindow.label     "Le dupliquer dans une nouvelle fenêtre">
+<!-- End Clone Current Tab Tweak -->
+
+<!-- Features Tab Tweak -->
+<!ENTITY warnOnQuit.label         	"M’avertir avant de fermer la fenêtre">
+<!ENTITY newtabsoptions.label     	"Options des nouveaux onglets">
+<!ENTITY newtabenabled.label      	"Active la page de mosaïque pour les nouveaux onglets.">
+<!ENTITY newtabpreload.label      	"Active le préchargement des nouveaux onglets.">
+<!ENTITY newtabsearch.label 		"Activer le champ de recherche sur la page des nouveaux onglets (rafraîchir la page).">
+<!ENTITY newtabpage.label         	"Page chargée :">
+<!ENTITY newtabthumbnail.label 		"Empêcher la capture des vignettes sur la page des nouveaux onglets.">
+<!ENTITY aboutnewtab.pageTitle "About:NewTab">
+<!ENTITY incontent.label 			"Afficher les préférences dans un onglet.">
+<!-- End Features Tab Tweak -->
+
+<!-- Tabs Features -->
+<!ENTITY tabsAnimation.label "Activer l’animation des onglets">
+<!-- End Tabs Features -->
+
+<!-- Click 2 Play Via Checkbox Tweak -->
+<!ENTITY  enableClickToPlay.label      "Activer « Cliquer pour exécuter »">
+<!-- End Click 2 Play Via Checkbox Tweak -->
+
+<!-- Geo Location Via Checkbox Tweak -->
+<!ENTITY  geographicalLocation.label   "Localisation géographique">
+<!ENTITY  disableGeolocation.label     "Activer la géolocalisation">
+<!-- End Geo Location Via Checkbox Tweak -->
+
+<!-- Tracking sendRefererHeader Tweak -->
+<!ENTITY  sendRefererHeader.label      "Supprimer l’en-tête du référend HTTP">
+<!ENTITY  sendRefererHeaderopt0.label  "Ne jamais transmettre l’en-tête du référend">
+<!ENTITY  sendRefererHeaderopt1.label  "Envoyer comme en-tête de référend la page chargée">
+<!ENTITY  sendRefererHeaderopt2.label  "Envoyer l’en-tête du référend (valeur par défaut)">
+
+<!-- End Tracking sendRefererHeader Tweak -->
+
+<!-- ToolKitUi Browser Tweak -->
+<!ENTITY  toolKitUi.label             "Activer l’autre gestionnaire de téléchargement">
+<!ENTITY  toolKitUi.title             "Options de téléchargement">
+<!-- End ToolKitUi Browser Tweak -->
+
+<!-- Disable Javascript & Block Images Feature Dont Remove -->
+<!ENTITY  loadImages.label            "Charger les images automatiquement">
+<!ENTITY  loadImages.accesskey        "I">
+<!ENTITY  exceptions.label            "Exceptions…">
+<!ENTITY  exceptions.accesskey        "x">
+
+<!ENTITY  enableJavaScript.label      "Activer JavaScript">
+<!ENTITY  enableJavaScript.accesskey  "J">
+<!ENTITY  advancedJS.label            "Avancé">
+<!ENTITY  advancedJS.accesskey        "v">
+
+<!ENTITY  enableJava.label            "Activer Java">
+<!ENTITY  enableJava.accesskey        "n">
+<!ENTITY showTabBar.label             "Toujours afficher la barre d’onglets">
+<!ENTITY showTabBar.accesskey         "b">
+
+<!ENTITY advancedJSDialog.title           "Paramètres JavaScript avancés">
+<!ENTITY window.width                     "44em">
+
+<!ENTITY allowScripts.label               "Autoriser les scripts à :">
+
+<!ENTITY moveResizePopupWindows.label     "Déplacer ou redimensionner les fenêtres supplémentaires">
+<!ENTITY moveResizePopupWindows.accesskey "M">
+<!ENTITY raiseLowerWindows.label          "Passer les fenêtres à l’avant ou à l’arrière-plan">
+<!ENTITY raiseLowerWindows.accesskey      "R">
+<!ENTITY disableContextMenus.label        "Désactiver ou remplacer les menus contextuels">
+<!ENTITY disableContextMenus.accesskey    "D">
+<!-- End Disable Javascript & Block Images Feature Dont Remove -->
+
+<!-- User Agent Feature -->
+<!ENTITY userAgentOverride.label     	"Options de supplantation de l’agent utilisateur">
+<!ENTITY selectUserAgentMenuItem.label  "Choisir un agent utilisateur">
+<!ENTITY clearUserAgentButton.label     "Effacer l’agent utilisateur">
+<!ENTITY enterAgentManually.label       "Saisir l’agent utilisateur :">
+<!ENTITY enterAgentApplyButton.label 	"Appliquer">
+<!ENTITY enterAgentClearButton.label 	"Effacer">
+<!ENTITY showOptionsAgentOverride.label "Afficher les options">
+
+<!-- Update check options -->
+<!ENTITY updateoptions.label "Options de mise à jour de &brandShortName;">
+<!ENTITY updateautocheck.label "Vérifier automatiquement les mises à jour dans « À propos de &brandShortName; »">
+<!ENTITY updatestartupcheck.label "Vérifier automatiquement les mises à jour au démarrage de &brandShortName;.">
+<!ENTITY updatecheckenabled.label "Permettre la vérification des mises à jour.">
+
+<!-- Copy tab URL Tweak -->
+<!ENTITY copyTabURL.label "Copier l’URL de l’onglet">
+<!ENTITY copyTabURLOptions.label "Ajouter Copier l’URL de l’onglet au menu contextuel.">
+<!ENTITY copyAllTabUrls.label "Copier l’URL de tous les onglets">
+<!ENTITY copyAllTabUrlsOptions.label "Activer l’élément de menu  « Copier l’URL de tous les onglets ».">
+
+<!-- Classic Context Menu Tweak -->
+<!ENTITY contextNavigationClassic.label "Utiliser le menu contextuel classique.">
+
+<!-- Email Link Context Menu Tweak -->
+<!ENTITY turnoffemaillink.label "Ajouter « Envoyer un lien par courriel » au menu contextuel.">
+
+<!-- about:config Context Menu Tweak -->
+<!ENTITY turnoffcontextabout.label "Activer l’élément de menu contextuel about:config.">
+<!-- about:config Menu Tweak -->
+<!ENTITY turnoffmenuabout.label "Activer l’élément de menu about:config.">
+<!-- one click search Tweak -->
+<!ENTITY turnoffoneclicksearch.label "Activer la recherche en un clic.">
+
+<!-- Loop Toggle Tweak -->
+<!ENTITY enablehellochat.label "Activer les conversations Hello.">
+
+<!-- Helpful ToolTips -->
+<!ENTITY restartRequiredMSG.label "Redémarrage du navigateur nécessaire.">
+
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Lecteur Flash d’Adobe">
+<!ENTITY disableflashprotect.label "Désactiver le mode de protection du lecteur Flash">
+
+<!-- Toggle JavaScript in tab feature -->
+<!ENTITY togglescriptintab.label "Activer / désactiver JavaScript">
+
+<!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
+<!ENTITY webrtcp2group.description "Connexion à un homologue avec le protocole WebRTC">
+<!ENTITY webrtcp2preference.label "Permettre la connexion WebRTC à un homologue">
+
+<!-- about:home localization Tweak -->
+<!ENTITY abouthome.google.label "Google">
+<!ENTITY abouthome.google.url "https://www.google.com/">
+<!ENTITY abouthome.youtube.label "YouTube">
+<!ENTITY abouthome.youtube.url "https://www.youtube.com">
+<!ENTITY abouthome.facebook.label "FaceBook">
+<!ENTITY abouthome.facebook.url "https://www.facebook.com/">
+<!ENTITY abouthome.twitter.label "Twitter">
+<!ENTITY abouthome.twitter.url "https://www.twitter.com/">
+<!ENTITY abouthome.support.label "Soutien">
+<!ENTITY abouthome.support.url "https://8pecxstudios.com/Forums/index.php">
+<!ENTITY abouthome.feedback.label "Feedback">
+<!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
+<!ENTITY abouthome.addons.label "Modules complémentaires">
+<!ENTITY abouthome.addons.url "https://addons.mozilla.org/fr/firefox/">

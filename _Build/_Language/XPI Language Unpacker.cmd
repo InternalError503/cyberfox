@@ -1,10 +1,10 @@
 @echo off
 :top
-title XPI Language Unpacker Version: 2.0.2
+title XPI Language Unpacker Version: 2.0.3
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
-ECHO.#              Copyright(c) 2014 8pecxstudios             #
+ECHO.#              Copyright(c) 2015 8pecxstudios             #
 ECHO.#         ---------------------------------------         #
 ECHO.#                                                         #
 ECHO.#                      8pecxstudios                       #
@@ -180,7 +180,7 @@ ECHO.#                                                         #
 ECHO.#        Thank you for using XPI Language Unpacker        #
 ECHO.#                                                         #
 ECHO.#                                                         #
-ECHO.#             Copyright(c) 2014 8pecxstudios              #
+ECHO.#             Copyright(c) 2015 8pecxstudios              #
 ECHO.#         ---------------------------------------         #
 ECHO.###########################################################
 ECHO.

@@ -1,9 +1,9 @@
 @echo off
-title XPI Language Compy About-Properties 1.0.1
+title XPI Language Copy About-Properties 1.0.2
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
-ECHO.#              Copyright(c) 2014 8pecxstudios             #
+ECHO.#              Copyright(c) 2015 8pecxstudios             #
 ECHO.#         ---------------------------------------         #
 ECHO.#                                                         #
 ECHO.#                      8pecxstudios                       #

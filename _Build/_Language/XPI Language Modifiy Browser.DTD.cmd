@@ -1,6 +1,5 @@
 @echo off
 
-:top
 title XPI Language Modifiy Browser.DTD Version: 2.0 
 ECHO.
 ECHO.###########################################################

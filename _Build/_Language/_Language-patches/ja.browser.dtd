@@ -1,0 +1,207 @@
+<!-- cyberfox unused australis-->
+
+<!-- LOCALIZATION NOTE: the following strings are unused in Australis, they're
+     kept here to avoid warnings from l10n tools like compare-locales on
+     l10n-central. They will be definitely removed when Australis is ready
+     for mozilla-aurora. -->
+
+<!ENTITY navbarCmd.accesskey           "N">
+<!ENTITY addonBarCmd.label             "Add-on Bar">
+<!ENTITY addonBarCmd.accesskey         "A">
+<!ENTITY throbberItem.title            "Activity Indicator">
+<!ENTITY appMenuButton.label           "Menu">
+<!ENTITY appMenuButton.tooltip         "Open &brandShortName; menu">
+<!ENTITY feedButton.label              "Subscribe">
+<!ENTITY feedButton.tooltip            "Subscribe to this page…">
+<!ENTITY bookmarksButton.tooltip       "Display your bookmarks">
+<!ENTITY historyButton.tooltip         "Display pages you've viewed recently">
+<!ENTITY viewTabsOnTop.label           "Tabs on Top">
+<!ENTITY viewTabsOnTop.accesskey       "T">
+<!ENTITY appMenuEdit.label             "Edit">
+<!ENTITY appMenuToolbarLayout.label    "Toolbar Layout…">
+<!ENTITY appMenuFind.label             "Find…">
+<!ENTITY appMenuUnsorted.label         "Unsorted Bookmarks">
+<!ENTITY appMenuWebDeveloper.label     "Web Developer">
+<!ENTITY appMenuGettingStarted.label   "Getting Started">
+<!ENTITY appMenuSafeMode.label         "Restart with Add-ons Disabled…">
+<!ENTITY appMenuSafeMode.accesskey     "R">
+<!ENTITY cutButton.tooltip             "Cut">
+<!ENTITY copyButton.tooltip            "Copy">
+<!ENTITY pasteButton.tooltip           "Paste">
+<!ENTITY zoomOutButton.tooltip         "Zoom out">
+<!ENTITY zoomInButton.tooltip          "Zoom in">
+<!ENTITY zoomControls.label            "Zoom Controls">
+<!ENTITY addonBarCloseButton.tooltip   "Close Add-on Bar">
+<!ENTITY toggleAddonBarCmd.key         "/">
+<!ENTITY backForwardItem.title         "Back/Forward">
+<!ENTITY viewBookmarksSidebar.label    "Show in Sidebar">
+<!ENTITY bookmarksItem.title           "Bookmarks">
+<!ENTITY openLocationCmd.label         "Open Location…">
+<!ENTITY openLocationCmd.accesskey     "L">
+<!ENTITY bookmarksMenuButton.tooltip   "Display your bookmarks">
+
+<!-- cyberfox -->
+<!ENTITY tabGroupsButton.tooltip       "Group your tabs">
+<!-- end of strings to be removed post-Australis -->
+<!ENTITY mixedContentBlocked.helplink "Learn more">
+<!-- Purge RAM browser tweak -->
+<!ENTITY minimizeMemoryCache.label "RAM キャッシュを消去">
+<!ENTITY turnOnCleanRam.label "メニュー項目 [RAM キャッシュを消去] を有効にする">
+<!-- End Purge RAM browser tweak -->
+
+<!-- Restart Browser Tweak -->
+<!ENTITY restartBrowser.label "ブラウザ再起動">
+<!ENTITY restartBrowserButton.label "ブラウザ再起動">
+<!ENTITY turnOnRestart.label "メニュー項目 [ブラウザ再起動] を有効にする">
+<!ENTITY cleanFastRestartCache.label "高速再起動用キャッシュをブラウザ再起動時に消去する">
+<!ENTITY restartOptions.label "再起動オプション">
+<!ENTITY restart_paneluibtn.label "メニューパネルにボタンを追加する">
+<!ENTITY restart_panelbtnsmall.label "メニューパネルに小さいボタンを使用する">
+<!ENTITY restart_reqconfirmation.label "再起動には確認を表示する">
+<!-- End Restart Browser Tweak -->
+
+<!ENTITY FeaturesTabLabel "機能">
+<!ENTITY cyberfoxOptions.label "Cyberfox 機能">
+<!ENTITY menuFeaturesTab.label "コンテキスト メニュー">
+
+<!-- Clone Current Tab Tweak -->
+<!ENTITY turnonclone.label "タブ複製機能を有効にする">
+<!ENTITY cloneCurrentTab.label "現在のタブを複製">
+<!ENTITY cloneInNewWindow.label "新しいウィンドウに複製">
+<!-- End Clone Current Tab Tweak -->
+
+<!-- Features Tab Tweak -->
+<!ENTITY warnOnQuit.label "ウィンドウ終了時に警告メッセージを表示する">
+<!ENTITY newtabsoptions.label "新しいタブ オプション">
+<!ENTITY newtabenabled.label "新しいタブのページを有効にする">
+<!ENTITY newtabpreload.label "新しいタブの事前読み込みを有効にする">
+<!ENTITY newtabsearch.label "新しいタブの検索バーを有効にする(ページ再読み込み)">
+<!ENTITY newtabpage.label "新しいタブのページ:">
+<!ENTITY newtabthumbnail.label "新しいタブ ページの縮小表示の取り込みを無効にする">
+<!ENTITY aboutnewtab.pageTitle "About:NewTab">
+<!ENTITY incontent.label "オプションをタブ内に表示する">
+<!-- End Features Tab Tweak -->
+
+<!-- Tabs Features -->
+<!ENTITY tabsAnimation.label "ブラウザ タブのアニメーションを有効にする">
+
+<!-- End Tabs Features -->
+
+<!-- Click 2 Play Via Checkbox Tweak -->
+<!ENTITY  enableClickToPlay.label     "Click to Play を有効にする">
+<!-- End Click 2 Play Via Checkbox Tweak -->
+
+<!-- Geo Location Via Checkbox Tweak -->
+<!ENTITY  geographicalLocation.label            "地理的な場所">
+<!ENTITY  disableGeolocation.label            "位置情報を有効にする">
+<!-- End Geo Location Via Checkbox Tweak -->
+
+<!-- Tracking sendRefererHeader Tweak -->
+<!ENTITY  sendRefererHeader.label            "HTTP リファラー ヘッダーの抑制">
+<!ENTITY  sendRefererHeaderopt0.label            "リファラー ヘッダーを送信しない">
+<!ENTITY  sendRefererHeaderopt1.label            "リファラー ヘッダーを送信する (ページ訪問時)">
+<!ENTITY  sendRefererHeaderopt2.label            "リファラー ヘッダーを送信する (デフォルト)">
+
+<!-- End Tracking sendRefererHeader Tweak -->
+
+<!-- ToolKitUi Browser Tweak -->
+<!ENTITY  toolKitUi.label "代替ダウンロード ユーザー インターフェイスを有効にする">
+<!ENTITY  toolKitUi.title "ダウンロード オプション">
+<!-- End ToolKitUi Browser Tweak -->
+
+<!-- Disable Javascript & Block Images Feature Dont Remove -->
+<!ENTITY  loadImages.label            "画像を自動的に読み込む">
+<!ENTITY  loadImages.accesskey        "I">
+<!ENTITY  exceptions.label            "例外サイト...">
+<!ENTITY  exceptions.accesskey        "x">
+
+<!ENTITY  enableJavaScript.label      "JavaScript を有効にする">
+<!ENTITY  enableJavaScript.accesskey  "J">
+<!ENTITY  advancedJS.label            "詳細設定...">
+<!ENTITY  advancedJS.accesskey        "v">
+
+<!ENTITY  enableJava.label            "Java を有効にする">
+<!ENTITY  enableJava.accesskey        "n">
+<!ENTITY showTabBar.label             "Always show the tab bar">
+<!ENTITY showTabBar.accesskey         "b">
+
+<!ENTITY advancedJSDialog.title         "JavaScript の詳細設定">
+<!ENTITY window.width                   "45em">
+
+<!ENTITY allowScripts.label             "次のスクリプトを許可する:">
+
+<!ENTITY moveResizePopupWindows.label     "ポップアップ ウィンドウの移動またはサイズ変更">
+<!ENTITY moveResizePopupWindows.accesskey "M">
+<!ENTITY raiseLowerWindows.label        "ウィンドウの前面または背面への表示">
+<!ENTITY raiseLowerWindows.accesskey    "R">
+<!ENTITY disableContextMenus.label      "コンテキスト メニューの無効化または置換">
+<!ENTITY disableContextMenus.accesskey  "D">
+<!-- End Disable Javascript & Block Images Feature Dont Remove -->
+
+<!-- User Agent Feature -->
+<!ENTITY userAgentOverride.label     "ユーザー エージェント上書きオプション">
+<!ENTITY selectUserAgentMenuItem.label     "ユーザー エージェント項目を選択">
+<!ENTITY clearUserAgentButton.label     "ユーザー エージェントのクリア">
+<!ENTITY enterAgentManually.label     "ユーザー エージェントの手動入力:">
+<!ENTITY enterAgentApplyButton.label "適用">
+<!ENTITY enterAgentClearButton.label "クリア">
+<!ENTITY showOptionsAgentOverride.label "オプション表示">
+
+<!-- Update check options -->
+<!ENTITY updateoptions.label "&brandShortName; 更新オプション">
+<!ENTITY updateautocheck.label "&brandShortName; についての更新を自動的に確認する">
+<!ENTITY updatestartupcheck.label "&brandShortName; の起動時に更新を自動的に確認する">
+<!ENTITY updatecheckenabled.label "更新の確認を有効にする">
+
+<!-- Copy tab URL Tweak -->
+<!ENTITY copyTabURL.label "タブの URL をコピー">
+<!ENTITY copyTabURLOptions.label "メニュー項目 [タブの URL をコピー] を有効にする">
+<!ENTITY copyAllTabUrls.label "すべてのタブの URL をコピー">
+<!ENTITY copyAllTabUrlsOptions.label "メニュー項目 [すべてのタブの URL をコピー] を有効にする">
+
+<!-- Classic Context Menu Tweak -->
+<!ENTITY contextNavigationClassic.label "クラシック コンテキスト メニューを使用する">
+
+<!-- Email Link Context Menu Tweak -->
+<!ENTITY turnoffemaillink.label "コンテキスト メニュー項目 [ページの URL をメールで送信...] を有効にする">
+
+<!-- about:config Context Menu Tweak -->
+<!ENTITY turnoffcontextabout.label "コンテキスト メニュー項目 [about:config] を有効にする">
+<!-- about:config Menu Tweak -->
+<!ENTITY turnoffmenuabout.label "メニュー項目 [about:config] を有効にする">
+<!-- one click search Tweak -->
+<!ENTITY turnoffoneclicksearch.label "ワンクリック検索を有効にする">
+
+<!-- Loop Toggle Tweak -->
+<!ENTITY enablehellochat.label "Hello 通話を有効にする">
+
+<!-- Helpful ToolTips -->
+<!ENTITY restartRequiredMSG.label "ブラウザ再起動が必要です">
+
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
+<!ENTITY disableflashprotect.label "Flash Player 保護モードを無効にする">
+
+<!-- Toggle JavaScript in tab feature -->
+<!ENTITY togglescriptintab.label "JavaScript を切り替え">
+
+<!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
+<!ENTITY webrtcp2group.description "WebRTC ピア接続">
+<!ENTITY webrtcp2preference.label "WebRTC ピア接続を有効にする">
+
+<!-- about:home localization Tweak -->
+<!ENTITY abouthome.google.label "Google">
+<!ENTITY abouthome.google.url "https://www.google.com/">
+<!ENTITY abouthome.youtube.label "YouTube">
+<!ENTITY abouthome.youtube.url "https://www.youtube.com/">
+<!ENTITY abouthome.facebook.label "FaceBook">
+<!ENTITY abouthome.facebook.url "https://www.facebook.com/">
+<!ENTITY abouthome.twitter.label "Twitter">
+<!ENTITY abouthome.twitter.url "https://www.twitter.com/">
+<!ENTITY abouthome.support.label "Support">
+<!ENTITY abouthome.support.url "https://8pecxstudios.com/Forums/index.php">
+<!ENTITY abouthome.feedback.label "Feedback">
+<!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
+<!ENTITY abouthome.addons.label "Addons">
+<!ENTITY abouthome.addons.url "https://addons.mozilla.org/ja/firefox/">
+
