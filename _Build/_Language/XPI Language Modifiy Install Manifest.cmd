@@ -1,6 +1,6 @@
 @echo off
 :top
-title XPI Language Modifiy Install Manifest Version: 1.0.1
+title XPI Language Modifiy Install Manifest Version: 1.0.2
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
@@ -51,7 +51,5 @@ exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do del "%InputPath%\%%f\install.rdf" 
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.install.rdf" "%InputPath%\%%f\"
-for /f %%f in ('dir /b "%InputPath%"') do ren  "%InputPath%\%%f\%%~nf.install.rdf" "install.rdf"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.install.rdf" "%InputPath%\%%f\install.rdf"
 exit /b %ERRORLEVEL%

@@ -1,11 +1,11 @@
 @echo off
 
 :top
-title XPI Language Modifiy appstrings.properties Version: 1.0 
+title XPI Language Modifiy appstrings.properties Version: 1.1 
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
-ECHO.#              Copyright(c) 2014 8pecxstudios             #
+ECHO.#              Copyright(c) 2015 8pecxstudios             #
 ECHO.#         ---------------------------------------         #
 ECHO.#                                                         #
 ECHO.#                      8pecxstudios                       #
@@ -49,7 +49,5 @@ for /f %%f in ('dir /b %InputPath%') do copy /y "%InputPath%\%%f\browser\chrome\
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b %InputPath%') do del "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\appstrings.properties" 
-for /f %%f in ('dir /b %InputPath%') do copy /y  "%OutputPath%\%%~nf.appstrings.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\"
-for /f %%f in ('dir /b %InputPath%') do ren  "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\%%~nf.appstrings.properties" "appstrings.properties"
+for /f %%f in ('dir /b %InputPath%') do copy /y  "%OutputPath%\%%~nf.appstrings.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\appstrings.properties"
 exit /b %ERRORLEVEL%

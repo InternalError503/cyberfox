@@ -1,11 +1,11 @@
 @echo off
 
 :top
-title XPI Language Modifiy Browser.DTD Version: 1.0.1 
+title XPI Language Modifiy Browser.DTD Version: 2.0 
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
-ECHO.#              Copyright(c) 2014 8pecxstudios             #
+ECHO.#              Copyright(c) 2015 8pecxstudios             #
 ECHO.#         ---------------------------------------         #
 ECHO.#                                                         #
 ECHO.#                      8pecxstudios                       #
@@ -51,7 +51,5 @@ exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do del "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\browser.dtd" 
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.browser.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\"
-for /f %%f in ('dir /b "%InputPath%"') do ren  "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\%%~nf.browser.dtd" "browser.dtd"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.browser.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\browser.dtd"
 exit /b %ERRORLEVEL%
