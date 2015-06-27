@@ -11,6 +11,7 @@ function IsAppRunning(const FileName : string): Boolean;
 		FWbemObjectSet: Variant;
 	begin
 		Result := false;
+		log('Checking for ' + FileName + ' process!');
 	try
 		FSWbemLocator := CreateOleObject('WBEMScripting.SWBEMLocator');
 		FWMIService := FSWbemLocator.ConnectServer('localhost', 'root\CIMV2', '', '');
@@ -21,8 +22,8 @@ function IsAppRunning(const FileName : string): Boolean;
 		FWMIService := Unassigned;
 		FSWbemLocator := Unassigned;			
 	except
-			// Catch the exception, dump it to error log if /log set, and continue
-			GetExceptionMessage;
+			// Catch the exception, dump it to error log if /log set, and continue.
+			log('Exception occurred when checking for running process! ' + GetExceptionMessage);
 			Result := false;
 		end;		
 	end;
@@ -55,8 +56,9 @@ procedure CurStepChanged(CurStep: TSetupStep);
 			if CurStep = ssInstall then
 	begin
 		if FileOrDirExists(ExpandConstant('{group}')) then
+				log('Removing start-menu group to prevent duplicate.');
 				DelTree(ExpandConstant('{group}'), True, True, True);
-				end
+		end
 
 end;
 //Get the uninstall string;
@@ -70,6 +72,7 @@ function GetUninstallString: string;
 		sUnInstallString := '';
 	if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
 		RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
+	log('Getting uninstall string ' + sUnInstPath);
 	Result := sUnInstallString;
 end;
 //Check if install exists of not disable clean install check-box
@@ -135,7 +138,7 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 	begin
 		if CurUninstallStep = usPostUninstall then
 	begin
-	
+	log('Running uninstall clean-up event!');
 	if not UninstallSilent() then
 		begin
 			if FileOrDirExists(ExpandConstant('{app}\distribution')) then
