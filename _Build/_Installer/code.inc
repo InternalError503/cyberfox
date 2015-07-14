@@ -27,16 +27,52 @@ function IsAppRunning(const FileName : string): Boolean;
 			Result := false;
 		end;		
 	end;
+
+function forcedInstallation(const Count : LongInt): boolean;
+var
+	ForceInstallation : Boolean;
+	ii : LongInt;
+	Param : String;	
+	begin
+		ForceInstallation := FALSE;
+		for ii := 0 to Count do
+		begin
+			Param := ParamStr(ii)
+			if CompareText(Param,'--FORCE')=0 then
+			begin
+				ForceInstallation := TRUE;
+				Result := TRUE;
+			end;
+		end;
+end;	
+	
 //Initialize installer run check for running process.	
 #if Arch == "amd64"
 //Check and warn user if installing Cyberfox x64 bit on x86 OS.
 #endif
 function InitializeSetup(): Boolean;
+var 
+	ErrorCode: Integer;
 	begin
 		if (IsAppRunning(ExpandConstant ('{#MyAppExeName}'))) then
 	begin
-		msgbox(ExpandConstant ('{cm:ProcessName}{cm:IsAppRunning}'), mbInformation, MB_OK)
-			ExitProcess(9); // Our Exit code for process is running.
+		if (forcedInstallation(ParamCount())) then
+	begin
+		ShellExec('open','taskkill.exe','/f /im {#MyAppExeName}','',SW_HIDE,ewNoWait,ErrorCode);
+		Result := true;
+#if Arch == "amd64"		
+		if not IsWin64 then
+		begin
+			msgbox(ExpandConstant ('{cm:Isx64BitOS}'), mbInformation, MB_OK)
+			ExitProcess(10); // Our Exit code for incompatible OS.
+		end	
+#endif
+	end
+		else
+	begin
+			msgbox(ExpandConstant ('{cm:ProcessName}{cm:IsAppRunning}'), mbInformation, MB_OK)
+				ExitProcess(9); // Our Exit code for process is running.
+		end	
 	end
 		else
 	begin
