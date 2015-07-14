@@ -24,8 +24,8 @@
 ;as published at PortableApps.com/development. It may also be used with commercial
 ;software by contacting PortableApps.com.
 
-!define PORTABLEAPPSINSTALLERVERSION "3.0.17.0"
-!define PORTABLEAPPS.COMFORMATVERSION "3.0.17"
+!define PORTABLEAPPSINSTALLERVERSION "3.0.19.0"
+!define PORTABLEAPPS.COMFORMATVERSION "3.0.19"
 
 !if ${__FILE__} == "PortableApps.comInstallerPlugin.nsi"
 	!include PortableApps.comInstallerPluginConfig.nsh
@@ -1261,9 +1261,9 @@ FunctionEnd
 					!ifdef AdvancedExtract${_n}To
 						CreateDirectory "$INSTDIR\${AdvancedExtract${_n}To}"
 						${If} "${AdvancedExtract${_n}Filter}" == "**"
-							ExecDOS::exec `"$INSTDIR\7zTemp\7z.exe" x -r "$DOWNLOADEDFILE" -o"$INSTDIR\${AdvancedExtract${_n}To}" * -aoa -y` "" ""
+							nsExec::Exec `"$INSTDIR\7zTemp\7z.exe" x -r "$DOWNLOADEDFILE" -o"$INSTDIR\${AdvancedExtract${_n}To}" * -aoa -y`
 						${Else}
-							ExecDOS::exec `"$INSTDIR\7zTemp\7z.exe" x "$DOWNLOADEDFILE" -o"$INSTDIR\${AdvancedExtract${_n}To}" "${AdvancedExtract${_n}Filter}" -aoa -y` "" ""
+							nsExec::Exec `"$INSTDIR\7zTemp\7z.exe" x "$DOWNLOADEDFILE" -o"$INSTDIR\${AdvancedExtract${_n}To}" "${AdvancedExtract${_n}Filter}" -aoa -y`
 						${EndIf}
 						Pop $R0
 						${If} $R0 <> 0
@@ -1274,8 +1274,8 @@ FunctionEnd
 				!macroend
 				${!insertmacro1-10} AdvancedExtractFilter
 
-				Delete "$INSTDIR\7zTemp\7z.dll"
 				Delete "$INSTDIR\7zTemp\7z.exe"
+				Delete "$INSTDIR\7zTemp\7z.dll"
 				RMDir "$INSTDIR\7zTemp"
 			!endif
 			!ifdef DoubleExtractFilename
@@ -1287,7 +1287,7 @@ FunctionEnd
 				SetOutPath $INSTDIR
 
 				CreateDirectory "$PLUGINSDIR\Downloaded2"
-				ExecDOS::exec `"$INSTDIR\7zTemp\7z.exe" x "$DOWNLOADEDFILE" -o"$PLUGINSDIR\Downloaded2" "${DoubleExtractFilename}" -aoa -y` "" ""
+				nsExec::Exec `"$INSTDIR\7zTemp\7z.exe" x "$DOWNLOADEDFILE" -o"$PLUGINSDIR\Downloaded2" "${DoubleExtractFilename}" -aoa -y`
 				Pop $R0
 				${If} $R0 <> 0
 					DetailPrint "ERROR: (${DownloadFilename} > ${DoubleExtractFilename})"
@@ -1301,9 +1301,9 @@ FunctionEnd
 					!ifdef DoubleExtract${_n}To
 						CreateDirectory "$INSTDIR\${DoubleExtract${_n}To}"
 						${If} "${DoubleExtract${_n}Filter}" == "**"
-							ExecDOS::exec `"$INSTDIR\7zTemp\7z.exe" x -r "$PLUGINSDIR\Downloaded2\${DoubleExtractFilename}" -o"$INSTDIR\${DoubleExtract${_n}To}" * -aoa -y` "" ""
+							nsExec::Exec `"$INSTDIR\7zTemp\7z.exe" x -r "$PLUGINSDIR\Downloaded2\${DoubleExtractFilename}" -o"$INSTDIR\${DoubleExtract${_n}To}" * -aoa -y`
 						${Else}
-							ExecDOS::exec `"$INSTDIR\7zTemp\7z.exe" x "$PLUGINSDIR\Downloaded2\${DoubleExtractFilename}" -o"$INSTDIR\${DoubleExtract${_n}To}" "${DoubleExtract${_n}Filter}" -aoa -y` "" ""
+							nsExec::Exec `"$INSTDIR\7zTemp\7z.exe" x "$PLUGINSDIR\Downloaded2\${DoubleExtractFilename}" -o"$INSTDIR\${DoubleExtract${_n}To}" "${DoubleExtract${_n}Filter}" -aoa -y`
 						${EndIf}
 						Pop $R0
 						${If} $R0 <> 0
