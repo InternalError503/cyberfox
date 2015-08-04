@@ -18,6 +18,6 @@ browser.jar:
         content/browser/downloads/contentAreaDownloadsView.css (content/contentAreaDownloadsView.css)
 
 # Add Files For Cyberfox
-
-#Download UI		
-	      content/browser/downloads/downloads-cyberfox.js  (content/downloads-cyberfox.js)	
+#Download UI
+	content/browser/downloads/downloadsWindow.xul  (content/downloadsWindow.xul)		
+	content/browser/downloads/downloads-cyberfox.js  (content/downloads-cyberfox.js)	

@@ -219,7 +219,10 @@ let gPage = {
 
     for (let site of gGrid.sites) {
       if (site) {
-        site.captureIfMissing();
+        // The site may need to modify and/or re-render itself if
+        // something changed after newtab was created by preloader.
+        // For example, the suggested tile endTime may have passed.
+        site.onFirstVisible();
       }
     }
 

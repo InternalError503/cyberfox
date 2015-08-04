@@ -18,4 +18,7 @@ gDownloadsCustom.onSearch = function(searchFilter) {
 	}
 	
 }
-window.addEventListener("load", function () { gDownloadsCustom.init(); }, false);
+window.addEventListener("load", function () {
+	window.removeEventListener("load", gDownloadsCustom.init(), false);	
+	gDownloadsCustom.init(); 
+}, false);

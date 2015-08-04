@@ -23,6 +23,8 @@
             title="&newtab.pageTitle;"
 			onload="gPage.focus();">
 
+<div id="newtab-customize-overlay"></div>
+
   <xul:panel id="newtab-search-panel" orient="vertical" type="arrow"
              noautohide="true" hidden="true">
     <xul:hbox id="newtab-search-manage">
@@ -32,10 +34,12 @@
 
   <xul:panel id="newtab-customize-panel" orient="vertical" type="arrow"
              noautohide="true" hidden="true">
-    <xul:hbox id="newtab-customize-classic" class="newtab-customize-panel-item">
-      <xul:label>&newtab.customize.topsites;</xul:label>
-    </xul:hbox>
-    <xul:hbox id="newtab-customize-blank" class="newtab-customize-panel-item">
+    <xul:vbox class="newtab-customize-complex-option">
+      <xul:hbox id="newtab-customize-classic" class="newtab-customize-panel-superitem newtab-customize-panel-item selectable">
+        <xul:label>&newtab.customize.classic;</xul:label>
+      </xul:hbox>
+    </xul:vbox>
+    <xul:hbox id="newtab-customize-blank" class="newtab-customize-panel-item selectable">
       <xul:label>&newtab.customize.blank2;</xul:label>
     </xul:hbox>
   </xul:panel>

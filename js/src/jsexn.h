@@ -125,9 +125,12 @@ class AutoClearPendingException
     { }
 
     ~AutoClearPendingException() {
-        cx->clearPendingException();
+        JS_ClearPendingException(cx);
     }
 };
+
+extern const char*
+ValueToSourceForError(JSContext* cx, HandleValue val, JSAutoByteString& bytes);
 
 } // namespace js
 

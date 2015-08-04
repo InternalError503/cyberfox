@@ -150,7 +150,7 @@
                 class="plain"
                 label="&downloadsHistory.label;"
                 accesskey="&downloadsHistory.accesskey;"
-                oncommand="gCyberfoxCustom.customDownloadsOverlay();"/>
+                oncommand="gCyberfoxCustom.toolsDownloads(false);"/>
       </vbox>
     </panel>
   </popupset>

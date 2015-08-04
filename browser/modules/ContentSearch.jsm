@@ -1,4 +1,3 @@
-# -*- indent-tabs-mode: nil; js-indent-level: 2 -*-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -15,6 +14,9 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Promise.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
+  "resource://gre/modules/AppConstants.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "FormHistory",
   "resource://gre/modules/FormHistory.jsm");
@@ -227,14 +229,11 @@ this.ContentSearch = {
       // method on it will throw.
       return Promise.resolve();
     }
-    if (data.useNewTab) {
-      browser.getTabBrowser().selectedTab = newTab;
-    }
     let win = browser.ownerDocument.defaultView;
-#ifdef MOZ_SERVICES_HEALTHREPORT
-    win.BrowserSearch.recordSearchInHealthReport(engine, data.whence,
-                                                 data.selection || null);
-#endif
+	if (AppConstants.MOZ_SERVICES_HEALTHREPORT) {
+		win.BrowserSearch.recordSearchInHealthReport(engine, data.whence,
+													data.selection || null);
+	}
     return Promise.resolve();
   },
 

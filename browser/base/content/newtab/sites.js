@@ -37,7 +37,7 @@ Site.prototype = {
   /**
    * The title of the site's link.
    */
-  get title() { return this.link.title; },
+  get title() { return this.link.title || this.link.url; },
 
   /**
    * The site's parent cell.
@@ -122,7 +122,7 @@ Site.prototype = {
   _render: function Site_render() {
     let url = this.url;
     let title = this.title || url;
-    let tooltip = (title == url ? title : title + "\n" + url);
+    let tooltip = (this.title == url ? this.title : this.title + "\n" + url);
 
     let link = this._querySelector(".newtab-link");
     link.setAttribute("title", tooltip);
@@ -137,6 +137,21 @@ Site.prototype = {
     this.captureIfMissing();
     // but still display whatever thumbnail might be available now.
     this.refreshThumbnail();
+  },
+
+  /**
+   * Called when the site's tab becomes visible for the first time.
+   * Since the newtab may be preloaded long before it's displayed,
+   * check for changed conditions and re-render if needed
+   */
+  onFirstVisible: function Site_onFirstVisible() {
+    if (this.link.endTime && this.link.endTime < Date.now()) {
+      // site needs to change landing url and background image
+      this._render();
+    }
+    else {
+      this.captureIfMissing();
+    }
   },
 
   /**

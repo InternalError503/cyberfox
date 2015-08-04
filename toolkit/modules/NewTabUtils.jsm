@@ -377,8 +377,14 @@ let PinnedLinks = {
     // Clear the link's old position, if any.
     this.unpin(aLink);
 
+    // change pinned link into a history link
+    // update all pages on link change
+    let updatePages = this._makeHistoryLink(aLink);
     this.links[aIndex] = aLink;
     this.save();
+    if (updatePages) {
+      AllPages.update();
+    }
   },
 
   /**
@@ -436,7 +442,37 @@ let PinnedLinks = {
 
     // The given link is unpinned.
     return -1;
-  }
+  },
+
+  /**
+   * Transforms link into a "history" link
+   * @param aLink The link to change
+   * @return true if link changes, false otherwise
+   */
+  _makeHistoryLink: function PinnedLinks_makeHistoryLink(aLink) {
+    if (!aLink.type || aLink.type == "history") {
+      return false;
+    }
+    aLink.type = "history";
+    // always remove targetedSite
+    delete aLink.targetedSite;
+    return true;
+  },
+
+  /**
+   * Replaces existing link with another link.
+   * @param aUrl The url of existing link
+   * @param aLink The replacement link
+   */
+  replace: function PinnedLinks_replace(aUrl, aLink) {
+    let index = this._indexOfLink({url: aUrl});
+    if (index == -1) {
+      return;
+    }
+    this.links[index] = aLink;
+    this.save();
+  },
+
 };
 
 /**
@@ -649,6 +685,20 @@ let PlacesProvider = {
   /**
    * Called by the history service.
    */
+  onDeleteURI: function PlacesProvider_onDeleteURI(aURI, aGUID, aReason) {
+    // let observers remove sensetive data associated with deleted visit
+    this._callObservers("onDeleteURI", {
+      url: aURI.spec,
+    });
+  },
+
+  onClearHistory: function() {
+    this._callObservers("onClearHistory")
+  },
+
+  /**
+   * Called by the history service.
+   */
   onFrecencyChanged: function PlacesProvider_onFrecencyChanged(aURI, aNewFrecency, aGUID, aHidden, aLastVisitDate) {
     // The implementation of the query in getLinks excludes hidden and
     // unvisited pages, so it's important to exclude them here, too.
@@ -840,6 +890,11 @@ let Links = {
     if (links.length)
       pinnedLinks = pinnedLinks.concat(links);
 
+    for (let link of pinnedLinks) {
+      if (link) {
+        link.baseDomain = NewTabUtils.extractSite(link.url);
+      }
+    }
     return pinnedLinks;
   },
 

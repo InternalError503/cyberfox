@@ -259,3 +259,10 @@ richlistitem:not([selected]) * {
 .addon[type="experiment"][status="installing"] .experiment-state {
   display: none;
 }
+
+/* Hacky method for smaller window size with addon version */
+@media screen and (max-width: 960px) {
+	.version{
+		display: none;
+	}
+}

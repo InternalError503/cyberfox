@@ -59,7 +59,7 @@ const GMP_PLUGINS = [
     // The following learnMoreURL is another hack to be able to support a SUMO page for this
     // feature.
     get learnMoreURL() {
-      return Services.urlFormatter.formatURLPref("app.support.baseURL") + "drm-content";
+      return Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "drm-content";
     },
     licenseURL:      "http://help.adobe.com/en_US/primetime/drm/HTML5_CDM_EULA/index.html",
     homepageURL:     "http://help.adobe.com/en_US/primetime/drm/HTML5_CDM",
@@ -71,7 +71,8 @@ const GMP_PLUGINS = [
 XPCOMUtils.defineLazyGetter(this, "pluginsBundle",
   () => Services.strings.createBundle("chrome://global/locale/plugins.properties"));
 XPCOMUtils.defineLazyGetter(this, "gmpService",
-  () => Cc["@mozilla.org/gecko-media-plugin-service;1"].getService(Ci.mozIGeckoMediaPluginService));
+  () => Cc["@mozilla.org/gecko-media-plugin-service;1"].getService(Ci.mozIGeckoMediaPluginChromeService));
+
 
 let messageManager = Cc["@mozilla.org/globalmessagemanager;1"]
                        .getService(Ci.nsIMessageListenerManager);
@@ -503,7 +504,7 @@ let GMPProvider = {
       if (gmpPath && isEnabled) {
         if (!wrapper.validate()) {
           this._log.info("startup - gmp " + plugin.id +
-                         " missing lib and/or info files, uninstalling");
+                         " missing lib and/or info files, uninstalling"); 
           wrapper.uninstallPlugin();
           continue;
         }

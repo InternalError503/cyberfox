@@ -23,17 +23,9 @@ var gAdvancedPane = {
 
 	//Temp solution as the update system not active for beta so we don't want users trying just yet.
 	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){
-	
-		let elements = [
-				document.getElementById("updateOptions"),
-				document.getElementById("app.update.autocheck"),
-				document.getElementById("app.update.check.enabled")
-			];
-			
-			for (i=0; elements[i]; i++){
-				elements[i].hidden = true;
-			}
-			
+		document.getElementById("updateOptions").hidden = true;
+		document.getElementById("app.update.autocheck").hidden = true;
+		document.getElementById("app.update.check.enabled").hidden = true;
 		Services.prefs.setBoolPref("app.update.autocheck", false);
 		Services.prefs.setBoolPref("app.update.check.enabled", false);		
 	}	
@@ -648,22 +640,10 @@ var gAdvancedPane = {
   {
     var enabledPref = document.getElementById("app.update.enabled");
     var autoPref = document.getElementById("app.update.auto");
-#ifdef XP_WIN
-#ifdef MOZ_METRO
-    var metroEnabledPref = document.getElementById("app.update.metro.enabled");
-#endif
-#endif
     var radiogroup = document.getElementById("updateRadioGroup");
 
     if (!enabledPref.value)   // Don't care for autoPref.value in this case.
       radiogroup.value="manual";    // 3. Never check for updates.
-#ifdef XP_WIN
-#ifdef MOZ_METRO
-    // enabledPref.value && autoPref.value && metroEnabledPref.value
-    else if (metroEnabledPref.value && this._showingWin8Prefs)
-      radiogroup.value="autoMetro"; // 0. Automatically install updates for both Metro and Desktop
-#endif
-#endif
     else if (autoPref.value)  // enabledPref.value && autoPref.value
       radiogroup.value="auto";      // 1. Automatically install updates for Desktop only
     else                      // enabledPref.value && !autoPref.value
@@ -682,14 +662,6 @@ var gAdvancedPane = {
     // the warnIncompatible checkbox value is set by readAddonWarn
     warnIncompatible.disabled = radiogroup.disabled || modePref.locked ||
                                 !enabledPref.value || !autoPref.value;
-#ifdef XP_WIN
-#ifdef MOZ_METRO
-    if (this._showingWin8Prefs) {
-      warnIncompatible.disabled |= metroEnabledPref.value;
-      warnIncompatible.checked |= metroEnabledPref.value;
-    }
-#endif
-#endif
 
 #ifdef MOZ_MAINTENANCE_SERVICE
     // Check to see if the maintenance service is installed.
@@ -738,31 +710,12 @@ var gAdvancedPane = {
     var enabledPref = document.getElementById("app.update.enabled");
     var autoPref = document.getElementById("app.update.auto");
     var modePref = document.getElementById("app.update.mode");
-#ifdef XP_WIN
-#ifdef MOZ_METRO
-    var metroEnabledPref = document.getElementById("app.update.metro.enabled");
-    // Initialize the pref to false only if we're showing the option
-    if (this._showingWin8Prefs) {
-      metroEnabledPref.value = false;
-    }
-#endif
-#endif
     var radiogroup = document.getElementById("updateRadioGroup");
     switch (radiogroup.value) {
       case "auto":      // 1. Automatically install updates for Desktop only
         enabledPref.value = true;
         autoPref.value = true;
         break;
-#ifdef XP_WIN
-#ifdef MOZ_METRO
-      case "autoMetro": // 0. Automatically install updates for both Metro and Desktop
-        enabledPref.value = true;
-        autoPref.value = true;
-        metroEnabledPref.value = true;
-        modePref.value = 1;
-        break;
-#endif
-#endif
       case "checkOnly": // 2. Check, but let me choose
         enabledPref.value = true;
         autoPref.value = false;
@@ -776,15 +729,6 @@ var gAdvancedPane = {
     warnIncompatible.disabled = enabledPref.locked || !enabledPref.value ||
                                 autoPref.locked || !autoPref.value ||
                                 modePref.locked;
-
-#ifdef XP_WIN
-#ifdef MOZ_METRO
-    if (this._showingWin8Prefs) {
-      warnIncompatible.disabled |= metroEnabledPref.value;
-      warnIncompatible.checked |= metroEnabledPref.value;
-    }
-#endif
-#endif
   },
 
   /**

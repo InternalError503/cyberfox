@@ -94,7 +94,7 @@
     <command id="Browser:RestoreLastSession" oncommand="restoreLastSession();" disabled="true"/>
 
     <command id="Tools:Search" oncommand="BrowserSearch.webSearch();"/>
-    <command id="Tools:Downloads" oncommand="gCyberfoxCustom.toolsDownloads();"/>
+    <command id="Tools:Downloads" oncommand="gCyberfoxCustom.toolsDownloads(true);"/>
     <command id="Tools:DevToolbox" oncommand="gDevToolsBrowser.toggleToolboxCommand(gBrowser);"/>
     <command id="Tools:DevToolbar" oncommand="DeveloperToolbar.toggle();" disabled="true" hidden="true"/>
     <command id="Tools:DevToolbarFocus" oncommand="DeveloperToolbar.focusToggle();" disabled="true"/>
@@ -114,8 +114,6 @@
     <command id="Tools:PrivateBrowsing"
       oncommand="OpenBrowserWindow({private: true});" reserved="true"/>
 #ifdef E10S_TESTING_ONLY
-    <command id="Tools:RemoteWindow"
-      oncommand="OpenBrowserWindow({remote: true});"/>
     <command id="Tools:NonRemoteWindow"
       oncommand="OpenBrowserWindow({remote: false});"/>
 #endif

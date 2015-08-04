@@ -1,6 +1,6 @@
 # Define indicating that this build is prior to one of the early betas. To be
 # unset mid-way through the beta cycle.
-EARLY_BETA_OR_EARLIER=
+EARLY_BETA_OR_EARLIER=0
 
 # Set the browser branding identity color
 IDENTITY_BRANDING_AMD=

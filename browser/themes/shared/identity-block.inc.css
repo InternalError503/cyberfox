@@ -6,43 +6,42 @@
 
 :root {
 	 --identity-box-verified-color: hsl(92,100%,30%);
-	 --identity-box-verified-background-image: linear-gradient(hsla(92,81%,16%,0),
+	 --identity-box-verified-background-image: linear-gradient(transparent 15%,
 										hsla(92,81%,16%,.2) 35%,
 										hsla(92,81%,16%,.2) 65%,
-										hsla(92,81%,16%,0));
+										transparent 85%);
 %ifdef IDENTITY_BRANDING_BETA
 	--identity-box-chrome-color: rgb(252,183,0);
-	--identity-box-chrome-background-image: linear-gradient(rgba(252,183,0,0),
+	--identity-box-chrome-background-image: linear-gradient(transparent 15%,
 										rgba(252,183,0,.5) 35%,
 										rgba(252,183,0,.5) 65%,
-										rgba(252,183,0,0));
+										transparent 85%);
 %elif IDENTITY_BRANDING_AMD
 	--identity-box-chrome-color: rgb(236,24,24);
-	--identity-box-chrome-background-image: linear-gradient(rgba(236,24,24,0),
+	--identity-box-chrome-background-image: linear-gradient(transparent 15%,
 										rgba(236,24,24,.5) 35%,
 										rgba(236,24,24,.5) 65%,
-										rgba(236,24,24,0));
+										transparent 85%);
 %elif IDENTITY_BRANDING_LINUX
 	--identity-box-chrome-color: rgb(3,81,1);
-	--identity-box-chrome-background-image: linear-gradient(rgba(3,81,1,0),
+	--identity-box-chrome-background-image: linear-gradient(transparent 15%,
 										rgba(3,81,1,.5) 35%,
 										rgba(3,81,1,.5) 65%,
-										rgba(3,81,1,0));
+										transparent 85%);
 %elif IDENTITY_BRANDING_INTEL
 	--identity-box-chrome-color: rgb(24,147,236);
-	--identity-box-chrome-background-image: linear-gradient(rgba(24,147,236,0),
+	--identity-box-chrome-background-image: linear-gradient(transparent 15%,
 										rgba(24,147,236,.5) 35%,
 										rgba(24,147,236,.5) 65%,
-										rgba(24,147,236,0));
+										transparent 85%);
 %else
 	  --identity-box-chrome-color: rgb(229,115,0);
-	  --identity-box-chrome-background-image: linear-gradient(rgba(229,114,0,0),
+	  --identity-box-chrome-background-image: linear-gradient(transparent 15%,
 										rgba(229,114,0,.5) 35%,
 										rgba(229,114,0,.5) 65%,
-										rgba(229,114,0,0));
+										transparent 85%);
 %endif
 }
-
 
 #urlbar[pageproxystate="valid"] > #identity-box.chromeUI,
 #urlbar[pageproxystate="valid"] > #identity-box.verifiedIdentity {
@@ -115,4 +114,64 @@
 
 #identity-popup-content-box {
   max-width: 50ch;
+}
+
+@media not all and (min-resolution: 1.1dppx) {
+  #page-proxy-favicon {
+    -moz-image-region: rect(0, 16px, 16px, 0);
+  }
+
+  #identity-box:hover > #page-proxy-favicon {
+    -moz-image-region: rect(0, 32px, 16px, 16px);
+  }
+
+  #identity-box:hover:active > #page-proxy-favicon,
+  #identity-box[open=true] > #page-proxy-favicon {
+    -moz-image-region: rect(0, 48px, 16px, 32px);
+  }
+}
+
+@media (min-resolution: 1.1dppx) {
+  #page-proxy-favicon {
+    list-style-image: url(chrome://browser/skin/identity-icons-generic@2x.png);
+    -moz-image-region: rect(0, 32px, 32px, 0);
+  }
+
+  .chromeUI > #page-proxy-favicon[pageproxystate="valid"] {
+    list-style-image: url(chrome://branding/content/identity-icons-brand@2x.png);
+  }
+
+  .verifiedDomain > #page-proxy-favicon[pageproxystate="valid"] {
+    list-style-image: url(chrome://browser/skin/identity-icons-https@2x.png);
+  }
+
+  .verifiedIdentity > #page-proxy-favicon[pageproxystate="valid"] {
+    list-style-image: url(chrome://browser/skin/identity-icons-https-ev@2x.png);
+  }
+
+  .mixedActiveContent > #page-proxy-favicon[pageproxystate="valid"] {
+    list-style-image: url(chrome://browser/skin/identity-icons-https-mixed-active@2x.png);
+  }
+
+  .mixedDisplayContent > #page-proxy-favicon[pageproxystate="valid"] {
+    list-style-image: url(chrome://browser/skin/identity-icons-https-mixed-display@2x.png);
+  }
+
+  .mixedDisplayContentLoadedActiveBlocked > #page-proxy-favicon[pageproxystate="valid"] {
+    list-style-image: url(chrome://browser/skin/identity-icons-https-mixed-display@2x.png);
+  }
+
+  #identity-box:hover > #page-proxy-favicon {
+    -moz-image-region: rect(0, 64px, 32px, 32px);
+  }
+
+  #identity-box:hover:active > #page-proxy-favicon,
+  #identity-box[open=true] > #page-proxy-favicon {
+    -moz-image-region: rect(0, 96px, 32px, 64px);
+  }
+
+  #identity-popup.chromeUI > #identity-popup-container > #identity-popup-icon {
+    list-style-image: url("chrome://branding/content/icon128.png");
+    -moz-image-region: rect(0, 128px, 128px, 0);
+  }
 }

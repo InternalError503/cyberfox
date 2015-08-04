@@ -13,6 +13,8 @@ this.EXPORTED_SYMBOLS = ["AboutHome" ];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
+  "resource://gre/modules/AppConstants.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
   "resource://gre/modules/PrivateBrowsingUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "fxAccounts",
@@ -74,7 +76,7 @@ let AboutHome = {
 				var DownloadsWindow;
 				if ( Services.prefs.getBoolPref("browser.download.useToolkitUI")){
 						if(DownloadsWindow == null || DownloadsWindow.closed){
-								window.open("chrome://browser/content/downloadUI.xul","Downloads","resizable,chrome,centerscreen");
+								window.open("chrome://browser/content/downloads/downloadsWindow.xul","Downloads","resizable,chrome,centerscreen");
 						}else{
 								DownloadsWindow.focus();
 							}
@@ -140,12 +142,12 @@ let AboutHome = {
           }
 
           let engine = Services.search.currentEngine;
-#ifdef MOZ_SERVICES_HEALTHREPORT
-          window.BrowserSearch.recordSearchInHealthReport(engine, "abouthome", data.selection);
-#endif
+          if (AppConstants.MOZ_SERVICES_HEALTHREPORT) {
+            window.BrowserSearch.recordSearchInHealthReport(engine, "abouthome", data.selection);
+          }
           // Trigger a search through nsISearchEngine.getSubmission()
           let submission = engine.getSubmission(data.searchTerms, null, "homepage");
-          let where = data.useNewTab ? "tab" : "current";
+          let where = data.useNewTab ? "tabshifted" : "current";
           window.openUILinkIn(submission.uri.spec, where, false,
                               submission.postData);
 

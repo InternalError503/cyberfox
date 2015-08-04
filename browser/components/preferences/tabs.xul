@@ -21,9 +21,7 @@
 <script type="application/javascript" 
         src="chrome://browser/content/preferences/in-content/main.js"/>
   <prefpane id="paneTabs"
-#ifdef XP_WIN
             onpaneload="gTabsPane.init();"
-#endif
             helpTopic="prefs-tabs">
 
     <preferences id="tabsPreferences">

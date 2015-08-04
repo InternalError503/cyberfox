@@ -10,6 +10,7 @@ let gCustomize = {
     "button",
     "classic",
     "panel",
+    "overlay"
   ],
 
   _nodes: {},
@@ -30,7 +31,25 @@ let gCustomize = {
     this.updateSelected();
   },
 
+  _onHidden: function() {
+    let nodes = gCustomize._nodes;
+    nodes.overlay.addEventListener("transitionend", function onTransitionEnd() {
+      nodes.overlay.removeEventListener("transitionend", onTransitionEnd);
+      nodes.overlay.style.display = "none";
+    });
+    nodes.overlay.style.opacity = 0;
+    nodes.panel.removeEventListener("popuphidden", gCustomize._onHidden);
+    nodes.panel.hidden = true;
+    nodes.button.removeAttribute("active");
+  },
+
   showPanel: function() {
+    this._nodes.overlay.style.display = "block";
+    setTimeout(() => {
+      // Wait for display update to take place, then animate.
+      this._nodes.overlay.style.opacity = 0.8;
+    }, 0);
+
     let nodes = this._nodes;
     let {button, panel} = nodes;
     if (button.hasAttribute("active")) {
@@ -40,11 +59,7 @@ let gCustomize = {
     panel.hidden = false;
     panel.openPopup(button);
     button.setAttribute("active", true);
-    panel.addEventListener("popuphidden", function onHidden() {
-      panel.removeEventListener("popuphidden", onHidden);
-      panel.hidden = true;
-      button.removeAttribute("active");
-    });
+    panel.addEventListener("popuphidden", this._onHidden);
 
     return new Promise(resolve => {
       panel.addEventListener("popupshown", function onShown() {

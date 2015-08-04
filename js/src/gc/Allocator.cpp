@@ -72,7 +72,10 @@ GCRuntime::checkAllocatorState(JSContext* cx, AllocKind kind)
 
     // For testing out of memory conditions
     if (js::oom::ShouldFailWithOOM()) {
-        ReportOutOfMemory(cx);
+        // If we are doing a fallible allocation, percolate up the OOM
+        // instead of reporting it.
+        if (allowGC)
+            ReportOutOfMemory(cx);
         return false;
     }
 
@@ -346,7 +349,7 @@ ArenaLists::allocateFromArena(JS::Zone* zone, AllocKind thingKind,
                               AutoMaybeStartBackgroundAllocation& maybeStartBGAlloc)
 {
     JSRuntime* rt = zone->runtimeFromAnyThread();
-    Maybe<AutoLockGC> maybeLock;
+    mozilla::Maybe<AutoLockGC> maybeLock;
 
     // See if we can proceed without taking the GC lock.
     if (backgroundFinalizeState[thingKind] != BFS_DONE)
