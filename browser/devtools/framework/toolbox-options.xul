@@ -213,7 +213,7 @@
 					<menuitem label="6.1" value="6.1"/>
 					<menuitem label="6.2" value="6.2"/>
 					<menuitem label="6.3" value="6.3"/>
-					<menuitem label="6.4" value="6.4"/>					
+					<menuitem label="10.0" value="10.0"/>					
 				</menupopup>
 			</menulist>			
 			<menulist id="devtools-agent-version"
