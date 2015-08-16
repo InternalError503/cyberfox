@@ -117,7 +117,7 @@
 /* LINKS */
 .newtab-link {
   border-radius: 10px;
-  overflow: hidden;
+  overflow: none;
 }
 
 /* THUMBNAILS */
@@ -129,6 +129,7 @@
   border-radius: 8px 8px 0px 0px;
   height: 180px;
   transition: opacity 100ms ease-out;
+  border-radius: 0px 0px 5px 5px;
 }
 
 .newtab-site[type=organic] .newtab-thumbnail {
