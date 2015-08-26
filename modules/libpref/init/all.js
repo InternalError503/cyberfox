@@ -4742,9 +4742,9 @@ pref("media.gmp.insecure.allow", false);
 // Use vsync aligned rendering. b2g prefs are in b2g.js.
 // Hardware vsync supported on windows, os x, and b2g.
 // Linux and fennec will use software vsync.
-pref("gfx.vsync.hw-vsync.enabled", true);
-pref("gfx.vsync.compositor", true);
-pref("gfx.vsync.refreshdriver", true);
+pref("gfx.vsync.hw-vsync.enabled", false);
+pref("gfx.vsync.compositor", false);
+pref("gfx.vsync.refreshdriver", false);
 
 // Secure Element API
 #ifdef MOZ_SECUREELEMENT
