@@ -117,7 +117,9 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  {"sprotector.dll", ALL_VERSIONS},
 
 	  // Topcrash with Websense Endpoint, bug 828184
-	  {"qipcap.dll", MAKE_VERSION(7, 6, 815, 1)},
+	  //Mass startup crash with Websense Endpoint set block too {ALL_VERSIONS} for now see if helps.
+	  {"qipcap.dll", ALL_VERSIONS},
+	  {"qipcap64.dll", ALL_VERSIONS},
 
 	  // leave these two in always for tests
 	  { "mozdllblockingtest.dll", ALL_VERSIONS },
@@ -229,9 +231,6 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 
 	  // NetOp School, discontinued product, bug 763395
       { "nlsp.dll", MAKE_VERSION(6, 23, 2012, 19) },
-	  
-	  //Temp solution for mass startup crash with Websense Endpoint
-	  { "qipcap.dll", ALL_VERSIONS },
 
 	  { nullptr, 0 }
 };
