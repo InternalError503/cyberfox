@@ -229,6 +229,9 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 
 	  // NetOp School, discontinued product, bug 763395
       { "nlsp.dll", MAKE_VERSION(6, 23, 2012, 19) },
+	  
+	  //Temp solution for mass startup crash with Websense Endpoint
+	  { "qipcap.dll", ALL_VERSIONS },
 
 	  { nullptr, 0 }
 };

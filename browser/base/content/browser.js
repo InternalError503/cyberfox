@@ -1267,6 +1267,7 @@ var gBrowserInit = {
     Services.obs.addObserver(gXPInstallObserver, "addon-install-disabled", false);
     Services.obs.addObserver(gXPInstallObserver, "addon-install-started", false);
     Services.obs.addObserver(gXPInstallObserver, "addon-install-blocked", false);
+    Services.obs.addObserver(gXPInstallObserver, "addon-install-origin-blocked", false);
     Services.obs.addObserver(gXPInstallObserver, "addon-install-failed", false);
     Services.obs.addObserver(gXPInstallObserver, "addon-install-confirmation", false);
     Services.obs.addObserver(gXPInstallObserver, "addon-install-complete", false);
@@ -1563,6 +1564,7 @@ var gBrowserInit = {
       Services.obs.removeObserver(gXPInstallObserver, "addon-install-disabled");
       Services.obs.removeObserver(gXPInstallObserver, "addon-install-started");
       Services.obs.removeObserver(gXPInstallObserver, "addon-install-blocked");
+      Services.obs.removeObserver(gXPInstallObserver, "addon-install-origin-blocked");
       Services.obs.removeObserver(gXPInstallObserver, "addon-install-failed");
       Services.obs.removeObserver(gXPInstallObserver, "addon-install-confirmation");
       Services.obs.removeObserver(gXPInstallObserver, "addon-install-complete");
@@ -6754,7 +6756,7 @@ var gIdentityHandler = {
 
     // Chrome URIs however get special treatment. Some chrome URIs are
     // whitelisted to provide a positive security signal to the user.
-    let whitelist = /^about:(accounts|addons|app-manager|buildconfig|cache|config|customizing|downloads|home|license|logo|memory|networking|newaddon|permissions|plugins|preferences|privatebrowsing|rights|sessionrestore|support|welcomeback)/i;
+    let whitelist = /^about:(accounts|addons|app-manager|buildconfig|cache|config|customizing|downloads|home|license|logo|memory|networking|newaddon|permissions|plugins|preferences|privatebrowsing|rights|sessionrestore|support|serviceworkers|welcomeback)/i;
     let isChromeUI = uri.schemeIs("about") && whitelist.test(uri.spec);
     if (isChromeUI) {
       this.setMode(this.IDENTITY_MODE_CHROMEUI);

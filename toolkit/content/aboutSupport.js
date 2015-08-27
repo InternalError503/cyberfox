@@ -723,9 +723,12 @@ function openProfileDirectory() {
  * Profile reset is only supported for the default profile if the appropriate migrator exists.
  */
 function populateActionBox() {
-  if (ResetProfile.resetSupported()) {
+  if (ResetProfile.resetSupported() || Services.appinfo.inSafeMode) {
     $("reset-box").style.display = "block";
     $("action-box").style.display = "block";
+	if (Services.appinfo.inSafeMode){
+		$("safe-mode-box").style.display = "none";
+	}
   }
   if (!Services.appinfo.inSafeMode) {
     $("safe-mode-box").style.display = "block";
