@@ -1,17 +1,6 @@
 @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
 @-moz-document url(chrome://browser/content/browser.xul) {
 
-:root {
-    --ctr-tbi-moz-appearance: none;
-    --ctr-tbi-background: none;
-    --ctr-tbi-background-image: none;
-    --ctr-tbi-border-radius: 2.5px;
-    --ctr-tbi-border-color: transparent;
-    --ctr-tbi-box-shadow: none;
-    --ctr-tbi-transition-property: none;
-    --ctr-tbi-transition-duration: 0ms;
-}
-
 	#nav-bar #notification-popup-box + *{
 	  -moz-padding-start: 9px !important;
 	  transition: none !important;
@@ -20,6 +9,12 @@
 	#nav-bar #notification-popup-box[hidden] + * {
 	  -moz-padding-start: 2px !important;
 	  transition: none !important;
+	}
+	
+	#main-window[fx42plus="true"][defaultfxtheme="true"] #navigator-toolbox #nav-bar #urlbar-container #notification-popup-box[hidden] + *,
+	#main-window[fx42plus="true"] #navigator-toolbox #nav-bar #urlbar-container #notification-popup-box[hidden] + * {
+	  -moz-padding-start: 4px !important;
+	  -moz-padding-end: 3px !important;
 	}
 
 	#nav-bar #notification-popup-box:not([hidden]) {
@@ -197,21 +192,20 @@
 	  opacity: 1.0 !important;
 	}
 
-/* Overridden at document level */
-#navigator-toolbox #nav-bar #back-button[disabled] > .toolbarbutton-icon,
-#navigator-toolbox #nav-bar .toolbarbutton-menubutton-dropmarker > image,
-#navigator-toolbox #nav-bar .toolbarbutton-menubutton-button .toolbarbutton-icon,
-#navigator-toolbox #nav-bar toolbarbutton[type="menu-button"] > .toolbarbutton-icon,
-#navigator-toolbox #nav-bar .toolbarbutton-1:-moz-any(:hover ,[checked],[open],[type="menu-button"]) > .toolbarbutton-icon,
-#navigator-toolbox #nav-bar .toolbarbutton-1[type="menu-button"] > .toolbarbutton-menubutton-dropmarker::before{
-    -moz-appearance: var(--ctr-tbi-moz-appearance);
-    background: var(--ctr-tbi-background);
-    background-image: var(--ctr-tbi-background-image);
-    border-radius: var(--ctr-tbi-border-radius);
-    border-color: var(--ctr-tbi-border-color);
-    box-shadow: var(--ctr-tbi-box-shadow);
-    transition-property: var(--ctr-tbi-transition-property);
-    transition-duration: var(--ctr-tbi-transition-duration);
+    #navigator-toolbox #nav-bar #back-button[disabled] > .toolbarbutton-icon,
+	#navigator-toolbox #nav-bar .toolbarbutton-menubutton-dropmarker > image,
+	#navigator-toolbox #nav-bar .toolbarbutton-menubutton-button .toolbarbutton-icon,
+	#navigator-toolbox #nav-bar toolbarbutton[type="menu-button"] > .toolbarbutton-icon,
+	#navigator-toolbox #nav-bar .toolbarbutton-1:-moz-any(:hover ,[checked],[open],[type="menu-button"]) > .toolbarbutton-icon,
+	#navigator-toolbox #nav-bar .toolbarbutton-1[type="menu-button"] > .toolbarbutton-menubutton-dropmarker::before{
+	  -moz-appearance: none !important;
+	  background: none !important;
+	  background-image: none !important;
+	  border-radius: 2.5px;
+	  border-color: transparent !important;
+	  box-shadow: none !important;
+	  transition-property: none !important;
+      transition-duration: 0ms !important;
 	}   
 
 	#main-window:not([fx40plus="true"]) #nav-bar .toolbarbutton-menubutton-button > .toolbarbutton-icon,
@@ -274,6 +268,10 @@
 	}
 
 	/* START: urlbar border tweaking (default theme does not provide left urlbar border) */
+	#main-window[fx42plus="true"][defaultfxtheme="true"] #urlbar {
+	  min-height: 24px;
+	}
+
 	#main-window[defaultfxtheme="true"] #urlbar,
 	#main-window[defaultfxtheme="true"] .searchbar-textbox {
 	  border: 1px solid ThreeDShadow !important;
@@ -355,13 +353,23 @@
 	}
 
 	#nav-bar toolbarbutton .toolbarbutton-badge,
-	#nav-bar toolbarbutton .toolbarbutton-badge-container {
+	#nav-bar toolbarbutton .toolbarbutton-badge-container,
+	#nav-bar toolbarbutton .toolbarbutton-badge-stack {
 	  box-shadow: none !important;
 	  border: 0 !important;
 	  padding: 0 !important;
 	  margin: 0 !important;
 	}
-	#nav-bar toolbarbutton .toolbarbutton-badge-container {
+
+	#navigator-toolbox #nav-bar toolbarbutton .toolbarbutton-badge-stack {
+	  padding-right: 1px !important;
+      padding-left: 1px !important;
+	  margin-right: 2px !important;
+      margin-left: 2px !important;
+	}
+
+	#nav-bar toolbarbutton .toolbarbutton-badge-container,
+	#nav-bar toolbarbutton .toolbarbutton-badge-stack {
 	  background: none !important;
 	}
 	
@@ -439,5 +447,13 @@
 	  border: unset !important;
 	  box-shadow: unset !important;
 	  background: unset !important;
+	}
+
+	/*Tile tabs tweaks*/
+	#navigator-toolbox #nav-bar #tiletabs-buttonmenu .toolbarbutton-menubutton-button image {
+      margin-right: unset !important;
+      padding-right: unset !important;
+	  padding: 0 !important;
+	  -moz-margin-start: 1px !important;
 	}
 }

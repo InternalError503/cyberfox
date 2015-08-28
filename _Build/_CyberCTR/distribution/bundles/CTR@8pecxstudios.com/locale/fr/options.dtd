@@ -51,11 +51,10 @@
 <!ENTITY Ctr_tabheightinfo	"Une valeur trop petite causera des problèmes lorsque la fenêtre est maximisée.">
 <!ENTITY Ctr_tabmaxwidth	"Largeur maximale :">
 <!ENTITY Ctr_tabminwidth	"Largeur minimale :">
-<!ENTITY Ctr_tabclipwidth	"Largeur min. pour bouton de ferm. :">
-<!ENTITY Ctr_tabclipwidthI	"Saisir « 1 » dans « largeur min. pour bouton de ferm. »">
 <!ENTITY Ctr_tabwidthinfo	"Onglets : les largeurs mini et maxi sont controlées par TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Onglets : les largeurs mini et maxi sont controlées par TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Les valeurs en dessous de 48px causent des problèmes dans la majorité des cas.">
+<!ENTITY Ctr_square_edges	"Squared top corners">
 <!ENTITY Ctr_tabinsertion	"Placer l’onglet apparenté après l’onglet courant (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Restaurer le favicon vide sur les onglets (sites ne possédant pas de favicon)">
 <!ENTITY Ctr_noemptypticon	"Enlever les favicons vides des onglets épinglés">
@@ -67,7 +66,7 @@
 <!ENTITY Ctr_closetab_4		"Au début de la barre d’onglets">
 <!ENTITY Ctr_closetab_5		"Sur tous les onglets (forcé)">
 <!ENTITY Ctr_closetab_hfot	"Masquer si un seul onglet est visible">
-<!ENTITY Ctr_closealt		"Icône alternative">
+<!ENTITY Ctr_closei_def		"Default icons">
 <!ENTITY Ctr_closeonleft	"Position alternative sur l’onglet">
 <!ENTITY Ctr_close_wwltab	"Fermer la fenêtre à la fermeture du dernier onglet (about:config)">
 
@@ -82,13 +81,12 @@
 <!ENTITY Ctr_appbutton2h	"Bouton sur la barre de titre [&brandShortName;] (caché)">
 <!ENTITY Ctr_appbutton2io	"Bouton sur la barre de titre [&brandShortName;] (icône seule)">
 <!ENTITY Ctr_paneluibtweak	"Bouton orange sur la barre d’onglets">
-<!ENTITY Ctr_appbuttonc_o	"Bouton orange">
-<!ENTITY Ctr_appbuttonc_d	"Bouton &brandShortName; (par défaut)">
+<!ENTITY Ctr_appbuttonc_o	"Bouton orange (par firefox)">
 <!ENTITY Ctr_appbuttonc_a	"Bouton bleu (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Bouton noir (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Bouton transparent">
+<!ENTITY Ctr_appbuttonc_p	"Bouton bleu (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"Bouton rouge">
-<!ENTITY Ctr_appbuttonc_s	"Bouton saumon">
 <!ENTITY Ctr_appbuttonc_g	"Bouton vert">
 <!ENTITY Ctr_appbuttonc_gr	"Bouton gris">
 <!ENTITY Ctr_appbuttonc_pu	"Bouton pourpre">
@@ -98,6 +96,7 @@
 <!ENTITY Ctr_appbuttonI1e	"Non visible sur la barre de titre de l’OS">
 <!ENTITY Ctr_appbuttonI2	"Bouton coloré uniquement sur la barre de titre ou sur la barre d’onglets!">
 <!ENTITY Ctr_appbutmhi		"Position plus élevée (si sur la barre d’onglets)">
+<!ENTITY Ctr_appbautocol	"Set default / Aurora / Nightly color automatically">
 <!ENTITY Ctr_appbutbdl		"Masquer les bordures et les couleurs de fond">
 <!ENTITY Ctr_dblclclosefx	"Un double clic ferme la fenêtre courante">
 <!ENTITY Ctr_appbclmmenus	"Menus cliquables à l’intérieur d’un bouton de menus (Nouvel onglet, Imprimer…)">
@@ -140,34 +139,34 @@
 <!ENTITY Ctr_cpanelmenus	"Compacter le menu du panneau latéral (marque-pages, historique, etc)">
 <!ENTITY Ctr_hidezoomres	"Boutons de zoom (si sur une barre d’outils) : cacher le bouton « Réinitialiser le niveau de zoom »">
 <!ENTITY Ctr_alt_newtabp	"Page Nouvel onglet : aspect alternatif">
-<!ENTITY Ctr_alt_newtabpalt	"Page Nouvel onglet : aspect stylisé">
-<!ENTITY ctr_aboutnewtab.customhighlight 	"Utiliser une couleur de surlignement personnalisée">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Définir cette couleur">
-<!ENTITY ctr_aboutnewtab.custombase 	"Utiliser une couleur de texte personnalisée">
-<!ENTITY ctr_aboutnewtab.custombasecol 	"Changer la couleur de base du texte">
+<!ENTITY Ctr_addonmanager	"Add-on manager">
 <!ENTITY Ctr_alt_addonsp	"Pages « plus de détails » de la page des modules complémentaires : autre aspect">
-<!ENTITY Ctr_alt_newtabcol	"Page Nouvel onglet : nombre de colonnes">
-<!ENTITY Ctr_alt_newtabrow	"Page Nouvel onglet : nombre de rangées">
+<!ENTITY Ctr_alt_addonsm	"Gestionnaire de modules complémentaires : autre présentation">
+<!ENTITY Ctr_am_nowarning	"Add-on managers add-on lists: hide warnings">
+<!ENTITY Ctr_addonversion	"Gestionnaire de modules complémentaires : afficher la version dans les listes de modules">
+<!ENTITY Ctr_xpinstallui	"Add-on manager: old add-on install window (about:config preference)">
 <!ENTITY Ctr_bmbutpanelm	"Bouton du menu des marque-pages : aspect du panneau de menus">
 <!ENTITY Ctr_bmbutnotext	"Bouton du menu des marque-pages : masquer l’étiquette sur la barre personnelle">
 <!ENTITY Ctr_skipprintpr	"Bouton Imprimer : masquer « Aperçu avant l’impression »">
 <!ENTITY Ctr_tbconmenu		"Menu contextuel de la barre d’outils : masquer « déplacer au menu », « enlever de la barre d’outils », « recharger / marquer tous les onglets » et « annuler fermer l’onglet »">
 <!ENTITY Ctr_noresizerxp	"Masquer l’outil de redimensionnement (Windows XP)">
-<!ENTITY Ctr_extraurlkeycb	"Ouvrir une barre d’adresse supplémentaire (Cmd/Ctrl+">
+<!ENTITY Ctr_extraurlkeycb	"Ouvrir une barre d’adresse supplémentaire (Cmd/Ctrl+)">
 <!ENTITY Ctr_pmhidelabels	"Menu du panneau latéral : icônes seules">
 <!ENTITY Ctr_menupopupscr	"Menus pop-up : afficher des ascenseurs au lieu des flèches de défilement">
 
+<!ENTITY Ctr_tabsep_def		"Default tab separators">
 <!ENTITY Ctr_fxmockup		"Maquette &brandShortName;">
-<!ENTITY Ctr_tabmokcolor	"Boutons des onglets de couleur blanche (fermer, nouveau, groupes, tout lister)">
-<!ENTITY Ctr_tabmokcolor2	"Texte des onglets de couleur blanche et ombre noire pour les onglets non actifs">
-<!ENTITY Ctr_tabmokcolor3	"Séparateurs de couleur blanche sur la barre d’onglets">
-<!ENTITY Ctr_tabmokcolor4	"Favicons vides pointillés de couleur blanche">
+<!ENTITY Ctr_tabmokcolor	"Boutons des onglets en blanc (fermer, nouveau, groupes, tout lister)">
+<!ENTITY Ctr_tabmokcolor2	"Texte des onglets en blanc avec ombre noire pour les onglets non actifs">
+<!ENTITY Ctr_tabmokcolor4	"Favicons vides : Pointillés de couleur blanche  ">
 
-<!ENTITY Ctr_navthrobber1	"En cliquant l’indicateur, on ouvre l’URL suivante :">
-<!ENTITY Ctr_navthrobber2	"Saisir une url or laisser vide">
+<!ENTITY Ctr_navthrobber1	"En cliquant l’indicateur, on ouvre l’adresse suivante :">
+<!ENTITY Ctr_navthrobber2	"Saisir une adresse ou laisser vide">
+<!ENTITY Ctr_anewtaburl		"Adresse de la page Nouvel onglet">
+<!ENTITY Ctr_anewtaburlcb	"Adresse personnalisée de la page Nouvel onglet (par défaut : « about:newtab »)">
 
 <!ENTITY Ctr_tab_tf_info1	"Les noms de couleurs, les codes hexadécimaux, et les entités rgb(a) et hsl(a) sont pris en charge.">
-<!ENTITY Ctr_tab_tf_info2	"Toute autre saisie ne fonctionnera pas !">
+<!ENTITY Ctr_tab_tf_info2	"Toute autre saisie ne fonctionne pas !">
 <!ENTITY Ctr_tabact_t		"actif">
 <!ENTITY Ctr_tabhov_t		"au survol">
 <!ENTITY Ctr_tabnor_t		"par défaut">
@@ -187,12 +186,13 @@
 <!ENTITY Ctr_bold			"Gras">
 <!ENTITY Ctr_italic			"Italique">
 <!ENTITY Ctr_notabhov		"Les valeurs paramétrées supplantent celles « au survol »">
-<!ENTITY Ctr_tabc_act_tb	"Couleur de fond pour les barres d'outils">
+<!ENTITY Ctr_tabc_act_tb	"Couleur de fond pour les barres d’outils">
 
-<!ENTITY Ctr_urlbar			"La barre d’adresse">
+<!ENTITY Ctr_urlbar			"Barre d’adresse">
 <!ENTITY Ctr_starinurl		"Bouton des marque-pages">
 <!ENTITY Ctr_feedinurl		"Bouton d’abonnement">
 <!ENTITY Ctr_hideurelstop	"Masquer « stop-actualiser »">
+<!ENTITY Ctr_hideurlgo		"Masquer le bouton « Go »">
 <!ENTITY Ctr_urlbardropm	"Placer le dropmarker à la fin de la barre d’adresse">
 <!ENTITY Ctr_hideprbutton	"Masquer l’icône de notification quand un pop-up est bloqué">
 <!ENTITY Ctr_urlbar_ib		"Bouton d’identité">
@@ -229,7 +229,7 @@
 <!ENTITY Ctr_hidetbwote2	"Conserver la barre de titre (onglets en haut)">
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
-<!ENTITY Ctr_hightabpos		"Réduire l’espace supérieur (si possible)">
+<!ENTITY Ctr_hightabpos		"Réduire l’espace en haut (si possible)">
 <!ENTITY Ctr_alttabstb		"Arrière plan alternatif">
 <!ENTITY Ctr_alttabstb2		"En mode maximisé (les onglets en haut)">
 
@@ -238,8 +238,10 @@
 <!ENTITY Ctr_menubarnofog	"Enlever l’effet de flou / l’arrière-plan des éléments (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Couleur aéro bleue pour les barres d’outils principales et la barre d’onglets">
+<!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color (Windows 10)">
 <!ENTITY Ctr_hidenavbar		"Masquer la barre de navigation">
 <!ENTITY Ctr_nobookbarbg	"Barre personnelle : enlever l’arrière-plan">
+<!ENTITY Ctr_bookbarfs		"Barre personnelle : en mode plein écran">
 <!ENTITY Ctr_nonavbarbg		"Barre de navigation : enlever l’arrière-plan">
 <!ENTITY Ctr_nonavbarbg1	"Affecte les barres d’outils additionnelles de cette extension, ainsi que d’autres barres d’onglets au-dessus.">
 <!ENTITY Ctr_nonavbarbg2	"Toutes les barres de l’interface réduite de « The Fox, Only Better » sont affectées.">
@@ -255,11 +257,13 @@
 <!ENTITY Ctr_addonbarfs		"En mode plein écran">
 
 <!ENTITY Ctr_animation		"Animation">
-<!ENTITY Ctr_throbberalt	"Icône animée alternative lors du chargement des onglets">
+<!ENTITY Ctr_tabthrobber	"Default loading image">
 <!ENTITY Ctr_bmanimation	"Animation lors de l’ajout de nouveaux marque-pages">
 <!ENTITY Ctr_pananimation	"Animation d’ouverture des panneaux">
 <!ENTITY Ctr_tabanimation	"Animation de l’ouverture et la fermeture des onglets (about:config)">
 <!ENTITY Ctr_dlanimation	"Animation de « Téléchargement terminé » (about:config)">
+<!ENTITY Ctr_fsanimation	"Animations plein écran (préférence about:config)">
+<!ENTITY Ctr_fsaduration	"Animations plein écran de contenu HTML5 (préférences about:config)">
 
 <!ENTITY Ctr_toolsitem		"« Personnaliser &brandShortName; » dans le menu outils">
 <!ENTITY Ctr_appmenuitem	"« Personnaliser &brandShortName; » dans le menu d’application">
@@ -272,26 +276,27 @@
 <!ENTITY Ctr_nodevtheme		"Empêche l’activation du « thème développeur »">
 
 <!ENTITY Ctr_experttweaks	"Expert">
-<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ – offre de nouvelles fonctions de rendu, lesquelles sont responsables de bugs avec les onglets sur certains systèmes (aucune réaction, onglets gelés). Ce problème est résolu en décochant cette option.">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ – offre une nouvelle barre de recherche. Si cette option est décochée, l’ancienne barre de recherche est activée.">
-<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ – offre la possibilité d’inviter quelqu’un à discuter. Cette possibilité est désactivée en décochant cette option.">
-<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ – offre un nouveau « thème développeur ». Si cette option est décochée, ce thème et le bouton correspondant sont désactivés.">
-<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ – place les préférences dans un onglet. Si cette option est décochée, l’ancienne fenêtre de préférences est utilisée.">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ offre un mode de lecture d’articles. Si cette option est décochée, ce mode est désactivé et l’icône est enlevée de la barre d’adresse.">
-<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ offre le mode « sac de rangement » (« Pocket »). Si cette option est décochée, ce mode est désactivé et l’icône est enlevée des barres d’outils.">
-<!ENTITY Ctr_fx38pocket2	"Note: Déplacer le bouton « Sac » vers la fenêtre de personnalisation avant de désactiver cette fonction permet également d’enlever le sac de rangement des marque-pages et du menu de lecture.">
-<!ENTITY Ctr_e_omtc			"Problèmes de composition asynchrone (« OMTC »)">
-<!ENTITY Ctr_e_searchui		"Apparence et fonctionnement de la recherche">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ introduit une nouvelle barre de recherche. Si cette option est décochée, l'ancienne barre de recherche est activée.">
+<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ introduit la possibilité d'inviter quelqu'un à discuter. Cette possibilité est desactivée en décochant cette option.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ introduit un nouveau thème 'Developer Edition'. Si cette option est décochée, le thème 'Developer Edition' est desactivé ainsi que son bouton dans la fenêtre de personnalisation.">
+<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ introduit les 'Préférences dans un onglet'. Si cette option est décochée, l'ancienne fenêtre des préférences est restaurée.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduit un nouveau 'Mode lecture'. Si cette option est décochée, ce mode est desactivé et son icône est retirée de la barre d'adresse.">
+<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ introduit le support natif de 'Pocket'. Si cette option est décochée, 'Pocket' est desactivé et son bouton retiré des barres d'outils.">
+<!ENTITY Ctr_fx38pocket2	"Note: Déplacer le bouton 'Pocket' vers la 'fenêtre de personnalisation' avant de desactiver cette option, permet également d'enlever 'Pocket' des marques pages et du menu de lecture.">
+<!ENTITY Ctr_e_searchui		"Apparence de recherche">
 <!ENTITY Ctr_e_loop			"Appels et conversations">
 <!ENTITY Ctr_e_deved		"Thème de l’édition de développement">
 <!ENTITY Ctr_e_prefsui		"Préférences dans un onglet">
 <!ENTITY Ctr_e_readermode	"Mode de lecture d’articles">
 <!ENTITY Ctr_e_pocket		"Sac de rangement (« Pocket »)">
+<!ENTITY Ctr_e_tabsaudioico	"Audio playing icon on tabs">
+<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Unchecking this preference removes 'audio playing icon' from tabs.">
 
 
 <!ENTITY Ctr_pw_settings	"Réglages">
 <!ENTITY Ctr_pw_set_reset	"Restaurer les réglages par défaut">
 <!ENTITY Ctr_pw_set_predef	"Préréglage classique">
+<!ENTITY Ctr_pw_set_preaus	"Préréglage &brandShortName;">
 <!ENTITY Ctr_pw_set_export	"Exporter les préférences">
 <!ENTITY Ctr_pw_set_import	"Importer les préférences">
 <!ENTITY Ctr_pw_set_syncon	"Ajouter à la synchronisation">
@@ -307,6 +312,7 @@
 <!ENTITY Ctr_openInPrivateWindow	"Ouvrir dans une nouvelle fenêtre de navigation privée">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Pour démarrer">
+<!ENTITY goCmd.label		"Go">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "d">
@@ -325,6 +331,19 @@
 <!ENTITY helpMenuWin.label		"Aide">
 
 <!-- Extra CyberCTR Additions -->
+
+<!ENTITY Ctr_appbuttonc_d	"Bouton &brandShortName; (par défaut)">
+<!ENTITY Ctr_appbuttonc_s	"Bouton saumon">
+
+<!ENTITY Ctr_alt_newtabpalt	"Page Nouvel onglet : aspect stylisé">
+<!ENTITY ctr_aboutnewtab.customhighlight 	"Utiliser une couleur de surlignement personnalisée">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Définir cette couleur">
+<!ENTITY ctr_aboutnewtab.custombase 	"Utiliser une couleur de texte personnalisée">
+<!ENTITY ctr_aboutnewtab.custombasecol 	"Changer la couleur de base du texte">
+
+<!ENTITY Ctr_alt_newtabcol	"Page Nouvel onglet : nombre de colonnes">
+<!ENTITY Ctr_alt_newtabrow	"Page Nouvel onglet : nombre de rangées">
+
 <!ENTITY Ctr_classic_elements	"Préréglage classique">
 <!ENTITY Ctr_pw_set_preaust		"Préréglage Australis">
 <!ENTITY ctr_Support_forums		"Forum d’assistance">
@@ -335,6 +354,7 @@
 
 <!ENTITY ctr_applyCTRPrefFile.label		"Appliquer les changements">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restaurer la copie de sauvegarde">
+<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
 
 <!ENTITY ctr_appbuttoncusttextcolor		"Couleur de texte du bouton d’application.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Enlever l’ombre du texte du bouton d’application.">
@@ -345,14 +365,14 @@
 <!ENTITY ctr_colapseaddonsearchbar.label	"Barre de recherche de about:addons compressible">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Barre personnelle">
-<!ENTITY ctr_custombookmarkfontsize.label	"Permettre de déterminer la taille de la police utilisée sur la barre personnelle">
+<!ENTITY ctr_custombookmarkfontsize.label	"Permettre de déterminer la taille de la police utilisée dans la barre personnelle">
 <!ENTITY ctr_cbookmarkfontsize.label	"Taille de la police des marque-pages : ">
 
 <!ENTITY ctr_abouthome.caption "Modifier le style de la page about:home">
-<!ENTITY ctr_abouthome.default "Style de la page « about:home » : par défaut">
-<!ENTITY ctr_abouthome.light "Style de la page « about:home » : pâle">
-<!ENTITY ctr_abouthome.dark "Style de la page « about:home » : foncé">
-<!ENTITY ctr_abouthome.simplicity  "Style de la page « about:home » : Simplicité">
+<!ENTITY ctr_abouthome.default "Page « about:home » : style par défaut">
+<!ENTITY ctr_abouthome.light   "Page « about:home » : style pâle">
+<!ENTITY ctr_abouthome.dark    "Page « about:home » : style foncé">
+<!ENTITY ctr_abouthome.simplicity  "Page « about:home » : style Simplicité">
 <!ENTITY ctr_abouthome.links "Aucun lien sur la page about:home">
 <!ENTITY ctr_abouthome.logo "Aucun logo sur la page about:home">
 <!ENTITY ctr_abouthome.icons "Aucune icône sur la page about:home">
@@ -380,5 +400,5 @@
 
 <!ENTITY movableurlbar.label "Barre d’adresse déplaçable (ceci permet de la déplacer)">
 <!ENTITY movableurlbar.warning0 "Attention, paramètre dangereux ! Si vous déplacez la barre d’adresse dans le panneau de menu ou que vous personnalisez la fenêtre et que vous redémarrez, le navigateur sera corrompu.">
-<!ENTITY movableurlbar.warning1 "Vous devez deplacer la barre d'adresse à sa position par défaut avant de désactiver.">
-<!ENTITY movableurlbar.warning2 "Utilisez cette fonction avec prudence et à vos risques this feature with caution and at own risk.">
+<!ENTITY movableurlbar.warning1 "Vous devez déplacer la barre d'adresse à sa position par défaut avant de désactiver.">
+<!ENTITY movableurlbar.warning2 "Utilisez cette fonction avec prudence et à vos risques.">

@@ -325,6 +325,11 @@
 	  clip-path: none !important;
 	}
 	
+	/* fix crash icons position */
+	.tabbrowser-tab[crashed] .tab-icon-overlay {
+	  margin-top:0px !important;
+	}
+	
 	/* Pinned tabs & TabMixPlus/TabUtilities locked/protected tabs support */	
 	.tabbrowser-tab:not([pinned]) .tab-close-button{
 	  -moz-margin-end:-4px !important;

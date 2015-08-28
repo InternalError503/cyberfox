@@ -1,4 +1,4 @@
-@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+/*@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);*/
 @-moz-document url(chrome://browser/content/browser.xul) {
 
 	#nav-bar #notification-popup-box + *{
@@ -9,6 +9,12 @@
 	#nav-bar #notification-popup-box[hidden] + * {
 	  -moz-padding-start: 2px !important;
 	  transition: none !important;
+	}
+
+	#main-window[fx42plus="true"][defaultfxtheme="true"] #navigator-toolbox #nav-bar #urlbar-container #notification-popup-box[hidden] + *,
+	#main-window[fx42plus="true"] #navigator-toolbox #nav-bar #urlbar-container #notification-popup-box[hidden] + * {
+	  -moz-padding-start: 4px !important;
+	  -moz-padding-end: 3px !important;
 	}
 
 	#nav-bar #notification-popup-box:not([hidden]) {
@@ -195,6 +201,13 @@
 		#main-window[fx40plus="true"] #nav-bar .toolbarbutton-1:not([type="menu"]) > .toolbarbutton-icon{
 		  padding: 2px !important;
 		}
+		
+		@media (-moz-os-version: windows-win10) {
+		  #main-window[fx40plus="true"] #nav-bar #bookmarks-menu-button[cui-areatype="toolbar"] > .toolbarbutton-menubutton-dropmarker > .dropmarker-icon {
+			padding: 2px !important;
+		  }
+		}
+
 		#main-window[fx40plus="true"] #nav-bar toolbarbutton[cui-areatype="toolbar"] > :-moz-any(#zoom-out-button, #zoom-reset-button, #zoom-in-button, #cut-button, #copy-button, #paste-button) > .toolbarbutton-icon,
 		#main-window[fx40plus="true"] #nav-bar :-moz-any(#back-button, #forward-button, #home-button, #print-button, #downloads-button, #bookmarks-menu-button, #new-tab-button, #new-window-button, #fullscreen-button, #sync-button, #feed-button, #tabview-button, #social-share-button, #open-file-button, #find-button, #developer-button, #preferences-button, #privatebrowsing-button, #save-page-button, #switch-to-metro-button, #add-ons-button, #history-panelmenu, #nav-bar-overflow-button, #PanelUI-menu-button, #characterencoding-button, #email-link-button, #sidebar-button, #zoom-out-button, #zoom-reset-button, #zoom-in-button, #cut-button, #copy-button, #paste-button, #e10s-button, #panic-button, #web-apps-button, #webide-button, #loop-button, #pocket-button):-moz-any([cui-areatype="toolbar"],:not([cui-areatype])) > .toolbarbutton-icon,
 		#main-window[fx40plus="true"] #nav-bar :-moz-any(#back-button, #forward-button, #home-button, #print-button, #downloads-button, #bookmarks-menu-button, #new-tab-button, #new-window-button, #fullscreen-button, #sync-button, #feed-button, #tabview-button, #social-share-button, #open-file-button, #find-button, #developer-button, #preferences-button, #privatebrowsing-button, #save-page-button, #switch-to-metro-button, #add-ons-button, #history-panelmenu, #nav-bar-overflow-button, #PanelUI-menu-button, #characterencoding-button, #email-link-button, #sidebar-button, #zoom-out-button, #zoom-reset-button, #zoom-in-button, #cut-button, #copy-button, #paste-button, #e10s-button, #panic-button, #web-apps-button, #webide-button, #loop-button, #pocket-button):-moz-any([cui-areatype="toolbar"],:not([cui-areatype])) > .toolbarbutton-menubutton-button > .toolbarbutton-icon,
@@ -236,6 +249,10 @@
 	}
 
 	/* START: urlbar border tweaking (default theme does not provide left urlbar border) */
+	#main-window[fx42plus="true"][defaultfxtheme="true"] #urlbar {
+	  min-height: 24px;
+	}
+
 	#main-window[defaultfxtheme="true"] #urlbar,
 	#main-window[defaultfxtheme="true"] .searchbar-textbox {
 	  border: 1px solid ThreeDShadow !important;
@@ -260,6 +277,75 @@
 	  #main-window[defaultfxtheme="true"] .searchbar-textbox:not(:-moz-lwtheme)[focused] {
 		border-color: Highlight !important;
 	  }
+	}
+	
+	/* Windows 10 tweaks */
+	@media (-moz-os-version: windows-win10) {
+
+		#main-window[fx40plus="true"]:not([fx42plus="true"])[defaultfxtheme="true"] #notification-popup-box[hidden] + * {
+		  -moz-padding-start: 0px !important;
+		}
+	
+		#main-window[fx42plus="true"][defaultfxtheme="true"] #nav-bar #notification-popup-box[hidden] + * {
+		  -moz-padding-start: 4px !important;
+		}
+
+		#urlbar-wrapper, #urlbar,
+		.searchbar-textbox{
+		  min-height: 24px !important;
+		  height: 24px !important;
+		}
+		
+		#searchbar .autocomplete-textbox,
+		#urlbar .autocomplete-textbox {
+		  font-size:97% !important;
+		}
+
+		#urlbar{
+		  padding-top: unset !important;
+		  padding-bottom: unset !important;
+		}
+		#searchbar .searchbar-search-button {
+		  margin-top:unset !important;
+		  margin-bottom:unset !important;
+		  padding-top: unset !important;
+		  padding-bottom: unset !important;
+		}
+		
+		#urlbar[pageproxystate="valid"] .verifiedDomain,
+		#urlbar[pageproxystate="valid"] .verifiedIdentity {
+		  background: unset !important;
+		}
+		
+		#main-window[defaultfxtheme="true"] #urlbar,
+		#main-window[defaultfxtheme="true"] .searchbar-textbox {
+		  border: 1px solid hsl(0,0%,90%) !important;
+		}
+		@media (-moz-windows-default-theme) {
+		  #main-window[defaultfxtheme="true"] #urlbar,
+		  #main-window[defaultfxtheme="true"] .searchbar-textbox {
+			border-color: hsl(0,0%,90%) !important;
+		  }
+		}
+		#main-window[defaultfxtheme="true"] #urlbar:-moz-lwtheme,
+		#main-window[defaultfxtheme="true"] .searchbar-textbox:-moz-lwtheme {
+		  border-color: rgba(0,0,0,.32) !important;
+		}
+		@media (-moz-windows-default-theme) {
+		  #main-window[defaultfxtheme="true"] #urlbar:not(:-moz-lwtheme),
+		  #main-window[defaultfxtheme="true"] .searchbar-textbox:not(:-moz-lwtheme) {
+			border-color: hsl(0,0%,90%) !important;
+		  }
+		  #main-window[defaultfxtheme="true"] #urlbar:hover:not(:-moz-lwtheme),
+		  #main-window[defaultfxtheme="true"] .searchbar-textbox:hover:not(:-moz-lwtheme) {
+			border-color: hsl(0,0%,80%) !important;
+		  }
+		  #main-window[defaultfxtheme="true"] #urlbar:not(:-moz-lwtheme)[focused],
+		  #main-window[defaultfxtheme="true"] .searchbar-textbox:not(:-moz-lwtheme)[focused] {
+			border-color: Highlight !important;
+		  }
+		}
+
 	}
 	/* END: urlbar border tweaking (default theme does not provide left urlbar border) */
 
@@ -305,13 +391,23 @@
 	}
 
 	#nav-bar toolbarbutton .toolbarbutton-badge,
-	#nav-bar toolbarbutton .toolbarbutton-badge-container {
+	#nav-bar toolbarbutton .toolbarbutton-badge-container,
+	#nav-bar toolbarbutton .toolbarbutton-badge-stack {
 	  box-shadow: none !important;
 	  border: 0 !important;
 	  padding: 0 !important;
 	  margin: 0 !important;
 	}
-	#nav-bar toolbarbutton .toolbarbutton-badge-container {
+
+	#navigator-toolbox #nav-bar toolbarbutton .toolbarbutton-badge-stack {
+	  padding-right: 1px !important;
+      padding-left: 1px !important;
+	  margin-right: 2px !important;
+      margin-left: 2px !important;
+	}
+
+	#nav-bar toolbarbutton .toolbarbutton-badge-container,
+	#nav-bar toolbarbutton .toolbarbutton-badge-stack {
 	  background: none !important;
 	}
 	
@@ -393,5 +489,13 @@
 	  border: unset !important;
 	  box-shadow: unset !important;
 	  background: unset !important;
+	}
+
+	/*Tile tabs tweaks*/
+	#navigator-toolbox #nav-bar #tiletabs-buttonmenu .toolbarbutton-menubutton-button image {
+      margin-right: unset !important;
+      padding-right: unset !important;
+	  padding: 0 !important;
+	  -moz-margin-start: 1px !important;
 	}
 }

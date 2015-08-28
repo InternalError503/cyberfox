@@ -38,6 +38,7 @@
 	  <menupopup  id="ApplyCTRpreferences">
 		<menuitem label="&ctr_applyCTRPrefFile.label;" oncommand="classicthemerestorerjs.ctr.ctrPrefRestart();"/>
 		<menuitem label="&ctr_restoreCTRPrefFile.label;" oncommand="classicthemerestorerjs.ctr.restoreBackupCTRpreferences();"/>
+		<menuitem label="&ctr_resetCTRPrefFile.label;" oncommand="classicthemerestorerjs.ctr.resetBackupCTRpreferences();"/>
 	  </menupopup>
 	</popupset>	
 	<!-- CyberCTR Feature -->	
@@ -77,7 +78,7 @@
 				 accesskey="&Ctr_addon-bar.accesskey;"
 				 key="key_toggleCtrAddonBar"
 				 defaultset="ctraddon_addonbar-close,spring,ctraddon_statusbar">
-		  <toolbarbutton id="ctraddon_addonbar-close" removable="false"
+		  <toolbarbutton id="ctraddon_addonbar-close" removable="false" class="close-icon"
 				    oncommand="classicthemerestorerjs.ctr.toggleCtrAddonBar();"/>
 					
 		  <toolbaritem id="ctraddon_statusbar"
@@ -528,19 +529,6 @@
 							   onpopupshowing="if (!this.parentNode._placesView)
 												 new PlacesMenu(event, 'place:folder=TOOLBAR');"/>
 				  </menu>
-				  <menu id="appmenu_BMB_readingList"
-						class="menu-iconic bookmark-item"
-						label="&readingList.label;"
-						container="true">
-					  <observes element="readingListSidebar" attribute="hidden"/>
-					  <menupopup id="appmenu_BMB_readingListPopup"
-								 placespopup="true"
-								 onpopupshowing="ReadingListUI.onReadingListPopupShowing(this);">
-						<menuitem id="appmenu_BMB_viewReadingListSidebar"
-								  oncommand="SidebarUI.show('readingListSidebar');"
-								  label="&readingList.showSidebar.label;"/>
-					  </menupopup>
-				  </menu>
 				  <menuseparator/>
 				  <!-- Bookmarks menu items -->
 				  <menuseparator builder="end"
@@ -744,7 +732,8 @@
                      persist="class"
                      removable="true"
                      type="menu"
-                     label="&historyButton.label;">
+                     label="&historyButton.label;"
+					 tooltiptext="&historyButton.label;">
 				  <menupopup id="ctraddon_history_historyMenupopup"
 							 placespopup="true"
 							 oncommand="this.parentNode._placesView._onCommand(event);"
@@ -852,19 +841,6 @@
                        onpopupshowing="if (!this.parentNode._placesView)
                                          new PlacesMenu(event, 'place:folder=TOOLBAR');"/>
           </menu>
-          <menu id="ctraddon_BMB_readingList"
-                class="menu-iconic bookmark-item"
-                label="&readingList.label;"
-                container="true">
-              <observes element="readingListSidebar" attribute="hidden"/>
-              <menupopup id="ctraddon_BMB_readingListPopup"
-                         placespopup="true"
-                         onpopupshowing="ReadingListUI.onReadingListPopupShowing(this);">
-                <menuitem id="ctraddon_BMB_viewReadingListSidebar"
-                          oncommand="SidebarUI.show('readingListSidebar');"
-                          label="&readingList.showSidebar.label;"/>
-              </menupopup>
-          </menu>
           <menuseparator/>
 
           <!-- Bookmarks menu items -->
@@ -905,7 +881,7 @@
 				   overflows="false"
                    title="&brandShortName;">
         <toolbarbutton id="PanelUI-menu-button"
-                       class="toolbarbutton-1"
+                       class="toolbarbutton-1 badged-button"
                        label="&brandShortName;"
                        tooltiptext="&appmenu.tooltip;"/>
       </toolbaritem>
@@ -980,6 +956,12 @@
                      label="&stopCmd.label;" removable="true"
                      command="Browser:Stop"
                      tooltiptext="&stopButton.tooltip;"/>
+					 
+      <!--### creates a movable go button ###-->
+	  <toolbarbutton id="ctraddon_go-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
+                     label="&goCmd.label;" removable="true"
+                     onclick="gURLBar.handleCommand(event);"
+                     tooltiptext="&goEndCap.tooltip;"/>
   
 	  <!--### creates clone of fullscreen window control buttons ###-->
 	  <toolbaritem id="ctraddon_window-controls" class="chromeclass-toolbar-additional"

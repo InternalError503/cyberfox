@@ -2,6 +2,7 @@
 pref("extensions.classicthemerestorer.tabs","tabs_squared");
 pref("extensions.classicthemerestorer.tabsontop",'unset');
 pref("extensions.classicthemerestorer.ctabheightcb",false);
+pref("extensions.classicthemerestorer.square_edges",false);
 pref("extensions.classicthemerestorer.ctabheight",28);
 pref("extensions.classicthemerestorer.ctabmwidth",100);
 pref("extensions.classicthemerestorer.ctabwidth",210);
@@ -11,7 +12,7 @@ pref("extensions.classicthemerestorer.noemptypticon",false);
 pref("extensions.classicthemerestorer.closetab","closetab_default");
 pref("extensions.classicthemerestorer.closetabhfl",false);
 pref("extensions.classicthemerestorer.closeonleft",false);
-pref("extensions.classicthemerestorer.closealt",false);
+pref("extensions.classicthemerestorer.closeicon",'closeicon_default');
 
 pref("extensions.classicthemerestorer.custtabfontsize", false);
 pref("extensions.classicthemerestorer.ctabfontsize", 12);
@@ -24,6 +25,7 @@ pref("extensions.classicthemerestorer.appbutmhi",false);
 pref("extensions.classicthemerestorer.appbutbdl",false);
 pref("extensions.classicthemerestorer.dblclclosefx",false);
 pref("extensions.classicthemerestorer.appbclmmenus",true);
+pref("extensions.classicthemerestorer.appbautocol",false);
 
 pref("extensions.classicthemerestorer.appbuttontxt",'');
 
@@ -55,9 +57,15 @@ pref("extensions.classicthemerestorer.emptyfavicon2",false);
 pref("extensions.classicthemerestorer.panelmenucol",false);
 pref("extensions.classicthemerestorer.cpanelmenus",false);
 pref("extensions.classicthemerestorer.hidezoomres",false);
+pref("extensions.classicthemerestorer.addonversion",false);
+pref("extensions.classicthemerestorer.alt_addonsm",false);
+pref("extensions.classicthemerestorer.am_nowarning",false);
 pref("extensions.classicthemerestorer.alt_newtabp",false);
 pref("extensions.classicthemerestorer.alt_newtabpalt",false);
 
+pref("extensions.classicthemerestorer.aboutnewtabcustombg", false);
+pref("extensions.classicthemerestorer.aboutnewtabcustomurl", "");
+pref("extensions.classicthemerestorer.aboutnewtabbgstretch", false);
 pref("extensions.classicthemerestorer.aboutnewtabcustombase",false);
 pref("extensions.classicthemerestorer.aboutnewtabcustomhighlight",false);
 pref("extensions.classicthemerestorer.aboutnewtabcustombasecolor","#efefef");
@@ -88,6 +96,11 @@ pref("extensions.classicthemerestorer.invicoaddonbar",false);
 pref("extensions.classicthemerestorer.athrobberurl","");
 pref("extensions.classicthemerestorer.movableurlbar", false);
 
+pref("extensions.classicthemerestorer.anewtaburlcb",false);
+pref("extensions.classicthemerestorer.anewtaburl","about:newtab");
+
+pref("extensions.classicthemerestorer.tabseparator","tabsep_default");
+
 //Custom about:home style
 pref("extensions.classicthemerestorer.abouthome", "dark");
 pref("extensions.classicthemerestorer.abouthomenobar", false);
@@ -107,6 +120,7 @@ pref("extensions.classicthemerestorer.abouthomebgstretch", true);
 pref("extensions.classicthemerestorer.starinurl",false);
 pref("extensions.classicthemerestorer.feedinurl",false);
 pref("extensions.classicthemerestorer.hideurelstop",false);
+pref("extensions.classicthemerestorer.hideurlgo",false);
 pref("extensions.classicthemerestorer.hideprbutton",false);
 pref("extensions.classicthemerestorer.urlbardropm",false);
 
@@ -120,9 +134,11 @@ pref("extensions.classicthemerestorer.extraurlkeycb",false);
 
 // Toolbar settings
 pref("extensions.classicthemerestorer.aerocolors",false);
+pref("extensions.classicthemerestorer.transpttbw10",false);
 pref("extensions.classicthemerestorer.nbiconsize",'small');
 
 pref("extensions.classicthemerestorer.nobookbarbg",false);
+pref("extensions.classicthemerestorer.bookbarfs",false);
 pref("extensions.classicthemerestorer.hidenavbar",false);
 pref("extensions.classicthemerestorer.nonavbarbg",false);
 pref("extensions.classicthemerestorer.nonavborder",false);
@@ -167,9 +183,10 @@ pref("extensions.classicthemerestorer.custbookmarkfontsize", false);
 pref("extensions.classicthemerestorer.cbookmarkfontsize", 12);
 
 // Animation
-pref("extensions.classicthemerestorer.throbberalt",false);
+pref("extensions.classicthemerestorer.tabthrobber","throbber_default");
 pref("extensions.classicthemerestorer.bmanimation",true);
 pref("extensions.classicthemerestorer.pananimation",true);
+pref("extensions.classicthemerestorer.fsaduration",true);
 
 // CTR area
 pref("extensions.classicthemerestorer.toolsitem",true);
@@ -178,7 +195,6 @@ pref("extensions.classicthemerestorer.contextitem",false);
 pref("extensions.classicthemerestorer.puictrbutton",false);
 pref("extensions.classicthemerestorer.cuibuttons",true);
 pref("extensions.classicthemerestorer.bmarkoinpw",false);
-pref("extensions.classicthemerestorer.nodevtheme",false);
 pref("extensions.classicthemerestorer.nodevtheme2",false);
 pref("extensions.classicthemerestorer.pref_actindx",3);
 pref("extensions.classicthemerestorer.pref_actindx2",0);
@@ -260,20 +276,24 @@ pref("extensions.classicthemerestorer.hidexulfilter", "");
 pref("extensions.classicthemerestorer.compatibility.treestyle",false);
 pref("extensions.classicthemerestorer.compatibility.treestyle.disable",false);
 
-//Tab Mix Plus, Not implemented yet!
+//Tab Mix Plus
 pref("extensions.classicthemerestorer.compatibility.tabmix",false);
+
+//Personal Menu
+pref("extensions.classicthemerestorer.compatibility.personalmenu",true);
 
 //CyberCTR Pre-set Configuration
 pref("extensions.classicthemerestorer.ctrpref.firstrun", true);
 pref("extensions.classicthemerestorer.ctrpref.lastmod", "0");
 pref("extensions.classicthemerestorer.ctrpref.lastmodapply", false);
 pref("extensions.classicthemerestorer.ctrpref.updatekey", false);
+pref("extensions.classicthemerestorer.ctrpref.active", false);
 
 //CyberCTR Add tab title to titlebar
 pref("extensions.classicthemerestorer.titleintitlebar", false);
 
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.3.6");
+pref("extensions.classicthemerestorer.version", "1.3.8");
 
 //Features
 pref("extensions.classicthemerestorer.features.firstrun", false);

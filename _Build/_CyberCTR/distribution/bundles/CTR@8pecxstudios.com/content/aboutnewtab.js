@@ -1,4 +1,5 @@
 "use strict";
+(function(global) {
 /*
 	Clicking 'newtab customize button' simulates toggling newtab page visibility like in Fx28.
 	- If newtab page is active, deactivate it.
@@ -9,36 +10,51 @@
 	is enabled on CTRs options window. It is disabled by default and does not interfere
 	with newtab page.  
 */
-Cu.import("resource://gre/modules/Services.jsm");
-    
-function ctraddon_toggle_newtab_page(){
-  if(Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabp') || Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabpalt')) {
-    try{
-	  Services.prefs.getBranch('browser.newtabpage.').setBoolPref('enhanced',false);
- 
-	  if(!Services.prefs.getBranch('browser.newtabpage.').getBoolPref('enabled')==false)
-		Services.prefs.getBranch('browser.newtabpage.').setBoolPref('enabled',false);
-	  else
-		Services.prefs.getBranch('browser.newtabpage.').setBoolPref('enabled',true);
-	} catch(e){}
-  }
-  
-  setTimeout(function(){
-	try{
-	  if(document.getElementById("newtab-customize-button").hasAttribute('active'))
-		document.getElementById("newtab-customize-button").removeAttribute('active');
-	}catch(e){}
-	try{
-	  if(parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")) >= 40)
-		document.getElementById("newtab-window").setAttribute('fx40plus',true);
-	} catch(e){}
-  },200);
+var Cc = Components.classes, Cu = Components.utils;
+var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-}
+if (typeof ctrAboutNewTab  == "undefined") {
+    var ctrAboutNewTab  = {};
+};
+if (!ctrAboutNewTab ) {
+    ctrAboutNewTab  = {};
+};
+ 
+ctrAboutNewTab = {
 	
-if(Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabp') || Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabpalt')) {
-  try{
-	if(parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")) >= 40)
-	  document.getElementById("newtab-window").setAttribute('fx40plus',true);
-  } catch(e){}
+	init : function(){
+		if(Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabp') || Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabpalt')) {
+		  try{
+			if(parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")) >= 40)
+			  document.getElementById("newtab-window").setAttribute('fx40plus',true);
+		  } catch(e){}
+		}
+	},
+
+	ctraddon_toggle_newtab_page : function(){
+		  if(Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabp') || Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabpalt')) {
+			try{
+			  Services.prefs.getBranch('browser.newtabpage.').setBoolPref('enhanced',false);
+		 
+			  if(!Services.prefs.getBranch('browser.newtabpage.').getBoolPref('enabled')==false)
+				Services.prefs.getBranch('browser.newtabpage.').setBoolPref('enabled',false);
+			  else
+				Services.prefs.getBranch('browser.newtabpage.').setBoolPref('enabled',true);
+			} catch(e){}
+		  }
+		  
+		  setTimeout(function(){
+			try{
+			  if(document.getElementById("newtab-customize-button").hasAttribute('active'))
+				document.getElementById("newtab-customize-button").removeAttribute('active');
+			}catch(e){}
+			try{
+			  if(parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")) >= 40)
+				document.getElementById("newtab-window").setAttribute('fx40plus',true);
+			} catch(e){}
+		  },200);
+	}
 }
+  // Make ctrAboutNewTab a global variable
+  global.ctrAboutNewTab = ctrAboutNewTab;
+}(this));

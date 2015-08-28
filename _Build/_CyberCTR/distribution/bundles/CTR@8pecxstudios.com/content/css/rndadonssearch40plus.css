@@ -1,0 +1,23 @@
+/*40Plus*/
+@-moz-document url(about:addons) {
+
+	#header-search { 
+        -moz-appearance: none;		
+        margin-bottom: -2px;
+        -moz-padding-start: 5px!important;
+        border: 1.1px solid #adbdcd;
+        width: 22px!important;		
+        transition: background-color 0.55s, box-shadow 0.55s, width 0.65s!important;
+    }
+	
+	#header-search .textbox-search-icon {
+        -moz-margin-end: 0px;		
+    }
+    #header-search:hover,
+    #header-search[focused],
+    #header-search:active {
+        width: 245px!important;
+        transition: 1.2s ease-out;
+    }
+	
+}

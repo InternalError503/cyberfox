@@ -3,12 +3,18 @@
 popup.title=Персонализация %S
 popup.msg.restart=%S должен быть перезапущен для вступления изменений в силу. \nВы хотите сделать это сейчас?
 import.error=ОШИБКА: Найден неправильный или изменённый файл\nНе удается ничего импортировать!
-import.errorJSON=К сожалению, при попытке импортировать CTRpreferences.json возникла проблема (ошибка в json!)
 ctr_extrabar=Дополнительная панель
 ctr_actthrobber=Индикатор активности
+
+# Extra CyberCTR Additions
+import.errorJSON=К сожалению, при попытке импортировать CTRpreferences.json возникла проблема (ошибка в json!)
 notification_msg_firstrun=Обнаружен набор опций CTRpreferences, для применения требуется перезапуск
 notification_button_firstrun=Перезапуск
 notification_msg_change=Набор опций CTRpreferences был изменен
 notification_button_change=Опции
 clearFilter.title=Подтверждение очистки фильтра.
 clearFilter.msg=Вы действительно хотите очистить фильтр?
+popup_compatibility_title=Обнаружены проблемы с совместимостью!
+popup_compatibility_permenu=Вы хотите включить режим совместимости? \n В противном случае нужно удалить (CyberCTR) или (Personal Menu)!
+notification_confirm_clear_title=Подтвердите действие, пожалуйста!
+notification_confirm_clear=Вы уверены, что хотите это сделать?

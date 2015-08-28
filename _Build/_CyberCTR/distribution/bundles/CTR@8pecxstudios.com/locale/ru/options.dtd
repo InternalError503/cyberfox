@@ -50,11 +50,10 @@
 <!ENTITY Ctr_tabheightinfo	"Низкое значение вызовет сбои в развёрнутом режиме!">
 <!ENTITY Ctr_tabmaxwidth	"Макс. ширина:">
 <!ENTITY Ctr_tabminwidth	"Мин. ширина:">
-<!ENTITY Ctr_tabclipwidth	"Clip-width:">
-<!ENTITY Ctr_tabclipwidthI	"Вручную присвоить 'clip width' значение '1' !">
 <!ENTITY Ctr_tabwidthinfo	"Минимальная и максимальная ширина вкладок изменяются расширением TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Минимальная и максимальная ширина вкладок изменяются расширением TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Значения ниже 48px часто приводят к сбоям!">
+<!ENTITY Ctr_square_edges	"Верхние углы без закругления">
 <!ENTITY Ctr_tabinsertion	"Вставить соответствующую вкладку после текущей вкладки (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Восстановить пустые значки на вкладках">
 <!ENTITY Ctr_noemptypticon	"Удалить пустой значок из прикреплённой вкладки">
@@ -66,7 +65,7 @@
 <!ENTITY Ctr_closetab_4		"в начале панели">
 <!ENTITY Ctr_closetab_5		"на всех вкладках (принудительно)">
 <!ENTITY Ctr_closetab_hfot	"Скрыть для одной вкладки">
-<!ENTITY Ctr_closealt		"Альтернативный значок">
+<!ENTITY Ctr_closei_def		"Стандартный значок 'Закрыть'">
 <!ENTITY Ctr_closeonleft	"Альтернативная позиция на вкладке">
 <!ENTITY Ctr_close_wwltab	"Закрыть окно при закрытии последней вкладки (about:config)">
 
@@ -85,9 +84,8 @@
 <!ENTITY Ctr_appbuttonc_a	"Синяя кнопка (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Черная кнопка (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Прозрачная кнопка">
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; (по умолчанию)">
+<!ENTITY Ctr_appbuttonc_p	"Голубая кнопка (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"Красная кнопка">
-<!ENTITY Ctr_appbuttonc_s	"Оранжево-розовая кнопка">
 <!ENTITY Ctr_appbuttonc_g	"Зеленая кнопка">
 <!ENTITY Ctr_appbuttonc_gr	"Серая кнопка">
 <!ENTITY Ctr_appbuttonc_pu	"Фиолетовая кнопка">
@@ -97,6 +95,7 @@
 <!ENTITY Ctr_appbuttonI1e	"не видно в строке заголовка операционной системы">
 <!ENTITY Ctr_appbuttonI2	"Цвета кнопок, видимых только на панели заголовка и вкладок!">
 <!ENTITY Ctr_appbutmhi		"Высокое положение (если на панели вкладок)">
+<!ENTITY Ctr_appbautocol	"Автоматический выбор: По умолчанию / Aurora / Nightly">
 <!ENTITY Ctr_appbutbdl		"Скрыть рамки и цвет фона">
 <!ENTITY Ctr_dblclclosefx	"Двойной клик закрывает активное окно">
 <!ENTITY Ctr_appbclmmenus	"Активное меню внутри меню кнопки (Новая вкладка, Печать ...)">
@@ -139,31 +138,31 @@
 <!ENTITY Ctr_cpanelmenus	"Компактная панель меню (закладки, история и т. д.)">
 <!ENTITY Ctr_hidezoomres	"Кнопки масштаба: скрыть сброс масштабирования">
 <!ENTITY Ctr_alt_newtabp	"Страница новой вкладки: альтернативный вид">
-<!ENTITY Ctr_alt_newtabpalt	"Стиль представления страницы новой вкладки">
-<!ENTITY ctr_aboutnewtab.customhighlight "Использовать свой цвет подсветки ">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Изменение цвета подсветки">
-<!ENTITY ctr_aboutnewtab.custombase "Использовать свой цвет текста">
-<!ENTITY ctr_aboutnewtab.custombasecol "Изменить цвет текста">
+<!ENTITY Ctr_addonmanager	"Управление дополнениями">
 <!ENTITY Ctr_alt_addonsp	"Альтернативное представление страницы дополнительной информации о дополнениях">
-<!ENTITY Ctr_alt_newtabcol	"Страница новой вкладки: столбцы">
-<!ENTITY Ctr_alt_newtabrow	"Страница новой вкладки: ряды">
+<!ENTITY Ctr_alt_addonsm	"Управление дополнениями: альтернативное представление">
+<!ENTITY Ctr_am_nowarning	"Список дополнений в менеджере: скрыть предупреждения">
+<!ENTITY Ctr_addonversion	"Отображать версии дополнений на странице 'Управление дополнениями'">
+<!ENTITY Ctr_xpinstallui	"Управление дополнениями: старый стиль окна установки дополнения (настройка в about:config)">
 <!ENTITY Ctr_bmbutpanelm	"Кнопка меню закладок: стиль отображения меню">
 <!ENTITY Ctr_bmbutnotext	"Кнопка меню закладок: скрыть метку на панели закладок">
 <!ENTITY Ctr_skipprintpr	"Кнопка печати: пропускать предварительный просмотр">
 <!ENTITY Ctr_tbconmenu		"Контекстное меню панели инструментов: скрыть «Переместить в меню», «Удалить с панели инструментов», «Обновить/В закладки все вкладки», «Восстановить закрытую вкладку»">
-<!ENTITY Ctr_noresizerxp	"Скрыть «Resizer» (Windows XP/2000)">
+<!ENTITY Ctr_noresizerxp	"Скрыть «Изменение размера» (Windows XP/2000)">
 <!ENTITY Ctr_extraurlkeycb	"Открыть дополнительную адресную строку (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Панель меню: спрятать надписи на кнопках">
 <!ENTITY Ctr_menupopupscr	"Всплывающие окна меню: показывать полосы прокрутки вместо стрелки прокрутки">
 
+<!ENTITY Ctr_tabsep_def		"Разделители вкладок по умолчанию">
 <!ENTITY Ctr_fxmockup		"Другие настройки для &brandShortName;">
 <!ENTITY Ctr_tabmokcolor	"Белый цвет для кнопок вкладок (закрыть, новая, группы, список всех)">
 <!ENTITY Ctr_tabmokcolor2	"Белый цвет и темная тень для текста на неактивной вкладке">
-<!ENTITY Ctr_tabmokcolor3	"Белый цвет для разделителей на панели вкладок">
-<!ENTITY Ctr_tabmokcolor4	"Белый цвет для значка пустой вкладки">
+<!ENTITY Ctr_tabmokcolor4	"Белый цвет для пустой пунктирной иконки сайта на вкладке">
 
 <!ENTITY Ctr_navthrobber1	"Клик по индикатору активности открывает определенную страницу:">
 <!ENTITY Ctr_navthrobber2	"Укажите url страницы или оставьте пустое место">
+<!ENTITY Ctr_anewtaburl		"Адрес url новой вкладки">
+<!ENTITY Ctr_anewtaburlcb	"Изменение адреса url новой вкладки (по умолчанию - 'about:newtab')">
 
 <!ENTITY Ctr_tab_tf_info1	"Текстовые поля поддерживают названия цветов на английском, шестнадцатеричные коды, rgb(a) и значения hsl(a).">
 <!ENTITY Ctr_tab_tf_info2	"Введённое не будет проверяться!">
@@ -192,6 +191,7 @@
 <!ENTITY Ctr_starinurl		"Звёздочка в адресной строке">
 <!ENTITY Ctr_feedinurl		"Кнопка RSS в адресной строке">
 <!ENTITY Ctr_hideurelstop	"Скрыть кнопку «Остановить и перезагрузить»">
+<!ENTITY Ctr_hideurlgo		"Скрыть кнопку 'Перейти'">
 <!ENTITY Ctr_urlbardropm	"Переместить дропмаркер в конец адресной строки">
 <!ENTITY Ctr_hideprbutton	"Скрыть значок уведомления, когда блокируется всплывающее окно">
 <!ENTITY Ctr_urlbar_ib		"Кнопка подлинности сайта">
@@ -237,8 +237,10 @@
 <!ENTITY Ctr_menubarnofog	"Удалить туман из фона меню (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Цвета Blue Aero для основных панелей и вкладок">
+<!ENTITY Ctr_transpttbw10	"Панели заголовка/меню/вкладок: убрать цвет фона (Windows 10)">
 <!ENTITY Ctr_hidenavbar		"Скрыть панель навигации">
 <!ENTITY Ctr_nobookbarbg	"Панель закладок: удалить цвет фона">
+<!ENTITY Ctr_bookbarfs		"Панель закладок: в полноэкранном режиме">
 <!ENTITY Ctr_nonavbarbg		"Панель навигации: удалить цвет фона">
 <!ENTITY Ctr_nonavbarbg1	"Параметр влияет на все дополнительные и верхние панели инструментов.">
 <!ENTITY Ctr_nonavbarbg2	"Поддержка всех панелей инструментов в стиле Slim Chrome при использовании расширения 'The Fox, Only Better'.">
@@ -254,11 +256,13 @@
 <!ENTITY Ctr_addonbarfs		"В полноэкранном режиме">
 
 <!ENTITY Ctr_animation		"Анимация">
-<!ENTITY Ctr_throbberalt	"Заменить анимацию загрузки вкладки">
+<!ENTITY Ctr_tabthrobber	"Стандартное изображение загрузки">
 <!ENTITY Ctr_bmanimation	"Анимация создания закладок">
 <!ENTITY Ctr_pananimation	"Анимация открытия панели">
 <!ENTITY Ctr_tabanimation	"Анимация открытия и закрытия вкладок (about:config)">
 <!ENTITY Ctr_dlanimation	"Анимация «Загрузка завершена» (about:config)">
+<!ENTITY Ctr_fsanimation	"Полноэкранная анимация (настройка в about:config)">
+<!ENTITY Ctr_fsaduration	"Полноэкранная анимация для контента HTML5 (настройка в about:config)">
 
 <!ENTITY Ctr_toolsitem		"Пункт в меню инструментов">
 <!ENTITY Ctr_appmenuitem	"Пункт в меню кнопки приложения">
@@ -271,7 +275,6 @@
 <!ENTITY Ctr_nodevtheme		"Предотвращение активации «Тема разработчика»">
 
 <!ENTITY Ctr_experttweaks	"Продвинутые">
-<!ENTITY Ctr_fx33layers		"&brandShortName; версий 33 и выше введены новые возможности визуализации, на некоторых системах вызывает ошибки с вкладками (нет реакции, вкладки заморожены). Отключение этой опции решает проблему.">
 <!ENTITY Ctr_fx34search		"&brandShortName; версий 34 и выше введена новая панель поиска. Отключение этой опции позволяет вернуть старую панель поиска.">
 <!ENTITY Ctr_fx34loop		"&brandShortName; версий 34 и выше добавлен клиент для связи в режиме реального времени. Отключение параметра удаляет эту функцию.">
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; версий 35 и выше введена новая «Тема разработчика». Отключение параметра удаляет её и соответствующую кнопку в режиме «Настройка».">
@@ -279,18 +282,20 @@
 <!ENTITY Ctr_fx38reader		"&brandShortName; версий 38 и выше представлен новый «режим чтения». Отключение этой опции выключает его и убирает иконку с адресной панели.">
 <!ENTITY Ctr_fx38pocket      "В &brandShortName; версий 38.0.5 и выше введена новая функция 'Карман'. Отключение данной настройки отключает эту функцию и удаляет кнопку с панели инструментов.">
 <!ENTITY Ctr_fx38pocket2	"Заметка: Перемещение кнопки 'Pocket' в 'персонализацию палитры' до отключения этой опции также удаляет вхождения 'Pocket' из закладок и меню читателя.">
-<!ENTITY Ctr_e_omtc			"OMTC / проблема с зависанием вкладок">
 <!ENTITY Ctr_e_searchui		"Внешний вид панели поиска">
 <!ENTITY Ctr_e_loop			"Вызовы и разговоры">
 <!ENTITY Ctr_e_deved		"Тема оформления для разработчиков">
 <!ENTITY Ctr_e_prefsui		"Настройки в виде вкладки">
 <!ENTITY Ctr_e_readermode	"Режим чтения">
 <!ENTITY Ctr_e_pocket		"Карман">
+<!ENTITY Ctr_e_tabsaudioico	"Значок проигрывания аудио на вкладках">
+<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Снимите галочку для удаления с вкладок значка 'проигрывание аудио'.">
 
 
 <!ENTITY Ctr_pw_settings	"Настройки">
 <!ENTITY Ctr_pw_set_reset	"Сбросить настройки">
 <!ENTITY Ctr_pw_set_predef	"Классическое оформление">
+<!ENTITY Ctr_pw_set_preaus	"&brandShortName; предустановки">
 <!ENTITY Ctr_pw_set_export	"Экспорт настроек">
 <!ENTITY Ctr_pw_set_import	"Импорт настроек">
 <!ENTITY Ctr_pw_set_syncon	"Добавить в синхронизацию">
@@ -306,6 +311,7 @@
 <!ENTITY Ctr_openInPrivateWindow	"Открыть в новом приватном окне">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Приступаем к работе">
+<!ENTITY goCmd.label		"Перейти">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "Н">
@@ -321,6 +327,19 @@
 <!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
 
 <!-- Extra CyberCTR Additions -->
+ 
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; (по умолчанию)">
+<!ENTITY Ctr_appbuttonc_s	"Оранжево-розовая кнопка">
+
+<!ENTITY Ctr_alt_newtabpalt	"Стиль представления страницы новой вкладки">
+<!ENTITY ctr_aboutnewtab.customhighlight "Использовать свой цвет подсветки ">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Изменение цвета подсветки">
+<!ENTITY ctr_aboutnewtab.custombase "Использовать свой цвет текста">
+<!ENTITY ctr_aboutnewtab.custombasecol "Изменить цвет текста">
+
+<!ENTITY Ctr_alt_newtabcol	"Страница новой вкладки: столбцы">
+<!ENTITY Ctr_alt_newtabrow	"Страница новой вкладки: ряды">
+
 <!ENTITY Ctr_classic_elements		"Классическое оформление">
 <!ENTITY Ctr_pw_set_preaust		"Оформление Australis">
 <!ENTITY ctr_Support_forums	"Форум поддержки">
@@ -331,6 +350,7 @@
 
 <!ENTITY ctr_applyCTRPrefFile.label	"Применить изменения">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Восстановление из резервной копии">
+<!ENTITY ctr_resetCTRPrefFile.label	"Удалить резервные копии">
 
 <!ENTITY ctr_appbuttoncusttextcolor	"Цвет текста кнопки меню.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Удаление тени шрифта кнопки меню">

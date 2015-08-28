@@ -2,12 +2,10 @@
 
 @namespace url(http://www.w3.org/1999/xhtml);
 @-moz-document url("about:home") {
-
-	:root {
-		--main-highlight-color:#00adee;
-		--main-text-color:#efefef;
-	}
-
+    :root {
+        --main-highlight-color: #00adee;
+        --main-text-color: #efefef;
+    }
     html {
         font: message-box;
         font-size: 100%;
@@ -23,7 +21,7 @@
         height: 100%;
         background-color: #222 !important;
         background-image: url("chrome://classic_theme_restorer/content/images/abouthome/two_tone.jpg") !important;
-		background-size: 100% 100%!important;
+        background-size: 100% 100%!important;
     }
     input,
     button {
@@ -452,9 +450,10 @@
     #aboutMozilla:hover {
         opacity: 1;
     }
-	/* We don't use this in cyberfox but can in firefox*/	
+    /* We don't use this in cyberfox but can in firefox*/
+    
     #aboutMozilla::before {
-       content: url("chrome://classic_theme_restorer/content/images/abouthome/mozilla.png")!important;       
+        content: url("chrome://classic_theme_restorer/content/images/abouthome/mozilla.png")!important;
         display: block;
         position: absolute;
         top: 12px;
@@ -525,7 +524,8 @@
             transform: scale(-0.5, 0.5) translateX(24px);
             transform-origin: top center;
         }
-		/* We don't use this in cyberfox but can in firefox*/
+        /* We don't use this in cyberfox but can in firefox*/
+        
         #aboutMozilla::before {
             content: url("chrome://classic_theme_restorer/content/images/abouthome/mozilla@2x.png")!important;
         }

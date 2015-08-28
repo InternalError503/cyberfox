@@ -50,11 +50,10 @@
 <!ENTITY Ctr_tabheightinfo	"Baixos Valores Causarão Falhas no Modo Maximizado!">
 <!ENTITY Ctr_tabmaxwidth	"Largura Máxima:">
 <!ENTITY Ctr_tabminwidth	"Largura Mínima:">
-<!ENTITY Ctr_tabclipwidth	"Clip-width:">
-<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"Larguras Mínimas e Máximas são Controladas Pelo TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Larguras Mínimas e Máximas são Controladas Pelo TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Valores Abaixo de 48px Causarão Falhas na Maioria dos Casos!">
+<!ENTITY Ctr_square_edges	"Squared top corners">
 <!ENTITY Ctr_tabinsertion	"Inserir a Aba Relacionada Depois da Aba Atual (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Restaurar o Favicon Vazio (Se um Site Não Oferecer Um)">
 <!ENTITY Ctr_noemptypticon	"Remover o Favicon Vazio da Aba Fixa">
@@ -66,7 +65,7 @@
 <!ENTITY Ctr_closetab_4		"No Início das Barras de Abas">
 <!ENTITY Ctr_closetab_5		"Em Todas as Abas (Forçada)">
 <!ENTITY Ctr_closetab_hfot	"Ocultar com uma Aba Visível">
-<!ENTITY Ctr_closealt		"Ícone Alternativo">
+<!ENTITY Ctr_closei_def		"Default icons">
 <!ENTITY Ctr_closeonleft	"Posição Alternativa na Aba">
 <!ENTITY Ctr_close_wwltab	"Fechar a Janela com a Última Aba Visível (about:config)">
 
@@ -85,9 +84,8 @@
 <!ENTITY Ctr_appbuttonc_a	"Botão Azul (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Botão Preto (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Botão Transparente">
-<!ENTITY Ctr_appbuttonc_d	"Cyebrfox (Default)">
+<!ENTITY Ctr_appbuttonc_p	"Botão Azul (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"Botão Vermelho">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 <!ENTITY Ctr_appbuttonc_g	"Botão Verde">
 <!ENTITY Ctr_appbuttonc_gr	"Botão Cinza">
 <!ENTITY Ctr_appbuttonc_pu	"Botão Roxo">
@@ -97,6 +95,7 @@
 <!ENTITY Ctr_appbuttonI1e	"Invisível na Barra de Título do Sistema Operacional">
 <!ENTITY Ctr_appbuttonI2	"Colorido só nas Barras de Título e de Abas!">
 <!ENTITY Ctr_appbutmhi		"Posição No Topo (Se na Barra de Abas)">
+<!ENTITY Ctr_appbautocol	"Set default / Aurora / Nightly color automatically">
 <!ENTITY Ctr_appbutbdl		"Ocultar as Bordas e Cores do Fundo">
 <!ENTITY Ctr_dblclclosefx	"Clicar Duas Vezes para Fechar a Janela Atual">
 <!ENTITY Ctr_appbclmmenus	"Menus Clicáveis Dentro do Menu do Botão (Nova Aba, Imprimir...)">
@@ -139,14 +138,12 @@
 <!ENTITY Ctr_cpanelmenus	"Menus do Painel Compacto (Favoritos, Histórico, etc.)">
 <!ENTITY Ctr_hidezoomres	"Controles de Ampliação na Barra de Ferramentas: Ocultar o Botão Redefinir Ampliação">
 <!ENTITY Ctr_alt_newtabp	"Página Nova Aba: Aparência Alternativa">
-<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
-<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
-<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_addonmanager	"Add-on manager">
 <!ENTITY Ctr_alt_addonsp	"Add-ons 'more info' page: alternative appearance">
-<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
-<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_alt_addonsm	"Add-on manager: alternative appearance">
+<!ENTITY Ctr_am_nowarning	"Add-on managers add-on lists: hide warnings">
+<!ENTITY Ctr_addonversion	"Add-on managers add-on lists: show add-on version">
+<!ENTITY Ctr_xpinstallui	"Add-on manager: old add-on install window (about:config preference)">
 <!ENTITY Ctr_bmbutpanelm	"Bookmarks menu button: panel menu appearance">
 <!ENTITY Ctr_bmbutnotext	"Bookmarks menu button: hide label on bookmarks bar">
 <!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
@@ -156,14 +153,16 @@
 <!ENTITY Ctr_pmhidelabels	"Menu do Painel: Ocultar Rótulos do Botão">
 <!ENTITY Ctr_menupopupscr	"Pop-ups do Menu: Exibir Barras de Rolagem em vez das Setas de Rolagem">
 
+<!ENTITY Ctr_tabsep_def		"Default tab separators">
 <!ENTITY Ctr_fxmockup		"Modelo do &brandShortName;">
 <!ENTITY Ctr_tabmokcolor	"Botões da Aba na Cor Branca (Fechar, Nova, Grupos, Listar Tudo)">
 <!ENTITY Ctr_tabmokcolor2	"Texto na Cor Branca e Sombra Escura nas Abas Inativas">
-<!ENTITY Ctr_tabmokcolor3	"Separadores para as Abas na Cor Branca">
 <!ENTITY Ctr_tabmokcolor4	"Cor Branca para o Favicon Vazio da Aba Pontilhada">
 
 <!ENTITY Ctr_navthrobber1	"Clicar no Indicador de Atividade Abre a URL Especificada:">
 <!ENTITY Ctr_navthrobber2	"Adicione uma URL ou Deixe em Branco">
+<!ENTITY Ctr_anewtaburl		"New tab page url">
+<!ENTITY Ctr_anewtaburlcb	"Custom new tab page url (default: 'about:newtab')">
 
 <!ENTITY Ctr_tab_tf_info1	"Nomes de Cores, Códigos hex., Valores rgb(a) e hsl(a) são Suportados.">
 <!ENTITY Ctr_tab_tf_info2	"As Entradas Não Serão Validadas!">
@@ -192,6 +191,7 @@
 <!ENTITY Ctr_starinurl		"Botão de Favoritos">
 <!ENTITY Ctr_feedinurl		"Botão Feed">
 <!ENTITY Ctr_hideurelstop	"Ocultar os Botões Parar e Recarregar">
+<!ENTITY Ctr_hideurlgo		"Hide 'go' button">
 <!ENTITY Ctr_urlbardropm	"Mover o dropmarker para o Final das Barras de URL">
 <!ENTITY Ctr_hideprbutton	"Ocultar o Ícone de Notificação Quando um Pop-up Ficar Bloqueado">
 <!ENTITY Ctr_urlbar_ib		"Botão de Identidade do Site (Caixa de Identidade)">
@@ -237,8 +237,10 @@
 <!ENTITY Ctr_menubarnofog	"Remover a Cor/Névoa do Fundo (Windows AeroGlass/Win8)">
 
 <!ENTITY Ctr_aerocolors		"Cores Azul Aero para Barras de Ferramentas Principais e Abas">
+<!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color (Windows 10)">
 <!ENTITY Ctr_hidenavbar		"Ocultar a Barra de Navegação">
 <!ENTITY Ctr_nobookbarbg	"Barra de Favoritos: Remover a Cor do Fundo">
+<!ENTITY Ctr_bookbarfs		"Barra de Favoritos: No Modo de Tela Cheia">
 <!ENTITY Ctr_nonavbarbg		"Barra de Navegação: Remover a Cor do Fundo">
 <!ENTITY Ctr_nonavbarbg1	"Estas Barras de Ferramentas Adicionais de Complementos e Outras Barras de Ferramentas Localizadas No Topo são Afetadas.">
 <!ENTITY Ctr_nonavbarbg2	"Todas as Barras de Ferramentas em 'A Raposa, Só Que Melhor' no Slim Chrome dos Complementos, são Afetadas.">
@@ -246,7 +248,7 @@
 <!ENTITY Ctr_nonavtbborder	"Barras superiores: Remover Bordas da Barra">
 <!ENTITY Ctr_hidesbclose	"Barras laterais: Ocultar o Botão Fechar da Barra Lateral">
 <!ENTITY Ctr_notextshadow	"Toolbars: hide shadow for toolbar text and tab text">
-<!ENTITY Ctr_chevronfix		"Barra de Ferramentas Navegação: Ocultar a Seta Dupla ('chevron') no Final das Barras de Ferramentas">
+<!ENTITY Ctr_chevronfix		"Barra de Ferramentas Navegação: Ocultar a Seta Dupla ('More Tools') no Final das Barras de Ferramentas">
 <!ENTITY Ctr_tbsep_winc		"Top toolbars: additional toolbar separators">
 
 <!ENTITY Ctr_closeabarbut	"Ocultar o Botão Fechar">
@@ -254,11 +256,13 @@
 <!ENTITY Ctr_addonbarfs		"No Modo de Tela Cheia">
 
 <!ENTITY Ctr_animation		"Animações">
-<!ENTITY Ctr_throbberalt	"Aba Alternativa 'throbber' ao Carregar a Animação">
+<!ENTITY Ctr_tabthrobber	"Default loading image">
 <!ENTITY Ctr_bmanimation	"Usar Animação ao Usar os Favoritos">
 <!ENTITY Ctr_pananimation	"Usar Animação ao Abrir o Painel">
 <!ENTITY Ctr_tabanimation	"Usar Animação ao Fechar/Abrir a Aba (about:config)">
 <!ENTITY Ctr_dlanimation	"Usar Animação ao 'Notificar Download' (about:config)">
+<!ENTITY Ctr_fsanimation	"Fullscreen animations (about:config preference)">
+<!ENTITY Ctr_fsaduration	"Fullscreen animations for HTML5 content (about:config preferences)">
 
 <!ENTITY Ctr_toolsitem		"Item do Menu no Menu Ferramentas">
 <!ENTITY Ctr_appmenuitem	"Item do Menu no Menu Botões do Aplicativo">
@@ -271,26 +275,27 @@
 <!ENTITY Ctr_nodevtheme		"Evitar Habilitar o 'Tema do Desenvolvedor'">
 
 <!ENTITY Ctr_experttweaks	"Avançado">
-<!ENTITY Ctr_fx33layers		"O &brandShortName; 33+ Introduziu 'Novos Recursos de Renderização', Atualmente Responsáveis por 'Suspender Abas' em Alguns Sistemas. Desmarque esta Opção para Resolver este Problema.">
 <!ENTITY Ctr_fx34search		"O &brandShortName; 34+ Introduziu uma 'Nova Interface de Usuário de Pesquisa'. Desmarque esta Opção para Retornar à 'Antiga Interface de Usuário de Pesquisa'.">
 <!ENTITY Ctr_fx34loop		"O &brandShortName; 34+ Introduziu Recursos de 'Chamada e Conversação'. Desmarque esta Opção para Removê-los.">
 <!ENTITY Ctr_fx35devtheme	"O &brandShortName; 35+ Introduziu um Novo 'Tema do Desenvolvedor'. Desmarque estas Opções para Desabilitar o 'Tema do Desenvolvedor' e o seu Botão em Modo de Personalização.">
 <!ENTITY Ctr_fx36prefs		"O &brandShortName; 36+ Introduziu as Preferências em uma Nova Aba. Desmarque esta Opção para Retornar à Antiga Janela de Preferências.">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking this preference disables it and removes its icon from location bar.">
 <!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ introduced the 'Pocket' feature. Unchecking this preference disables it and removes its button from the toolbars.">
 <!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
-<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
 <!ENTITY Ctr_e_searchui		"Search appearance">
 <!ENTITY Ctr_e_loop			"Calling and conversation">
 <!ENTITY Ctr_e_deved		"Developer Edition Theme">
 <!ENTITY Ctr_e_prefsui		"Preferences in tab">
 <!ENTITY Ctr_e_readermode	"Reader mode">
 <!ENTITY Ctr_e_pocket		"Pocket">
+<!ENTITY Ctr_e_tabsaudioico	"Audio playing icon on tabs">
+<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Unchecking this preference removes 'audio playing icon' from tabs.">
 
 
 <!ENTITY Ctr_pw_settings	"Configurações">
 <!ENTITY Ctr_pw_set_reset	"Restaurar aos Padrões">
 <!ENTITY Ctr_pw_set_predef	"Pré-configurações Clássicas">
+<!ENTITY Ctr_pw_set_preaus	"Pré-configurações do &brandShortName;">
 <!ENTITY Ctr_pw_set_export	"Exportar as Preferências">
 <!ENTITY Ctr_pw_set_import	"Importar as Preferências">
 <!ENTITY Ctr_pw_set_syncon	"Add to Sync">
@@ -306,6 +311,7 @@
 <!ENTITY Ctr_openInPrivateWindow	"Abrir em uma Nova Janela Particular">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Guia Rápido">
+<!ENTITY goCmd.label		"Go">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "V">
@@ -321,6 +327,19 @@
 <!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
 
 <!-- Extra CyberCTR Additions -->
+
+<!ENTITY Ctr_appbuttonc_d	"Cyebrfox (Default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
@@ -331,6 +350,7 @@
 
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
 
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">

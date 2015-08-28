@@ -1,9 +1,11 @@
 @namespace url(http://www.w3.org/1999/xhtml);
 @-moz-document url("about:home") {
-	#snippet-5079-contents,
+	  div[id^=snippet-],
+	  div[id^=logo-replacement],
     #defaultSnippet1,
     #defaultSnippet2,
     #rightsSnippet ,
+    #snippetContainer,
     #snippets {
         display: none!important;
     }

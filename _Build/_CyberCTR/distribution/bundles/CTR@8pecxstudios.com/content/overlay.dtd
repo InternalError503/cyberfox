@@ -138,6 +138,7 @@
 <!ENTITY helpShowTour2.accesskey        "">
 <!ENTITY eyedropper.accesskey			"y">
 <!ENTITY navbarCmd.label				"Navigation Toolbar">
+<!ENTITY goEndCap.tooltip 		        "">
 
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Clean Ram Cache">

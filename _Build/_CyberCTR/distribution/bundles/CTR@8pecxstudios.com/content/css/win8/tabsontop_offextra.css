@@ -8,6 +8,13 @@
 	  background-clip: padding-box !important;
 	}
 	
+	@media (-moz-os-version: windows-win10) {
+	  #main-window[defaultfxtheme="true"][tabsontop="false"][sizemode="normal"] #TabsToolbar:not(:-moz-lwtheme) {
+		border-left: 0px !important;
+		border-right: 0px !important;
+	  }
+	}
+	
 	#main-window[tabsintitlebar]:not([inFullscreen]) #navigator-toolbox #toolbar-menubar{
 	  margin-top: 3px !important;
 	  margin-bottom: 3px !important;
@@ -44,6 +51,14 @@
 	/* add missing line for Fx38+ */
 	#main-window[defaultfxtheme="true"][fx38plus="true"][tabsontop="false"] #TabsToolbar:-moz-lwtheme {
 	  border-bottom: 1px solid hsla(209,67%,12%,0.25) !important;
+	}
+	
+	/* Windows 10 tweaks */
+	@media (-moz-os-version: windows-win10) {
+	  #main-window[defaultfxtheme="true"][fx32plus="true"][tabsontop="false"] #TabsToolbar:not(:-moz-lwtheme),	
+	  #main-window[defaultfxtheme="true"][fx32plus="true"][tabsontop="false"] #TabsToolbar:-moz-lwtheme {
+		border-bottom: 0 !important;
+	  }
 	}
 	
 	/* for LavaFox themes */

@@ -51,6 +51,8 @@
 	  visibility: collapse !important;
 	  display:none !important;
 	}
+    #nav-bar * .toolbarbutton-icon,
+	#nav-bar *,
 	window:not([chromehidden~="toolbar"]) #urlbar-container[forwarddisabled] > #urlbar-wrapper {
 	  clip-path: none !important;
 	}
@@ -99,16 +101,16 @@
 	}
 	
 	/* Main menu button & call button fix */
-	toolbar #PanelUI-menu-button .toolbarbutton-badge,
-	toolbar #PanelUI-menu-button .toolbarbutton-badge-container,
-	toolbar #loop-button .toolbarbutton-badge,
-	toolbar #loop-button .toolbarbutton-badge-container,
-	toolbar #loop-button-throttled .toolbarbutton-badge,
-	toolbar #loop-button-throttled .toolbarbutton-badge-container{
+	toolbar .toolbarbutton-1 .toolbarbutton-badge,
+	toolbar .toolbarbutton-1 .toolbarbutton-badge-container {
 	  -moz-appearance:none !important;
 	  background:none !important;
 	  border:0 !important;
 	  padding:0 !important;
 	  box-shadow:none !important;
+	}
+	
+	toolbar .toolbarbutton-badge-stack {
+	  display: none !important;
 	}
 }

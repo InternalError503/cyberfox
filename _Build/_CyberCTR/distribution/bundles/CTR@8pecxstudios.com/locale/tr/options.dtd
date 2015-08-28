@@ -30,7 +30,7 @@
 <!ENTITY Ctr_tabcolors_t	"Özel Renkler">
 
 <!ENTITY Ctr_tabs			"Sekmeler">
-<!ENTITY Ctr_tabs0			"Kavisli Sekmeler (Australis varsayılanı)">
+<!ENTITY Ctr_tabs0			"Kavisli Sekmeler (&brandShortName; varsayılanı)">
 <!ENTITY Ctr_tabs1			"Köşeli Sekmeler (Klasik)">
 <!ENTITY Ctr_tabs1m			"Kareli Sekmeler (Australize)">
 <!ENTITY Ctr_tabs2			"Kavisli Sekmeler (Alternatif)">
@@ -42,7 +42,7 @@
 <!ENTITY Ctr_tabsontop2		"Sekmeler Tepede - ayarla [tabsontop=true]">
 <!ENTITY Ctr_tabsontop3		"Sekmeler Tepede Değil - ayarla [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 sadece bazı eklentiler ve tam temalar içindir!">
-<!ENTITY Ctr_tabsontopI1	"Öznitelik Ekler [tabsontop=true/false]">
+<!ENTITY Ctr_tabsontopI1	"Öznitelik Ekler [tabsontop=true/false] to">
 <!ENTITY Ctr_tabsintitlebar	"&brandShortName; başlık çubuğu (about:config)">
 <!ENTITY Ctr_tabwidthdef	"(varsayılan)">
 <!ENTITY Ctr_tabwidthcla	"(klasik)">
@@ -50,14 +50,13 @@
 <!ENTITY Ctr_tabheightinfo	"Düşük değerler tam ekran modunda hatalara neden olabilir!">
 <!ENTITY Ctr_tabmaxwidth	"Max-genişlik:">
 <!ENTITY Ctr_tabminwidth	"Min-genişlik:">
-<!ENTITY Ctr_tabclipwidth	"Clip-width:">
-<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"Sekme genişlikleri TabMixPlus tarafından kontrol ediliyor">
 <!ENTITY Ctr_tabwidthinfo2	"Sekme genişlikleri TabUtilities tarafından kontrol ediliyor">
 <!ENTITY Ctr_tabwidthinfo3	"48px altındaki değerler bazı hatalara sebep olabilir!">
+<!ENTITY Ctr_square_edges	"Squared top corners">
 <!ENTITY Ctr_tabinsertion	"İlgili sekmeyi geçerli sekmeden sonra ekle (about:config tercihi)">
 <!ENTITY Ctr_emptyfavicon	"Boş faviconu yükle (sitenin faviconu yoksa eğer)">
-<!ENTITY Ctr_noemptypticon	"Sabitlenmiş sekmelerde boş faviconu kaldır">
+<!ENTITY Ctr_noemptypticon	"Tutturulmuş sekmelerde boş faviconu kaldır">
 <!ENTITY Ctr_e10stab_notd	"E10s sekmeler: altçizgiyi kaldır">
 <!ENTITY Ctr_closetab_0		"Sekme Kapat">
 <!ENTITY Ctr_closetab_1		"Sadece aktif sekme için">
@@ -66,12 +65,12 @@
 <!ENTITY Ctr_closetab_4		"Araç çubuğunun başladığı sekmede">
 <!ENTITY Ctr_closetab_5		"Tüm sekmelerde (zorla)">
 <!ENTITY Ctr_closetab_hfot	"Görünen sekme için sakla">
-<!ENTITY Ctr_closealt		"Alternatif ikon">
+<!ENTITY Ctr_closei_def		"Default icons">
 <!ENTITY Ctr_closeonleft	"Sekme üstünde alternatif pozisyon">
-<!ENTITY Ctr_close_wwltab	"Son görülebilir sekmeyle pencereyi kapat (about:config)">
+<!ENTITY Ctr_close_wwltab	"Son görülebilir sekmeyle sencereyi kapat (about:config)">
 
 <!ENTITY Ctr_hctpinfotab	"Bazı sekme varyasyonları 'Hide Caption Titlebar Plus' eklentisiyle uyumlu değildir.">
-<!ENTITY Ctr_hctpinfoab		"Cyberfox butonu ekleme özelliği 'Hide Caption Titlebar Plus' eklentisiyle uyumlu değildir.">
+<!ENTITY Ctr_hctpinfoab		"&brandShortName; butonu ekleme özelliği 'Hide Caption Titlebar Plus' eklentisiyle uyumlu değildir.">
 
 <!ENTITY Ctr_appbutton		"&brandShortName; Butonu">
 <!ENTITY Ctr_appbutton0		"Buton devre-dışı">
@@ -80,14 +79,13 @@
 <!ENTITY Ctr_appbutton2		"[&brandShortName;] başlığında buton">
 <!ENTITY Ctr_appbutton2h	"Araç çubuğunda [&brandShortName;] butonu(saklı)">
 <!ENTITY Ctr_appbutton2io	"[&brandShortName;] başlığında buton (sadece ikon)">
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; buton rengi (varsayılan)">
 <!ENTITY Ctr_paneluibtweak	"Sekme çubuğunda turuncu panel menü butonu">
 <!ENTITY Ctr_appbuttonc_o	"Turuncu renk butonu">
 <!ENTITY Ctr_appbuttonc_a	"Mavi renk butonu (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Siyah renk butonu (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Şeffaf Buton">
+<!ENTITY Ctr_appbuttonc_p	"Blue button color (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"Kırmızı Buton Rengi">
-<!ENTITY Ctr_appbuttonc_s	"Somon Buton Rengi">
 <!ENTITY Ctr_appbuttonc_g	"Yeşil Buton Rengi">
 <!ENTITY Ctr_appbuttonc_gr	"Gri Buton Rengi">
 <!ENTITY Ctr_appbuttonc_pu	"Mor Buton Rengi">
@@ -97,6 +95,7 @@
 <!ENTITY Ctr_appbuttonI1e	"Windows başlık çubuğunda görünür değil!">
 <!ENTITY Ctr_appbuttonI2	"Sadece buton renkleri görünür">
 <!ENTITY Ctr_appbutmhi		"Daha yüksek pozisyon (eğer sekmeler araç çubuğu üstünde ise)">
+<!ENTITY Ctr_appbautocol	"Set default / Aurora / Nightly color automatically">
 <!ENTITY Ctr_appbutbdl		"Sınırları ve arka plan renklerini gizle">
 <!ENTITY Ctr_dblclclosefx	"Çift tıklama mevcut pencereyi kapatır">
 <!ENTITY Ctr_appbclmmenus	"Sekmelerde tıklanabiir menüler(Yeni sekme, Yazdır...)">
@@ -111,7 +110,7 @@
 <!ENTITY Ctr_nbcompact		"Gezinti araç çubuğu yüksekliğini azalt">
 <!ENTITY Ctr_hide_bf_popup	"Geçmiş menüsü butonunu gizlemek için Fare tuşuna basın">
 <!ENTITY Ctr_bf_space		"Düğmeleri arası boşluğu azaltın (mümkünse)">
-<!ENTITY Ctr_noconicons		"Etiketlerle sayfa içerik menüsü simgelerini değiştirin (geri, ileri, dur, yenile, yerimleri sayfası)">
+<!ENTITY Ctr_noconicons		"Etiketlerle sayfa içerik menüsü simgelerini değiştirin (geri, ileri, dur, yenile, yerimleri sayfaıs)">
 <!ENTITY Ctr_svgfilters		"Araç çubuğu düğmeleri için SVG renkleri kullan">
 <!ENTITY Ctr_wincontrols	"Hareketli tam ekran penceresi kontrolleri">
 <!ENTITY Ctr_emptyfavicon2	"Genel(boş noktalı) faviconu kağıt görünümlü favicon ile değiştir">
@@ -139,14 +138,12 @@
 <!ENTITY Ctr_cpanelmenus	"Panel menu: tümleşik görünüm (yerimleri, geçmiş vb.)">
 <!ENTITY Ctr_hidezoomres	"Araç çubuğunda zoom kontrolü: zoom-reset butonu gizle">
 <!ENTITY Ctr_alt_newtabp	"Yeni sekme sayfası: alternatif görünüm">
-<!ENTITY Ctr_alt_newtabpalt	"Yeni sekme sayfası: tarz görünüm">
-<!ENTITY ctr_aboutnewtab.customhighlight "Özel vurgu rengi kullanın">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Özel vurgu rengini değiştirin">
-<!ENTITY ctr_aboutnewtab.custombase "Özel metin rengi kullan">
-<!ENTITY ctr_aboutnewtab.custombasecol "Taban metin rengini değiştir">
+<!ENTITY Ctr_addonmanager	"Add-on manager">
 <!ENTITY Ctr_alt_addonsp	"Eklentiler için 'daha fazla bilgi' sayfası: alternatif görünüm">
-<!ENTITY Ctr_alt_newtabcol	"Yeni sekme sayfası: sütunlar">
-<!ENTITY Ctr_alt_newtabrow	"Yeni sekme sayfası: satırlar">
+<!ENTITY Ctr_alt_addonsm	"Add-on manager: alternative appearance">
+<!ENTITY Ctr_am_nowarning	"Add-on managers add-on lists: hide warnings">
+<!ENTITY Ctr_addonversion	"Add-on managers add-on lists: show add-on version">
+<!ENTITY Ctr_xpinstallui	"Add-on manager: old add-on install window (about:config preference)">
 <!ENTITY Ctr_bmbutpanelm	"Yer imleri menü düğmesi: panel menu görünümü">
 <!ENTITY Ctr_bmbutnotext	"Yer imleri menü düğmesi: bar üzerinde etiketi gizle">
 <!ENTITY Ctr_skipprintpr	"Yazdır Butonu: baskı önizlemeyi atla">
@@ -156,14 +153,16 @@
 <!ENTITY Ctr_pmhidelabels	"Panel menu uyarısı: buton etikeitini gizle">
 <!ENTITY Ctr_menupopupscr	"Menu uyarısı: kaydırma okları yerine kaydırma çubuklarını göster">
 
+<!ENTITY Ctr_tabsep_def		"Default tab separators">
 <!ENTITY Ctr_fxmockup		"&brandShortName; Taklit Modeli">
 <!ENTITY Ctr_tabmokcolor	"Sekme butonları için beyaz renk (kapat, yeni, gruplar, tümünü listele)">
 <!ENTITY Ctr_tabmokcolor2	"Yazılar ve aktif olmayan sekmeler için beyaz renk ve karanlık gölge">
-<!ENTITY Ctr_tabmokcolor3	"Sekme ayırıcıları için Beyaz renk kullan">
 <!ENTITY Ctr_tabmokcolor4	"Boş-noktalı sekme faviconu için Beyaz renk kullan">
 
 <!ENTITY Ctr_navthrobber1	"Etkinlik göstergesine tıklamak beliritilen bağlantıyı açar:">
 <!ENTITY Ctr_navthrobber2	"Bağlantı ekle ve ya boş bırakın:">
+<!ENTITY Ctr_anewtaburl		"New tab page url">
+<!ENTITY Ctr_anewtaburlcb	"Custom new tab page url (default: 'about:newtab')">
 
 <!ENTITY Ctr_tab_tf_info1	"Renk isimleri, hexcodes, rgb(a) ve hsl(a) değerleri desteklenir.">
 <!ENTITY Ctr_tab_tf_info2	"Girişler doğrulanamayacak!">
@@ -192,6 +191,7 @@
 <!ENTITY Ctr_starinurl		"Yıldız-butonu">
 <!ENTITY Ctr_feedinurl		"RSS feed-butonu">
 <!ENTITY Ctr_hideurelstop	"'Dur &amp; Yenile' butonlarını gizle">
+<!ENTITY Ctr_hideurlgo		"Hide 'go' button">
 <!ENTITY Ctr_urlbardropm	"İşaretçiyi konum çubuğunun sonuna taşı">
 <!ENTITY Ctr_hideprbutton	"Popup engellendiğinde beliren uyarıyı gizle">
 <!ENTITY Ctr_urlbar_ib		"Site Kimlik Düğmesi (kimlik kutusu)">
@@ -237,8 +237,10 @@
 <!ENTITY Ctr_menubarnofog	"Arkaplan bulanıklığı/rengi kaldır (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Araç çubukları için Mavi Aero renkleri (ve sekmelere)">
+<!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color (Windows 10)">
 <!ENTITY Ctr_hidenavbar		"Gezinti Araç çubuğu: Çubuğu gizle">
 <!ENTITY Ctr_nobookbarbg	"Yerimi araç çubuğu: Arkaplan rengini kaldır">
+<!ENTITY Ctr_bookbarfs		"Yerimi araç çubuğu: Tam Ekran modunda">
 <!ENTITY Ctr_nonavbarbg		"Gezinti Araç çubuğu: Arkaplan rengini kaldır">
 <!ENTITY Ctr_nonavbarbg1	"Bu eklentiler, ek araç çubukları ve diğer üst düzey araç çubuklarını etkiler.">
 <!ENTITY Ctr_nonavbarbg2	"Tüm araç çubukları 'Fox, Only Better' eklentileri Slim Chrome etkilenir.">
@@ -246,7 +248,7 @@
 <!ENTITY Ctr_nonavtbborder	"Tepedeki sekmeler: Araç çubuğu sınırları kaldır">
 <!ENTITY Ctr_hidesbclose	"Sidebars: Kenar çubuğu kapatma düğmesini gizle">
 <!ENTITY Ctr_notextshadow	"Araç Çubukları: Araç çubuğu metin ve sekme metinlerinde gölgeleri gizle">
-<!ENTITY Ctr_chevronfix		"Gezinti araç çubuğu: Araç çubuğu sonunda ki Çift oku gizle ('chevron')">
+<!ENTITY Ctr_chevronfix		"Gezinti araç çubuğu: Araç çubuğu sonunda ki Çift oku gizle ('More Tools')">
 <!ENTITY Ctr_tbsep_winc		"Üst araç çubukları: ek araç çubuğu ayırıcıları">
 
 <!ENTITY Ctr_closeabarbut	"Eklenti çubuğu kapatma düğmesini sakla">
@@ -254,11 +256,13 @@
 <!ENTITY Ctr_addonbarfs		"Tam Ekran modunda">
 
 <!ENTITY Ctr_animation		"Animasyon">
-<!ENTITY Ctr_throbberalt	"Alternatif throbber sekme yüklenme animasyonu">
+<!ENTITY Ctr_tabthrobber	"Default loading image">
 <!ENTITY Ctr_bmanimation	"Yerimi animasyonu">
 <!ENTITY Ctr_pananimation	"Panel açılış animasyonu">
 <!ENTITY Ctr_tabanimation	"Sekme kapama/açma animasyonu (about:config tercihi)">
 <!ENTITY Ctr_dlanimation	"'İndirme Bildirisi' animasyonu (about:config  tercihi)">
+<!ENTITY Ctr_fsanimation	"Fullscreen animations (about:config preference)">
+<!ENTITY Ctr_fsaduration	"Fullscreen animations for HTML5 content (about:config preferences)">
 
 <!ENTITY Ctr_toolsitem		"Araçlar menüsünde menü ögeleri">
 <!ENTITY Ctr_appmenuitem	"Appbuttons menüsünde menü ögeleri">
@@ -268,29 +272,30 @@
 <!ENTITY Ctr_otherctroptns	"Diğer ayarlar">
 <!ENTITY Ctr_cuibotbuttons	"'Özelleştirme' modunda ekstra butonlar">
 <!ENTITY Ctr_bookmarkoinpw	"'Yeni gizli pencere aç' yerimleri bağlam menüsünde bir girdi">
-<!ENTITY Ctr_nodevtheme		"'Developer Tema'sının etkinleşmesini engelle">
+<!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
 <!ENTITY Ctr_experttweaks	"Gelişmiş">
-<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ introduced 'new render features' currently responsible for 'hanging tabs' on some systems. Unchecking this preference resolves this issue.">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ introduced a 'new seach ui'. Unchecking this preference returns the 'old seach ui'.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ introduced a 'new search ui'. Unchecking this preference returns the 'old search ui'.">
 <!ENTITY Ctr_fx34loop		"&brandShortName; 34+ introduced 'calling and conversation' features. Unchecking this preference removes them.">
-<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ introduced a new 'developer theme'. Unchecking these preferences disables the 'developer theme' and its button in customizing mode.">
+<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ introduced a new 'developer theme'. Unchecking this preference disables the 'developer theme'.">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ introduced 'preferences in tab'. Unchecking this preference restores the old preference window.">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking these preferences disables it and removes its icon from location bar.">
+<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ introduced a new 'reader mode'. Unchecking this preference disables it and removes its icon from location bar.">
 <!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ introduced the 'Pocket' feature. Unchecking this preference disables it and removes its button from the toolbars.">
-<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
-<!ENTITY Ctr_e_omtc			"OMTC / hanging tabs issue">
+<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries from bookmarks and reader menus.">
 <!ENTITY Ctr_e_searchui		"Arama görünümü">
 <!ENTITY Ctr_e_loop			"Arama ve konuşma">
 <!ENTITY Ctr_e_deved		"Developer Edition Teması">
 <!ENTITY Ctr_e_prefsui		"Sekmeler içinde tercihler">
 <!ENTITY Ctr_e_readermode	"Okuyucu Modu">
 <!ENTITY Ctr_e_pocket		"Pocket">
+<!ENTITY Ctr_e_tabsaudioico	"Audio playing icon on tabs">
+<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Unchecking this preference removes 'audio playing icon' from tabs.">
 
 
 <!ENTITY Ctr_pw_settings	"Ayarlar">
 <!ENTITY Ctr_pw_set_reset	"Sıfırla">
 <!ENTITY Ctr_pw_set_predef	"Klasik ön-tanımlı">
+<!ENTITY Ctr_pw_set_preaus	"&brandShortName; ön-tanımlı">
 <!ENTITY Ctr_pw_set_export	"Tercihleri dışa Aktar">
 <!ENTITY Ctr_pw_set_import	"Tercihleri içe Aktar">
 <!ENTITY Ctr_pw_set_syncon	"Sync'e ekle">
@@ -306,6 +311,7 @@
 <!ENTITY Ctr_openInPrivateWindow	"Yeni Gizli Pencerede Aç">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"Başlarken">
+<!ENTITY goCmd.label		"Go">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "i">
@@ -321,6 +327,19 @@
 <!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
 
 <!-- Extra CyberCTR Additions -->
+
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; buton rengi (varsayılan)">
+<!ENTITY Ctr_appbuttonc_s	"Somon Buton Rengi">
+
+<!ENTITY Ctr_alt_newtabpalt	"Yeni sekme sayfası: tarz görünüm">
+<!ENTITY ctr_aboutnewtab.customhighlight "Özel vurgu rengi kullanın">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Özel vurgu rengini değiştirin">
+<!ENTITY ctr_aboutnewtab.custombase "Özel metin rengi kullan">
+<!ENTITY ctr_aboutnewtab.custombasecol "Taban metin rengini değiştir">
+
+<!ENTITY Ctr_alt_newtabcol	"Yeni sekme sayfası: sütunlar">
+<!ENTITY Ctr_alt_newtabrow	"Yeni sekme sayfası: satırlar">
+
 <!ENTITY Ctr_classic_elements		"Klasik Elementler">
 <!ENTITY Ctr_pw_set_preaust		"Ön-Tanımlı Australis">
 <!ENTITY ctr_Support_forums	"Destek Forumu">
@@ -331,6 +350,7 @@
 
 <!ENTITY ctr_applyCTRPrefFile.label	"Değişiklikleri Uygula">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Yedeği Geri Yükle">
+<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
 
 <!ENTITY ctr_appbuttoncusttextcolor	"Uygulama metin rengi.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Uygulama metin gölgesini kaldır">

@@ -343,6 +343,11 @@
 	  clip-path: none !important;
 	}
 	
+	/* fix crash icons position */
+	.tabbrowser-tab[crashed] .tab-icon-overlay {
+	  margin-top:0px !important;
+	}
+	
 	/* Private Tab extension */
 	.tabs-newtab-button + .tabs-newtab-button {
 	  -moz-margin-start: 15px !important;
@@ -369,7 +374,8 @@
 	  border-right:0 !important;
 	}
 	
-	/*Faviconise tab add-on */
+	/*Faviconize tab add-on */
+	#tabbrowser-tabs .tabbrowser-tab[faviconized="true"] .tab-throbber,
 	#tabbrowser-tabs .tabbrowser-tab[faviconized="true"] .tab-icon-image{
 	  -moz-margin-start:2px !important;
 	  -moz-margin-end:1px !important;

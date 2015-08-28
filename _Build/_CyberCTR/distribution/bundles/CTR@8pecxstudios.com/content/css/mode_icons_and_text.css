@@ -80,6 +80,8 @@
 	#urlbar-container #forward-button {
 	  visibility: collapse !important;
 	}
+    #nav-bar * .toolbarbutton-icon,
+	#nav-bar *,
 	window:not([chromehidden~="toolbar"]) #urlbar-container[forwarddisabled] > #urlbar-wrapper {
 	  clip-path: none !important;
 	}
@@ -148,16 +150,12 @@
 	}
 	
 	/* Main menu button & call button fix */
-	#nav-bar #PanelUI-menu-button .toolbarbutton-badge,
-	#nav-bar #PanelUI-menu-button .toolbarbutton-badge-container,
-	#nav-bar #loop-button .toolbarbutton-badge,
-	#nav-bar #loop-button .toolbarbutton-badge-container,
-	#nav-bar #loop-button-throttled .toolbarbutton-badge,
-	#nav-bar #loop-button-throttled .toolbarbutton-badge-container{
+	#nav-bar .toolbarbutton-1 .toolbarbutton-badge,
+	#nav-bar .toolbarbutton-1 .toolbarbutton-badge-container,
+	#nav-bar .toolbarbutton-1 .toolbarbutton-badge-stack {
 	  -moz-appearance:none !important;
 	  background:none !important;
 	  border:1px solid transparent !important;
-	  /*padding:0 !important;*/
 	  box-shadow:none !important;
 	}
 

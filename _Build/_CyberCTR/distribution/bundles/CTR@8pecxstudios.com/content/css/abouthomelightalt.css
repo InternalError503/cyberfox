@@ -2,12 +2,10 @@
 
 @namespace url(http://www.w3.org/1999/xhtml);
 @-moz-document url("about:home") {
-
-	:root {
-		--main-highlight-color:#00adee;
-		--main-text-color:#555555;
-	}
-
+    :root {
+        --main-highlight-color: #00adee;
+        --main-text-color: #555555;
+    }
     html {
         font: message-box;
         font-size: 100%;
@@ -23,7 +21,7 @@
         height: 100%;
         background-color: #dedede !important;
         background-image: url("chrome://classic_theme_restorer/content/images/abouthome/two_tone_light.jpg") !important;
-		background-size: 100% 100%!important;
+        background-size: 100% 100%!important;
     }
     input,
     button {

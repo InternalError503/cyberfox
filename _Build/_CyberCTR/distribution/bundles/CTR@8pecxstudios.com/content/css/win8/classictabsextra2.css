@@ -40,6 +40,10 @@
 	  -moz-image-region: rect(0, 16px, 16px, 0) !important;
 	}
 	
+	#TabsToolbar .close-icon > .toolbarbutton-icon {
+	  width: 16px !important;
+	}
+	
 	/* TabUtilities auto-reload extra */
 	.tabbrowser-tab:not([pinned]):not([protected])[autoReload] .tab-close-button:hover,
 	.tabbrowser-tab:not([pinned]):not([protected])[autoReload] .tab-close-button:hover[selected="true"] {
@@ -116,6 +120,20 @@
 	.tabbrowser-tab[pinned][titlechanged]:not([selected="true"]):not(:hover):not(:-moz-lwtheme){
 	  background-size: 100% 100% !important;
 	  background-image: none !important;
+	}
+	
+	/* Windows 10 tweaks */
+	@media (-moz-os-version: windows-win10) {
+	  #main-window #navigator-toolbox #TabsToolbar:-moz-lwtheme{
+		border-bottom: 0 !important;
+	  }
+	  #main-window[fx40plus="true"] #navigator-toolbox #nav-bar:not([tabsontop="false"]):not(:-moz-lwtheme){
+		border-top: 1px solid rgba(0,0,0,.2) !important;
+        margin-top: -2px !important;
+	  }
+	  #TabsToolbar:not([multibar]):-moz-lwtheme  {
+		margin-bottom: -1px !important;
+	  }
 	}
 	
 }

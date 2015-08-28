@@ -3,12 +3,18 @@
 popup.title=Customize %S
 popup.msg.restart=%S 需要重启才能生效。\n现在就重启吗?
 import.error=错误：发现修改的或者是错误的文件。\n无法被导入！
-import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 ctr_extrabar=附加工具栏
 ctr_actthrobber=活动指示器
+
+# Extra CyberCTR Additions
+import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
 notification_msg_firstrun=CTRpreferences has been found select restart to apply
 notification_button_firstrun=Restart
 notification_msg_change=Your pre-set CTRpreferences has been modified 
 notification_button_change=Options
 clearFilter.title=Confirm clear filter.
 clearFilter.msg=Are you sure you want to clear the filter?
+popup_compatibility_title=Compatibility issues detected!
+popup_compatibility_permenu=Would you like to enable compatibility mode? \n If not please uninstall (CyberCTR) or (Personal Menu)!
+notification_confirm_clear_title=Please confirm action!
+notification_confirm_clear=Are you sure you want to do this?

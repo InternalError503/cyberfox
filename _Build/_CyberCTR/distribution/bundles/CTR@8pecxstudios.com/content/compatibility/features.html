@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="uk-notouch" lang="en-us" dir="ltr">
  <head>
-<!-- Last updated 27.5.2015 --> 
+<!-- Last updated 12.7.2015 --> 
   <meta charset="utf-8" />
   <title id="windowtitle">CyberCTR Features</title>
 	<link rel="icon" 
@@ -11,12 +11,6 @@
 	<link rel="stylesheet"
 			 href="css/uikit.gradient.min.css"  
 			 type="text/css" />
-	<link rel="stylesheet"
-			 href="css/tooltip.gradient.min.css"  
-			 type="text/css" />
-	<script src="js/jquery-2.1.4.min.js"></script>
-	<script src="js/uikit.min.js"></script>
-	<script src="js/tooltip.min.js"></script>
 	<script src="js/features.js"></script>
  </head>
  <body>
@@ -24,7 +18,7 @@
 		<div class="uk-grid">
 			<div class="column_main uk-grid-width-*">  
 
-<nav class="uk-navbar uk-animation-slide-top">
+<nav class="uk-navbar">
 <a class="uk-navbar-brand uk-hidden-small"><i class="uk-icon-cubes uk-icon-small"></i> <span class="uk-text-primary uk-text-bold">Cyber</span><span class="uk-text-bold">CTR</span></a>
     <ul class="uk-navbar-nav uk-hidden-small">		
 		<li id="up-check"><a onclick="cyberctrFeatures.updateCheck(true);"><i class="uk-icon-cloud-download uk-icon-medium"></i> <span id="btn-check-update">Check For Updates</span></a></li>
@@ -36,8 +30,7 @@
 					target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> <span id="btn-support-forums">Support Forums</span></a></li>
         <li><a href="https://cyberfox.8pecxstudios.com/contact-us"
 					target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> <span id="btn-contact-us">Contact Us</span></a></li>
-    </ul>
-		<a class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas="{target:'#small-menu'}" href="#"></a>	
+    </ul>		
 </nav>
 <hr class="uk-grid-divider" style="border:none;"></hr>
 
@@ -63,46 +56,28 @@
 				<i class="uk-icon-info-circle uk-icon-medium"></i> <span id="msg-no-new-version">No CyberCTR updates available, You have the latest version.</span></p>
 	</div>
 </div>
-<div class="uk-panel uk-panel-box uk-animation-slide-bottom">
+<div class="uk-panel uk-panel-box">
 	<h2>Main features (Added to CyberCTR)</h2>	
 	<h3>App-Menu button</h3>
 		<ul class="uk-list">
-			<li>Button color <span style="color:#0291e6;cursor:pointer;" 
+			<li>Button color <span style="color:#0291e6;" 
 												  class="uk-text-bold" 
-												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
-												  title="Color" 
-												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
-												  onmouseout="$('.uk-tooltip').removeAttr('style');">Aurora</span> (Light)</li>
-			<li>Button color <span style="color:#3F3F3F;cursor:pointer;" 
-												  class="uk-text-bold"  
-												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
-												  title="Color" 
-												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
-												  onmouseout="$('.uk-tooltip').removeAttr('style');">Cyberfox</span></li>			
-			<li>Button color <span style="color:#2e7704;cursor:pointer;" 
+												  title="Color">Aurora</span> (Light)</li>
+			<li>Button color <span style="color:#3F3F3F;" 
+												  class="uk-text-bold"
+												  title="Color">Cyberfox</span></li>			
+			<li>Button color <span style="color:#2e7704;" 
+												  class="uk-text-bold"
+												  title="Color">Green</span> (Dark)</li>
+			<li>Button color <span style="color:#C1690C;" 
 												  class="uk-text-bold" 
-												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
-												  title="Color" 
-												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
-												  onmouseout="$('.uk-tooltip').removeAttr('style');">Green</span> (Dark)</li>
-			<li>Button color <span style="color:#C1690C;cursor:pointer;" 
+												  title="Color">Orange</span> (Dark)</li>			
+			<li>Button color <span style="color:#f51417;" 
 												  class="uk-text-bold" 
-												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
-												  title="Color" 
-												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
-												  onmouseout="$('.uk-tooltip').removeAttr('style');">Orange</span> (Dark)</li>			
-			<li>Button color <span style="color:#f51417;cursor:pointer;" 
-												  class="uk-text-bold" 
-												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
-												  title="Color" 
-												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
-												  onmouseout="$('.uk-tooltip').removeAttr('style');">Red</span> (Dark)</li>		
-			<li>Button color <span style="color:#ef5c45;cursor:pointer;" 
-												  class="uk-text-bold" 
-												  data-uk-tooltip="{pos:'bottom-left',animation:'true'}" 
-												  title="Color" 
-												  onmouseover="$('.uk-tooltip').css('background', this.style.color);"
-												  onmouseout="$('.uk-tooltip').removeAttr('style');">Salmon</span></li>			
+												  title="Color">Red</span> (Dark)</li>		
+			<li>Button color <span style="color:#ef5c45;" 
+												  class="uk-text-bold"
+												  title="Color">Salmon</span></li>			
 		</ul>
 	<h3>Shipped Pre-Sets</h3>
 		<ul class="uk-list">
@@ -112,8 +87,7 @@
 		<ul class="uk-list">
 			<li>Pre-Configure CyberCTR Settings 
 			<a href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&t=672" 
-				  target="_blank" 
-				  data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
+				  target="_blank"
 				  title="Pre-Configure CyberCTR Settings"><i class="uk-icon-external-link"></i> FAQ article</a></li>	
 			<li>Pre-Configure CyberCTR Settings in <span class="uk-text-primary">*.txt</span> or <span class="uk-text-primary">*.json</span> formats</li>			  
 			<li>Pre-Configure CyberCTR Settings file change detection &amp; notification.</li>	
@@ -135,8 +109,7 @@
 			<li>Change highlight color of about:home page links, search-bar and buttons.</li>
 			<li>Change default text color of about:home page text.</li>
 			<li>Hide elements by class or id with css using the elements filter.  See list of <a href="https://github.com/InternalError503/CyberCTR/blob/master/ID_List.md" 
-				  target="_blank" 
-				  data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
+				  target="_blank"
 				  title="Filter List">elements</a></li>
 			<li>Alternate about:newtab page style</li>
 			<li>Change highlight color of about:newtab page elements</li>
@@ -256,42 +229,19 @@ Toolbar: [something]...[stop-button][reload-button]...[something]</p>
 <h4>Spaces, flexible spaces ans separators</h4>
 <p>These toolbar items appear in customizing mode and can be moved to toolbars like on previous Firefox versions.</p>
 <span class="uk-text-primary">Quoted from <a href="https://addons.mozilla.org/en-US/firefox/addon/classicthemerestorer#addon-description" 
-																			 target="_blank" 
-																			 data-uk-tooltip="{pos:'bottom-right',animation:'true'}" 
+																			 target="_blank"
 																			 title="Classic Theme Restorer by Aris" ><i class="uk-icon-external-link"></i> original addons page</a><!-- Last Updated 4/7/2015 --></span>
 			</div><br/><center>
 			<span class="uk-text-center">
 			<a href="https://8pecxstudios.com/" 
-				 title="8pecxstudios" 
-				 data-uk-tooltip="{pos:'top',animation:'true'}">8pecxstudios &trade;</a>
+				 title="8pecxstudios">8pecxstudios &trade;</a>
 			</span> 			
 			<a class="uk-icon-button uk-icon-facebook-square" 
 			      href="https://www.facebook.com/8pecxstudios" 
-				  title="Give us a like" 
-				  data-uk-tooltip="{pos:'top',animation:'true'}"></a> </center>
+				  title="Give us a like"></a> </center>
 		</div>	
 	</div>
-</div>	
-
-<div id="small-menu" class="uk-offcanvas">
-            <div class="uk-offcanvas-bar">
-					<div class="uk-panel">
-						<a class="uk-navbar-brand"><i class="uk-icon-cubes uk-icon-small" style="color:#f8f8f8;"></i> <span class="uk-text-bold" style="color:#f8f8f8;">CyberCTR</span></a>
-                </div>			
-                <ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav="">
-					<li id="up-check-oc"><a onclick="cyberctrFeatures.updateCheck(true); UIkit.offcanvas.hide();"><i class="uk-icon-cloud-download uk-icon-medium"></i> <span id="btn-check-update-oc">Check For Updates</span></a></li>
-					<li><a onclick="cyberctrFeatures.get_localized_document();"  
-								target="_Slef"><i class="uk-icon-file uk-icon-medium"></i> <span id="btn-Documentation-oc">Documentation</span></a></li>					
-					<li><a href="https://8pecxstudios.com/Forums/viewforum.php?f=8"
-								 target="_blank" ><i class="uk-icon-question-circle uk-icon-medium"></i> <span id="btn-faq-oc">Frequently Ask Questions</span></a></li>		
-					<li><a href="https://8pecxstudios.com/Forums/index.php"
-								target="_blank" ><i class="uk-icon-user uk-icon-medium"></i> <span id="btn-support-forums-oc">Support Forums</span></a></li>
-					<li><a href="https://cyberfox.8pecxstudios.com/contact-us"
-								target="_blank" ><i class="uk-icon-envelope uk-icon-medium"></i> <span id="btn-contact-us-oc">Contact Us</span></a></li>	
-                    </ul>
-            </div>
-        </div>
-				
+</div>			
 </body>
 
 </html>

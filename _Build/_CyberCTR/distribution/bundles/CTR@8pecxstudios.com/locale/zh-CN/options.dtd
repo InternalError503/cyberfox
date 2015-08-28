@@ -30,7 +30,7 @@
 <!ENTITY Ctr_tabcolors_t	"标签页颜色与文本">
 
 <!ENTITY Ctr_tabs			"标签页">
-<!ENTITY Ctr_tabs0			"弧形标签页 (Australis 默认)">
+<!ENTITY Ctr_tabs0			"弧形标签页 (&brandShortName; 默认)">
 <!ENTITY Ctr_tabs1			"方形标签页 (经典)">
 <!ENTITY Ctr_tabs1m			"方形标签页 (仿 Australis)">
 <!ENTITY Ctr_tabs2			"弧形标签页 (备选风格)">
@@ -50,11 +50,10 @@
 <!ENTITY Ctr_tabheightinfo	"较小的值在最大化模式下可能出现问题!">
 <!ENTITY Ctr_tabmaxwidth	"最大宽度:">
 <!ENTITY Ctr_tabminwidth	"最小宽度:">
-<!ENTITY Ctr_tabclipwidth	"Clip-width:">
-<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"标签页的最小宽度和最大宽度由 TabMixPlus 所控制">
 <!ENTITY Ctr_tabwidthinfo2	"标签页的最小宽度和最大宽度由 TabUtilities 所控制">
 <!ENTITY Ctr_tabwidthinfo3	"小于48px的值在多数情况下可能出现问题!">
+<!ENTITY Ctr_square_edges	"方形顶部边角">
 <!ENTITY Ctr_tabinsertion	"在当前标签页后插入关联标签页 (about:config)">
 <!ENTITY Ctr_emptyfavicon	"使用空白网站小图标 (如果网站没有提供)">
 <!ENTITY Ctr_noemptypticon	"为固定的标签页移除空白小图标">
@@ -66,7 +65,7 @@
 <!ENTITY Ctr_closetab_4		"在标签页栏头部">
 <!ENTITY Ctr_closetab_5		"在所有标签页上显示 (强制)">
 <!ENTITY Ctr_closetab_hfot	"仅一个可见标签页时隐藏">
-<!ENTITY Ctr_closealt		"红色关闭图标">
+<!ENTITY Ctr_closei_def		"默认图标">
 <!ENTITY Ctr_closeonleft	"标签页上的备选位置">
 <!ENTITY Ctr_close_wwltab	"关闭最后一个可见标签页后关闭窗口 (about:config 选项)">
 
@@ -82,12 +81,11 @@
 <!ENTITY Ctr_appbutton2io	"在 [&brandShortName;] 标题栏上显示 (仅图标)">
 <!ENTITY Ctr_paneluibtweak	"在标签页栏上显示橙色面板菜单按钮">
 <!ENTITY Ctr_appbuttonc_o	"橙色按钮 (默认)">
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (Default)">
 <!ENTITY Ctr_appbuttonc_a	"蓝色按钮 (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"黑色按钮 (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"透明按钮">
+<!ENTITY Ctr_appbuttonc_p	"蓝色按钮 (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"红色按钮">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 <!ENTITY Ctr_appbuttonc_g	"绿色按钮">
 <!ENTITY Ctr_appbuttonc_gr	"灰色按钮">
 <!ENTITY Ctr_appbuttonc_pu	"紫色按钮">
@@ -97,6 +95,7 @@
 <!ENTITY Ctr_appbuttonI1e	"在 Windows 系统标题栏上不可见，仅在 &brandShortName; 标题栏上!">
 <!ENTITY Ctr_appbuttonI2	"按钮颜色只在标题栏与标签页栏上可见!">
 <!ENTITY Ctr_appbutmhi		"更高的位置 (如果在标签页栏上)">
+<!ENTITY Ctr_appbautocol	"自动设置 默认 / Aurora / Nightly 颜色">
 <!ENTITY Ctr_appbutbdl		"隐藏边框和背景色">
 <!ENTITY Ctr_dblclclosefx	"双击关闭当前窗口">
 <!ENTITY Ctr_appbclmmenus	"按钮菜单内的可点击菜单 (新建标签页, 打印...)">
@@ -139,14 +138,12 @@
 <!ENTITY Ctr_cpanelmenus	"面板菜单: 更紧凑的视图 (书签、历史等等)">
 <!ENTITY Ctr_hidezoomres	"当缩放控制按钮在工具栏上时: 隐藏重置缩放按钮">
 <!ENTITY Ctr_alt_newtabp	"新标签页页面: 备选的外观">
-<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
-<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
-<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_addonmanager	"附加组件管理器">
 <!ENTITY Ctr_alt_addonsp	"附加组件“更多”页面: 备选的外观">
-<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
-<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_alt_addonsm	"附加组件管理器: 备选的外观">
+<!ENTITY Ctr_am_nowarning	"附加组件管理器列表: 隐藏警告">
+<!ENTITY Ctr_addonversion	"附加组件页面: 显示附加组件版本">
+<!ENTITY Ctr_xpinstallui	"Add-on manager: old add-on install window (about:config preference)">
 <!ENTITY Ctr_bmbutpanelm	"书签菜单按钮: 面板式菜单外观">
 <!ENTITY Ctr_bmbutnotext	"书签菜单按钮: 隐藏书签工具栏上的文本标签">
 <!ENTITY Ctr_skipprintpr	"打印按钮: 跳过打印预览">
@@ -156,14 +153,16 @@
 <!ENTITY Ctr_pmhidelabels	"面板菜单: 隐藏按钮标签文本">
 <!ENTITY Ctr_menupopupscr	"弹出式菜单: 用滚动栏代替滚动箭头">
 
+<!ENTITY Ctr_tabsep_def		"默认标签页分隔符">
 <!ENTITY Ctr_fxmockup		"&brandShortName; 样式">
 <!ENTITY Ctr_tabmokcolor	"白色标签页按钮 (关闭, 新建, 分组, 显示所有)">
 <!ENTITY Ctr_tabmokcolor2	"在非激活标签页上使用白色文字并添加文字阴影">
-<!ENTITY Ctr_tabmokcolor3	"白色标签页分隔符">
 <!ENTITY Ctr_tabmokcolor4	"白色的空白虚线标签页网站图标">
 
 <!ENTITY Ctr_navthrobber1	"点击活动指示器打开指定网址:">
 <!ENTITY Ctr_navthrobber2	"添加网址或放空">
+<!ENTITY Ctr_anewtaburl		"新标签页地址">
+<!ENTITY Ctr_anewtaburlcb	"自定义新标签页地址 (默认: 'about:newtab')">
 
 <!ENTITY Ctr_tab_tf_info1	"可支持颜色名称, hex值, rgb(a) 以及 hsl(a) 值。">
 <!ENTITY Ctr_tab_tf_info2	"输入值不会进行校验！">
@@ -192,6 +191,7 @@
 <!ENTITY Ctr_starinurl		"五星按钮">
 <!ENTITY Ctr_feedinurl		"RSS源按钮">
 <!ENTITY Ctr_hideurelstop	"隐藏停止和重新载入按钮">
+<!ENTITY Ctr_hideurlgo		"隐藏 “转到” 按钮">
 <!ENTITY Ctr_urlbardropm	"下拉控件移动到地址栏尾部">
 <!ENTITY Ctr_hideprbutton	"当弹出窗口被阻止时隐藏通知图标">
 <!ENTITY Ctr_urlbar_ib		"网站身份标识按钮 (身份标识框)">
@@ -237,8 +237,10 @@
 <!ENTITY Ctr_menubarnofog	"移除背景颜色/模糊 (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"主工具栏和标签页使用蓝色 Aero 颜色">
+<!ENTITY Ctr_transpttbw10	"标题/菜单/标签页工具栏: 移除背景颜色(Windows 10)">
 <!ENTITY Ctr_hidenavbar		"导航工具栏: 隐藏工具栏">
 <!ENTITY Ctr_nobookbarbg	"书签工具栏: 移除背景颜色">
+<!ENTITY Ctr_bookbarfs		"书签工具栏: 在全屏模式">
 <!ENTITY Ctr_nonavbarbg		"导航工具栏: 移除背景颜色">
 <!ENTITY Ctr_nonavbarbg1	"应用到该附加组件的附加工具栏和其它顶部工具栏。">
 <!ENTITY Ctr_nonavbarbg2	"应用到“The Fox, Only Better”附加组件的 Slim Chrome 中的所有工具栏。">
@@ -246,7 +248,7 @@
 <!ENTITY Ctr_nonavtbborder	"顶部工具栏: 移除工具栏边框">
 <!ENTITY Ctr_hidesbclose	"侧边栏: 隐藏侧边栏关闭按钮">
 <!ENTITY Ctr_notextshadow	"工具栏: 隐藏工具栏文本与标签页文本的阴影">
-<!ENTITY Ctr_chevronfix		"导航工具栏: 隐藏工具栏尾部的双箭头 ('chevron')">
+<!ENTITY Ctr_chevronfix		"导航工具栏: 隐藏工具栏尾部的双箭头 ('更多工具')">
 <!ENTITY Ctr_tbsep_winc		"顶部工具栏: 附加的工具栏分隔符">
 
 <!ENTITY Ctr_closeabarbut	"隐藏附加组件栏关闭按钮">
@@ -254,11 +256,13 @@
 <!ENTITY Ctr_addonbarfs		"在全屏模式">
 
 <!ENTITY Ctr_animation		"动画">
-<!ENTITY Ctr_throbberalt	"使用备选的加载动画效果">
+<!ENTITY Ctr_tabthrobber	"默认的正在加载图片">
 <!ENTITY Ctr_bmanimation	"加入书签动画">
 <!ENTITY Ctr_pananimation	"打开面板动画">
 <!ENTITY Ctr_tabanimation	"打开/关闭标签页动画 (about:config 选项)">
 <!ENTITY Ctr_dlanimation	"“下载提醒”动画 (about:config 选项)">
+<!ENTITY Ctr_fsanimation	"全屏动画 (about:config 选项)">
+<!ENTITY Ctr_fsaduration	"HTML5 内容使用全屏动画 (about:config 选项)">
 
 <!ENTITY Ctr_toolsitem		"在工具菜单中显示菜单项">
 <!ENTITY Ctr_appmenuitem	"在 &brandShortName; 按钮菜单中显示菜单项">
@@ -271,26 +275,27 @@
 <!ENTITY Ctr_nodevtheme		"阻止“开发者主题”被启用">
 
 <!ENTITY Ctr_experttweaks	"高级">
-<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ 引入“新渲染器功能”目前可能是某些系统“标签页卡死”的主要原因。不选中此项以解决该问题。">
 <!ENTITY Ctr_fx34search		"&brandShortName; 34+ 引入“新搜索界面”。不选中此项以恢复“旧搜索界面”。">
 <!ENTITY Ctr_fx34loop		"&brandShortName; 34+ 引入“呼叫和通话”功能。不选中此项以移除它们。">
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ 引入新的“开发者版本主题”。不选中此项以禁用“开发者版本主题”以及定制模式下它的一些按钮。">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ 引入在标签页中显示选项设置。不选中此项以使用旧选项窗口。">
 <!ENTITY Ctr_fx38reader		"&brandShortName; 38+ 引入新的“阅读模式”。不选中此项以禁用它并从地址栏移除图标。">
 <!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ 引入“Pocket”功能。不选中此项以禁用它并从地址栏移除图标。">
-<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
-<!ENTITY Ctr_e_omtc			"OMTC / 卡死标签页的问题">
+<!ENTITY Ctr_fx38pocket2	"注意: 在禁用该选项前移动“Pocket”按钮到 “定制面板” 同时会从书签和阅读菜单移除“Pocket”">
 <!ENTITY Ctr_e_searchui		"搜索栏外观">
 <!ENTITY Ctr_e_loop			"呼叫与会话">
 <!ENTITY Ctr_e_deved		"开发者版本主题">
 <!ENTITY Ctr_e_prefsui		"标签页中显示选项设置">
 <!ENTITY Ctr_e_readermode	"阅读模式">
 <!ENTITY Ctr_e_pocket		"Pocket">
+<!ENTITY Ctr_e_tabsaudioico	"标签页上显示正在播放音频图标">
+<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: 不选中此项，从标签页上移除“正在播放音频图标”。">
 
 
 <!ENTITY Ctr_pw_settings	"设置">
 <!ENTITY Ctr_pw_set_reset	"恢复默认">
 <!ENTITY Ctr_pw_set_predef	"经典主题预设">
+<!ENTITY Ctr_pw_set_preaus	"&brandShortName; 预设">
 <!ENTITY Ctr_pw_set_export	"导出选项设置">
 <!ENTITY Ctr_pw_set_import	"导入选项设置">
 <!ENTITY Ctr_pw_set_syncon	"添加到同步">
@@ -306,6 +311,7 @@
 <!ENTITY Ctr_openInPrivateWindow	"在新建隐私浏览窗口中打开">
 <!ENTITY Ctr_openInPrivateWindow.accesskey	"P">
 <!ENTITY appMenuGettingStarted.label	"开始使用">
+<!ENTITY goCmd.label		"转到">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "B">
@@ -321,6 +327,19 @@
 <!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
 
 <!-- Extra CyberCTR Additions -->
+
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (Default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
@@ -331,6 +350,7 @@
 
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
 
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">

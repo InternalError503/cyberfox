@@ -1,14 +1,15 @@
 "use strict";
+(function(global) {
 if (typeof classicthemerestorerjso == "undefined") {var classicthemerestorerjso = {};};
 if (!classicthemerestorerjso.ctr) {classicthemerestorerjso.ctr = {};};
 
-Components.utils.import("resource://gre/modules/AddonManager.jsm");
-Components.utils.import("resource:///modules/CustomizableUI.jsm");
+var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
+
+var {CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm", {});
+var {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
 //Import services use one service for preferences.
-Components.utils.import("resource://gre/modules/Services.jsm");
-//Query nsIPrefBranch see: Bug 1125570 | Bug 1083561
-Services.prefs.QueryInterface(Components.interfaces.nsIPrefBranch);
+var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 var  contexts = Services.prefs.getBranch("browser.context.");
 
 classicthemerestorerjso.ctr = {
@@ -19,8 +20,7 @@ classicthemerestorerjso.ctr = {
   oswindows:		Services.appinfo.OS=="WINNT",
   needsRestart: 	false,
   tmp_tu_active:	false,
-  
-  // Exclude all preferences we don't want to synced or export/import.
+  // Exclude all preferences we don't want to sync, export or import.
 	blacklist: [
 		"extensions.classicthemerestorer.pref_actindx",
 		"extensions.classicthemerestorer.pref_actindx2",
@@ -36,19 +36,14 @@ classicthemerestorerjso.ctr = {
 		"extensions.classicthemerestorer.ctrpref.lastmodapply",
 		"extensions.classicthemerestorer.ctrpref.updatekey",
 		"extensions.classicthemerestorer.version",
-		"extensions.classicthemerestorer.features.firstrun",
-		"extensions.classicthemerestorer.ctrpref.lastmod.backup"
+		"extensions.classicthemerestorer.ctrpref.lastmod.backup",
+		"extensions.classicthemerestorer.ctrpref.importjson",
+		"extensions.classicthemerestorer.ctrpref.active",
+		"extensions.classicthemerestorer.compatibility.personalmenu"
 		],	
 
   initprefwindow: function() {
-
-	// Movable url-bar (Note: If user moves url-bar to panel UI or customize pallet then restart it will break browser).
-	try{  
-		Application.prefs.get("extensions.classicthemerestorer.movableurlbar").events.addListener("change", function(aEvent){			
-			classicthemerestorerjso.ctr.needsBrowserRestart();						
-		});
-	} catch(e){}	  
-	
+  
 	// adds a new global attribute 'defaultfxtheme' -> better parting css for default and non-default themes
 	try{
 		if (this.fxdefaulttheme) document.getElementById("ClassicTRoptionsPane").setAttribute('defaultfxtheme',true);
@@ -63,9 +58,12 @@ classicthemerestorerjso.ctr = {
 	} catch(e){}
 	
 	try{
-	  if (this.appversion >= 40)
-		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org')
+	  if (this.appversion >= 40) {
+		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org') {
 		  this.fxdefaulttheme=false;
+		}
+		document.getElementById("ClassicTRoptionsPane").setAttribute('fx40plus',true);
+	  }
 	} catch(e){}
 	
 	// restore last selected categories/tabs
@@ -73,7 +71,7 @@ classicthemerestorerjso.ctr = {
 	document.getElementById("ctraddon_tabcolor_tabs").selectedIndex = this.prefs.getIntPref('pref_actindx2');
 	
 		// Append CyberCTR Version To Window Title extensions.classicthemerestorer.version
-		var newTitle = document.title + " " + this.prefs.getCharPref('version');
+		var newTitle = document.title.replace(/.[0-9]/g, '') + " " + this.prefs.getCharPref('version');
 		document.title = newTitle;
 	
 	// disable and hide items not usable on third party themes
@@ -87,7 +85,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_menubarnofog').disabled = true;
 		document.getElementById('ctraddon_pw_tabmokcolor').disabled = true;
 		document.getElementById('ctraddon_pw_tabmokcolor2').disabled = true;
-		document.getElementById('ctraddon_pw_tabmokcolor3').disabled = true;
 		document.getElementById('ctraddon_pw_tabmokcolor4').disabled = true;
 		document.getElementById('ctraddon_pw_panelmenucolor').disabled = true;
 		document.getElementById('ctraddon_pw_nobookbarbg').disabled = true;
@@ -106,11 +103,11 @@ classicthemerestorerjso.ctr = {
 		}
 		
 		document.getElementById('ctraddon_pw_closeonleft').disabled = true;
-		//document.getElementById('ctraddon_pw_closealt').disabled = true;
 		document.getElementById('ctraddon_pw_nbcompact').disabled = true;
 		document.getElementById('ctraddon_pw_tabc_act_tb').disabled = true;
 		document.getElementById('ctraddon_pw_aerocolors').disabled = true;
 		document.getElementById('ctraddon_pw_tbsep_winc').disabled = true;
+		document.getElementById('ctraddon_pw_alt_addonsm').disabled = true;
 
 		document.getElementById('ctraddon_abhigher').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_smallnavbut').style.visibility = 'collapse';
@@ -127,7 +124,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_menubarnofog').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabmokcolor').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabmokcolor2').style.visibility = 'collapse';
-		document.getElementById('ctraddon_pw_tabmokcolor3').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabmokcolor4').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_panelmenucolor').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_mockupoptions').style.visibility = 'collapse';
@@ -149,44 +145,21 @@ classicthemerestorerjso.ctr = {
 		}
 		
 		document.getElementById('ctraddon_pw_closeonleft').style.visibility = 'collapse';
-		//document.getElementById('ctraddon_pw_closealt').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nbcompact').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabc_act_tb').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_aerocolors').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tbsep_winc').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_alt_addonsm').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_transpttbw10').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_tabstoolbargroup').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_devthemegb').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_hightabpososx').style.visibility = 'collapse';
 	} else {
 		document.getElementById('ctraddon_pw_special_info2').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_special_font').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
 	};
 
-	//Custom Button Color Text Color
-	Application.prefs.get("extensions.classicthemerestorer.appbutton").events.addListener("change", function(aEvent){
-		var isButton = Services.prefs.getCharPref("extensions.classicthemerestorer.appbutton");
-		if (isButton ==="appbutton_off" || 
-			isButton ==="appbutton_v1" ||
-			isButton ==="appbutton_v1wt" ||
-			isButton ==="appbutton_v2h" || 
-			isButton ==="appbutton_pm"){
-				document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
-				document.getElementById('ctraddon_pw_cappbutctct').disabled = true;
-				document.getElementById('ctraddon_pw_cappbutctcc').disabled = true;
-				document.getElementById('ctraddon_cappbutnotxtsh').disabled = true;		
-	}});
-	Application.prefs.get("extensions.classicthemerestorer.appbuttonc").events.addListener("change", function(aEvent){
-		
-	if (Services.prefs.getCharPref("extensions.classicthemerestorer.appbuttonc") === "appbuttonc_custom" || 
-		Services.prefs.getCharPref("extensions.classicthemerestorer.appbuttonc") === "appbuttonc_custom1"){
-		document.getElementById('ctraddon_pw_cappbutctcl').disabled = false;
-		document.getElementById('ctraddon_pw_cappbutctct').disabled = false;
-		document.getElementById('ctraddon_pw_cappbutctcc').disabled = false;
-		document.getElementById('ctraddon_cappbutnotxtsh').disabled = false;		
-	}else{
-		document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
-		document.getElementById('ctraddon_pw_cappbutctct').disabled = true;
-		document.getElementById('ctraddon_pw_cappbutctcc').disabled = true;
-		document.getElementById('ctraddon_cappbutnotxtsh').disabled = true;
-	}});	
 	document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
 	document.getElementById('ctraddon_pw_cappbutctct').disabled = true;
 	document.getElementById('ctraddon_pw_cappbutctcc').disabled = true;
@@ -212,7 +185,6 @@ classicthemerestorerjso.ctr = {
 	// HCTP add-on extra labels
 	document.getElementById('ctraddon_hctpinfotab').style.visibility = 'collapse';
 	document.getElementById('ctraddon_hctpinfoab').style.visibility = 'collapse';
-			
 	
 	//Custom search bar width
 	if (this.prefs.getBoolPref("customsearchbarwidth")){
@@ -222,16 +194,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_searchbarwidth').disabled = true;
 		document.getElementById('ctraddon_searchbarwidthl').disabled = true;
 	}
-		
-	Application.prefs.get("extensions.classicthemerestorer.customsearchbarwidth").events.addListener("change", function(aEvent){	
-	if (Services.prefs.getBoolPref("extensions.classicthemerestorer.customsearchbarwidth")){
-		document.getElementById('ctraddon_searchbarwidth').disabled = false;
-		document.getElementById('ctraddon_searchbarwidthl').disabled = false;
-	}else{
-		document.getElementById('ctraddon_searchbarwidth').disabled = true;
-		document.getElementById('ctraddon_searchbarwidthl').disabled = true;
-	}});
-	
+
 	// extra checks to not enable tab width settings while 'TabMixPlus' or 'TabUtilities' is enabled
 	AddonManager.getAddonByID('{dc572301-7619-498c-a57d-39143191b318}', function(addon) {
 	  if(addon && addon.isActive) {
@@ -345,6 +308,13 @@ classicthemerestorerjso.ctr = {
 	   }
 	};
 	AddonManager.addAddonListener(HCTPListener);
+	//Personal menu
+	AddonManager.getAddonByID('CompactMenuCE@Merci.chao', function(addon) {
+		if(addon && addon.isActive) { 
+			document.getElementById('ctraddon_appbuttonboxtab').style.visibility = 'collapse';
+			document.getElementById('ctraddon_appbuttonbox').style.visibility = 'collapse';
+		}
+	});
 
 	// disable bookmark animation checkbox, if 'star button in urlbar' is used
 	if (this.prefs.getBoolPref('starinurl')) document.getElementById('ctraddon_pw_bmanimation').disabled = true;
@@ -377,26 +347,34 @@ classicthemerestorerjso.ctr = {
 	if (this.appversion < 38) {
 	  document.getElementById('ctraddon_pw_readermodegb').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_pocketgb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_readermode2').style.visibility = 'collapse';
 	}
 	if (this.appversion > 37) {
 	  document.getElementById('ctraddon_pw_bmarkoinpw').style.visibility = 'collapse';
 	}
-	if (this.appversion > 39) {
-	  document.getElementById('ctraddon_pw_devtheme').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_devthemeb').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_devthemedescr').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_nodevtheme1').style.visibility = 'collapse';
-	}
 	if (this.appversion < 40) {
-	  document.getElementById('ctraddon_pw_nodevtheme2').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_addonversion').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_alt_addonsm').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_transpttbw10').style.visibility = 'collapse';
+	}
+	if (this.appversion < 41) {
+	  document.getElementById('ctraddon_pw_anewtaburlgbox').style.visibility = 'collapse';
 	}
 
+	if (this.appversion < 42) {
+	  document.getElementById('ctraddon_pw_fsaduration').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_tabsaudioicogb').style.visibility = 'collapse';
+	}
+	
+	if (this.appversion >= 42) {
+	  document.getElementById('ctraddon_pw_readermode2').style.visibility = 'collapse';
+	}
 
 	function PrefListener(branch_name, callback) {
 	  // Keeping a reference to the observed preference branch or it will get
 	  // garbage collected.
 	  this._branch = Services.prefs.getBranch(branch_name);
-	  this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+	  this._branch.QueryInterface(Ci.nsIPrefBranch2);
 	  this._callback = callback;
 	}
 
@@ -470,7 +448,150 @@ classicthemerestorerjso.ctr = {
 			  document.getElementById('ctraddon_pw_tabheightinfo').style.visibility = 'collapse';
 		  
 		  break;
+		  
+			//Temp fix visual glitch changing from square to curved tabs after installing TMP
+			case "tabs":
+				AddonManager.getAddonByID('{dc572301-7619-498c-a57d-39143191b318}', function(addon) {
+					if(addon && addon.isActive && branch.getCharPref("tabs") === "tabs_default" && branch.getBoolPref("compatibility.tabmix") === false) {
+						branch.setBoolPref("compatibility.tabmix", true);
+						classicthemerestorerjso.ctr.needsBrowserRestart();
+					}else if (addon && addon.isActive && branch.getCharPref("tabs") != "tabs_default" && branch.getBoolPref("compatibility.tabmix") === true){
+							branch.setBoolPref("compatibility.tabmix", false);
+					}	
+				});
+			break;
+		  
+			//Custom Button Color Text Color
+			case "appbutton":
+			var isButton = branch.getCharPref("appbutton");
+					if (isButton ==="appbutton_off" || 
+						isButton ==="appbutton_v1" ||
+						isButton ==="appbutton_v1wt" ||
+						isButton ==="appbutton_v2h" || 
+						isButton ==="appbutton_pm"){
+							document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
+							document.getElementById('ctraddon_pw_cappbutctct').disabled = true;
+							document.getElementById('ctraddon_pw_cappbutctcc').disabled = true;
+							document.getElementById('ctraddon_cappbutnotxtsh').disabled = true;		
+				}
+			break;
+			
+			case "appbuttonc":
+				if (branch.getCharPref("appbuttonc") === "appbuttonc_custom" || 
+					branch.getCharPref("appbuttonc") === "appbuttonc_custom1"){
+					document.getElementById('ctraddon_pw_cappbutctcl').disabled = false;
+					document.getElementById('ctraddon_pw_cappbutctct').disabled = false;
+					document.getElementById('ctraddon_pw_cappbutctcc').disabled = false;
+					document.getElementById('ctraddon_cappbutnotxtsh').disabled = false;		
+				}else{
+					document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
+					document.getElementById('ctraddon_pw_cappbutctct').disabled = true;
+					document.getElementById('ctraddon_pw_cappbutctcc').disabled = true;
+					document.getElementById('ctraddon_cappbutnotxtsh').disabled = true;
+				}
+			break;
+			
+			case "customsearchbarwidth":
+				if (branch.getBoolPref("customsearchbarwidth")){
+					document.getElementById('ctraddon_searchbarwidth').disabled = false;
+					document.getElementById('ctraddon_searchbarwidthl').disabled = false;
+				}else{
+					document.getElementById('ctraddon_searchbarwidth').disabled = true;
+					document.getElementById('ctraddon_searchbarwidthl').disabled = true;
+				}
+			break;	
+			
+			case "abouthome":
+				if (branch.getCharPref("abouthome") === "simplicityred" || 
+					branch.getCharPref("abouthome") === "simplicityblue"|| 
+					branch.getCharPref("abouthome") === "simplicitygreen"|| 
+					branch.getCharPref("abouthome") === "simplicityyellow"){
+					document.getElementById('noicons').disabled = true;
+					//Disable custom highlight color on pre-sets.
+					document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
+					document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
+					document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
+					document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
+					branch.setBoolPref("abouthomehighlight", false);
+				}else{
+					document.getElementById('noicons').disabled = false;
+					document.getElementById('ctraddon_ctabouthomecusthltck').disabled = false;
+					document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = false;
+					document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = false;
+					document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = false;
+				}
+				//Disable custom background image on Light|dark theme styles.
+				if (branch.getCharPref("abouthome") === "dark" || 
+					branch.getCharPref("abouthome") === "darkalt" ||
+					branch.getCharPref("abouthome") === "light" ||
+					branch.getCharPref("abouthome") === "lightalt"){
+					document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
+					document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
+					document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
+					document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;
+					branch.setBoolPref("abouthomecustombg", false);
 
+				}else{
+					document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
+					document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
+					document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
+					document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
+				}
+				if (branch.getCharPref("abouthome") === "simplicitycustom"){
+					document.getElementById('noicons').disabled = true;
+				}
+			break;
+
+			case "abouthomecustomurl":
+				//Disable custom highlight colors on default theme in firefox.	
+				if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && 
+					branch.getCharPref("abouthome") === "default") {
+						document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
+						document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
+						document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
+						document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
+						this.prefs.setBoolPref("abouthomehighlight", false);
+				}
+				// Replace whiteSpace and backslash in custom background urls
+				try{
+					branch.setCharPref("abouthomecustomurl", document.getElementById('ctraddon_ctabouthome_bg_urlbox').value.trim().replace(/ /g, "%20").replace(/\\/g,"/"));
+				} catch (e){ }
+			break;
+
+			//Alternate about:newtab page style listener
+			case "alt_newtabpalt":
+				if(branch.getBoolPref("alt_newtabpalt") === true){
+					document.getElementById('ctraddon_pw_alt_newtabp').disabled = true;
+					branch.setBoolPref("alt_newtabp", false);
+					document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = false;
+				}else{
+					document.getElementById('ctraddon_pw_alt_newtabp').disabled = false;
+					document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = true;
+					document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = true;
+				}
+			break;
+			
+			case "aboutnewtabcustomurl":
+
+				// Replace whiteSpace and backslash in custom background urls
+				try{
+					branch.setCharPref("aboutnewtabcustomurl", document.getElementById('ctraddon_ctnewtab_bg_urlbox').value.trim().replace(/ /g, "%20").replace(/\\/g,"/"));
+				} catch (e){ }
+			break;
+	
 		}
 	  }
 	);
@@ -487,8 +608,7 @@ classicthemerestorerjso.ctr = {
 	this.ctrpwHidetbwotExtra(this.prefs.getBoolPref("hidetbwot"));
 	this.altTabsToolbarBgExtra(this.prefs.getBoolPref("alttabstb"));
 	this.ctrpwModeextra(this.prefs.getCharPref("nav_txt_ico"));
-	this.ctrpwDisableDevThemePrefsExtra(this.prefs.getBoolPref("nodevtheme"));
-
+	this.currentTabAppearance(this.prefs.getCharPref("tabs"));
 	
 	var closetab_value = this.prefs.getCharPref("closetab");
   
@@ -552,38 +672,7 @@ classicthemerestorerjso.ctr = {
 		if (this.prefs.getCharPref("abouthome") === "simplicitycustom"){
 			document.getElementById('noicons').disabled = true;
 		}	
-
-		Application.prefs.get("extensions.classicthemerestorer.abouthome").events.addListener("change", function(aEvent){
-			if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicityred" || 
-				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicityblue"|| 
-				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicitygreen"|| 
-				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicityyellow"){
-				document.getElementById('noicons').disabled = true;
-				//Disable custom highlight color on pre-sets.
-				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
-				document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
-				document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
-				document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
-				Services.prefs.setBoolPref("extensions.classicthemerestorer.abouthomehighlight", false);
-			}else{
-				document.getElementById('noicons').disabled = false;
-				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = false;
-				document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = false;
-				document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = false;
-				document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = false;
-			}
-			if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "simplicitycustom"){
-				document.getElementById('noicons').disabled = true;
-			}
-		});
-		
-		// Replace whiteSpace and backslash in custom background urls	
-		Application.prefs.get("extensions.classicthemerestorer.abouthomecustomurl").events.addListener("change", function(aEvent){				
-		try{
-			Services.prefs.setCharPref("extensions.classicthemerestorer.abouthomecustomurl", document.getElementById('ctraddon_ctabouthome_bg_urlbox').value.trim().replace(/ /g, "%20").replace(/\\/g,"/"));
-		} catch (e){ }
-		});
-		
+	
 		//Disable custom background image on Light|dark theme styles.
 		if (this.prefs.getCharPref("abouthome") === "dark" || 
 			this.prefs.getCharPref("abouthome") === "darkalt" ||
@@ -602,32 +691,6 @@ classicthemerestorerjso.ctr = {
 			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
 		}
 
-		Application.prefs.get("extensions.classicthemerestorer.abouthome").events.addListener("change", function(aEvent){
-				if (Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "dark" || 
-					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "darkalt" ||
-					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "light" ||
-					Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "lightalt"){
-				document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
-				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
-				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
-			    document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;
-				Services.prefs.setBoolPref("extensions.classicthemerestorer.abouthomecustombg", false);
-			}else{
-				document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
-				document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
-				document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
-				document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
-			}
-			//Disable custom highlight colors on default theme in firefox.	
-			if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && 
-				Services.prefs.getCharPref("extensions.classicthemerestorer.abouthome") === "default") {
-					document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
-					document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
-					document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
-					document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = true;
-					this.prefs.setBoolPref("abouthomehighlight", false);
-			}
-		});
 		//Disable custom highlight colors on default theme in firefox.	
 		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && this.prefs.getCharPref("abouthome") === "default") {
 				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
@@ -660,34 +723,7 @@ classicthemerestorerjso.ctr = {
 				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = true;
 				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = true;
 			}		
-		
-		
-		//Alternate about:newtab page style listener
-		Application.prefs.get("extensions.classicthemerestorer.alt_newtabpalt").events.addListener("change", function(aEvent){
-			if(Services.prefs.getBoolPref("extensions.classicthemerestorer.alt_newtabpalt") === true){
-				document.getElementById('ctraddon_pw_alt_newtabp').disabled = true;
-				Services.prefs.setBoolPref("extensions.classicthemerestorer.alt_newtabp", false);
-				document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = false;
-			}else{
-				document.getElementById('ctraddon_pw_alt_newtabp').disabled = false;
-				document.getElementById('ctraddon_ctaboutnewtabcustbsck').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcusthltck').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcustbslb').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcustbstb').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcustbscp').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcusthltlb').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcusthlttb').disabled = true;
-				document.getElementById('ctraddon_ctaboutnewtabcusthltcp').disabled = true;
-			}	
-		});
-		
+
 			document.getElementById("css").value = Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter");
 			this.hideThemeInfoForTabs();
   },
@@ -696,8 +732,8 @@ classicthemerestorerjso.ctr = {
      when preference window gets closed */
   unloadprefwindow: function() {
 
-	var cancelQuit   = Components.classes["@mozilla.org/supports-PRBool;1"].createInstance(Components.interfaces.nsISupportsPRBool);
-	var observerSvc  = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+	var cancelQuit   = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
+	var observerSvc  = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
 						
 	var brandName	 = '';
@@ -748,20 +784,11 @@ classicthemerestorerjso.ctr = {
 	this.unsetTabColorsAndMore();
 
   },
-  
-  //only reset prefs for dev theme, if it is enabled
-  resetPrefsForDevTheme2: function(){
-	try {
-	  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
-		classicthemerestorerjso.ctr.resetPrefsForDevTheme();
-	  }
-	} catch(e) {}
-  },
  
   hideThemeInfoForTabs: function(){
 	setTimeout(function(){
 		//try {
-		  if(classicthemerestorerjso.ctr.appversion < 40) {
+		  if(classicthemerestorerjso.ctr.appversion < 41) {
 			try {
 			  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
 				document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'visible';
@@ -863,14 +890,7 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_pw_hidetbwote_winc').style.visibility = itemvis;
 	document.getElementById('ctraddon_pw_hidetbwote2').style.visibility = itemvis;
   },
-  
-  ctrpwDisableDevThemePrefsExtra: function(which) {
-	if (this.appversion >= 35) {
-	  document.getElementById('ctraddon_pw_devtheme').disabled = which;
-	  document.getElementById('ctraddon_pw_devthemeb').disabled = which;
-	}
-  },
-  
+ 
   altTabsToolbarBgExtra: function(which) {
 	if (this.fxdefaulttheme) {
 	
@@ -891,7 +911,7 @@ classicthemerestorerjso.ctr = {
   },
   
   ctrpwTabcloseextra2: function(which) {
-	document.getElementById('ctraddon_pw_closealt').disabled = which;
+	document.getElementById('ctraddon_pw_closeicon').disabled = which;
   },
   
   ctrMovStatusextra: function() {
@@ -926,6 +946,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = false;
 	} else if (which=="appbutton_v1wt" && this.fxdefaulttheme){
 	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = false;
@@ -933,8 +954,9 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
 	  document.getElementById('ctraddon_dblclclosefx').disabled = true;
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
-	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
+	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = false;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = false;
 	} else if (which=="appbutton_v1" && !this.fxdefaulttheme){
 	  document.getElementById('ctraddon_altabico_list').disabled = false;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
@@ -944,6 +966,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = false;
 	} else if (which=="appbutton_v1wt" && !this.fxdefaulttheme){
 	  document.getElementById('ctraddon_altabico_list').disabled = false;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
@@ -951,9 +974,10 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
 	  document.getElementById('ctraddon_dblclclosefx').disabled = true;
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
-	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
+	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = false;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
-	} else if (which=="appbutton_off" || which=="appbutton_pm" || which=="appbutton_v2h"){
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = false;
+	} else if (which=="appbutton_off" || which=="appbutton_v2h"){
 	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
 	  document.getElementById('ctraddon_appbutbdl').disabled = true;
@@ -962,6 +986,17 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = true;
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = true;
+	} else if (which=="appbutton_pm"){
+	  document.getElementById('ctraddon_altabico_list').disabled = true;
+	  document.getElementById('ctraddon_abhigher').disabled = true;
+	  document.getElementById('ctraddon_appbutbdl').disabled = true;
+	  document.getElementById('ctraddon_appbutcolor_list').disabled = false;
+	  document.getElementById('ctraddon_dblclclosefx').disabled = true;
+	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
+	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
+	  document.getElementById('ctraddon_appbclmmenus').disabled = true;
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = true;
 	} else if (which=="appbutton_v2io" || which=="appbutton_v2io2") {
 	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
@@ -971,10 +1006,12 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = true;
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = true;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
-	  
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = false;
+
 	  if (tabsintitlebar==false && fromprefwindow==true) {
 		Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
 	  }
+
 	} else {
 	  document.getElementById('ctraddon_altabico_list').disabled = true;
 	  document.getElementById('ctraddon_abhigher').disabled = true;
@@ -984,10 +1021,11 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = false;
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = false;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
-	  
+
 	  if (tabsintitlebar==false && fromprefwindow==true) {
 		Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
 	  }
+
 	}
   },
   
@@ -1047,6 +1085,17 @@ classicthemerestorerjso.ctr = {
   
   },
   
+  currentTabAppearance: function(which) {
+	
+	if(which=="tabs_squaredc2" || which=="tabs_squared2c2") {
+	  document.getElementById('ctraddon_pw_square_edges').disabled = false;
+	  document.getElementById('ctraddon_pw_square_edges').style.visibility = 'visible';
+	} else {
+	  document.getElementById('ctraddon_pw_square_edges').disabled = true;
+	  document.getElementById('ctraddon_pw_square_edges').style.visibility = 'collapse';
+	}
+  },
+  
   ctrpwStarFeedDelay: function(){
 	document.getElementById('ctraddon_pw_starinurl').disabled = true;
 	document.getElementById('ctraddon_pw_feedinurl').disabled = true;
@@ -1064,6 +1113,13 @@ classicthemerestorerjso.ctr = {
 		else document.getElementById('ctraddon_pw_bmanimation').disabled = false;
 	},1350);
   },
+  
+  // Movable url-bar (Note: If user moves url-bar to panel UI or customize pallet then restart it will break browser).
+  isUrlbarMovable: function(aBoolean){
+	  if(aBoolean){
+		classicthemerestorerjso.ctr.needsBrowserRestart();
+	  }	
+  },		
   
   resetCTRpreferences: function() {
     var preferences = document.getElementsByTagName("preference");
@@ -1107,6 +1163,7 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("alt_newtabp",true);
 	this.prefs.setBoolPref("skipprintpr",true);
 	this.prefs.setBoolPref("tbconmenu",true);
+	if(this.appversion >= 40) this.prefs.setBoolPref("alt_addonsm",true);
 	
 	setTimeout(function(){
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("starinurl",true);
@@ -1121,7 +1178,7 @@ classicthemerestorerjso.ctr = {
   },
 
   // 'Australis' preset
-  AustralisCTRpreferences: function() {
+  australisCTRpreferences: function() {
 	this.resetCTRpreferences();
 	CustomizableUI.moveWidgetWithinArea("bookmarks-menu-button",5);
 	this.prefs.setCharPref("appbutton",'appbutton_off');	
@@ -1211,7 +1268,7 @@ classicthemerestorerjso.ctr = {
 
 	  } catch(e) {
 		// Report errors to console
-		Components.utils.reportError(e);
+		Cu.reportError(e);
 	  }
 
 	}	  
@@ -1298,7 +1355,7 @@ classicthemerestorerjso.ctr = {
 
 	  } catch(e) {
 		// Report errors to console
-		Components.utils.reportError(e);
+		Cu.reportError(e);
 	  }
 	}	
 
@@ -1345,7 +1402,7 @@ classicthemerestorerjso.ctr = {
 
 	  } catch(e) {
 		// Report errors to console
-		Components.utils.reportError(e);
+		Cu.reportError(e);
 	  }
 
 	}
@@ -1372,9 +1429,9 @@ classicthemerestorerjso.ctr = {
 			  return false;
 			}
 
-			const nsIFilePicker = Components.interfaces.nsIFilePicker;
-			var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-			var stream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+			const nsIFilePicker = Ci.nsIFilePicker;
+			var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+			var stream = Cc["@mozilla.org/network/file-output-stream;1"].createInstance(Ci.nsIFileOutputStream);
 
 			fp.init(window, null, nsIFilePicker.modeSave);
 			fp.defaultExtension = aType;
@@ -1416,7 +1473,7 @@ classicthemerestorerjso.ctr = {
 			}
 			return true;
 		  } catch(e) {
-			Components.utils.reportError(e);
+			Cu.reportError(e);
 		  }
 	  },
 
@@ -1427,10 +1484,10 @@ classicthemerestorerjso.ctr = {
 			}
 			
 			var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
-			const nsIFilePicker = Components.interfaces.nsIFilePicker;
-			var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-			var stream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
-			var streamIO = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
+			const nsIFilePicker = Ci.nsIFilePicker;
+			var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+			var stream = Cc["@mozilla.org/network/file-input-stream;1"].createInstance(Ci.nsIFileInputStream);
+			var streamIO = Cc["@mozilla.org/scriptableinputstream;1"].createInstance(Ci.nsIScriptableInputStream);
 
 			fp.defaultExtension = aType;
 			fp.defaultString = "CTRpreferences." + aType;
@@ -1467,7 +1524,7 @@ classicthemerestorerjso.ctr = {
 			}
 			return null;
 		  } catch(e) {
-			Components.utils.reportError(e);
+			Cu.reportError(e);
 		  }
 	  },
  
@@ -1486,8 +1543,8 @@ classicthemerestorerjso.ctr = {
  	ReuseFeaturesTab: function (attrName, url) {
 	
 	try{
-			  var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-								 .getService(Components.interfaces.nsIWindowMediator);
+			  var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
+								 .getService(Ci.nsIWindowMediator);
 			  for (var found = false, index = 0, tabbrowser = wm.getEnumerator('navigator:browser').getNext().gBrowser;
 				   index < tabbrowser.tabContainer.childNodes.length && !found;
 				   index++) {
@@ -1572,15 +1629,15 @@ classicthemerestorerjso.ctr = {
 	
 	copyCss: function () {
 			if(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter").length === 0){return;}
-            var gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper);
+            var gClipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);
             gClipboardHelper.copyString(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter"));
 	},
 
-	selectBG: function() {
+	selectBG: function(aPlace) {
 		try{
-		   const nsIFilePicker = Components.interfaces.nsIFilePicker;
-		   var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-		   var stream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+		   const nsIFilePicker = Ci.nsIFilePicker;
+		   var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+		   var stream = Cc["@mozilla.org/network/file-input-stream;1"].createInstance(Ci.nsIFileInputStream);
 		   var IOpath = "";
 
 		   fp.init(window, null, nsIFilePicker.modeOpen);
@@ -1590,9 +1647,13 @@ classicthemerestorerjso.ctr = {
 			   IOpath = fp.file.path;
 			   stream.close();
 			   if (IOpath === ""){return null;}
+			if (aPlace === "abh"){   
 			  document.getElementById('ctraddon_ctabouthome_bg_urlbox').value = "file:" + IOpath ;
 			  Services.prefs.setCharPref("extensions.classicthemerestorer.abouthomecustomurl", "file:" + IOpath);
-			  
+			}else if (aPlace === "ntp"){
+			  document.getElementById('ctraddon_ctnewtab_bg_urlbox').value = "file:" + IOpath ;
+			  Services.prefs.setCharPref("extensions.classicthemerestorer.aboutnewtabcustomurl", "file:" + IOpath);
+			}			
 			  return true;
 		   }
 		   return null;
@@ -1600,3 +1661,8 @@ classicthemerestorerjso.ctr = {
 	}
 	
 };
+
+
+  // Make classicthemerestorerjso a global variable
+  global.classicthemerestorerjso = classicthemerestorerjso;
+}(this));

@@ -30,7 +30,7 @@
 <!ENTITY Ctr_tabcolors_t	"Barve zavihkov in besedilo">
 
 <!ENTITY Ctr_tabs			"Zavihki">
-<!ENTITY Ctr_tabs0			"Zaokroženi zavihki (Australis default)">
+<!ENTITY Ctr_tabs0			"Zaokroženi zavihki (&brandShortName;ova privzeta nastavitev)">
 <!ENTITY Ctr_tabs1			"Pravokotni zavihki (klasični)">
 <!ENTITY Ctr_tabs1m			"Pravokotni zavihki (australizirani)">
 <!ENTITY Ctr_tabs2			"Zaokroženi zavihki (nadomestni)">
@@ -50,11 +50,10 @@
 <!ENTITY Ctr_tabheightinfo	"Nizke vrednosti bodo v razpetem načinu povzročile napake!">
 <!ENTITY Ctr_tabmaxwidth	"Največja širina:">
 <!ENTITY Ctr_tabminwidth	"Najmanjša širina:">
-<!ENTITY Ctr_tabclipwidth	"Clip-width:">
-<!ENTITY Ctr_tabclipwidthI	"Set 'clip width' to '1' manually!">
 <!ENTITY Ctr_tabwidthinfo	"Širino zavihkov nadzira TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Širino zavihkov nadzira TabUtilities">
-<!ENTITY Ctr_tabwidthinfo3	"Vrednosti pod 48 slikovnih točk bodo v večini premerov povzročile napake!">
+<!ENTITY Ctr_tabwidthinfo3	"Vrednosti pod 48 sl. točk bodo v večini premerov povzročile napake!">
+<!ENTITY Ctr_square_edges	"Kvadratasti zgornji koti">
 <!ENTITY Ctr_tabinsertion	"Vstavi odprti zavihek poleg trenutnega (nastavitev about:config)">
 <!ENTITY Ctr_emptyfavicon	"Obnovi prazno zaznamko (če je stran ne dobavi)">
 <!ENTITY Ctr_noemptypticon	"Odstrani prazno zaznamko iz pripetih zavihkov">
@@ -66,7 +65,7 @@
 <!ENTITY Ctr_closetab_4		"Na začetku orodne vrstice zavihkov">
 <!ENTITY Ctr_closetab_5		"Na vseh zavihkih (vsiljeno)">
 <!ENTITY Ctr_closetab_hfot	"Skrij ob enem odprtem zavihku">
-<!ENTITY Ctr_closealt		"Rdeča ikona Zapri">
+<!ENTITY Ctr_closei_def		"Privzete ikone">
 <!ENTITY Ctr_closeonleft	"Nadomestni položaj na zavihku">
 <!ENTITY Ctr_close_wwltab	"Zapri okno z nazadje vidnim zavihkom (nastavitev about:config)">
 
@@ -80,14 +79,13 @@
 <!ENTITY Ctr_appbutton2		"Gumb na nazivni vrstici [&brandShortName;a]">
 <!ENTITY Ctr_appbutton2h	"Gumb na nazivni vrstici [&brandShortName;a] (skrit)">
 <!ENTITY Ctr_appbutton2io	"Gumb na nazivni vrstici [&brandShortName;a] (samo ikona)">
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName;a button color (default)">
 <!ENTITY Ctr_paneluibtweak	"Oranžni gumb ploščastega menija na orodni vrstici zavihkov">
 <!ENTITY Ctr_appbuttonc_o	"Oranžna barva gumba (privzeto)">
 <!ENTITY Ctr_appbuttonc_a	"Modra barva gumba (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Črna barva gumba (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Prosojen gumb">
+<!ENTITY Ctr_appbuttonc_p	"Modra barva gumba (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"Rdeča barva gumba">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 <!ENTITY Ctr_appbuttonc_g	"Zelena barva gumba">
 <!ENTITY Ctr_appbuttonc_gr	"Siva barva gumba">
 <!ENTITY Ctr_appbuttonc_pu	"Vijolična barva gumba">
@@ -97,13 +95,14 @@
 <!ENTITY Ctr_appbuttonI1e	"Ni viden na orodni vrstici OS-a Windows, samo na orodni vrstici &brandShortName;a!">
 <!ENTITY Ctr_appbuttonI2	"Barve gumba so vidne samo na nazivni vrstici in vrstici zavihkov!">
 <!ENTITY Ctr_appbutmhi		"Višji položaj (če se nahaja na orodni vrstici zavihkov)">
+<!ENTITY Ctr_appbautocol	"Set default / Aurora / Nightly color automatically">
 <!ENTITY Ctr_appbutbdl		"Skrij obrobe in barve ozadja">
 <!ENTITY Ctr_dblclclosefx	"Dvojni klik zapre trenutno okno">
 <!ENTITY Ctr_appbclmmenus	"Klikljivi meniji v meniju gumba (Nov zavihek, Natisni ...)">
 <!ENTITY Ctr_appbutonclab	"Naziv">
 <!ENTITY Ctr_appbutonclab2	"Dodajte naziv ali pustite prazno">
 
-<!ENTITY Ctr_ui				"Splošen UI">
+<!ENTITY Ctr_ui				"Splošen up.vmesnik">
 <!ENTITY Ctr_nbiconsize0	"Atribut orodne vrstice za krmarjenje 'iconsize'">
 <!ENTITY Ctr_smallnavbut	"Majhni gumbi na orodni vrstici za krmarjenje">
 <!ENTITY Ctr_bfurlbarfix	"Pritrdi polmer obrobe naslovne vrstice">
@@ -139,14 +138,12 @@
 <!ENTITY Ctr_cpanelmenus	"Ploščasti meniji: strnjen pogled (zaznamki, zgodovina itd.)">
 <!ENTITY Ctr_hidezoomres	"Nadzorni gumbi za povečavo na orodni vrstici: skrij gumb za ponastavitev povečave">
 <!ENTITY Ctr_alt_newtabp	"Stran novega zavihka: nadomestni videz">
-<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
-<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
-<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
-<!ENTITY Ctr_alt_addonsp	"Add-ons 'more info' page: alternative appearance">
-<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
-<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_addonmanager	"Upravitelj dodatkov">
+<!ENTITY Ctr_alt_addonsp	"Stran dodatkov 'Več': nadomestni videz">
+<!ENTITY Ctr_alt_addonsm	"Upravitelj dodatkov: nadomestni videz">
+<!ENTITY Ctr_am_nowarning	"Seznami dodatkov Upravitelja dodatkov: skrij opozorila">
+<!ENTITY Ctr_addonversion	"Stran dodatkov: prikaži različico dodatka">
+<!ENTITY Ctr_xpinstallui	"Add-on manager: old add-on install window (about:config preference)">
 <!ENTITY Ctr_bmbutpanelm	"Gumb menija zaznamkov: videz ploščastega menija">
 <!ENTITY Ctr_bmbutnotext	"Gumb menija zaznamkov: skrij oznako na vrstici zaznamkov">
 <!ENTITY Ctr_skipprintpr	"Gumb Natisni: preskoči predogled tiskanja">
@@ -156,14 +153,16 @@
 <!ENTITY Ctr_pmhidelabels	"Pojavno okno ploščastega menija: skrij oznake gumbov">
 <!ENTITY Ctr_menupopupscr	"Pojavna okna menijev: prikaži drsnike namesto drsnih puščic">
 
+<!ENTITY Ctr_tabsep_def		"Default tab separators">
 <!ENTITY Ctr_fxmockup		"Prototip &brandShortName;a">
 <!ENTITY Ctr_tabmokcolor	"Bela barva gumbov zavihkov (Zapri, Nov, Skupine, Seznam vseh)">
 <!ENTITY Ctr_tabmokcolor2	"Bela barva in temna senca besedila nedejavnih zavihkov">
-<!ENTITY Ctr_tabmokcolor3	"Bela barva ločil zavihov">
 <!ENTITY Ctr_tabmokcolor4	"Bela barva pikčaste prazne zaznamke zavihka">
 
 <!ENTITY Ctr_navthrobber1	"Klik na kazalnik dejavnosti odpre naslednji url v novem zavihku:">
 <!ENTITY Ctr_navthrobber2	"Dodajte url ali pustite prazno">
+<!ENTITY Ctr_anewtaburl		"URL strani novega zavihka">
+<!ENTITY Ctr_anewtaburlcb	"URL strani novega zavihka po meri (privzeto: 'about:newtab')">
 
 <!ENTITY Ctr_tab_tf_info1	"Podprta so imena barv, šestnajstiške kode, rga(a) in hsl(a).">
 <!ENTITY Ctr_tab_tf_info2	"Vnosi ne bodo preverjeni!">
@@ -192,6 +191,7 @@
 <!ENTITY Ctr_starinurl		"Gumb Zvezdica">
 <!ENTITY Ctr_feedinurl		"Gumb vira RSS">
 <!ENTITY Ctr_hideurelstop	"Skrij gumba 'Ustavi in Ponovno naloži'">
+<!ENTITY Ctr_hideurlgo		"Skrij gumb 'pojdi'">
 <!ENTITY Ctr_urlbardropm	"Premakni spustno puščico na konec naslovne vrstice">
 <!ENTITY Ctr_hideprbutton	"Skrij ikono obvestil ob blokiranju pojavnega okna">
 <!ENTITY Ctr_urlbar_ib		"Gumb identitete strani (polje indentitete)">
@@ -237,8 +237,10 @@
 <!ENTITY Ctr_menubarnofog	"Odstrani barvo ozadja/meglo (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Modre barve Aero za orodne vrstice (in zavihke)">
+<!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color (Windows 10)">
 <!ENTITY Ctr_hidenavbar		"Orodna vrstica za krmarjenje: skrij orodno vrstico">
 <!ENTITY Ctr_nobookbarbg	"Orodna vrstica zaznamkov: odstrani barvo ozadja">
+<!ENTITY Ctr_bookbarfs		"Orodna vrstica zaznamkov: v celozaslonskem načinu">
 <!ENTITY Ctr_nonavbarbg		"Orodna vrstica za krmarjenje: odstrani barvo ozadja">
 <!ENTITY Ctr_nonavbarbg1	"To vpliva na dodatne orodne vrstice tega dodatka in druge orodne vrstice na vrhu.">
 <!ENTITY Ctr_nonavbarbg2	"To vpliva na vse orodne vrstice izbire Slim Chrome dodatka 'The Fox, Only Better'.">
@@ -246,7 +248,7 @@
 <!ENTITY Ctr_nonavtbborder	"Orodne vrstice na vrhu: odstrani obrobe orodnih vrstic">
 <!ENTITY Ctr_hidesbclose	"Stranske vrstice: skrij gumb Zapri stranske vrstice">
 <!ENTITY Ctr_notextshadow	"Orodne vrstice: skrij senco besedila orodnih vrstic in zavihkov">
-<!ENTITY Ctr_chevronfix		"Orodna vrstica za krmarjenje: skrij dvojno puščico ('chevron') na koncu orodne vrstice">
+<!ENTITY Ctr_chevronfix		"Orodna vrstica za krmarjenje: skrij dvojno puščico ('Več orodij') na koncu orodne vrstice">
 <!ENTITY Ctr_tbsep_winc		"Zgornje orodne vrstice: dodatna ločila orodnih vrstic">
 
 <!ENTITY Ctr_closeabarbut	"Skrij gumb Zapri vrstice dodatkov">
@@ -254,11 +256,13 @@
 <!ENTITY Ctr_addonbarfs		"V celozaslonskem načinu">
 
 <!ENTITY Ctr_animation		"Animacija">
-<!ENTITY Ctr_throbberalt	"Nadomestna animacija nalaganja na zavihkih">
+<!ENTITY Ctr_tabthrobber	"Default loading image">
 <!ENTITY Ctr_bmanimation	"Animacija dodajanja med zaznamke">
 <!ENTITY Ctr_pananimation	"Animacija odpiranja podokna">
 <!ENTITY Ctr_tabanimation	"Animacija zapiranja/odpiranja zavihkov (nastavitev about:config)">
 <!ENTITY Ctr_dlanimation	"Animacija 'obvestila o prenosih' (nastavitev about:config)">
+<!ENTITY Ctr_fsanimation	"Celozaslonske animacije (nastavitev about:config)">
+<!ENTITY Ctr_fsaduration	"Celozaslonske animacije za vsebino HTML5 (nastavitev about:config)">
 
 <!ENTITY Ctr_toolsitem		"Predmet menija v meniju Orodja">
 <!ENTITY Ctr_appmenuitem	"Predmet menija v meniju programskega gumba">
@@ -271,30 +275,31 @@
 <!ENTITY Ctr_nodevtheme		"Prepreči namestitev teme 'Developer Theme'">
 
 <!ENTITY Ctr_experttweaks	"Napredno">
-<!ENTITY Ctr_fx33layers		"&brandShortName; 33+ je vpeljal 'nove možnosti izrisa', ki na nekaterih sistemih povzročajo 'zamrznitev zavihkov'. Odznačitev te nastavitve bo rešila to težavo.">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ je vpeljal 'nov ui za iskanje'. Odznačitev te nastavitve povrne 'stari ui za iskanje'.">
+<!ENTITY Ctr_fx34search		"&brandShortName; 34+ je vpeljal 'nov up. vmesnik za iskanje'. Odznačitev te nastavitve povrne 'stari up. vmesnik za iskanje'.">
 <!ENTITY Ctr_fx34loop		"&brandShortName; 34+ je vpeljal možnosti 'klicanja in pogovorov'. Odznačitev te nastavitve jih odstrani.">
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ je vpeljal novo temo 'Developer theme'. Odznačitev teh nastavitev to temo in pripadajoči gumb v načinu prilagoditve onemogoči.">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ je vpeljal nastavitve v zavihku. Odznačitev te nastavitve obnovi staro okno nastavitev.">
 <!ENTITY Ctr_fx38reader		"&brandShortName; 38+ je vpeljal nov 'način za branje'. Odznačitev teh nastavitev ga onemogoči in odstrani njegovo ikono iz naslovne vrstice.">
-<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ introduced the 'Pocket' feature. Unchecking this preference disables it and removes its button from the toolbars.">
-<!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries in bookmarks and reader menus.">
-<!ENTITY Ctr_e_omtc			"OMTC / težava z zamrznjenim zavihkom">
+<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ je vpeljal storitev 'Pocket'. Odznačitev te nastavitve jo onemogoči in iz orodnih vrstic odstrani njen gumb.">
+<!ENTITY Ctr_fx38pocket2	"Opomba: Premikanje gumba 'Pocket' v 'paleto za prilagoditev' pred onemogočanjem te nastavitve odstani tudi vnose 'Pocket' v menijih zaznamkov in bralnika.">
 <!ENTITY Ctr_e_searchui		"Videz iskanja">
 <!ENTITY Ctr_e_loop			"Klicanje in pogovori">
 <!ENTITY Ctr_e_deved		"Tema Developer Edition">
 <!ENTITY Ctr_e_prefsui		"Nastavitve v zavihku">
 <!ENTITY Ctr_e_readermode	"Način za branje">
 <!ENTITY Ctr_e_pocket		"Pocket">
+<!ENTITY Ctr_e_tabsaudioico	"Audio playing icon on tabs">
+<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Unchecking this preference removes 'audio playing icon' from tabs.">
 
 
 <!ENTITY Ctr_pw_settings	"Nastavitve">
 <!ENTITY Ctr_pw_set_reset	"Obnovi privzete nastavitve">
 <!ENTITY Ctr_pw_set_predef	"Klasične prednastavljene nastavitve">
+<!ENTITY Ctr_pw_set_preaus	"&brandShortName;ove prednastavljene nastavitve">
 <!ENTITY Ctr_pw_set_export	"Izvozi nastavitve">
 <!ENTITY Ctr_pw_set_import	"Uvozi nastavitve">
-<!ENTITY Ctr_pw_set_syncon	"Add to Sync">
-<!ENTITY Ctr_pw_set_syncoff	"Remove from Sync">
+<!ENTITY Ctr_pw_set_syncon	"Dodaj v Sync">
+<!ENTITY Ctr_pw_set_syncoff	"Odstrani iz Synca">
 
 <!ENTITY Ctr_special_font	"Nastavitve barve ozadja so samo za privzeto temo!">
 <!ENTITY Ctr_special_info	"Nekatere možnosti v vseh primerih morda ne bodo povzročile vidnih sprememb">
@@ -306,6 +311,7 @@
 <!ENTITY Ctr_openInPrivateWindow "Odpri v novem Zasebnem oknu">
 <!ENTITY Ctr_openInPrivateWindow.accesskey "Z">
 <!ENTITY appMenuGettingStarted.label "Začetek">
+<!ENTITY goCmd.label		"Pojdi">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "N">
@@ -321,6 +327,19 @@
 <!-- DONT-EDIT! End Fallback entities. Leave empty! DONT-EDIT! -->
 
 <!-- Extra CyberCTR Additions -->
+
+<!ENTITY Ctr_appbuttonc_d	"&brandShortName;a button color (default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+
+<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
+<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
+<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+
+<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
+<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+
 <!ENTITY Ctr_classic_elements		"Classic Elements">
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
@@ -331,6 +350,7 @@
 
 <!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
 <!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
+<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
 
 <!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
 <!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
