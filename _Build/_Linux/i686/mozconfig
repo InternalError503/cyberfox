@@ -32,7 +32,6 @@ ac_add_options --enable-install-strip
 
 #Disable unwanted features
 ac_add_options --disable-pay
-ac_add_options --disable-metro
 ac_add_options --disable-maintenance-service
 ac_add_options --disable-services-healthreport
 ac_add_options --disable-moz-services-healthreport
@@ -54,6 +53,6 @@ ac_add_options --disable-mochitest
 ac_add_options --disable-mochitests
 ac_add_options --disable-accessibility
 ac_add_options --disable-parental-controls
-ac_add_options --disable-logging
+#ac_add_options --disable-logging
 ac_add_options --disable-gnomevfs
 ac_add_options --disable-elf-hack 
