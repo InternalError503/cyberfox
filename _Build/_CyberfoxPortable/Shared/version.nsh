@@ -1,1 +1,1 @@
-!define VER "1.8.4.7"
+!define VER "1.8.5.2"

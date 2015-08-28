@@ -1,11 +1,8 @@
 @echo Off
-title Build Cyberfox Portable V1.6
+title Build Cyberfox Portable V1.7
 ECHO.
-ECHO.Package Version *(Required)
-echo. Must be same as version been package
-set /P verdata=Enter Version Number (27.0.1.0)? 
-set Version=%verdata%
-:top
+(set /P Version=
+)<Version\Version.txt
 
 set BuildFolderPath=%~DP0
 set BuildFolderPathIntel=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable\
@@ -23,40 +20,7 @@ echo.Exiting
 goto :exit
 ) 
 
-ECHO.
-ECHO.
-ECHO.                                                         			   
-ECHO.Please Select Compiler Option           
-ECHO.---------------------------------------         	   
-ECHO.                                                                      
-ECHO.Press 1 to Create (x86) Package.                
-ECHO.Press 2 to Create (x64) Package.
-ECHO.Press 3 to Create Installer Package.
-ECHO.Press 4 to Create Zipped Package.
-ECHO.Press E to Exit.                      
-ECHO.                                                          
-ECHO.---------------------------------------         
-ECHO.
-ECHO.
-ECHO.----------- 
-ECHO.1. Create (x86) Package. 
-ECHO.2. Create (x64) Package. 
-ECHO.3  Create Installer Package.
-ECHO.4  Create Zipped Package.
-ECHO.E. E to Exit.
-ECHO.Any Key. Cancel.             
-ECHO.----------- 
-SET /P uin=Choose an option (1,2,3,4,E)? 
-if /i {%uin%}=={1} (goto :Compile-Package-86)
-if /i {%uin%}=={2} (goto :Compile-Package-64)
-if /i {%uin%}=={3} (goto :Installer-Package)
-if /i {%uin%}=={4} (goto :Zipped-Package)  
-if /i {%uin%}=={E} (goto :exit)
-if /i {%uin%}=={Exit} (goto :exit)
-if /i {%uin%}=={EXIT} (goto :exit)
-if /i {%uin%}=={e} (goto :exit)
-if /i {%uin%}=={exit} (goto :exit)
-goto :top
+goto :Compile-Package-86
 
 :Compile-Package-86
 echo. Compilation of portable medium is starting!
@@ -70,6 +34,7 @@ copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel86\UpdateConfig.ini
 call %DeleteDir% "%BuildFolderPathIntel%App\Cyberfox" "%BuildFolderPathIntel%App\Cyberfox not found!"
 mkdir "%BuildFolderPathIntel%App\Cyberfox"
 @echo on
+call _Func_GenDirHash.bat "intel86"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel86" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
 @echo off
 mkdir "%BuildFolderPathIntel%App\Cyberfox\distribution"
@@ -88,6 +53,7 @@ copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd86\UpdateConfig.ini" 
 call %DeleteDir% "%BuildFolderPathAmd%App\Cyberfox" "%BuildFolderPathAmd%App\Cyberfox not found!"
 mkdir "%BuildFolderPathAmd%App\Cyberfox"
 @echo on
+call _Func_GenDirHash.bat "amd86"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd86" "%BuildFolderPathAmd%App\Cyberfox"
 @echo off
 mkdir "%BuildFolderPathAmd%App\Cyberfox\distribution"
@@ -98,7 +64,7 @@ xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathAmd%App\C
 %NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log"
 @echo off
 echo. Build Amd 86 bit portable package complete!
-goto :completed
+goto :Compile-Package-86-Portable
 
 :Compile-Package-64
 echo. Compilation of portable medium is starting!
@@ -114,6 +80,7 @@ copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel64\UpdateConfig.ini
 call %DeleteDir% "%BuildFolderPathIntel%App\Cyberfox" "%BuildFolderPathIntel%App\Cyberfox not found!"
 mkdir "%BuildFolderPathIntel%App\Cyberfox"
 @echo on
+call _Func_GenDirHash.bat "intel64"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel64" "%BuildFolderPathIntel%App\Cyberfox"
 @echo off
 mkdir "%BuildFolderPathIntel%App\Cyberfox\distribution"
@@ -134,6 +101,7 @@ copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" 
 call %DeleteDir% "%BuildFolderPathAmd%App\Cyberfox" "%BuildFolderPathAmd%App\Cyberfox not found!"
 mkdir "%BuildFolderPathAmd%App\Cyberfox"
 @echo on
+call _Func_GenDirHash.bat "amd64"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd64" "%BuildFolderPathAmd%App\Cyberfox"
 @echo off
 mkdir "%BuildFolderPathAmd%App\Cyberfox\distribution"
@@ -144,42 +112,14 @@ xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathAmd%App\C
 %NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" 
 @echo off
 echo. Build Amd 64 bit portable package complete!
-goto :completed
+goto :Compile-Package-64-Portable
 
-:Installer-Package
+:Compile-Package-86-Portable
 @echo off
 set BuildFolderPath=%~DP0
 set PortableAppsInstaller="%BuildFolderPath%_PortableApps.comInstaller\PortableApps.comInstaller.exe"
 set PortableAppsInstallerOutput="%BuildFolderPath%_Installation"
-:top-Installer-Package
-ECHO.
-ECHO.                                                         			   
-ECHO.Please Select Compiler Option           
-ECHO.---------------------------------------         	   
-ECHO.                                                                      
-ECHO.Press 1 to Create (x86) Portable Installer Package.                
-ECHO.Press 2 to Create (x64) Portable Installer Package.             
-ECHO.Press E to Exit.                      
-ECHO.                                                          
-ECHO.---------------------------------------         
-ECHO.
-ECHO.
-ECHO.----------- 
-ECHO.1. Create (x86) Package. 
-ECHO.2. Create (x64) Package. 
-ECHO.E. E to Exit.        
-ECHO.----------- 
-SET /P uin=Choose an option (1,2,E)? 
-if /i {%uin%}=={1} (goto :Compile-Package-86-Portable)
-if /i {%uin%}=={2} (goto :Compile-Package-64-Portable) 
-if /i {%uin%}=={E} (goto :exit)
-if /i {%uin%}=={Exit} (goto :exit)
-if /i {%uin%}=={EXIT} (goto :exit)
-if /i {%uin%}=={e} (goto :exit)
-if /i {%uin%}=={exit} (goto :exit)
-goto :top-Installer-Package
 
-:Compile-Package-86-Portable
 echo. Compilation of %Version% portable installation medium is starting!
 echo. Building Amd 86 bit portable package!
 %PortableAppsInstaller% "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable"
@@ -196,9 +136,14 @@ echo. Build intel 86 bit portable package complete!
 ren "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.paf.exe"  "CyberfoxPortable_%Version%_English.Intel.86.paf.exe"
 copy /y "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.86.paf.exe" "%PortableAppsInstallerOutput%"
 call %Delete% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.86.paf.exe" "CyberfoxPortable_%Version%_English.Intel.86.paf.exe not found!"
-goto :completed
+goto :Compile-Package-86-Zipped
 
 :Compile-Package-64-Portable
+@echo off
+set BuildFolderPath=%~DP0
+set PortableAppsInstaller="%BuildFolderPath%_PortableApps.comInstaller\PortableApps.comInstaller.exe"
+set PortableAppsInstallerOutput="%BuildFolderPath%_Installation"
+
 echo. Compilation of %Version% portable installation medium is starting!
 if not exist "%BuildFolderPath%_Installation" (
 mkdir "%BuildFolderPath%_Installation"
@@ -216,44 +161,15 @@ echo. Build intel64 bit portable package complete!
 ren "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.paf.exe"  "CyberfoxPortable_%Version%_English.Intel.paf.exe"
 copy /y "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.paf.exe" "%PortableAppsInstallerOutput%"
 call %Delete% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.paf.exe" "CyberfoxPortable_%Version%_English.Intel.paf.exe not found!"
-goto :completed
+goto :Compile-Package-64-Zipped
 
-:Zipped-Package
+:Compile-Package-86-Zipped
 @echo Off
 set BuildFolderPath=%~DP0
 if not exist "%BuildFolderPath%_7ZipPortable\App\7-Zip\7za.exe" goto :bye
 set SevenZip=%BuildFolderPath%_7ZipPortable\App\7-Zip\7za.exe
 set PortableAppsZippedOutput="%BuildFolderPath%_Installation"
 
-:top-Zipped-Package
-ECHO.
-ECHO.                                                         			   
-ECHO.Please Select Compiler Option           
-ECHO.---------------------------------------         	   
-ECHO.                                                                      
-ECHO.Press 1 to Create (x86) Zipped Installer Package.                
-ECHO.Press 2 to Create (x64) Zipped Installer Package.                
-ECHO.Press E to Exit.                      
-ECHO.                                                          
-ECHO.---------------------------------------         
-ECHO.
-ECHO.
-ECHO.----------- 
-ECHO.1. Create (x86) Package. 
-ECHO.2. Create (x64) Package.  
-ECHO.E. E to Exit.        
-ECHO.----------- 
-SET /P uin=Choose an option (1,2,E)? 
-if /i {%uin%}=={1} (goto :Compile-Package-86-Zipped)
-if /i {%uin%}=={2} (goto :Compile-Package-64-Zipped)
-if /i {%uin%}=={E} (goto :exit)
-if /i {%uin%}=={Exit} (goto :exit)
-if /i {%uin%}=={EXIT} (goto :exit)
-if /i {%uin%}=={e} (goto :exit)
-if /i {%uin%}=={exit} (goto :exit)
-goto :top-Zipped-Package
-
-:Compile-Package-86-Zipped
 echo. Compilation of %Version% zipped installation medium is starting!
 echo. Building amd 86 bit zipped package!
 %SevenZip% a -mx9 -t7z "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable_%Version%_English.Amd.86.7z" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable"
@@ -268,9 +184,15 @@ echo. Building intel 86 bit zipped package
 echo. Build intel 86 bit zipped package complete!
 copy /y "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.86.7z" "%PortableAppsZippedOutput%"
 call %Delete% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.86.7z" "CyberfoxPortable_%Version%_English.Intel.86.7z not found!"
-goto :completed
+goto :Compile-Package-64
 
 :Compile-Package-64-Zipped
+@echo Off
+set BuildFolderPath=%~DP0
+if not exist "%BuildFolderPath%_7ZipPortable\App\7-Zip\7za.exe" goto :bye
+set SevenZip=%BuildFolderPath%_7ZipPortable\App\7-Zip\7za.exe
+set PortableAppsZippedOutput="%BuildFolderPath%_Installation"
+
 echo. Compilation 0f %Version% zipped installation medium is starting!
 echo. Building amd 64 bit zipped package!
 %SevenZip% a -mx9 -t7z "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable_%Version%_English.Amd.7z" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable"

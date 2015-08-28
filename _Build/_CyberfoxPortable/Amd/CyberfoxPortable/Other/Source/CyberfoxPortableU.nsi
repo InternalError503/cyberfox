@@ -402,10 +402,10 @@ Section "Main"
 		StrCmp $LASTPROFILEDIRECTORY "NONE" RunProgram
 		${GetParent} $LASTPROFILEDIRECTORY $0
 		${GetParent} $0 $0
-		StrCpy $0 '$0\' ;last Portable directory
+		StrCpy $0 '$0\' ;last ${NAME}Portable directory
 		${GetParent} $ORIGINALPROFILEDIRECTORY $1
 		${GetParent} $1 $1
-		StrCpy $1 '$1\' ;current Portable directory
+		StrCpy $1 '$1\' ;current ${NAME}Portable directory
 		StrCmp $0 $1 RunProgram
 		${If} ${FileExists} "$PROFILEDIRECTORY\pluginreg.dat"
 			${ReplaceInFile} "$PROFILEDIRECTORY\pluginreg.dat" $0 $1
