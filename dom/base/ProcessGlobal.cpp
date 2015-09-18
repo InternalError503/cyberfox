@@ -7,6 +7,7 @@
 #include "ProcessGlobal.h"
 
 #include "nsContentCID.h"
+#include "nsDOMClassInfoID.h"
 
 using namespace mozilla;
 using namespace mozilla::dom;
@@ -102,4 +103,10 @@ ProcessGlobal::LoadScript(const nsAString& aURL)
 {
   Init();
   LoadScriptInternal(aURL, false);
+}
+
+void
+ProcessGlobal::SetInitialProcessData(JS::HandleValue aInitialData)
+{
+  mMessageManager->SetInitialProcessData(aInitialData);
 }

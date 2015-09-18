@@ -115,8 +115,8 @@ public:
     virtual gfxPlatformFontList* CreatePlatformFontList();
 
     virtual already_AddRefed<gfxASurface>
-      CreateOffscreenSurface(const IntSize& size,
-                             gfxContentType contentType) override;
+      CreateOffscreenSurface(const IntSize& aSize,
+                             gfxImageFormat aFormat) override;
 
     virtual mozilla::TemporaryRef<mozilla::gfx::ScaledFont>
       GetScaledFontForFont(mozilla::gfx::DrawTarget* aTarget, gfxFont *aFont);
@@ -257,6 +257,7 @@ public:
     static bool IsOptimus();
 
     bool IsWARP() { return mIsWARP; }
+    bool DoesD3D11TextureSharingWork() { return mDoesD3D11TextureSharingWork; }
 
     bool SupportsApzWheelInput() const override {
       return true;
@@ -307,8 +308,5 @@ private:
 
     virtual void GetPlatformCMSOutputProfile(void* &mem, size_t &size);
 };
-
-bool DoesD3D11TextureSharingWork(ID3D11Device *device);
-bool DoesD3D11DeviceWork(ID3D11Device *device);
 
 #endif /* GFX_WINDOWS_PLATFORM_H */

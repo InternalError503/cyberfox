@@ -693,7 +693,9 @@ nsDOMMutationObserver::TakeRecords(
 }
 
 void
-nsDOMMutationObserver::GetObservingInfo(nsTArray<Nullable<MutationObservingInfo> >& aResult)
+nsDOMMutationObserver::GetObservingInfo(
+                         nsTArray<Nullable<MutationObservingInfo>>& aResult,
+                         mozilla::ErrorResult& aRv)
 {
   aResult.SetCapacity(mReceivers.Count());
   for (int32_t i = 0; i < mReceivers.Count(); ++i) {
@@ -712,7 +714,11 @@ nsDOMMutationObserver::GetObservingInfo(nsTArray<Nullable<MutationObservingInfo>
       mozilla::dom::Sequence<nsString>& filtersAsStrings =
         info.mAttributeFilter.Value();
       for (int32_t j = 0; j < filters.Count(); ++j) {
-        filtersAsStrings.AppendElement(nsDependentAtomString(filters[j]));
+        if (!filtersAsStrings.AppendElement(nsDependentAtomString(filters[j]),
+                                            mozilla::fallible)) {
+          aRv.Throw(NS_ERROR_OUT_OF_MEMORY);
+          return;
+        }
       }
     }
     info.mObservedNode = mr->Target();
@@ -760,7 +766,7 @@ nsDOMMutationObserver::HandleMutation()
 
   mozilla::dom::Sequence<mozilla::dom::OwningNonNull<nsDOMMutationRecord> >
     mutations;
-  if (mutations.SetCapacity(mPendingMutationCount)) {
+  if (mutations.SetCapacity(mPendingMutationCount, mozilla::fallible)) {
     // We can't use TakeRecords easily here, because it deals with a
     // different type of array, and we want to optimize out any extra copying.
     nsRefPtr<nsDOMMutationRecord> current;
@@ -768,7 +774,7 @@ nsDOMMutationObserver::HandleMutation()
     for (uint32_t i = 0; i < mPendingMutationCount; ++i) {
       nsRefPtr<nsDOMMutationRecord> next;
       current->mNext.swap(next);
-      *mutations.AppendElement() = current;
+      *mutations.AppendElement(mozilla::fallible) = current;
       current.swap(next);
     }
   }

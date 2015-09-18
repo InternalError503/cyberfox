@@ -16,13 +16,12 @@
 #include "AudioNodeStream.h"
 #include "MediaStreamGraph.h"
 #include "OfflineAudioCompletionEvent.h"
+#include "nsContentUtils.h"
 #include "nsIInterfaceRequestorUtils.h"
 #include "nsIDocShell.h"
 #include "nsIPermissionManager.h"
 #include "nsIScriptObjectPrincipal.h"
 #include "nsServiceManagerUtils.h"
-#include "nsIAppShell.h"
-#include "nsWidgetsCID.h"
 #include "mozilla/dom/Promise.h"
 
 namespace mozilla {
@@ -62,7 +61,7 @@ public:
       // These allocations might fail if content provides a huge number of
       // channels or size, but it's OK since we'll deal with the failure
       // gracefully.
-      if (mInputChannels.SetLength(mNumberOfChannels)) {
+      if (mInputChannels.SetLength(mNumberOfChannels, fallible)) {
         for (uint32_t i = 0; i < mNumberOfChannels; ++i) {
           mInputChannels[i] = new (fallible) float[mLength];
           if (!mInputChannels[i]) {
@@ -351,7 +350,6 @@ AudioDestinationNode::AudioDestinationNode(AudioContext* aContext,
   , mFramesToProduce(aLength)
   , mAudioChannel(AudioChannel::Normal)
   , mIsOffline(aIsOffline)
-  , mHasFinished(false)
   , mAudioChannelAgentPlaying(false)
   , mExtraCurrentTime(0)
   , mExtraCurrentTimeSinceLastStartedBlocking(0)
@@ -371,7 +369,7 @@ AudioDestinationNode::AudioDestinationNode(AudioContext* aContext,
   mStream->AddAudioOutput(&gWebAudioOutputKey);
 
   if (!aIsOffline) {
-    graph->NotifyWhenGraphStarted(mStream->AsAudioNodeStream());
+    graph->NotifyWhenGraphStarted(mStream);
   }
 
   if (aChannel != AudioChannel::Normal) {
@@ -426,24 +424,22 @@ AudioDestinationNode::DestroyMediaStream()
 }
 
 void
-AudioDestinationNode::NotifyMainThreadStateChanged()
+AudioDestinationNode::NotifyMainThreadStreamFinished()
 {
-  if (mStream->IsFinished() && !mHasFinished) {
-    mHasFinished = true;
-    if (mIsOffline) {
-      nsCOMPtr<nsIRunnable> runnable =
-        NS_NewRunnableMethod(this, &AudioDestinationNode::FireOfflineCompletionEvent);
-      NS_DispatchToCurrentThread(runnable);
-    }
+  MOZ_ASSERT(mStream->IsFinished());
+
+  if (mIsOffline) {
+    nsCOMPtr<nsIRunnable> runnable =
+      NS_NewRunnableMethod(this, &AudioDestinationNode::FireOfflineCompletionEvent);
+    NS_DispatchToCurrentThread(runnable);
   }
 }
 
 void
 AudioDestinationNode::FireOfflineCompletionEvent()
 {
-  AudioNodeStream* stream = static_cast<AudioNodeStream*>(Stream());
   OfflineDestinationNodeEngine* engine =
-    static_cast<OfflineDestinationNodeEngine*>(stream->Engine());
+    static_cast<OfflineDestinationNodeEngine*>(Stream()->Engine());
   engine->FireOfflineCompletionEvent(this);
 }
 
@@ -686,17 +682,16 @@ AudioDestinationNode::NotifyStableState()
   mExtraCurrentTimeUpdatedSinceLastStableState = false;
 }
 
-static NS_DEFINE_CID(kAppShellCID, NS_APPSHELL_CID);
-
 void
 AudioDestinationNode::ScheduleStableStateNotification()
 {
-  nsCOMPtr<nsIAppShell> appShell = do_GetService(kAppShellCID);
-  if (appShell) {
-    nsCOMPtr<nsIRunnable> event =
-      NS_NewRunnableMethod(this, &AudioDestinationNode::NotifyStableState);
-    appShell->RunInStableState(event);
-  }
+  nsCOMPtr<nsIRunnable> event =
+    NS_NewRunnableMethod(this, &AudioDestinationNode::NotifyStableState);
+  // Dispatch will fail if this is called on AudioNode destruction during
+  // shutdown, in which case failure can be ignored.
+  nsContentUtils::RunInStableState(event.forget(),
+                                   nsContentUtils::
+                                     DispatchFailureHandling::IgnoreFailure);
 }
 
 double

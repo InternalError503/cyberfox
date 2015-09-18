@@ -30,8 +30,7 @@ TimerThread::TimerThread() :
   mShutdown(false),
   mWaiting(false),
   mNotified(false),
-  mSleeping(false),
-  mLastTimerEventLoopRun(TimeStamp::Now())
+  mSleeping(false)
 {
 }
 
@@ -83,7 +82,7 @@ TimerObserverRunnable::Run()
 nsresult
 TimerThread::Init()
 {
-  PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+  MOZ_LOG(GetTimerLog(), LogLevel::Debug,
          ("TimerThread::Init [%d]\n", mInitialized));
 
   if (mInitialized) {
@@ -130,7 +129,7 @@ TimerThread::Init()
 nsresult
 TimerThread::Shutdown()
 {
-  PR_LOG(GetTimerLog(), PR_LOG_DEBUG, ("TimerThread::Shutdown begin\n"));
+  MOZ_LOG(GetTimerLog(), LogLevel::Debug, ("TimerThread::Shutdown begin\n"));
 
   if (!mThread) {
     return NS_ERROR_NOT_INITIALIZED;
@@ -168,7 +167,7 @@ TimerThread::Shutdown()
 
   mThread->Shutdown();    // wait for the thread to die
 
-  PR_LOG(GetTimerLog(), PR_LOG_DEBUG, ("TimerThread::Shutdown end\n"));
+  MOZ_LOG(GetTimerLog(), LogLevel::Debug, ("TimerThread::Shutdown end\n"));
   return NS_OK;
 }
 
@@ -206,7 +205,6 @@ TimerThread::Run()
   }
 #endif
 
-  NS_SetIgnoreStatusOfCurrentThread();
   MonitorAutoLock lock(mMonitor);
 
   // We need to know how many microseconds give a positive PRIntervalTime. This
@@ -244,7 +242,6 @@ TimerThread::Run()
     } else {
       waitFor = PR_INTERVAL_NO_TIMEOUT;
       TimeStamp now = TimeStamp::Now();
-      mLastTimerEventLoopRun = now;
       nsTimerImpl* timer = nullptr;
 
       if (!mTimers.IsEmpty()) {
@@ -262,7 +259,7 @@ TimerThread::Run()
           RemoveTimerInternal(timer);
           timer = nullptr;
 
-          PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+          MOZ_LOG(GetTimerLog(), LogLevel::Debug,
                  ("Timer thread woke up %fms from when it was supposed to\n",
                   fabs((now - timerRef->mTimeout).ToMilliseconds())));
 
@@ -344,12 +341,12 @@ TimerThread::Run()
         }
       }
 
-      if (PR_LOG_TEST(GetTimerLog(), PR_LOG_DEBUG)) {
+      if (MOZ_LOG_TEST(GetTimerLog(), LogLevel::Debug)) {
         if (waitFor == PR_INTERVAL_NO_TIMEOUT)
-          PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+          MOZ_LOG(GetTimerLog(), LogLevel::Debug,
                  ("waiting for PR_INTERVAL_NO_TIMEOUT\n"));
         else
-          PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+          MOZ_LOG(GetTimerLog(), LogLevel::Debug,
                  ("waiting for %u\n", PR_IntervalToMilliseconds(waitFor)));
       }
     }
@@ -456,9 +453,9 @@ TimerThread::AddTimerInternal(nsTimerImpl* aTimer)
   NS_ADDREF(aTimer);
 
 #ifdef MOZ_TASK_TRACER
-  // Create a FakeTracedTask, and dispatch it here. This is the start point of
-  // the latency.
-  aTimer->DispatchTracedTask();
+  // Caller of AddTimer is the parent task of its timer event, so we store the
+  // TraceInfo here for later used.
+  aTimer->GetTLSTraceInfo();
 #endif
 
   return insertSlot - mTimers.Elements();
@@ -493,7 +490,6 @@ TimerThread::DoBeforeSleep()
 {
   // Mainthread
   MonitorAutoLock lock(mMonitor);
-  mLastTimerEventLoopRun = TimeStamp::Now();
   mSleeping = true;
 }
 
@@ -502,27 +498,11 @@ void
 TimerThread::DoAfterSleep()
 {
   // Mainthread
-  TimeStamp now = TimeStamp::Now();
-
   MonitorAutoLock lock(mMonitor);
-
-  // an over-estimate of time slept, usually small
-  TimeDuration slept = now - mLastTimerEventLoopRun;
-
-  // Adjust all old timers to expire roughly similar times in the future
-  // compared to when we went to sleep, by adding the time we slept to the
-  // target time. It's slightly possible a few will end up slightly in the
-  // past and fire immediately, but ordering should be preserved.  All
-  // timers retain the exact same order (and relative times) as before
-  // going to sleep.
-  for (uint32_t i = 0; i < mTimers.Length(); i ++) {
-    nsTimerImpl* timer = mTimers[i];
-    timer->mTimeout += slept;
-  }
   mSleeping = false;
-  mLastTimerEventLoopRun = now;
 
-  // Wake up the timer thread to process the updated array
+  // Wake up the timer thread to re-process the array to ensure the sleep delay is correct,
+  // and fire any expired timers (perhaps quite a few)
   mNotified = true;
   mMonitor.Notify();
 }

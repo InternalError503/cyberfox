@@ -2047,7 +2047,7 @@ nsBlockFrame::ReflowDirtyLines(nsBlockReflowState& aState)
 
   bool selfDirty = (GetStateBits() & NS_FRAME_IS_DIRTY) ||
                      (aState.mReflowState.IsBResize() &&
-                      (GetStateBits() & NS_FRAME_CONTAINS_RELATIVE_HEIGHT));
+                      (GetStateBits() & NS_FRAME_CONTAINS_RELATIVE_BSIZE));
 
   // Reflow our last line if our availableBSize has increased
   // so that we (and our last child) pull up content as necessary
@@ -2966,38 +2966,22 @@ nsBlockFrame::IsSelfEmpty()
     return false;
   }
 
+  WritingMode wm = GetWritingMode();
   const nsStylePosition* position = StylePosition();
-  bool vertical = GetWritingMode().IsVertical();
 
-  if (vertical) {
-    if (IsNonAutoNonZeroBSize(position->mMinWidth) ||
-        IsNonAutoNonZeroBSize(position->mWidth)) {
-      return false;
-    }
-  } else {
-    if (IsNonAutoNonZeroBSize(position->mMinHeight) ||
-        IsNonAutoNonZeroBSize(position->mHeight)) {
-      return false;
-    }
+  if (IsNonAutoNonZeroBSize(position->MinBSize(wm)) ||
+      IsNonAutoNonZeroBSize(position->BSize(wm))) {
+    return false;
   }
 
   const nsStyleBorder* border = StyleBorder();
   const nsStylePadding* padding = StylePadding();
 
-  if (vertical) {
-    if (border->GetComputedBorderWidth(NS_SIDE_LEFT) != 0 ||
-        border->GetComputedBorderWidth(NS_SIDE_RIGHT) != 0 ||
-        !nsLayoutUtils::IsPaddingZero(padding->mPadding.GetLeft()) ||
-        !nsLayoutUtils::IsPaddingZero(padding->mPadding.GetRight())) {
-      return false;
-    }
-  } else {
-    if (border->GetComputedBorderWidth(NS_SIDE_TOP) != 0 ||
-        border->GetComputedBorderWidth(NS_SIDE_BOTTOM) != 0 ||
-        !nsLayoutUtils::IsPaddingZero(padding->mPadding.GetTop()) ||
-        !nsLayoutUtils::IsPaddingZero(padding->mPadding.GetBottom())) {
-      return false;
-    }
+  if (border->GetComputedBorderWidth(wm.PhysicalSide(eLogicalSideBStart)) != 0 ||
+      border->GetComputedBorderWidth(wm.PhysicalSide(eLogicalSideBEnd)) != 0 ||
+      !nsLayoutUtils::IsPaddingZero(padding->mPadding.GetBStart(wm)) ||
+      !nsLayoutUtils::IsPaddingZero(padding->mPadding.GetBEnd(wm))) {
+    return false;
   }
 
   if (HasOutsideBullet() && !BulletIsEmpty()) {
@@ -6163,8 +6147,10 @@ nsBlockFrame::ReflowPushedFloats(nsBlockReflowState& aState,
 
   // If there are continued floats, then we may need to continue BR clearance
   if (0 != aState.ClearFloats(0, NS_STYLE_CLEAR_BOTH)) {
-    aState.mFloatBreakType = static_cast<nsBlockFrame*>(GetPrevInFlow())
-                               ->FindTrailingClear();
+    nsBlockFrame* prevBlock = static_cast<nsBlockFrame*>(GetPrevInFlow());
+    if (prevBlock) {
+      aState.mFloatBreakType = prevBlock->FindTrailingClear();
+    }
   }
 }
 
@@ -7228,7 +7214,7 @@ nsBlockFrame::ISizeToClearPastFloats(nsBlockReflowState& aState,
   nscoord inlineStartOffset, inlineEndOffset;
   WritingMode wm = aState.mReflowState.GetWritingMode();
   nsCSSOffsetState offsetState(aFrame, aState.mReflowState.rendContext,
-                               aState.mContentArea.Width(wm));
+                               wm, aState.mContentArea.ISize(wm));
 
   ReplacedElementISizeToClear result;
   aState.ComputeReplacedBlockOffsetsForFloats(aFrame, aFloatAvailableSpace,

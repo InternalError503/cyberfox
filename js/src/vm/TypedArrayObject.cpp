@@ -233,7 +233,7 @@ class TypedArrayObjectTemplate : public TypedArrayObject
             return nullptr;
 
         return NewFunctionWithProto(cx, class_constructor, 3,
-                                    JSFunction::NATIVE_CTOR, NullPtr(),
+                                    JSFunction::NATIVE_CTOR, nullptr,
                                     ClassName(key, cx),
                                     ctorProto, gc::AllocKind::FUNCTION,
                                     SingletonObject);
@@ -253,7 +253,7 @@ class TypedArrayObjectTemplate : public TypedArrayObject
 
         RootedFunction fun(cx);
         fun = NewNativeFunction(cx, ArrayBufferObject::createTypedArrayFromBuffer<NativeType>,
-                                0, NullPtr());
+                                0, nullptr);
         if (!fun)
             return false;
 
@@ -1120,7 +1120,7 @@ DataViewObject::class_constructor(JSContext* cx, unsigned argc, Value* vp)
         return true;
     }
 
-    return construct(cx, bufobj, args, NullPtr());
+    return construct(cx, bufobj, args, nullptr);
 }
 
 template <typename NativeType>
@@ -1833,8 +1833,8 @@ const Class TypedArrayObject::classes[Scalar::MaxTypedArrayViewType] = {
 // @@toStringTag) a custom class.  The third requirement mandates that each
 // prototype's class have the relevant typed array's cached JSProtoKey in them.
 // Thus we need one class with cached prototype per kind of typed array, with a
-// dummy createConstructor to placate js::ClassSpec::defined().
-#define IMPL_TYPED_ARRAY_PROTO_CLASS(typedArray) \
+// delegated ClassSpec.
+#define IMPL_TYPED_ARRAY_PROTO_CLASS(typedArray, i) \
 { \
     /*
      * Actually ({}).toString.call(Uint8Array.prototype) should throw, because
@@ -1859,27 +1859,27 @@ const Class TypedArrayObject::classes[Scalar::MaxTypedArrayViewType] = {
     nullptr, /* construct */ \
     nullptr, /* trace  */ \
     { \
-        typedArray::createConstructor, \
-        typedArray::createPrototype, \
+        DELEGATED_CLASSSPEC(&TypedArrayObject::classes[i].spec), \
         nullptr, \
         nullptr, \
         nullptr, \
         nullptr, \
         nullptr, \
-        JSProto_TypedArray \
+        nullptr, \
+        JSProto_TypedArray | ClassSpec::IsDelegated \
     } \
 }
 
 const Class TypedArrayObject::protoClasses[Scalar::MaxTypedArrayViewType] = {
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Int8Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint8Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Int16Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint16Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Int32Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint32Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Float32Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Float64Array),
-    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint8ClampedArray)
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Int8Array, 0),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint8Array, 1),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Int16Array, 2),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint16Array, 3),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Int32Array, 4),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint32Array, 5),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Float32Array, 6),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Float64Array, 7),
+    IMPL_TYPED_ARRAY_PROTO_CLASS(Uint8ClampedArray, 8)
 };
 
 /* static */ bool
@@ -1961,7 +1961,7 @@ DataViewObject::defineGetter(JSContext* cx, PropertyName* name, HandleNativeObje
 
     Rooted<GlobalObject*> global(cx, cx->compartment()->maybeGlobal());
     JSObject* getter =
-        NewNativeFunction(cx, DataViewObject::getter<ValueGetter>, 0, NullPtr());
+        NewNativeFunction(cx, DataViewObject::getter<ValueGetter>, 0, nullptr);
     if (!getter)
         return false;
 
@@ -2006,7 +2006,7 @@ DataViewObject::initClass(JSContext* cx)
      * global for use by the DataViewObject constructor.
      */
     RootedFunction fun(cx, NewNativeFunction(cx, ArrayBufferObject::createDataViewForThis,
-                                             0, NullPtr()));
+                                             0, nullptr));
     if (!fun)
         return false;
 
@@ -2209,6 +2209,18 @@ JS_GetArrayBufferViewType(JSObject* obj)
     else if (obj->is<DataViewObject>())
         return Scalar::MaxTypedArrayViewType;
     MOZ_CRASH("invalid ArrayBufferView type");
+}
+
+JS_FRIEND_API(js::Scalar::Type)
+JS_GetSharedArrayBufferViewType(JSObject* obj)
+{
+    obj = CheckedUnwrap(obj);
+    if (!obj)
+        return Scalar::MaxTypedArrayViewType;
+
+    if (obj->is<SharedTypedArrayObject>())
+        return obj->as<SharedTypedArrayObject>().type();
+    MOZ_CRASH("invalid SharedArrayBufferView type");
 }
 
 JS_FRIEND_API(int8_t*)

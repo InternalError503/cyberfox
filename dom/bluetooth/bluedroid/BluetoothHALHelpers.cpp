@@ -234,15 +234,35 @@ Convert(const btrc_player_settings_t& aIn, BluetoothAvrcpPlayerSettings& aOut)
 nsresult
 Convert(const BluetoothGattId& aIn, btgatt_gatt_id_t& aOut)
 {
+  nsresult rv = Convert(aIn.mUuid, aOut.uuid);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  // HAL uses reversed UUID for GATT
+  for (uint8_t i = 0; i < sizeof(aOut.uuid.uu) / 2; i++) {
+    auto temp = aOut.uuid.uu[i];
+    aOut.uuid.uu[i] = aOut.uuid.uu[sizeof(aOut.uuid.uu) - i - 1];
+    aOut.uuid.uu[sizeof(aOut.uuid.uu) - i - 1] = temp;
+  }
   aOut.inst_id = aIn.mInstanceId;
-  return Convert(aIn.mUuid, aOut.uuid);
+  return NS_OK;
 }
 
 nsresult
 Convert(const btgatt_gatt_id_t& aIn, BluetoothGattId& aOut)
 {
+  nsresult rv = Convert(aIn.uuid, aOut.mUuid);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  // HAL uses reversed UUID for GATT
+  for (uint8_t i = 0; i < sizeof(aOut.mUuid.mUuid) / 2; i++) {
+    auto temp = aOut.mUuid.mUuid[i];
+    aOut.mUuid.mUuid[i] = aOut.mUuid.mUuid[sizeof(aOut.mUuid.mUuid) - i - 1];
+    aOut.mUuid.mUuid[sizeof(aOut.mUuid.mUuid) - i - 1] = temp;
+  }
   aOut.mInstanceId = aIn.inst_id;
-  return Convert(aIn.uuid, aOut.mUuid);
+  return NS_OK;
 }
 
 nsresult
@@ -262,16 +282,20 @@ Convert(const btgatt_srvc_id_t& aIn, BluetoothGattServiceId& aOut)
 nsresult
 Convert(const btgatt_read_params_t& aIn, BluetoothGattReadParam& aOut)
 {
-  nsresult rv;
-
-  rv = Convert(aIn.srvc_id, aOut.mServiceId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  nsresult rv = Convert(aIn.srvc_id, aOut.mServiceId);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   rv = Convert(aIn.char_id, aOut.mCharId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   rv = Convert(aIn.descr_id, aOut.mDescriptorId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   memcpy(aOut.mValue, aIn.value.value, aIn.value.len);
   aOut.mValueLength = aIn.value.len;
@@ -284,16 +308,20 @@ Convert(const btgatt_read_params_t& aIn, BluetoothGattReadParam& aOut)
 nsresult
 Convert(const btgatt_write_params_t& aIn, BluetoothGattWriteParam& aOut)
 {
-  nsresult rv;
-
-  rv = Convert(aIn.srvc_id, aOut.mServiceId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  nsresult rv = Convert(aIn.srvc_id, aOut.mServiceId);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   rv = Convert(aIn.char_id, aOut.mCharId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   rv = Convert(aIn.descr_id, aOut.mDescriptorId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   aOut.mStatus = aIn.status;
 
@@ -303,20 +331,59 @@ Convert(const btgatt_write_params_t& aIn, BluetoothGattWriteParam& aOut)
 nsresult
 Convert(const btgatt_notify_params_t& aIn, BluetoothGattNotifyParam& aOut)
 {
-  nsresult rv;
-
-  rv = Convert(aIn.bda, aOut.mBdAddr);
-  NS_ENSURE_SUCCESS(rv, rv);
+  nsresult rv = Convert(aIn.bda, aOut.mBdAddr);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   rv = Convert(aIn.srvc_id, aOut.mServiceId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   rv = Convert(aIn.char_id, aOut.mCharId);
-  NS_ENSURE_SUCCESS(rv, rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   memcpy(aOut.mValue, aIn.value, aIn.len);
   aOut.mLength = aIn.len;
   aOut.mIsNotify = (aIn.is_notify != 0);
+
+  return NS_OK;
+}
+
+nsresult
+Convert(const BluetoothGattTestParam& aIn, btgatt_test_params_t& aOut)
+{
+  nsresult rv = Convert(aIn.mBdAddr, *aOut.bda1);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  rv = Convert(aIn.mUuid, *aOut.uuid1);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  rv = Convert(aIn.mU1, aOut.u1);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  rv = Convert(aIn.mU2, aOut.u2);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  rv = Convert(aIn.mU3, aOut.u3);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  rv = Convert(aIn.mU4, aOut.u4);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  rv = Convert(aIn.mU5, aOut.u5);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
 
   return NS_OK;
 }

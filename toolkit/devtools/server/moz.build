@@ -8,15 +8,34 @@ BROWSER_CHROME_MANIFESTS += ['tests/browser/browser.ini']
 MOCHITEST_CHROME_MANIFESTS += ['tests/mochitest/chrome.ini']
 XPCSHELL_TESTS_MANIFESTS += ['tests/unit/xpcshell.ini']
 
+if CONFIG['ENABLE_TESTS']:
+    DIRS += ['tests/gtest']
+
 XPIDL_SOURCES += [
     'nsIJSInspector.idl',
 ]
 
 XPIDL_MODULE = 'jsinspector'
 
-SOURCES += [
-    'nsJSInspector.cpp',
+EXPORTS.mozilla.devtools += [
+    'AutoMemMap.h',
+    'CoreDump.pb.h',
+    'DeserializedNode.h',
+    'HeapSnapshot.h',
+    'ZeroCopyNSIOutputStream.h',
 ]
+
+SOURCES += [
+    'AutoMemMap.cpp',
+    'CoreDump.pb.cc',
+    'DeserializedNode.cpp',
+    'HeapSnapshot.cpp',
+    'nsJSInspector.cpp',
+    'ZeroCopyNSIOutputStream.cpp',
+]
+
+# Disable RTTI in google protocol buffer
+DEFINES['GOOGLE_PROTOBUF_NO_RTTI'] = True
 
 FINAL_LIBRARY = 'xul'
 
@@ -30,6 +49,7 @@ EXTRA_JS_MODULES.devtools.server += [
     'content-globals.js',
     'main.js',
     'protocol.js',
+    'worker.js'
 ]
 
 EXTRA_JS_MODULES.devtools.server.actors += [
@@ -54,9 +74,11 @@ EXTRA_JS_MODULES.devtools.server.actors += [
     'actors/layout.js',
     'actors/memory.js',
     'actors/monitor.js',
+    'actors/object.js',
     'actors/preference.js',
     'actors/pretty-print-worker.js',
     'actors/profiler.js',
+    'actors/promises.js',
     'actors/root.js',
     'actors/script.js',
     'actors/settings.js',
@@ -72,6 +94,7 @@ EXTRA_JS_MODULES.devtools.server.actors += [
     'actors/webbrowser.js',
     'actors/webconsole.js',
     'actors/webgl.js',
+    'actors/worker.js',
 ]
 
 EXTRA_JS_MODULES.devtools.server.actors.utils += [
@@ -80,7 +103,6 @@ EXTRA_JS_MODULES.devtools.server.actors.utils += [
     'actors/utils/automation-timeline.js',
     'actors/utils/make-debugger.js',
     'actors/utils/map-uri-to-addon-id.js',
-    'actors/utils/memory-bridge.js',
     'actors/utils/ScriptStore.js',
     'actors/utils/stack.js',
     'actors/utils/TabSources.js'

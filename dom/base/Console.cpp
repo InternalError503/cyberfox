@@ -36,6 +36,10 @@
 #include "nsIWebNavigation.h"
 #include "nsIXPConnect.h"
 
+#ifdef MOZ_ENABLE_PROFILER_SPS
+#include "nsIProfiler.h"
+#endif
+
 // The maximum allowed number of concurrent timers per page.
 #define MAX_PAGE_TIMERS 10000
 
@@ -60,7 +64,7 @@ struct
 ConsoleStructuredCloneData
 {
   nsCOMPtr<nsISupports> mParent;
-  nsTArray<nsRefPtr<FileImpl>> mFiles;
+  nsTArray<nsRefPtr<BlobImpl>> mBlobs;
 };
 
 /**
@@ -84,13 +88,13 @@ ConsoleStructuredCloneCallbacksRead(JSContext* aCx,
   MOZ_ASSERT(data);
 
   if (aTag == CONSOLE_TAG_BLOB) {
-    MOZ_ASSERT(data->mFiles.Length() > aIndex);
+    MOZ_ASSERT(data->mBlobs.Length() > aIndex);
 
     JS::Rooted<JS::Value> val(aCx);
     {
-      nsRefPtr<File> file =
-        new File(data->mParent, data->mFiles.ElementAt(aIndex));
-      if (!GetOrCreateDOMReflector(aCx, file, &val)) {
+      nsRefPtr<Blob> blob =
+        Blob::Create(data->mParent, data->mBlobs.ElementAt(aIndex));
+      if (!ToJSValue(aCx, blob, &val)) {
         return nullptr;
       }
     }
@@ -114,14 +118,14 @@ ConsoleStructuredCloneCallbacksWrite(JSContext* aCx,
     static_cast<ConsoleStructuredCloneData*>(aClosure);
   MOZ_ASSERT(data);
 
-  nsRefPtr<File> file;
-  if (NS_SUCCEEDED(UNWRAP_OBJECT(Blob, aObj, file)) &&
-      file->Impl()->MayBeClonedToOtherThreads()) {
-    if (!JS_WriteUint32Pair(aWriter, CONSOLE_TAG_BLOB, data->mFiles.Length())) {
+  nsRefPtr<Blob> blob;
+  if (NS_SUCCEEDED(UNWRAP_OBJECT(Blob, aObj, blob)) &&
+      blob->Impl()->MayBeClonedToOtherThreads()) {
+    if (!JS_WriteUint32Pair(aWriter, CONSOLE_TAG_BLOB, data->mBlobs.Length())) {
       return false;
     }
 
-    data->mFiles.AppendElement(file->Impl());
+    data->mBlobs.AppendElement(blob->Impl());
     return true;
   }
 
@@ -174,7 +178,9 @@ public:
     mMethodString = aString;
 
     for (uint32_t i = 0; i < aArguments.Length(); ++i) {
-      mArguments.AppendElement(aArguments[i]);
+      if (!mArguments.AppendElement(aArguments[i])) {
+        return;
+      }
     }
   }
 
@@ -666,7 +672,9 @@ private:
         return;
       }
 
-      arguments.AppendElement(value);
+      if (!arguments.AppendElement(value, fallible)) {
+        return;
+      }
     }
 
     mConsole->ProfileMethod(aCx, mAction, arguments);
@@ -826,8 +834,8 @@ Console::Time(JSContext* aCx, const JS::Handle<JS::Value> aTime)
   Sequence<JS::Value> data;
   SequenceRooter<JS::Value> rooter(aCx, &data);
 
-  if (!aTime.isUndefined()) {
-    data.AppendElement(aTime);
+  if (!aTime.isUndefined() && !data.AppendElement(aTime, fallible)) {
+    return;
   }
 
   Method(aCx, MethodTime, NS_LITERAL_STRING("time"), data);
@@ -839,8 +847,8 @@ Console::TimeEnd(JSContext* aCx, const JS::Handle<JS::Value> aTime)
   Sequence<JS::Value> data;
   SequenceRooter<JS::Value> rooter(aCx, &data);
 
-  if (!aTime.isUndefined()) {
-    data.AppendElement(aTime);
+  if (!aTime.isUndefined() && !data.AppendElement(aTime, fallible)) {
+    return;
   }
 
   Method(aCx, MethodTimeEnd, NS_LITERAL_STRING("timeEnd"), data);
@@ -852,9 +860,26 @@ Console::TimeStamp(JSContext* aCx, const JS::Handle<JS::Value> aData)
   Sequence<JS::Value> data;
   SequenceRooter<JS::Value> rooter(aCx, &data);
 
-  if (aData.isString()) {
-    data.AppendElement(aData);
+  if (aData.isString() && !data.AppendElement(aData, fallible)) {
+    return;
   }
+
+#ifdef MOZ_ENABLE_PROFILER_SPS
+  if (aData.isString() && NS_IsMainThread()) {
+    if (!mProfiler) {
+      mProfiler = do_GetService("@mozilla.org/tools/profiler;1");
+    }
+    if (mProfiler) {
+      bool active = false;
+      if (NS_SUCCEEDED(mProfiler->IsActive(&active)) && active) {
+        nsAutoJSString stringValue;
+        if (stringValue.init(aCx, aData)) {
+          mProfiler->AddMarker(NS_ConvertUTF16toUTF8(stringValue).get());
+        }
+      }
+    }
+  }
+#endif
 
   Method(aCx, MethodTimeStamp, NS_LITERAL_STRING("timeStamp"), data);
 }
@@ -892,7 +917,9 @@ Console::ProfileMethod(JSContext* aCx, const nsAString& aAction,
   Sequence<JS::Value>& sequence = event.mArguments.Value();
 
   for (uint32_t i = 0; i < aData.Length(); ++i) {
-    sequence.AppendElement(aData[i]);
+    if (!sequence.AppendElement(aData[i], fallible)) {
+      return;
+    }
   }
 
   JS::Rooted<JS::Value> eventValue(aCx);
@@ -1038,7 +1065,6 @@ public:
                           const nsAString& aCause)
     : TimelineMarker(aDocShell, "TimeStamp", aMetaData, aCause)
   {
-    CaptureStack();
     MOZ_ASSERT(aMetaData == TRACING_TIMESTAMP);
   }
 
@@ -1048,7 +1074,6 @@ public:
     if (!GetCause().IsEmpty()) {
       aMarker.mCauseName.Construct(GetCause());
     }
-    aMarker.mEndStack = GetStack();
   }
 };
 
@@ -1293,13 +1318,18 @@ Console::ProcessCallData(ConsoleCallData* aData)
     case MethodAssert:
       event.mArguments.Construct();
       event.mStyles.Construct();
-      ProcessArguments(cx, aData->mArguments, event.mArguments.Value(),
-                       event.mStyles.Value());
+      if (!ProcessArguments(cx, aData->mArguments, event.mArguments.Value(),
+                            event.mStyles.Value())) {
+        return;
+      }
+
       break;
 
     default:
       event.mArguments.Construct();
-      ArgumentsToValueList(aData->mArguments, event.mArguments.Value());
+      if (!ArgumentsToValueList(aData->mArguments, event.mArguments.Value())) {
+        return;
+      }
   }
 
   if (aData->mMethodName == MethodGroup ||
@@ -1418,48 +1448,52 @@ Console::ProcessCallData(ConsoleCallData* aData)
 namespace {
 
 // Helper method for ProcessArguments. Flushes output, if non-empty, to aSequence.
-void
-FlushOutput(JSContext* aCx, Sequence<JS::Value>& aSequence, nsString &output)
+bool
+FlushOutput(JSContext* aCx, Sequence<JS::Value>& aSequence, nsString &aOutput)
 {
-  if (!output.IsEmpty()) {
+  if (!aOutput.IsEmpty()) {
     JS::Rooted<JSString*> str(aCx, JS_NewUCStringCopyN(aCx,
-                                                       output.get(),
-                                                       output.Length()));
+                                                       aOutput.get(),
+                                                       aOutput.Length()));
     if (!str) {
-      return;
+      return false;
     }
 
-    aSequence.AppendElement(JS::StringValue(str));
-    output.Truncate();
+    if (!aSequence.AppendElement(JS::StringValue(str), fallible)) {
+      return false;
+    }
+
+    aOutput.Truncate();
   }
+
+  return true;
 }
 
 } // anonymous namespace
 
-void
+bool
 Console::ProcessArguments(JSContext* aCx,
                           const nsTArray<JS::Heap<JS::Value>>& aData,
                           Sequence<JS::Value>& aSequence,
                           Sequence<JS::Value>& aStyles)
 {
   if (aData.IsEmpty()) {
-    return;
+    return true;
   }
 
   if (aData.Length() == 1 || !aData[0].isString()) {
-    ArgumentsToValueList(aData, aSequence);
-    return;
+    return ArgumentsToValueList(aData, aSequence);
   }
 
   JS::Rooted<JS::Value> format(aCx, aData[0]);
   JS::Rooted<JSString*> jsString(aCx, JS::ToString(aCx, format));
   if (!jsString) {
-    return;
+    return false;
   }
 
   nsAutoJSString string;
   if (!string.init(aCx, jsString)) {
-    return;
+    return false;
   }
 
   nsString::const_iterator start, end;
@@ -1547,35 +1581,47 @@ Console::ProcessArguments(JSContext* aCx,
       case 'o':
       case 'O':
       {
-        FlushOutput(aCx, aSequence, output);
+        if (!FlushOutput(aCx, aSequence, output)) {
+          return false;
+        }
 
         JS::Rooted<JS::Value> v(aCx);
         if (index < aData.Length()) {
           v = aData[index++];
         }
 
-        aSequence.AppendElement(v);
+        if (!aSequence.AppendElement(v, fallible)) {
+          return false;
+        }
+
         break;
       }
 
       case 'c':
       {
-        FlushOutput(aCx, aSequence, output);
+        if (!FlushOutput(aCx, aSequence, output)) {
+          return false;
+        }
 
         if (index < aData.Length()) {
           JS::Rooted<JS::Value> v(aCx, aData[index++]);
           JS::Rooted<JSString*> jsString(aCx, JS::ToString(aCx, v));
           if (!jsString) {
-            return;
+            return false;
           }
 
           int32_t diff = aSequence.Length() - aStyles.Length();
           if (diff > 0) {
             for (int32_t i = 0; i < diff; i++) {
-              aStyles.AppendElement(JS::NullValue());
+              if (!aStyles.AppendElement(JS::NullValue(), fallible)) {
+                return false;
+              }
             }
           }
-          aStyles.AppendElement(JS::StringValue(jsString));
+
+          if (!aStyles.AppendElement(JS::StringValue(jsString), fallible)) {
+            return false;
+          }
         }
         break;
       }
@@ -1585,12 +1631,12 @@ Console::ProcessArguments(JSContext* aCx,
           JS::Rooted<JS::Value> value(aCx, aData[index++]);
           JS::Rooted<JSString*> jsString(aCx, JS::ToString(aCx, value));
           if (!jsString) {
-            return;
+            return false;
           }
 
           nsAutoJSString v;
           if (!v.init(aCx, jsString)) {
-            return;
+            return false;
           }
 
           output.Append(v);
@@ -1604,7 +1650,7 @@ Console::ProcessArguments(JSContext* aCx,
 
           int32_t v;
           if (!JS::ToInt32(aCx, value, &v)) {
-            return;
+            return false;
           }
 
           nsCString format;
@@ -1619,7 +1665,7 @@ Console::ProcessArguments(JSContext* aCx,
 
           double v;
           if (!JS::ToNumber(aCx, value, &v)) {
-            return;
+            return false;
           }
 
           nsCString format;
@@ -1634,7 +1680,9 @@ Console::ProcessArguments(JSContext* aCx,
     }
   }
 
-  FlushOutput(aCx, aSequence, output);
+  if (!FlushOutput(aCx, aSequence, output)) {
+    return false;
+  }
 
   // Discard trailing style element if there is no output to apply it to.
   if (aStyles.Length() > aSequence.Length()) {
@@ -1643,8 +1691,12 @@ Console::ProcessArguments(JSContext* aCx,
 
   // The rest of the array, if unused by the format string.
   for (; index < aData.Length(); ++index) {
-    aSequence.AppendElement(aData[index]);
+    if (!aSequence.AppendElement(aData[index], fallible)) {
+      return false;
+    }
   }
+
+  return true;
 }
 
 void
@@ -1770,13 +1822,17 @@ Console::StopTimer(JSContext* aCx, const JS::Value& aName,
   return value;
 }
 
-void
+bool
 Console::ArgumentsToValueList(const nsTArray<JS::Heap<JS::Value>>& aData,
                               Sequence<JS::Value>& aSequence)
 {
   for (uint32_t i = 0; i < aData.Length(); ++i) {
-    aSequence.AppendElement(aData[i]);
+    if (!aSequence.AppendElement(aData[i], fallible)) {
+      return false;
+    }
   }
+
+  return true;
 }
 
 JS::Value

@@ -31,7 +31,7 @@ typedef MediaPromise<bool, bool, false> ShutdownPromise;
 // to make this threadsafe for objects that aren't already threadsafe.
 class MediaTaskQueue : public AbstractThread {
 public:
-  explicit MediaTaskQueue(TemporaryRef<SharedThreadPool> aPool, bool aRequireTailDispatch = false);
+  explicit MediaTaskQueue(TemporaryRef<SharedThreadPool> aPool, bool aSupportsTailDispatch = false);
 
   void Dispatch(TemporaryRef<nsIRunnable> aRunnable,
                 DispatchFailureHandling aFailureHandling = AssertDispatchSuccess)
@@ -93,6 +93,15 @@ protected:
   nsresult DispatchLocked(already_AddRefed<nsIRunnable> aRunnable, DispatchMode aMode,
                           DispatchFailureHandling aFailureHandling,
                           DispatchReason aReason = NormalDispatch);
+
+  void MaybeResolveShutdown()
+  {
+    mQueueMonitor.AssertCurrentThreadOwns();
+    if (mIsShutdown && !mIsRunning) {
+      mShutdownPromise.ResolveIfExists(true, __func__);
+      mPool = nullptr;
+    }
+  }
 
   RefPtr<SharedThreadPool> mPool;
 

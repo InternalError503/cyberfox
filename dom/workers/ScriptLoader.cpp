@@ -14,7 +14,6 @@
 #include "nsIIOService.h"
 #include "nsIProtocolHandler.h"
 #include "nsIScriptSecurityManager.h"
-#include "nsISerializable.h"
 #include "nsIStreamLoader.h"
 #include "nsIStreamListenerTee.h"
 #include "nsIThreadRetargetableRequest.h"
@@ -39,6 +38,7 @@
 #include "mozilla/LoadContext.h"
 #include "mozilla/ipc/BackgroundUtils.h"
 #include "mozilla/dom/CacheBinding.h"
+#include "mozilla/dom/cache/CacheTypes.h"
 #include "mozilla/dom/cache/Cache.h"
 #include "mozilla/dom/cache/CacheStorage.h"
 #include "mozilla/dom/Exceptions.h"
@@ -191,6 +191,14 @@ ChannelFromScriptURL(nsIPrincipal* principal,
 
   NS_ENSURE_SUCCESS(rv, rv);
 
+  if (nsCOMPtr<nsIHttpChannel> httpChannel = do_QueryInterface(channel)) {
+    rv = nsContentUtils::SetFetchReferrerURIWithPolicy(principal, parentDoc,
+                                                       httpChannel);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+  }
+
   channel.forget(aChannel);
   return rv;
 }
@@ -314,6 +322,7 @@ class CacheCreator final : public PromiseNativeHandler
 public:
   explicit CacheCreator(WorkerPrivate* aWorkerPrivate)
     : mCacheName(aWorkerPrivate->ServiceWorkerCacheName())
+    , mPrivateBrowsing(aWorkerPrivate->IsInPrivateBrowsing())
   {
     MOZ_ASSERT(aWorkerPrivate->IsServiceWorker());
     MOZ_ASSERT(aWorkerPrivate->LoadScriptAsPartOfLoadingServiceWorkerScript());
@@ -374,6 +383,7 @@ private:
   nsTArray<nsRefPtr<CacheScriptLoader>> mLoaders;
 
   nsString mCacheName;
+  bool mPrivateBrowsing;
 };
 
 class CacheScriptLoader final : public PromiseNativeHandler
@@ -422,7 +432,8 @@ private:
   bool mFailed;
   nsCOMPtr<nsIInputStreamPump> mPump;
   nsCOMPtr<nsIURI> mBaseURI;
-  nsCString mSecurityInfo;
+  ChannelInfo mChannelInfo;
+  UniquePtr<PrincipalInfo> mPrincipalInfo;
 };
 
 NS_IMPL_ISUPPORTS(CacheScriptLoader, nsIStreamLoaderObserver)
@@ -589,19 +600,30 @@ private:
       new InternalResponse(200, NS_LITERAL_CSTRING("OK"));
     ir->SetBody(mReader);
 
-    // Set the security info of the channel on the response so that it's
+    // Set the channel info of the channel on the response so that it's
     // saved in the cache.
-    nsCOMPtr<nsISupports> infoObj;
-    channel->GetSecurityInfo(getter_AddRefs(infoObj));
-    if (infoObj) {
-      nsCOMPtr<nsISerializable> serializable = do_QueryInterface(infoObj);
-      if (serializable) {
-        ir->SetSecurityInfo(serializable);
-        MOZ_ASSERT(!ir->GetSecurityInfo().IsEmpty());
-      } else {
-        NS_WARNING("A non-serializable object was obtained from nsIChannel::GetSecurityInfo()!");
-      }
+    ir->InitChannelInfo(channel);
+
+    // Save the principal of the channel since its URI encodes the script URI
+    // rather than the ServiceWorkerRegistrationInfo URI.
+    nsIScriptSecurityManager* ssm = nsContentUtils::GetSecurityManager();
+    NS_ASSERTION(ssm, "Should never be null!");
+
+    nsCOMPtr<nsIPrincipal> channelPrincipal;
+    nsresult rv = ssm->GetChannelResultPrincipal(channel, getter_AddRefs(channelPrincipal));
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      channel->Cancel(rv);
+      return rv;
     }
+
+    UniquePtr<PrincipalInfo> principalInfo(new PrincipalInfo());
+    rv = PrincipalToPrincipalInfo(channelPrincipal, principalInfo.get());
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      channel->Cancel(rv);
+      return rv;
+    }
+
+    ir->SetPrincipalInfo(Move(principalInfo));
 
     nsRefPtr<Response> response = new Response(mCacheCreator->Global(), ir);
 
@@ -965,18 +987,9 @@ private:
       // Take care of the base URI first.
       mWorkerPrivate->SetBaseURI(finalURI);
 
-      // Store the security info if needed.
+      // Store the channel info if needed.
       if (mWorkerPrivate->IsServiceWorker()) {
-        nsCOMPtr<nsISupports> infoObj;
-        channel->GetSecurityInfo(getter_AddRefs(infoObj));
-        if (infoObj) {
-          nsCOMPtr<nsISerializable> serializable = do_QueryInterface(infoObj);
-          if (serializable) {
-            mWorkerPrivate->SetSecurityInfo(serializable);
-          } else {
-            NS_WARNING("A non-serializable object was obtained from nsIChannel::GetSecurityInfo()!");
-          }
-        }
+        mWorkerPrivate->InitChannelInfo(channel);
       }
 
       // Now to figure out which principal to give this worker.
@@ -1003,9 +1016,11 @@ private:
 
       // If the load principal is the system principal then the channel
       // principal must also be the system principal (we do not allow chrome
-      // code to create workers with non-chrome scripts). Otherwise this channel
-      // principal must be same origin with the load principal (we check again
-      // here in case redirects changed the location of the script).
+      // code to create workers with non-chrome scripts, and if we ever decide
+      // to change this we need to make sure we don't always set
+      // mPrincipalIsSystem to true in WorkerPrivate::GetLoadInfo()). Otherwise
+      // this channel principal must be same origin with the load principal (we
+      // check again here in case redirects changed the location of the script).
       if (nsContentUtils::IsSystemPrincipal(loadPrincipal)) {
         if (!nsContentUtils::IsSystemPrincipal(channelPrincipal)) {
           // See if this is a resource URI. Since JSMs usually come from
@@ -1047,7 +1062,9 @@ private:
 
   void
   DataReceivedFromCache(uint32_t aIndex, const uint8_t* aString,
-                        uint32_t aStringLen, const nsCString& aSecurityInfo)
+                        uint32_t aStringLen,
+                        const ChannelInfo& aChannelInfo,
+                        UniquePtr<PrincipalInfo> aPrincipalInfo)
   {
     AssertIsOnMainThread();
     MOZ_ASSERT(aIndex < mLoadInfos.Length());
@@ -1071,14 +1088,19 @@ private:
         mWorkerPrivate->SetBaseURI(finalURI);
       }
 
-      nsIPrincipal* principal = mWorkerPrivate->GetPrincipal();
+      DebugOnly<nsIPrincipal*> principal = mWorkerPrivate->GetPrincipal();
       MOZ_ASSERT(principal);
       nsILoadGroup* loadGroup = mWorkerPrivate->GetLoadGroup();
       MOZ_ASSERT(loadGroup);
-      mWorkerPrivate->SetSecurityInfo(aSecurityInfo);
-      // Needed to initialize the principal info. This is fine because
-      // the cache principal cannot change, unlike the channel principal.
-      mWorkerPrivate->SetPrincipal(principal, loadGroup);
+
+      nsCOMPtr<nsIPrincipal> responsePrincipal =
+        PrincipalInfoToPrincipal(*aPrincipalInfo);
+      DebugOnly<bool> equal = false;
+      MOZ_ASSERT(responsePrincipal && NS_SUCCEEDED(responsePrincipal->Equals(principal, &equal)));
+      MOZ_ASSERT(equal);
+
+      mWorkerPrivate->InitChannelInfo(aChannelInfo);
+      mWorkerPrivate->SetPrincipal(responsePrincipal, loadGroup);
     }
 
     if (NS_SUCCEEDED(rv)) {
@@ -1221,11 +1243,23 @@ CacheCreator::CreateCacheStorage(nsIPrincipal* aPrincipal)
     return NS_ERROR_FAILURE;
   }
 
+  // If we're in private browsing mode, don't even try to create the
+  // CacheStorage.  Instead, just fail immediately to terminate the
+  // ServiceWorker load.
+  if (NS_WARN_IF(mPrivateBrowsing)) {
+    return NS_ERROR_DOM_SECURITY_ERR;
+  }
+
+  // Create a CacheStorage bypassing its trusted origin checks.  The
+  // ServiceWorker has already performed its own checks before getting
+  // to this point.
   ErrorResult error;
   mCacheStorage =
     CacheStorage::CreateOnMainThread(cache::CHROME_ONLY_NAMESPACE,
                                      mSandboxGlobalObject,
-                                     aPrincipal, error);
+                                     aPrincipal, mPrivateBrowsing,
+                                     true /* force trusted origin */,
+                                     error);
   if (NS_WARN_IF(error.Failed())) {
     return error.StealNSResult();
   }
@@ -1429,11 +1463,17 @@ CacheScriptLoader::ResolvedCallback(JSContext* aCx,
 
   nsCOMPtr<nsIInputStream> inputStream;
   response->GetBody(getter_AddRefs(inputStream));
-  mSecurityInfo = response->GetSecurityInfo();
+  mChannelInfo = response->GetChannelInfo();
+  const UniquePtr<mozilla::ipc::PrincipalInfo>& pInfo =
+    response->GetPrincipalInfo();
+  if (pInfo) {
+    mPrincipalInfo = MakeUnique<mozilla::ipc::PrincipalInfo>(*pInfo);
+  }
 
   if (!inputStream) {
     mLoadInfo.mCacheStatus = ScriptLoadInfo::Cached;
-    mRunnable->DataReceivedFromCache(mIndex, (uint8_t*)"", 0, mSecurityInfo);
+    mRunnable->DataReceivedFromCache(mIndex, (uint8_t*)"", 0, mChannelInfo,
+                                     Move(mPrincipalInfo));
     return;
   }
 
@@ -1489,7 +1529,9 @@ CacheScriptLoader::OnStreamComplete(nsIStreamLoader* aLoader, nsISupports* aCont
 
   mLoadInfo.mCacheStatus = ScriptLoadInfo::Cached;
 
-  mRunnable->DataReceivedFromCache(mIndex, aString, aStringLen, mSecurityInfo);
+  MOZ_ASSERT(mPrincipalInfo);
+  mRunnable->DataReceivedFromCache(mIndex, aString, aStringLen, mChannelInfo,
+                                   Move(mPrincipalInfo));
   return NS_OK;
 }
 
@@ -1602,27 +1644,24 @@ ScriptExecutorRunnable::WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate)
     }
   }
 
-  JS::Rooted<JSObject*> global(aCx, JS::CurrentGlobalOrNull(aCx));
-  NS_ASSERTION(global, "Must have a global by now!");
+  JS::Rooted<JSObject*> global(aCx);
 
-  // Determine whether we want to be discarding source on this global to save
-  // memory. It would make more sense to do this when we create the global, but
-  // the information behind UsesSystemPrincipal() et al isn't finalized until
-  // the call to SetPrincipal during the first script load. After that, however,
-  // it never changes. So we can just idempotently set the bits here.
-  //
-  // Note that we read a pref that is cached on the main thread. This is benignly
-  // racey.
-  if (xpc::ShouldDiscardSystemSource()) {
-    bool discard = aWorkerPrivate->UsesSystemPrincipal() ||
-                   aWorkerPrivate->IsInPrivilegedApp();
-    JS::CompartmentOptionsRef(global).setDiscardSource(discard);
+  if (mIsWorkerScript) {
+    WorkerGlobalScope* globalScope =
+      aWorkerPrivate->GetOrCreateGlobalScope(aCx);
+    if (NS_WARN_IF(!globalScope)) {
+      NS_WARNING("Failed to make global!");
+      return false;
+    }
+
+    global.set(globalScope->GetWrapper());
+  } else {
+    global.set(JS::CurrentGlobalOrNull(aCx));
   }
 
-  // Similar to the above.
-  if (xpc::ExtraWarningsForSystemJS() && aWorkerPrivate->UsesSystemPrincipal()) {
-      JS::CompartmentOptionsRef(global).extraWarningsOverride().set(true);
-  }
+  MOZ_ASSERT(global);
+
+  JSAutoCompartment ac(aCx, global);
 
   for (uint32_t index = mFirstIndex; index <= mLastIndex; index++) {
     ScriptLoadInfo& loadInfo = loadInfos.ElementAt(index);

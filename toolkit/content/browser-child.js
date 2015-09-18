@@ -147,6 +147,15 @@ let WebProgressListener = {
       json.mayEnableCharacterEncodingMenu = docShell.mayEnableCharacterEncodingMenu;
       json.principal = content.document.nodePrincipal;
       json.synthetic = content.document.mozSyntheticDocument;
+
+      if (AppConstants.MOZ_CRASHREPORTER && CrashReporter.enabled) {
+        let uri = aLocationURI.clone();
+        try {
+          // If the current URI contains a username/password, remove it.
+          uri.userPass = "";
+        } catch (ex) { /* Ignore failures on about: URIs. */ }
+        CrashReporter.annotateCrashReport("URL", uri.spec);
+      }
     }
 
     this._send("Content:LocationChange", json, objects);
@@ -261,8 +270,17 @@ let WebNavigation =  {
   },
 
   loadURI: function(uri, flags, referrer, referrerPolicy, baseURI) {
-    if (AppConstants.MOZ_CRASHREPORTER && CrashReporter.enabled)
-      CrashReporter.annotateCrashReport("URL", uri);
+    if (AppConstants.MOZ_CRASHREPORTER && CrashReporter.enabled) {
+      let annotation = uri;
+      try {
+        let url = Services.io.newURI(uri, null, null);
+        // If the current URI contains a username/password, remove it.
+        url.userPass = "";
+        annotation = url.spec;
+      } catch (ex) { /* Ignore failures to parse and failures
+                      on about: URIs. */ }
+      CrashReporter.annotateCrashReport("URL", annotation);
+    }
     if (referrer)
       referrer = Services.io.newURI(referrer, null, null);
     if (baseURI)
@@ -472,9 +490,11 @@ addMessageListener("Browser:Thumbnail:CheckState", function (aMessage) {
 // The AddonsChild needs to be rooted so that it stays alive as long as
 // the tab.
 let AddonsChild = RemoteAddonsChild.init(this);
-addEventListener("unload", () => {
-  RemoteAddonsChild.uninit(AddonsChild);
-});
+if (AddonsChild) {
+  addEventListener("unload", () => {
+    RemoteAddonsChild.uninit(AddonsChild);
+  });
+}
 
 addMessageListener("NetworkPrioritizer:AdjustPriority", (msg) => {
   let webNav = docShell.QueryInterface(Ci.nsIWebNavigation);
@@ -482,48 +502,6 @@ addMessageListener("NetworkPrioritizer:AdjustPriority", (msg) => {
                         .loadGroup.QueryInterface(Ci.nsISupportsPriority);
   loadGroup.adjustPriority(msg.data.adjustment);
 });
-
-let DOMFullscreenManager = {
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
-                                         Ci.nsISupportsWeakReference]),
-
-  init: function() {
-    Services.obs.addObserver(this, "ask-parent-to-exit-fullscreen", false);
-    Services.obs.addObserver(this, "ask-parent-to-rollback-fullscreen", false);
-    addMessageListener("DOMFullscreen:ChildrenMustExit", () => {
-      let utils = content.QueryInterface(Ci.nsIInterfaceRequestor)
-                         .getInterface(Ci.nsIDOMWindowUtils);
-      utils.exitFullscreen();
-    });
-    addEventListener("unload", () => {
-      Services.obs.removeObserver(this, "ask-parent-to-exit-fullscreen");
-      Services.obs.removeObserver(this, "ask-parent-to-rollback-fullscreen");
-    });
-  },
-
-  observe: function(aSubject, aTopic, aData) {
-    // Observer notifications are global, which means that these notifications
-    // might be coming from elements that are not actually children within this
-    // windows' content. We should ignore those. This will not be necessary once
-    // we fix bug 1053413 and stop using observer notifications for this stuff.
-    if (aSubject.defaultView.top !== content) {
-      return;
-    }
-
-    switch (aTopic) {
-      case "ask-parent-to-exit-fullscreen": {
-        sendAsyncMessage("DOMFullscreen:RequestExit");
-        break;
-      }
-      case "ask-parent-to-rollback-fullscreen": {
-        sendAsyncMessage("DOMFullscreen:RequestRollback");
-        break;
-      }
-    }
-  },
-};
-
-DOMFullscreenManager.init();
 
 let AutoCompletePopup = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIAutoCompletePopup]),
@@ -575,6 +553,12 @@ let AutoCompletePopup = {
   },
 
   openAutocompletePopup: function (input, element) {
+    if (!this._popupOpen) {
+      // The search itself normally opens the popup itself, but in some cases,
+      // nsAutoCompleteController tries to use cached results so notify our
+      // popup to reuse the last results.
+      sendAsyncMessage("FormAutoComplete:MaybeOpenPopup", {});
+    }
     this._input = input;
     this._popupOpen = true;
   },

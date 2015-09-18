@@ -41,8 +41,20 @@ TalosErrorList = PythonErrorList + [
 
 class TalosOutputParser(OutputParser):
     minidump_regex = re.compile(r'''talosError: "error executing: '(\S+) (\S+) (\S+)'"''')
-    minidump_output = None
     worst_tbpl_status = TBPL_SUCCESS
+
+    def __init__(self, **kwargs):
+        super(TalosOutputParser, self).__init__(**kwargs)
+        self.minidump_output = None
+        self.found_talosdata = False
+
+    def update_worst_log_and_tbpl_levels(self, log_level, tbpl_level):
+        self.worst_log_level = self.worst_level(log_level,
+                                                self.worst_log_level)
+        self.worst_tbpl_status = self.worst_level(
+            tbpl_level, self.worst_tbpl_status,
+            levels=TBPL_WORST_LEVEL_TUPLE
+        )
 
     def parse_single_line(self, line):
         """ In Talos land, every line that starts with RETURN: needs to be
@@ -53,16 +65,14 @@ class TalosOutputParser(OutputParser):
         if m:
             self.minidump_output = (m.group(1), m.group(2), m.group(3))
 
+        if line.startswith('INFO : TALOSDATA: '):
+            self.found_talosdata = True
+
         # now let's check if buildbot should retry
         harness_retry_re = TinderBoxPrintRe['harness_error']['retry_regex']
         if harness_retry_re.search(line):
             self.critical(' %s' % line)
-            self.worst_log_level = self.worst_level(CRITICAL,
-                                                    self.worst_log_level)
-            self.worst_tbpl_status = self.worst_level(
-                TBPL_RETRY, self.worst_tbpl_status,
-                levels=TBPL_WORST_LEVEL_TUPLE
-            )
+            self.update_worst_log_and_tbpl_levels(CRITICAL, TBPL_RETRY)
             return  # skip base parse_single_line
         super(TalosOutputParser, self).parse_single_line(line)
 
@@ -73,12 +83,6 @@ talos_config_options = [
       "dest": "tests",
       "default": [],
       "help": "Specify the tests to run"
-      }],
-    [["--results-url"],
-     {'action': 'store',
-      'dest': 'results_url',
-      'default': None,
-      'help': "URL to send results to"
       }],
 ]
 
@@ -163,11 +167,6 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
 
         self.workdir = self.query_abs_dirs()['abs_work_dir']  # convenience
 
-        # results output
-        self.results_url = self.config.get('results_url')
-        if self.results_url is None:
-            # use a results_url by default based on the class name in the working directory
-            self.results_url = 'file://%s' % os.path.join(self.workdir, self.__class__.__name__.lower() + '.txt')
         self.installer_url = self.config.get("installer_url")
         self.talos_json_url = self.config.get("talos_json_url")
         self.talos_json = self.config.get("talos_json")
@@ -415,15 +414,14 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
             self.fatal("Talos requires a path to the binary.  You can specify binary_path or add download-and-extract to your action list.")
 
         # talos options
-        options = ['-v', ]  # hardcoded options (for now)
+        options = []
         if self.config.get('python_webserver', True):
             options.append('--develop')
         # talos can't gather data if the process name ends with '.exe'
         if binary_path.endswith('.exe'):
             binary_path = binary_path[:-4]
-        kw_options = {'output': 'talos.yml',  # options overwritten from **kw
-                      'executablePath': binary_path,
-                      'results_url': self.results_url}
+        # options overwritten from **kw
+        kw_options = {'executablePath': binary_path}
         kw_options['activeTests'] = self.query_tests()
         if self.config.get('title'):
             kw_options['title'] = self.config['title']
@@ -439,13 +437,6 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
             kw_options['activeTests'] = tests
         for key, value in kw_options.items():
             options.extend(['--%s' % key, value])
-        # add datazilla results urls
-        for url in self.config.get('datazilla_urls', []):
-            options.extend(['--datazilla-url', url])
-        # add datazilla authfile
-        authfile = self.config.get('datazilla_authfile')
-        if authfile:
-            options.extend(['--authfile', authfile])
         # configure profiling options
         options.extend(self.query_sps_profile_options())
         # extra arguments
@@ -531,27 +522,13 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
         talos from its source, we have to wrap that method here."""
         # XXX This method could likely be replaced with a PreScriptAction hook.
         if self.has_cloned_talos:
-            requirements = self.read_from_file(
-                os.path.join(self.talos_path, 'requirements.txt'),
-                verbose=False
+            # talos in harness requires mozinstall and what is
+            # listed in talos requirements.txt file.
+            return super(Talos, self).create_virtualenv(
+                modules=['mozinstall'],
+                requirements=[os.path.join(self.talos_path,
+                                           'requirements.txt')]
             )
-            # talos in harness requires mozinstall
-            virtualenv_modules = ['mozinstall']
-            for requirement in requirements.splitlines():
-                requirement = requirement.strip()
-                if requirement:
-                    virtualenv_modules.append(requirement)
-
-            # Bug 900015 - Silent warnings on osx when libyaml is not found
-            pyyaml_module = {
-                'name': 'PyYAML',
-                'url': None,
-                'global_options': ['--without-libyaml']
-            }
-            virtualenv_modules.insert(0, pyyaml_module)
-
-            self.info(pprint.pformat(virtualenv_modules))
-            return super(Talos, self).create_virtualenv(modules=virtualenv_modules)
         else:
             return super(Talos, self).create_virtualenv(**kwargs)
 
@@ -583,9 +560,6 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
         # XXX temporary python version check
         python = self.query_python_path()
         self.run_command([python, "--version"])
-        # run talos tests
-        talos = os.path.join(self.talos_path, 'talos', 'PerfConfigurator.py')
-        command = [python, talos] + options
         parser = TalosOutputParser(config=self.config, log_obj=self.log_obj,
                                    error_list=TalosErrorList)
         env = {}
@@ -594,17 +568,17 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
         if not os.path.isdir(env['MOZ_UPLOAD_DIR']):
             self.mkdir_p(env['MOZ_UPLOAD_DIR'])
         env = self.query_env(partial_env=env, log_level=INFO)
+        # adjust PYTHONPATH to be able to use talos as a python package
+        if 'PYTHONPATH' in env:
+            env['PYTHONPATH'] = self.talos_path + os.pathsep + env['PYTHONPATH']
+        else:
+            env['PYTHONPATH'] = self.talos_path
+
         # sets a timeout for how long talos should run without output
         output_timeout = self.config.get('talos_output_timeout', 3600)
-        # Call PerfConfigurator to generate talos.yml
-        self.return_code = self.run_command(command, cwd=self.workdir,
-                                            output_timeout=output_timeout,
-                                            output_parser=parser,
-                                            env=env)
-        # Call run_tests on generated talos.yml
+        # run talos tests
         run_tests = os.path.join(self.talos_path, 'talos', 'run_tests.py')
-        options = "talos.yml"
-        command = [python, run_tests, '--noisy', '--debug'] + [options]
+        command = [python, run_tests, '--debug'] + options
         self.return_code = self.run_command(command, cwd=self.workdir,
                                             output_timeout=output_timeout,
                                             output_parser=parser,
@@ -613,6 +587,10 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
             self.info("Looking at the minidump files for debugging purposes...")
             for item in parser.minidump_output:
                 self.run_command(["ls", "-l", item])
+        if not parser.found_talosdata:
+            self.critical("No talos data in output!")
+            parser.update_worst_log_and_tbpl_levels(WARNING, TBPL_WARNING)
+
         if self.return_code not in [0]:
             # update the worst log level and tbpl status
             log_level = ERROR
@@ -624,12 +602,7 @@ class Talos(TestingMixin, MercurialScript, BlobUploadMixin):
                 log_level = WARNING
                 tbpl_level = TBPL_RETRY
 
-            parser.worst_log_level = parser.worst_level(
-                log_level, parser.worst_log_level
-            )
-            parser.worst_tbpl_status = parser.worst_level(
-                tbpl_level, parser.worst_tbpl_status,
-                levels=TBPL_WORST_LEVEL_TUPLE
-            )
+            parser.update_worst_log_and_tbpl_levels(log_level, tbpl_level)
+
         self.buildbot_status(parser.worst_tbpl_status,
                              level=parser.worst_log_level)

@@ -105,9 +105,15 @@
 #include "nsDOMMutationObserver.h"
 #include "GeometryUtils.h"
 #include "nsIAnimationObserver.h"
+#include "nsChildContentList.h"
 
 using namespace mozilla;
 using namespace mozilla::dom;
+
+nsINode::nsSlots::nsSlots()
+  : mWeakReference(nullptr)
+{
+}
 
 nsINode::nsSlots::~nsSlots()
 {
@@ -1296,11 +1302,18 @@ nsINode::GetContextForEventHandlers(nsresult* aRv)
 }
 
 nsIDOMWindow*
-nsINode::GetOwnerGlobal()
+nsINode::GetOwnerGlobalForBindings()
 {
   bool dummy;
   return nsPIDOMWindow::GetOuterFromCurrentInner(
     static_cast<nsGlobalWindow*>(OwnerDoc()->GetScriptHandlingObject(dummy)));
+}
+
+nsIGlobalObject*
+nsINode::GetOwnerGlobal() const
+{
+  bool dummy;
+  return OwnerDoc()->GetScriptHandlingObject(dummy);
 }
 
 bool

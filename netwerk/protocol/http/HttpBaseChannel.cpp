@@ -103,14 +103,7 @@ HttpBaseChannel::~HttpBaseChannel()
 {
   LOG(("Destroying HttpBaseChannel @%x\n", this));
 
-  if (mLoadInfo) {
-    nsCOMPtr<nsIThread> mainThread;
-    NS_GetMainThread(getter_AddRefs(mainThread));
-    
-    nsILoadInfo *forgetableLoadInfo;
-    mLoadInfo.forget(&forgetableLoadInfo);
-    NS_ProxyRelease(mainThread, forgetableLoadInfo, false);
-  }
+  NS_ReleaseOnMainThread(mLoadInfo);
 
   // Make sure we don't leak
   CleanRedirectCacheChainIfNecessary();
@@ -1106,7 +1099,7 @@ HttpBaseChannel::SetReferrerWithPolicy(nsIURI *referrer,
     if (NS_FAILED(rv)) return rv;
 
     // It's ok to send referrer for https-to-http scenarios if the referrer
-    // policy is "unsafe-url", "origin", or "origin-when-crossorigin".
+    // policy is "unsafe-url", "origin", or "origin-when-cross-origin".
     if (referrerPolicy != REFERRER_POLICY_UNSAFE_URL &&
 	referrerPolicy != REFERRER_POLICY_ORIGIN_WHEN_XORIGIN &&
         referrerPolicy != REFERRER_POLICY_ORIGIN) {
@@ -1426,13 +1419,46 @@ HttpBaseChannel::SetRedirectionLimit(uint32_t value)
 nsresult
 HttpBaseChannel::OverrideSecurityInfo(nsISupports* aSecurityInfo)
 {
-  MOZ_RELEASE_ASSERT(!mSecurityInfo,
-                     "This can only be called when we don't have a security info object already");
+  MOZ_ASSERT(!mSecurityInfo,
+             "This can only be called when we don't have a security info object already");
   MOZ_RELEASE_ASSERT(aSecurityInfo,
                      "This can only be called with a valid security info object");
-  MOZ_RELEASE_ASSERT(ShouldIntercept(),
-                     "This can only be called on channels that can be intercepted");
+  MOZ_ASSERT(ShouldIntercept(),
+             "This can only be called on channels that can be intercepted");
+  if (mSecurityInfo) {
+    LOG(("HttpBaseChannel::OverrideSecurityInfo mSecurityInfo is null! "
+         "[this=%p]\n", this));
+    return NS_ERROR_UNEXPECTED;
+  }
+  if (!ShouldIntercept()) {
+    LOG(("HttpBaseChannel::OverrideSecurityInfo channel cannot be intercepted! "
+         "[this=%p]\n", this));
+    return NS_ERROR_UNEXPECTED;
+  }
+
   mSecurityInfo = aSecurityInfo;
+  return NS_OK;
+}
+
+nsresult
+HttpBaseChannel::OverrideURI(nsIURI* aRedirectedURI)
+{
+  MOZ_ASSERT(mLoadFlags & LOAD_REPLACE,
+             "This can only happen if the LOAD_REPLACE flag is set");
+  MOZ_ASSERT(ShouldIntercept(),
+             "This can only be called on channels that can be intercepted");
+  if (!(mLoadFlags & LOAD_REPLACE)) {
+    LOG(("HttpBaseChannel::OverrideURI LOAD_REPLACE flag not set! [this=%p]\n",
+         this));
+    return NS_ERROR_UNEXPECTED;
+  }
+  if (!ShouldIntercept()) {
+    LOG(("HttpBaseChannel::OverrideURI channel cannot be intercepted! "
+         "[this=%p]\n", this));
+    return NS_ERROR_UNEXPECTED;
+  }
+
+  mURI = aRedirectedURI;
   return NS_OK;
 }
 
@@ -2251,6 +2277,14 @@ HttpBaseChannel::SetupReplacementChannel(nsIURI       *newURI,
       do_QueryInterface(newChannel);
     if (newPBChannel) {
       newPBChannel->SetPrivate(mPrivateBrowsing);
+    }
+  }
+
+  // Preserve any skip-serviceworker-flag if possible.
+  if (mForceNoIntercept) {
+    nsCOMPtr<nsIHttpChannelInternal> httpChan = do_QueryInterface(newChannel);
+    if (httpChan) {
+      httpChan->ForceNoIntercept();
     }
   }
 

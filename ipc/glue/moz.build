@@ -76,6 +76,11 @@ if CONFIG['OS_TARGET'] == 'Android':
     UNIFIED_SOURCES += [
         'SharedMemoryBasic_android.cpp',
     ]
+elif CONFIG['OS_ARCH'] == 'Darwin':
+    EXPORTS.mozilla.ipc += ['SharedMemoryBasic_mach.h']
+    SOURCES += [
+        'SharedMemoryBasic_mach.cpp',
+    ]
 else:
     EXPORTS.mozilla.ipc += ['SharedMemoryBasic_chromium.h']
 
@@ -133,6 +138,7 @@ LOCAL_INCLUDES += [
     '/caps',
     '/dom/broadcastchannel',
     '/dom/indexedDB',
+    '/dom/workers',
     '/xpcom/build',
 ]
 
@@ -157,8 +163,8 @@ include('/ipc/chromium/chromium-config.mozbuild')
 
 FINAL_LIBRARY = 'xul'
 
-for var in ('MOZ_CHILD_PROCESS_NAME', 'MOZ_CHILD_PROCESS_BUNDLE',
-            'DLL_PREFIX', 'DLL_SUFFIX'):
+for var in ('MOZ_CHILD_PROCESS_NAME', 'MOZ_CHILD_PROCESS_NAME_PIE',
+            'MOZ_CHILD_PROCESS_BUNDLE', 'DLL_PREFIX', 'DLL_SUFFIX'):
     DEFINES[var] = '"%s"' % CONFIG[var]
 
 LOCAL_INCLUDES += [

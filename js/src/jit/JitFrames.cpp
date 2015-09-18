@@ -11,6 +11,7 @@
 #include "jsfun.h"
 #include "jsobj.h"
 #include "jsscript.h"
+#include "jsutil.h"
 
 #include "gc/Marking.h"
 #include "jit/BaselineDebugModeOSR.h"
@@ -265,6 +266,9 @@ SizeOfFramePrefix(FrameType type)
       case JitFrame_BaselineStub:
       case JitFrame_Unwound_BaselineStub:
         return BaselineStubFrameLayout::Size();
+      case JitFrame_IonStub:
+      case JitFrame_Unwound_IonStub:
+        return JitStubFrameLayout::Size();
       case JitFrame_Rectifier:
         return RectifierFrameLayout::Size();
       case JitFrame_Unwound_Rectifier:
@@ -317,6 +321,8 @@ JitFrameIterator::operator++()
     type_ = current()->prevType();
     if (type_ == JitFrame_Unwound_IonJS)
         type_ = JitFrame_IonJS;
+    else if (type_ == JitFrame_Unwound_IonStub)
+        type_ = JitFrame_IonStub;
     else if (type_ == JitFrame_Unwound_BaselineJS)
         type_ = JitFrame_BaselineJS;
     else if (type_ == JitFrame_Unwound_BaselineStub)
@@ -939,6 +945,7 @@ EnsureExitFrame(CommonFrameLayout* frame)
 {
     switch (frame->prevType()) {
       case JitFrame_Unwound_IonJS:
+      case JitFrame_Unwound_IonStub:
       case JitFrame_Unwound_BaselineJS:
       case JitFrame_Unwound_BaselineStub:
       case JitFrame_Unwound_Rectifier:
@@ -969,6 +976,10 @@ EnsureExitFrame(CommonFrameLayout* frame)
 
       case JitFrame_IonJS:
         frame->changePrevType(JitFrame_Unwound_IonJS);
+        return;
+
+      case JitFrame_IonStub:
+        frame->changePrevType(JitFrame_Unwound_IonStub);
         return;
 
       case JitFrame_IonAccessorIC:
@@ -1037,9 +1048,11 @@ MarkThisAndArguments(JSTracer* trc, JitFrameLayout* layout)
 
     size_t nargs = layout->numActualArgs();
     size_t nformals = 0;
+    size_t newTargetOffset = 0;
     if (CalleeTokenIsFunction(layout->calleeToken())) {
         JSFunction* fun = CalleeTokenToFunction(layout->calleeToken());
         nformals = fun->nonLazyScript()->argumentsHasVarBinding() ? 0 : fun->nargs();
+        newTargetOffset = Max(nargs, fun->nargs());
     }
 
     Value* argv = layout->argv();
@@ -1050,6 +1063,11 @@ MarkThisAndArguments(JSTracer* trc, JitFrameLayout* layout)
     // Trace actual arguments beyond the formals. Note + 1 for thisv.
     for (size_t i = nformals + 1; i < nargs + 1; i++)
         TraceRoot(trc, &argv[i], "ion-argv");
+
+    // Always mark the new.target from the frame. It's not in the snapshots.
+    // +1 to pass |this|
+    if (CalleeTokenIsConstructing(layout->calleeToken()))
+        TraceRoot(trc, &argv[1 + newTargetOffset], "ion-newTarget");
 }
 
 static void
@@ -1221,13 +1239,13 @@ UpdateIonJSFrameForMinorGC(JSTracer* trc, const JitFrameIterator& frame)
 }
 
 static void
-MarkBaselineStubFrame(JSTracer* trc, const JitFrameIterator& frame)
+MarkJitStubFrame(JSTracer* trc, const JitFrameIterator& frame)
 {
     // Mark the ICStub pointer stored in the stub frame. This is necessary
     // so that we don't destroy the stub code after unlinking the stub.
 
-    MOZ_ASSERT(frame.type() == JitFrame_BaselineStub);
-    BaselineStubFrameLayout* layout = (BaselineStubFrameLayout*)frame.fp();
+    MOZ_ASSERT(frame.type() == JitFrame_IonStub || frame.type() == JitFrame_BaselineStub);
+    JitStubFrameLayout* layout = (JitStubFrameLayout*)frame.fp();
 
     if (ICStub* stub = layout->maybeStubPtr()) {
         MOZ_ASSERT(ICStub::CanMakeCalls(stub->kind()));
@@ -1522,11 +1540,12 @@ MarkJitActivation(JSTracer* trc, const JitActivationIterator& activations)
           case JitFrame_BaselineJS:
             frames.baselineFrame()->trace(trc, frames);
             break;
-          case JitFrame_BaselineStub:
-            MarkBaselineStubFrame(trc, frames);
-            break;
           case JitFrame_IonJS:
             MarkIonJSFrame(trc, frames);
+            break;
+          case JitFrame_BaselineStub:
+          case JitFrame_IonStub:
+            MarkJitStubFrame(trc, frames);
             break;
           case JitFrame_Bailout:
             MarkBailoutFrame(trc, frames);
@@ -2460,7 +2479,8 @@ InlineFrameIterator::findNextFrame()
             MOZ_CRASH("Couldn't deduce the number of arguments of an ionmonkey frame");
 
         // Skip over non-argument slots, as well as |this|.
-        unsigned skipCount = (si_.numAllocations() - 1) - numActualArgs_ - 1;
+        bool skipNewTarget = JSOp(*pc_) == JSOP_NEW;
+        unsigned skipCount = (si_.numAllocations() - 1) - numActualArgs_ - 1 - skipNewTarget;
         for (unsigned j = 0; j < skipCount; j++)
             si_.skip();
 
@@ -2540,7 +2560,7 @@ InlineFrameIterator::computeScopeChain(Value scopeChainValue, MaybeReadFallback&
     // Ion does not handle non-function scripts that have anything other than
     // the global on their scope chain.
     MOZ_ASSERT(!script()->isForEval());
-    MOZ_ASSERT(!script()->hasPollutedGlobalScope());
+    MOZ_ASSERT(!script()->hasNonSyntacticScope());
     return &script()->global();
 }
 
@@ -2780,6 +2800,11 @@ JitFrameIterator::dump() const
         }
         break;
       }
+      case JitFrame_IonStub:
+      case JitFrame_Unwound_IonStub:
+        fprintf(stderr, " Ion stub frame\n");
+        fprintf(stderr, "  Frame size: %u\n", unsigned(current()->prevFrameLocalSize()));
+        break;
       case JitFrame_Rectifier:
       case JitFrame_Unwound_Rectifier:
         fprintf(stderr, " Rectifier frame\n");
@@ -2795,7 +2820,10 @@ JitFrameIterator::dump() const
         fprintf(stderr, "Warning! Unwound JS frames are not observable.\n");
         break;
       case JitFrame_Exit:
+        fprintf(stderr, " Exit frame\n");
+        break;
       case JitFrame_LazyLink:
+        fprintf(stderr, " Lazy link frame\n");
         break;
     };
     fputc('\n', stderr);
@@ -2999,6 +3027,35 @@ JitProfilingFrameIterator::JitProfilingFrameIterator(void* exitFrame)
         fp_ = ((uint8_t*) stubFrame->reverseSavedFramePtr())
                 + jit::BaselineFrame::FramePointerOffset;
         type_ = JitFrame_BaselineJS;
+        return;
+    }
+
+    if (prevType == JitFrame_Unwound_Rectifier) {
+        // Unwound rectifier exit frames still keep their 'JS' format (with
+        // the target function and actual-args included in the frame and not
+        // counted in the frame size).
+        RectifierFrameLayout* rectFrame =
+            GetPreviousRawFrame<JitFrameLayout, RectifierFrameLayout*>((JitFrameLayout*) frame);
+
+        MOZ_ASSERT(rectFrame->prevType() == JitFrame_BaselineStub ||
+                   rectFrame->prevType() == JitFrame_IonJS);
+
+        if (rectFrame->prevType() == JitFrame_BaselineStub) {
+            // Unwind past stub frame.
+            BaselineStubFrameLayout* stubFrame =
+                GetPreviousRawFrame<RectifierFrameLayout, BaselineStubFrameLayout*>(rectFrame);
+            MOZ_ASSERT(stubFrame->prevType() == JitFrame_BaselineJS);
+            returnAddressToFp_ = stubFrame->returnAddress();
+            fp_ = ((uint8_t*) stubFrame->reverseSavedFramePtr())
+                    + jit::BaselineFrame::FramePointerOffset;
+            type_ = JitFrame_BaselineJS;
+            return;
+        }
+
+        // else, prior frame was ion frame.
+        returnAddressToFp_ = rectFrame->returnAddress();
+        fp_ = GetPreviousRawFrame<RectifierFrameLayout, uint8_t*>(rectFrame);
+        type_ = JitFrame_IonJS;
         return;
     }
 

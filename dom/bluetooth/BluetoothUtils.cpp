@@ -43,17 +43,6 @@ UuidToString(const BluetoothUuid& aUuid, nsAString& aString)
 }
 
 void
-ReversedUuidToString(const BluetoothUuid& aUuid, nsAString& aString)
-{
-  BluetoothUuid uuid;
-  for (uint8_t i = 0; i < 16; i++) {
-    uuid.mUuid[i] = aUuid.mUuid[15 - i];
-  }
-
-  UuidToString(uuid, aString);
-}
-
-void
 StringToUuid(const char* aString, BluetoothUuid& aUuid)
 {
   uint32_t uuid0, uuid4;
@@ -100,22 +89,14 @@ GenerateUuid(nsAString &aUuidString)
 
 void
 GeneratePathFromGattId(const BluetoothGattId& aId,
-                       nsAString& aPath,
-                       nsAString& aUuidStr)
-{
-  ReversedUuidToString(aId.mUuid, aUuidStr);
-
-  aPath.Assign(aUuidStr);
-  aPath.AppendLiteral("_");
-  aPath.AppendInt(aId.mInstanceId);
-}
-
-void
-GeneratePathFromGattId(const BluetoothGattId& aId,
                        nsAString& aPath)
 {
   nsString uuidStr;
-  GeneratePathFromGattId(aId, aPath, uuidStr);
+  UuidToString(aId.mUuid, uuidStr);
+
+  aPath.Assign(uuidStr);
+  aPath.AppendLiteral("_");
+  aPath.AppendInt(aId.mInstanceId);
 }
 
 void
@@ -270,7 +251,6 @@ BroadcastSystemMessage(const nsAString& aType,
   return true;
 }
 
-#ifdef MOZ_B2G_BT_API_V2
 void
 DispatchReplySuccess(BluetoothReplyRunnable* aRunnable)
 {
@@ -297,8 +277,14 @@ DispatchReplyError(BluetoothReplyRunnable* aRunnable,
   MOZ_ASSERT(aRunnable);
   MOZ_ASSERT(!aErrorStr.IsEmpty());
 
+  // Reply will be deleted by the runnable after running on main thread
+#ifndef MOZ_B2G_BT_API_V1
   BluetoothReply* reply =
     new BluetoothReply(BluetoothReplyError(STATUS_FAIL, nsString(aErrorStr)));
+#else
+  BluetoothReply* reply =
+    new BluetoothReply(BluetoothReplyError(nsString(aErrorStr)));
+#endif
 
   aRunnable->SetReply(reply); // runnable will delete reply after Run()
   NS_WARN_IF(NS_FAILED(NS_DispatchToMainThread(aRunnable)));
@@ -311,8 +297,15 @@ DispatchReplyError(BluetoothReplyRunnable* aRunnable,
   MOZ_ASSERT(aRunnable);
   MOZ_ASSERT(aStatus != STATUS_SUCCESS);
 
+  // Reply will be deleted by the runnable after running on main thread
+#ifndef MOZ_B2G_BT_API_V1
   BluetoothReply* reply =
     new BluetoothReply(BluetoothReplyError(aStatus, EmptyString()));
+#else
+  BluetoothReply* reply =
+    new BluetoothReply(
+      BluetoothReplyError(NS_LITERAL_STRING("Internal error")));
+#endif
 
   aRunnable->SetReply(reply); // runnable will delete reply after Run()
   NS_WARN_IF(NS_FAILED(NS_DispatchToMainThread(aRunnable)));
@@ -331,50 +324,14 @@ DispatchStatusChangedEvent(const nsAString& aType,
 
   BluetoothService* bs = BluetoothService::Get();
   NS_ENSURE_TRUE_VOID(bs);
+
+#ifndef MOZ_B2G_BT_API_V1
   bs->DistributeSignal(aType, NS_LITERAL_STRING(KEY_ADAPTER), data);
-}
 #else
-// TODO: remove with bluetooth1
-void
-DispatchBluetoothReply(BluetoothReplyRunnable* aRunnable,
-                       const BluetoothValue& aValue,
-                       const nsAString& aErrorStr)
-{
-  // Reply will be deleted by the runnable after running on main thread
-  BluetoothReply* reply;
-  if (!aErrorStr.IsEmpty()) {
-    nsString err(aErrorStr);
-    reply = new BluetoothReply(BluetoothReplyError(err));
-  } else {
-    MOZ_ASSERT(aValue.type() != BluetoothValue::T__None);
-    reply = new BluetoothReply(BluetoothReplySuccess(aValue));
-  }
-
-  aRunnable->SetReply(reply);
-  if (NS_FAILED(NS_DispatchToMainThread(aRunnable))) {
-    BT_WARNING("Failed to dispatch to main thread!");
-  }
-}
-
-// TODO: remove with bluetooth1
-void
-DispatchStatusChangedEvent(const nsAString& aType,
-                           const nsAString& aAddress,
-                           bool aStatus)
-{
-  MOZ_ASSERT(NS_IsMainThread());
-
-  InfallibleTArray<BluetoothNamedValue> data;
-  BT_APPEND_NAMED_VALUE(data, "address", nsString(aAddress));
-  BT_APPEND_NAMED_VALUE(data, "status", aStatus);
-
   BluetoothSignal signal(nsString(aType), NS_LITERAL_STRING(KEY_ADAPTER), data);
-
-  BluetoothService* bs = BluetoothService::Get();
-  NS_ENSURE_TRUE_VOID(bs);
   bs->DistributeSignal(signal);
-}
 #endif
+}
 
 bool
 IsMainProcess()

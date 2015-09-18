@@ -4,28 +4,38 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 var FullScreen = {
+  _MESSAGES: [
+    "DOMFullscreen:Request",
+    "DOMFullscreen:NewOrigin",
+    "DOMFullscreen:Exit",
+  ],
+
   init: function() {
     // called when we go into full screen, even if initiated by a web page script
     window.addEventListener("fullscreen", this, true);
-    window.messageManager.addMessageListener("MozEnteredDomFullscreen", this);
-    window.messageManager.addMessageListener("MozExitedDomFullscreen", this);
+    window.addEventListener("MozDOMFullscreen:Entered", this,
+                            /* useCapture */ true,
+                            /* wantsUntrusted */ false);
+    window.addEventListener("MozDOMFullscreen:Exited", this,
+                            /* useCapture */ true,
+                            /* wantsUntrusted */ false);
+    for (let type of this._MESSAGES) {
+      window.messageManager.addMessageListener(type, this);
+    }
 
     if (window.fullScreen)
       this.toggle();
   },
 
   uninit: function() {
-    window.messageManager.removeMessageListener("MozEnteredDomFullscreen", this);
-    window.messageManager.removeMessageListener("MozExitedDomFullscreen", this);
+    for (let type of this._MESSAGES) {
+      window.messageManager.removeMessageListener(type, this);
+    }
     this.cleanup();
   },
 
-  toggle: function (event) {
+  toggle: function () {
     var enterFS = window.fullScreen;
-
-    // We get the fullscreen event _before_ the window transitions into or out of FS mode.
-    if (event && event.type == "fullscreen")
-      enterFS = !enterFS;
 
     // Toggle the View:FullScreen command, which controls elements like the
     // fullscreen menuitem, and menubars.
@@ -75,6 +85,12 @@ var FullScreen = {
       // This is needed if they use the context menu to quit fullscreen
       this._isPopupOpen = false;
       this.cleanup();
+      // In TabsInTitlebar._update(), we cancel the appearance update on
+      // resize event for exiting fullscreen, since that happens before we
+      // change the UI here in the "fullscreen" event. Hence we need to
+      // call it here to ensure the appearance is properly updated. See
+      // TabsInTitlebar._update() and bug 1173768.
+      TabsInTitlebar.updateAppearance(true);
     }
   },
 
@@ -90,39 +106,70 @@ var FullScreen = {
         }
         break;
       case "fullscreen":
-        this.toggle(event);
+        this.toggle();
         break;
       case "transitionend":
         if (event.propertyName == "opacity")
           this.cancelWarning();
         break;
+      case "MozDOMFullscreen:Entered": {
+        // The event target is the element which requested the DOM
+        // fullscreen. If we were entering DOM fullscreen for a remote
+        // browser, the target would be `gBrowser` and the original
+        // target would be the browser which was the parameter of
+        // `remoteFrameFullscreenChanged` call. If the fullscreen
+        // request was initiated from an in-process browser, we need
+        // to get its corresponding browser here.
+        let browser;
+        if (event.target == gBrowser) {
+          browser = event.originalTarget;
+        } else {
+          let topWin = event.target.ownerDocument.defaultView.top;
+          browser = gBrowser.getBrowserForContentWindow(topWin);
+          if (!browser) {
+            document.mozCancelFullScreen();
+            break;
+          }
+        }
+        if (!this.enterDomFullscreen(browser)) {
+          break;
+        }
+        // If it is a remote browser, send a message to ask the content
+        // to enter fullscreen state. We don't need to do so if it is an
+        // in-process browser, since all related document should have
+        // entered fullscreen state at this point.
+        if (this._isRemoteBrowser(browser)) {
+          browser.messageManager.sendAsyncMessage("DOMFullscreen:Entered");
+        }
+        break;
+      }
+      case "MozDOMFullscreen:Exited":
+        this.cleanupDomFullscreen();
+        break;
     }
   },
 
   receiveMessage: function(aMessage) {
-    if (aMessage.name == "MozEnteredDomFullscreen") {
-      // If we're a multiprocess browser, then the request to enter fullscreen
-      // did not bubble up to the root browser document - it stopped at the root
-      // of the content document. That means we have to kick off the switch to
-      // fullscreen here at the operating system level in the parent process
-      // ourselves.
-      let data = aMessage.data;
-      let browser = aMessage.target;
-      if (gMultiProcessBrowser && browser.getAttribute("remote") == "true") {
-        let windowUtils = window.QueryInterface(Ci.nsIInterfaceRequestor)
-                                .getInterface(Ci.nsIDOMWindowUtils);
-        windowUtils.remoteFrameFullscreenChanged(browser, data.origin);
+    let browser = aMessage.target;
+    switch (aMessage.name) {
+      case "DOMFullscreen:Request": {
+        this._windowUtils.remoteFrameFullscreenChanged(browser);
+        break;
       }
-      this.enterDomFullscreen(browser, data.origin);
-    } else if (aMessage.name == "MozExitedDomFullscreen") {
-      document.documentElement.removeAttribute("inDOMFullscreen");
-      this.cleanupDomFullscreen();
+      case "DOMFullscreen:NewOrigin": {
+        this.showWarning(aMessage.data.originNoSuffix);
+        break;
+      }
+      case "DOMFullscreen:Exit": {
+        this._windowUtils.remoteFrameFullscreenReverted();
+        break;
+      }
     }
   },
 
-  enterDomFullscreen : function(aBrowser, aOrigin) {
+  enterDomFullscreen : function(aBrowser) {
     if (!document.mozFullScreen)
-      return;
+      return false;
 
     // If we've received a fullscreen notification, we have to ensure that the
     // element that's requesting fullscreen belongs to the browser that's currently
@@ -130,7 +177,7 @@ var FullScreen = {
     // actually visible now.
     if (gBrowser.selectedBrowser != aBrowser) {
       document.mozCancelFullScreen();
-      return;
+      return false;
     }
 
     let focusManager = Services.focus;
@@ -138,15 +185,13 @@ var FullScreen = {
       // The top-level window has lost focus since the request to enter
       // full-screen was made. Cancel full-screen.
       document.mozCancelFullScreen();
-      return;
+      return false;
     }
 
     document.documentElement.setAttribute("inDOMFullscreen", true);
 
     if (gFindBarInitialized)
       gFindBar.close();
-
-    this.showWarning(aOrigin);
 
     // Exit DOM full-screen mode upon open, close, or change tab.
     gBrowser.tabContainer.addEventListener("TabOpen", this.exitDomFullScreen);
@@ -156,19 +201,17 @@ var FullScreen = {
     // Add listener to detect when the fullscreen window is re-focused.
     // If a fullscreen window loses focus, we show a warning when the
     // fullscreen window is refocused.
-    if (!this.useLionFullScreen) {
-      window.addEventListener("activate", this);
-    }
+    window.addEventListener("activate", this);
+
+    return true;
   },
 
   cleanup: function () {
-    if (window.fullScreen) {
+    if (!window.fullScreen) {
       MousePosTracker.removeListener(this);
       document.removeEventListener("keypress", this._keyToggleCallback, false);
       document.removeEventListener("popupshown", this._setPopupOpen, false);
       document.removeEventListener("popuphidden", this._setPopupOpen, false);
-
-      this.cleanupDomFullscreen();
     }
   },
 
@@ -177,11 +220,21 @@ var FullScreen = {
     gBrowser.tabContainer.removeEventListener("TabOpen", this.exitDomFullScreen);
     gBrowser.tabContainer.removeEventListener("TabClose", this.exitDomFullScreen);
     gBrowser.tabContainer.removeEventListener("TabSelect", this.exitDomFullScreen);
-    if (!this.useLionFullScreen)
-      window.removeEventListener("activate", this);
+    window.removeEventListener("activate", this);
+
+    document.documentElement.removeAttribute("inDOMFullscreen");
 
     window.messageManager
-          .broadcastAsyncMessage("DOMFullscreen:Cleanup");
+          .broadcastAsyncMessage("DOMFullscreen:CleanUp");
+  },
+
+  _isRemoteBrowser: function (aBrowser) {
+    return gMultiProcessBrowser && aBrowser.getAttribute("remote") == "true";
+  },
+
+  get _windowUtils() {
+    return window.QueryInterface(Ci.nsIInterfaceRequestor)
+                 .getInterface(Ci.nsIDOMWindowUtils);
   },
 
   getMouseTargetRect: function()

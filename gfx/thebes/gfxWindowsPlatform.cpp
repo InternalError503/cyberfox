@@ -74,6 +74,7 @@
 #include "gfxPrefs.h"
 
 #include "VsyncSource.h"
+#include "DriverInitCrashDetection.h"
 
 using namespace mozilla;
 using namespace mozilla::gfx;
@@ -405,7 +406,8 @@ public:
 NS_IMPL_ISUPPORTS(D3D9SharedTextureReporter, nsIMemoryReporter)
 
 gfxWindowsPlatform::gfxWindowsPlatform()
-  : mD3D11DeviceInitialized(false)
+  : mUseDirectWrite(false)
+  , mD3D11DeviceInitialized(false)
   , mIsWARP(false)
   , mHasDeviceReset(false)
   , mDoesD3D11TextureSharingWork(false)
@@ -456,8 +458,8 @@ gfxWindowsPlatform::~gfxWindowsPlatform()
 
     mozilla::gfx::Factory::D2DCleanup();
 
-	mAdapter = nullptr;
-	
+    mAdapter = nullptr;
+
     /* 
      * Uninitialize COM 
      */ 
@@ -504,11 +506,10 @@ gfxWindowsPlatform::UpdateRenderMode()
     }
 
     mRenderMode = RENDER_GDI;
-    mDoesD3D11TextureSharingWork = true;
 
     bool isVistaOrHigher = IsVistaOrLater();
 
-    mUseDirectWrite = Preferences::GetBool("gfx.font_rendering.directwrite.enabled", false);
+    mUseDirectWrite = false;
 
 #ifdef CAIRO_HAS_D2D_SURFACE
     bool d2dDisabled = false;
@@ -544,9 +545,6 @@ gfxWindowsPlatform::UpdateRenderMode()
     }
 
     ID3D11Device *device = GetD3D11Device();
-    if (device) {
-        mDoesD3D11TextureSharingWork = DoesD3D11TextureSharingWork(device);
-    }
     if (isVistaOrHigher && !InSafeMode() && tryD2D && device &&
         mDoesD3D11TextureSharingWork) {
 
@@ -667,6 +665,11 @@ void
 gfxWindowsPlatform::VerifyD2DDevice(bool aAttemptForce)
 {
 #ifdef CAIRO_HAS_D2D_SURFACE
+    DriverInitCrashDetection detectCrashes;
+    if (detectCrashes.DisableAcceleration()) {
+      return;
+    }
+
     if (mD2DDevice) {
         ID3D10Device1 *device = cairo_d2d_device_get_device(mD2DDevice);
 
@@ -771,26 +774,23 @@ gfxWindowsPlatform::CreatePlatformFontList()
 }
 
 already_AddRefed<gfxASurface>
-gfxWindowsPlatform::CreateOffscreenSurface(const IntSize& size,
-                                           gfxContentType contentType)
+gfxWindowsPlatform::CreateOffscreenSurface(const IntSize& aSize,
+                                           gfxImageFormat aFormat)
 {
     nsRefPtr<gfxASurface> surf = nullptr;
 
 #ifdef CAIRO_HAS_WIN32_SURFACE
     if (mRenderMode == RENDER_GDI)
-        surf = new gfxWindowsSurface(size,
-                                     OptimalFormatForContent(contentType));
+        surf = new gfxWindowsSurface(aSize, aFormat);
 #endif
 
 #ifdef CAIRO_HAS_D2D_SURFACE
     if (mRenderMode == RENDER_DIRECT2D)
-        surf = new gfxD2DSurface(size,
-                                 OptimalFormatForContent(contentType));
+        surf = new gfxD2DSurface(aSize, aFormat);
 #endif
 
     if (!surf || surf->CairoStatus()) {
-        surf = new gfxImageSurface(size,
-                                   OptimalFormatForContent(contentType));
+        surf = new gfxImageSurface(aSize, aFormat);
     }
 
     return surf.forget();
@@ -1709,7 +1709,7 @@ gfxWindowsPlatform::GetDXGIAdapter()
   return mAdapter;
 }
 
-bool CouldD3D11DeviceWork()
+bool DoesD3D11DeviceWork()
 {
   static bool checked = false;
   static bool result = false;
@@ -1853,23 +1853,7 @@ bool DoesD3D11TextureSharingWork(ID3D11Device *device)
 
 bool DoesD3D11AlphaTextureSharingWork(ID3D11Device *device)
 {
-  nsCOMPtr<nsIGfxInfo> gfxInfo = do_GetService("@mozilla.org/gfx/info;1");
-  if (gfxInfo) {
-    // A8 texture sharing crashes on this intel driver version (and no others)
-    // so just avoid using it in that case.
-    nsString adapterVendor;
-    nsString driverVersion;
-    gfxInfo->GetAdapterVendorID(adapterVendor);
-    gfxInfo->GetAdapterDriverVersion(driverVersion);
-
-    nsAString &intelVendorID = (nsAString &)GfxDriverInfo::GetDeviceVendor(VendorIntel);
-    if (adapterVendor.Equals(intelVendorID, nsCaseInsensitiveStringComparator()) &&
-        driverVersion.Equals(NS_LITERAL_STRING("8.15.10.2086"))) {
-      return false;
-    }
-  }
-
-  return DoesD3D11TextureSharingWorkInternal(device, DXGI_FORMAT_A8_UNORM, D3D11_BIND_SHADER_RESOURCE);
+  return DoesD3D11TextureSharingWorkInternal(device, DXGI_FORMAT_R8_UNORM, D3D11_BIND_SHADER_RESOURCE);
 }
 
 void
@@ -1883,14 +1867,12 @@ gfxWindowsPlatform::InitD3D11Devices()
   // a WARP device which should always be available on Windows 7 and higher.
 
   mD3D11DeviceInitialized = true;
+  mDoesD3D11TextureSharingWork = false;
 
   MOZ_ASSERT(!mD3D11Device); 
 
-  if (InSafeMode()) {
-    return;
-  }
-
-  if (!CouldD3D11DeviceWork()) {
+  DriverInitCrashDetection detectCrashes;
+  if (InSafeMode() || detectCrashes.DisableAcceleration()) {
     return;
   }
 
@@ -1979,14 +1961,21 @@ gfxWindowsPlatform::InitD3D11Devices()
       adapter = nullptr;
     }
 
-    if (FAILED(hr)) {
+    if (FAILED(hr) || !DoesD3D11DeviceWork()) {
       gfxCriticalError() << "D3D11 device creation failed" << hexa(hr);
+      mD3D11Device = nullptr;
       if (gfxPrefs::LayersD3D11DisableWARP()) {
         return;
       }
 
       useWARP = allowWARP;
       adapter = nullptr;
+    }
+
+    if (mD3D11Device) {
+      // Only test this when not using WARP since it can fail and cause GetDeviceRemovedReason to return
+      // weird values.
+      mDoesD3D11TextureSharingWork = ::DoesD3D11TextureSharingWork(mD3D11Device);
     }
   }
 
@@ -2008,7 +1997,7 @@ gfxWindowsPlatform::InitD3D11Devices()
 
       if (FAILED(hr)) {
         // This should always succeed... in theory.
-        gfxCriticalError() << "Failed to initialize WARP D3D11 device!" << hr;
+        gfxCriticalError() << "Failed to initialize WARP D3D11 device! " << hexa(hr);
         return;
       }
 
@@ -2087,10 +2076,6 @@ gfxWindowsPlatform::InitD3D11Devices()
 TemporaryRef<ID3D11Device>
 gfxWindowsPlatform::CreateD3D11DecoderDevice()
 {
-  if (!CouldD3D11DeviceWork()) {
-    return nullptr;
-  }
-
   nsModuleHandle d3d11Module(LoadLibrarySystem32(L"d3d11.dll"));
   decltype(D3D11CreateDevice)* d3d11CreateDevice = (decltype(D3D11CreateDevice)*)
     GetProcAddress(d3d11Module, "D3D11CreateDevice");
@@ -2128,7 +2113,7 @@ gfxWindowsPlatform::CreateD3D11DecoderDevice()
     return nullptr;
   }
 
-  if (FAILED(hr)) {
+  if (FAILED(hr) || !DoesD3D11DeviceWork()) {
     return nullptr;
   }
 
@@ -2137,7 +2122,7 @@ gfxWindowsPlatform::CreateD3D11DecoderDevice()
 
   multi->SetMultithreadProtected(TRUE);
 
-  return device;
+  return device.forget();
 }
 
 static bool
@@ -2159,6 +2144,7 @@ public:
     public:
       D3DVsyncDisplay()
         : mVsyncEnabledLock("D3DVsyncEnabledLock")
+        , mPrevVsync(TimeStamp::Now())
         , mVsyncEnabled(false)
       {
         mVsyncThread = new base::Thread("WindowsVsyncThread");
@@ -2218,6 +2204,53 @@ public:
             delay.ToMilliseconds());
       }
 
+      TimeStamp GetAdjustedVsyncTimeStamp(LARGE_INTEGER& aFrequency,
+                                          QPC_TIME& aQpcVblankTime)
+      {
+        TimeStamp vsync = TimeStamp::Now();
+        LARGE_INTEGER qpcNow;
+        QueryPerformanceCounter(&qpcNow);
+
+        const int microseconds = 1000000;
+        int64_t adjust = qpcNow.QuadPart - aQpcVblankTime;
+        int64_t usAdjust = (adjust * microseconds) / aFrequency.QuadPart;
+        vsync -= TimeDuration::FromMicroseconds((double) usAdjust);
+
+        if (IsWin10OrLater()) {
+          // On Windows 10 and on, DWMGetCompositionTimingInfo, mostly
+          // reports the upcoming vsync time, which is in the future.
+          // It can also sometimes report a vblank time in the past.
+          // Since large parts of Gecko assume TimeStamps can't be in future,
+          // use the previous vsync.
+
+          // Windows 10 and Intel HD vsync timestamps are messy and
+          // all over the place once in a while. Most of the time,
+          // it reports the upcoming vsync. Sometimes, that upcoming
+          // vsync is in the past. Sometimes that upcoming vsync is before
+          // the previously seen vsync. Sometimes, the previous vsync
+          // is still in the future. In these error cases,
+          // we try to normalize to Now().
+          TimeStamp upcomingVsync = vsync;
+          if (upcomingVsync < mPrevVsync) {
+            // Windows can report a vsync that's before
+            // the previous one. So update it to sometime in the future.
+            upcomingVsync = TimeStamp::Now() + TimeDuration::FromMilliseconds(1);
+          }
+
+          vsync = mPrevVsync;
+          mPrevVsync = upcomingVsync;
+        }
+        // On Windows 7 and 8, DwmFlush wakes up AFTER qpcVBlankTime
+        // from DWMGetCompositionTimingInfo. We can return the adjusted vsync.
+
+        // Once in a while, the reported vsync timestamp can be in the future.
+        // Normalize the reported timestamp to now.
+        if (vsync >= TimeStamp::Now()) {
+          vsync = TimeStamp::Now();
+        }
+        return vsync;
+      }
+
       void VBlankLoop()
       {
         MOZ_ASSERT(IsInVsyncThread());
@@ -2227,12 +2260,9 @@ public:
         // Make sure to init the cbSize, otherwise GetCompositionTiming will fail
         vblankTime.cbSize = sizeof(DWM_TIMING_INFO);
 
-        LARGE_INTEGER qpcNow;
         LARGE_INTEGER frequency;
         QueryPerformanceFrequency(&frequency);
         TimeStamp vsync = TimeStamp::Now();
-        TimeStamp previousVsync = vsync;
-        const int microseconds = 1000000;
 
         for (;;) {
           { // scope lock
@@ -2240,12 +2270,9 @@ public:
             if (!mVsyncEnabled) return;
           }
 
-          if (previousVsync > vsync) {
-            vsync = TimeStamp::Now();
-            NS_WARNING("Previous vsync timestamp is ahead of the calculated vsync timestamp.");
-          }
-
-          previousVsync = vsync;
+          // Large parts of gecko assume that the refresh driver timestamp
+          // must be <= Now() and cannot be in the future.
+          MOZ_ASSERT(vsync <= TimeStamp::Now());
           Display::NotifyVsync(vsync);
 
           // DwmComposition can be dynamically enabled/disabled
@@ -2263,13 +2290,7 @@ public:
           HRESULT hr = WinUtils::dwmGetCompositionTimingInfoPtr(0, &vblankTime);
           vsync = TimeStamp::Now();
           if (SUCCEEDED(hr)) {
-            QueryPerformanceCounter(&qpcNow);
-            // Adjust the timestamp to be the vsync timestamp since when
-            // DwmFlush wakes up and when the actual vsync occurred are not the
-            // same.
-            int64_t adjust = qpcNow.QuadPart - vblankTime.qpcVBlank;
-            int64_t usAdjust = (adjust * microseconds) / frequency.QuadPart;
-            vsync -= TimeDuration::FromMicroseconds((double) usAdjust);
+            vsync = GetAdjustedVsyncTimeStamp(frequency, vblankTime.qpcVBlank);
           }
         } // end for
       }
@@ -2289,6 +2310,7 @@ public:
       }
 
       TimeDuration mSoftwareVsyncRate;
+      TimeStamp mPrevVsync; // Only used on Windows 10
       Monitor mVsyncEnabledLock;
       base::Thread* mVsyncThread;
       bool mVsyncEnabled;

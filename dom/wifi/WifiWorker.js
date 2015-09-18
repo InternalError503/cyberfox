@@ -416,7 +416,7 @@ var WifiManager = (function() {
     let currentNetwork = Object.create(null);
     currentNetwork.netId = manager.connectionInfo.id;
 
-    manager.getNetworkConfiguration(currentNetwork, function (){
+    manager.getNetworkConfiguration(currentNetwork, function () {
       curNetworkKey = getNetworkKey(currentNetwork);
 
       // Add additional information to static ip configuration
@@ -435,15 +435,19 @@ var WifiManager = (function() {
       // If the ssid of current connection is the same as configured ssid
       // It means we need update current connection to use static IP address.
       if (setNetworkKey == curNetworkKey) {
-        // Use configureInterface directly doesn't work, the network iterface
+        // Use configureInterface directly doesn't work, the network interface
         // and routing table is changed but still cannot connect to network
         // so the workaround here is disable interface the enable again to
         // trigger network reconnect with static ip.
         gNetworkService.disableInterface(manager.ifname, function (ok) {
           gNetworkService.enableInterface(manager.ifname, function (ok) {
+            callback(ok);
           });
         });
+        return;
       }
+
+      callback(true);
     });
   }
 
@@ -633,6 +637,8 @@ var WifiManager = (function() {
     wifiCommand.connectToSupplicant(connectCallback);
   }
 
+  let dhcpRequestGen = 0;
+
   function onconnected() {
     // For now we do our own DHCP. In the future, this should be handed
     // off to the Network Manager.
@@ -648,9 +654,14 @@ var WifiManager = (function() {
           runStaticIp(manager.ifname, key);
           return;
       }
-      netUtil.runDhcp(manager.ifname, function(data) {
+      netUtil.runDhcp(manager.ifname, dhcpRequestGen++, function(data, gen) {
         dhcpInfo = data.info;
+        debug('dhcpRequestGen: ' + dhcpRequestGen + ', gen: ' + gen);
         if (!dhcpInfo) {
+          if (gen + 1 < dhcpRequestGen) {
+            debug('Do not bother younger DHCP request.');
+            return;
+          }
           if (++manager.dhcpFailuresCount >= MAX_RETRIES_ON_DHCP_FAILURE) {
             manager.dhcpFailuresCount = 0;
             notify("disconnected", {connectionInfo: manager.connectionInfo});
@@ -3290,6 +3301,17 @@ WifiWorker.prototype = {
       }
     }
 
+    function connectToNetwork() {
+      WifiManager.updateNetwork(privnet, (function(ok) {
+        if (!ok) {
+          self._sendMessage(message, false, "Network is misconfigured", msg);
+          return;
+        }
+
+        networkReady();
+      }));
+    }
+
     let ssid = privnet.ssid;
     let networkKey = getNetworkKey(privnet);
     let configured;
@@ -3311,14 +3333,22 @@ WifiWorker.prototype = {
       // it can be sorted correctly in _reprioritizeNetworks() because the
       // function sort network based on priority in configure list.
       configured.priority = privnet.priority;
-      WifiManager.updateNetwork(privnet, (function(ok) {
-        if (!ok) {
-          this._sendMessage(message, false, "Network is misconfigured", msg);
-          return;
-        }
 
-        networkReady();
-      }).bind(this));
+      // When investigating Bug 1123680, we observed that gaia may unexpectedly
+      // request to associate with incorrect password before successfully
+      // forgetting the network. It would cause the network unable to connect
+      // subsequently. Aside from preventing the racing forget/associate, we
+      // also try to disable network prior to updating the network.
+      WifiManager.getNetworkId(dequote(configured.ssid), function(netId) {
+        if (netId) {
+          WifiManager.disableNetwork(netId, function() {
+            connectToNetwork();
+          });
+        }
+        else {
+          connectToNetwork();
+        }
+      });
     } else {
       // networkReady, above, calls saveConfig. We want to remember the new
       // network as being enabled, which isn't the default, so we explicitly
@@ -3475,7 +3505,7 @@ WifiWorker.prototype = {
   },
 
   setStaticIpMode: function(msg) {
-    const message = "WifiManager:setStaticMode:Return";
+    const message = "WifiManager:setStaticIpMode:Return";
     let self = this;
     let network = msg.data.network;
     let info = msg.data.info;

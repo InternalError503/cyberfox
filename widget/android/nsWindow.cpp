@@ -182,7 +182,9 @@ nsWindow::nsWindow() :
     mIMEMaskEventsCount(1), // Mask IME events since there's no focus yet
     mIMERanges(new TextRangeArray()),
     mIMEUpdatingContext(false),
-    mIMESelectionChanged(false)
+    mIMESelectionChanged(false),
+    mAwaitingFullScreen(false),
+    mIsFullScreen(false)
 {
 }
 
@@ -280,7 +282,7 @@ NS_IMETHODIMP
 nsWindow::ConfigureChildren(const nsTArray<nsIWidget::Configuration>& config)
 {
     for (uint32_t i = 0; i < config.Length(); ++i) {
-        nsWindow *childWin = (nsWindow*) config[i].mChild;
+        nsWindow *childWin = (nsWindow*) config[i].mChild.get();
         childWin->Resize(config[i].mBounds.x,
                          config[i].mBounds.y,
                          config[i].mBounds.width,
@@ -494,6 +496,12 @@ nsWindow::Resize(double aX,
     if (aRepaint && FindTopLevel() == nsWindow::TopWindow())
         RedrawAll();
 
+    nsIWidgetListener* listener = GetWidgetListener();
+    if (mAwaitingFullScreen && listener) {
+      listener->FullscreenChanged(mIsFullScreen);
+      mAwaitingFullScreen = false;
+    }
+
     return NS_OK;
 }
 
@@ -630,7 +638,7 @@ nsWindow::GetScreenBounds(nsIntRect &aRect)
     aRect.y = p.y;
     aRect.width = mBounds.width;
     aRect.height = mBounds.height;
-    
+
     return NS_OK;
 }
 
@@ -672,6 +680,8 @@ nsWindow::DispatchEvent(WidgetGUIEvent* aEvent)
 NS_IMETHODIMP
 nsWindow::MakeFullScreen(bool aFullScreen, nsIScreen*)
 {
+    mIsFullScreen = aFullScreen;
+    mAwaitingFullScreen = true;
     GeckoAppShell::SetFullScreen(aFullScreen);
     return NS_OK;
 }
@@ -1681,6 +1691,23 @@ nsWindow::RemoveIMEComposition()
     DispatchEvent(&compositionCommitEvent);
 }
 
+/*
+ * Send dummy key events for pages that are unaware of input events,
+ * to provide web compatibility for pages that depend on key events.
+ * Our dummy key events have 0 as the keycode.
+ */
+void
+nsWindow::SendIMEDummyKeyEvents()
+{
+    WidgetKeyboardEvent downEvent(true, NS_KEY_DOWN, this);
+    MOZ_ASSERT(downEvent.keyCode == 0);
+    DispatchEvent(&downEvent);
+
+    WidgetKeyboardEvent upEvent(true, NS_KEY_UP, this);
+    MOZ_ASSERT(upEvent.keyCode == 0);
+    DispatchEvent(&upEvent);
+}
+
 void
 nsWindow::OnIMEEvent(AndroidGeckoEvent *ae)
 {
@@ -1837,6 +1864,10 @@ nsWindow::OnIMEEvent(AndroidGeckoEvent *ae)
                         true, NS_COMPOSITION_COMMIT_AS_IS, this);
                 InitEvent(compositionCommitEvent, nullptr);
                 DispatchEvent(&compositionCommitEvent);
+            }
+
+            if (mInputContext.mMayBeIMEUnaware) {
+                SendIMEDummyKeyEvents();
             }
 
             FlushIMEChanges();
@@ -2087,11 +2118,9 @@ nsWindow::SetInputContext(const InputContext& aContext,
             aContext.mIMEState.mEnabled, aContext.mIMEState.mOpen,
             aAction.mCause, aAction.mFocusChange);
 
-    mInputContext = aContext;
-
     // Ensure that opening the virtual keyboard is allowed for this specific
     // InputContext depending on the content.ime.strict.policy pref
-    if (aContext.mIMEState.mEnabled != IMEState::DISABLED && 
+    if (aContext.mIMEState.mEnabled != IMEState::DISABLED &&
         aContext.mIMEState.mEnabled != IMEState::PLUGIN &&
         Preferences::GetBool("content.ime.strict_policy", false) &&
         !aAction.ContentGotFocusByTrustedCause() &&
@@ -2108,6 +2137,7 @@ nsWindow::SetInputContext(const InputContext& aContext,
         enabled = IMEState::DISABLED;
     }
 
+    mInputContext = aContext;
     mInputContext.mIMEState.mEnabled = enabled;
 
     if (enabled == IMEState::ENABLED && aAction.UserMightRequestOpenVKB()) {

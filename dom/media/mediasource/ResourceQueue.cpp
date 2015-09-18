@@ -6,9 +6,8 @@
 
 #include "nsDeque.h"
 #include "MediaData.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
-#ifdef PR_LOGGING
 extern PRLogModuleInfo* GetSourceBufferResourceLog();
 
 /* Polyfill __func__ on MSVC to pass to the log. */
@@ -16,16 +15,12 @@ extern PRLogModuleInfo* GetSourceBufferResourceLog();
 #define __func__ __FUNCTION__
 #endif
 
-#define SBR_DEBUG(arg, ...) PR_LOG(GetSourceBufferResourceLog(), PR_LOG_DEBUG, ("ResourceQueue(%p)::%s: " arg, this, __func__, ##__VA_ARGS__))
-#define SBR_DEBUGV(arg, ...) PR_LOG(GetSourceBufferResourceLog(), PR_LOG_DEBUG+1, ("ResourceQueue(%p)::%s: " arg, this, __func__, ##__VA_ARGS__))
-#else
-#define SBR_DEBUG(...)
-#define SBR_DEBUGV(...)
-#endif
+#define SBR_DEBUG(arg, ...) MOZ_LOG(GetSourceBufferResourceLog(), mozilla::LogLevel::Debug, ("ResourceQueue(%p)::%s: " arg, this, __func__, ##__VA_ARGS__))
+#define SBR_DEBUGV(arg, ...) MOZ_LOG(GetSourceBufferResourceLog(), mozilla::LogLevel::Verbose, ("ResourceQueue(%p)::%s: " arg, this, __func__, ##__VA_ARGS__))
 
 namespace mozilla {
 
-ResourceItem::ResourceItem(MediaLargeByteBuffer* aData)
+ResourceItem::ResourceItem(MediaByteBuffer* aData)
   : mData(aData)
 {
 }
@@ -87,21 +82,22 @@ ResourceQueue::CopyData(uint64_t aOffset, uint32_t aCount, char* aDest)
 }
 
 void
-ResourceQueue::AppendItem(MediaLargeByteBuffer* aData)
+ResourceQueue::AppendItem(MediaByteBuffer* aData)
 {
   mLogicalLength += aData->Length();
   Push(new ResourceItem(aData));
 }
 
 uint32_t
-ResourceQueue::Evict(uint64_t aOffset, uint32_t aSizeToEvict)
+ResourceQueue::Evict(uint64_t aOffset, uint32_t aSizeToEvict,
+                     ErrorResult& aRv)
 {
   SBR_DEBUG("Evict(aOffset=%llu, aSizeToEvict=%u)",
             aOffset, aSizeToEvict);
-  return EvictBefore(std::min(aOffset, mOffset + (uint64_t)aSizeToEvict));
+  return EvictBefore(std::min(aOffset, mOffset + (uint64_t)aSizeToEvict), aRv);
 }
 
-uint32_t ResourceQueue::EvictBefore(uint64_t aOffset)
+uint32_t ResourceQueue::EvictBefore(uint64_t aOffset, ErrorResult& aRv)
 {
   SBR_DEBUG("EvictBefore(%llu)", aOffset);
   uint32_t evicted = 0;
@@ -115,9 +111,14 @@ uint32_t ResourceQueue::EvictBefore(uint64_t aOffset)
       uint32_t offset = aOffset - mOffset;
       mOffset += offset;
       evicted += offset;
-      nsRefPtr<MediaLargeByteBuffer> data = new MediaLargeByteBuffer;
-      data->AppendElements(item->mData->Elements() + offset,
-                           item->mData->Length() - offset);
+      nsRefPtr<MediaByteBuffer> data = new MediaByteBuffer;
+      if (!data->AppendElements(item->mData->Elements() + offset,
+                                item->mData->Length() - offset,
+                                fallible)) {
+        aRv.Throw(NS_ERROR_OUT_OF_MEMORY);
+        return 0;
+      }
+
       item->mData = data;
       break;
     }

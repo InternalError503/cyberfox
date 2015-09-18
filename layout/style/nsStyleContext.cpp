@@ -448,6 +448,7 @@ nsStyleContext::GetUniqueStyleData(const nsStyleStructID& aSID)
   UNIQUE_CASE(Display)
   UNIQUE_CASE(Text)
   UNIQUE_CASE(TextReset)
+  UNIQUE_CASE(Visibility)
 
 #undef UNIQUE_CASE
 
@@ -591,6 +592,23 @@ nsStyleContext::ApplyStyleFixups(bool aSkipParentDisplayBasedStyleFixup)
 
   if ((mParent && mParent->HasPseudoElementData()) || mPseudoTag) {
     mBits |= NS_STYLE_HAS_PSEUDO_ELEMENT_DATA;
+  }
+
+  // CSS 2.1 10.1: Propagate the root element's 'direction' to the ICB.
+  // (PageContentFrame/CanvasFrame etc will inherit 'direction')
+  if (mPseudoTag == nsCSSAnonBoxes::viewport) {
+    nsPresContext* presContext = PresContext();
+    mozilla::dom::Element* docElement = presContext->Document()->GetRootElement();
+    if (docElement) {
+      nsRefPtr<nsStyleContext> rootStyle =
+        presContext->StyleSet()->ResolveStyleFor(docElement, nullptr);
+      auto dir = rootStyle->StyleVisibility()->mDirection;
+      if (dir != StyleVisibility()->mDirection) {
+        nsStyleVisibility* uniqueVisibility =
+          (nsStyleVisibility*)GetUniqueStyleData(eStyleStruct_Visibility);
+        uniqueVisibility->mDirection = dir;
+      }
+    }
   }
 
   // Correct tables.
@@ -828,15 +846,15 @@ nsStyleContext::CalcStyleDifference(nsStyleContext* aOther,
     if (this##struct_) {                                                      \
       const nsStyle##struct_* other##struct_ = aOther->Style##struct_();      \
       nsChangeHint maxDifference = nsStyle##struct_::MaxDifference();         \
-      nsChangeHint maxDifferenceNeverInherited =                              \
-        nsStyle##struct_::MaxDifferenceNeverInherited();                      \
+      nsChangeHint differenceAlwaysHandledForDescendants =                    \
+        nsStyle##struct_::DifferenceAlwaysHandledForDescendants();            \
       if (this##struct_ == other##struct_) {                                  \
         /* The very same struct, so we know that there will be no */          \
         /* differences.                                           */          \
         *aEqualStructs |= NS_STYLE_INHERIT_BIT(struct_);                      \
       } else if (compare ||                                                   \
                  (NS_SubtractHint(maxDifference,                              \
-                                  maxDifferenceNeverInherited) &              \
+                                  differenceAlwaysHandledForDescendants) &    \
                   aParentHintsNotHandledForDescendants)) {                    \
         nsChangeHint difference =                                             \
             this##struct_->CalcDifference(*other##struct_);                   \
@@ -1248,7 +1266,7 @@ nsStyleContext::CombineVisitedColors(nscolor *aColors, bool aLinkIsVisited)
 nsStyleContext::AssertStyleStructMaxDifferenceValid()
 {
 #define STYLE_STRUCT(name, checkdata_cb)                                     \
-    MOZ_ASSERT(NS_IsHintSubset(nsStyle##name::MaxDifferenceNeverInherited(), \
+    MOZ_ASSERT(NS_IsHintSubset(nsStyle##name::DifferenceAlwaysHandledForDescendants(), \
                                nsStyle##name::MaxDifference()));
 #include "nsStyleStructList.h"
 #undef STYLE_STRUCT

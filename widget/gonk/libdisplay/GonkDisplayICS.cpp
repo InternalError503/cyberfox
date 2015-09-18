@@ -23,10 +23,9 @@
 #include <cutils/log.h>
 #include <fcntl.h>
 
+#include "mozilla/Assertions.h"
 #include "mozilla/FileUtils.h"
 #include "mozilla/FileUtils.h"
-
-#include "BootAnimation.h"
 
 using namespace android;
 
@@ -104,7 +103,7 @@ GonkDisplayICS::GonkDisplayICS()
             len = read(fd.get(), &buf, 1);
         } while (len < 0 && errno == EINTR);
         if (len < 0) {
-            LOGE("BootAnimation: wait_for_fb_sleep failed errno: %d", errno);
+            LOGE("wait_for_fb_sleep failed errno: %d", errno);
         }
     }
 
@@ -129,21 +128,12 @@ GonkDisplayICS::GonkDisplayICS()
 
     const framebuffer_device_t *fbdev = mFBSurface->getDevice();
     surfaceformat = fbdev->format;
-
-    StartBootAnimation();
 }
 
 GonkDisplayICS::~GonkDisplayICS()
 {
     if (mHwc)
         hwc_close(mHwc);
-}
-
-ANativeWindow*
-GonkDisplayICS::GetNativeWindow()
-{
-    StopBootAnimation();
-    return static_cast<ANativeWindow *>(mFBSurface.get());
 }
 
 void
@@ -178,14 +168,7 @@ GonkDisplayICS::SwapBuffers(EGLDisplay dpy, EGLSurface sur)
 {
     // Should be called when composition rendering is complete for a frame.
     // Only HWC v1.0 needs this call. ICS gonk always needs the call.
-    mFBSurface->compositionComplete();
-
-    if (!mHwc) {
-        return true;
-    }
-
-    mHwc->prepare(mHwc, nullptr);
-    return !mHwc->set(mHwc, dpy, sur, 0);
+    return !mFBSurface->compositionComplete();
 }
 
 ANativeWindowBuffer*
@@ -207,12 +190,24 @@ GonkDisplayICS::QueueBuffer(ANativeWindowBuffer *buf)
 void
 GonkDisplayICS::UpdateDispSurface(EGLDisplay dpy, EGLSurface sur)
 {
-    eglSwapBuffers(dpy, sur);
 }
 
 void
 GonkDisplayICS::SetDispReleaseFd(int fd)
 {
+}
+
+GonkDisplay::NativeData
+GonkDisplayICS::GetNativeData(GonkDisplay::DisplayType aDisplayType,
+                              android::IGraphicBufferProducer* aProducer)
+{
+    MOZ_ASSERT(aDisplayType == DISPLAY_PRIMARY, "ICS gonk supports primary display only.");
+
+    NativeData data;
+    data.mNativeWindow = static_cast<ANativeWindow *>(mFBSurface.get());
+    data.mXdpi = xdpi;
+
+    return data;
 }
 
 __attribute__ ((visibility ("default")))

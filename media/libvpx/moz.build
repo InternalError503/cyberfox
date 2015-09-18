@@ -35,12 +35,11 @@ if CONFIG['VPX_ARM_ASM']:
     arm_asm_files += files['ARM_ASM']
 
     if CONFIG['VPX_AS_CONVERSION']:
-        GENERATED_SOURCES += [ "%s.%s" % (f, CONFIG['VPX_ASM_SUFFIX'])
-            for f in sorted(arm_asm_files) if f.endswith('.asm')
-        ]
-        SOURCES += [
-            f for f in sorted(arm_asm_files) if not f.endswith('.asm')
-        ]
+        SOURCES += sorted([
+            "!%s.%s" % (f, CONFIG['VPX_ASM_SUFFIX'])
+            if f.endswith('.asm') else f
+            for f in sorted(arm_asm_files)
+        ])
     else:
         SOURCES += sorted(arm_asm_files)
 
@@ -87,3 +86,16 @@ if CONFIG['CLANG_CL'] or not CONFIG['_MSC_VER']:
 # Suppress warnings in third-party code.
 if CONFIG['GNU_CC']:
     CFLAGS += ['-Wno-sign-compare']
+
+ASFLAGS += CONFIG['VPX_ASFLAGS']
+ASFLAGS += [
+    '-I.',
+    '-I%s/media/libvpx/' % TOPSRCDIR,
+    '-I%s/media/libvpx/vpx_ports/' % TOPSRCDIR,
+]
+
+if CONFIG['OS_TARGET'] == 'Android':
+    # For LIBVPX_RAND
+    ASFLAGS += [
+        '-D__ANDROID__'
+    ]

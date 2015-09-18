@@ -4,8 +4,8 @@
 
 function test() {
   //initialization
-  waitForExplicitFinish();
   let newTabPrefName = "browser.newtab.url";
+  waitForExplicitFinish();
   let newTabURL;
   let testURL = "http://example.com/";
   let mode;

@@ -117,7 +117,8 @@ protected:
                           const nsCString& securityInfoSerialization,
                           const NetAddr& selfAddr,
                           const NetAddr& peerAddr,
-                          const int16_t& redirectCount) override;
+                          const int16_t& redirectCount,
+                          const uint32_t& cacheKey) override;
   bool RecvOnTransportAndData(const nsresult& channelStatus,
                               const nsresult& status,
                               const uint64_t& progress,
@@ -176,6 +177,7 @@ private:
   bool mCacheEntryAvailable;
   uint32_t     mCacheExpirationTime;
   nsCString    mCachedCharset;
+  nsCOMPtr<nsISupports> mCacheKey;
 
   // If ResumeAt is called before AsyncOpen, we need to send extra data upstream
   bool mSendResumeAt;
@@ -193,6 +195,14 @@ private:
   // diverting callbacks to parent.
   bool mSuspendSent;
 
+  // Set if a response was synthesized, indicating that any forthcoming redirects
+  // should be intercepted.
+  bool mSynthesizedResponse;
+
+  // Set if the corresponding parent channel should force an interception to occur
+  // before the network transaction is initiated.
+  bool mShouldParentIntercept;
+
   // true after successful AsyncOpen until OnStopRequest completes.
   bool RemoteChannelExists() { return mIPCOpen && !mKeptAlive; }
 
@@ -208,7 +218,8 @@ private:
                       const nsCString& cachedCharset,
                       const nsCString& securityInfoSerialization,
                       const NetAddr& selfAddr,
-                      const NetAddr& peerAddr);
+                      const NetAddr& peerAddr,
+                      const uint32_t& cacheKey);
   void OnTransportAndData(const nsresult& channelStatus,
                           const nsresult& status,
                           const uint64_t progress,

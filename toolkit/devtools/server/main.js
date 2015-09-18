@@ -14,12 +14,13 @@ let { Ci, Cc, CC, Cu, Cr } = require("chrome");
 let Services = require("Services");
 let { ActorPool, OriginalLocation, RegisteredActorFactory,
       ObservedActorFactory } = require("devtools/server/actors/common");
-let { LocalDebuggerTransport, ChildDebuggerTransport } =
+let { LocalDebuggerTransport, ChildDebuggerTransport, WorkerDebuggerTransport } =
   require("devtools/toolkit/transport/transport");
 let DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 let { dumpn, dumpv, dbg_assert } = DevToolsUtils;
 let EventEmitter = require("devtools/toolkit/event-emitter");
 let Debugger = require("Debugger");
+let Promise = require("promise");
 
 DevToolsUtils.defineLazyGetter(this, "DebuggerSocket", () => {
   let { DebuggerSocket } = require("devtools/toolkit/security/socket");
@@ -47,7 +48,9 @@ this.dbg_assert = dbg_assert;
 // Overload `Components` to prevent SDK loader exception on Components
 // object usage
 Object.defineProperty(this, "Components", {
-  get: function () require("chrome").components
+  get: function() {
+    return require("chrome").components;
+  }
 });
 
 if (isWorker) {
@@ -185,9 +188,13 @@ var DebuggerServer = {
     this._initialized = true;
   },
 
-  get protocol() require("devtools/server/protocol"),
+  get protocol() {
+    return require("devtools/server/protocol");
+  },
 
-  get initialized() this._initialized,
+  get initialized() {
+    return this._initialized;
+  },
 
   /**
    * Performs cleanup tasks before shutting down the debugger server. Such tasks
@@ -538,6 +545,11 @@ var DebuggerServer = {
       constructor: "AnimationsActor",
       type: { tab: true }
     });
+    this.registerModule("devtools/server/actors/promises", {
+      prefix: "promises",
+      constructor: "PromisesActor",
+      type: { global: true, tab: true }
+    });
   },
 
   /**
@@ -674,10 +686,13 @@ var DebuggerServer = {
    *    "debug:<prefix>:packet", and all its actors will have names
    *    beginning with "<prefix>/".
    */
-  connectToParent: function(aPrefix, aMessageManager) {
+  connectToParent: function(aPrefix, aScopeOrManager) {
     this._checkInit();
 
-    let transport = new ChildDebuggerTransport(aMessageManager, aPrefix);
+    let transport = isWorker ?
+                    new WorkerDebuggerTransport(aScopeOrManager, aPrefix) :
+                    new ChildDebuggerTransport(aScopeOrManager, aPrefix);
+
     return this._onConnection(transport, aPrefix, true);
   },
 
@@ -744,13 +759,136 @@ var DebuggerServer = {
     return deferred.promise;
   },
 
+  connectToWorker: function (aConnection, aDbg, aId, aOptions) {
+    return new Promise((resolve, reject) => {
+      // Step 1: Ensure the worker debugger is initialized.
+      if (!aDbg.isInitialized) {
+        aDbg.initialize("resource://gre/modules/devtools/server/worker.js");
+
+        // Create a listener for rpc requests from the worker debugger. Only do
+        // this once, when the worker debugger is first initialized, rather than
+        // for each connection.
+        let listener = {
+          onClose: () => {
+            aDbg.removeListener(listener);
+          },
+
+          onMessage: (message) => {
+            let packet = JSON.parse(message);
+            if (packet.type !== "rpc") {
+              return;
+            }
+
+            Promise.resolve().then(() => {
+              let method = {
+                "fetch": DevToolsUtils.fetch,
+              }[packet.method];
+              if (!method) {
+                throw Error("Unknown method: " + packet.method);
+              }
+
+              return method.apply(undefined, packet.params);
+            }).then((value) => {
+              aDbg.postMessage(JSON.stringify({
+                type: "rpc",
+                result: value,
+                error: null,
+                id: packet.id
+              }));
+            }, (reason) => {
+              aDbg.postMessage(JSON.stringify({
+                type: "rpc",
+                result: null,
+                error: reason,
+                id: packet.id
+              }));
+            });
+          }
+        };
+
+        aDbg.addListener(listener);
+      }
+
+      // Step 2: Send a connect request to the worker debugger.
+      aDbg.postMessage(JSON.stringify({
+        type: "connect",
+        id: aId,
+        options: aOptions
+      }));
+
+      // Steps 3-5 are performed on the worker thread (see worker.js).
+
+      // Step 6: Wait for a response from the worker debugger.
+      let listener = {
+        onClose: () => {
+          aDbg.removeListener(listener);
+
+          reject("closed");
+        },
+
+        onMessage: (message) => {
+          let packet = JSON.parse(message);
+          if (packet.type !== "message" || packet.id !== aId) {
+            return;
+          }
+
+          message = packet.message;
+          if (message.error) {
+            reject(error);
+          }
+
+          if (message.type !== "paused") {
+            return;
+          }
+
+          aDbg.removeListener(listener);
+
+          // Step 7: Create a transport for the connection to the worker.
+          let transport = new WorkerDebuggerTransport(aDbg, aId);
+          transport.ready();
+          transport.hooks = {
+            onClosed: () => {
+              if (!aDbg.isClosed) {
+                aDbg.postMessage(JSON.stringify({
+                  type: "disconnect",
+                  id: aId
+                }));
+              }
+
+              aConnection.cancelForwarding(aId);
+            },
+
+            onPacket: (packet) => {
+              // Ensure that any packets received from the server on the worker
+              // thread are forwarded to the client on the main thread, as if
+              // they had been sent by the server on the main thread.
+              aConnection.send(packet);
+            }
+          };
+
+          // Ensure that any packets received from the client on the main thread
+          // to actors on the worker thread are forwarded to the server on the
+          // worker thread.
+          aConnection.setForwarding(aId, transport);
+
+          resolve({
+            threadActor: message.from,
+            transport: transport
+          });
+        }
+      };
+      aDbg.addListener(listener);
+    });
+  },
+
   /**
    * Check if the caller is running in a content child process.
+   * (Eventually set by child.js)
    *
    * @return boolean
    *         true if the caller is running in a content
    */
-  get isInChildProcess() !!this.parentMessageManager,
+  isInChildProcess: false,
 
   /**
    * In a chrome parent process, ask all content child processes
@@ -767,40 +905,19 @@ var DebuggerServer = {
       return;
     }
 
-    const gMessageManager = Cc["@mozilla.org/globalmessagemanager;1"].
-      getService(Ci.nsIMessageListenerManager);
-
-    gMessageManager.broadcastAsyncMessage("debug:setup-in-child", {
-      module: module,
-      setupChild: setupChild,
-      args: args,
+    this._childMessageManagers.forEach(mm => {
+      mm.sendAsyncMessage("debug:setup-in-child", {
+        module: module,
+        setupChild: setupChild,
+        args: args,
+      });
     });
   },
 
   /**
-   * In a content child process, ask the DebuggerServer in the parent process
-   * to execute a given module setup helper.
-   *
-   * @param module
-   *        The module to be required
-   * @param setupParent
-   *        The name of the setup helper exported by the above module
-   *        (setup helper signature: function ({mm}) { ... })
-   * @return boolean
-   *         true if the setup helper returned successfully
+   * Live list of all currenctly attached child's message managers.
    */
-  setupInParent: function({ module, setupParent }) {
-    if (!this.isInChildProcess) {
-      return false;
-    }
-
-    let { sendSyncMessage } = DebuggerServer.parentMessageManager;
-
-    return sendSyncMessage("debug:setup-in-parent", {
-      module: module,
-      setupParent: setupParent
-    });
-  },
+  _childMessageManagers: new Set(),
 
   /**
    * Connect to a child process.
@@ -823,6 +940,7 @@ var DebuggerServer = {
     let mm = aFrame.QueryInterface(Ci.nsIFrameLoaderOwner).frameLoader
              .messageManager;
     mm.loadFrameScript("resource://gre/modules/devtools/server/child.js", false);
+    this._childMessageManagers.add(mm);
 
     let actor, childTransport;
     let prefix = aConnection.allocID("child");
@@ -928,6 +1046,8 @@ var DebuggerServer = {
         mm.removeMessageListener("debug:actor", onActorCreated);
       }
       events.off(aConnection, "closed", destroy);
+
+      DebuggerServer._childMessageManagers.delete(mm);
     });
 
     // Listen for app process exit
@@ -1199,6 +1319,13 @@ DebuggerServerConnection.prototype = {
   _transport: null,
   get transport() { return this._transport },
 
+  /**
+   * Message manager used to communicate with the parent process,
+   * set by child.js. Is only defined for connections instantiated
+   * within a child process.
+   */
+  parentMessageManager: null,
+
   close: function() {
     this._transport.close();
   },
@@ -1429,13 +1556,16 @@ DebuggerServerConnection.prototype = {
     // forwarding is needed: in DebuggerServerConnection instances in child
     // processes, every actor has a prefixed name.
     if (this._forwardingPrefixes.size > 0) {
-      let separator = aPacket.to.indexOf('/');
-      if (separator >= 0) {
+      let to = aPacket.to;
+      let separator = to.lastIndexOf('/');
+      while (separator >= 0) {
+        to = to.substring(0, separator);
         let forwardTo = this._forwardingPrefixes.get(aPacket.to.substring(0, separator));
         if (forwardTo) {
           forwardTo.send(aPacket);
           return;
         }
+        separator = to.lastIndexOf('/');
       }
     }
 
@@ -1569,7 +1699,7 @@ DebuggerServerConnection.prototype = {
       dumpn("--------------------- actorPool actors: " +
             uneval(Object.keys(this._actorPool._actors)));
     }
-    for each (let pool in this._extraPools) {
+    for (let pool of this._extraPools) {
       if (pool !== this._actorPool) {
         dumpn("--------------------- extraPool actors: " +
               uneval(Object.keys(pool._actors)));
@@ -1584,5 +1714,30 @@ DebuggerServerConnection.prototype = {
     dumpn("/-------------------- dumping pool:");
     dumpn("--------------------- actorPool actors: " +
           uneval(Object.keys(aPool._actors)));
-  }
+  },
+
+  /**
+   * In a content child process, ask the DebuggerServer in the parent process
+   * to execute a given module setup helper.
+   *
+   * @param module
+   *        The module to be required
+   * @param setupParent
+   *        The name of the setup helper exported by the above module
+   *        (setup helper signature: function ({mm}) { ... })
+   * @return boolean
+   *         true if the setup helper returned successfully
+   */
+  setupInParent: function({ conn, module, setupParent }) {
+    if (!this.parentMessageManager) {
+      return false;
+    }
+
+    let { sendSyncMessage } = this.parentMessageManager;
+
+    return sendSyncMessage("debug:setup-in-parent", {
+      module: module,
+      setupParent: setupParent
+    });
+  },
 };

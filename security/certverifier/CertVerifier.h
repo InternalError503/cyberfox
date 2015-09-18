@@ -84,7 +84,8 @@ public:
   enum OcspGetConfig { ocspGetDisabled = 0, ocspGetEnabled = 1 };
 
   CertVerifier(OcspDownloadConfig odc, OcspStrictConfig osc,
-               OcspGetConfig ogc, PinningMode pinningMode);
+               OcspGetConfig ogc, uint32_t certShortLifetimeInDays,
+               PinningMode pinningMode);
   ~CertVerifier();
 
   void ClearOCSPCache() { mOCSPCache.Clear(); }
@@ -92,6 +93,7 @@ public:
   const OcspDownloadConfig mOCSPDownloadConfig;
   const bool mOCSPStrict;
   const bool mOCSPGETEnabled;
+  const uint32_t mCertShortLifetimeInDays;
   const PinningMode mPinningMode;
 
 private:

@@ -105,7 +105,6 @@ BytecodeEmitter::BytecodeEmitter(BytecodeEmitter* parent,
                                  Parser<FullParseHandler>* parser, SharedContext* sc,
                                  HandleScript script, Handle<LazyScript*> lazyScript,
                                  bool insideEval, HandleScript evalCaller,
-                                 Handle<StaticEvalObject*> staticEvalScope,
                                  bool insideNonGlobalEval, uint32_t lineNum,
                                  EmitterMode emitterMode)
   : sc(sc),
@@ -118,7 +117,6 @@ BytecodeEmitter::BytecodeEmitter(BytecodeEmitter* parent,
     current(&main),
     parser(parser),
     evalCaller(evalCaller),
-    evalStaticScope(staticEvalScope),
     topStmt(nullptr),
     topScopeStmt(nullptr),
     staticScope(cx),
@@ -143,8 +141,6 @@ BytecodeEmitter::BytecodeEmitter(BytecodeEmitter* parent,
 {
     MOZ_ASSERT_IF(evalCaller, insideEval);
     MOZ_ASSERT_IF(emitterMode == LazyFunction, lazyScript);
-    // Function scripts are never eval scripts.
-    MOZ_ASSERT_IF(evalStaticScope, !sc->isFunctionBox());
 }
 
 bool
@@ -773,7 +769,7 @@ BytecodeEmitter::enclosingStaticScope()
 
         // Top-level eval scripts have a placeholder static scope so that
         // StaticScopeIter may iterate through evals.
-        return evalStaticScope;
+        return sc->asGlobalSharedContext()->topStaticScope();
     }
 
     return sc->asFunctionBox()->function();
@@ -1552,14 +1548,14 @@ BytecodeEmitter::tryConvertFreeName(ParseNode* pn)
                     // Use generic ops if a catch block is encountered.
                     return false;
                 }
-                if (ssi.hasDynamicScopeObject())
+                if (ssi.hasSyntacticDynamicScopeObject())
                     hops++;
                 continue;
             }
             RootedScript script(cx, ssi.funScript());
             if (script->functionNonDelazifying()->atom() == pn->pn_atom)
                 return false;
-            if (ssi.hasDynamicScopeObject()) {
+            if (ssi.hasSyntacticDynamicScopeObject()) {
                 uint32_t slot;
                 if (lookupAliasedName(script, pn->pn_atom->asPropertyName(), &slot, pn)) {
                     JSOp op;
@@ -1591,9 +1587,9 @@ BytecodeEmitter::tryConvertFreeName(ParseNode* pn)
     if (insideNonGlobalEval)
         return false;
 
-    // Skip trying to use GNAME ops if we know our script has a polluted
-    // global scope, since they'll just get treated as NAME ops anyway.
-    if (script->hasPollutedGlobalScope())
+    // Skip trying to use GNAME ops if we know our script has a non-syntactic
+    // scope, since they'll just get treated as NAME ops anyway.
+    if (script->hasNonSyntacticScope())
         return false;
 
     // Deoptimized names also aren't necessarily globals.
@@ -1906,186 +1902,430 @@ BytecodeEmitter::bindNameToSlot(ParseNode* pn)
 bool
 BytecodeEmitter::checkSideEffects(ParseNode* pn, bool* answer)
 {
-    if (!pn || *answer)
+    JS_CHECK_RECURSION(cx, return false);
+
+    switch (pn->getKind()) {
+      // Trivial cases with no side effects.
+      case PNK_NEWTARGET:
+      case PNK_NOP:
+      case PNK_STRING:
+      case PNK_TEMPLATE_STRING:
+      case PNK_REGEXP:
+      case PNK_TRUE:
+      case PNK_FALSE:
+      case PNK_NULL:
+      case PNK_THIS:
+      case PNK_ELISION:
+      case PNK_GENERATOR:
+      case PNK_NUMBER:
+      case PNK_OBJECT_PROPERTY_NAME:
+        MOZ_ASSERT(pn->isArity(PN_NULLARY));
+        *answer = false;
         return true;
 
-    switch (pn->getArity()) {
-      case PN_CODE:
+      case PNK_BREAK:
+      case PNK_CONTINUE:
+      case PNK_DEBUGGER:
+        MOZ_ASSERT(pn->isArity(PN_NULLARY));
+        *answer = true;
+        return true;
+
+      // Watch out for getters!
+      case PNK_SUPERPROP:
+        MOZ_ASSERT(pn->isArity(PN_NULLARY));
+        *answer = true;
+        return true;
+
+      // Again, getters.
+      case PNK_DOT:
+        MOZ_ASSERT(pn->isArity(PN_NAME));
+        *answer = true;
+        return true;
+
+      // Unary cases with side effects only if the child has them.
+      case PNK_TYPEOFEXPR:
+      case PNK_VOID:
+      case PNK_NOT:
+      case PNK_COMPUTED_NAME:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        return checkSideEffects(pn->pn_kid, answer);
+
+      // Looking up or evaluating the associated name could throw.
+      case PNK_TYPEOFNAME:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      // These unary cases have side effects on the enclosing object/array,
+      // sure.  But that's not the question this function answers: it's
+      // whether the operation may have a side effect on something *other* than
+      // the result of the overall operation in which it's embedded.  The
+      // answer to that is no, for an object literal having a mutated prototype
+      // and an array comprehension containing no other effectful operations
+      // only produce a value, without affecting anything else.
+      case PNK_MUTATEPROTO:
+      case PNK_ARRAYPUSH:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        return checkSideEffects(pn->pn_kid, answer);
+
+      // Unary cases with obvious side effects.
+      case PNK_PREINCREMENT:
+      case PNK_POSTINCREMENT:
+      case PNK_PREDECREMENT:
+      case PNK_POSTDECREMENT:
+      case PNK_THROW:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      // These might invoke valueOf/toString, even with a subexpression without
+      // side effects!  Consider |+{ valueOf: null, toString: null }|.
+      case PNK_BITNOT:
+      case PNK_POS:
+      case PNK_NEG:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      // This invokes the (user-controllable) iterator protocol.
+      case PNK_SPREAD:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      case PNK_YIELD_STAR:
+      case PNK_YIELD:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      // Deletion generally has side effects, even if isolated cases have none.
+      case PNK_DELETENAME:
+      case PNK_DELETEPROP:
+      case PNK_DELETESUPERPROP:
+      case PNK_DELETEELEM:
+      case PNK_DELETESUPERELEM:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      // Deletion of a non-Reference expression has side effects only through
+      // evaluating the expression.
+      case PNK_DELETEEXPR: {
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        ParseNode* expr = pn->pn_kid;
+        return checkSideEffects(expr, answer);
+      }
+
+      case PNK_SEMI:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        if (ParseNode* expr = pn->pn_kid)
+            return checkSideEffects(expr, answer);
+        *answer = false;
+        return true;
+
+      // Binary cases with obvious side effects.
+      case PNK_ASSIGN:
+      case PNK_ADDASSIGN:
+      case PNK_SUBASSIGN:
+      case PNK_BITORASSIGN:
+      case PNK_BITXORASSIGN:
+      case PNK_BITANDASSIGN:
+      case PNK_LSHASSIGN:
+      case PNK_RSHASSIGN:
+      case PNK_URSHASSIGN:
+      case PNK_MULASSIGN:
+      case PNK_DIVASSIGN:
+      case PNK_MODASSIGN:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      case PNK_STATEMENTLIST:
+      case PNK_CATCHLIST:
+      // Strict equality operations and logical operators are well-behaved and
+      // perform no conversions.
+      case PNK_OR:
+      case PNK_AND:
+      case PNK_STRICTEQ:
+      case PNK_STRICTNE:
+      // Any subexpression of a comma expression could be effectful.
+      case PNK_COMMA:
+        MOZ_ASSERT(pn->pn_count > 0);
+      // Subcomponents of a literal may be effectful.
+      case PNK_ARRAY:
+      case PNK_OBJECT:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        for (ParseNode* item = pn->pn_head; item; item = item->pn_next) {
+            if (!checkSideEffects(item, answer))
+                return false;
+            if (*answer)
+                return true;
+        }
+        return true;
+
+      // Most other binary operations (parsed as lists in SpiderMonkey) may
+      // perform conversions triggering side effects.  Math operations perform
+      // ToNumber and may fail invoking invalid user-defined toString/valueOf:
+      // |5 < { toString: null }|.  |instanceof| throws if provided a
+      // non-object constructor: |null instanceof null|.  |in| throws if given
+      // a non-object RHS: |5 in null|.
+      case PNK_BITOR:
+      case PNK_BITXOR:
+      case PNK_BITAND:
+      case PNK_EQ:
+      case PNK_NE:
+      case PNK_LT:
+      case PNK_LE:
+      case PNK_GT:
+      case PNK_GE:
+      case PNK_INSTANCEOF:
+      case PNK_IN:
+      case PNK_LSH:
+      case PNK_RSH:
+      case PNK_URSH:
+      case PNK_ADD:
+      case PNK_SUB:
+      case PNK_STAR:
+      case PNK_DIV:
+      case PNK_MOD:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        MOZ_ASSERT(pn->pn_count >= 2);
+        *answer = true;
+        return true;
+
+      case PNK_DEFAULT:
+      case PNK_COLON:
+      case PNK_CASE:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        if (!checkSideEffects(pn->pn_left, answer))
+            return false;
+        if (*answer)
+            return true;
+        return checkSideEffects(pn->pn_right, answer);
+
+      // More getters.
+      case PNK_ELEM:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      // Again, getters.
+      case PNK_SUPERELEM:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      // These affect visible names in this code, or in other code.
+      case PNK_IMPORT:
+      case PNK_EXPORT_FROM:
+      case PNK_EXPORT_DEFAULT:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      // Likewise.
+      case PNK_EXPORT:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        *answer = true;
+        return true;
+
+      // Every part of a loop might be effect-free, but looping infinitely *is*
+      // an effect.  (Language lawyer trivia: C++ says threads can be assumed
+      // to exit or have side effects, C++14 [intro.multithread]p27, so a C++
+      // implementation's equivalent of the below could set |*answer = false;|
+      // if all loop sub-nodes set |*answer = false|!)
+      case PNK_DOWHILE:
+      case PNK_WHILE:
+      case PNK_FOR:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      // Declarations affect the name set of the relevant scope.
+      case PNK_VAR:
+      case PNK_CONST:
+      case PNK_LET:
+      case PNK_GLOBALCONST:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        *answer = true;
+        return true;
+
+      case PNK_CONDITIONAL:
+        MOZ_ASSERT(pn->isArity(PN_TERNARY));
+        if (!checkSideEffects(pn->pn_kid1, answer))
+            return false;
+        if (*answer)
+            return true;
+        if (!checkSideEffects(pn->pn_kid2, answer))
+            return false;
+        if (*answer)
+            return true;
+        return checkSideEffects(pn->pn_kid3, answer);
+
+      case PNK_IF:
+        MOZ_ASSERT(pn->isArity(PN_TERNARY));
+        if (!checkSideEffects(pn->pn_kid1, answer))
+            return false;
+        if (*answer)
+            return true;
+        if (!checkSideEffects(pn->pn_kid2, answer))
+            return false;
+        if (*answer)
+            return true;
+        if (ParseNode* elseNode = pn->pn_kid3) {
+            if (!checkSideEffects(elseNode, answer))
+                return false;
+        }
+        return true;
+
+      // Function calls can invoke non-local code.
+      case PNK_NEW:
+      case PNK_CALL:
+      case PNK_TAGGED_TEMPLATE:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        *answer = true;
+        return true;
+
+      // Classes typically introduce names.  Even if no name is introduced,
+      // the heritage and/or class body (through computed property names)
+      // usually have effects.
+      case PNK_CLASS:
+        MOZ_ASSERT(pn->isArity(PN_TERNARY));
+        *answer = true;
+        return true;
+
+      // |with| calls |ToObject| on its expression and so throws if that value
+      // is null/undefined.
+      case PNK_WITH:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      case PNK_RETURN:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      case PNK_NAME:
+        MOZ_ASSERT(pn->isArity(PN_NAME));
+        *answer = true;
+        return true;
+
+      // Shorthands could trigger getters: the |x| in the object literal in
+      // |with ({ get x() { throw 42; } }) ({ x });|, for example, triggers
+      // one.  (Of course, it isn't necessary to use |with| for a shorthand to
+      // trigger a getter.)
+      case PNK_SHORTHAND:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        *answer = true;
+        return true;
+
+      case PNK_FUNCTION:
+        MOZ_ASSERT(pn->isArity(PN_CODE));
         /*
-         * A named function, contrary to ES3, is no longer useful, because we
-         * bind its name lexically (using JSOP_CALLEE) instead of creating an
-         * Object instance and binding a readonly, permanent property in it
+         * A named function, contrary to ES3, is no longer effectful, because
+         * we bind its name lexically (using JSOP_CALLEE) instead of creating
+         * an Object instance and binding a readonly, permanent property in it
          * (the object and binding can be detected and hijacked or captured).
          * This is a bug fix to ES3; it is fixed in ES3.1 drafts.
          */
-        MOZ_ASSERT(*answer == false);
+        *answer = false;
         return true;
 
-      case PN_LIST:
-        if (pn->isOp(JSOP_NOP) || pn->isOp(JSOP_OR) || pn->isOp(JSOP_AND) ||
-            pn->isOp(JSOP_STRICTEQ) || pn->isOp(JSOP_STRICTNE)) {
-            /*
-             * Non-operators along with ||, &&, ===, and !== never invoke
-             * toString or valueOf.
-             */
-            bool ok = true;
-            for (ParseNode* pn2 = pn->pn_head; pn2; pn2 = pn2->pn_next)
-                ok &= checkSideEffects(pn2, answer);
-            return ok;
-        }
-
-        if (pn->isKind(PNK_GENEXP)) {
-            /* Generator-expressions are harmless if the result is ignored. */
-            MOZ_ASSERT(*answer == false);
-            return true;
-        }
-
-        /*
-         * All invocation operations (construct: PNK_NEW, call: PNK_CALL)
-         * are presumed to be useful, because they may have side effects
-         * even if their main effect (their return value) is discarded.
-         *
-         * PNK_ELEM binary trees of 3+ nodes are flattened into lists to
-         * avoid too much recursion. All such lists must be presumed to be
-         * useful because each index operation could invoke a getter.
-         *
-         * Likewise, array and object initialisers may call prototype
-         * setters (the __defineSetter__ built-in, and writable __proto__
-         * on Array.prototype create this hazard). Initialiser list nodes
-         * have JSOP_NEWINIT in their pn_op.
-         */
-        *answer = true;
+      // Generator expressions have no side effects on their own.
+      case PNK_GENEXP:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        *answer = false;
         return true;
 
-      case PN_TERNARY:
-        return checkSideEffects(pn->pn_kid1, answer) &&
-               checkSideEffects(pn->pn_kid2, answer) &&
-               checkSideEffects(pn->pn_kid3, answer);
-
-      case PN_BINARY:
-      case PN_BINARY_OBJ:
-        if (pn->isAssignment()) {
-            /*
-             * Assignment is presumed to be useful, even if the next operation
-             * is another assignment overwriting this one's ostensible effect,
-             * because the left operand may be a property with a setter that
-             * has side effects.
-             *
-             * The only exception is assignment of a useless value to a const
-             * declared in the function currently being compiled.
-             */
-            ParseNode* pn2 = pn->pn_left;
-            if (!pn2->isKind(PNK_NAME)) {
-                *answer = true;
-            } else {
-                if (!bindNameToSlot(pn2))
-                    return false;
-                if (!checkSideEffects(pn->pn_right, answer))
-                    return false;
-                if (!*answer && (!pn->isOp(JSOP_NOP) || !pn2->isConst()))
-                    *answer = true;
-            }
+      case PNK_TRY:
+        MOZ_ASSERT(pn->isArity(PN_TERNARY));
+        if (!checkSideEffects(pn->pn_kid1, answer))
+            return false;
+        if (*answer)
             return true;
-        }
-
-        MOZ_ASSERT(!pn->isOp(JSOP_OR), "|| produces a list now");
-        MOZ_ASSERT(!pn->isOp(JSOP_AND), "&& produces a list now");
-        MOZ_ASSERT(!pn->isOp(JSOP_STRICTEQ), "=== produces a list now");
-        MOZ_ASSERT(!pn->isOp(JSOP_STRICTNE), "!== produces a list now");
-
-        /*
-         * We can't easily prove that neither operand ever denotes an
-         * object with a toString or valueOf method.
-         */
-        *answer = true;
-        return true;
-
-      case PN_UNARY:
-        switch (pn->getKind()) {
-          case PNK_DELETE:
-          {
-            ParseNode* pn2 = pn->pn_kid;
-            switch (pn2->getKind()) {
-              case PNK_NAME:
-                if (!bindNameToSlot(pn2))
-                    return false;
-                if (pn2->isConst()) {
-                    MOZ_ASSERT(*answer == false);
-                    return true;
-                }
-                /* FALL THROUGH */
-              case PNK_DOT:
-              case PNK_CALL:
-              case PNK_ELEM:
-              case PNK_SUPERELEM:
-                /* All these delete addressing modes have effects too. */
-                *answer = true;
-                return true;
-              default:
-                return checkSideEffects(pn2, answer);
-            }
-            MOZ_CRASH("We have a returning default case");
-          }
-
-          case PNK_TYPEOF:
-          case PNK_VOID:
-          case PNK_NOT:
-          case PNK_BITNOT:
-            if (pn->isOp(JSOP_NOT)) {
-                /* ! does not convert its operand via toString or valueOf. */
-                return checkSideEffects(pn->pn_kid, answer);
-            }
-            /* FALL THROUGH */
-
-          default:
-            /*
-             * All of PNK_INC, PNK_DEC and PNK_THROW have direct effects. Of
-             * the remaining unary-arity node types, we can't easily prove that
-             * the operand never denotes an object with a toString or valueOf
-             * method.
-             */
-            *answer = true;
-            return true;
-        }
-        MOZ_CRASH("We have a returning default case");
-
-      case PN_NAME:
-        /*
-         * Take care to avoid trying to bind a label name (labels, both for
-         * statements and property values in object initialisers, have pn_op
-         * defaulted to JSOP_NOP).
-         */
-        if (pn->isKind(PNK_NAME) && !pn->isOp(JSOP_NOP)) {
-            if (!bindNameToSlot(pn))
+        if (ParseNode* catchList = pn->pn_kid2) {
+            MOZ_ASSERT(catchList->isKind(PNK_CATCHLIST));
+            if (!checkSideEffects(catchList, answer))
                 return false;
-            if (!pn->isOp(JSOP_CALLEE) && pn->pn_cookie.isFree()) {
-                /*
-                 * Not a use of an unshadowed named function expression's given
-                 * name, so this expression could invoke a getter that has side
-                 * effects.
-                 */
-                *answer = true;
-            }
+            if (*answer)
+                return true;
         }
-
-        if (pn->isHoistedLexicalUse()) {
-            // Hoisted uses of lexical bindings throw on access.
-            *answer = true;
+        if (ParseNode* finallyBlock = pn->pn_kid3) {
+            if (!checkSideEffects(finallyBlock, answer))
+                return false;
         }
-
-        if (pn->isKind(PNK_DOT)) {
-            /* Dotted property references in general can call getters. */
-            *answer = true;
-        }
-        return checkSideEffects(pn->maybeExpr(), answer);
-
-      case PN_NULLARY:
-        if (pn->isKind(PNK_DEBUGGER) ||
-            pn->isKind(PNK_SUPERPROP))
-            *answer = true;
         return true;
+
+      case PNK_CATCH:
+        MOZ_ASSERT(pn->isArity(PN_TERNARY));
+        if (!checkSideEffects(pn->pn_kid1, answer))
+            return false;
+        if (*answer)
+            return true;
+        if (ParseNode* cond = pn->pn_kid2) {
+            if (!checkSideEffects(cond, answer))
+                return false;
+            if (*answer)
+                return true;
+        }
+        return checkSideEffects(pn->pn_kid3, answer);
+
+      case PNK_SWITCH:
+      case PNK_LETBLOCK:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        if (!checkSideEffects(pn->pn_left, answer))
+            return false;
+        return *answer || checkSideEffects(pn->pn_right, answer);
+
+      case PNK_LABEL:
+      case PNK_LEXICALSCOPE:
+        MOZ_ASSERT(pn->isArity(PN_NAME));
+        return checkSideEffects(pn->expr(), answer);
+
+      // We could methodically check every interpolated expression, but it's
+      // probably not worth the trouble.  Treat template strings as effect-free
+      // only if they don't contain any substitutions.
+      case PNK_TEMPLATE_STRING_LIST:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        MOZ_ASSERT(pn->pn_count > 0);
+        MOZ_ASSERT((pn->pn_count % 2) == 1,
+                   "template strings must alternate template and substitution "
+                   "parts");
+        *answer = pn->pn_count > 1;
+        return true;
+
+      case PNK_ARRAYCOMP:
+        MOZ_ASSERT(pn->isArity(PN_LIST));
+        MOZ_ASSERT(pn->pn_count == 1);
+        return checkSideEffects(pn->pn_head, answer);
+
+      case PNK_ARGSBODY:
+        *answer = true;
+        return true;
+
+      case PNK_FORIN:           // by PNK_FOR
+      case PNK_FOROF:           // by PNK_FOR
+      case PNK_FORHEAD:         // by PNK_FOR
+      case PNK_FRESHENBLOCK:    // by PNK_FOR
+      case PNK_CLASSMETHOD:     // by PNK_CLASS
+      case PNK_CLASSNAMES:      // by PNK_CLASS
+      case PNK_CLASSMETHODLIST: // by PNK_CLASS
+      case PNK_IMPORT_SPEC_LIST: // by PNK_IMPORT
+      case PNK_IMPORT_SPEC:      // by PNK_IMPORT
+      case PNK_EXPORT_BATCH_SPEC:// by PNK_EXPORT
+      case PNK_EXPORT_SPEC_LIST: // by PNK_EXPORT
+      case PNK_EXPORT_SPEC:      // by PNK_EXPORT
+      case PNK_CALLSITEOBJ:      // by PNK_TAGGED_TEMPLATE
+        MOZ_CRASH("handled by parent nodes");
+
+      case PNK_LIMIT: // invalid sentinel value
+        MOZ_CRASH("invalid node kind");
     }
-    return true;
+
+    MOZ_CRASH("invalid, unenumerated ParseNodeKind value encountered in "
+              "BytecodeEmitter::checkSideEffects");
 }
 
 bool
@@ -2116,13 +2356,14 @@ BytecodeEmitter::checkRunOnceContext()
 bool
 BytecodeEmitter::needsImplicitThis()
 {
-    if (sc->isFunctionBox() && sc->asFunctionBox()->inWith)
+    if (sc->inWith())
         return true;
 
     for (StmtInfoBCE* stmt = topStmt; stmt; stmt = stmt->down) {
         if (stmt->type == STMT_WITH)
             return true;
     }
+
     return false;
 }
 
@@ -3166,6 +3407,19 @@ BytecodeEmitter::emitFunctionScript(ParseNode* body)
      */
 
     FunctionBox* funbox = sc->asFunctionBox();
+
+    // Link the function and the script to each other, so that StaticScopeIter
+    // may walk the scope chain of currently compiling scripts.
+    RootedFunction fun(cx, funbox->function());
+    MOZ_ASSERT(fun->isInterpreted());
+
+    script->setFunction(fun);
+
+    if (fun->isInterpretedLazy())
+        fun->setUnlazifiedScript(script);
+    else
+        fun->setScript(script);
+
     if (funbox->argumentsHasLocalBinding()) {
         MOZ_ASSERT(offset() == 0);  /* See JSScript::argumentsBytecode. */
         switchToPrologue();
@@ -3268,15 +3522,6 @@ BytecodeEmitter::emitFunctionScript(ParseNode* body)
         script->setTreatAsRunOnce();
         MOZ_ASSERT(!script->hasRunOnce());
     }
-
-    /* Initialize fun->script() so that the debugger has a valid fun->script(). */
-    RootedFunction fun(cx, script->functionNonDelazifying());
-    MOZ_ASSERT(fun->isInterpreted());
-
-    if (fun->isInterpretedLazy())
-        fun->setUnlazifiedScript(script);
-    else
-        fun->setScript(script);
 
     tellDebuggerAboutCompiledScript(cx);
 
@@ -3729,11 +3974,14 @@ BytecodeEmitter::emitDestructuringOpsObjectHelper(ParseNode* pattern, VarEmitOpt
     MOZ_ASSERT(pattern->isKind(PNK_OBJECT));
     MOZ_ASSERT(pattern->isArity(PN_LIST));
 
-    MOZ_ASSERT(this->stackDepth != 0);                            // ... OBJ
+    MOZ_ASSERT(this->stackDepth > 0);                             // ... RHS
+
+    if (!emitRequireObjectCoercible())                            // ... RHS
+        return false;
 
     for (ParseNode* member = pattern->pn_head; member; member = member->pn_next) {
         // Duplicate the value being destructured to use as a reference base.
-        if (!emit1(JSOP_DUP))                                     // ... OBJ OBJ
+        if (!emit1(JSOP_DUP))                                     // ... RHS RHS
             return false;
 
         // Now push the property name currently being matched, which is the
@@ -3743,7 +3991,7 @@ BytecodeEmitter::emitDestructuringOpsObjectHelper(ParseNode* pattern, VarEmitOpt
 
         ParseNode* subpattern;
         if (member->isKind(PNK_MUTATEPROTO)) {
-            if (!emitAtomOp(cx->names().proto, JSOP_GETPROP))     // ... OBJ PROP
+            if (!emitAtomOp(cx->names().proto, JSOP_GETPROP))     // ... RHS PROP
                 return false;
             needsGetElem = false;
             subpattern = member->pn_kid;
@@ -3752,7 +4000,7 @@ BytecodeEmitter::emitDestructuringOpsObjectHelper(ParseNode* pattern, VarEmitOpt
 
             ParseNode* key = member->pn_left;
             if (key->isKind(PNK_NUMBER)) {
-                if (!emitNumberOp(key->pn_dval))                  // ... OBJ OBJ KEY
+                if (!emitNumberOp(key->pn_dval))                  // ... RHS RHS KEY
                     return false;
             } else if (key->isKind(PNK_OBJECT_PROPERTY_NAME) || key->isKind(PNK_STRING)) {
                 PropertyName* name = key->pn_atom->asPropertyName();
@@ -3762,16 +4010,16 @@ BytecodeEmitter::emitDestructuringOpsObjectHelper(ParseNode* pattern, VarEmitOpt
                 // as indexes for simplification of downstream analysis.
                 jsid id = NameToId(name);
                 if (id != IdToTypeId(id)) {
-                    if (!emitTree(key))                           // ... OBJ OBJ KEY
+                    if (!emitTree(key))                           // ... RHS RHS KEY
                         return false;
                 } else {
-                    if (!emitAtomOp(name, JSOP_GETPROP))          // ...OBJ PROP
+                    if (!emitAtomOp(name, JSOP_GETPROP))          // ...RHS PROP
                         return false;
                     needsGetElem = false;
                 }
             } else {
                 MOZ_ASSERT(key->isKind(PNK_COMPUTED_NAME));
-                if (!emitTree(key->pn_kid))                       // ... OBJ OBJ KEY
+                if (!emitTree(key->pn_kid))                       // ... RHS RHS KEY
                     return false;
             }
 
@@ -3779,7 +4027,7 @@ BytecodeEmitter::emitDestructuringOpsObjectHelper(ParseNode* pattern, VarEmitOpt
         }
 
         // Get the property value if not done already.
-        if (needsGetElem && !emitElemOpBase(JSOP_GETELEM))        // ... OBJ PROP
+        if (needsGetElem && !emitElemOpBase(JSOP_GETELEM))        // ... RHS PROP
             return false;
 
         if (subpattern->isKind(PNK_ASSIGN)) {
@@ -3797,7 +4045,7 @@ BytecodeEmitter::emitDestructuringOpsObjectHelper(ParseNode* pattern, VarEmitOpt
         // target in the subpattern's LHS as it went, then popped PROP.  We've
         // correctly returned to the loop-entry stack, and we continue to the
         // next member.
-        if (emitOption == InitializeVars)                         // ... OBJ
+        if (emitOption == InitializeVars)                         // ... RHS
             continue;
 
         MOZ_ASSERT(emitOption == PushInitialValues);
@@ -4355,7 +4603,6 @@ ParseNode::getConstantValue(ExclusiveContext* cx, AllowConstantObjects allowObje
         return true;
       case PNK_CALLSITEOBJ:
       case PNK_ARRAY: {
-        RootedValue value(cx);
         unsigned count;
         ParseNode* pn;
 
@@ -4363,8 +4610,12 @@ ParseNode::getConstantValue(ExclusiveContext* cx, AllowConstantObjects allowObje
             vp.setMagic(JS_GENERIC_MAGIC);
             return true;
         }
-        if (allowObjects == DontAllowNestedObjects)
+
+        ObjectGroup::NewArrayKind arrayKind = ObjectGroup::NewArrayKind::Normal;
+        if (allowObjects == ForCopyOnWriteArray) {
+            arrayKind = ObjectGroup::NewArrayKind::CopyOnWrite;
             allowObjects = DontAllowObjects;
+        }
 
         if (getKind() == PNK_CALLSITEOBJ) {
             count = pn_count - 1;
@@ -4375,26 +4626,25 @@ ParseNode::getConstantValue(ExclusiveContext* cx, AllowConstantObjects allowObje
             pn = pn_head;
         }
 
-        RootedArrayObject obj(cx, NewDenseFullyAllocatedArray(cx, count, NullPtr(), newKind));
-        if (!obj)
+        AutoValueVector values(cx);
+        if (!values.appendN(MagicValue(JS_ELEMENTS_HOLE), count))
             return false;
-
-        unsigned idx = 0;
-        RootedId id(cx);
-        for (; pn; idx++, pn = pn->pn_next) {
-            if (!pn->getConstantValue(cx, allowObjects, &value))
+        size_t idx;
+        for (idx = 0; pn; idx++, pn = pn->pn_next) {
+            if (!pn->getConstantValue(cx, allowObjects, values[idx]))
                 return false;
-            if (value.isMagic(JS_GENERIC_MAGIC)) {
+            if (values[idx].isMagic(JS_GENERIC_MAGIC)) {
                 vp.setMagic(JS_GENERIC_MAGIC);
                 return true;
             }
-            id = INT_TO_JSID(idx);
-            if (!DefineProperty(cx, obj, id, value, nullptr, nullptr, JSPROP_ENUMERATE))
-                return false;
         }
         MOZ_ASSERT(idx == count);
 
-        ObjectGroup::fixArrayGroup(cx, obj);
+        JSObject* obj = ObjectGroup::newArrayObject(cx, values.begin(), values.length(),
+                                                    newKind, arrayKind);
+        if (!obj)
+            return false;
+
         vp.setObject(*obj);
         return true;
       }
@@ -4406,8 +4656,7 @@ ParseNode::getConstantValue(ExclusiveContext* cx, AllowConstantObjects allowObje
             vp.setMagic(JS_GENERIC_MAGIC);
             return true;
         }
-        if (allowObjects == DontAllowNestedObjects)
-            allowObjects = DontAllowObjects;
+        MOZ_ASSERT(allowObjects == AllowObjects);
 
         AutoIdValueVector properties(cx);
 
@@ -4858,41 +5107,15 @@ BytecodeEmitter::emitIf(ParseNode* pn)
 }
 
 /*
- * pnLet represents one of:
+ * pnLet represents a let-statement: let (x = y) { ... }
  *
- *   let-expression:   (let (x = y) EXPR)
- *   let-statement:    let (x = y) { ... }
- *
- * For a let-expression 'let (x = a, [y,z] = b) e', EmitLet produces:
- *
- *  bytecode          stackDepth  srcnotes
- *  evaluate a        +1
- *  evaluate b        +1
- *  dup               +1
- *  destructure y
- *  pick 1
- *  dup               +1
- *  destructure z
- *  pick 1
- *  pop               -1
- *  setlocal 2        -1
- *  setlocal 1        -1
- *  setlocal 0        -1
- *  pushblockscope (if needed)
- *  evaluate e        +1
- *  debugleaveblock
- *  popblockscope (if needed)
- *
- * Note that, since pushblockscope simply changes fp->scopeChain and does not
- * otherwise touch the stack, evaluation of the let-var initializers must leave
- * the initial value in the let-var's future slot.
  */
 /*
  * Using MOZ_NEVER_INLINE in here is a workaround for llvm.org/pr14047. See
  * the comment on emitSwitch.
  */
 MOZ_NEVER_INLINE bool
-BytecodeEmitter::emitLet(ParseNode* pnLet)
+BytecodeEmitter::emitLetBlock(ParseNode* pnLet)
 {
     MOZ_ASSERT(pnLet->isArity(PN_BINARY));
     ParseNode* varList = pnLet->pn_left;
@@ -4952,6 +5175,42 @@ BytecodeEmitter::emitWith(ParseNode* pn)
         return false;
     if (!leaveNestedScope(&stmtInfo))
         return false;
+    return true;
+}
+
+bool
+BytecodeEmitter::emitRequireObjectCoercible()
+{
+    // For simplicity, handle this in self-hosted code, at cost of 13 bytes of
+    // bytecode versus 1 byte for a dedicated opcode.  As more places need this
+    // behavior, we may want to reconsider this tradeoff.
+
+#ifdef DEBUG
+    auto depth = this->stackDepth;
+#endif
+    MOZ_ASSERT(depth > 0);                 // VAL
+    if (!emit1(JSOP_DUP))                  // VAL VAL
+        return false;
+
+    // Note that "intrinsic" is a misnomer: we're calling a *self-hosted*
+    // function that's not an intrinsic!  But it nonetheless works as desired.
+    if (!emitAtomOp(cx->names().RequireObjectCoercible,
+                    JSOP_GETINTRINSIC))    // VAL VAL REQUIREOBJECTCOERCIBLE
+    {
+        return false;
+    }
+    if (!emit1(JSOP_UNDEFINED))            // VAL VAL REQUIREOBJECTCOERCIBLE UNDEFINED
+        return false;
+    if (!emit2(JSOP_PICK, jsbytecode(2)))  // VAL REQUIREOBJECTCOERCIBLE UNDEFINED VAL
+        return false;
+    if (!emitCall(JSOP_CALL, 1))           // VAL IGNORED
+        return false;
+    checkTypeSet(JSOP_CALL);
+
+    if (!emit1(JSOP_POP))                  // VAL
+        return false;
+
+    MOZ_ASSERT(depth == this->stackDepth);
     return true;
 }
 
@@ -5447,6 +5706,19 @@ BytecodeEmitter::emitFor(ParseNode* pn, ptrdiff_t top)
     return emitNormalFor(pn, top);
 }
 
+bool
+BytecodeEmitter::arrowNeedsNewTarget()
+{
+    for (BytecodeEmitter* bce = this; bce; bce = bce->parent) {
+        SharedContext *sc = bce->sc;
+        if (sc->isFunctionBox() && sc->asFunctionBox()->function()->isArrow())
+            continue;
+
+        return sc->allowSyntax(SharedContext::AllowedSyntax::NewTarget);
+    }
+    MOZ_CRASH("impossible parent chain");
+}
+
 MOZ_NEVER_INLINE bool
 BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
 {
@@ -5498,8 +5770,6 @@ BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
             Rooted<JSScript*> parent(cx, script);
             CompileOptions options(cx, parser->options());
             options.setMutedErrors(parent->mutedErrors())
-                   .setHasPollutedScope(parent->hasPollutedGlobalScope())
-                   .setSelfHostingMode(parent->selfHosted())
                    .setNoScriptRval(false)
                    .setForEval(false)
                    .setVersion(parent->getVersion());
@@ -5516,9 +5786,8 @@ BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
             script->bindings = funbox->bindings;
 
             uint32_t lineNum = parser->tokenStream.srcCoords.lineNum(pn->pn_pos.begin);
-            BytecodeEmitter bce2(this, parser, funbox, script, /* lazyScript = */ js::NullPtr(),
+            BytecodeEmitter bce2(this, parser, funbox, script, /* lazyScript = */ nullptr,
                                  insideEval, evalCaller,
-                                 /* evalStaticScope = */ js::NullPtr(),
                                  insideNonGlobalEval, lineNum, emitterMode);
             if (!bce2.init())
                 return false;
@@ -5539,10 +5808,21 @@ BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
 
     /* Non-hoisted functions simply emit their respective op. */
     if (!pn->functionIsHoisted()) {
-        /* JSOP_LAMBDA_ARROW is always preceded by JSOP_THIS. */
+        /* JSOP_LAMBDA_ARROW is always preceded by JSOP_THIS and a new.target */
         MOZ_ASSERT(fun->isArrow() == (pn->getOp() == JSOP_LAMBDA_ARROW));
-        if (fun->isArrow() && !emit1(JSOP_THIS))
-            return false;
+        if (fun->isArrow()) {
+            if (!emit1(JSOP_THIS))
+                return false;
+
+            if (arrowNeedsNewTarget()) {
+                if (!emit1(JSOP_NEWTARGET))
+                    return false;
+            } else {
+                if (!emit1(JSOP_NULL))
+                    return false;
+            }
+        }
+
         if (needsProto) {
             MOZ_ASSERT(pn->getOp() == JSOP_LAMBDA);
             pn->setOp(JSOP_FUNWITHPROTO);
@@ -6048,12 +6328,7 @@ BytecodeEmitter::emitStatementList(ParseNode* pn, ptrdiff_t top)
     StmtInfoBCE stmtInfo(cx);
     pushStatement(&stmtInfo, STMT_BLOCK, top);
 
-    ParseNode* pnchild = pn->pn_head;
-
-    if (pn->pn_xflags & PNX_DESTRUCT)
-        pnchild = pnchild->pn_next;
-
-    for (ParseNode* pn2 = pnchild; pn2; pn2 = pn2->pn_next) {
+    for (ParseNode* pn2 = pn->pn_head; pn2; pn2 = pn2->pn_next) {
         if (!emitTree(pn2))
             return false;
     }
@@ -6154,82 +6429,110 @@ BytecodeEmitter::emitStatement(ParseNode* pn)
 }
 
 bool
-BytecodeEmitter::emitDelete(ParseNode* pn)
+BytecodeEmitter::emitDeleteName(ParseNode* node)
 {
-    /*
-     * Under ECMA 3, deleting a non-reference returns true -- but alas we
-     * must evaluate the operand if it appears it might have side effects.
-     */
-    ParseNode* pn2 = pn->pn_kid;
-    switch (pn2->getKind()) {
-      case PNK_NAME:
-        if (!bindNameToSlot(pn2))
-            return false;
-        if (!emitAtomOp(pn2, pn2->getOp()))
-            return false;
-        break;
-      case PNK_DOT:
-      {
-        JSOp delOp = sc->strict() ? JSOP_STRICTDELPROP : JSOP_DELPROP;
-        if (!emitPropOp(pn2, delOp))
-            return false;
-        break;
-      }
-      case PNK_SUPERPROP:
-        // Still have to calculate the base, even though we are are going
-        // to throw unconditionally, as calculating the base could also
-        // throw.
-        if (!emit1(JSOP_SUPERBASE))
-            return false;
-        if (!emitUint16Operand(JSOP_THROWMSG, JSMSG_CANT_DELETE_SUPER))
-            return false;
-        break;
-      case PNK_ELEM:
-      {
-        JSOp delOp = sc->strict() ? JSOP_STRICTDELELEM : JSOP_DELELEM;
-        if (!emitElemOp(pn2, delOp))
-            return false;
-        break;
-      }
-      case PNK_SUPERELEM:
-        // Still have to calculate everything, even though we're gonna throw
-        // since it may have side effects
-        if (!emitTree(pn2->pn_kid))
-            return false;
-        if (!emit1(JSOP_SUPERBASE))
-            return false;
-        if (!emitUint16Operand(JSOP_THROWMSG, JSMSG_CANT_DELETE_SUPER))
-            return false;
+    MOZ_ASSERT(node->isKind(PNK_DELETENAME));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
 
-        // Another wrinkle: Balance the stack from the emitter's point of view.
-        // Execution will not reach here, as the last bytecode threw.
+    ParseNode* nameExpr = node->pn_kid;
+    MOZ_ASSERT(nameExpr->isKind(PNK_NAME));
+
+    if (!bindNameToSlot(nameExpr))
+        return false;
+
+    MOZ_ASSERT(nameExpr->isOp(JSOP_DELNAME));
+    return emitAtomOp(nameExpr, JSOP_DELNAME);
+}
+
+bool
+BytecodeEmitter::emitDeleteProperty(ParseNode* node)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETEPROP));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode* propExpr = node->pn_kid;
+    MOZ_ASSERT(propExpr->isKind(PNK_DOT));
+
+    JSOp delOp = sc->strict() ? JSOP_STRICTDELPROP : JSOP_DELPROP;
+    return emitPropOp(propExpr, delOp);
+}
+
+bool
+BytecodeEmitter::emitDeleteSuperProperty(ParseNode* node)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETESUPERPROP));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+    MOZ_ASSERT(node->pn_kid->isKind(PNK_SUPERPROP));
+
+    // Still have to calculate the base, even though we are are going
+    // to throw unconditionally, as calculating the base could also
+    // throw.
+    if (!emit1(JSOP_SUPERBASE))
+        return false;
+
+    return emitUint16Operand(JSOP_THROWMSG, JSMSG_CANT_DELETE_SUPER);
+}
+
+bool
+BytecodeEmitter::emitDeleteElement(ParseNode* node)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETEELEM));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode* elemExpr = node->pn_kid;
+    MOZ_ASSERT(elemExpr->isKind(PNK_ELEM));
+
+    JSOp delOp = sc->strict() ? JSOP_STRICTDELELEM : JSOP_DELELEM;
+    return emitElemOp(elemExpr, delOp);
+}
+
+bool
+BytecodeEmitter::emitDeleteSuperElement(ParseNode* node)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETESUPERELEM));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode* superElemExpr = node->pn_kid;
+    MOZ_ASSERT(superElemExpr->isKind(PNK_SUPERELEM));
+
+    // Still have to calculate everything, even though we're gonna throw
+    // since it may have side effects
+    MOZ_ASSERT(superElemExpr->isArity(PN_UNARY));
+    if (!emitTree(superElemExpr->pn_kid))
+        return false;
+    if (!emit1(JSOP_SUPERBASE))
+        return false;
+    if (!emitUint16Operand(JSOP_THROWMSG, JSMSG_CANT_DELETE_SUPER))
+        return false;
+
+    // Another wrinkle: Balance the stack from the emitter's point of view.
+    // Execution will not reach here, as the last bytecode threw.
+    return emit1(JSOP_POP);
+}
+
+bool
+BytecodeEmitter::emitDeleteExpression(ParseNode* node)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETEEXPR));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode* expression = node->pn_kid;
+
+    // If useless, just emit JSOP_TRUE; otherwise convert |delete <expr>| to
+    // effectively |<expr>, true|.
+    bool useful = false;
+    if (!checkSideEffects(expression, &useful))
+        return false;
+
+    if (useful) {
+        MOZ_ASSERT_IF(expression->isKind(PNK_CALL), !(expression->pn_xflags & PNX_SETCALL));
+        if (!emitTree(expression))
+            return false;
         if (!emit1(JSOP_POP))
             return false;
-        break;
-      default:
-      {
-        /*
-         * If useless, just emit JSOP_TRUE; otherwise convert delete foo()
-         * to foo(), true (a comma expression).
-         */
-        bool useful = false;
-        if (!checkSideEffects(pn2, &useful))
-            return false;
-
-        if (useful) {
-            MOZ_ASSERT_IF(pn2->isKind(PNK_CALL), !(pn2->pn_xflags & PNX_SETCALL));
-            if (!emitTree(pn2))
-                return false;
-            if (!emit1(JSOP_POP))
-                return false;
-        }
-
-        if (!emit1(JSOP_TRUE))
-            return false;
-      }
     }
 
-    return true;
+    return emit1(JSOP_TRUE);
 }
 
 bool
@@ -6420,6 +6723,8 @@ BytecodeEmitter::emitCallOrNew(ParseNode* pn)
             return false;
     }
 
+    bool isNewOp = pn->getOp() == JSOP_NEW || pn->getOp() == JSOP_SPREADNEW;
+
     /*
      * Emit code for each argument in order, then emit the JSOP_*CALL or
      * JSOP_NEW bytecode with a two-byte immediate telling how many args
@@ -6432,9 +6737,20 @@ BytecodeEmitter::emitCallOrNew(ParseNode* pn)
             if (!emitTree(pn3))
                 return false;
         }
+
+        if (isNewOp) {
+            // Repush the callee as new.target
+            if (!emitDupAt(this->stackDepth - 1 - (argc + 1)))
+                return false;
+        }
     } else {
         if (!emitArray(pn2->pn_next, argc, JSOP_SPREADCALLARRAY))
             return false;
+
+        if (isNewOp) {
+            if (!emitDupAt(this->stackDepth - 1 - 2))
+                return false;
+        }
     }
     emittingForInit = oldEmittingForInit;
 
@@ -6636,27 +6952,6 @@ BytecodeEmitter::emitLabeledStatement(const LabeledStatement* pn)
 }
 
 bool
-BytecodeEmitter::emitSyntheticStatements(ParseNode* pn, ptrdiff_t top)
-{
-    MOZ_ASSERT(pn->isArity(PN_LIST));
-
-    StmtInfoBCE stmtInfo(cx);
-    pushStatement(&stmtInfo, STMT_SEQ, top);
-
-    ParseNode* pn2 = pn->pn_head;
-    if (pn->pn_xflags & PNX_DESTRUCT)
-        pn2 = pn2->pn_next;
-
-    for (; pn2; pn2 = pn2->pn_next) {
-        if (!emitTree(pn2))
-            return false;
-    }
-
-    popStatement();
-    return true;
-}
-
-bool
 BytecodeEmitter::emitConditionalExpression(ConditionalExpression& conditional)
 {
     /* Emit the condition, then branch if false to the else part. */
@@ -6686,9 +6981,8 @@ BytecodeEmitter::emitConditionalExpression(ConditionalExpression& conditional)
      * ignore the value pushed by the first branch.  Execution will follow
      * only one path, so we must decrement this->stackDepth.
      *
-     * Failing to do this will foil code, such as let expression and block
-     * code generation, which must use the stack depth to compute local
-     * stack indexes correctly.
+     * Failing to do this will foil code, such as let block code generation,
+     * which must use the stack depth to compute local stack indexes correctly.
      */
     MOZ_ASSERT(stackDepth > 0);
     stackDepth--;
@@ -6769,7 +7063,7 @@ BytecodeEmitter::emitPropertyList(ParseNode* pn, MutableHandlePlainObject objp, 
         if (propdef->pn_right->isKind(PNK_FUNCTION) &&
             propdef->pn_right->pn_funbox->needsHomeObject())
         {
-            MOZ_ASSERT(propdef->pn_right->pn_funbox->function()->isMethod());
+            MOZ_ASSERT(propdef->pn_right->pn_funbox->function()->allowSuperProperty());
             if (!emit2(JSOP_INITHOMEOBJECT, isIndex))
                 return false;
         }
@@ -6983,9 +7277,6 @@ BytecodeEmitter::emitUnary(ParseNode* pn)
     JSOp op = pn->getOp();
     ParseNode* pn2 = pn->pn_kid;
 
-    if (op == JSOP_TYPEOF && !pn2->isKind(PNK_NAME))
-        op = JSOP_TYPEOFEXPR;
-
     bool oldEmittingForInit = emittingForInit;
     emittingForInit = false;
     if (!emitTree(pn2))
@@ -6996,35 +7287,76 @@ BytecodeEmitter::emitUnary(ParseNode* pn)
 }
 
 bool
-BytecodeEmitter::emitDefaults(ParseNode* pn)
+BytecodeEmitter::emitTypeof(ParseNode* node, JSOp op)
+{
+    MOZ_ASSERT(op == JSOP_TYPEOF || op == JSOP_TYPEOFEXPR);
+
+    if (!updateSourceCoordNotes(node->pn_pos.begin))
+        return false;
+
+    bool oldEmittingForInit = emittingForInit;
+    emittingForInit = false;
+    if (!emitTree(node->pn_kid))
+        return false;
+
+    emittingForInit = oldEmittingForInit;
+    return emit1(op);
+}
+
+bool
+BytecodeEmitter::emitDefaultsAndDestructuring(ParseNode* pn)
 {
     MOZ_ASSERT(pn->isKind(PNK_ARGSBODY));
 
     ParseNode* pnlast = pn->last();
     for (ParseNode* arg = pn->pn_head; arg != pnlast; arg = arg->pn_next) {
-        if (!(arg->pn_dflags & PND_DEFAULT))
-            continue;
-        if (!bindNameToSlot(arg))
-            return false;
-        if (!emitVarOp(arg, JSOP_GETARG))
-            return false;
-        if (!emit1(JSOP_UNDEFINED))
-            return false;
-        if (!emit1(JSOP_STRICTEQ))
-            return false;
-        // Emit source note to enable ion compilation.
-        if (!newSrcNote(SRC_IF))
-            return false;
-        ptrdiff_t jump;
-        if (!emitJump(JSOP_IFEQ, 0, &jump))
-            return false;
-        if (!emitTree(arg->expr()))
-            return false;
-        if (!emitVarOp(arg, JSOP_SETARG))
-            return false;
-        if (!emit1(JSOP_POP))
-            return false;
-        SET_JUMP_OFFSET(code(jump), offset() - jump);
+        MOZ_ASSERT(arg->isKind(PNK_NAME) || arg->isKind(PNK_ASSIGN));
+        ParseNode* argName = nullptr;
+        ParseNode* defNode = nullptr;
+        ParseNode* destruct = nullptr;
+        if (arg->isKind(PNK_ASSIGN)) {
+            argName = arg->pn_left;
+            defNode = arg->pn_right;
+        } else if (arg->pn_atom == cx->names().empty) {
+            argName = arg;
+            destruct = arg->expr();
+            MOZ_ASSERT(destruct);
+            if (destruct->isKind(PNK_ASSIGN)) {
+                defNode = destruct->pn_right;
+                destruct = destruct->pn_left;
+            }
+        }
+        if (defNode) {
+            if (!bindNameToSlot(argName))
+                return false;
+            if (!emitVarOp(argName, JSOP_GETARG))
+                return false;
+            if (!emit1(JSOP_UNDEFINED))
+                return false;
+            if (!emit1(JSOP_STRICTEQ))
+                return false;
+            // Emit source note to enable ion compilation.
+            if (!newSrcNote(SRC_IF))
+                return false;
+            ptrdiff_t jump;
+            if (!emitJump(JSOP_IFEQ, 0, &jump))
+                return false;
+            if (!emitTree(defNode))
+                return false;
+            if (!emitVarOp(argName, JSOP_SETARG))
+                return false;
+            if (!emit1(JSOP_POP))
+                return false;
+            SET_JUMP_OFFSET(code(jump), offset() - jump);
+        }
+        if (destruct) {
+            if (!emitTree(argName))
+                return false;
+            if (!emitDestructuringOps(destruct, false))
+                 return false;
+            if (!emit1(JSOP_POP))
+                return false;
+        }
     }
 
     return true;
@@ -7200,61 +7532,49 @@ BytecodeEmitter::emitTree(ParseNode* pn)
         ParseNode* pnlast = pn->last();
 
         // Carefully emit everything in the right order:
-        // 1. Destructuring
-        // 2. Defaults
-        // 3. Functions
+        // 1. Defaults and Destructuring for each argument
+        // 2. Functions
         ParseNode* pnchild = pnlast->pn_head;
-        if (pnlast->pn_xflags & PNX_DESTRUCT) {
-            // Assign the destructuring arguments before defining any functions,
-            // see bug 419662.
-            MOZ_ASSERT(pnchild->isKind(PNK_SEMI));
-            MOZ_ASSERT(pnchild->pn_kid->isKind(PNK_VAR) || pnchild->pn_kid->isKind(PNK_GLOBALCONST));
-            if (!emitTree(pnchild))
-                return false;
-            pnchild = pnchild->pn_next;
-        }
         bool hasDefaults = sc->asFunctionBox()->hasDefaults();
-        if (hasDefaults) {
-            ParseNode* rest = nullptr;
-            bool restIsDefn = false;
-            if (fun->hasRest()) {
-                MOZ_ASSERT(!sc->asFunctionBox()->argumentsHasLocalBinding());
+        ParseNode* rest = nullptr;
+        bool restIsDefn = false;
+        if (fun->hasRest() && hasDefaults) {
+            MOZ_ASSERT(!sc->asFunctionBox()->argumentsHasLocalBinding());
 
-                // Defaults with a rest parameter need special handling. The
-                // rest parameter needs to be undefined while defaults are being
-                // processed. To do this, we create the rest argument and let it
-                // sit on the stack while processing defaults. The rest
-                // parameter's slot is set to undefined for the course of
-                // default processing.
-                rest = pn->pn_head;
-                while (rest->pn_next != pnlast)
-                    rest = rest->pn_next;
-                restIsDefn = rest->isDefn();
-                if (!emit1(JSOP_REST))
-                    return false;
-                checkTypeSet(JSOP_REST);
-
-                // Only set the rest parameter if it's not aliased by a nested
-                // function in the body.
-                if (restIsDefn) {
-                    if (!emit1(JSOP_UNDEFINED))
-                        return false;
-                    if (!bindNameToSlot(rest))
-                        return false;
-                    if (!emitVarOp(rest, JSOP_SETARG))
-                        return false;
-                    if (!emit1(JSOP_POP))
-                        return false;
-                }
-            }
-            if (!emitDefaults(pn))
+            // Defaults with a rest parameter need special handling. The
+            // rest parameter needs to be undefined while defaults are being
+            // processed. To do this, we create the rest argument and let it
+            // sit on the stack while processing defaults. The rest
+            // parameter's slot is set to undefined for the course of
+            // default processing.
+            rest = pn->pn_head;
+            while (rest->pn_next != pnlast)
+                rest = rest->pn_next;
+            restIsDefn = rest->isDefn();
+            if (!emit1(JSOP_REST))
                 return false;
-            if (fun->hasRest()) {
-                if (restIsDefn && !emitVarOp(rest, JSOP_SETARG))
+            checkTypeSet(JSOP_REST);
+
+            // Only set the rest parameter if it's not aliased by a nested
+            // function in the body.
+            if (restIsDefn) {
+                if (!emit1(JSOP_UNDEFINED))
+                    return false;
+                if (!bindNameToSlot(rest))
+                    return false;
+                if (!emitVarOp(rest, JSOP_SETARG))
                     return false;
                 if (!emit1(JSOP_POP))
                     return false;
             }
+        }
+        if (!emitDefaultsAndDestructuring(pn))
+            return false;
+        if (fun->hasRest() && hasDefaults) {
+            if (restIsDefn && !emitVarOp(rest, JSOP_SETARG))
+                return false;
+            if (!emit1(JSOP_POP))
+                return false;
         }
         for (ParseNode* pn2 = pn->pn_head; pn2 != pnlast; pn2 = pn2->pn_next) {
             // Only bind the parameter if it's not aliased by a nested function
@@ -7367,10 +7687,6 @@ BytecodeEmitter::emitTree(ParseNode* pn)
         ok = emitStatementList(pn, top);
         break;
 
-      case PNK_SEQ:
-        ok = emitSyntheticStatements(pn, top);
-        break;
-
       case PNK_SEMI:
         ok = emitStatement(pn);
         break;
@@ -7455,8 +7771,15 @@ BytecodeEmitter::emitTree(ParseNode* pn)
         break;
       }
 
+      case PNK_TYPEOFNAME:
+        ok = emitTypeof(pn, JSOP_TYPEOF);
+        break;
+
+      case PNK_TYPEOFEXPR:
+        ok = emitTypeof(pn, JSOP_TYPEOFEXPR);
+        break;
+
       case PNK_THROW:
-      case PNK_TYPEOF:
       case PNK_VOID:
       case PNK_NOT:
       case PNK_BITNOT:
@@ -7472,8 +7795,28 @@ BytecodeEmitter::emitTree(ParseNode* pn)
         ok = emitIncOrDec(pn);
         break;
 
-      case PNK_DELETE:
-        ok = emitDelete(pn);
+      case PNK_DELETENAME:
+        ok = emitDeleteName(pn);
+        break;
+
+      case PNK_DELETEPROP:
+        ok = emitDeleteProperty(pn);
+        break;
+
+      case PNK_DELETESUPERPROP:
+        ok = emitDeleteSuperProperty(pn);
+        break;
+
+      case PNK_DELETEELEM:
+        ok = emitDeleteElement(pn);
+        break;
+
+      case PNK_DELETESUPERELEM:
+        ok = emitDeleteSuperElement(pn);
+        break;
+
+      case PNK_DELETEEXPR:
+        ok = emitDeleteExpression(pn);
         break;
 
       case PNK_DOT:
@@ -7506,8 +7849,7 @@ BytecodeEmitter::emitTree(ParseNode* pn)
         break;
 
       case PNK_LETBLOCK:
-      case PNK_LETEXPR:
-        ok = emitLet(pn);
+        ok = emitLetBlock(pn);
         break;
 
       case PNK_CONST:
@@ -7517,6 +7859,7 @@ BytecodeEmitter::emitTree(ParseNode* pn)
 
       case PNK_IMPORT:
       case PNK_EXPORT:
+      case PNK_EXPORT_DEFAULT:
       case PNK_EXPORT_FROM:
        // TODO: Implement emitter support for modules
        reportError(nullptr, JSMSG_MODULES_NOT_IMPLEMENTED);
@@ -7555,7 +7898,7 @@ BytecodeEmitter::emitTree(ParseNode* pn)
             // every time the initializer executes.
             if (emitterMode != BytecodeEmitter::SelfHosting && pn->pn_count != 0) {
                 RootedValue value(cx);
-                if (!pn->getConstantValue(cx, ParseNode::DontAllowNestedObjects, &value))
+                if (!pn->getConstantValue(cx, ParseNode::ForCopyOnWriteArray, &value))
                     return false;
                 if (!value.isMagic(JS_GENERIC_MAGIC)) {
                     // Note: the group of the template object might not yet reflect
@@ -7565,9 +7908,9 @@ BytecodeEmitter::emitTree(ParseNode* pn)
                     // group for the template is accurate. We don't do this here as we
                     // want to use ObjectGroup::allocationSiteGroup, which requires a
                     // finished script.
-                    NativeObject* obj = &value.toObject().as<NativeObject>();
-                    if (!ObjectElements::MakeElementsCopyOnWrite(cx, obj))
-                        return false;
+                    JSObject* obj = &value.toObject();
+                    MOZ_ASSERT(obj->is<ArrayObject>() &&
+                               obj->as<ArrayObject>().denseElementsAreCopyOnWrite());
 
                     ObjectBox* objbox = parser->newObjectBox(obj);
                     if (!objbox)
@@ -7633,6 +7976,11 @@ BytecodeEmitter::emitTree(ParseNode* pn)
 
       case PNK_CLASS:
         ok = emitClass(pn);
+        break;
+
+      case PNK_NEWTARGET:
+        if (!emit1(JSOP_NEWTARGET))
+            return false;
         break;
 
       default:

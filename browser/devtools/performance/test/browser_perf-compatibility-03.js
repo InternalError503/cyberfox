@@ -7,11 +7,12 @@
 
 let WAIT_TIME = 100;
 
-function spawnTest () {
+function* spawnTest() {
   let { target, front } = yield initBackend(SIMPLE_URL, {
     TEST_MOCK_MEMORY_ACTOR: true
   });
   Services.prefs.setBoolPref(MEMORY_PREF, true);
+  Services.prefs.setBoolPref(ALLOCATIONS_PREF, true);
 
   let { memory, timeline } = front.getActorSupport();
   ok(!memory, "memory should be mocked.");

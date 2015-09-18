@@ -126,6 +126,8 @@ private:
   }
 
   void Decode();
+  void OnMetadataRead(MetadataHolder* aMetadata);
+  void OnMetadataNotRead(ReadMetadataFailureReason aReason);
   void RequestSample();
   void SampleDecoded(AudioData* aData);
   void SampleNotDecoded(MediaDecoderReader::NotDecodedReason aReason);
@@ -209,10 +211,6 @@ MediaDecodeTask::CreateReader()
     return false;
   }
 
-  if (!mDecoderReader->EnsureTaskQueue()) {
-    return false;
-  }
-
   return true;
 }
 
@@ -247,34 +245,43 @@ MediaDecodeTask::Decode()
 {
   MOZ_ASSERT(!NS_IsMainThread());
 
-  mBufferDecoder->BeginDecoding(mDecoderReader->GetTaskQueue());
+  mBufferDecoder->BeginDecoding(mDecoderReader->TaskQueue());
 
   // Tell the decoder reader that we are not going to play the data directly,
   // and that we should not reject files with more channels than the audio
   // backend support.
   mDecoderReader->SetIgnoreAudioOutputFormat();
 
-  nsAutoPtr<MetadataTags> tags;
-  nsresult rv = mDecoderReader->ReadMetadata(&mMediaInfo, getter_Transfers(tags));
-  if (NS_FAILED(rv)) {
-    mDecoderReader->Shutdown();
-    ReportFailureOnMainThread(WebAudioDecodeJob::InvalidContent);
-    return;
-  }
+  mDecoderReader->AsyncReadMetadata()->Then(mDecoderReader->TaskQueue(), __func__, this,
+                                       &MediaDecodeTask::OnMetadataRead,
+                                       &MediaDecodeTask::OnMetadataNotRead);
+}
 
-  if (!mDecoderReader->HasAudio()) {
+void
+MediaDecodeTask::OnMetadataRead(MetadataHolder* aMetadata)
+{
+  mMediaInfo = aMetadata->mInfo;
+  if (!mMediaInfo.HasAudio()) {
     mDecoderReader->Shutdown();
     ReportFailureOnMainThread(WebAudioDecodeJob::NoAudio);
     return;
   }
-
   RequestSample();
+}
+
+void
+MediaDecodeTask::OnMetadataNotRead(ReadMetadataFailureReason aReason)
+{
+  MOZ_RELEASE_ASSERT(aReason != ReadMetadataFailureReason::WAITING_FOR_RESOURCES);
+  mDecoderReader->Shutdown();
+  ReportFailureOnMainThread(WebAudioDecodeJob::InvalidContent);
+  return;
 }
 
 void
 MediaDecodeTask::RequestSample()
 {
-  mDecoderReader->RequestAudioData()->Then(mDecoderReader->GetTaskQueue(), __func__, this,
+  mDecoderReader->RequestAudioData()->Then(mDecoderReader->TaskQueue(), __func__, this,
                                            &MediaDecodeTask::SampleDecoded,
                                            &MediaDecodeTask::SampleNotDecoded);
 }
@@ -341,7 +348,7 @@ MediaDecodeTask::FinishDecode()
   // write fewer bytes than mResampledFrames to the output buffer, in which
   // case mWriteIndex will tell us how many valid samples we have.
   bool memoryAllocationSuccess = true;
-  if (!mDecodeJob.mChannelBuffers.SetLength(channelCount)) {
+  if (!mDecodeJob.mChannelBuffers.SetLength(channelCount, fallible)) {
     memoryAllocationSuccess = false;
   } else {
     for (uint32_t i = 0; i < channelCount; ++i) {
@@ -496,7 +503,12 @@ AsyncDecodeWebAudio(const char* aContentType, uint8_t* aBuffer,
                            WebAudioDecodeJob::UnknownError);
     NS_DispatchToMainThread(event);
   } else {
-    task->Reader()->GetTaskQueue()->Dispatch(task);
+    // If we did this without a temporary:
+    //   task->Reader()->TaskQueue()->Dispatch(task.forget())
+    // we might evaluate the task.forget() before calling Reader(). Enforce
+    // a non-crashy order-of-operations.
+    MediaTaskQueue* taskQueue = task->Reader()->TaskQueue();
+    taskQueue->Dispatch(task.forget());
   }
 }
 

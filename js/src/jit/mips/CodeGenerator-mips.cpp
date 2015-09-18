@@ -10,6 +10,7 @@
 
 #include "jscntxt.h"
 #include "jscompartment.h"
+#include "jsmath.h"
 #include "jsnum.h"
 
 #include "jit/CodeGenerator.h"
@@ -23,6 +24,7 @@
 
 #include "jsscriptinlines.h"
 
+#include "jit/MacroAssembler-inl.h"
 #include "jit/shared/CodeGenerator-shared-inl.h"
 
 using namespace js;
@@ -32,6 +34,24 @@ using mozilla::FloorLog2;
 using mozilla::NegativeInfinity;
 using JS::GenericNaN;
 using JS::ToInt32;
+
+// inline
+Address
+CodeGeneratorMIPS::ToAddress(const LAllocation& a)
+{
+    MOZ_ASSERT(a.isMemory());
+    int32_t offset = ToStackOffset(&a);
+
+    return Address(StackPointer, offset);
+}
+
+// inline
+Address
+CodeGeneratorMIPS::ToAddress(const LAllocation* a)
+{
+    return ToAddress(*a);
+}
+
 
 // shared
 CodeGeneratorMIPS::CodeGeneratorMIPS(MIRGenerator* gen, LIRGraph* graph, MacroAssembler* masm)
@@ -948,11 +968,11 @@ CodeGeneratorMIPS::visitPowHalfD(LPowHalfD* ins)
 }
 
 MoveOperand
-CodeGeneratorMIPS::toMoveOperand(const LAllocation* a) const
+CodeGeneratorMIPS::toMoveOperand(LAllocation a) const
 {
-    if (a->isGeneralReg())
+    if (a.isGeneralReg())
         return MoveOperand(ToRegister(a));
-    if (a->isFloatReg()) {
+    if (a.isFloatReg()) {
         return MoveOperand(ToFloatRegister(a));
     }
     int32_t offset = ToStackOffset(a);
@@ -1798,13 +1818,6 @@ CodeGeneratorMIPS::generateInvalidateEpilogue()
 }
 
 void
-DispatchIonCache::initializeAddCacheState(LInstruction* ins, AddCacheState* addState)
-{
-    // Can always use the scratch register on MIPS.
-    addState->dispatchScratch = ScratchRegister;
-}
-
-void
 CodeGeneratorMIPS::visitLoadTypedArrayElementStatic(LLoadTypedArrayElementStatic* ins)
 {
     MOZ_CRASH("NYI");
@@ -2139,4 +2152,19 @@ CodeGeneratorMIPS::visitNegF(LNegF* ins)
     FloatRegister output = ToFloatRegister(ins->output());
 
     masm.as_negs(output, input);
+}
+
+void
+CodeGeneratorMIPS::visitRandom(LRandom* ins)
+{
+    Register temp = ToRegister(ins->temp());
+    Register temp2 = ToRegister(ins->temp2());
+
+    masm.loadJSContext(temp);
+
+    masm.setupUnalignedABICall(1, temp2);
+    masm.passABIArg(temp);
+    masm.callWithABI(JS_FUNC_TO_DATA_PTR(void*, math_random_no_outparam), MoveOp::DOUBLE);
+
+    MOZ_ASSERT(ToFloatRegister(ins->output()) == ReturnDoubleReg);
 }

@@ -132,7 +132,7 @@ DOMSVGTransformList::InternalListLengthWillChange(uint32_t aNewLength)
     }
   }
 
-  if (!mItems.SetLength(aNewLength)) {
+  if (!mItems.SetLength(aNewLength, fallible)) {
     // We silently ignore SetLength OOM failure since being out of sync is safe
     // so long as we have *fewer* items than our internal list.
     mItems.Clear();
@@ -247,7 +247,7 @@ DOMSVGTransformList::InsertItemBefore(SVGTransform& newItem,
   }
 
   // Ensure we have enough memory so we can avoid complex error handling below:
-  if (!mItems.SetCapacity(mItems.Length() + 1) ||
+  if (!mItems.SetCapacity(mItems.Length() + 1, fallible) ||
       !InternalList().SetCapacity(InternalList().Length() + 1)) {
     error.Throw(NS_ERROR_OUT_OF_MEMORY);
     return nullptr;
@@ -258,7 +258,7 @@ DOMSVGTransformList::InsertItemBefore(SVGTransform& newItem,
   MaybeInsertNullInAnimValListAt(index);
 
   InternalList().InsertItem(index, domItem->ToSVGTransform());
-  mItems.InsertElementAt(index, domItem.get());
+  MOZ_ALWAYS_TRUE(mItems.InsertElementAt(index, domItem.get(), fallible));
 
   // This MUST come after the insertion into InternalList(), or else under the
   // insertion into InternalList() the values read from domItem would be bad
@@ -406,8 +406,7 @@ DOMSVGTransformList::MaybeInsertNullInAnimValListAt(uint32_t aIndex)
   MOZ_ASSERT(animVal->mItems.Length() == mItems.Length(),
              "animVal list not in sync!");
 
-  animVal->mItems.InsertElementAt(aIndex,
-                                  static_cast<SVGTransform*>(nullptr));
+  MOZ_ALWAYS_TRUE(animVal->mItems.InsertElementAt(aIndex, nullptr, fallible));
 
   UpdateListIndicesFromIndex(animVal->mItems, aIndex + 1);
 }

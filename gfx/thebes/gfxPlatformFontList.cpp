@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 #include "gfxPlatformFontList.h"
 #include "gfxTextRun.h"
@@ -23,16 +23,16 @@
 
 using namespace mozilla;
 
-#define LOG_FONTLIST(args) PR_LOG(gfxPlatform::GetLog(eGfxLog_fontlist), \
-                               PR_LOG_DEBUG, args)
-#define LOG_FONTLIST_ENABLED() PR_LOG_TEST( \
+#define LOG_FONTLIST(args) MOZ_LOG(gfxPlatform::GetLog(eGfxLog_fontlist), \
+                               LogLevel::Debug, args)
+#define LOG_FONTLIST_ENABLED() MOZ_LOG_TEST( \
                                    gfxPlatform::GetLog(eGfxLog_fontlist), \
-                                   PR_LOG_DEBUG)
-#define LOG_FONTINIT(args) PR_LOG(gfxPlatform::GetLog(eGfxLog_fontinit), \
-                               PR_LOG_DEBUG, args)
-#define LOG_FONTINIT_ENABLED() PR_LOG_TEST( \
+                                   LogLevel::Debug)
+#define LOG_FONTINIT(args) MOZ_LOG(gfxPlatform::GetLog(eGfxLog_fontinit), \
+                               LogLevel::Debug, args)
+#define LOG_FONTINIT_ENABLED() MOZ_LOG_TEST( \
                                    gfxPlatform::GetLog(eGfxLog_fontinit), \
-                                   PR_LOG_DEBUG)
+                                   LogLevel::Debug)
 
 gfxPlatformFontList *gfxPlatformFontList::sPlatformFontList = nullptr;
 
@@ -195,6 +195,10 @@ gfxPlatformFontList::~gfxPlatformFontList()
 nsresult
 gfxPlatformFontList::InitFontList()
 {
+    if (LOG_FONTINIT_ENABLED()) {
+        LOG_FONTINIT(("(fontinit) system fontlist initialization\n"));
+    }
+
     // rebuilding fontlist so clear out font/word caches
     gfxFontCache *fontCache = gfxFontCache::GetCache();
     if (fontCache) {
@@ -580,10 +584,10 @@ gfxPlatformFontList::SystemFindFontForChar(uint32_t aCh, uint32_t aNextCh,
 
     PRLogModuleInfo *log = gfxPlatform::GetLog(eGfxLog_textrun);
 
-    if (MOZ_UNLIKELY(PR_LOG_TEST(log, PR_LOG_WARNING))) {
+    if (MOZ_UNLIKELY(MOZ_LOG_TEST(log, LogLevel::Warning))) {
         uint32_t unicodeRange = FindCharUnicodeRange(aCh);
         int32_t script = mozilla::unicode::GetScriptCode(aCh);
-        PR_LOG(log, PR_LOG_WARNING,\
+        MOZ_LOG(log, LogLevel::Warning,\
                ("(textrun-systemfallback-%s) char: u+%6.6x "
                  "unicode-range: %d script: %d match: [%s]"
                 " time: %dus cmaps: %d\n",
@@ -650,8 +654,7 @@ gfxPlatformFontList::CommonFontFallback(uint32_t aCh, uint32_t aNextCh,
         const char *fallbackFamily = defaultFallbacks[i];
 
         familyName.AppendASCII(fallbackFamily);
-        gfxFontFamily *fallback =
-                gfxPlatformFontList::PlatformFontList()->FindFamily(familyName);
+        gfxFontFamily *fallback = FindFamilyByCanonicalName(familyName);
         if (!fallback)
             continue;
 
@@ -726,7 +729,9 @@ gfxPlatformFontList::CheckFamily(gfxFontFamily *aFamily)
 }
 
 gfxFontFamily* 
-gfxPlatformFontList::FindFamily(const nsAString& aFamily, bool aUseSystemFonts)
+gfxPlatformFontList::FindFamily(const nsAString& aFamily,
+                                nsIAtom* aLanguage,
+                                bool aUseSystemFonts)
 {
     nsAutoString key;
     gfxFontFamily *familyEntry;

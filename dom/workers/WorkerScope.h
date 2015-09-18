@@ -215,6 +215,9 @@ public:
   WrapGlobalObject(JSContext* aCx,
                    JS::MutableHandle<JSObject*> aReflector) override;
 
+  static bool
+  InterceptionEnabled(JSContext* aCx, JSObject* aObj);
+
   void
   GetScope(nsString& aScope) const
   {
@@ -226,6 +229,9 @@ public:
 
   ServiceWorkerRegistrationWorkerThread*
   Registration();
+
+  already_AddRefed<Promise>
+  SkipWaiting(ErrorResult& aRv);
 
   IMPL_EVENT_HANDLER(activate)
   IMPL_EVENT_HANDLER(beforeevicted)

@@ -320,7 +320,10 @@ WebConsole.prototype = {
    *
    * @type function
    */
-  get lastFinishedRequestCallback() HUDService.lastFinishedRequest.callback,
+  get lastFinishedRequestCallback()
+  {
+    return HUDService.lastFinishedRequest.callback;
+  },
 
   /**
    * Getter for the window that can provide various utilities that the web
@@ -434,6 +437,15 @@ WebConsole.prototype = {
    *        The line number which should be highlighted.
    */
   viewSource: function WC_viewSource(aSourceURL, aSourceLine) {
+    // Attempt to access view source via a browser first, which may display it in
+    // a tab, if enabled.
+    let browserWin = Services.wm.getMostRecentWindow("navigator:browser");
+    if (browserWin && browserWin.BrowserViewSourceOfDocument) {
+      return browserWin.BrowserViewSourceOfDocument({
+        URL: aSourceURL,
+        lineNumber: aSourceLine
+      });
+    }
     this.gViewSourceUtils.viewSource(aSourceURL, null, this.iframeWindow.document, aSourceLine || 0);
   },
 

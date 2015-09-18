@@ -99,7 +99,7 @@ AudioContext::AudioContext(nsPIDOMWindow* aWindow,
   , mIsShutDown(false)
   , mCloseCalled(false)
 {
-  aWindow->AddAudioContext(this);
+  bool mute = aWindow->AddAudioContext(this);
 
   // Note: AudioDestinationNode needs an AudioContext that must already be
   // bound to the window.
@@ -110,6 +110,11 @@ AudioContext::AudioContext(nsPIDOMWindow* aWindow,
   // call them after mDestination has been set up.
   mDestination->CreateAudioChannelAgent();
   mDestination->SetIsOnlyNodeForContext(true);
+
+  // The context can't be muted until it has a destination.
+  if (mute) {
+    Mute();
+  }
 }
 
 AudioContext::~AudioContext()
@@ -666,11 +671,9 @@ AudioContext::Shutdown()
 {
   mIsShutDown = true;
 
-  // We mute rather than suspending, because the delay between the ::Shutdown
-  // call and the CC would make us overbuffer in the MediaStreamGraph.
-  // See bug 936784 for details.
   if (!mIsOffline) {
-    Mute();
+    ErrorResult dummy;
+    nsRefPtr<Promise> ignored = Close(dummy);
   }
 
   // Release references to active nodes.
@@ -771,14 +774,21 @@ private:
   nsRefPtr<AudioContext> mAudioContext;
 };
 
-
-
 void
 AudioContext::OnStateChanged(void* aPromise, AudioContextState aNewState)
 {
   MOZ_ASSERT(NS_IsMainThread());
 
+  // This can happen if close() was called right after creating the
+  // AudioContext, before the context has switched to "running".
+  if (mAudioContextState == AudioContextState::Closed &&
+      aNewState == AudioContextState::Running &&
+      !aPromise) {
+    return;
+  }
+
 #ifndef WIN32 // Bug 1170547
+
   MOZ_ASSERT((mAudioContextState == AudioContextState::Suspended &&
               aNewState == AudioContextState::Running)   ||
              (mAudioContextState == AudioContextState::Running   &&
@@ -789,6 +799,7 @@ AudioContext::OnStateChanged(void* aPromise, AudioContextState aNewState)
               aNewState == AudioContextState::Closed)    ||
              (mAudioContextState == aNewState),
              "Invalid AudioContextState transition");
+
 #endif // WIN32
 
   MOZ_ASSERT(
@@ -910,14 +921,18 @@ AudioContext::Close(ErrorResult& aRv)
   mCloseCalled = true;
 
   mPromiseGripArray.AppendElement(promise);
-  Graph()->ApplyAudioContextOperation(DestinationStream()->AsAudioNodeStream(),
-                                      AudioContextOperation::Close, promise);
 
+  // This can be called when freeing a document, and the streams are dead at
+  // this point, so we need extra null-checks.
   MediaStream* ds = DestinationStream();
   if (ds) {
-    ds->BlockStreamIfNeeded();
-  }
+    Graph()->ApplyAudioContextOperation(ds->AsAudioNodeStream(),
+                                        AudioContextOperation::Close, promise);
 
+    if (ds) {
+      ds->BlockStreamIfNeeded();
+    }
+  }
   return promise.forget();
 }
 

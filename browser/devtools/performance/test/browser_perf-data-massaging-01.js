@@ -8,7 +8,7 @@
 
 const WAIT_TIME = 1000; // ms
 
-function spawnTest () {
+function* spawnTest() {
   let { panel } = yield initPerformance(SIMPLE_URL);
   let front = panel.panelWin.gFront;
 
@@ -22,8 +22,6 @@ function spawnTest () {
 
   yield front.stopRecording(firstRecording);
 
-  is(firstRecordingStartTime, 0,
-    "The profiling start time should be 0 for the first recording.");
   ok(firstRecording.getDuration() >= WAIT_TIME,
     "The first recording duration is correct.");
 

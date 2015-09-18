@@ -13,7 +13,7 @@
 
 #include "nsCOMPtr.h"
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "mozilla/TimeStamp.h"
 #include "mozilla/Attributes.h"
 
@@ -59,10 +59,8 @@ public:
   }
 
 #ifdef MOZ_TASK_TRACER
-  void DispatchTracedTask()
-  {
-    mTracedTask = mozilla::tasktracer::CreateFakeTracedTask(*(int**)(this));
-  }
+  void GetTLSTraceInfo();
+  mozilla::tasktracer::TracedTaskCommon GetTracedTask();
 #endif
 
   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
@@ -116,8 +114,9 @@ private:
   union CallbackUnion
   {
     nsTimerCallbackFunc c;
-    nsITimerCallback*   i;
-    nsIObserver*        o;
+    // These refcounted references are managed manually, as they are in a union
+    nsITimerCallback* MOZ_OWNING_REF i;
+    nsIObserver* MOZ_OWNING_REF o;
   } mCallback;
 
   // Some callers expect to be able to access the callback while the
@@ -149,7 +148,7 @@ private:
   TimeStamp             mTimeout;
 
 #ifdef MOZ_TASK_TRACER
-  nsRefPtr<mozilla::tasktracer::FakeTracedTask> mTracedTask;
+  mozilla::tasktracer::TracedTaskCommon mTracedTask;
 #endif
 
   TimeStamp             mStart, mStart2;

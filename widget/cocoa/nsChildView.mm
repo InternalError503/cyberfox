@@ -5,7 +5,7 @@
 
 #include "mozilla/ArrayUtils.h"
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 #include <unistd.h>
 #include <math.h>
@@ -241,27 +241,6 @@ static uint32_t gNumberOfWidgetsNeedingEventThread = 0;
 @end
 
 #pragma mark -
-
-/* Convenience routine to go from a Gecko rect to Cocoa NSRect.
- *
- * Gecko rects (nsRect) contain an origin (x,y) in a coordinate
- * system with (0,0) in the top-left of the screen. Cocoa rects
- * (NSRect) contain an origin (x,y) in a coordinate system with
- * (0,0) in the bottom-left of the screen. Both nsRect and NSRect
- * contain width/height info, with no difference in their use.
- * If a Cocoa rect is from a flipped view, there is no need to
- * convert coordinate systems.
- */
-#ifndef __LP64__
-static inline void
-ConvertGeckoRectToMacRect(const nsIntRect& aRect, Rect& outMacRect)
-{
-  outMacRect.left = aRect.x;
-  outMacRect.top = aRect.y;
-  outMacRect.right = aRect.x + aRect.width;
-  outMacRect.bottom = aRect.y + aRect.height;
-}
-#endif
 
 // Flips a screen coordinate from a point in the cocoa coordinate system (bottom-left rect) to a point
 // that is a "flipped" cocoa coordinate system (starts in the top-left).
@@ -1929,16 +1908,6 @@ nsChildView::CreateCompositor()
   }
 }
 
-bool
-nsChildView::IsMultiProcessWindow()
-{
-  // On OS X the XULWindowWidget object gets the widget's init-data, which
-  // is what has the electrolysis window flag. So here in the child view
-  // we need to get the flag from that window instead.
-  nsCocoaWindow* parent = GetXULWindowWidget();
-  return parent ? parent->IsMultiProcessWindow() : false;
-}
-
 void
 nsChildView::ConfigureAPZCTreeManager()
 {
@@ -1987,7 +1956,8 @@ nsChildView::PrepareWindowEffects()
   CGFloat cornerRadius = [(ChildView*)mView cornerRadius];
   mDevPixelCornerRadius = cornerRadius * BackingScaleFactor();
   mIsCoveringTitlebar = [(ChildView*)mView isCoveringTitlebar];
-  mIsFullscreen = ([[mView window] styleMask] & NSFullScreenWindowMask) != 0;
+  NSInteger styleMask = [[mView window] styleMask];
+  mIsFullscreen = (styleMask & NSFullScreenWindowMask) || !(styleMask & NSTitledWindowMask);
   if (mIsCoveringTitlebar) {
     mTitlebarRect = RectContainingTitlebarControls();
     UpdateTitlebarCGContext();
@@ -2505,6 +2475,8 @@ nsChildView::UpdateVibrancy(const nsTArray<ThemeGeometry>& aThemeGeometries)
     return;
   }
 
+  nsIntRegion sheetRegion =
+    GatherThemeGeometryRegion(aThemeGeometries, nsNativeThemeCocoa::eThemeGeometryTypeSheet);
   nsIntRegion vibrantLightRegion =
     GatherThemeGeometryRegion(aThemeGeometries, nsNativeThemeCocoa::eThemeGeometryTypeVibrancyLight);
   nsIntRegion vibrantDarkRegion =
@@ -2516,14 +2488,15 @@ nsChildView::UpdateVibrancy(const nsTArray<ThemeGeometry>& aThemeGeometries)
   nsIntRegion highlightedMenuItemRegion =
     GatherThemeGeometryRegion(aThemeGeometries, nsNativeThemeCocoa::eThemeGeometryTypeHighlightedMenuItem);
 
-  MakeRegionsNonOverlapping(vibrantLightRegion, vibrantDarkRegion, menuRegion,
-                            tooltipRegion, highlightedMenuItemRegion);
+  MakeRegionsNonOverlapping(sheetRegion, vibrantLightRegion, vibrantDarkRegion,
+                            menuRegion, tooltipRegion, highlightedMenuItemRegion);
 
   auto& vm = EnsureVibrancyManager();
   vm.UpdateVibrantRegion(VibrancyType::LIGHT, vibrantLightRegion);
   vm.UpdateVibrantRegion(VibrancyType::TOOLTIP, tooltipRegion);
   vm.UpdateVibrantRegion(VibrancyType::MENU, menuRegion);
   vm.UpdateVibrantRegion(VibrancyType::HIGHLIGHTED_MENUITEM, highlightedMenuItemRegion);
+  vm.UpdateVibrantRegion(VibrancyType::SHEET, sheetRegion);
   vm.UpdateVibrantRegion(VibrancyType::DARK, vibrantDarkRegion);
 }
 
@@ -2549,6 +2522,8 @@ ThemeGeometryTypeToVibrancyType(nsITheme::ThemeGeometryType aThemeGeometryType)
       return VibrancyType::MENU;
     case nsNativeThemeCocoa::eThemeGeometryTypeHighlightedMenuItem:
       return VibrancyType::HIGHLIGHTED_MENUITEM;
+    case nsNativeThemeCocoa::eThemeGeometryTypeSheet:
+      return VibrancyType::SHEET;
     default:
       MOZ_CRASH();
   }
@@ -2613,7 +2588,7 @@ nsChildView::StartRemoteDrawing()
     return nullptr;
   }
 
-  return drawTarget;
+  return drawTarget.forget();
 }
 
 void
@@ -2743,7 +2718,7 @@ RectTextureImage::BeginUpdate(const nsIntSize& aNewSize,
   mInUpdate = true;
 
   RefPtr<gfx::DrawTarget> drawTarget = mUpdateDrawTarget;
-  return drawTarget;
+  return drawTarget.forget();
 }
 
 #define NSFoundationVersionWithProperStrideSupportForSubtextureUpload NSFoundationVersionNumber10_6_3
@@ -5425,7 +5400,8 @@ static int32_t RoundUp(double aDouble)
   }
 
 #if !defined(RELEASE_BUILD) || defined(DEBUG)
-  if (mGeckoChild && mTextInputHandler && mTextInputHandler->IsFocused()) {
+  if (!Preferences::GetBool("intl.allow-insecure-text-input", false) &&
+      mGeckoChild && mTextInputHandler && mTextInputHandler->IsFocused()) {
 #ifdef MOZ_CRASHREPORTER
     NSWindow* window = [self window];
     NSString* info = [NSString stringWithFormat:@"\nview [%@], window [%@], window is key %i, is fullscreen %i, app is active %i",
@@ -5605,15 +5581,13 @@ static int32_t RoundUp(double aDouble)
 // drag'n'drop stuff
 #define kDragServiceContractID "@mozilla.org/widget/dragservice;1"
 
-- (NSDragOperation)dragOperationForSession:(nsIDragSession*)aDragSession
+- (NSDragOperation)dragOperationFromDragAction:(int32_t)aDragAction
 {
-  uint32_t dragAction;
-  aDragSession->GetDragAction(&dragAction);
-  if (nsIDragService::DRAGDROP_ACTION_LINK & dragAction)
+  if (nsIDragService::DRAGDROP_ACTION_LINK & aDragAction)
     return NSDragOperationLink;
-  if (nsIDragService::DRAGDROP_ACTION_COPY & dragAction)
+  if (nsIDragService::DRAGDROP_ACTION_COPY & aDragAction)
     return NSDragOperationCopy;
-  if (nsIDragService::DRAGDROP_ACTION_MOVE & dragAction)
+  if (nsIDragService::DRAGDROP_ACTION_MOVE & aDragAction)
     return NSDragOperationGeneric;
   return NSDragOperationNone;
 }
@@ -5643,7 +5617,7 @@ static int32_t RoundUp(double aDouble)
   if (!mGeckoChild)
     return NSDragOperationNone;
 
-  PR_LOG(sCocoaLog, PR_LOG_ALWAYS, ("ChildView doDragAction: entered\n"));
+  MOZ_LOG(sCocoaLog, LogLevel::Info, ("ChildView doDragAction: entered\n"));
 
   if (!mDragService) {
     CallGetService(kDragServiceContractID, &mDragService);
@@ -5712,7 +5686,22 @@ static int32_t RoundUp(double aDouble)
     switch (aMessage) {
       case NS_DRAGDROP_ENTER:
       case NS_DRAGDROP_OVER:
-        return [self dragOperationForSession:dragSession];
+      {
+        uint32_t dragAction;
+        dragSession->GetDragAction(&dragAction);
+
+        // If TakeChildProcessDragAction returns something other than
+        // DRAGDROP_ACTION_UNINITIALIZED, it means that the last event was sent
+        // to the child process and this event is also being sent to the child
+        // process. In this case, use the last event's action instead.
+        nsDragService* dragService = static_cast<nsDragService *>(mDragService);
+        int32_t childDragAction = dragService->TakeChildProcessDragAction();
+        if (childDragAction != nsIDragService::DRAGDROP_ACTION_UNINITIALIZED) {
+          dragAction = childDragAction;
+        }
+
+        return [self dragOperationFromDragAction:dragAction];
+      }
       case NS_DRAGDROP_EXIT:
       case NS_DRAGDROP_DROP: {
         nsCOMPtr<nsIDOMNode> sourceNode;
@@ -5737,7 +5726,7 @@ static int32_t RoundUp(double aDouble)
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_RETURN;
 
-  PR_LOG(sCocoaLog, PR_LOG_ALWAYS, ("ChildView draggingEntered: entered\n"));
+  MOZ_LOG(sCocoaLog, LogLevel::Info, ("ChildView draggingEntered: entered\n"));
 
   // there should never be a globalDragPboard when "draggingEntered:" is
   // called, but just in case we'll take care of it here.
@@ -5755,14 +5744,14 @@ static int32_t RoundUp(double aDouble)
 
 - (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
-  PR_LOG(sCocoaLog, PR_LOG_ALWAYS, ("ChildView draggingUpdated: entered\n"));
+  MOZ_LOG(sCocoaLog, LogLevel::Info, ("ChildView draggingUpdated: entered\n"));
 
   return [self doDragAction:NS_DRAGDROP_OVER sender:sender];
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-  PR_LOG(sCocoaLog, PR_LOG_ALWAYS, ("ChildView draggingExited: entered\n"));
+  MOZ_LOG(sCocoaLog, LogLevel::Info, ("ChildView draggingExited: entered\n"));
 
   nsAutoRetainCocoaObject kungFuDeathGrip(self);
   [self doDragAction:NS_DRAGDROP_EXIT sender:sender];
@@ -5861,7 +5850,7 @@ static int32_t RoundUp(double aDouble)
 
   nsresult rv;
 
-  PR_LOG(sCocoaLog, PR_LOG_ALWAYS, ("ChildView namesOfPromisedFilesDroppedAtDestination: entering callback for promised files\n"));
+  MOZ_LOG(sCocoaLog, LogLevel::Info, ("ChildView namesOfPromisedFilesDroppedAtDestination: entering callback for promised files\n"));
 
   nsCOMPtr<nsIFile> targFile;
   NS_NewLocalFile(EmptyString(), true, getter_AddRefs(targFile));

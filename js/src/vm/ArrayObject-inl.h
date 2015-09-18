@@ -12,6 +12,9 @@
 #include "gc/GCTrace.h"
 #include "vm/String.h"
 
+#include "jsgcinlines.h"
+#include "jsobjinlines.h"
+
 #include "vm/TypeInference-inl.h"
 
 namespace js {
@@ -83,25 +86,6 @@ ArrayObject::createArray(ExclusiveContext* cx, gc::AllocKind kind, gc::InitialHe
 
     obj->setFixedElements();
     new (obj->getElementsHeader()) ObjectElements(capacity, length);
-
-    return finishCreateArray(obj, shape);
-}
-
-/* static */ inline ArrayObject*
-ArrayObject::createArray(ExclusiveContext* cx, gc::InitialHeap heap,
-                         HandleShape shape, HandleObjectGroup group,
-                         HeapSlot* elements)
-{
-    // Use the smallest allocation kind for the array, as it can't have any
-    // fixed slots (see the assert in createArrayInternal) and will not be using
-    // its fixed elements.
-    gc::AllocKind kind = gc::AllocKind::OBJECT0_BACKGROUND;
-
-    ArrayObject* obj = createArrayInternal(cx, kind, heap, shape, group);
-    if (!obj)
-        return nullptr;
-
-    obj->elements_ = elements;
 
     return finishCreateArray(obj, shape);
 }

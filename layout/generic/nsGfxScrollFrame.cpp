@@ -56,6 +56,7 @@
 #include "gfxPlatform.h"
 #include "gfxPrefs.h"
 #include "AsyncScrollBase.h"
+#include "UnitTransforms.h"
 #include <mozilla/layers/AxisPhysicsModel.h>
 #include <mozilla/layers/AxisPhysicsMSDModel.h>
 #include <algorithm>
@@ -401,22 +402,25 @@ nsHTMLScrollFrame::TryLayout(ScrollReflowState* aState,
   aState->mShowVScrollbar = aAssumeVScroll;
   nsPoint scrollPortOrigin(aState->mComputedBorder.left,
                            aState->mComputedBorder.top);
-  if (!mHelper.IsScrollbarOnRight()) {
+  if (!IsScrollbarOnRight()) {
     scrollPortOrigin.x += vScrollbarActualWidth;
   }
   mHelper.mScrollPort = nsRect(scrollPortOrigin, scrollPortSize);
   return true;
 }
 
+// XXX Height/BSize mismatch needs to be addressed here; check the caller!
+// Currently this will only behave as expected for horizontal writing modes.
+// (See bug 1175509.)
 bool
 nsHTMLScrollFrame::ScrolledContentDependsOnHeight(ScrollReflowState* aState)
 {
   // Return true if ReflowScrolledFrame is going to do something different
   // based on the presence of a horizontal scrollbar.
-  return (mHelper.mScrolledFrame->GetStateBits() & NS_FRAME_CONTAINS_RELATIVE_HEIGHT) ||
-    aState->mReflowState.ComputedHeight() != NS_UNCONSTRAINEDSIZE ||
-    aState->mReflowState.ComputedMinHeight() > 0 ||
-    aState->mReflowState.ComputedMaxHeight() != NS_UNCONSTRAINEDSIZE;
+  return (mHelper.mScrolledFrame->GetStateBits() & NS_FRAME_CONTAINS_RELATIVE_BSIZE) ||
+    aState->mReflowState.ComputedBSize() != NS_UNCONSTRAINEDSIZE ||
+    aState->mReflowState.ComputedMinBSize() > 0 ||
+    aState->mReflowState.ComputedMaxBSize() != NS_UNCONSTRAINEDSIZE;
 }
 
 void
@@ -437,7 +441,7 @@ nsHTMLScrollFrame::ReflowScrolledFrame(ScrollReflowState* aState,
   nscoord computedBSize = aState->mReflowState.ComputedBSize();
   nscoord computedMinBSize = aState->mReflowState.ComputedMinBSize();
   nscoord computedMaxBSize = aState->mReflowState.ComputedMaxBSize();
-  if (!ShouldPropagateComputedHeightToScrolledContent()) {
+  if (!ShouldPropagateComputedBSizeToScrolledContent()) {
     computedBSize = NS_UNCONSTRAINEDSIZE;
     computedMinBSize = 0;
     computedMaxBSize = NS_UNCONSTRAINEDSIZE;
@@ -492,15 +496,18 @@ nsHTMLScrollFrame::ReflowScrolledFrame(ScrollReflowState* aState,
     kidReflowState(presContext, aState->mReflowState,
                    mHelper.mScrolledFrame,
                    LogicalSize(wm, availISize, NS_UNCONSTRAINEDSIZE),
-                   -1, -1, nsHTMLReflowState::CALLER_WILL_INIT);
+                   nullptr, nsHTMLReflowState::CALLER_WILL_INIT);
   const nsMargin physicalPadding = padding.GetPhysicalMargin(wm);
-  kidReflowState.Init(presContext, -1, -1, nullptr,
+  kidReflowState.Init(presContext, nullptr, nullptr,
                       &physicalPadding);
   kidReflowState.mFlags.mAssumingHScrollbar = aAssumeHScroll;
   kidReflowState.mFlags.mAssumingVScrollbar = aAssumeVScroll;
   kidReflowState.SetComputedBSize(computedBSize);
   kidReflowState.ComputedMinBSize() = computedMinBSize;
   kidReflowState.ComputedMaxBSize() = computedMaxBSize;
+  if (aState->mReflowState.IsBResize()) {
+    kidReflowState.SetBResize(true);
+  }
 
   // Temporarily set mHasHorizontalScrollbar/mHasVerticalScrollbar to
   // reflect our assumptions while we reflow the child.
@@ -1789,6 +1796,7 @@ ScrollFrameHelper::ScrollFrameHelper(nsContainerFrame* aOuter,
   , mResolution(1.0)
   , mScrollPosForLayerPixelAlignment(-1, -1)
   , mLastUpdateImagesPos(-1, -1)
+  , mAncestorClip(nullptr)
   , mNeverHasVerticalScrollbar(false)
   , mNeverHasHorizontalScrollbar(false)
   , mHasVerticalScrollbar(false)
@@ -1824,7 +1832,7 @@ ScrollFrameHelper::ScrollFrameHelper(nsContainerFrame* aOuter,
 
   if (IsAlwaysActive() &&
       gfxPrefs::LayersTilesEnabled() &&
-      !nsLayoutUtils::UsesAsyncScrolling() &&
+      !nsLayoutUtils::UsesAsyncScrolling(mOuter) &&
       mOuter->GetContent()) {
     // If we have tiling but no APZ, then set a 0-margin display port on
     // active scroll containers so that we paint by whole tile increments
@@ -2028,7 +2036,7 @@ ScrollFrameHelper::ScrollToWithOrigin(nsPoint aScrollPosition,
           mAsyncScroll = nullptr;
         }
 
-        if (gfxPrefs::AsyncPanZoomEnabled()) {
+        if (nsLayoutUtils::AsyncPanZoomEnabled(mOuter)) {
           // The animation will be handled in the compositor, pass the
           // information needed to start the animation and skip the main-thread
           // animation for this scroll.
@@ -2754,6 +2762,9 @@ ScrollFrameHelper::BuildDisplayList(nsDisplayListBuilder*   aBuilder,
     }
   }
 
+  // Clear the scroll port clip that was set during the last paint.
+  mAncestorClip = nullptr;
+
   // We put non-overlay scrollbars in their own layers when this is the root
   // scroll frame and we are a toplevel content document. In this situation,
   // the scrollbar(s) would normally be assigned their own layer anyway, since
@@ -2909,7 +2920,7 @@ ScrollFrameHelper::BuildDisplayList(nsDisplayListBuilder*   aBuilder,
     shouldBuildLayer = true;
   } else {
     shouldBuildLayer =
-      gfxPrefs::AsyncPanZoomEnabled() &&
+      nsLayoutUtils::AsyncPanZoomEnabled(mOuter) &&
       WantAsyncScroll() &&
       // If we are using containers for root frames, and we are the root
       // scroll frame for the display root, then we don't need a scroll
@@ -2936,6 +2947,11 @@ ScrollFrameHelper::BuildDisplayList(nsDisplayListBuilder*   aBuilder,
     DisplayListClipState::AutoSaveRestore clipState(aBuilder);
 
     if (usingDisplayport) {
+      // Capture the clip state of the parent scroll frame. This will be saved
+      // on FrameMetrics for layers with this frame as their animated geoemetry
+      // root.
+      mAncestorClip = aBuilder->ClipState().GetCurrentCombinedClip(aBuilder);
+
       // If we are using a display port, then ignore any pre-existing clip
       // passed down from our parents. The pre-existing clip would just defeat
       // the purpose of a display port which is to paint regions that are not
@@ -2962,6 +2978,7 @@ ScrollFrameHelper::BuildDisplayList(nsDisplayListBuilder*   aBuilder,
       }
     }
 
+    aBuilder->StoreDirtyRectForScrolledContents(mOuter, dirtyRect);
     mOuter->BuildDisplayListForChild(aBuilder, mScrolledFrame, dirtyRect, scrolledContent);
 
     if (idSetter.ShouldForceLayerForScrollParent() &&
@@ -3042,30 +3059,67 @@ void
 ScrollFrameHelper::ComputeFrameMetrics(Layer* aLayer,
                                        nsIFrame* aContainerReferenceFrame,
                                        const ContainerLayerParameters& aParameters,
-                                       nsRect* aClipRect,
                                        nsTArray<FrameMetrics>* aOutput) const
 {
+  if (!mShouldBuildScrollableLayer || mIsScrollableLayerInRootContainer) {
+    return;
+  }
+
+  bool needsParentLayerClip = true;
+  if (gfxPrefs::LayoutUseContainersForRootFrames() && !mAddClipRectToLayer) {
+    // For containerful frames, the clip is on the container frame.
+    needsParentLayerClip = false;
+  }
+
   nsPoint toReferenceFrame = mOuter->GetOffsetToCrossDoc(aContainerReferenceFrame);
-  bool isRoot = mIsRoot && mOuter->PresContext()->IsRootContentDocument();
-  // If APZ is enabled, do not apply clips to the scroll ports of metrics
-  // above the first one on a given layer. They will be applied by the
-  // compositor instead, with async transforms for the scrollframes interspersed
-  // between them.
-  bool omitClip = gfxPrefs::AsyncPanZoomEnabled() && aOutput->Length() > 0;
-  if (!omitClip && (!gfxPrefs::LayoutUseContainersForRootFrames() || mAddClipRectToLayer)) {
+  bool isRootContent = mIsRoot && mOuter->PresContext()->IsRootContentDocument();
+
+  Maybe<nsRect> parentLayerClip;
+  if (needsParentLayerClip) {
     nsRect clip = nsRect(mScrollPort.TopLeft() + toReferenceFrame,
                          nsLayoutUtils::CalculateCompositionSizeForFrame(mOuter));
-    if (isRoot) {
+    if (isRootContent) {
       double res = mOuter->PresContext()->PresShell()->GetResolution();
       clip.width = NSToCoordRound(clip.width / res);
       clip.height = NSToCoordRound(clip.height / res);
     }
-    // When using containers, the container layer contains the clip. Otherwise
-    // we always include the clip.
-    *aClipRect = clip;
+
+    if (mAncestorClip && mAncestorClip->HasClip()) {
+      clip = mAncestorClip->GetClipRect().Intersect(clip);
+    }
+
+    parentLayerClip = Some(clip);
   }
 
-  if (!mShouldBuildScrollableLayer || mIsScrollableLayerInRootContainer) {
+  bool thisScrollFrameUsesAsyncScrolling = nsLayoutUtils::UsesAsyncScrolling(mOuter);
+#if defined(MOZ_WIDGET_ANDROID) && !defined(MOZ_ANDROID_APZ)
+  // Android without apzc (aka the java pan zoom code) only uses async scrolling
+  // for the root scroll frame of the root content document.
+  if (!isRootContent) {
+    thisScrollFrameUsesAsyncScrolling = false;
+  }
+#endif
+  if (!thisScrollFrameUsesAsyncScrolling) {
+    if (parentLayerClip) {
+      // If APZ is not enabled, we still need the displayport to be clipped
+      // in the compositor.
+      ParentLayerIntRect displayportClip =
+        ViewAs<ParentLayerPixel>(
+          parentLayerClip->ScaleToNearestPixels(
+            aParameters.mXScale,
+            aParameters.mYScale,
+            mScrolledFrame->PresContext()->AppUnitsPerDevPixel()));
+
+      ParentLayerIntRect layerClip;
+      if (const ParentLayerIntRect* origClip = aLayer->GetClipRect().ptrOr(nullptr)) {
+        layerClip = displayportClip.Intersect(*origClip);
+      } else {
+        layerClip = displayportClip;
+      }
+      aLayer->SetClipRect(Some(layerClip));
+    }
+
+    // Return early, since if we don't use APZ we don't need FrameMetrics.
     return;
   }
 
@@ -3076,7 +3130,7 @@ ScrollFrameHelper::ComputeFrameMetrics(Layer* aLayer,
       nsLayoutUtils::ComputeFrameMetrics(
         mScrolledFrame, mOuter, mOuter->GetContent(),
         aContainerReferenceFrame, aLayer, mScrollParentID,
-        scrollport, isRoot, aParameters);
+        scrollport, parentLayerClip, isRootContent, aParameters);
 }
 
 bool
@@ -3355,7 +3409,8 @@ ScrollFrameHelper::ScrollBy(nsIntPoint aDelta,
   }
 
   if (aUnit == nsIScrollableFrame::DEVICE_PIXELS &&
-      !gfxPrefs::AsyncPanZoomEnabled()) {
+      !nsLayoutUtils::AsyncPanZoomEnabled(mOuter))
+  {
     // When APZ is disabled, we must track the velocity
     // on the main thread; otherwise, the APZC will manage this.
     mVelocityQueue.Sample(GetScrollPosition());
@@ -4275,7 +4330,7 @@ ScrollFrameHelper::IsScrollingActive(nsDisplayListBuilder* aBuilder) const
 nsresult
 nsXULScrollFrame::Layout(nsBoxLayoutState& aState)
 {
-  bool scrollbarRight = mHelper.IsScrollbarOnRight();
+  bool scrollbarRight = IsScrollbarOnRight();
   bool scrollbarBottom = true;
 
   // get the content rect
@@ -5537,4 +5592,13 @@ ScrollFrameHelper::GetSnapPointForDestination(nsIScrollableFrame::ScrollUnit aUn
     aDestination = finalPos;
   }
   return snapped;
+}
+
+bool
+ScrollFrameHelper::UsesContainerScrolling() const
+{
+  if (gfxPrefs::LayoutUseContainersForRootFrames()) {
+    return mIsRoot;
+  }
+  return false;
 }

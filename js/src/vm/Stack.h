@@ -12,6 +12,7 @@
 
 #include "jsfun.h"
 #include "jsscript.h"
+#include "jsutil.h"
 
 #include "asmjs/AsmJSFrameIterator.h"
 #include "jit/JitFrameIterator.h"
@@ -203,6 +204,8 @@ class AbstractFramePtr
     inline Value calleev() const;
     inline Value& thisValue() const;
 
+    inline Value newTarget() const;
+
     inline bool isNonEvalFunctionFrame() const;
     inline bool isNonStrictDirectEvalFrame() const;
     inline bool isStrictEvalFrame() const;
@@ -233,12 +236,8 @@ class AbstractFramePtr
     inline void setIsDebuggee();
     inline void unsetIsDebuggee();
 
-    JSObject* evalPrevScopeChain(JSContext* cx) const;
-
     inline HandleValue returnValue() const;
     inline void setReturnValue(const Value& rval) const;
-
-    bool hasPushedSPSFrame() const;
 
     inline bool freshenBlock(JSContext* cx) const;
 
@@ -305,7 +304,9 @@ class InterpreterFrame
 
         CONSTRUCTING       =       0x10,  /* frame is for a constructor invocation */
 
-        /* (0x20, 0x40 and 0x80 are unused) */
+        RESUMED_GENERATOR  =       0x20,  /* frame is for a resumed generator invocation */
+
+        /* (0x40 and 0x80 are unused) */
 
         /* Function prologue state */
         HAS_CALL_OBJ       =      0x100,  /* CallObject created for heavyweight fun */
@@ -376,8 +377,6 @@ class InterpreterFrame
         JS_STATIC_ASSERT(sizeof(InterpreterFrame) % sizeof(Value) == 0);
     }
 
-    void writeBarrierPost();
-
     /*
      * The utilities are private since they are not able to assert that only
      * unaliased vars/formals are accessed. Normal code should prefer the
@@ -404,7 +403,8 @@ class InterpreterFrame
 
     /* Used for global and eval frames. */
     void initExecuteFrame(JSContext* cx, HandleScript script, AbstractFramePtr prev,
-                          const Value& thisv, HandleObject scopeChain, ExecuteType type);
+                          const Value& thisv, const Value& newTargetValue,
+                          HandleObject scopeChain, ExecuteType type);
 
   public:
     /*
@@ -549,7 +549,7 @@ class InterpreterFrame
     unsigned numActualArgs() const { MOZ_ASSERT(hasArgs()); return u.nactual; }
 
     /* Watch out, this exposes a pointer to the unaliased formal arg array. */
-    Value* argv() const { return argv_; }
+    Value* argv() const { MOZ_ASSERT(hasArgs()); return argv_; }
 
     /*
      * Arguments object
@@ -740,6 +740,28 @@ class InterpreterFrame
     }
 
     /*
+     * New Target
+     *
+     * Only function frames have a meaningful newTarget. An eval frame in a
+     * function will have a copy of the newTarget of the enclosing function
+     * frame.
+     */
+    Value newTarget() const {
+        MOZ_ASSERT(isFunctionFrame());
+        if (isEvalFrame())
+            return ((Value*)this)[-3];
+
+        if (callee().isArrow())
+            return callee().getExtendedSlot(FunctionExtended::ARROW_NEWTARGET_SLOT);
+
+        if (isConstructing()) {
+            unsigned pushedArgs = Max(numFormalArgs(), numActualArgs());
+            return argv()[pushedArgs];
+        }
+        return UndefinedValue();
+    }
+
+    /*
      * Frame compartment
      *
      * A stack frame's compartment is the frame's containing context's
@@ -813,6 +835,13 @@ class InterpreterFrame
 
     bool isConstructing() const {
         return !!(flags_ & CONSTRUCTING);
+    }
+
+    void setResumedGenerator() {
+        flags_ |= RESUMED_GENERATOR;
+    }
+    bool isResumedGenerator() const {
+        return !!(flags_ & RESUMED_GENERATOR);
     }
 
     /*
@@ -938,7 +967,8 @@ class InterpreterRegs
 
     void popInlineFrame() {
         pc = fp_->prevpc();
-        sp = fp_->prevsp() - fp_->numActualArgs() - 1;
+        unsigned spForNewTarget = fp_->isResumedGenerator() ? 0 : fp_->isConstructing();
+        sp = fp_->prevsp() - fp_->numActualArgs() - 1 - spForNewTarget;
         fp_ = fp_->prev();
         MOZ_ASSERT(fp_);
     }
@@ -999,8 +1029,8 @@ class InterpreterStack
 
     // For execution of eval or global code.
     InterpreterFrame* pushExecuteFrame(JSContext* cx, HandleScript script, const Value& thisv,
-                                 HandleObject scopeChain, ExecuteType type,
-                                 AbstractFramePtr evalInFrame);
+                                 const Value& newTargetValue, HandleObject scopeChain,
+                                 ExecuteType type, AbstractFramePtr evalInFrame);
 
     // Called to invoke a function.
     InterpreterFrame* pushInvokeFrame(JSContext* cx, const CallArgs& args,
@@ -1015,7 +1045,7 @@ class InterpreterStack
 
     bool resumeGeneratorCallFrame(JSContext* cx, InterpreterRegs& regs,
                                   HandleFunction callee, HandleValue thisv,
-                                  HandleObject scopeChain);
+                                  HandleValue newTarget, HandleObject scopeChain);
 
     inline void purge(JSRuntime* rt);
 
@@ -1033,12 +1063,14 @@ class InvokeArgs : public JS::CallArgs
     AutoValueVector v_;
 
   public:
-    explicit InvokeArgs(JSContext* cx) : v_(cx) {}
+    explicit InvokeArgs(JSContext* cx, bool construct = false) : v_(cx) {}
 
-    bool init(unsigned argc) {
-        if (!v_.resize(2 + argc))
+    bool init(unsigned argc, bool construct = false) {
+        if (!v_.resize(2 + argc + construct))
             return false;
         ImplicitCast<CallArgs>(*this) = CallArgsFromVp(argc, v_.begin());
+        // Set the internal flag, since we are not initializing from a made array
+        constructing_ = construct;
         return true;
     }
 };
@@ -1221,7 +1253,7 @@ class InterpreterActivation : public Activation
     inline void popInlineFrame(InterpreterFrame* frame);
 
     inline bool resumeGeneratorFrame(HandleFunction callee, HandleValue thisv,
-                                     HandleObject scopeChain);
+                                     HandleValue newTarget, HandleObject scopeChain);
 
     InterpreterFrame* current() const {
         return regs_.fp();
@@ -1736,6 +1768,8 @@ class FrameIter
     Value       computedThisValue() const;
     Value       thisv(JSContext* cx) const;
 
+    Value       newTarget() const;
+
     Value       returnValue() const;
     void        setReturnValue(const Value& v);
 
@@ -1859,6 +1893,13 @@ class NonBuiltinFrameIter : public FrameIter
                         FrameIter::DebuggerEvalOption debuggerEvalOption,
                         JSPrincipals* principals)
       : FrameIter(cx, contextOption, savedOption, debuggerEvalOption, principals)
+    {
+        settle();
+    }
+
+    NonBuiltinFrameIter(JSContext* cx, JSPrincipals* principals)
+        : FrameIter(cx, FrameIter::ALL_CONTEXTS, FrameIter::GO_THROUGH_SAVED,
+                    FrameIter::FOLLOW_DEBUGGER_EVAL_PREV_LINK, principals)
     {
         settle();
     }

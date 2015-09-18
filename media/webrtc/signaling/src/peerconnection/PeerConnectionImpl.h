@@ -149,9 +149,10 @@ class PCUuidGenerator : public mozilla::JsepUuidGenerator {
 class IceConfiguration
 {
 public:
-  bool addStunServer(const std::string& addr, uint16_t port)
+  bool addStunServer(const std::string& addr, uint16_t port,
+                     const char* transport)
   {
-    NrIceStunServer* server(NrIceStunServer::Create(addr, port));
+    NrIceStunServer* server(NrIceStunServer::Create(addr, port, transport));
     if (!server) {
       return false;
     }
@@ -197,6 +198,7 @@ class RTCStatsQuery {
     std::string error;
     // A timestamp to help with telemetry.
     mozilla::TimeStamp iceStartTime;
+    bool isHello;
     // Just for convenience, maybe integrate into the report later
     bool failed;
 
@@ -459,6 +461,8 @@ public:
   }
 #endif
 
+  bool IsLoop() const { return mIsLoop; }
+
   // this method checks to see if we've made a promise to protect media.
   bool PrivacyRequested() const { return mPrivacyRequested; }
 
@@ -572,10 +576,11 @@ public:
   const std::vector<std::string> &GetSdpParseErrors();
 
   // Sets the RTC Signaling State
-  void SetSignalingState_m(mozilla::dom::PCImplSignalingState aSignalingState);
+  void SetSignalingState_m(mozilla::dom::PCImplSignalingState aSignalingState,
+                           bool rollback = false);
 
   // Updates the RTC signaling state based on the JsepSession state
-  void UpdateSignalingState();
+  void UpdateSignalingState(bool rollback = false);
 
   bool IsClosed() const;
   // called when DTLS connects; we only need this once
@@ -729,6 +734,7 @@ private:
 
   // A name for this PC that we are willing to expose to content.
   std::string mName;
+  bool mIsLoop; // For telemetry; doesn't have to be 100% right
 
   // The target to run stuff on
   nsCOMPtr<nsIEventTarget> mSTSThread;

@@ -960,7 +960,11 @@ WebSocket::Constructor(const GlobalObject& aGlobal,
                        ErrorResult& aRv)
 {
   Sequence<nsString> protocols;
-  protocols.AppendElement(aProtocol);
+  if (!protocols.AppendElement(aProtocol, fallible)) {
+    aRv.Throw(NS_ERROR_OUT_OF_MEMORY);
+    return nullptr;
+  }
+
   return WebSocket::Constructor(aGlobal, aUrl, protocols, aRv);
 }
 
@@ -1822,53 +1826,6 @@ WebSocket::CreateAndDispatchCloseEvent(bool aWasClean,
   return DispatchDOMEvent(nullptr, event, nullptr, nullptr);
 }
 
-namespace {
-
-class PrefEnabledRunnable final : public WorkerMainThreadRunnable
-{
-public:
-  explicit PrefEnabledRunnable(WorkerPrivate* aWorkerPrivate)
-    : WorkerMainThreadRunnable(aWorkerPrivate)
-    , mEnabled(false)
-  { }
-
-  bool MainThreadRun() override
-  {
-    AssertIsOnMainThread();
-    mEnabled = Preferences::GetBool("dom.workers.websocket.enabled", false);
-    return true;
-  }
-
-  bool IsEnabled() const
-  {
-    return mEnabled;
-  }
-
-private:
-  bool mEnabled;
-};
-
-} // anonymous namespace
-
-bool
-WebSocket::PrefEnabled(JSContext* /* aCx */, JSObject* /* aGlobal */)
-{
-  // WebSockets are always enabled on main-thread.
-  if (NS_IsMainThread()) {
-    return true;
-  }
-
-  WorkerPrivate* workerPrivate = GetCurrentThreadWorkerPrivate();
-  MOZ_ASSERT(workerPrivate);
-  workerPrivate->AssertIsOnWorkerThread();
-
-  nsRefPtr<PrefEnabledRunnable> runnable =
-    new PrefEnabledRunnable(workerPrivate);
-  runnable->Dispatch(workerPrivate->GetJSContext());
-
-  return runnable->IsEnabled();
-}
-
 nsresult
 WebSocketImpl::ParseURL(const nsAString& aURL)
 {
@@ -2240,21 +2197,18 @@ WebSocket::Send(const nsAString& aData,
 }
 
 void
-WebSocket::Send(File& aData, ErrorResult& aRv)
+WebSocket::Send(Blob& aData, ErrorResult& aRv)
 {
   AssertIsOnTargetThread();
 
   nsCOMPtr<nsIInputStream> msgStream;
-  nsresult rv = aData.GetInternalStream(getter_AddRefs(msgStream));
-  if (NS_FAILED(rv)) {
-    aRv.Throw(rv);
+  aData.GetInternalStream(getter_AddRefs(msgStream), aRv);
+  if (NS_WARN_IF(aRv.Failed())){
     return;
   }
 
-  uint64_t msgLength;
-  rv = aData.GetSize(&msgLength);
-  if (NS_FAILED(rv)) {
-    aRv.Throw(rv);
+  uint64_t msgLength = aData.GetSize(aRv);
+  if (NS_WARN_IF(aRv.Failed())){
     return;
   }
 

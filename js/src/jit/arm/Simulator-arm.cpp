@@ -692,7 +692,7 @@ ArmDebugger::debug()
                                 i < 8 &&
                                 (i % 2) == 0) {
                                 dvalue = getRegisterPairDoubleValue(i);
-                                printf(" (%f)\n", dvalue);
+                                printf(" (%.16g)\n", dvalue);
                             } else {
                                 printf("\n");
                             }
@@ -700,7 +700,7 @@ ArmDebugger::debug()
                         for (uint32_t i = 0; i < FloatRegisters::TotalPhys; i++) {
                             dvalue = getVFPDoubleRegisterValue(i);
                             uint64_t as_words = mozilla::BitwiseCast<uint64_t>(dvalue);
-                            printf("%3s: %f 0x%08x %08x\n",
+                            printf("%3s: %.16g 0x%08x %08x\n",
                                    FloatRegister::FromCode(i).name(),
                                    dvalue,
                                    static_cast<uint32_t>(as_words >> 32),
@@ -711,7 +711,7 @@ ArmDebugger::debug()
                             printf("%s: 0x%08x %d \n", arg1, value, value);
                         } else if (getVFPDoubleValue(arg1, &dvalue)) {
                             uint64_t as_words = mozilla::BitwiseCast<uint64_t>(dvalue);
-                            printf("%s: %f 0x%08x %08x\n",
+                            printf("%s: %.16g 0x%08x %08x\n",
                                    arg1,
                                    dvalue,
                                    static_cast<uint32_t>(as_words >> 32),
@@ -957,8 +957,9 @@ GetCachePageLocked(Simulator::ICacheMap& i_cache, void* page)
         return p->value();
 
     CachePage* new_page = js_new<CachePage>();
-    if (!i_cache.add(p, page, new_page))
-        return nullptr;
+    if (!new_page || !i_cache.add(p, page, new_page))
+        CrashAtUnhandlableOOM("Simulator CachePage");
+
     return new_page;
 }
 
@@ -1186,11 +1187,8 @@ class Redirection
         }
 
         Redirection* redir = (Redirection*)js_malloc(sizeof(Redirection));
-        if (!redir) {
-            MOZ_ReportAssertionFailure("[unhandlable oom] Simulator redirection",
-                                       __FILE__, __LINE__);
-            MOZ_CRASH();
-        }
+        if (!redir)
+            CrashAtUnhandlableOOM("Simulator redirection");
         new(redir) Redirection(nativeFunction, type, sim);
         return redir;
     }

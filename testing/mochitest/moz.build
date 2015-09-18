@@ -11,9 +11,6 @@ DIRS += [
     'BrowserTestUtils',
 ]
 
-if CONFIG['MOZ_BUILD_APP'] == 'mobile/android':
-    DIRS += ['roboextender']
-
 XPI_NAME = 'mochijar'
 
 JAR_MANIFESTS += ['jar.mn']
@@ -58,6 +55,7 @@ TEST_HARNESS_FILES.testing.mochitest += [
     'jetpack-addon-overlay.xul',
     'jetpack-package-harness.js',
     'jetpack-package-overlay.xul',
+    'mach_test_package_commands.py',
     'manifest.webapp',
     'manifestLibrary.js',
     'mochitest_options.py',

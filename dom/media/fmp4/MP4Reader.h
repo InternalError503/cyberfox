@@ -15,14 +15,9 @@
 #include "MediaTaskQueue.h"
 
 #include <deque>
-#include "mozilla/Atomics.h"
 #include "mozilla/Monitor.h"
 
 namespace mozilla {
-
-namespace dom {
-class TimeRanges;
-}
 
 typedef std::deque<nsRefPtr<MediaRawData>> MediaSampleQueue;
 
@@ -39,7 +34,7 @@ class MP4Reader final : public MediaDecoderReader
   typedef TrackInfo::TrackType TrackType;
 
 public:
-  explicit MP4Reader(AbstractMediaDecoder* aDecoder);
+  explicit MP4Reader(AbstractMediaDecoder* aDecoder, MediaTaskQueue* aBorrowedTaskQueue = nullptr);
 
   virtual ~MP4Reader();
 
@@ -67,9 +62,12 @@ public:
   virtual bool IsMediaSeekable() override;
 
   virtual int64_t GetEvictionOffset(double aTime) override;
-  virtual void NotifyDataArrived(const char* aBuffer, uint32_t aLength, int64_t aOffset) override;
 
-  virtual nsresult GetBuffered(dom::TimeRanges* aBuffered) override;
+protected:
+  virtual void NotifyDataArrivedInternal(uint32_t aLength, int64_t aOffset) override;
+public:
+
+  virtual media::TimeIntervals GetBuffered() override;
 
   // For Media Resource Management
   virtual void SetIdle() override;
@@ -125,7 +123,6 @@ private:
   void UpdateIndex();
   bool IsSupportedAudioMimeType(const nsACString& aMimeType);
   bool IsSupportedVideoMimeType(const nsACString& aMimeType);
-  void NotifyResourcesStatusChanged();
   virtual bool IsWaitingOnCDMResource() override;
 
   Microseconds GetNextKeyframeTime();
@@ -157,9 +154,6 @@ private:
     virtual void DrainComplete() override {
       mReader->DrainComplete(mType);
     }
-    virtual void NotifyResourcesStatusChanged() override {
-      mReader->NotifyResourcesStatusChanged();
-    }
     virtual void ReleaseMediaResources() override {
       mReader->ReleaseMediaResources();
     }
@@ -188,7 +182,6 @@ private:
       , mDemuxEOS(false)
       , mDrainComplete(false)
       , mDiscontinuity(false)
-      , mIsHardwareAccelerated(false)
     {
     }
 
@@ -226,9 +219,6 @@ private:
     bool mDemuxEOS;
     bool mDrainComplete;
     bool mDiscontinuity;
-    // Used by the MDSM to determine if video decoding is hardware accelerated.
-    // This value is updated after a frame is successfully decoded.
-    Atomic<bool> mIsHardwareAccelerated;
   };
 
   template<typename PromiseType>

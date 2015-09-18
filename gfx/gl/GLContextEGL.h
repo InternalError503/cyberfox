@@ -10,10 +10,6 @@
 #include "GLContext.h"
 #include "GLLibraryEGL.h"
 
-#ifdef MOZ_WIDGET_GONK
-#include "HwcComposer2D.h"
-#endif
-
 class nsIWidget;
 
 namespace mozilla {
@@ -109,10 +105,10 @@ public:
     void BindOffscreenFramebuffer();
 
     static already_AddRefed<GLContextEGL>
-    CreateEGLPixmapOffscreenContext(const gfxIntSize& size);
+    CreateEGLPixmapOffscreenContext(const gfx::IntSize& size);
 
     static already_AddRefed<GLContextEGL>
-    CreateEGLPBufferOffscreenContext(const gfxIntSize& size);
+    CreateEGLPBufferOffscreenContext(const gfx::IntSize& size);
 
 protected:
     friend class GLContextProviderEGL;
@@ -128,14 +124,11 @@ protected:
     bool mIsDoubleBuffered;
     bool mCanBindToTexture;
     bool mShareWithEGLImage;
-#ifdef MOZ_WIDGET_GONK
-    nsRefPtr<HwcComposer2D> mHwc;
-#endif
     bool mOwnsContext;
 
     static EGLSurface CreatePBufferSurfaceTryingPowerOfTwo(EGLConfig config,
                                                            EGLenum bindToTextureFormat,
-                                                           gfxIntSize& pbsize);
+                                                           gfx::IntSize& pbsize);
 };
 
 }

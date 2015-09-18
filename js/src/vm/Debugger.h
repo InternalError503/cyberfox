@@ -35,6 +35,8 @@ enum JSTrapStatus {
 
 namespace js {
 
+class LSprinter;
+
 class Breakpoint;
 class DebuggerMemory;
 
@@ -188,7 +190,8 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
     friend class SavedStacks;
     friend class mozilla::LinkedListElement<Debugger>;
     friend bool (::JS_DefineDebuggerObject)(JSContext* cx, JS::HandleObject obj);
-    friend bool (::JS::dbg::IsDebugger)(JS::Value val);
+    friend bool (::JS::dbg::IsDebugger)(const JSObject&);
+    friend bool (::JS::dbg::GetDebuggeeGlobals)(JSContext*, const JSObject&, AutoObjectVector&);
     friend void JS::dbg::onNewPromise(JSContext* cx, HandleObject promise);
     friend void JS::dbg::onPromiseSettled(JSContext* cx, HandleObject promise);
     friend bool JS::dbg::FireOnGarbageCollectionHook(JSContext* cx,
@@ -204,6 +207,7 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
         OnNewPromise,
         OnPromiseSettled,
         OnGarbageCollection,
+        OnIonCompilation,
         HookCount
     };
     enum {
@@ -270,7 +274,7 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
 
     struct AllocationSite : public mozilla::LinkedListElement<AllocationSite>
     {
-        AllocationSite(HandleObject frame, int64_t when)
+        AllocationSite(HandleObject frame, double when)
             : frame(frame),
               when(when),
               className(nullptr),
@@ -279,11 +283,11 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
             MOZ_ASSERT_IF(frame, UncheckedUnwrap(frame)->is<SavedFrame>());
         };
 
-        static AllocationSite* create(JSContext* cx, HandleObject frame, int64_t when,
+        static AllocationSite* create(JSContext* cx, HandleObject frame, double when,
                                       HandleObject obj);
 
         RelocatablePtrObject frame;
-        int64_t when;
+        double when;
         const char* className;
         RelocatablePtrAtom ctorName;
     };
@@ -300,7 +304,7 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
     static const size_t DEFAULT_MAX_ALLOCATIONS_LOG_LENGTH = 5000;
 
     bool appendAllocationSite(JSContext* cx, HandleObject obj, HandleSavedFrame frame,
-                              int64_t when);
+                              double when);
     void emptyAllocationsLog();
 
     /*
@@ -479,6 +483,8 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
     static bool getAllowUnobservedAsmJS(JSContext* cx, unsigned argc, Value* vp);
     static bool setAllowUnobservedAsmJS(JSContext* cx, unsigned argc, Value* vp);
     static bool getMemory(JSContext* cx, unsigned argc, Value* vp);
+    static bool getOnIonCompilation(JSContext* cx, unsigned argc, Value* vp);
+    static bool setOnIonCompilation(JSContext* cx, unsigned argc, Value* vp);
     static bool addDebuggee(JSContext* cx, unsigned argc, Value* vp);
     static bool addAllGlobalsAsDebuggees(JSContext* cx, unsigned argc, Value* vp);
     static bool removeDebuggee(JSContext* cx, unsigned argc, Value* vp);
@@ -544,10 +550,14 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
     static void slowPathOnNewScript(JSContext* cx, HandleScript script);
     static void slowPathOnNewGlobalObject(JSContext* cx, Handle<GlobalObject*> global);
     static bool slowPathOnLogAllocationSite(JSContext* cx, HandleObject obj, HandleSavedFrame frame,
-                                            int64_t when, GlobalObject::DebuggerVector& dbgs);
+                                            double when, GlobalObject::DebuggerVector& dbgs);
     static void slowPathPromiseHook(JSContext* cx, Hook hook, HandleObject promise);
-    static JSTrapStatus dispatchHook(JSContext* cx, MutableHandleValue vp, Hook which,
-                                     HandleObject payload);
+    static void slowPathOnIonCompilation(JSContext* cx, AutoScriptVector& scripts, LSprinter& graph);
+
+    template <typename HookIsEnabledFun /* bool (Debugger*) */,
+              typename FireHookFun /* JSTrapStatus (Debugger*) */>
+    static JSTrapStatus dispatchHook(JSContext* cx, HookIsEnabledFun hookIsEnabled,
+                                     FireHookFun fireHook);
 
     JSTrapStatus fireDebuggerStatement(JSContext* cx, MutableHandleValue vp);
     JSTrapStatus fireExceptionUnwind(JSContext* cx, MutableHandleValue vp);
@@ -581,6 +591,13 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
                                      const JS::dbg::GarbageCollectionEvent::Ptr& gcData);
 
     /*
+     * Receive a "Ion compilation" event from the engine. An Ion compilation with
+     * the given summary just got linked.
+     */
+    JSTrapStatus fireOnIonCompilationHook(JSContext* cx, AutoScriptVector& scripts,
+                                          LSprinter& graph);
+
+    /*
      * Gets a Debugger.Frame object. If maybeIter is non-null, we eagerly copy
      * its data if we need to make a new Debugger.Frame.
      */
@@ -601,7 +618,7 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
     bool init(JSContext* cx);
     inline const js::HeapPtrNativeObject& toJSObject() const;
     inline js::HeapPtrNativeObject& toJSObjectRef();
-    static inline Debugger* fromJSObject(JSObject* obj);
+    static inline Debugger* fromJSObject(const JSObject* obj);
     static Debugger* fromChildJSObject(JSObject* obj);
 
     bool hasMemory() const;
@@ -696,7 +713,9 @@ class Debugger : private mozilla::LinkedListElement<Debugger>
     static inline void onNewScript(JSContext* cx, HandleScript script);
     static inline void onNewGlobalObject(JSContext* cx, Handle<GlobalObject*> global);
     static inline bool onLogAllocationSite(JSContext* cx, JSObject* obj, HandleSavedFrame frame,
-                                           int64_t when);
+                                           double when);
+    static inline bool observesIonCompilation(JSContext* cx);
+    static inline void onIonCompilation(JSContext* cx, AutoScriptVector& scripts, LSprinter& graph);
     static JSTrapStatus onTrap(JSContext* cx, MutableHandleValue vp);
     static JSTrapStatus onSingleStep(JSContext* cx, MutableHandleValue vp);
     static bool handleBaselineOsr(JSContext* cx, InterpreterFrame* from, jit::BaselineFrame* to);
@@ -997,7 +1016,7 @@ Debugger::onNewGlobalObject(JSContext* cx, Handle<GlobalObject*> global)
 }
 
 /* static */ bool
-Debugger::onLogAllocationSite(JSContext* cx, JSObject* obj, HandleSavedFrame frame, int64_t when)
+Debugger::onLogAllocationSite(JSContext* cx, JSObject* obj, HandleSavedFrame frame, double when)
 {
     GlobalObject::DebuggerVector* dbgs = cx->global()->getDebuggers();
     if (!dbgs || dbgs->empty())

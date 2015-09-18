@@ -395,7 +395,10 @@ var gMainPane = {
    * downloads are automatically saved, updating preferences and UI in
    * response to the choice, if one is made.
    */
-  chooseFolder() this.chooseFolderTask().catch(Components.utils.reportError),
+  chooseFolder()
+  {
+    return this.chooseFolderTask().catch(Components.utils.reportError);
+  },
   chooseFolderTask: Task.async(function* ()
   {
     let bundlePreferences = document.getElementById("bundlePreferences");
@@ -611,7 +614,6 @@ var gMainPane = {
    */
   setDefaultBrowser: function()
   {
-  	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){return;}
     let shellSvc = getShellService();
     if (!shellSvc)
       return;

@@ -11,7 +11,7 @@
 #include "nsMemory.h"
 #include "nsAutoPtr.h"
 #include "prinrval.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 using namespace mozilla;
 
@@ -27,7 +27,7 @@ GetThreadPoolLog()
 #ifdef LOG
 #undef LOG
 #endif
-#define LOG(args) PR_LOG(GetThreadPoolLog(), PR_LOG_DEBUG, args)
+#define LOG(args) MOZ_LOG(GetThreadPoolLog(), mozilla::LogLevel::Debug, args)
 
 // DESIGN:
 //  o  Allocate anonymous threads.
@@ -151,6 +151,7 @@ NS_IMETHODIMP
 nsThreadPool::Run()
 {
   LOG(("THRD-P(%p) enter\n", this));
+
   mThreadNaming.SetThreadPoolName(mName);
 
   nsCOMPtr<nsIThread> current;
@@ -208,9 +209,6 @@ nsThreadPool::Run()
         } else {
           PRIntervalTime delta = timeout - (now - idleSince);
           LOG(("THRD-P(%p) waiting [%d]\n", this, delta));
-#ifdef MOZ_NUWA_PROCESS
-          nsThreadManager::get()->SetThreadIdle(nullptr);
-#endif // MOZ_NUWA_PROCESS
           mon.Wait(delta);
         }
       } else if (wasIdle) {
@@ -220,9 +218,6 @@ nsThreadPool::Run()
     }
     if (event) {
       LOG(("THRD-P(%p) running [%p]\n", this, event.get()));
-#ifdef MOZ_NUWA_PROCESS
-      nsThreadManager::get()->SetThreadWorking();
-#endif // MOZ_NUWA_PROCESS
       event->Run();
     }
   } while (!exitThread);

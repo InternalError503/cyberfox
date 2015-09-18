@@ -9,10 +9,10 @@
 
 const { Cc, Ci, Cu, Cr } = require("chrome");
 const { Task } = require("resource://gre/modules/Task.jsm");
-const { LineGraphWidget } = require("resource:///modules/devtools/Graphs.jsm");
-const { BarGraphWidget } = require("resource:///modules/devtools/Graphs.jsm");
-const { CanvasGraphUtils } = require("resource:///modules/devtools/Graphs.jsm");
 const { Heritage } = require("resource:///modules/devtools/ViewHelpers.jsm");
+const LineGraphWidget = require("devtools/shared/widgets/LineGraphWidget");
+const BarGraphWidget = require("devtools/shared/widgets/BarGraphWidget");
+const { CanvasGraphUtils } = require("devtools/shared/widgets/Graphs");
 
 loader.lazyRequireGetter(this, "promise");
 loader.lazyRequireGetter(this, "EventEmitter",
@@ -135,8 +135,8 @@ MemoryGraph.prototype = Heritage.extend(PerformanceGraph.prototype, {
   }
 });
 
-function TimelineGraph(parent, blueprint) {
-  MarkersOverview.call(this, parent, blueprint);
+function TimelineGraph(parent, filter) {
+  MarkersOverview.call(this, parent, filter);
 }
 
 TimelineGraph.prototype = Heritage.extend(MarkersOverview.prototype, {
@@ -163,7 +163,6 @@ const GRAPH_DEFINITIONS = {
   timeline: {
     constructor: TimelineGraph,
     selector: "#markers-overview",
-    needsBlueprints: true,
     primaryLink: true
   }
 };
@@ -174,15 +173,15 @@ const GRAPH_DEFINITIONS = {
  *
  * @param {object} definition
  * @param {DOMElement} root
- * @param {function} getBlueprint
+ * @param {function} getFilter
  * @param {function} getTheme
  */
-function GraphsController ({ definition, root, getBlueprint, getTheme }) {
+function GraphsController ({ definition, root, getFilter, getTheme }) {
   this._graphs = {};
   this._enabled = new Set();
   this._definition = definition || GRAPH_DEFINITIONS;
   this._root = root;
-  this._getBlueprint = getBlueprint;
+  this._getFilter = getFilter;
   this._getTheme = getTheme;
   this._primaryLink = Object.keys(this._definition).filter(name => this._definition[name].primaryLink)[0];
   this.$ = root.ownerDocument.querySelector.bind(root.ownerDocument);
@@ -326,7 +325,7 @@ GraphsController.prototype = {
 
   /**
    * Fetches the currently mapped selection. If graphs are not yet rendered,
-   * (which throws in Graphs.jsm), return null.
+   * (which throws in Graphs.js), return null.
    */
   getMappedSelection: function ({ mapStart, mapEnd }) {
     let primary = this._getPrimaryLink();
@@ -369,8 +368,8 @@ GraphsController.prototype = {
   _construct: Task.async(function *(graphName) {
     let def = this._definition[graphName];
     let el = this.$(def.selector);
-    let blueprint = def.needsBlueprints ? this._getBlueprint() : void 0;
-    let graph = this._graphs[graphName] = new def.constructor(el, blueprint);
+    let filter = this._getFilter();
+    let graph = this._graphs[graphName] = new def.constructor(el, filter);
     graph.graphName = graphName;
 
     yield graph.ready();

@@ -26,12 +26,11 @@ namespace dom {
 /*
  * The mapping of RequestContext and nsContentPolicyType is currently as the
  * following.  Note that this mapping is not perfect yet (see the TODO comments
- * below for examples), so for now we'll have to keep both an mContext and an
- * mContentPolicyType, because we cannot have a two way conversion.
+ * below for examples).
  *
  * RequestContext    | nsContentPolicyType
  * ------------------+--------------------
- * audio             | TYPE_MEDIA
+ * audio             | TYPE_INTERNAL_AUDIO
  * beacon            | TYPE_BEACON
  * cspreport         | TYPE_CSP_REPORT
  * download          |
@@ -49,25 +48,23 @@ namespace dom {
  * import            | Not supported by Gecko
  * internal          | TYPE_DOCUMENT, TYPE_XBL, TYPE_OTHER
  * location          |
- * manifest          |
+ * manifest          | TYPE_WEB_MANIFEST
  * object            | TYPE_OBJECT
  * ping              | TYPE_PING
  * plugin            | TYPE_OBJECT_SUBREQUEST
  * prefetch          |
  * script            | TYPE_SCRIPT
- * serviceworker     |
  * sharedworker      |
  * subresource       | Not supported by Gecko
  * style             | TYPE_STYLESHEET
- * track             | TYPE_MEDIA
- * video             | TYPE_MEDIA
+ * track             | TYPE_INTERNAL_TRACK
+ * video             | TYPE_INTERNAL_VIDEO
  * worker            |
  * xmlhttprequest    | TYPE_XMLHTTPREQUEST
  * xslt              | TYPE_XSLT
  *
  * TODO: Figure out if TYPE_REFRESH maps to anything useful
  * TODO: Figure out if TYPE_DTD maps to anything useful
- * TODO: Split TYPE_MEDIA into TYPE_AUDIO, TYPE_VIDEO and TYPE_TRACK
  * TODO: Split TYPE_XMLHTTPREQUEST and TYPE_DATAREQUEST for EventSource
  * TODO: Figure out if TYPE_WEBSOCKET maps to anything useful
  * TODO: Differentiate between frame and iframe
@@ -282,13 +279,7 @@ public:
   RequestContext
   Context() const
   {
-    return mContext;
-  }
-
-  void
-  SetContext(RequestContext aContext)
-  {
-    mContext = aContext;
+    return MapContentPolicyTypeToRequestContext(mContentPolicyType);
   }
 
   bool
@@ -372,13 +363,15 @@ private:
 
   ~InternalRequest();
 
+  static RequestContext
+  MapContentPolicyTypeToRequestContext(nsContentPolicyType aContentPolicyType);
+
   nsCString mMethod;
   nsCString mURL;
   nsRefPtr<InternalHeaders> mHeaders;
   nsCOMPtr<nsIInputStream> mBodyStream;
 
   nsContentPolicyType mContentPolicyType;
-  RequestContext mContext;
 
   // Empty string: no-referrer
   // "about:client": client (default)

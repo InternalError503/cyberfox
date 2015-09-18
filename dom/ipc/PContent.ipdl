@@ -15,7 +15,6 @@ include protocol PContentBridge;
 include protocol PContentPermissionRequest;
 include protocol PCycleCollectWithLogs;
 include protocol PCrashReporter;
-include protocol PDocAccessible;
 include protocol PPSMContentDownloader;
 include protocol PExternalHelperApp;
 include protocol PDeviceStorageRequest;
@@ -26,6 +25,7 @@ include protocol PHal;
 include protocol PIcc;
 include protocol PProcessHangMonitor;
 include protocol PImageBridge;
+include protocol PMedia;
 include protocol PMemoryReportRequest;
 include protocol PMobileConnection;
 include protocol PNecko;
@@ -90,6 +90,7 @@ using gfxIntSize from "nsSize.h";
 using mozilla::dom::TabId from "mozilla/dom/ipc/IdType.h";
 using mozilla::dom::ContentParentId from "mozilla/dom/ipc/IdType.h";
 using struct LookAndFeelInt from "mozilla/widget/WidgetMessageUtils.h";
+using struct mozilla::OwningSerializedStructuredCloneBuffer from "ipc/IPCMessageUtils.h";
 
 union ChromeRegistryItem
 {
@@ -421,7 +422,6 @@ prio(normal upto urgent) sync protocol PContent
     manages PContentPermissionRequest;
     manages PCrashReporter;
     manages PCycleCollectWithLogs;
-    manages PDocAccessible;
     manages PDeviceStorageRequest;
     manages PFileSystemRequest;
     manages PPSMContentDownloader;
@@ -430,6 +430,7 @@ prio(normal upto urgent) sync protocol PContent
     manages PFMRadio;
     manages PHal;
     manages PIcc;
+    manages PMedia;
     manages PMemoryReportRequest;
     manages PMobileConnection;
     manages PNecko;
@@ -505,10 +506,6 @@ child:
 
     async UpdateServiceWorkerRegistrations();
 
-    async RemoveServiceWorkerRegistrationsForDomain(nsString aDomain);
-
-    async RemoveServiceWorkerRegistrations();
-
     async DataStoreNotify(uint32_t aAppId, nsString aName,
                           nsString aManifestURL);
 
@@ -564,6 +561,7 @@ child:
 
     AppInfo(nsCString version, nsCString buildID, nsCString name, nsCString UAName,
             nsCString ID, nsCString vendor);
+    AppInit();
 
     // Notify child that last-pb-context-exited notification was observed
     LastPrivateDocShellDestroyed();
@@ -624,13 +622,12 @@ child:
     async StartProfiler(uint32_t aEntries, double aInterval, nsCString[] aFeatures,
                         nsCString[] aThreadNameFilters);
     async StopProfiler();
-    prio(high) sync GetProfile()
-      returns (nsCString aProfile);
+
+    async GatherProfile();
 
     InvokeDragSession(IPCDataTransfer[] transfers, uint32_t action);
 
     EndDragSession(bool aDoneDrag, bool aUserCancelled);
-    NuwaFreeze();
 
     async DomainSetChanged(uint32_t aSetType, uint32_t aChangeType, OptionalURIParams aDomain);
 
@@ -654,14 +651,6 @@ child:
     GamepadUpdate(GamepadChangeEvent aGamepadEvent);
 parent:
     /**
-     * Tell the parent process a new accessible document has been created.
-     * aParentDoc is the accessible document it was created in if any, and
-     * aParentAcc is the id of the accessible in that document the new document
-     * is a child of.
-     */
-    PDocAccessible(nullable PDocAccessible aParentDoc, uint64_t aParentAcc);
-
-    /**
      * Tell the content process some attributes of itself.  This is
      * among the first information queried by content processes after
      * startup.  (The message is sync to allow the content process to
@@ -679,7 +668,8 @@ parent:
     sync GetXPCOMProcessAttributes()
         returns (bool isOffline, bool isConnected, bool isLangRTL, nsString[] dictionaries,
                  ClipboardCapabilities clipboardCaps,
-                 DomainPolicyClone domainPolicy);
+                 DomainPolicyClone domainPolicy,
+                 OwningSerializedStructuredCloneBuffer initialData);
 
     sync CreateChildProcess(IPCTabContext context,
                             ProcessPriority priority,
@@ -735,7 +725,7 @@ parent:
 
     sync PCrashReporter(NativeThreadId tid, uint32_t processType);
 
-    sync GetRandomValues(uint32_t length)
+    prio(urgent) sync GetRandomValues(uint32_t length)
         returns (uint8_t[] randomValues);
 
     async GetSystemMemory(uint64_t getterId);
@@ -745,7 +735,7 @@ parent:
 
     sync GetLookAndFeelCache(LookAndFeelInt[] lookAndFeelIntCache);
 
-    PHal();
+    prio(urgent) async PHal();
 
     PIcc(uint32_t serviceId);
 
@@ -766,11 +756,13 @@ parent:
 
     PSpeechSynthesis();
 
-    PStorage();
+    prio(urgent) async PStorage();
 
     PTelephony();
 
     PVoicemail();
+
+    PMedia();
 
     PBluetooth();
 
@@ -795,11 +787,11 @@ parent:
 
     sync SyncMessage(nsString aMessage, ClonedMessageData aData,
                      CpowEntry[] aCpows, Principal aPrincipal)
-      returns (nsString[] retval);
+      returns (OwningSerializedStructuredCloneBuffer[] retval);
 
     prio(high) sync RpcMessage(nsString aMessage, ClonedMessageData aData,
                                CpowEntry[] aCpows, Principal aPrincipal)
-      returns (nsString[] retval);
+      returns (OwningSerializedStructuredCloneBuffer[] retval);
 
     ShowAlertNotification(nsString imageUrl,
                           nsString title,
@@ -896,9 +888,6 @@ parent:
     async SystemMessageHandled();
 
     NuwaReady();
-    // Sent when nuwa finished its initialization process and is waiting for
-    // parent's signal to make it freeze.
-    NuwaWaitForFreeze();
 
     sync AddNewProcess(uint32_t pid, ProtocolFdMapping[] aFds);
 
@@ -1064,6 +1053,8 @@ parent:
      * Tells the parent to stop the gamepad listening service if it hasn't already.
      */
     GamepadListenerRemoved();
+
+    async Profile(nsCString aProfile);
 
 both:
      AsyncMessage(nsString aMessage, ClonedMessageData aData,

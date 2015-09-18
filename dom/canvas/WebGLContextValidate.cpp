@@ -266,8 +266,10 @@ WebGLContext::ValidateDataRanges(WebGLintptr readOffset, WebGLintptr writeOffset
     MOZ_ASSERT((CheckedInt<WebGLsizeiptr>(writeOffset) + size).isValid());
 
     bool separate = (readOffset + size < writeOffset || writeOffset + size < readOffset);
-    if (!separate)
-        ErrorInvalidValue("%s: ranges [readOffset, readOffset + size) and [writeOffset, writeOffset + size) overlap");
+    if (!separate) {
+        ErrorInvalidValue("%s: ranges [readOffset, readOffset + size) and [writeOffset, "
+                          "writeOffset + size) overlap", info);
+    }
 
     return separate;
 }
@@ -1753,6 +1755,7 @@ WebGLContext::InitAndValidateGL()
     mBound2DTextures.Clear();
     mBoundCubeMapTextures.Clear();
     mBound3DTextures.Clear();
+    mBoundSamplers.Clear();
 
     mBoundArrayBuffer = nullptr;
     mBoundTransformFeedbackBuffer = nullptr;
@@ -1796,6 +1799,7 @@ WebGLContext::InitAndValidateGL()
     mBound2DTextures.SetLength(mGLMaxTextureUnits);
     mBoundCubeMapTextures.SetLength(mGLMaxTextureUnits);
     mBound3DTextures.SetLength(mGLMaxTextureUnits);
+    mBoundSamplers.SetLength(mGLMaxTextureUnits);
 
     if (MinCapabilityMode()) {
         mGLMaxTextureSize = MINVALUE_GL_MAX_TEXTURE_SIZE;

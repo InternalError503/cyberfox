@@ -25,8 +25,9 @@ class nsIInterceptedChannel;
 
 namespace mozilla {
 namespace dom {
-  class Request;
-  class ResponseOrPromise;
+class Blob;
+class Request;
+class ResponseOrPromise;
 } // namespace dom
 } // namespace mozilla
 
@@ -162,7 +163,8 @@ class PushMessageData final : public nsISupports,
   nsString mData;
 
 public:
-  NS_DECL_ISUPPORTS
+  NS_DECL_CYCLE_COLLECTING_ISUPPORTS
+  NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS(PushMessageData)
 
   virtual JSObject* WrapObject(JSContext* aCx, JS::Handle<JSObject*> aGivenProto) override
   {
@@ -176,7 +178,7 @@ public:
   void Json(JSContext* cx, JS::MutableHandle<JSObject*> aRetval);
   void Text(nsAString& aData);
   void ArrayBuffer(JSContext* cx, JS::MutableHandle<JSObject*> aRetval);
-  mozilla::dom::File* Blob();
+  mozilla::dom::Blob* Blob();
 
   explicit PushMessageData(const nsAString& aData);
 private:

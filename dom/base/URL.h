@@ -22,7 +22,7 @@ class DOMMediaStream;
 
 namespace dom {
 
-class File;
+class Blob;
 class MediaSource;
 class GlobalObject;
 struct objectURLOptions;
@@ -61,7 +61,7 @@ public:
   Constructor(const nsAString& aUrl, nsIURI* aBase, ErrorResult& aRv);
 
   static void CreateObjectURL(const GlobalObject& aGlobal,
-                              File& aBlob,
+                              Blob& aBlob,
                               const objectURLOptions& aOptions,
                               nsAString& aResult,
                               ErrorResult& aError);
@@ -118,8 +118,6 @@ public:
   void SetSearch(const nsAString& aArg, ErrorResult& aRv);
 
   URLSearchParams* SearchParams();
-
-  void SetSearchParams(URLSearchParams& aSearchParams);
 
   void GetHash(nsAString& aRetval, ErrorResult& aRv) const;
 

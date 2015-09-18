@@ -26,7 +26,7 @@ function TCPPresentationServer() {
   this._id = null;
   this._port = 0;
   this._serverSocket = null;
-  this._devices = new Map(); // id -> device
+  this._devices = null;
 }
 
 TCPPresentationServer.prototype = {
@@ -78,6 +78,7 @@ TCPPresentationServer.prototype = {
      */
     this.id = aId;
     this._port = this._serverSocket.port;
+    this._devices = new Map(); // id -> device
   },
 
   get id() {
@@ -113,16 +114,8 @@ TCPPresentationServer.prototype = {
     return this._id !== null && this._serverSocket !== null;
   },
 
-  close: function() {
-    DEBUG && log("TCPPresentationServer - close");
-    if (this._serverSocket) {
-      this._serverSocket.close();
-    }
-    this._id = null;
-    this._port = 0;
-  },
-
   createTCPDevice: function(aId, aName, aType, aHost, aPort) {
+    DEBUG && log("TCPPresentationServer - createTCPDevice with id: " + aId);
     if (this._devices.has(aId)) {
       throw Cr.NS_ERROR_INVALID_ARG;
     }
@@ -136,6 +129,7 @@ TCPPresentationServer.prototype = {
   },
 
   getTCPDevice: function(aId) {
+    DEBUG && log("TCPPresentationServer - getTCPDevice with id: " + aId);
     if (!this._devices.has(aId)) {
       throw Cr.NS_ERROR_INVALID_ARG;
     }
@@ -143,6 +137,7 @@ TCPPresentationServer.prototype = {
   },
 
   removeTCPDevice: function(aId) {
+    DEBUG && log("TCPPresentationServer - removeTCPDevice with id: " + aId);
     if (!this._devices.has(aId)) {
       throw Cr.NS_ERROR_INVALID_ARG;
     }
@@ -235,17 +230,21 @@ TCPPresentationServer.prototype = {
   onStopListening: function(aServerSocket, aStatus) {
     DEBUG && log("TCPPresentationServer - onStopListening: " + aStatus);
 
-    // manually closed
-    if (aStatus === Cr.NS_BINDING_ABORTED) {
+    if (this._serverSocket) {
+      DEBUG && log("TCPPresentationServer - should be non-manually closed");
+      this.close();
+    } else if (aStatus === Cr.NS_BINDING_ABORTED) {
+      DEBUG && log("TCPPresentationServer - should be manually closed");
       aStatus = Cr.NS_OK;
     }
+
     this._listener && this._listener.onClose(aStatus);
-    this._serverSocket = null;
   },
 
   close: function() {
-    DEBUG && log("TCPPresentationServer - close signalling channel");
+    DEBUG && log("TCPPresentationServer - close");
     if (this._serverSocket) {
+      DEBUG && log("TCPPresentationServer - close server socket");
       this._serverSocket.close();
       this._serverSocket = null;
     }

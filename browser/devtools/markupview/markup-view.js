@@ -419,10 +419,13 @@ MarkupView.prototype = {
   },
 
   /**
-   * Highlight the inspector selected node.
+   * React to new-node-front selection events.
+   * Highlights the node if needed, and make sure it is shown and selected in
+   * the view.
    */
   _onNewSelection: function() {
     let selection = this._inspector.selection;
+    let reason = selection.reason;
 
     this.htmlEditor.hide();
     if (this._hoveredNode && this._hoveredNode !== selection.nodeFront) {
@@ -430,34 +433,57 @@ MarkupView.prototype = {
       this._hoveredNode = null;
     }
 
+    if (!selection.isNode()) {
+      this.unmarkSelectedNode();
+      return;
+    }
+
     let done = this._inspector.updating("markup-view");
-    if (selection.isNode()) {
-      if (this._shouldNewSelectionBeHighlighted()) {
-        this._brieflyShowBoxModel(selection.nodeFront);
+
+    // Highlight the element briefly if needed.
+    if (this._shouldNewSelectionBeHighlighted()) {
+      this._brieflyShowBoxModel(selection.nodeFront);
+    }
+
+    this.showNode(selection.nodeFront).then(() => {
+      // We could be destroyed by now.
+      if (this._destroyer) {
+        return promise.reject("markupview destroyed");
       }
 
-      this.showNode(selection.nodeFront).then(() => {
-        if (this._destroyer) {
-          return promise.reject("markupview destroyed");
-        }
-        if (selection.reason !== "treepanel") {
-          this.markNodeAsSelected(selection.nodeFront);
-        }
-        done();
-      }).then(null, e => {
-        if (!this._destroyer) {
-          console.error(e);
-        } else {
-          console.warn("Could not mark node as selected, the markup-view was " +
-            "destroyed while showing the node.");
-        }
+      // Mark the node as selected.
+      this.markNodeAsSelected(selection.nodeFront);
 
-        done();
-      });
-    } else {
-      this.unmarkSelectedNode();
+      // Make sure the new selection receives focus so the keyboard can be used.
+      this.maybeFocusNewSelection();
+
       done();
+    }).catch(e => {
+      if (!this._destroyer) {
+        console.error(e);
+      } else {
+        console.warn("Could not mark node as selected, the markup-view was " +
+          "destroyed while showing the node.");
+      }
+
+      done();
+    });
+  },
+
+  /**
+   * Focus the current node selection's MarkupContainer if the selection
+   * happened because the user picked an element using the element picker or
+   * browser context menu.
+   */
+  maybeFocusNewSelection: function() {
+    let {reason, nodeFront} = this._inspector.selection;
+
+    if (reason !== "browser-context-menu" &&
+        reason !== "picker-node-picked") {
+      return;
     }
+
+    this.getContainer(nodeFront).focus();
   },
 
   /**
@@ -500,9 +526,9 @@ MarkupView.prototype = {
         } else {
           let node = this._selectedContainer.node;
           if (node.hidden) {
-            this.walker.unhideNode(node).then(() => this.nodeChanged(node));
+            this.walker.unhideNode(node);
           } else {
-            this.walker.hideNode(node).then(() => this.nodeChanged(node));
+            this.walker.hideNode(node);
           }
         }
         break;
@@ -706,6 +732,8 @@ MarkupView.prototype = {
     container.childrenDirty = true;
 
     this._updateChildren(container);
+
+    this._inspector.emit("container-created", container);
 
     return container;
   },
@@ -1155,22 +1183,33 @@ MarkupView.prototype = {
   /**
    * Mark the given node selected, and update the inspector.selection
    * object's NodeFront to keep consistent state between UI and selection.
-   * @param aNode The NodeFront to mark as selected.
+   * @param {NodeFront} aNode The NodeFront to mark as selected.
+   * @param {String} reason The reason for marking the node as selected.
+   * @return {Boolean} False if the node is already marked as selected, true
+   * otherwise.
    */
-  markNodeAsSelected: function(aNode, reason) {
-    let container = this.getContainer(aNode);
+  markNodeAsSelected: function(node, reason) {
+    let container = this.getContainer(node);
     if (this._selectedContainer === container) {
       return false;
     }
+
+    // Un-select the previous container.
     if (this._selectedContainer) {
       this._selectedContainer.selected = false;
     }
+
+    // Select the new container.
     this._selectedContainer = container;
-    if (aNode) {
+    if (node) {
       this._selectedContainer.selected = true;
     }
 
-    this._inspector.selection.setNodeFront(aNode, reason || "nodeselected");
+    // Change the current selection if needed.
+    if (this._inspector.selection.nodeFront !== node) {
+      this._inspector.selection.setNodeFront(node, reason || "nodeselected");
+    }
+
     return true;
   },
 
@@ -1202,15 +1241,6 @@ MarkupView.prototype = {
     if (this._selectedContainer) {
       this._selectedContainer.selected = false;
       this._selectedContainer = null;
-    }
-  },
-
-  /**
-   * Called when the markup panel initiates a change on a node.
-   */
-  nodeChanged: function(aNode) {
-    if (aNode === this._inspector.selection.nodeFront) {
-      this._inspector.change("markupview");
     }
   },
 
@@ -1382,7 +1412,8 @@ MarkupView.prototype = {
     if (!this._queuedChildUpdates) {
       return promise.resolve(undefined);
     }
-    return promise.all([updatePromise for (updatePromise of this._queuedChildUpdates.values())]);
+
+    return promise.all([...this._queuedChildUpdates.values()]);
   },
 
   /**
@@ -2223,7 +2254,7 @@ MarkupElementContainer.prototype = Heritage.extend(MarkupContainer.prototype, {
     // the tooltip, because we want the full-size image
     this.node.getImageData().then(data => {
       data.data.string().then(str => {
-        clipboardHelper.copyString(str, this.markup.doc);
+        clipboardHelper.copyString(str);
       });
     });
   },
@@ -2330,13 +2361,9 @@ function TextEditor(aContainer, aNode, aTemplate) {
           longstr.release().then(null, console.error);
 
           this.container.undo.do(() => {
-            this.node.setNodeValue(aVal).then(() => {
-              this.markup.nodeChanged(this.node);
-            });
+            this.node.setNodeValue(aVal);
           }, () => {
-            this.node.setNodeValue(oldValue).then(() => {
-              this.markup.nodeChanged(this.node);
-            });
+            this.node.setNodeValue(oldValue);
           });
         });
       });
@@ -2347,7 +2374,10 @@ function TextEditor(aContainer, aNode, aTemplate) {
 }
 
 TextEditor.prototype = {
-  get selected() this._selected,
+  get selected() {
+    return this._selected;
+  },
+
   set selected(aValue) {
     if (aValue === this._selected) {
       return;
@@ -2673,11 +2703,10 @@ ElementEditor.prototype = {
     // Create links in the attribute value, and collapse long attributes if
     // needed.
     let collapse = value => {
-      if (value.match(COLLAPSE_DATA_URL_REGEX)) {
+      if (value && value.match(COLLAPSE_DATA_URL_REGEX)) {
         return truncateString(value, COLLAPSE_DATA_URL_LENGTH);
-      } else {
-        return truncateString(value, COLLAPSE_ATTRIBUTE_LENGTH);
       }
+      return truncateString(value, COLLAPSE_ATTRIBUTE_LENGTH);
     };
 
     val.innerHTML = "";
@@ -2855,7 +2884,7 @@ function nodeDocument(node) {
 }
 
 function truncateString(str, maxLength) {
-  if (str.length <= maxLength) {
+  if (!str || str.length <= maxLength) {
     return str;
   }
 

@@ -176,6 +176,7 @@
     macro(proxy, proxy, "proxy") \
     macro(reason, reason, "reason") \
     macro(Reify, Reify, "Reify") \
+    macro(RequireObjectCoercible, RequireObjectCoercible, "RequireObjectCoercible") \
     macro(resumeGenerator, resumeGenerator, "resumeGenerator") \
     macro(return, return_, "return") \
     macro(revoke, revoke, "revoke") \
@@ -186,6 +187,8 @@
     macro(signMask, signMask, "signMask") \
     macro(source, source, "source") \
     macro(stack, stack, "stack") \
+    macro(star, star, "*") \
+    macro(starDefaultStar, starDefaultStar, "*default*") \
     macro(startTimestamp, startTimestamp, "startTimestamp") \
     macro(static, static_, "static") \
     macro(sticky, sticky, "sticky") \
@@ -193,6 +196,7 @@
     macro(StructType, StructType, "StructType") \
     macro(style, style, "style") \
     macro(super, super, "super") \
+    macro(target, target, "target") \
     macro(test, test, "test") \
     macro(throw, throw_, "throw") \
     macro(timestamp, timestamp, "timestamp") \
@@ -248,6 +252,7 @@
      * enum JS::SymbolCode in jsapi.h. */ \
     macro(iterator, iterator, "iterator") \
     macro(match, match, "match") \
+    macro(species, species, "species") \
     /* Same goes for the descriptions of the well-known symbols. */ \
     macro(Symbol_create, Symbol_create, "Symbol.create") \
     macro(Symbol_hasInstance, Symbol_hasInstance, "Symbol.hasInstance") \
@@ -255,6 +260,7 @@
     macro(Symbol_isRegExp, Symbol_isRegExp, "Symbol.isRegExp") \
     macro(Symbol_iterator, Symbol_iterator, "Symbol.iterator") \
     macro(Symbol_match,    Symbol_match,    "Symbol.match") \
+    macro(Symbol_species,  Symbol_species,  "Symbol.species") \
     macro(Symbol_toPrimitive, Symbol_toPrimitive, "Symbol.toPrimitive") \
     macro(Symbol_toStringTag, Symbol_toStringTag, "Symbol.toStringTag") \
     macro(Symbol_unscopables, Symbol_unscopables, "Symbol.unscopables") \

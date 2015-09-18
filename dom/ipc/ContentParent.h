@@ -37,6 +37,9 @@ class nsIWidget;
 
 namespace mozilla {
 class PRemoteSpellcheckEngineParent;
+#ifdef MOZ_ENABLE_PROFILER_SPS
+class ProfileGatherer;
+#endif
 
 namespace ipc {
 class OptionalURIParams;
@@ -77,6 +80,7 @@ class ContentParent final : public PContentParent
     typedef mozilla::ipc::TestShellParent TestShellParent;
     typedef mozilla::ipc::URIParams URIParams;
     typedef mozilla::dom::ClonedMessageData ClonedMessageData;
+    typedef mozilla::OwningSerializedStructuredCloneBuffer OwningSerializedStructuredCloneBuffer;
 
 public:
 #ifdef MOZ_NUWA_PROCESS
@@ -232,7 +236,7 @@ public:
       return mIsForBrowser;
     }
 #ifdef MOZ_NUWA_PROCESS
-    bool IsNuwaProcess() const;
+    bool IsNuwaProcess();
 #endif
 
     GeckoChildProcessHost* Process() {
@@ -246,11 +250,7 @@ public:
     }
 
     bool NeedsPermissionsUpdate() const {
-#ifdef MOZ_NUWA_PROCESS
-        return !IsNuwaProcess() && mSendPermissionUpdates;
-#else
         return mSendPermissionUpdates;
-#endif
     }
 
     bool NeedsDataStoreInfos() const {
@@ -433,7 +433,6 @@ private:
                   ContentParent* aOpener,
                   bool aIsForBrowser,
                   bool aIsForPreallocated,
-                  hal::ProcessPriority aInitialPriority = hal::PROCESS_PRIORITY_FOREGROUND,
                   bool aIsNuwaProcess = false);
 
 #ifdef MOZ_NUWA_PROCESS
@@ -446,7 +445,11 @@ private:
     // The common initialization for the constructors.
     void InitializeMembers();
 
-    // The common initialization logic shared by all constuctors.
+    // Launch the subprocess and associated initialization.
+    // Returns false if the process fails to start.
+    bool LaunchSubprocess(hal::ProcessPriority aInitialPriority = hal::PROCESS_PRIORITY_FOREGROUND);
+
+    // Common initialization after sub process launch or adoption.
     void InitInternal(ProcessPriority aPriority,
                       bool aSetupOffMainThreadCompositing,
                       bool aSendRegisteredChrome);
@@ -550,7 +553,8 @@ private:
                                                bool* aIsLangRTL,
                                                InfallibleTArray<nsString>* dictionaries,
                                                ClipboardCapabilities* clipboardCaps,
-                                               DomainPolicyClone* domainPolicy) override;
+                                               DomainPolicyClone* domainPolicy,
+                                               OwningSerializedStructuredCloneBuffer* initialData) override;
 
     virtual bool DeallocPJavaScriptParent(mozilla::jsipc::PJavaScriptParent*) override;
 
@@ -642,6 +646,9 @@ private:
     virtual bool RecvPVoicemailConstructor(PVoicemailParent* aActor) override;
     virtual bool DeallocPVoicemailParent(PVoicemailParent* aActor) override;
 
+    virtual PMediaParent* AllocPMediaParent() override;
+    virtual bool DeallocPMediaParent(PMediaParent* aActor) override;
+
     virtual bool DeallocPStorageParent(PStorageParent* aActor) override;
 
     virtual PBluetoothParent* AllocPBluetoothParent() override;
@@ -711,12 +718,12 @@ private:
                                  const ClonedMessageData& aData,
                                  InfallibleTArray<CpowEntry>&& aCpows,
                                  const IPC::Principal& aPrincipal,
-                                 InfallibleTArray<nsString>* aRetvals) override;
+                                 nsTArray<OwningSerializedStructuredCloneBuffer>* aRetvals) override;
     virtual bool RecvRpcMessage(const nsString& aMsg,
                                 const ClonedMessageData& aData,
                                 InfallibleTArray<CpowEntry>&& aCpows,
                                 const IPC::Principal& aPrincipal,
-                                InfallibleTArray<nsString>* aRetvals) override;
+                                nsTArray<OwningSerializedStructuredCloneBuffer>* aRetvals) override;
     virtual bool RecvAsyncMessage(const nsString& aMsg,
                                   const ClonedMessageData& aData,
                                   InfallibleTArray<CpowEntry>&& aCpows,
@@ -777,8 +784,6 @@ private:
     virtual bool RecvSystemMessageHandled() override;
 
     virtual bool RecvNuwaReady() override;
-
-    virtual bool RecvNuwaWaitForFreeze() override;
 
     virtual bool RecvAddNewProcess(const uint32_t& aPid,
                                    InfallibleTArray<ProtocolFdMapping>&& aFds) override;
@@ -846,11 +851,6 @@ private:
                           int32_t* aSliceRefCnt,
                           bool* aResult) override;
 
-    virtual PDocAccessibleParent* AllocPDocAccessibleParent(PDocAccessibleParent*, const uint64_t&) override;
-    virtual bool DeallocPDocAccessibleParent(PDocAccessibleParent*) override;
-    virtual bool RecvPDocAccessibleConstructor(PDocAccessibleParent* aDoc,
-                                               PDocAccessibleParent* aParentDoc, const uint64_t& aParentID) override;
-
     virtual PWebrtcGlobalParent* AllocPWebrtcGlobalParent() override;
     virtual bool DeallocPWebrtcGlobalParent(PWebrtcGlobalParent *aActor) override;
 
@@ -862,6 +862,7 @@ private:
 
     virtual bool RecvGamepadListenerAdded() override;
     virtual bool RecvGamepadListenerRemoved() override;
+    virtual bool RecvProfile(const nsCString& aProfile) override;
 
     // If you add strong pointers to cycle collected objects here, be sure to
     // release these objects in ShutDownProcess.  See the comment there for more
@@ -923,7 +924,7 @@ private:
     nsRefPtr<nsConsoleService>  mConsoleService;
     nsConsoleService* GetConsoleService();
 
-    nsDataHashtable<nsUint64HashKey, nsRefPtr<ParentIdleListener> > mIdleListeners;
+    nsTArray<nsCOMPtr<nsIObserver>> mIdleListeners;
 
 #ifdef MOZ_X11
     // Dup of child's X socket, used to scope its resources to this
@@ -937,23 +938,30 @@ private:
 #endif
 
     PProcessHangMonitorParent* mHangMonitorActor;
+#ifdef MOZ_ENABLE_PROFILER_SPS
+    nsRefPtr<mozilla::ProfileGatherer> mGatherer;
+#endif
+    nsCString mProfile;
 };
 
 } // namespace dom
 } // namespace mozilla
 
 class ParentIdleListener : public nsIObserver {
+  friend class mozilla::dom::ContentParent;
+
 public:
   NS_DECL_ISUPPORTS
   NS_DECL_NSIOBSERVER
 
-  ParentIdleListener(mozilla::dom::ContentParent* aParent, uint64_t aObserver)
-    : mParent(aParent), mObserver(aObserver)
+  ParentIdleListener(mozilla::dom::ContentParent* aParent, uint64_t aObserver, uint32_t aTime)
+    : mParent(aParent), mObserver(aObserver), mTime(aTime)
   {}
 private:
   virtual ~ParentIdleListener() {}
   nsRefPtr<mozilla::dom::ContentParent> mParent;
   uint64_t mObserver;
+  uint32_t mTime;
 };
 
 #endif

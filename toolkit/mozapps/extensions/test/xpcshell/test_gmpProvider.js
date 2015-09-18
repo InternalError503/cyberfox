@@ -239,11 +239,11 @@ function createMockPluginFilesIfNeeded(aFile, aPluginId) {
     createFile(id + ".voucher");
 }
 
-// Array.includes is only in 41, so polyfill for 40/39 uplift.
+// Array.includes() is only in Nightly channel, so polyfill so we don't fail
+// on other branches.
 if (![].includes) {
   Array.prototype.includes = function(element) {
-    var O = Object(this);
-    return O.indexOf(element) != -1;
+    return Object(this).indexOf(element) != -1;
   }
 }
 

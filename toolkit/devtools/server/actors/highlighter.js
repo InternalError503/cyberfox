@@ -1,33 +1,43 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* globals LayoutHelpers, DOMUtils, CssLogic, setIgnoreLayoutChanges */
 
 "use strict";
 
 const {Cu, Cc, Ci} = require("chrome");
-const Services = require("Services");
 const protocol = require("devtools/server/protocol");
-const {Arg, Option, method} = protocol;
+const {Arg, Option, method, RetVal} = protocol;
 const events = require("sdk/event/core");
 const Heritage = require("sdk/core/heritage");
-const {CssLogic} = require("devtools/styleinspector/css-logic");
 const EventEmitter = require("devtools/toolkit/event-emitter");
-const {setIgnoreLayoutChanges} = require("devtools/server/actors/layout");
 
-Cu.import("resource://gre/modules/devtools/LayoutHelpers.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+loader.lazyRequireGetter(this, "CssLogic",
+  "devtools/styleinspector/css-logic", true);
+loader.lazyRequireGetter(this, "setIgnoreLayoutChanges",
+  "devtools/server/actors/layout", true);
+loader.lazyGetter(this, "DOMUtils", function() {
+  return Cc["@mozilla.org/inspector/dom-utils;1"].getService(Ci.inIDOMUtils);
+});
+loader.lazyImporter(this, "LayoutHelpers",
+  "resource://gre/modules/devtools/LayoutHelpers.jsm");
 
 // FIXME: add ":visited" and ":link" after bug 713106 is fixed
 const PSEUDO_CLASSES = [":hover", ":active", ":focus"];
+// Note that the order of items in this array is important because it is used
+// for drawing the BoxModelHighlighter's path elements correctly.
 const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"];
 const BOX_MODEL_SIDES = ["top", "right", "bottom", "left"];
 const SVG_NS = "http://www.w3.org/2000/svg";
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-const HIGHLIGHTER_STYLESHEET_URI = "resource://gre/modules/devtools/server/actors/highlighter.css";
+const STYLESHEET_URI = "resource://gre/modules/devtools/server/actors/" +
+                       "highlighter.css";
 const HIGHLIGHTER_PICKED_TIMER = 1000;
-// How high is the nodeinfobar
-const NODE_INFOBAR_HEIGHT = 34; //px
-const NODE_INFOBAR_ARROW_SIZE = 9; // px
+// How high is the nodeinfobar (px).
+const NODE_INFOBAR_HEIGHT = 34;
+// What's the size of the nodeinfobar arrow (px).
+const NODE_INFOBAR_ARROW_SIZE = 9;
 // Width of boxmodelhighlighter guides
 const GUIDE_STROKE_WIDTH = 1;
 // The minimum distance a line should be before it has an arrow marker-end
@@ -44,8 +54,6 @@ const SIMPLE_OUTLINE_SHEET = ".__fx-devtools-hide-shortcut__ {" +
                              "  outline: 2px dashed #F06!important;" +
                              "  outline-offset: -2px!important;" +
                              "}";
-// Distance of the width or height handles from the node's edge.
-const GEOMETRY_SIZE_ARROW_OFFSET = .25; // 25%
 const GEOMETRY_LABEL_SIZE = 6;
 
 // Maximum size, in pixel, for the horizontal ruler and vertical ruler
@@ -83,11 +91,11 @@ exports.isTypeRegistered = isTypeRegistered;
  */
 const register = (constructor, typeName=constructor.prototype.typeName) => {
   if (!typeName) {
-    throw Error("No type's name found, or provided.")
+    throw Error("No type's name found, or provided.");
   }
 
   if (highlighterTypes.has(typeName)) {
-    throw Error(`${typeName} is already registered.`)
+    throw Error(`${typeName} is already registered.`);
   }
 
   highlighterTypes.set(typeName, constructor);
@@ -110,8 +118,9 @@ exports.register = register;
  * conveniently retrieved via the InspectorActor's 'getHighlighter' method.
  * The InspectorActor will always return the same instance of
  * HighlighterActor if asked several times and this instance is used in the
- * toolbox to highlighter elements's box-model from the markup-view, layout-view,
- * console, debugger, ... as well as select elements with the pointer (pick).
+ * toolbox to highlighter elements's box-model from the markup-view,
+ * layout-view, console, debugger, ... as well as select elements with the
+ * pointer (pick).
  *
  * Other types of highlighter actors exist and can be accessed via the
  * InspectorActor's 'getHighlighterByType' method.
@@ -145,7 +154,9 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
     events.on(this._tabActor, "navigate", this._onNavigate);
   },
 
-  get conn() this._inspector && this._inspector.conn,
+  get conn() {
+    return this._inspector && this._inspector.conn;
+  },
 
   _createHighlighter: function() {
     this._isPreviousWindowXUL = isXUL(this._tabActor.window);
@@ -223,7 +234,8 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
       region: Option(1),
       hideInfoBar: Option(1),
       hideGuides: Option(1),
-      showOnly: Option(1)
+      showOnly: Option(1),
+      onlyRegionArea: Option(1)
     }
   }),
 
@@ -280,7 +292,7 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
       this._preventContentEvent(event);
       this._currentNode = this._findAndAttachElement(event);
       if (this._hoveredNode !== this._currentNode.node) {
-        this._highlighter.show( this._currentNode.node.rawNode);
+        this._highlighter.show(this._currentNode.node.rawNode);
         events.emit(this._walker, "picker-node-hovered", this._currentNode);
         this._hoveredNode = this._currentNode.node;
       }
@@ -301,15 +313,17 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
        * ENTER/CARRIAGE_RETURN: Picks currentNode
        * ESC: Cancels picker, picks currentNode
        */
-      switch(event.keyCode) {
-        case Ci.nsIDOMKeyEvent.DOM_VK_LEFT: // wider
+      switch (event.keyCode) {
+        // Wider.
+        case Ci.nsIDOMKeyEvent.DOM_VK_LEFT:
           if (!currentNode.parentElement) {
             return;
           }
           currentNode = currentNode.parentElement;
           break;
 
-        case Ci.nsIDOMKeyEvent.DOM_VK_RIGHT: // narrower
+        // Narrower.
+        case Ci.nsIDOMKeyEvent.DOM_VK_RIGHT:
           if (!currentNode.children.length) {
             return;
           }
@@ -328,11 +342,13 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
           currentNode = child;
           break;
 
-        case Ci.nsIDOMKeyEvent.DOM_VK_RETURN: // select element
+        // Select the element.
+        case Ci.nsIDOMKeyEvent.DOM_VK_RETURN:
           this._onPick(event);
           return;
 
-        case Ci.nsIDOMKeyEvent.DOM_VK_ESCAPE: // cancel picking
+        // Cancel pick mode.
+        case Ci.nsIDOMKeyEvent.DOM_VK_ESCAPE:
           this.cancelPick();
           events.emit(this._walker, "picker-node-canceled");
           return;
@@ -353,12 +369,10 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
   }),
 
   _findAndAttachElement: function(event) {
-    let doc = event.target.ownerDocument;
-
-    let x = event.clientX;
-    let y = event.clientY;
-
-    let node = doc.elementFromPoint(x, y);
+    // originalTarget allows access to the "real" element before any retargeting
+    // is applied, such as in the case of XBL anonymous elements.  See also
+    // https://developer.mozilla.org/docs/XBL/XBL_1.0_Reference/Anonymous_Content#Event_Flow_and_Targeting
+    let node = event.originalTarget || event.target;
     return this._walker.attachElement(node);
   },
 
@@ -442,7 +456,9 @@ let CustomHighlighterActor = exports.CustomHighlighterActor = protocol.ActorClas
     }
   },
 
-  get conn() this._inspector && this._inspector.conn,
+  get conn() {
+    return this._inspector && this._inspector.conn;
+  },
 
   destroy: function() {
     protocol.Actor.prototype.destroy.call(this);
@@ -456,25 +472,31 @@ let CustomHighlighterActor = exports.CustomHighlighterActor = protocol.ActorClas
    * method.
    *
    * Most custom highlighters are made to highlight DOM nodes, hence the first
-   * NodeActor argument (NodeActor as in toolkit/devtools/server/actor/inspector).
+   * NodeActor argument (NodeActor as in
+   * toolkit/devtools/server/actor/inspector).
    * Note however that some highlighters use this argument merely as a context
    * node: the RectHighlighter for instance uses it to calculate the absolute
    * position of the provided rect. The SelectHighlighter uses it as a base node
    * to run the provided CSS selector on.
    *
-   * @param NodeActor The node to be highlighted
-   * @param Object Options for the custom highlighter
+   * @param {NodeActor} The node to be highlighted
+   * @param {Object} Options for the custom highlighter
+   * @return {Boolean} True, if the highlighter has been successfully shown
+   * (FF41+)
    */
   show: method(function(node, options) {
     if (!node || !isNodeValid(node.rawNode) || !this._highlighter) {
-      return;
+      return false;
     }
 
-    this._highlighter.show(node.rawNode, options);
+    return this._highlighter.show(node.rawNode, options);
   }, {
     request: {
       node: Arg(0, "domnode"),
       options: Arg(1, "nullable:json")
+    },
+    response: {
+      value: RetVal("nullable:boolean")
     }
   }),
 
@@ -503,7 +525,6 @@ let CustomHighlighterActor = exports.CustomHighlighterActor = protocol.ActorClas
       this._highlighter.destroy();
       this._highlighter = null;
     }
-
   }, {
     oneway: true
   })
@@ -535,7 +556,8 @@ function CanvasFrameAnonymousContentHelper(highlighterEnv, nodeBuilder) {
   this.nodeBuilder = nodeBuilder;
   this.anonymousContentDocument = this.highlighterEnv.document;
   // XXX the next line is a wallpaper for bug 1123362.
-  this.anonymousContentGlobal = Cu.getGlobalForObject(this.anonymousContentDocument);
+  this.anonymousContentGlobal = Cu.getGlobalForObject(
+                                this.anonymousContentDocument);
 
   this._insert();
 
@@ -549,12 +571,13 @@ exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHelper;
 
 CanvasFrameAnonymousContentHelper.prototype = {
   destroy: function() {
-    // If the current window isn't the one the content was inserted into, this
-    // will fail, but that's fine.
     try {
       let doc = this.anonymousContentDocument;
       doc.removeAnonymousContent(this._content);
-    } catch (e) {}
+    } catch (e) {
+      // If the current window isn't the one the content was inserted into, this
+      // will fail, but that's fine.
+    }
     this.highlighterEnv.off("navigate", this._onNavigate);
     this.highlighterEnv = this.nodeBuilder = this._content = null;
     this.anonymousContentDocument = null;
@@ -591,7 +614,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
     // If it did, highlighter.css would be injected as an anonymous content
     // node using CanvasFrameAnonymousContentHelper instead.
     installHelperSheet(this.highlighterEnv.window,
-      "@import url('" + HIGHLIGHTER_STYLESHEET_URI + "');");
+      "@import url('" + STYLESHEET_URI + "');");
     let node = this.nodeBuilder();
     this._content = doc.insertAnonymousContent(node);
   },
@@ -683,7 +706,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
       let target = this.highlighterEnv.pageListenerTarget;
       target.addEventListener(type, this, true);
       // Each type entry in the map is a map of ids:handlers.
-      this.listeners.set(type, new Map);
+      this.listeners.set(type, new Map());
     }
 
     let listeners = this.listeners.get(type);
@@ -695,9 +718,8 @@ CanvasFrameAnonymousContentHelper.prototype = {
    * canvasFrame native anonymous container.
    * @param {String} id
    * @param {String} type
-   * @param {Function} handler
    */
-  removeEventListenerForElement: function(id, type, handler) {
+  removeEventListenerForElement: function(id, type) {
     let listeners = this.listeners.get(type);
     if (!listeners) {
       return;
@@ -728,9 +750,8 @@ CanvasFrameAnonymousContentHelper.prototype = {
           return () => {
             isPropagationStopped = true;
           };
-        } else {
-          return obj[name];
         }
+        return obj[name];
       }
     });
 
@@ -810,8 +831,8 @@ CanvasFrameAnonymousContentHelper.prototype = {
 
     if (zoom !== 1) {
       value = "position:absolute;";
-      value += "transform-origin:top left;transform:scale(" + (1/zoom) + ");";
-      value += "width:" + (100*zoom) + "%;height:" + (100*zoom) + "%;";
+      value += "transform-origin:top left;transform:scale(" + (1 / zoom) + ");";
+      value += "width:" + (100 * zoom) + "%;height:" + (100 * zoom) + "%;";
     }
 
     this.setAttributeForElement(id, "style", value);
@@ -864,7 +885,7 @@ AutoRefreshHighlighter.prototype = {
     let isSameOptions = this._isSameOptions(options);
 
     if (!isNodeValid(node) || (isSameNode && isSameOptions)) {
-      return;
+      return false;
     }
 
     this.options = options;
@@ -873,9 +894,12 @@ AutoRefreshHighlighter.prototype = {
     this.currentNode = node;
     this._updateAdjustedQuads();
     this._startRefreshLoop();
-    this._show();
 
-    this.emit("shown");
+    let shown = this._show();
+    if (shown) {
+      this.emit("shown");
+    }
+    return shown;
   },
 
   /**
@@ -944,7 +968,7 @@ AutoRefreshHighlighter.prototype = {
   /**
    * Update the highlighter if the node has moved since the last update.
    */
-  update: function(e) {
+  update: function() {
     if (!isNodeValid(this.currentNode) || !this._hasMoved()) {
       return;
     }
@@ -957,6 +981,7 @@ AutoRefreshHighlighter.prototype = {
     // To be implemented by sub classes
     // When called, sub classes should actually show the highlighter for
     // this.currentNode, potentially using options in this.options
+    throw new Error("Custom highlighter class had to implement _show method");
   },
 
   _update: function() {
@@ -964,11 +989,13 @@ AutoRefreshHighlighter.prototype = {
     // When called, sub classes should update the highlighter shown for
     // this.currentNode
     // This is called as a result of a page scroll, zoom or repaint
+    throw new Error("Custom highlighter class had to implement _update method");
   },
 
   _hide: function() {
     // To be implemented by sub classes
     // When called, sub classes should actually hide the highlighter
+    throw new Error("Custom highlighter class had to implement _hide method");
   },
 
   _startRefreshLoop: function() {
@@ -1019,7 +1046,12 @@ AutoRefreshHighlighter.prototype = {
  *   Defaults to false
  * - showOnly {String}
  *   "content", "padding", "border" or "margin"
- *    If set, only this region will be highlighted
+ *   If set, only this region will be highlighted. Use with onlyRegionArea to
+ *   only highlight the area of the region.
+ * - onlyRegionArea {Boolean}
+ *   This can be set to true to make each region's box only highlight the area
+ *   of the corresponding region rather than the area of nested regions too.
+ *   This is useful when used with showOnly.
  *
  * Structure:
  * <div class="highlighter-container">
@@ -1240,13 +1272,14 @@ BoxModelHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.prototype
    * Show the highlighter on a given node
    */
   _show: function() {
-    if (BOX_MODEL_REGIONS.indexOf(this.options.region) == -1)  {
+    if (BOX_MODEL_REGIONS.indexOf(this.options.region) == -1) {
       this.options.region = "content";
     }
 
-    this._update();
+    let shown = this._update();
     this._trackMutations();
     this.emit("ready");
+    return shown;
   },
 
   /**
@@ -1274,6 +1307,7 @@ BoxModelHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.prototype
    * Should be called whenever node size or attributes change
    */
   _update: function() {
+    let shown = false;
     setIgnoreLayoutChanges(true);
 
     if (this._updateBoxModel()) {
@@ -1283,12 +1317,15 @@ BoxModelHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.prototype
         this._hideInfobar();
       }
       this._showBoxModel();
+      shown = true;
     } else {
       // Nothing to highlight (0px rectangle like a <script> tag for instance)
       this._hide();
     }
 
     setIgnoreLayoutChanges(false, this.currentNode.ownerDocument.documentElement);
+
+    return shown;
   },
 
   /**
@@ -1396,49 +1433,90 @@ BoxModelHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.prototype
    *         True if the current node has a box model to be highlighted
    */
   _updateBoxModel: function() {
-    this.options.region = this.options.region || "content";
+    let options = this.options;
+    options.region = options.region || "content";
 
-    if (this._nodeNeedsHighlighting()) {
-      for (let boxType of BOX_MODEL_REGIONS) {
-        let box = this.getElement(boxType);
+    if (!this._nodeNeedsHighlighting()) {
+      this._hideBoxModel();
+      return false;
+    }
 
-        if (this.regionFill[boxType]) {
-          box.setAttribute("style", "fill:" + this.regionFill[boxType]);
-        } else {
-          box.setAttribute("style", "");
-        }
+    for (let i = 0; i < BOX_MODEL_REGIONS.length; i++) {
+      let boxType = BOX_MODEL_REGIONS[i];
+      let nextBoxType = BOX_MODEL_REGIONS[i + 1];
+      let box = this.getElement(boxType);
 
-        if (!this.options.showOnly || this.options.showOnly === boxType) {
-          // Highlighting all quads.
-          let path = [];
-          for (let {p1, p2, p3, p4} of this.currentQuads[boxType]) {
-            path.push("M" + p1.x + "," + p1.y + " " +
-                      "L" + p2.x + "," + p2.y + " " +
-                      "L" + p3.x + "," + p3.y + " " +
-                      "L" + p4.x + "," + p4.y);
-          }
+      if (this.regionFill[boxType]) {
+        box.setAttribute("style", "fill:" + this.regionFill[boxType]);
+      } else {
+        box.setAttribute("style", "");
+      }
 
-          box.setAttribute("d", path.join(" "));
+      // Highlight all quads for this region by setting the "d" attribute of the
+      // corresponding <path>.
+      let path = [];
+      for (let j = 0; j < this.currentQuads[boxType].length; j++) {
+        let boxQuad = this.currentQuads[boxType][j];
+        let nextBoxQuad = this.currentQuads[nextBoxType]
+                          ? this.currentQuads[nextBoxType][j]
+                          : null;
+        path.push(this._getBoxPathCoordinates(boxQuad, nextBoxQuad));
+      }
+
+      box.setAttribute("d", path.join(" "));
+      box.removeAttribute("faded");
+
+      // If showOnly is defined, either hide the other regions, or fade them out
+      // if onlyRegionArea is set too.
+      if (options.showOnly && options.showOnly !== boxType) {
+        if (options.onlyRegionArea) {
+          box.setAttribute("faded", "true");
         } else {
           box.removeAttribute("d");
         }
-
-        if (boxType === this.options.region && !this.options.hideGuides) {
-          this._showGuides(boxType);
-        } else if (this.options.hideGuides) {
-          this._hideGuides();
-        }
       }
 
-      // Un-zoom the root wrapper if the page was zoomed.
-      let rootId = this.ID_CLASS_PREFIX + "root";
-      this.markup.scaleRootElement(this.currentNode, rootId);
-
-      return true;
+      if (boxType === options.region && !options.hideGuides) {
+        this._showGuides(boxType);
+      } else if (options.hideGuides) {
+        this._hideGuides();
+      }
     }
 
-    this._hideBoxModel();
-    return false;
+    // Un-zoom the root wrapper if the page was zoomed.
+    let rootId = this.ID_CLASS_PREFIX + "root";
+    this.markup.scaleRootElement(this.currentNode, rootId);
+
+    return true;
+  },
+
+  _getBoxPathCoordinates: function(boxQuad, nextBoxQuad) {
+    let {p1, p2, p3, p4} = boxQuad;
+
+    let path;
+    if (!nextBoxQuad || !this.options.onlyRegionArea) {
+      // If this is the content box (inner-most box) or if we're not being asked
+      // to highlight only region areas, then draw a simple rectangle.
+      path = "M" + p1.x + "," + p1.y + " " +
+             "L" + p2.x + "," + p2.y + " " +
+             "L" + p3.x + "," + p3.y + " " +
+             "L" + p4.x + "," + p4.y;
+    } else {
+      // Otherwise, just draw the region itself, not a filled rectangle.
+      let {p1: np1, p2: np2, p3: np3, p4: np4} = nextBoxQuad;
+      path = "M" + p1.x + "," + p1.y + " " +
+             "L" + p2.x + "," + p2.y + " " +
+             "L" + p3.x + "," + p3.y + " " +
+             "L" + p4.x + "," + p4.y + " " +
+             "L" + p1.x + "," + p1.y + " " +
+             "L" + np1.x + "," + np1.y + " " +
+             "L" + np4.x + "," + np4.y + " " +
+             "L" + np3.x + "," + np3.y + " " +
+             "L" + np2.x + "," + np2.y + " " +
+             "L" + np1.x + "," + np1.y;
+    }
+
+    return path;
   },
 
   _nodeNeedsHighlighting: function() {
@@ -1573,15 +1651,17 @@ BoxModelHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.prototype
       return;
     }
 
-    let {bindingElement:node, pseudo} =
-      CssLogic.getBindingElementAndPseudo(this.currentNode);
+    let {bindingElement: node, pseudo} =
+        CssLogic.getBindingElementAndPseudo(this.currentNode);
 
     // Update the tag, id, classes, pseudo-classes and dimensions
     let tagName = node.tagName;
 
     let id = node.id ? "#" + node.id : "";
 
-    let classList = (node.classList || []).length ? "." + [...node.classList].join(".") : "";
+    let classList = (node.classList || []).length
+                    ? "." + [...node.classList].join(".")
+                    : "";
 
     let pseudos = PSEUDO_CLASSES.filter(pseudo => {
       return DOMUtils.hasPseudoClassLock(node, pseudo);
@@ -1592,7 +1672,9 @@ BoxModelHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.prototype
     }
 
     let rect = this._getOuterQuad("border").bounds;
-    let dim = parseFloat(rect.width.toPrecision(6)) + " \u00D7 " + parseFloat(rect.height.toPrecision(6));
+    let dim = parseFloat(rect.width.toPrecision(6)) +
+              " \u00D7 " +
+              parseFloat(rect.height.toPrecision(6));
 
     this.getElement("nodeinfobar-tagname").setTextContent(tagName);
     this.getElement("nodeinfobar-id").setTextContent(id);
@@ -1677,8 +1759,6 @@ CssTransformHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.proto
   ID_CLASS_PREFIX: "css-transform-",
 
   _buildMarkup: function() {
-    let doc = this.win.document;
-
     let container = createNode(this.win, {
       attributes: {
         "class": "highlighter-container"
@@ -1709,7 +1789,7 @@ CssTransformHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.proto
 
     // Add a marker tag to the svg root for the arrow tip
     this.markerId = "arrow-marker-" + MARKER_COUNTER;
-    MARKER_COUNTER ++;
+    MARKER_COUNTER++;
     let marker = createSVGNode(this.win, {
       nodeType: "marker",
       parent: svg,
@@ -1790,15 +1870,14 @@ CssTransformHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.proto
 
   /**
    * Show the highlighter on a given node
-   * @param {DOMNode} node
    */
   _show: function() {
     if (!this._isTransformed(this.currentNode)) {
       this.hide();
-      return;
+      return false;
     }
 
-    this._update();
+    return this._update();
   },
 
   /**
@@ -1811,7 +1890,7 @@ CssTransformHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.proto
 
   _setPolygonPoints: function(quad, id) {
     let points = [];
-    for (let point of ["p1","p2", "p3", "p4"]) {
+    for (let point of ["p1", "p2", "p3", "p4"]) {
       points.push(quad[point].x + "," + quad[point].y);
     }
     this.getElement(id).setAttribute("points", points.join(" "));
@@ -1845,7 +1924,7 @@ CssTransformHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.proto
     if (!quads.length ||
         quads[0].bounds.width <= 0 || quads[0].bounds.height <= 0) {
       this._hideShapes();
-      return null;
+      return false;
     }
 
     let [quad] = quads;
@@ -1865,6 +1944,7 @@ CssTransformHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.proto
     this._showShapes();
 
     setIgnoreLayoutChanges(false, this.currentNode.ownerDocument.documentElement);
+    return true;
   },
 
   /**
@@ -1913,13 +1993,16 @@ SelectorHighlighter.prototype = {
     this.hide();
 
     if (!isNodeValid(node) || !options.selector) {
-      return;
+      return false;
     }
 
     let nodes = [];
     try {
       nodes = [...node.ownerDocument.querySelectorAll(options.selector)];
-    } catch (e) {}
+    } catch (e) {
+      // It's fine if the provided selector is invalid, nodes will be an empty
+      // array.
+    }
 
     delete options.selector;
 
@@ -1935,8 +2018,10 @@ SelectorHighlighter.prototype = {
       }
       highlighter.show(matchingNode, options);
       this._highlighters.push(highlighter);
-      i ++;
+      i++;
     }
+
+    return true;
   },
 
   hide: function() {
@@ -1976,8 +2061,8 @@ RectHighlighter.prototype = {
 
     let container = doc.createElement("div");
     container.className = "highlighter-container";
-    container.innerHTML = '<div id="highlighted-rect" ' +
-                          'class="highlighted-rect" hidden="true">';
+    container.innerHTML = "<div id=\"highlighted-rect\" " +
+                          "class=\"highlighted-rect\" hidden=\"true\">";
 
     return container;
   },
@@ -2007,13 +2092,14 @@ RectHighlighter.prototype = {
    * the parent documentElement and use it as context to position the
    * highlighter correctly.
    * @param {Object} options Accepts the following options:
-   * - rect: mandatory object that should have the x, y, width, height properties
+   * - rect: mandatory object that should have the x, y, width, height
+   *   properties
    * - fill: optional fill color for the rect
    */
   show: function(node, options) {
     if (!this._hasValidOptions(options) || !node || !node.ownerDocument) {
       this.hide();
-      return;
+      return false;
     }
 
     let contextNode = node.ownerDocument.documentElement;
@@ -2022,7 +2108,7 @@ RectHighlighter.prototype = {
     let quads = this.layoutHelpers.getAdjustedQuads(contextNode);
     if (!quads.length) {
       this.hide();
-      return;
+      return false;
     }
 
     let {bounds} = quads[0];
@@ -2040,6 +2126,8 @@ RectHighlighter.prototype = {
     let rect = this.getElement("highlighted-rect");
     rect.setAttribute("style", style);
     rect.removeAttribute("hidden");
+
+    return true;
   },
 
   hide: function() {
@@ -2330,8 +2418,8 @@ GeometryEditorHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.pro
       for (let name of GeoProp.allProps()) {
         let value = rule.style.getPropertyValue(name);
         if (value && value !== "auto") {
-          // getCSSStyleRules returns rules ordered from least-specific to
-          // most-specific, so just override any previous properties we have set.
+          // getCSSStyleRules returns rules ordered from least to most specific
+          // so just override any previous properties we have set.
           props.set(name, {
             cssRule: rule
           });
@@ -2381,22 +2469,21 @@ GeometryEditorHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.pro
     // XXX: sticky positioning is ignored for now. To be implemented next.
     if (pos === "sticky") {
       this.hide();
-      return;
+      return false;
     }
 
     let hasUpdated = this._update();
     if (!hasUpdated) {
       this.hide();
+      return false;
     }
+    return true;
   },
 
   _update: function() {
     // At each update, the position or/and size may have changed, so get the
     // list of defined properties, and re-position the arrows and highlighters.
     this.definedProperties = this.getDefinedGeometryProperties();
-
-    let isStatic = this.computedStyle.position === "static";
-    let hasSizes = GeoProp.containsSize([...this.definedProperties.keys()]);
 
     if (!this.definedProperties.size) {
       console.warn("The element does not have editable geometry properties");
@@ -2541,10 +2628,6 @@ GeometryEditorHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.pro
 
     // Position arrows always end at the node's margin box.
     let marginBox = this.currentQuads.margin[0].bounds;
-    // But size arrows are displayed in the box that corresponds to the current
-    // box-sizing.
-    let boxSizing = this.computedStyle.boxSizing.split("-")[0];
-    let box = this.currentQuads[boxSizing][0].bounds;
 
     // Position the side arrows which need to be visible.
     // Arrows always start at the offsetParent edge, and end at the middle
@@ -2571,18 +2654,16 @@ GeometryEditorHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.pro
       if (this.computedStyle.position === "relative") {
         if (GeoProp.isInverted(side)) {
           return marginBox[side] + parseFloat(this.computedStyle[side]);
-        } else {
-          return marginBox[side] - parseFloat(this.computedStyle[side]);
         }
+        return marginBox[side] - parseFloat(this.computedStyle[side]);
       }
 
       // In case the element is positioned in the viewport.
       if (GeoProp.isInverted(side)) {
         return this.offsetParent.dimension[GeoProp.mainAxisSize(side)];
-      } else {
-        return -1 * getWindow(this.currentNode)["scroll" +
-                                                GeoProp.axis(side).toUpperCase()];
       }
+      return -1 * getWindow(this.currentNode)["scroll" +
+                                              GeoProp.axis(side).toUpperCase()];
     };
 
     for (let side of GeoProp.SIDES) {
@@ -2616,7 +2697,7 @@ GeometryEditorHighlighter.prototype = Heritage.extend(AutoRefreshHighlighter.pro
     // Position the label <text> in the middle of the arrow (making sure it's
     // not hidden below the fold).
     let capitalize = str => str.substring(0, 1).toUpperCase() + str.substring(1);
-    let winMain = this.win["inner" + capitalize(GeoProp.mainAxisSize(side))]
+    let winMain = this.win["inner" + capitalize(GeoProp.mainAxisSize(side))];
     let labelMain = mainStart + (mainEnd - mainStart) / 2;
     if ((mainStart > 0 && mainStart < winMain) ||
         (mainEnd > 0 && mainEnd < winMain)) {
@@ -2651,7 +2732,7 @@ function RulersHighlighter(highlighterEnv) {
   this.win.addEventListener("pagehide", this, true);
 }
 
-RulersHighlighter.prototype =  {
+RulersHighlighter.prototype = {
   typeName: "RulersHighlighter",
 
   ID_CLASS_PREFIX: "rulers-highlighter-",
@@ -2739,8 +2820,10 @@ RulersHighlighter.prototype =  {
       let dMarkers = "";
       let graduationLength;
 
-      for (let i = 0; i < size; i+=RULERS_GRADUATION_STEP) {
-        if (i === 0) continue;
+      for (let i = 0; i < size; i += RULERS_GRADUATION_STEP) {
+        if (i === 0) {
+          continue;
+        }
 
         graduationLength = (i % 2 === 0) ? 6 : 4;
 
@@ -2757,16 +2840,17 @@ RulersHighlighter.prototype =  {
         }
 
         if (isHorizontal) {
-          if (i % RULERS_MARKER_STEP === 0)
+          if (i % RULERS_MARKER_STEP === 0) {
             dMarkers += `M${i} 0 L${i} ${graduationLength}`;
-          else
+          } else {
             dGraduations += `M${i} 0 L${i} ${graduationLength} `;
-
+          }
         } else {
-          if (i % 50 === 0)
+          if (i % 50 === 0) {
             dMarkers += `M0 ${i} L${graduationLength} ${i}`;
-          else
+          } else {
             dGraduations += `M0 ${i} L${graduationLength} ${i}`;
+          }
         }
       }
 
@@ -2847,6 +2931,7 @@ RulersHighlighter.prototype =  {
   show: function() {
     this.markup.removeAttributeForElement(this.ID_CLASS_PREFIX + "elements",
       "hidden");
+    return true;
   },
 
   hide: function() {
@@ -2889,6 +2974,7 @@ SimpleOutlineHighlighter.prototype = {
       installHelperSheet(getWindow(node), SIMPLE_OUTLINE_SHEET);
       DOMUtils.addPseudoClassLock(node, HIGHLIGHTED_PSEUDO_CLASS);
     }
+    return true;
   },
 
   /**
@@ -2904,7 +2990,7 @@ SimpleOutlineHighlighter.prototype = {
 
 function isNodeValid(node) {
   // Is it null or dead?
-  if(!node || Cu.isDeadWrapper(node)) {
+  if (!node || Cu.isDeadWrapper(node)) {
     return false;
   }
 
@@ -2932,7 +3018,7 @@ function isNodeValid(node) {
 /**
  * Inject a helper stylesheet in the window.
  */
-let installedHelperSheets = new WeakMap;
+let installedHelperSheets = new WeakMap();
 function installHelperSheet(win, source, type="agent") {
   if (installedHelperSheets.has(win.document)) {
     return;
@@ -2998,7 +3084,7 @@ function createNode(win, options) {
   for (let name in options.attributes || {}) {
     let value = options.attributes[name];
     if (options.prefix && (name === "class" || name === "id")) {
-      value = options.prefix + value
+      value = options.prefix + value;
     }
     node.setAttribute(name, value);
   }
@@ -3201,7 +3287,3 @@ HighlighterEnvironment.prototype = {
     this._win = null;
   }
 };
-
-XPCOMUtils.defineLazyGetter(this, "DOMUtils", function() {
-  return Cc["@mozilla.org/inspector/dom-utils;1"].getService(Ci.inIDOMUtils);
-});

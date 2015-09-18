@@ -8,12 +8,31 @@
  * and parsing out the blueprint to generate correct values for markers.
  */
 
+const { Cu, Ci } = require("chrome");
+
 loader.lazyRequireGetter(this, "L10N",
   "devtools/performance/global", true);
-loader.lazyRequireGetter(this, "TIMELINE_BLUEPRINT",
+loader.lazyRequireGetter(this, "PREFS",
   "devtools/performance/global", true);
+loader.lazyRequireGetter(this, "TIMELINE_BLUEPRINT",
+  "devtools/performance/markers", true);
 loader.lazyRequireGetter(this, "WebConsoleUtils",
   "devtools/toolkit/webconsole/utils");
+
+// String used to fill in platform data when it should be hidden.
+const GECKO_SYMBOL = "(Gecko)";
+
+/**
+ * Takes a marker, blueprint, and filter list and
+ * determines if this marker should be filtered or not.
+ */
+function isMarkerValid (marker, filter) {
+  let isUnknown = !(marker.name in TIMELINE_BLUEPRINT);
+  if (isUnknown) {
+    return filter.indexOf("UNKNOWN") === -1;
+  }
+  return filter.indexOf(marker.name) === -1;
+}
 
 /**
  * Returns the correct label to display for passed in marker, based
@@ -23,7 +42,7 @@ loader.lazyRequireGetter(this, "WebConsoleUtils",
  * @return {string}
  */
 function getMarkerLabel (marker) {
-  let blueprint = TIMELINE_BLUEPRINT[marker.name];
+  let blueprint = getBlueprintFor(marker);
   // Either use the label function in the blueprint, or use it directly
   // as a string.
   return typeof blueprint.label === "function" ? blueprint.label(marker) : blueprint.label;
@@ -37,7 +56,7 @@ function getMarkerLabel (marker) {
  * @return {string}
  */
 function getMarkerClassName (type) {
-  let blueprint = TIMELINE_BLUEPRINT[type];
+  let blueprint = getBlueprintFor({ name: type });
   // Either use the label function in the blueprint, or use it directly
   // as a string.
   let className = typeof blueprint.label === "function" ? blueprint.label() : blueprint.label;
@@ -65,7 +84,7 @@ function getMarkerClassName (type) {
  * @return {Array<object>}
  */
 function getMarkerFields (marker) {
-  let blueprint = TIMELINE_BLUEPRINT[marker.name];
+  let blueprint = getBlueprintFor(marker);
 
   // If blueprint.fields is a function, use that
   if (typeof blueprint.fields === "function") {
@@ -104,7 +123,7 @@ const DOM = {
    * @return {Array<Element>}
    */
   buildFields: function (doc, marker) {
-    let blueprint = TIMELINE_BLUEPRINT[marker.name];
+    let blueprint = getBlueprintFor(marker);
     let fields = getMarkerFields(marker);
 
     return fields.map(({ label, value }) => DOM.buildNameValueLabel(doc, label, value));
@@ -118,7 +137,7 @@ const DOM = {
    * @return {Element}
    */
   buildTitle: function (doc, marker) {
-    let blueprint = TIMELINE_BLUEPRINT[marker.name];
+    let blueprint = getBlueprintFor(marker);
 
     let hbox = doc.createElement("hbox");
     hbox.setAttribute("align", "center");
@@ -168,6 +187,7 @@ const DOM = {
    */
   buildNameValueLabel: function (doc, field, value) {
     let hbox = doc.createElement("hbox");
+    hbox.className = "marker-details-labelcontainer";
     let labelName = doc.createElement("label");
     let labelValue = doc.createElement("label");
     labelName.className = "plain marker-details-labelname";
@@ -194,6 +214,8 @@ const DOM = {
     let labelName = doc.createElement("label");
     labelName.className = "plain marker-details-labelname";
     labelName.setAttribute("value", L10N.getStr(`timeline.markerDetail.${type}`));
+    container.setAttribute("type", type);
+    container.className = "marker-details-stack";
     container.appendChild(labelName);
 
     let wasAsyncParent = false;
@@ -270,7 +292,194 @@ const DOM = {
   }
 };
 
+/**
+ * A series of collapsers used by the blueprint. These functions are
+ * invoked on a moving window of two markers.
+ *
+ * A function determining how markers are collapsed together.
+ * Invoked with 3 arguments: the current parent marker, the
+ * current marker and a method for peeking i markers ahead. If
+ * nothing is returned, the marker is added as a standalone entry
+ * in the waterfall. Otherwise, an object needs to be returned
+ * with the following properties:
+ * - toParent: The marker to be made a new parent. Can use the current
+ *             marker, becoming a parent itself, or make a new marker-esque
+ *             object.
+ * - collapse: Whether or not this current marker should be nested within
+ *             the current parent.
+ * - finalize: Whether or not the current parent should be finalized and popped
+ *        off the stack.
+ */
+const CollapseFunctions = {
+  /**
+   * Combines similar markers that are consecutive into a meta marker.
+   */
+  identical: function (parent, curr, peek) {
+    let next = peek(1);
+    // If there is a parent marker currently being filled and the current marker
+    // should go into the parent marker, make it so.
+    if (parent && parent.name == curr.name) {
+      let finalize = next && next.name !== curr.name;
+      return { collapse: true, finalize };
+    }
+    // Otherwise if the current marker is the same type as the next marker type,
+    // create a new parent marker containing the current marker.
+    if (next && curr.name == next.name) {
+      return { toParent: { name: curr.name, start: curr.start }, collapse: true };
+    }
+  },
+
+  /**
+   * Combines similar markers that are close to each other in time into a meta marker.
+   */
+  adjacent: function (parent, curr, peek) {
+    let next = peek(1);
+    if (next && (next.start < curr.end || next.start - curr.end <= 10 /* ms */)) {
+      return CollapseFunctions.identical(parent, curr, peek);
+    }
+  },
+
+  /**
+   * Folds this marker in parent marker if parent marker fully eclipses
+   * the current markers' time.
+   */
+  child: function (parent, curr, peek) {
+    let next = peek(1);
+    // If this marker is consumed by current parent, collapse
+    if (parent && curr.end <= parent.end) {
+      let finalize = next && next.end > parent.end;
+      return { collapse: true, finalize };
+    }
+  },
+
+  /**
+   * Turns this marker into a parent marker if the next marker
+   * is fully eclipsed by the current marker.
+   */
+  parent: function (parent, curr, peek) {
+    let next = peek(1);
+    // If the next marker is fully consumed by this marker, make
+    // it a parent (do not collapse, the marker becomes a parent).
+    if (next && curr.end >= next.end) {
+      return { toParent: curr };
+    }
+  },
+};
+
+/**
+ * Mapping of JS marker causes to a friendlier form. Only
+ * markers that are considered "from content" should be labeled here.
+ */
+const JS_MARKER_MAP = {
+  "<script> element":          "Script Tag",
+  "setInterval handler":       "setInterval",
+  "setTimeout handler":        "setTimeout",
+  "FrameRequestCallback":      "requestAnimationFrame",
+  "promise callback":          "Promise Callback",
+  "promise initializer":       "Promise Init",
+  "Worker runnable":           "Worker",
+  "javascript: URI":           "JavaScript URI",
+  // The difference between these two event handler markers are differences
+  // in their WebIDL implementation, so distinguishing them is not necessary.
+  "EventHandlerNonNull":       "Event Handler",
+  "EventListener.handleEvent": "Event Handler",
+};
+
+/**
+ * A series of formatters used by the blueprint.
+ */
+const Formatters = {
+  /**
+   * Uses the marker name as the label for markers that do not have
+   * a blueprint entry. Uses "Other" in the marker filter menu.
+   */
+  UnknownLabel: function (marker={}) {
+    return marker.name || L10N.getStr("timeline.label.unknown");
+  },
+
+  GCLabel: function (marker={}) {
+    let label = L10N.getStr("timeline.label.garbageCollection");
+    // Only if a `nonincrementalReason` exists, do we want to label
+    // this as a non incremental GC event.
+    if ("nonincrementalReason" in marker) {
+      label = `${label} (Non-incremental)`;
+    }
+    return label;
+  },
+
+  JSLabel: function (marker={}) {
+    let generic = L10N.getStr("timeline.label.javascript2");
+    if ("causeName" in marker) {
+      return JS_MARKER_MAP[marker.causeName] || generic;
+    }
+    return generic;
+  },
+
+  DOMJSLabel: function (marker={}) {
+    return `Event (${marker.type})`;
+  },
+
+  /**
+   * Returns a hash for computing a fields object for a JS marker. If the cause
+   * is considered content (so an entry exists in the JS_MARKER_MAP), do not display it
+   * since it's redundant with the label. Otherwise for Gecko code, either display
+   * the cause, or "(Gecko)", depending on if "show-platform-data" is set.
+   */
+  JSFields: function (marker) {
+    if ("causeName" in marker && !JS_MARKER_MAP[marker.causeName]) {
+      return { Reason: PREFS["show-platform-data"] ? marker.causeName : GECKO_SYMBOL };
+    }
+  },
+
+  DOMEventFields: function (marker) {
+    let fields = Object.create(null);
+    if ("type" in marker) {
+      fields[L10N.getStr("timeline.markerDetail.DOMEventType")] = marker.type;
+    }
+    if ("eventPhase" in marker) {
+      let phase;
+      if (marker.eventPhase === Ci.nsIDOMEvent.AT_TARGET) {
+        phase = L10N.getStr("timeline.markerDetail.DOMEventTargetPhase");
+      } else if (marker.eventPhase === Ci.nsIDOMEvent.CAPTURING_PHASE) {
+        phase = L10N.getStr("timeline.markerDetail.DOMEventCapturingPhase");
+      } else if (marker.eventPhase === Ci.nsIDOMEvent.BUBBLING_PHASE) {
+        phase = L10N.getStr("timeline.markerDetail.DOMEventBubblingPhase");
+      }
+      fields[L10N.getStr("timeline.markerDetail.DOMEventPhase")] = phase;
+    }
+    return fields;
+  },
+
+  StylesFields: function (marker) {
+    if ("restyleHint" in marker) {
+      return { "Restyle Hint": marker.restyleHint.replace(/eRestyle_/g, "") };
+    }
+  },
+
+  CycleCollectionFields: function (marker) {
+    let Type = PREFS["show-platform-data"]
+        ? marker.name
+        : marker.name.replace(/nsCycleCollector::/g, "");
+    return { Type };
+  },
+};
+
+/**
+ * Takes a marker and returns the definition for that marker type,
+ * falling back to the UNKNOWN definition if undefined.
+ *
+ * @param {Marker} marker
+ * @return {object}
+ */
+function getBlueprintFor (marker) {
+  return TIMELINE_BLUEPRINT[marker.name] || TIMELINE_BLUEPRINT.UNKNOWN;
+}
+
+exports.isMarkerValid = isMarkerValid;
 exports.getMarkerLabel = getMarkerLabel;
 exports.getMarkerClassName = getMarkerClassName;
 exports.getMarkerFields = getMarkerFields;
 exports.DOM = DOM;
+exports.CollapseFunctions = CollapseFunctions;
+exports.Formatters = Formatters;
+exports.getBlueprintFor = getBlueprintFor;

@@ -4,13 +4,12 @@
 
 # Integrates the xpcshell test runner with mach.
 
-from __future__ import unicode_literals, print_function
+from __future__ import absolute_import, unicode_literals, print_function
 
 import argparse
 import os
 import shutil
 import sys
-import urllib2
 
 from mozlog import structured
 
@@ -173,6 +172,7 @@ class XPCShellRunner(MozbuildObject):
             'jsDebugger': jsDebugger,
             'jsDebuggerPort': jsDebuggerPort,
             'test_tags': test_tags,
+            'utility_path': self.bindir,
         }
 
         if test_path is not None:
@@ -321,6 +321,8 @@ class B2GXPCShellRunner(MozbuildObject):
         self.bin_dir = os.path.join(self.distdir, 'bin')
 
     def _download_busybox(self, b2g_home, emulator):
+        import urllib2
+
         target_device = 'generic'
         if emulator == 'x86':
             target_device = 'generic_x86'
@@ -469,10 +471,10 @@ class MachCommands(MachCommandBase):
         driver = self._spawn(BuildDriver)
         driver.install_tests(remove=False)
 
-        structured.commandline.formatter_option_defaults['verbose'] = True
         params['log'] = structured.commandline.setup_logging("XPCShellTests",
                                                              params,
-                                                             {"mach": sys.stdout})
+                                                             {"mach": sys.stdout},
+                                                             {"verbose": True})
 
         if conditions.is_android(self):
             xpcshell = self._spawn(AndroidXPCShellRunner)

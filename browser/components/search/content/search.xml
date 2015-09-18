@@ -507,6 +507,7 @@
           if (!selection || (selection.index == -1)) {
             let source = "unknown";
             let type = "unknown";
+            let target = aEvent.originalTarget;
             if (aEvent instanceof KeyboardEvent) {
               type = "key";
               if (this._textbox.selectedButton) {
@@ -633,6 +634,7 @@
                    autocompletesearchparam="searchbar-history"
                    maxrows="10"
                    completeselectedindex="true"
+                   minresultsforpopup="0"
                    xbl:inherits="disabled,disableautocomplete,searchengine,src,newlines">
         <!--
         Empty <box> to properly position the icon within the autocomplete
@@ -1082,9 +1084,10 @@
           let buttons = this.getSelectableButtons(aCycleEngines);
 
           let suggestionsHidden;
-          if (!aSkipSuggestions && popup.hasAttribute("showonlysettings")) {
-            aSkipSuggestions = true;
-            suggestionsHidden = true;
+          if (!aSkipSuggestions) {
+            let suggestions = document.getAnonymousElementByAttribute(popup, "anonid", "tree");
+            suggestionsHidden = suggestions.getAttribute("collapsed") == "true";
+            aSkipSuggestions = suggestionsHidden;
           }
 
           // If the last suggestion is selected, DOWN selects the first button.

@@ -146,7 +146,7 @@ CallProgressSocket.prototype = {
       return;
     }
 
-    if (msg.messageType && msg.messageType === 'hello') {
+    if (msg.messageType && msg.messageType === "hello") {
       this._handshakeComplete = true;
       this._onSuccess();
     }
@@ -324,8 +324,9 @@ let LoopCallsInternal = {
    * @return true if the call is opened, false if it is not opened (i.e. busy)
    */
   startDirectCall: function(contact, callType) {
-    if ("id" in this.conversationInProgress)
+    if ("id" in this.conversationInProgress) {
       return false;
+    }
 
     var callData = {
       contact: contact,

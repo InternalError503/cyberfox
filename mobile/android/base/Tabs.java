@@ -22,6 +22,7 @@ import org.mozilla.gecko.mozglue.ContextUtils.SafeIntent;
 import org.mozilla.gecko.mozglue.JNITarget;
 import org.mozilla.gecko.mozglue.RobocopTarget;
 import org.mozilla.gecko.sync.setup.SyncAccounts;
+import org.mozilla.gecko.preferences.GeckoPreferences;
 import org.mozilla.gecko.util.GeckoEventListener;
 import org.mozilla.gecko.util.ThreadUtils;
 
@@ -36,6 +37,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.provider.Browser;
 import android.util.Log;
+import android.content.SharedPreferences;
 
 public class Tabs implements GeckoEventListener {
     private static final String LOGTAG = "GeckoTabs";
@@ -116,8 +118,7 @@ public class Tabs implements GeckoEventListener {
             "DesktopMode:Changed",
             "Tab:ViewportMetadata",
             "Tab:StreamStart",
-            "Tab:StreamStop",
-            "Reader:Toggle");
+            "Tab:StreamStop");
 
     }
 
@@ -580,8 +581,6 @@ public class Tabs implements GeckoEventListener {
             } else if (event.equals("Tab:StreamStop")) {
                 tab.setRecording(false);
                 notifyListeners(tab, TabEvents.RECORDING_CHANGE);
-            } else if (event.equals("Reader:Toggle")) {
-                tab.toggleReaderMode();
             }
 
         } catch (Exception e) {
@@ -639,7 +638,9 @@ public class Tabs implements GeckoEventListener {
         VIEWPORT_CHANGE,
         RECORDING_CHANGE,
         BOOKMARK_ADDED,
-        BOOKMARK_REMOVED
+        BOOKMARK_REMOVED,
+        READING_LIST_ADDED,
+        READING_LIST_REMOVED,
     }
 
     public void notifyListeners(Tab tab, TabEvents msg) {
@@ -853,6 +854,12 @@ public class Tabs implements GeckoEventListener {
             boolean userEntered = (flags & LOADURL_USER_ENTERED) != 0;
             boolean desktopMode = (flags & LOADURL_DESKTOP) != 0;
             boolean external = (flags & LOADURL_EXTERNAL) != 0;
+
+            final SharedPreferences sharedPrefs =  GeckoSharedPrefs.forApp(mAppContext);
+            final boolean isPrivatePref = sharedPrefs.getBoolean(GeckoPreferences.PREFS_OPEN_URLS_IN_PRIVATE, false);
+            if (isPrivatePref && external) {
+                isPrivate = true;
+            }
 
             args.put("url", url);
             args.put("engine", searchEngine);

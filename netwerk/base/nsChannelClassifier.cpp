@@ -31,7 +31,7 @@
 
 #include "mozilla/Preferences.h"
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 using mozilla::ArrayLength;
 using mozilla::Preferences;
@@ -41,7 +41,7 @@ using mozilla::Preferences;
 //
 static PRLogModuleInfo *gChannelClassifierLog;
 #undef LOG
-#define LOG(args)     PR_LOG(gChannelClassifierLog, PR_LOG_DEBUG, args)
+#define LOG(args)     MOZ_LOG(gChannelClassifierLog, mozilla::LogLevel::Debug, args)
 
 NS_IMPL_ISUPPORTS(nsChannelClassifier,
                   nsIURIClassifierCallback)

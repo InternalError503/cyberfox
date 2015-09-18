@@ -412,7 +412,7 @@ NetworkManager.prototype = {
           .then(() => {
             if (networkInterface.type == Ci.nsINetworkInterface.NETWORK_TYPE_WIFI) {
               // Remove routing table in /proc/net/route
-              return this._resetRoutingTable(networkInterface);
+              return this._resetRoutingTable(networkInterface.name);
             }
             if (networkInterface.type == Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE) {
               return this._removeDefaultRoute(networkInterface)
@@ -786,15 +786,18 @@ NetworkManager.prototype = {
 
     // Find a suitable network interface to activate.
     this.active = null;
+    let anyConnected = false;
 
-    let defaultDataNetwork;
     for each (let network in this.networkInterfaces) {
       if (network.state != Ci.nsINetworkInterface.NETWORK_STATE_CONNECTED) {
         continue;
       }
+      anyConnected = true;
 
-      if (network.type == Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE) {
-        defaultDataNetwork = network;
+      // Set active only for default connections.
+      if (network.type != Ci.nsINetworkInterface.NETWORK_TYPE_WIFI &&
+          network.type != Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE) {
+        continue;
       }
 
       this.active = network;
@@ -804,19 +807,9 @@ NetworkManager.prototype = {
       }
     }
 
-    // Give higher priority to default data APN than secondary APN.
-    // If default data APN is not connected, we still set default route
-    // and DNS on secondary APN.
-    if (this.active && defaultDataNetwork &&
-        this.isNetworkTypeSecondaryMobile(this.active.type) &&
-        this.active.type != this.preferredNetworkType) {
-      this.active = defaultDataNetwork;
-    }
-
     return Promise.resolve()
       .then(() => {
-        // Don't set default route on secondary APN
-        if (!this.active || this.isNetworkTypeSecondaryMobile(this.active.type)) {
+        if (!this.active) {
           return Promise.resolve();
         }
 
@@ -828,7 +821,7 @@ NetworkManager.prototype = {
         }
 
         if (this._manageOfflineStatus) {
-          Services.io.offline = !this.active;
+          Services.io.offline = !anyConnected;
         }
       });
   },
@@ -911,7 +904,10 @@ NetworkManager.prototype = {
 
   _setDNS: function(aNetwork) {
     return new Promise((aResolve, aReject) => {
-      gNetworkService.setDNS(aNetwork, (aError) => {
+      let dnses = aNetwork.getDnses();
+      let gateways = aNetwork.getGateways();
+      gNetworkService.setDNS(aNetwork.name, dnses.length, dnses,
+                             gateways.length, gateways, (aError) => {
         if (aError) {
           aReject("setDNS failed");
           return;
@@ -945,9 +941,9 @@ NetworkManager.prototype = {
     });
   },
 
-  _resetRoutingTable: function(aNetwork) {
+  _resetRoutingTable: function(aInterfaceName) {
     return new Promise((aResolve, aReject) => {
-      gNetworkService.resetRoutingTable(aNetwork, (aSuccess) => {
+      gNetworkService.resetRoutingTable(aInterfaceName, (aSuccess) => {
         if (!aSuccess) {
           debug("resetRoutingTable failed");
         }
@@ -959,7 +955,9 @@ NetworkManager.prototype = {
 
   _removeDefaultRoute: function(aNetwork) {
     return new Promise((aResolve, aReject) => {
-      gNetworkService.removeDefaultRoute(aNetwork, (aSuccess) => {
+      let gateways = aNetwork.getGateways();
+      gNetworkService.removeDefaultRoute(aNetwork.name, gateways.length,
+                                         gateways, (aSuccess) => {
         if (!aSuccess) {
           debug("removeDefaultRoute failed");
         }
@@ -971,7 +969,10 @@ NetworkManager.prototype = {
 
   _setDefaultRouteAndProxy: function(aNetwork, aOldInterface) {
     return new Promise((aResolve, aReject) => {
-      gNetworkService.setDefaultRoute(aNetwork, aOldInterface, (aSuccess) => {
+      let gateways = aNetwork.getGateways();
+      let oldInterfaceName = (aOldInterface ? aOldInterface.name : "");
+      gNetworkService.setDefaultRoute(aNetwork.name, gateways.length, gateways,
+                                      oldInterfaceName, (aSuccess) => {
         if (!aSuccess) {
           gNetworkService.destroyNetwork(aNetwork, function() {
             aReject("setDefaultRoute failed");

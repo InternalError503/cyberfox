@@ -112,7 +112,7 @@ public:
   // be execute synchronously.
   static already_AddRefed<Context>
   Create(Manager* aManager, nsIThread* aTarget,
-         Action* aQuotaIOThreadAction, Context* aOldContext);
+         Action* aInitAction, Context* aOldContext);
 
   // Execute given action on the target once the quota manager has been
   // initialized.
@@ -152,6 +152,11 @@ public:
     return mQuotaInfo;
   }
 
+  // Tell the Context that some state information has been orphaned in the
+  // data store and won't be cleaned up.  The Context will leave the marker
+  // in place to trigger cleanup the next times its opened.
+  void NoteOrphanedData();
+
 private:
   class Data;
   class QuotaInitRunnable;
@@ -173,6 +178,7 @@ private:
 
   Context(Manager* aManager, nsIThread* aTarget);
   ~Context();
+  void Init(Action* aInitAction, Context* aOldContext);
   void Start();
   void DispatchAction(Action* aAction, bool aDoomData = false);
   void OnQuotaInit(nsresult aRv, const QuotaInfo& aQuotaInfo,
@@ -191,6 +197,7 @@ private:
   nsCOMPtr<nsIThread> mTarget;
   nsRefPtr<Data> mData;
   State mState;
+  bool mOrphanedData;
   QuotaInfo mQuotaInfo;
   nsRefPtr<QuotaInitRunnable> mInitRunnable;
   nsTArray<PendingAction> mPendingActions;

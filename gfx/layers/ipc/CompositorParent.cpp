@@ -34,8 +34,10 @@
 #include "mozilla/layers/AsyncCompositionManager.h"
 #include "mozilla/layers/BasicCompositor.h"  // for BasicCompositor
 #include "mozilla/layers/Compositor.h"  // for Compositor
+#include "mozilla/layers/CompositorLRU.h"  // for CompositorLRU
 #include "mozilla/layers/CompositorOGL.h"  // for CompositorOGL
 #include "mozilla/layers/CompositorTypes.h"
+#include "mozilla/layers/FrameUniformityData.h"
 #include "mozilla/layers/LayerManagerComposite.h"
 #include "mozilla/layers/LayersTypes.h"
 #include "mozilla/layers/PLayerTransactionParent.h"
@@ -661,19 +663,15 @@ CompositorParent::CompositorParent(nsIWidget* aWidget,
     sIndirectLayerTrees[mRootLayerTreeID].mParent = this;
   }
 
-  if (gfxPrefs::AsyncPanZoomEnabled() &&
-#if defined(XP_WIN) || defined(MOZ_WIDGET_COCOA) || defined(MOZ_WIDGET_GTK)
-      // For desktop platforms we only want to use APZ in e10s-enabled windows.
-      // If we ever get input events off the main thread we can consider
-      // relaxing this requirement.
-      aWidget->IsMultiProcessWindow() &&
-#endif
+  // The Compositor uses the APZ pref directly since it needs to know whether
+  // to attempt to create the APZ machinery at all.
+  if (gfxPlatform::AsyncPanZoomEnabled() &&
       (aWidget->WindowType() == eWindowType_toplevel || aWidget->WindowType() == eWindowType_child)) {
     mApzcTreeManager = new APZCTreeManager();
   }
 
   if (UseVsyncComposition()) {
-    NS_WARNING("Enabling vsync compositor");
+    gfxDebugOnce() << "Enabling vsync compositor";
     mCompositorScheduler = new CompositorVsyncScheduler(this, aWidget);
   } else {
     mCompositorScheduler = new CompositorSoftwareTimerScheduler(this);
@@ -802,6 +800,18 @@ CompositorParent::RecvMakeSnapshot(const SurfaceDescriptor& aInSnapshot,
 {
   RefPtr<DrawTarget> target = GetDrawTargetForDescriptor(aInSnapshot, gfx::BackendType::CAIRO);
   ForceComposeToTarget(target, &aRect);
+  return true;
+}
+
+bool
+CompositorParent::RecvMakeWidgetSnapshot(const SurfaceDescriptor& aInSnapshot)
+{
+  if (!mCompositor || !mCompositor->GetWidget()) {
+    return false;
+  }
+
+  RefPtr<DrawTarget> target = GetDrawTargetForDescriptor(aInSnapshot, gfx::BackendType::CAIRO);
+  mCompositor->GetWidget()->CaptureWidgetOnScreen(target);
   return true;
 }
 
@@ -1319,11 +1329,31 @@ CompositorParent::ApplyAsyncProperties(LayerTransactionParent* aLayerTree)
 }
 
 bool
+CompositorParent::RecvGetFrameUniformity(FrameUniformityData* aOutData)
+{
+  mCompositionManager->GetFrameUniformity(aOutData);
+  return true;
+}
+
+bool
 CompositorParent::RecvRequestOverfill()
 {
   uint32_t overfillRatio = mCompositor->GetFillRatio();
   unused << SendOverfill(overfillRatio);
   return true;
+}
+
+void
+CompositorParent::FlushApzRepaints(const LayerTransactionParent* aLayerTree)
+{
+  MOZ_ASSERT(mApzcTreeManager);
+  uint64_t layersId = aLayerTree->GetId();
+  if (layersId == 0) {
+    // The request is coming from the parent-process layer tree, so we should
+    // use the compositor's root layer tree id.
+    layersId = mRootLayerTreeID;
+  }
+  mApzcTreeManager->FlushApzRepaints(layersId);
 }
 
 void
@@ -1426,12 +1456,9 @@ CompositorParent::AllocPLayerTransactionParent(const nsTArray<LayersBackend>& aB
 {
   MOZ_ASSERT(aId == 0);
 
-  // mWidget doesn't belong to the compositor thread, so it should be set to
-  // nullptr before returning from this method, to avoid accessing it elsewhere.
   gfx::IntRect rect;
   mWidget->GetClientBounds(rect);
   InitializeLayerManager(aBackendHints);
-  mWidget = nullptr;
 
   if (!mLayerManager) {
     NS_WARNING("Failed to initialise Compositor");
@@ -1690,10 +1717,14 @@ public:
   virtual bool RecvStop() override { return true; }
   virtual bool RecvPause() override { return true; }
   virtual bool RecvResume() override { return true; }
+  virtual bool RecvNotifyHidden(const uint64_t& id) override;
+  virtual bool RecvNotifyVisible(const uint64_t& id) override;
   virtual bool RecvNotifyChildCreated(const uint64_t& child) override;
   virtual bool RecvAdoptChild(const uint64_t& child) override { return false; }
   virtual bool RecvMakeSnapshot(const SurfaceDescriptor& aInSnapshot,
                                 const gfx::IntRect& aRect) override
+  { return true; }
+  virtual bool RecvMakeWidgetSnapshot(const SurfaceDescriptor& aInSnapshot) override
   { return true; }
   virtual bool RecvFlushRendering() override { return true; }
   virtual bool RecvNotifyRegionInvalidated(const nsIntRegion& aRegion) override { return true; }
@@ -1706,6 +1737,13 @@ public:
     return true;
   }
 
+  virtual bool RecvGetFrameUniformity(FrameUniformityData* aOutData) override
+  {
+    // Don't support calculating frame uniformity on the child process and
+    // this is just a stub for now.
+    MOZ_ASSERT(false);
+    return true;
+  }
 
   /**
    * Tells this CompositorParent to send a message when the compositor has received the transaction.
@@ -1735,6 +1773,7 @@ public:
   virtual void LeaveTestMode(LayerTransactionParent* aLayerTree) override;
   virtual void ApplyAsyncProperties(LayerTransactionParent* aLayerTree)
                override;
+  virtual void FlushApzRepaints(const LayerTransactionParent* aLayerTree) override;
   virtual void GetAPZTestData(const LayerTransactionParent* aLayerTree,
                               APZTestData* aOutData) override;
   virtual void SetConfirmedTargetAPZC(const LayerTransactionParent* aLayerTree,
@@ -1846,6 +1885,22 @@ CompositorParent::GetIndirectShadowTree(uint64_t aId)
 }
 
 bool
+CrossProcessCompositorParent::RecvNotifyHidden(const uint64_t& id)
+{
+  nsRefPtr<CompositorLRU> lru = CompositorLRU::GetSingleton();
+  lru->Add(this, id);
+  return true;
+}
+
+bool
+CrossProcessCompositorParent::RecvNotifyVisible(const uint64_t& id)
+{
+  nsRefPtr<CompositorLRU> lru = CompositorLRU::GetSingleton();
+  lru->Remove(this, id);
+  return true;
+}
+
+bool
 CrossProcessCompositorParent::RecvRequestNotifyAfterRemotePaint()
 {
   mNotifyAfterRemotePaint = true;
@@ -1855,6 +1910,9 @@ CrossProcessCompositorParent::RecvRequestNotifyAfterRemotePaint()
 void
 CrossProcessCompositorParent::ActorDestroy(ActorDestroyReason aWhy)
 {
+  nsRefPtr<CompositorLRU> lru = CompositorLRU::GetSingleton();
+  lru->Remove(this);
+
   MessageLoop::current()->PostTask(
     FROM_HERE,
     NewRunnableMethod(this, &CrossProcessCompositorParent::DeferredDestroy));
@@ -1993,7 +2051,9 @@ UpdatePluginWindowState(uint64_t aId)
       // to do here is hide the plugins for the old tree, so don't waste time
       // calculating clipping.
       nsTArray<uintptr_t> aVisibleIdList;
-      unused << lts.mParent->SendUpdatePluginVisibility(aVisibleIdList);
+      uintptr_t parentWidget = (uintptr_t)lts.mParent->GetWidget();
+      unused << lts.mParent->SendUpdatePluginVisibility(parentWidget,
+                                                        aVisibleIdList);
       lts.mUpdatedPluginDataAvailable = false;
       return;
     }
@@ -2126,6 +2186,21 @@ CrossProcessCompositorParent::ApplyAsyncProperties(
 
   MOZ_ASSERT(state->mParent);
   state->mParent->ApplyAsyncProperties(aLayerTree);
+}
+
+void
+CrossProcessCompositorParent::FlushApzRepaints(const LayerTransactionParent* aLayerTree)
+{
+  uint64_t id = aLayerTree->GetId();
+  MOZ_ASSERT(id != 0);
+  const CompositorParent::LayerTreeState* state =
+    CompositorParent::GetIndirectShadowTree(id);
+  if (!state) {
+    return;
+  }
+
+  MOZ_ASSERT(state->mParent);
+  state->mParent->FlushApzRepaints(aLayerTree);
 }
 
 void

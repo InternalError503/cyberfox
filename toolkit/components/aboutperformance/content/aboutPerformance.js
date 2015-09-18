@@ -11,19 +11,83 @@ const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 const { AddonManager } = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 const { AddonWatcher } = Cu.import("resource://gre/modules/AddonWatcher.jsm", {});
 const { PerformanceStats } = Cu.import("resource://gre/modules/PerformanceStats.jsm", {});
+const { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+const { Task } = Cu.import("resource://gre/modules/Task.jsm", {});
+
+// about:performance observes notifications on this topic.
+// if a notification is sent, this causes the page to be updated immediately,
+// regardless of whether the page is on pause.
+const UPDATE_IMMEDIATELY_TOPIC = "about:performance-update-immediately";
+
+// about:performance posts notifications on this topic whenever the page
+// is updated.
+const UPDATE_COMPLETE_TOPIC = "about:performance-update-complete";
 
 /**
  * The various measures we display.
  */
 const MEASURES = [
-  {key: "longestDuration", percentOfDeltaT: false, label: "Jank level"},
-  {key: "totalUserTime", percentOfDeltaT: true, label: "User (%)"},
-  {key: "totalSystemTime", percentOfDeltaT: true, label: "System (%)"},
-  {key: "totalCPOWTime", percentOfDeltaT: true, label: "Cross-Process (%)"},
-  {key: "ticks", percentOfDeltaT: false, label: "Activations"},
+  {probe: "jank", key: "longestDuration", percentOfDeltaT: false, label: "Jank level"},
+  {probe: "jank", key: "totalUserTime", percentOfDeltaT: true, label: "User (%)"},
+  {probe: "jank", key: "totalSystemTime", percentOfDeltaT: true, label: "System (%)"},
+  {probe: "cpow", key: "totalCPOWTime", percentOfDeltaT: true, label: "Cross-Process (%)"},
+  {probe: "ticks",key: "ticks", percentOfDeltaT: false, label: "Activations"},
 ];
 
+/**
+ * Used to control the live updates in the performance page.
+ */
+let AutoUpdate = {
+
+  /**
+   * The timer that is created when setInterval is called.
+   */
+  _timerId: null,
+
+  /**
+   * The dropdown DOM element.
+   */
+  _intervalDropdown: null,
+
+  /**
+   * Starts updating the performance data if the updates are paused.
+   */
+  start: function () {
+    if (AutoUpdate._intervalDropdown == null){
+      AutoUpdate._intervalDropdown = document.getElementById("intervalDropdown");
+    }
+
+    if (AutoUpdate._timerId == null) {
+      let dropdownIndex = AutoUpdate._intervalDropdown.selectedIndex;
+      let dropdownValue = AutoUpdate._intervalDropdown.options[dropdownIndex].value;
+      AutoUpdate._timerId = window.setInterval(update, dropdownValue);
+    }
+  },
+
+  /**
+   * Stops the updates if the data is updating.
+   */
+  stop: function () {
+    if (AutoUpdate._timerId == null) {
+      return;
+    }
+    clearInterval(AutoUpdate._timerId);
+    AutoUpdate._timerId = null;
+  },
+
+  /**
+   * Updates the refresh interval when the dropdown selection is changed.
+   */
+  updateRefreshRate: function () {
+    AutoUpdate.stop();
+    AutoUpdate.start();
+  }
+
+};
+
 let State = {
+  _monitor: PerformanceStats.getMonitor(["jank", "cpow", "ticks"]),
+
   /**
    * @type{PerformanceData}
    */
@@ -43,29 +107,30 @@ let State = {
   /**
    * Fetch the latest information, compute diffs.
    *
-   * @return {object} An object with the following fields:
+   * @return {Promise}
+   * @resolve An object with the following fields:
    * - `components`: an array of `PerformanceDiff` representing
    *   the components, sorted by `longestDuration`, then by `totalUserTime`
    * - `process`: a `PerformanceDiff` representing the entire process;
    * - `deltaT`: the number of milliseconds elapsed since the data
    *   was last displayed.
    */
-  update: function() {
-    let snapshot = PerformanceStats.getSnapshot();
+  update: Task.async(function*() {
+    let snapshot = yield this._monitor.promiseSnapshot();
     let newData = new Map();
     let deltas = [];
     for (let componentNew of snapshot.componentsData) {
-      let {name, addonId, isSystem} = componentNew;
-      let key = JSON.stringify({name, addonId, isSystem});
+      let key = componentNew.groupId;
       let componentOld = State._componentsData.get(key);
-      deltas.push(componentNew.substract(componentOld));
+      deltas.push(componentNew.subtract(componentOld));
       newData.set(key, componentNew);
     }
     State._componentsData = newData;
     let now = window.performance.now();
+    let process = snapshot.processData.subtract(State._processData);
     let result = {
-      components: deltas.filter(x => x.ticks > 0),
-      process: snapshot.processData.substract(State._processData),
+      components: deltas.filter(x => x.ticks.ticks > 0),
+      process: snapshot.processData.subtract(State._processData),
       deltaT: now - State._date
     };
     result.components.sort((a, b) => {
@@ -80,19 +145,20 @@ let State = {
     State._processData = snapshot.processData;
     State._date = now;
     return result;
-  }
+  })
 };
 
 
-function update() {
-  updateLiveData();
-  updateSlowAddons();
-}
+let update = Task.async(function*() {
+  yield updateLiveData();
+  yield updateSlowAddons();
+  Services.obs.notifyObservers(null, UPDATE_COMPLETE_TOPIC, "");
+});
 
 /**
  * Update the list of slow addons
  */
-function updateSlowAddons() {
+let updateSlowAddons = Task.async(function*() {
   try {
     let data = AddonWatcher.alerts;
     if (data.size == 0) {
@@ -164,12 +230,12 @@ function updateSlowAddons() {
   } catch (ex) {
     console.error(ex);
   }
-}
+});
 
 /**
  * Update the table of live data.
  */
-function updateLiveData() {
+let updateLiveData = Task.async(function*() {
   try {
     let dataElt = document.getElementById("liveData");
     dataElt.innerHTML = "";
@@ -185,9 +251,9 @@ function updateLiveData() {
       headerElt.appendChild(el);
     }
 
-    let deltas = State.update();
+    let deltas = yield State.update();
 
-    for (let item of deltas.components) {
+    for (let item of [deltas.process, ...deltas.components]) {
       let row = document.createElement("tr");
       if (item.addonId) {
         row.classList.add("addon");
@@ -199,13 +265,14 @@ function updateLiveData() {
       dataElt.appendChild(row);
 
       // Measures
-      for (let {key, percentOfDeltaT} of MEASURES) {
+      for (let {probe, key, percentOfDeltaT} of MEASURES) {
         let el = document.createElement("td");
         el.classList.add(key);
         el.classList.add("contents");
         row.appendChild(el);
 
-        let value = percentOfDeltaT ? Math.round(item[key] / deltas.deltaT) : item[key];
+        let rawValue = item[probe][key];
+        let value = percentOfDeltaT ? Math.round(rawValue / deltas.deltaT) : rawValue;
         if (key == "longestDuration") {
           value += 1;
           el.classList.add("jank" + value);
@@ -226,20 +293,27 @@ function updateLiveData() {
           _el.textContent = a ? a.name : _item.name
         });
       } else {
-        el.textContent = item.name;
+        el.textContent = item.title || item.name;
       }
     }
   } catch (ex) {
     console.error(ex);
   }
-}
+});
 
 function go() {
+  document.getElementById("playButton").addEventListener("click", () => AutoUpdate.start());
+  document.getElementById("pauseButton").addEventListener("click", () => AutoUpdate.stop());
+
+  document.getElementById("intervalDropdown").addEventListener("change", () => AutoUpdate.updateRefreshRate());
+
   // Compute initial state immediately, then wait a little
   // before we start computing diffs and refreshing.
   State.update();
+  window.setTimeout(update, 500);
 
-  window.setTimeout(() => {
-    window.setInterval(update, 10000);
-  }, 1000);
+  let observer = update;
+  
+  Services.obs.addObserver(update, UPDATE_IMMEDIATELY_TOPIC, false);
+  window.addEventListener("unload", () => Services.obs.removeObserver(update, UPDATE_IMMEDIATELY_TOPIC));
 }

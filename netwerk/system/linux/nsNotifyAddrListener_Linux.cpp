@@ -19,7 +19,7 @@
 #include "nsNotifyAddrListener_Linux.h"
 #include "nsString.h"
 #include "nsAutoPtr.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 #include "mozilla/Services.h"
 #include "mozilla/Preferences.h"
@@ -39,7 +39,7 @@
 using namespace mozilla;
 
 static PRLogModuleInfo *gNotifyAddrLog = nullptr;
-#define LOG(args) PR_LOG(gNotifyAddrLog, PR_LOG_DEBUG, args)
+#define LOG(args) MOZ_LOG(gNotifyAddrLog, mozilla::LogLevel::Debug, args)
 
 #define NETWORK_NOTIFY_CHANGED_PREF "network.notify.changed"
 

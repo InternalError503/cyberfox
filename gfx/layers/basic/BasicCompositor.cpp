@@ -148,7 +148,7 @@ BasicCompositor::CreateDataTextureSource(TextureFlags aFlags)
 bool
 BasicCompositor::SupportsEffect(EffectTypes aEffect)
 {
-  return static_cast<EffectTypes>(aEffect) != EffectTypes::YCBCR;
+  return aEffect != EffectTypes::YCBCR && aEffect != EffectTypes::COMPONENT_ALPHA;
 }
 
 static void
@@ -329,7 +329,8 @@ BasicCompositor::DrawQuad(const gfx::Rect& aRect,
                           const gfx::Rect& aClipRect,
                           const EffectChain &aEffectChain,
                           gfx::Float aOpacity,
-                          const gfx::Matrix4x4 &aTransform)
+                          const gfx::Matrix4x4& aTransform,
+                          const gfx::Rect& aVisibleRect)
 {
   RefPtr<DrawTarget> buffer = mRenderTarget->mDrawTarget;
 
@@ -523,7 +524,7 @@ BasicCompositor::BeginFrame(const nsIntRegion& aInvalidRegion,
   RefPtr<CompositingRenderTarget> target = CreateRenderTarget(mInvalidRect, INIT_MODE_CLEAR);
   if (!target) {
     if (!mTarget) {
-      mWidget->EndRemoteDrawing();
+      mWidget->EndRemoteDrawingInRegion(mDrawTarget, mInvalidRegion);
     }
     return;
   }
@@ -585,7 +586,7 @@ BasicCompositor::EndFrame()
                       IntPoint(r->x - offset.x, r->y - offset.y));
   }
   if (!mTarget) {
-    mWidget->EndRemoteDrawing();
+    mWidget->EndRemoteDrawingInRegion(mDrawTarget, mInvalidRegion);
   }
 
   mDrawTarget = nullptr;

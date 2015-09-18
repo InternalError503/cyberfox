@@ -342,6 +342,10 @@ ConsoleOutput.prototype = {
     this.owner.owner.openLink.apply(this.owner.owner, arguments);
   },
 
+  openLocationInDebugger: function ({url, line}) {
+    return this.owner.owner.viewSourceInDebugger(url, line);
+  },
+
   /**
    * Open the variables view to inspect an object actor.
    * @see JSTerm.openVariablesView() in webconsole.js
@@ -683,6 +687,7 @@ Messages.Simple = function(message, options = {})
   this.severity = options.severity;
   this.location = options.location;
   this.timestamp = options.timestamp || Date.now();
+  this.prefix = options.prefix;
   this.private = !!options.private;
 
   this._message = message;
@@ -711,6 +716,12 @@ Messages.Simple.prototype = Heritage.extend(Messages.BaseMessage.prototype,
    * @type object
    */
   location: null,
+
+  /**
+   * Message prefix
+   * @type string|null
+   */
+  prefix: null,
 
   /**
    * Tells if this message comes from a private browsing context.
@@ -809,6 +820,7 @@ Messages.Simple.prototype = Heritage.extend(Messages.BaseMessage.prototype,
 
     rid.category = this.category;
     rid.severity = this.severity;
+    rid.prefix = this.prefix;
     rid.private = this.private;
     rid.location = this.location;
     rid.link = this._link;
@@ -841,6 +853,13 @@ Messages.Simple.prototype = Heritage.extend(Messages.BaseMessage.prototype,
     icon.className = "icon";
     icon.title = l10n.getStr("severity." + this._severityNameCompat);
 
+    let prefixNode;
+    if (this.prefix) {
+      prefixNode = this.document.createElementNS(XHTML_NS, "span");
+      prefixNode.className = "prefix devtools-monospace";
+      prefixNode.textContent = this.prefix + ":";
+    }
+
     // Apply the current group by indenting appropriately.
     // TODO: remove this once bug 778766 is fixed.
     let indent = this._groupDepthCompat * COMPAT.GROUP_INDENT;
@@ -862,6 +881,9 @@ Messages.Simple.prototype = Heritage.extend(Messages.BaseMessage.prototype,
     this.element.appendChild(timestamp.element);
     this.element.appendChild(indentNode);
     this.element.appendChild(icon);
+    if (prefixNode) {
+      this.element.appendChild(prefixNode);
+    }
     this.element.appendChild(body);
     if (repeatNode) {
       this.element.appendChild(repeatNode);
@@ -1280,6 +1302,7 @@ Messages.ConsoleGeneric = function(packet)
     timestamp: packet.timeStamp,
     category: "webdev",
     severity: CONSOLE_API_LEVELS_TO_SEVERITIES[packet.level],
+    prefix: packet.prefix,
     private: packet.private,
     filterDuplicates: true,
     location: {
@@ -2477,6 +2500,8 @@ Widgets.JSObject.prototype = Heritage.extend(Widgets.BaseWidget.prototype,
       options.onClick = options.href ? this._onClickAnchor : this._onClick;
     }
 
+    options.onContextMenu = options.onContextMenu || this._onContextMenu;
+
     let anchor = this.el("a", {
       class: options.className,
       draggable: false,
@@ -2484,6 +2509,8 @@ Widgets.JSObject.prototype = Heritage.extend(Widgets.BaseWidget.prototype,
     }, text);
 
     this.message._addLinkCallback(anchor, options.onClick);
+
+    anchor.addEventListener("contextmenu", options.onContextMenu.bind(this));
 
     if (options.appendTo) {
       options.appendTo.appendChild(anchor);
@@ -2494,16 +2521,38 @@ Widgets.JSObject.prototype = Heritage.extend(Widgets.BaseWidget.prototype,
     return anchor;
   },
 
+  openObjectInVariablesView: function()
+  {
+    this.output.openVariablesView({
+      label: VariablesView.getString(this.objectActor, { concise: true }),
+      objectActor: this.objectActor,
+      autofocus: true,
+    });
+  },
+
   /**
    * The click event handler for objects shown inline.
    * @private
    */
   _onClick: function()
   {
-    this.output.openVariablesView({
-      label: VariablesView.getString(this.objectActor, { concise: true }),
-      objectActor: this.objectActor,
-      autofocus: true,
+    this.openObjectInVariablesView();
+  },
+
+  _onContextMenu: function(ev) {
+    // TODO offer a nice API for the context menu.
+    // Probably worth to take a look at Firebug's way
+    // https://github.com/firebug/firebug/blob/master/extension/content/firebug/chrome/menu.js
+    let doc = ev.target.ownerDocument;
+    let cmPopup = doc.getElementById("output-contextmenu");
+    let openInVarViewCmd = doc.getElementById("menu_openInVarView");
+    let openVarView = this.openObjectInVariablesView.bind(this);
+    openInVarViewCmd.addEventListener("command", openVarView);
+    openInVarViewCmd.removeAttribute("disabled");
+    cmPopup.addEventListener("popuphiding", function onPopupHiding() {
+      cmPopup.removeEventListener("popuphiding", onPopupHiding);
+      openInVarViewCmd.removeEventListener("command", openVarView);
+      openInVarViewCmd.setAttribute("disabled", "true");
     });
   },
 
@@ -2671,6 +2720,16 @@ Widgets.ObjectRenderers.add({
 
     this._text(")");
   },
+
+  _onClick: function () {
+    let location = this.objectActor.location;
+    if (location) {
+      this.output.openLocationInDebugger(location);
+    }
+    else {
+      this.openObjectInVariablesView();
+    }
+  }
 }); // Widgets.ObjectRenderers.byClass.Function
 
 /**
@@ -3160,6 +3219,12 @@ Widgets.ObjectRenderers.add({
         "message was got cleared away");
     }
 
+    // Check it again as this method is async!
+    if (this._linkedToInspector) {
+      return;
+    }
+    this._linkedToInspector = true;
+
     this.highlightDomNode = this.highlightDomNode.bind(this);
     this.element.addEventListener("mouseover", this.highlightDomNode, false);
     this.unhighlightDomNode = this.unhighlightDomNode.bind(this);
@@ -3170,8 +3235,6 @@ Widgets.ObjectRenderers.add({
       onClick: this.openNodeInInspector.bind(this)
     });
     this._openInspectorNode.title = l10n.getStr("openNodeInInspector");
-
-    this._linkedToInspector = true;
   }),
 
   /**

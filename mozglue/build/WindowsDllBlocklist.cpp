@@ -110,6 +110,10 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  {"rf-firefox.dll", MAKE_VERSION(7,6,1,0)},
 	  {"roboform.dll", MAKE_VERSION(7,6,1,0)},
 
+    // Crashes with RoboForm2Go written against old SDK, bug 988311/1196859
+    { "rf-firefox-22.dll", ALL_VERSIONS },
+    { "rf-firefox-40.dll", ALL_VERSIONS },
+
 	  // Topcrash with Babylon Toolbar on FF16+ (bug 721264)
 	  {"babyfox.dll", ALL_VERSIONS},
 
@@ -159,9 +163,6 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  { "libinject2.dll", 0x537DDC93, DllBlockInfo::USE_TIMESTAMP },
 	  { "libredir2.dll", 0x5385B7ED, DllBlockInfo::USE_TIMESTAMP },
 
-	  // Crashes with RoboForm2Go written against old SDK, bug 988311
-	  { "rf-firefox-22.dll", ALL_VERSIONS },
-
 	  // Crashes with DesktopTemperature, bug 1046382
 	  { "dtwxsvc.dll", ALL_VERSIONS },
 
@@ -177,14 +178,17 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  { "trustedshopper.dll", ALL_VERSIONS }, 
 	  
 	  // bug  - OSD displays on browser windows
-	  // Must block the OSD overlay DLL
+	  // Must block the OSD overlay DLL (Include x64 DLL for OSD)
 	  { "rtsshooks.dll", ALL_VERSIONS },
+	  { "rtsshooks64.dll", ALL_VERSIONS },
 	  { "rtui.dll", ALL_VERSIONS },
 	  { "rtmui.dll", ALL_VERSIONS },
 	  { "rtfc.dll", ALL_VERSIONS }, 
 	  { "libmfxsw32.dll", ALL_VERSIONS },
+	  { "libmfxsw64.dll", ALL_VERSIONS },
 	  { "qsv.dll", ALL_VERSIONS }, 
-	  { "rtvcvfw32.dll", ALL_VERSIONS }, 
+	  { "rtvcvfw32.dll", ALL_VERSIONS },
+	  { "rtvcvfw64.dll", ALL_VERSIONS },	  
 	  
 	  //Ask toolbar
 	  { "genericasktoolbar.dll", ALL_VERSIONS },
@@ -526,7 +530,7 @@ wchar_t* getFullPath (PWCHAR filePath, wchar_t* fname)
   // path name.  For example, its numerical value can be 1.  Passing a non-valid
   // pointer to SearchPathW will cause a crash, so we need to check to see if we
   // are handed a valid pointer, and otherwise just pass nullptr to SearchPathW.
-  PWCHAR sanitizedFilePath = (intptr_t(filePath) < 1024) ? nullptr : filePath;
+  PWCHAR sanitizedFilePath = (intptr_t(filePath) < 4096) ? nullptr : filePath;
 
   // figure out the length of the string that we need
   DWORD pathlen = SearchPathW(sanitizedFilePath, fname, L".dll", 0, nullptr,
@@ -772,7 +776,7 @@ void ReadPreviouslyCrashedModule()
     return;
   }
 
-  if (wcscat_s(tempPath, ArrayLength(tempPath), L"FirefoxBlockedDLL.txt")) {
+  if (wcscat_s(tempPath, ArrayLength(tempPath), L"CyberfoxBlockedDLL.txt")) {
     return;
   }
 

@@ -67,6 +67,7 @@
 #include "nsIDOMXPathEvaluator.h"
 #include "jsfriendapi.h"
 #include "ImportManager.h"
+#include "mozilla/LinkedList.h"
 
 #define XML_DECLARATION_BITS_DECLARATION_EXISTS   (1 << 0)
 #define XML_DECLARATION_BITS_ENCODING_EXISTS      (1 << 1)
@@ -85,7 +86,6 @@ class nsDOMNavigationTiming;
 class nsWindowSizes;
 class nsHtml5TreeOpExecutor;
 class nsDocumentOnStack;
-class nsPointerLockPermissionRequest;
 class nsISecurityConsoleMessage;
 class nsPIBoxObject;
 
@@ -96,8 +96,34 @@ class BoxObject;
 class UndoManager;
 struct LifecycleCallbacks;
 class CallbackFunction;
-}
-}
+
+struct FullscreenRequest : public LinkedListElement<FullscreenRequest>
+{
+  explicit FullscreenRequest(Element* aElement);
+  ~FullscreenRequest();
+
+  Element* GetElement() const { return mElement; }
+  nsDocument* GetDocument() const { return mDocument; }
+
+private:
+  nsRefPtr<Element> mElement;
+  nsRefPtr<nsDocument> mDocument;
+
+public:
+  nsRefPtr<gfx::VRHMDInfo> mVRHMDDevice;
+  // This value should be true if the fullscreen request is
+  // originated from chrome code.
+  bool mIsCallerChrome = false;
+  // This value denotes whether we should trigger a NewOrigin event if
+  // requesting fullscreen in its document causes the origin which is
+  // fullscreen to change. We may want *not* to trigger that event if
+  // we're calling RequestFullScreen() as part of a continuation of a
+  // request in a subdocument in different process, whereupon the caller
+  // need to send some notification itself with the real origin.
+  bool mShouldNotifyNewOrigin = true;
+};
+} // namespace dom
+} // namespace mozilla
 
 /**
  * Right now our identifier map entries contain information for 'name'
@@ -1115,6 +1141,9 @@ public:
                                  ReferrerPolicy aReferrerPolicy) override;
   virtual void ForgetImagePreload(nsIURI* aURI) override;
 
+  virtual void MaybePreconnect(nsIURI* uri,
+                               mozilla::CORSMode aCORSMode) override;
+
   virtual void PreloadStyle(nsIURI* uri, const nsAString& charset,
                             const nsAString& aCrossOriginAttr,
                             ReferrerPolicy aReferrerPolicy) override;
@@ -1155,6 +1184,16 @@ public:
   // the frame and any subframes.
   virtual void GetPlugins(nsTArray<nsIObjectLoadingContent*>& aPlugins) override;
 
+  // Adds an element to mResponsiveContent when the element is
+  // added to the tree.
+  virtual nsresult AddResponsiveContent(nsIContent* aContent) override;
+  // Removes an element from mResponsiveContent when the element is
+  // removed from the tree.
+  virtual void RemoveResponsiveContent(nsIContent* aContent) override;
+  // Notifies any responsive content added by AddResponsiveContent upon media
+  // features values changing.
+  virtual void NotifyMediaFeatureValuesChanged() override;
+
   virtual nsresult GetStateObject(nsIVariant** aResult) override;
 
   virtual nsDOMNavigationTiming* GetNavigationTiming() const override;
@@ -1163,14 +1202,14 @@ public:
   virtual Element* FindImageMap(const nsAString& aNormalizedMapName) override;
 
   virtual Element* GetFullScreenElement() override;
-  virtual void AsyncRequestFullScreen(Element* aElement,
-                                      mozilla::dom::FullScreenOptions& aOptions) override;
+  virtual void AsyncRequestFullScreen(
+    mozilla::UniquePtr<FullscreenRequest>&& aRequest) override;
   virtual void RestorePreviousFullScreenState() override;
   virtual bool IsFullscreenLeaf() override;
   virtual bool IsFullScreenDoc() override;
   virtual void SetApprovedForFullscreen(bool aIsApproved) override;
-  virtual nsresult RemoteFrameFullscreenChanged(nsIDOMElement* aFrameElement,
-                                                const nsAString& aNewOrigin) override;
+  virtual nsresult
+    RemoteFrameFullscreenChanged(nsIDOMElement* aFrameElement) override;
 
   virtual nsresult RemoteFrameFullscreenReverted() override;
   virtual nsIDocument* GetFullscreenRoot() override;
@@ -1204,20 +1243,13 @@ public:
 
   static void ExitFullscreen(nsIDocument* aDoc);
 
+  // Do the "fullscreen element ready check" from the fullscreen spec.
+  // It returns true if the given element is allowed to go into fullscreen.
+  bool FullscreenElementReadyCheck(Element* aElement, bool aWasCallerChrome);
+
   // This is called asynchronously by nsIDocument::AsyncRequestFullScreen()
-  // to move this document into full-screen mode if allowed. aWasCallerChrome
-  // should be true when nsIDocument::AsyncRequestFullScreen() was called
-  // by chrome code. aNotifyOnOriginChange denotes whether we should send a
-  // fullscreen-origin-change notification if requesting fullscreen in this
-  // document causes the origin which is fullscreen to change. We may want to
-  // *not* send this notification if we're calling RequestFullscreen() as part
-  // of a continuation of a request in a subdocument, whereupon the caller will
-  // need to send the notification with the origin of the document which
-  // originally requested fullscreen, not *this* document's origin.
-  void RequestFullScreen(Element* aElement,
-                         mozilla::dom::FullScreenOptions& aOptions,
-                         bool aWasCallerChrome,
-                         bool aNotifyOnOriginChange);
+  // to move this document into full-screen mode if allowed.
+  void RequestFullScreen(mozilla::UniquePtr<FullscreenRequest>&& aRequest);
 
   // Removes all elements from the full-screen stack, removing full-scren
   // styles from the top element in the stack.
@@ -1506,6 +1538,9 @@ protected:
 
   void NotifyStyleSheetApplicableStateChanged();
 
+  // Apply the fullscreen state to the document, and trigger related events.
+  void ApplyFullscreen(const FullscreenRequest& aRequest);
+
   nsTArray<nsIObserver*> mCharSetObservers;
 
   PLDHashTable *mSubDocuments;
@@ -1653,8 +1688,6 @@ public:
   // user.
   bool mAllowRelocking:1;
 
-  bool mAsyncFullscreenPending:1;
-
   // Whether we're observing the "app-theme-changed" observer service
   // notification.  We need to keep track of this because we might get multiple
   // OnPageShow notifications in a row without an OnPageHide in between, if
@@ -1665,7 +1698,11 @@ public:
   // 'style-sheet-applicable-state-changed' notification.
   bool mSSApplicableStateNotificationPending:1;
 
-  uint32_t mCancelledPointerLockRequests;
+  // The number of pointer lock requests which are cancelled by the user.
+  // The value is saturated to kPointerLockRequestLimit+1 = 3.
+  uint8_t mCancelledPointerLockRequests:2;
+
+  uint8_t mPendingFullscreenRequests;
 
   uint8_t mXMLDeclarationBits;
 
@@ -1754,6 +1791,9 @@ private:
   bool mStyledLinksCleared;
 #endif
 
+  // A set of responsive images keyed by address pointer.
+  nsTHashtable< nsPtrHashKey<nsIContent> > mResponsiveContent;
+
   // Member to store out last-selected stylesheet set.
   nsString mLastStyleSheetSet;
 
@@ -1771,6 +1811,11 @@ private:
   // make sure to not keep the image load going when no one cares
   // about it anymore.
   nsRefPtrHashtable<nsURIHashKey, imgIRequest> mPreloadingImages;
+
+  // A list of preconnects initiated by the preloader. This prevents
+  // the same uri from being used more than once, and allows the dom
+  // builder to not repeat the work of the preloader.
+  nsDataHashtable< nsURIHashKey, bool> mPreloadedPreconnects;
 
   // Current depth of picture elements from parser
   int32_t mPreloadPictureDepth;

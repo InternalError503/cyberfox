@@ -29,6 +29,10 @@ struct InputContext;
 struct InputContextAction;
 }
 
+namespace mozilla {
+class HwcComposer2D;
+}
+
 class nsScreenGonk;
 
 class nsWindow : public nsBaseWidget
@@ -123,6 +127,8 @@ public:
 
     void ConfigureAPZControllerThread() override;
 
+    nsScreenGonk* GetScreen();
+
 protected:
     nsWindow* mParent;
     bool mVisible;
@@ -157,6 +163,8 @@ private:
     nsAutoPtr<mozilla::MultiTouchInput> mSynthesizedTouchInput;
 
     nsRefPtr<nsScreenGonk> mScreen;
+
+    nsRefPtr<mozilla::HwcComposer2D> mComposer2D;
 };
 
 #endif /* nsWindow_h */

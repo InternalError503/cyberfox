@@ -63,7 +63,8 @@ ContentHostTexture::Composite(EffectChain& aEffectChain,
 
   RefPtr<TexturedEffect> effect = CreateTexturedEffect(mTextureSource.get(),
                                                        mTextureSourceOnWhite.get(),
-                                                       aFilter, true);
+                                                       aFilter, true,
+                                                       GetRenderState());
   if (!effect) {
     return;
   }
@@ -261,29 +262,46 @@ ContentHostTexture::Dump(std::stringstream& aStream,
                          bool aDumpHtml)
 {
 #ifdef MOZ_DUMP_PAINTING
-  if (!aDumpHtml) {
-    return;
+  if (aDumpHtml) {
+    aStream << "<ul>";
   }
-  aStream << "<ul>";
   if (mTextureHost) {
     aStream << aPrefix;
-    aStream << "<li> <a href=";
+    if (aDumpHtml) {
+      aStream << "<li> <a href=";
+    } else {
+      aStream << "Front buffer: ";
+    }
     DumpTextureHost(aStream, mTextureHost);
-    aStream << "> Front buffer </a></li> ";
+    if (aDumpHtml) {
+      aStream << "> Front buffer </a></li> ";
+    } else {
+      aStream << "\n";
+    }
   }
   if (mTextureHostOnWhite) {
-    aStream <<  aPrefix;
-    aStream << "<li> <a href=";
+    aStream << aPrefix;
+    if (aDumpHtml) {
+      aStream << "<li> <a href=";
+    } else {
+      aStream << "Front buffer on white: ";
+    }
     DumpTextureHost(aStream, mTextureHostOnWhite);
-    aStream << "> Front buffer on white </a> </li> ";
+    if (aDumpHtml) {
+      aStream << "> Front buffer on white </a> </li> ";
+    } else {
+      aStream << "\n";
+    }
   }
-  aStream << "</ul>";
+  if (aDumpHtml) {
+    aStream << "</ul>";
+  }
 #endif
 }
 
 static inline void
 AddWrappedRegion(const nsIntRegion& aInput, nsIntRegion& aOutput,
-                 const nsIntSize& aSize, const nsIntPoint& aShift)
+                 const IntSize& aSize, const nsIntPoint& aShift)
 {
   nsIntRegion tempRegion;
   tempRegion.And(IntRect(aShift, aSize), aInput);
@@ -323,7 +341,7 @@ ContentHostSingleBuffered::UpdateThebes(const ThebesBufferData& aData,
   // Shift to the rotation point
   destRegion.MoveBy(aData.rotation());
 
-  nsIntSize bufferSize = aData.rect().Size();
+  IntSize bufferSize = aData.rect().Size();
 
   // Select only the pixels that are still within the buffer.
   nsIntRegion finalRegion;
@@ -443,7 +461,8 @@ ContentHostTexture::GenEffect(const gfx::Filter& aFilter)
   }
   return CreateTexturedEffect(mTextureSource.get(),
                               mTextureSourceOnWhite.get(),
-                              aFilter, true);
+                              aFilter, true,
+                              GetRenderState());
 }
 
 TemporaryRef<gfx::DataSourceSurface>

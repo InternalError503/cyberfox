@@ -6,13 +6,21 @@
 #ifndef PROFILER_FUNCS_H
 #define PROFILER_FUNCS_H
 
+#ifndef SPS_STANDALONE
 #include "js/TypeDecls.h"
+#endif
 #include "js/ProfilingStack.h"
+#include "mozilla/UniquePtr.h"
 #include <stdint.h>
 
 namespace mozilla {
 class TimeStamp;
-}
+
+namespace dom {
+class Promise;
+} // namespace dom
+
+} // namespace mozilla
 
 class ProfilerBacktrace;
 class ProfilerMarkerPayload;
@@ -53,9 +61,13 @@ const double* mozilla_sampler_get_responsiveness();
 
 void mozilla_sampler_save();
 
-char* mozilla_sampler_get_profile(float aSinceTime);
+mozilla::UniquePtr<char[]> mozilla_sampler_get_profile(double aSinceTime);
 
-JSObject *mozilla_sampler_get_profile_data(JSContext *aCx, float aSinceTime);
+#ifndef SPS_STANDALONE
+JSObject *mozilla_sampler_get_profile_data(JSContext* aCx, double aSinceTime);
+void mozilla_sampler_get_profile_data_async(double aSinceTime,
+                                            mozilla::dom::Promise* aPromise);
+#endif
 
 // Make this function easily callable from a debugger in a build without
 // debugging information (work around http://llvm.org/bugs/show_bug.cgi?id=22211)

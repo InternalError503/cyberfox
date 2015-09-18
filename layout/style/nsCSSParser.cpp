@@ -839,7 +839,7 @@ protected:
   // to indicate that we parsed the empty list,
   // or set it to a eCSSUnit_List of eCSSUnit_Ident.
   //
-  // To parse an optional <line-names> (ie. if not finding an open paren
+  // To parse an optional <line-names> (ie. if not finding an open bracket
   // is considered the same as an empty list),
   // treat CSSParseResult::NotFound the same as CSSParseResult::Ok.
   //
@@ -887,6 +887,7 @@ protected:
   // for 'clip' and '-moz-image-region'
   bool ParseRect(nsCSSProperty aPropID);
   bool ParseColumns();
+  bool ParseContain(nsCSSValue& aValue);
   bool ParseContent();
   bool ParseCounterData(nsCSSProperty aPropID);
   bool ParseCursor();
@@ -3113,9 +3114,6 @@ CSSParserImpl::ParseMediaQuery(eMediaQueryType aQueryType,
       // case insensitive from CSS - must be lower cased
       nsContentUtils::ASCIIToLower(mToken.mIdent);
       mediaType = do_GetAtom(mToken.mIdent);
-      if (!mediaType) {
-        NS_RUNTIMEABORT("do_GetAtom failed - out of memory?");
-      }
       if (!gotNotOrOnly && mediaType == nsGkAtoms::_not) {
         gotNotOrOnly = true;
         query->SetNegated();
@@ -3256,9 +3254,6 @@ CSSParserImpl::ParseMediaQueryExpression(nsMediaQuery* aQuery)
   }
 
   nsCOMPtr<nsIAtom> mediaFeatureAtom = do_GetAtom(featureString);
-  if (!mediaFeatureAtom) {
-    NS_RUNTIMEABORT("do_GetAtom failed - out of memory?");
-  }
   const nsMediaFeature *feature = nsMediaFeatures::features;
   for (; feature->mName; ++feature) {
     if (*(feature->mName) == mediaFeatureAtom) {
@@ -3618,9 +3613,6 @@ CSSParserImpl::ProcessNameSpace(const nsString& aPrefix,
 
   if (!aPrefix.IsEmpty()) {
     prefix = do_GetAtom(aPrefix);
-    if (!prefix) {
-      NS_RUNTIMEABORT("do_GetAtom failed - out of memory?");
-    }
   }
 
   nsRefPtr<css::NameSpaceRule> rule = new css::NameSpaceRule(prefix, aURLSpec,
@@ -5544,9 +5536,6 @@ CSSParserImpl::ParsePseudoSelector(int32_t&       aDataMask,
   buffer.Append(mToken.mIdent);
   nsContentUtils::ASCIIToLower(buffer);
   nsCOMPtr<nsIAtom> pseudo = do_GetAtom(buffer);
-  if (!pseudo) {
-    NS_RUNTIMEABORT("do_GetAtom failed - out of memory?");
-  }
 
   // stash away some info about this pseudo so we only have to get it once.
   bool isTreePseudo = false;
@@ -8023,10 +8012,10 @@ CSSParserImpl::ParseGridAutoFlow()
 CSSParseResult
 CSSParserImpl::ParseGridLineNames(nsCSSValue& aValue)
 {
-  if (!ExpectSymbol('(', true)) {
+  if (!ExpectSymbol('[', true)) {
     return CSSParseResult::NotFound;
   }
-  if (!GetToken(true) || mToken.IsSymbol(')')) {
+  if (!GetToken(true) || mToken.IsSymbol(']')) {
     return CSSParseResult::Ok;
   }
   // 'return' so far leaves aValue untouched, to represent an empty list.
@@ -8053,10 +8042,10 @@ CSSParserImpl::ParseGridLineNames(nsCSSValue& aValue)
     if (!(eCSSToken_Ident == mToken.mType &&
           ParseCustomIdent(item->mValue, mToken.mIdent))) {
       UngetToken();
-      SkipUntil(')');
+      SkipUntil(']');
       return CSSParseResult::Error;
     }
-    if (!GetToken(true) || mToken.IsSymbol(')')) {
+    if (!GetToken(true) || mToken.IsSymbol(']')) {
       return CSSParseResult::Ok;
     }
     item->mNext = new nsCSSValueList;
@@ -10013,7 +10002,8 @@ CSSParserImpl::ParseProperty(nsCSSProperty aPropID)
             tokenStream->mBaseURI = mBaseURI;
             tokenStream->mSheetURI = mSheetURI;
             tokenStream->mSheetPrincipal = mSheetPrincipal;
-            tokenStream->mSheet = mSheet;
+            // XXX Should store sheet here (see bug 952338).
+            // tokenStream->mSheet = mSheet;
             tokenStream->mLineNumber = stateBeforeProperty.mPosition.LineNumber();
             tokenStream->mLineOffset = stateBeforeProperty.mPosition.LineOffset();
             value.SetTokenStreamValue(tokenStream);
@@ -10026,7 +10016,8 @@ CSSParserImpl::ParseProperty(nsCSSProperty aPropID)
           tokenStream->mBaseURI = mBaseURI;
           tokenStream->mSheetURI = mSheetURI;
           tokenStream->mSheetPrincipal = mSheetPrincipal;
-          tokenStream->mSheet = mSheet;
+          // XXX Should store sheet here (see bug 952338).
+          // tokenStream->mSheet = mSheet;
           tokenStream->mLineNumber = stateBeforeProperty.mPosition.LineNumber();
           tokenStream->mLineOffset = stateBeforeProperty.mPosition.LineOffset();
           value.SetTokenStreamValue(tokenStream);
@@ -10300,6 +10291,8 @@ CSSParserImpl::ParseSingleValueProperty(nsCSSValue& aValue,
         return ParseTextOverflow(aValue);
       case eCSSProperty_touch_action:
         return ParseTouchAction(aValue);
+      case eCSSProperty_contain:
+        return ParseContain(aValue);
       default:
         MOZ_ASSERT(false, "should not reach here");
         return false;
@@ -12405,6 +12398,29 @@ CSSParserImpl::ParseFontVariantEastAsian(nsCSSValue& aValue)
 
   return ParseBitmaskValues(aValue, nsCSSProps::kFontVariantEastAsianKTable,
                             maskEastAsian);
+}
+
+bool
+CSSParserImpl::ParseContain(nsCSSValue& aValue)
+{
+  if (ParseVariant(aValue, VARIANT_INHERIT | VARIANT_NONE, nullptr)) {
+    return true;
+  }
+  static const int32_t maskContain[] = { MASK_END_VALUE };
+  if (!ParseBitmaskValues(aValue, nsCSSProps::kContainKTable, maskContain)) {
+    return false;
+  }
+  if (aValue.GetIntValue() & NS_STYLE_CONTAIN_STRICT) {
+    if (aValue.GetIntValue() != NS_STYLE_CONTAIN_STRICT) {
+      // Disallow any other keywords in combination with 'strict'.
+      return false;
+    }
+    // Strict implies layout, style, and paint.
+    // However, for serialization purposes, we keep the strict bit around.
+    aValue.SetIntValue(NS_STYLE_CONTAIN_STRICT |
+        NS_STYLE_CONTAIN_ALL_BITS, eCSSUnit_Enumerated);
+  }
+  return true;
 }
 
 static const int32_t maskLigatures[] = {
@@ -14889,9 +14905,6 @@ CSSParserImpl::GetNamespaceIdForPrefix(const nsString& aPrefix)
   if (mNameSpaceMap) {
     // user-specified identifiers are case-sensitive (bug 416106)
     nsCOMPtr<nsIAtom> prefix = do_GetAtom(aPrefix);
-    if (!prefix) {
-      NS_RUNTIMEABORT("do_GetAtom failed - out of memory?");
-    }
     nameSpaceID = mNameSpaceMap->FindNameSpaceID(prefix);
   }
   // else no declared namespaces

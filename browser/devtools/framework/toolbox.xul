@@ -70,6 +70,14 @@
          keycode="VK_F5"
          oncommand="void(0);"
          modifiers="accel"/>
+    <key id="toolbox-minimize-key"
+         key="&toolboxToggleMinimize.key;"
+         oncommand="void(0);"
+         modifiers="shift, accel"/>
+    <key id="toolbox-toggle-host-key"
+         key="&toolboxToggle.key;"
+         oncommand="void(0);"
+         modifiers="accel shift"/>
   </keyset>
 
   <popupset>

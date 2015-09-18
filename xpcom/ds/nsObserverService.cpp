@@ -4,12 +4,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "nsAutoPtr.h"
+#include "nsIConsoleService.h"
 #include "nsIObserverService.h"
 #include "nsIObserver.h"
+#include "nsIScriptError.h"
 #include "nsObserverService.h"
 #include "nsObserverList.h"
+#include "nsServiceManagerUtils.h"
 #include "nsThreadUtils.h"
 #include "nsEnumeratorUtils.h"
 #include "xpcpublic.h"
@@ -25,7 +28,7 @@
 //    set NSPR_LOG_MODULES=ObserverService:5
 //    set NSPR_LOG_FILE=nspr.log
 //
-// this enables PR_LOG_DEBUG level information and places all output in
+// this enables LogLevel::Debug level information and places all output in
 // the file nspr.log
 static PRLogModuleInfo*
 GetObserverServiceLog()
@@ -36,7 +39,7 @@ GetObserverServiceLog()
   }
   return sLog;
 }
-#define LOG(x)  PR_LOG(GetObserverServiceLog(), PR_LOG_DEBUG, x)
+#define LOG(x)  MOZ_LOG(GetObserverServiceLog(), mozilla::LogLevel::Debug, x)
 
 namespace mozilla {
 
@@ -264,6 +267,13 @@ nsObserverService::AddObserver(nsIObserver* aObserver, const char* aTopic,
   }
 
   if (mozilla::net::IsNeckoChild() && !strncmp(aTopic, "http-on-", 8)) {
+    nsCOMPtr<nsIConsoleService> console(do_GetService(NS_CONSOLESERVICE_CONTRACTID));
+    nsCOMPtr<nsIScriptError> error(do_CreateInstance(NS_SCRIPTERROR_CONTRACTID));
+    error->Init(NS_LITERAL_STRING("http-on-* observers only work in the parent process"),
+                EmptyString(), EmptyString(), 0, 0,
+                nsIScriptError::warningFlag, "chrome javascript");
+    console->LogMessage(error);
+
     return NS_ERROR_NOT_IMPLEMENTED;
   }
 

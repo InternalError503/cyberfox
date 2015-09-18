@@ -46,7 +46,7 @@ TextureClientX11::CreateSimilar(TextureFlags aFlags,
     return nullptr;
   }
 
-  return tex;
+  return tex.forget();
 }
 
 bool
@@ -118,8 +118,8 @@ TextureClientX11::AllocateForSurface(IntSize aSize, TextureAllocationFlags aText
     gfxDebug() << "Asking for X11 surface of invalid size " << aSize.width << "x" << aSize.height;
     return false;
   }
-  gfxContentType contentType = ContentForFormat(mFormat);
-  nsRefPtr<gfxASurface> surface = gfxPlatform::GetPlatform()->CreateOffscreenSurface(aSize, contentType);
+  gfxImageFormat imageFormat = SurfaceFormatToImageFormat(mFormat);
+  nsRefPtr<gfxASurface> surface = gfxPlatform::GetPlatform()->CreateOffscreenSurface(aSize, imageFormat);
   if (!surface || surface->GetType() != gfxSurfaceType::Xlib) {
     NS_ERROR("creating Xlib surface failed!");
     return false;

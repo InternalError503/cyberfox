@@ -20,9 +20,6 @@
 #include "TabChild.h"
 
 #include "mozilla/Attributes.h"
-#ifdef ACCESSIBILITY
-#include "mozilla/a11y/DocAccessibleChild.h"
-#endif
 #include "mozilla/LookAndFeel.h"
 #include "mozilla/Preferences.h"
 #include "mozilla/ProcessHangMonitorIPC.h"
@@ -55,6 +52,7 @@
 #include "mozilla/plugins/PluginInstanceParent.h"
 #include "mozilla/plugins/PluginModuleParent.h"
 #include "mozilla/widget/WidgetMessageUtils.h"
+#include "mozilla/media/MediaChild.h"
 
 #if defined(MOZ_CONTENT_SANDBOX)
 #if defined(XP_WIN)
@@ -94,7 +92,6 @@
 #include "nsDebugImpl.h"
 #include "nsHashPropertyBag.h"
 #include "nsLayoutStylesheetCache.h"
-#include "nsIJSRuntimeService.h"
 #include "nsThreadManager.h"
 #include "nsAnonymousTemporaryFile.h"
 #include "nsISpellChecker.h"
@@ -207,6 +204,7 @@ using namespace mozilla::dom::mobileconnection;
 using namespace mozilla::dom::mobilemessage;
 using namespace mozilla::dom::telephony;
 using namespace mozilla::dom::voicemail;
+using namespace mozilla::media;
 using namespace mozilla::embedding;
 using namespace mozilla::gmp;
 using namespace mozilla::hal_sandbox;
@@ -538,12 +536,6 @@ NS_IMPL_ISUPPORTS(BackgroundChildPrimer, nsIIPCBackgroundChildCreateCallback)
 
 ContentChild* ContentChild::sSingleton;
 
-static void
-PostForkPreload()
-{
-    TabChild::PostForkPreload();
-}
-
 // Performs initialization that is not fork-safe, i.e. that must be done after
 // forking from the Nuwa process.
 static void
@@ -554,7 +546,6 @@ InitOnContentProcessCreated()
     if (IsNuwaProcess()) {
         return;
     }
-    PostForkPreload();
 
     nsCOMPtr<nsIPermissionManager> permManager =
         services::GetPermissionManager();
@@ -812,10 +803,11 @@ ContentChild::InitXPCOM()
     bool isConnected;
     ClipboardCapabilities clipboardCaps;
     DomainPolicyClone domainPolicy;
+    OwningSerializedStructuredCloneBuffer initialData;
 
     SendGetXPCOMProcessAttributes(&isOffline, &isConnected,
                                   &isLangRTL, &mAvailableDictionaries,
-                                  &clipboardCaps, &domainPolicy);
+                                  &clipboardCaps, &domainPolicy, &initialData);
     RecvSetOffline(isOffline);
     RecvSetConnectivity(isConnected);
     RecvBidiKeyboardNotify(isLangRTL);
@@ -838,6 +830,20 @@ ContentChild::InitXPCOM()
         clipboardProxy->SetCapabilities(clipboardCaps);
     }
 
+    {
+        AutoJSAPI jsapi;
+        if (NS_WARN_IF(!jsapi.Init(xpc::PrivilegedJunkScope()))) {
+            MOZ_CRASH();
+        }
+        JS::RootedValue data(jsapi.cx());
+        if (!JS_ReadStructuredClone(jsapi.cx(), initialData.data, initialData.dataLength,
+                                    JS_STRUCTURED_CLONE_VERSION, &data, nullptr, nullptr)) {
+            MOZ_CRASH();
+        }
+        ProcessGlobal* global = ProcessGlobal::Get();
+        global->SetInitialProcessData(data);
+    }
+
     DebugOnly<FileUpdateDispatcher*> observer = FileUpdateDispatcher::GetSingleton();
     NS_ASSERTION(observer, "FileUpdateDispatcher is null");
 
@@ -847,22 +853,6 @@ ContentChild::InitXPCOM()
     sysMsgObserver->Init();
 
     InitOnContentProcessCreated();
-}
-
-a11y::PDocAccessibleChild*
-ContentChild::AllocPDocAccessibleChild(PDocAccessibleChild*, const uint64_t&)
-{
-  MOZ_ASSERT(false, "should never call this!");
-  return nullptr;
-}
-
-bool
-ContentChild::DeallocPDocAccessibleChild(a11y::PDocAccessibleChild* aChild)
-{
-#ifdef ACCESSIBILITY
-  delete static_cast<mozilla::a11y::DocAccessibleChild*>(aChild);
-#endif
-  return true;
 }
 
 PMemoryReportRequestChild*
@@ -1253,26 +1243,6 @@ ContentChild::RecvUpdateServiceWorkerRegistrations()
     return true;
 }
 
-bool
-ContentChild::RecvRemoveServiceWorkerRegistrationsForDomain(const nsString& aDomain)
-{
-    nsCOMPtr<nsIServiceWorkerManager> swm = mozilla::services::GetServiceWorkerManager();
-    if (swm) {
-        swm->Remove(NS_ConvertUTF16toUTF8(aDomain));
-    }
-    return true;
-}
-
-bool
-ContentChild::RecvRemoveServiceWorkerRegistrations()
-{
-    nsCOMPtr<nsIServiceWorkerManager> swm = mozilla::services::GetServiceWorkerManager();
-    if (swm) {
-        swm->RemoveAll();
-    }
-    return true;
-}
-
 static CancelableTask* sFirstIdleTask;
 
 static void FirstIdle(void)
@@ -1341,6 +1311,7 @@ ContentChild::RecvPBrowserConstructor(PBrowserChild* aActor,
 {
     // This runs after AllocPBrowserChild() returns and the IPC machinery for this
     // PBrowserChild has been set up.
+
     nsCOMPtr<nsIObserverService> os = services::GetObserverService();
     if (os) {
         nsITabChild* tc =
@@ -1758,6 +1729,18 @@ ContentChild::DeallocPVoicemailChild(PVoicemailChild* aActor)
 {
     static_cast<VoicemailIPCService*>(aActor)->Release();
     return true;
+}
+
+media::PMediaChild*
+ContentChild::AllocPMediaChild()
+{
+  return media::AllocPMediaChild();
+}
+
+bool
+ContentChild::DeallocPMediaChild(media::PMediaChild *aActor)
+{
+  return media::DeallocPMediaChild(aActor);
 }
 
 PStorageChild*
@@ -2186,11 +2169,8 @@ bool
 ContentChild::RecvFlushMemory(const nsString& reason)
 {
 #ifdef MOZ_NUWA_PROCESS
-    if (IsNuwaProcess() || ManagedPBrowserChild().Length() == 0) {
+    if (IsNuwaProcess()) {
         // Don't flush memory in the nuwa process: the GC thread could be frozen.
-        // If there's no PBrowser child, don't flush memory, either. GC writes
-        // to copy-on-write pages and makes preallocated process take more memory
-        // before it actually becomes an app.
         return true;
     }
 #endif
@@ -2267,6 +2247,12 @@ ContentChild::RecvAppInfo(const nsCString& version, const nsCString& buildID,
     mAppInfo.ID.Assign(ID);
     mAppInfo.vendor.Assign(vendor);
 
+    return true;
+}
+
+bool
+ContentChild::RecvAppInit()
+{
     if (!Preferences::GetBool("dom.ipc.processPrelaunch.enabled", false)) {
         return true;
     }
@@ -2278,28 +2264,12 @@ ContentChild::RecvAppInfo(const nsCString& version, const nsCString& buildID,
     // BrowserElementChild.js.
     if ((mIsForApp || mIsForBrowser)
 #ifdef MOZ_NUWA_PROCESS
-        && IsNuwaProcess()
+        && !IsNuwaProcess()
 #endif
        ) {
         PreloadSlowThings();
-#ifndef MOZ_NUWA_PROCESS
-        PostForkPreload();
-#endif
     }
 
-#ifdef MOZ_NUWA_PROCESS
-    // Some modules are initialized in preloading. We need to wait until the
-    // tasks they dispatched to chrome process are done.
-    if (IsNuwaProcess()) {
-        SendNuwaWaitForFreeze();
-    }
-#endif
-    return true;
-}
-
-bool
-ContentChild::RecvNuwaFreeze()
-{
 #ifdef MOZ_NUWA_PROCESS
     if (IsNuwaProcess()) {
         ContentChild::GetSingleton()->RecvGarbageCollect();
@@ -2307,6 +2277,7 @@ ContentChild::RecvNuwaFreeze()
             FROM_HERE, NewRunnableFunction(OnFinishNuwaPreparation));
     }
 #endif
+
     return true;
 }
 
@@ -2583,36 +2554,6 @@ RunNuwaFork()
       DoNuwaFork();
     }
 }
-
-class NuwaForkCaller: public nsRunnable
-{
-public:
-    NS_IMETHODIMP
-    Run() {
-        // We want to ensure that the PBackground actor gets cloned in the Nuwa
-        // process before we freeze. Also, we have to do this to avoid deadlock.
-        // Protocols that are "opened" (e.g. PBackground, PCompositor) block the
-        // main thread to wait for the IPC thread during the open operation.
-        // NuwaSpawnWait() blocks the IPC thread to wait for the main thread when
-        // the Nuwa process is forked. Unless we ensure that the two cannot happen
-        // at the same time then we risk deadlock. Spinning the event loop here
-        // guarantees the ordering is safe for PBackground.
-        if (!BackgroundChild::GetForCurrentThread()) {
-            // Dispatch ourself again.
-            NS_DispatchToMainThread(this, NS_DISPATCH_NORMAL);
-        } else {
-            MessageLoop* ioloop = XRE_GetIOMessageLoop();
-            ioloop->PostTask(FROM_HERE, NewRunnableFunction(RunNuwaFork));
-        }
-        return NS_OK;
-    }
-private:
-    virtual
-    ~NuwaForkCaller()
-    {
-    }
-};
-
 #endif
 
 bool
@@ -2624,9 +2565,22 @@ ContentChild::RecvNuwaFork()
     }
     sNuwaForking = true;
 
-    nsRefPtr<NuwaForkCaller> runnable = new NuwaForkCaller();
-    NS_DispatchToMainThread(runnable, NS_DISPATCH_NORMAL);
+    // We want to ensure that the PBackground actor gets cloned in the Nuwa
+    // process before we freeze. Also, we have to do this to avoid deadlock.
+    // Protocols that are "opened" (e.g. PBackground, PCompositor) block the
+    // main thread to wait for the IPC thread during the open operation.
+    // NuwaSpawnWait() blocks the IPC thread to wait for the main thread when
+    // the Nuwa process is forked. Unless we ensure that the two cannot happen
+    // at the same time then we risk deadlock. Spinning the event loop here
+    // guarantees the ordering is safe for PBackground.
+    while (!BackgroundChild::GetForCurrentThread()) {
+        if (NS_WARN_IF(!NS_ProcessNextEvent())) {
+            return false;
+        }
+    }
 
+    MessageLoop* ioloop = XRE_GetIOMessageLoop();
+    ioloop->PostTask(FROM_HERE, NewRunnableFunction(RunNuwaFork));
     return true;
 #else
     return false; // Makes the underlying IPC channel abort.
@@ -2673,15 +2627,17 @@ ContentChild::RecvStopProfiler()
 }
 
 bool
-ContentChild::RecvGetProfile(nsCString* aProfile)
+ContentChild::RecvGatherProfile()
 {
-    char* profile = profiler_get_profile();
+    nsCString profileCString;
+    UniquePtr<char[]> profile = profiler_get_profile();
     if (profile) {
-        *aProfile = nsCString(profile, strlen(profile));
-        free(profile);
+        profileCString = nsCString(profile.get(), strlen(profile.get()));
     } else {
-        *aProfile = EmptyCString();
+        profileCString = EmptyCString();
     }
+
+    unused << SendProfile(profileCString);
     return true;
 }
 
@@ -2917,8 +2873,8 @@ ContentChild::RecvInvokeDragSession(nsTArray<IPCDataTransfer>&& aTransfers,
             variant->SetAsAString(data);
           } else if (item.data().type() == IPCDataTransferData::TPBlobChild) {
             BlobChild* blob = static_cast<BlobChild*>(item.data().get_PBlobChild());
-            nsRefPtr<FileImpl> fileImpl = blob->GetBlobImpl();
-            variant->SetAsISupports(fileImpl);
+            nsRefPtr<BlobImpl> blobImpl = blob->GetBlobImpl();
+            variant->SetAsISupports(blobImpl);
           } else {
             continue;
           }

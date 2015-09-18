@@ -598,6 +598,9 @@ DynamicallyLinkModule(JSContext* cx, CallArgs args, AsmJSModule& module)
 
     module.initGlobalNaN();
 
+    // See the comment in AllocateExecutableMemory.
+    ExecutableAllocator::makeExecutable(module.codeBase(), module.codeBytes());
+
     return true;
 }
 
@@ -835,7 +838,7 @@ HandleDynamicLinkFailure(JSContext* cx, CallArgs args, AsmJSModule& module, Hand
     if (!src)
         return false;
 
-    RootedFunction fun(cx, NewScriptedFunction(cx, 0, JSFunction::INTERPRETED,
+    RootedFunction fun(cx, NewScriptedFunction(cx, 0, JSFunction::INTERPRETED_NORMAL,
                                                name, gc::AllocKind::FUNCTION,
                                                TenuredObject));
     if (!fun)
@@ -872,7 +875,7 @@ HandleDynamicLinkFailure(JSContext* cx, CallArgs args, AsmJSModule& module, Hand
                                               : SourceBufferHolder::NoOwnership;
     SourceBufferHolder srcBuf(chars, end - begin, ownership);
     if (!frontend::CompileFunctionBody(cx, &fun, options, formals, srcBuf,
-                                       /* enclosingScope = */ NullPtr()))
+                                       /* enclosingScope = */ nullptr))
         return false;
 
     // Call the function we just recompiled.

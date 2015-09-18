@@ -6,6 +6,7 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 const Cr = Components.results;
+const CC = Components.Constructor;
 
 const { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 const { worker } = Cu.import("resource://gre/modules/devtools/worker-loader.js", {})
@@ -74,9 +75,9 @@ function attachTab(client, tab) {
   return rdpRequest(client, client.attachTab, tab.actor);
 }
 
-function waitForNewSource(client, url) {
+function waitForNewSource(threadClient, url) {
   dump("Waiting for new source with url '" + url + "'.\n");
-  return waitForEvent(client, "newSource", function (packet) {
+  return waitForEvent(threadClient, "newSource", function (packet) {
     return packet.source.url === url;
   });
 }
@@ -300,6 +301,20 @@ function initTestDebuggerServer(aServer = DebuggerServer)
   aServer.init(function () { return true; });
 }
 
+/**
+ * Initialize the testing debugger server with a tab whose title is |title|.
+ */
+function startTestDebuggerServer(title, server = DebuggerServer) {
+  initTestDebuggerServer(server);
+  addTestGlobal(title);
+  DebuggerServer.addTabActors();
+
+  let transport = DebuggerServer.connectPipe();
+  let client = new DebuggerClient(transport);
+
+  return connect(client).then(() => client);
+}
+
 function initTestTracerServer(aServer = DebuggerServer)
 {
   aServer.registerModule("xpcshell-test/testactors");
@@ -315,6 +330,7 @@ function initTestTracerServer(aServer = DebuggerServer)
 function finishClient(aClient)
 {
   aClient.close(function() {
+    DebuggerServer.destroy();
     do_test_finished();
   });
 }
@@ -337,6 +353,11 @@ function get_chrome_actors(callback)
   });
 }
 
+function getChromeActors(client, server = DebuggerServer) {
+  server.allowChromeProcess = true;
+  return client.getProcess().then(response => response.form);
+}
+
 /**
  * Takes a relative file path and returns the absolute file url for it.
  */
@@ -349,7 +370,7 @@ function getFileUrl(aName, aAllowMissing=false) {
  * Returns the full path of the file with the specified name in a
  * platform-independent and URL-like form.
  */
-function getFilePath(aName, aAllowMissing=false)
+function getFilePath(aName, aAllowMissing=false, aUsePlatformPathSeparator=false)
 {
   let file = do_get_file(aName, aAllowMissing);
   let path = Services.io.newFileURI(file).spec;
@@ -358,7 +379,14 @@ function getFilePath(aName, aAllowMissing=false)
       file instanceof Ci.nsILocalFileWin) {
     filePrePath += "/";
   }
-  return path.slice(filePrePath.length);
+
+  path = path.slice(filePrePath.length);
+
+  if (aUsePlatformPathSeparator && path.match(/^\w:/)) {
+    path = path.replace(/\//g, "\\");
+  }
+
+  return path;
 }
 
 Cu.import("resource://gre/modules/NetUtil.jsm");

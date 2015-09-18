@@ -15,18 +15,16 @@
 #include <stdint.h>
 #include <algorithm>
 
+using namespace mozilla::media;
+
 namespace mozilla {
 
 // Un-comment to enable logging of seek bisections.
 //#define SEEK_LOGGING
 
-#ifdef PR_LOGGING
 extern PRLogModuleInfo* gMediaDecoderLog;
 #define DECODER_LOG(x, ...) \
-  PR_LOG(gMediaDecoderLog, PR_LOG_DEBUG, ("Decoder=%p " x, mDecoder, ##__VA_ARGS__))
-#else
-#define DECODER_LOG(x, ...)
-#endif
+  MOZ_LOG(gMediaDecoderLog, LogLevel::Debug, ("Decoder=%p " x, mDecoder, ##__VA_ARGS__))
 
 // Same workaround as MediaDecoderStateMachine.cpp.
 #define DECODER_WARN_HELPER(a, b) NS_WARNING b
@@ -64,18 +62,43 @@ public:
   size_t mSize;
 };
 
-MediaDecoderReader::MediaDecoderReader(AbstractMediaDecoder* aDecoder)
+MediaDecoderReader::MediaDecoderReader(AbstractMediaDecoder* aDecoder,
+                                       MediaTaskQueue* aBorrowedTaskQueue)
   : mAudioCompactor(mAudioQueue)
   , mDecoder(aDecoder)
+  , mTaskQueue(aBorrowedTaskQueue ? aBorrowedTaskQueue
+                                  : new MediaTaskQueue(GetMediaThreadPool(MediaThreadType::PLAYBACK),
+                                                       /* aSupportsTailDispatch = */ true))
+  , mWatchManager(this, mTaskQueue)
+  , mTimer(new MediaTimer())
+  , mBuffered(mTaskQueue, TimeIntervals(), "MediaDecoderReader::mBuffered (Canonical)")
+  , mDuration(mTaskQueue, NullableTimeUnit(), "MediaDecoderReader::mDuration (Mirror)")
+  , mThrottleDuration(TimeDuration::FromMilliseconds(500))
+  , mLastThrottledNotify(TimeStamp::Now() - mThrottleDuration)
   , mIgnoreAudioOutputFormat(false)
-  , mStartTime(-1)
   , mHitAudioDecodeError(false)
   , mShutdown(false)
-  , mTaskQueueIsBorrowed(false)
+  , mTaskQueueIsBorrowed(!!aBorrowedTaskQueue)
   , mAudioDiscontinuity(false)
   , mVideoDiscontinuity(false)
 {
   MOZ_COUNT_CTOR(MediaDecoderReader);
+  MOZ_ASSERT(NS_IsMainThread());
+
+  // Dispatch initialization that needs to happen on that task queue.
+  nsCOMPtr<nsIRunnable> r = NS_NewRunnableMethod(this, &MediaDecoderReader::InitializationTask);
+  mTaskQueue->Dispatch(r.forget());
+}
+
+void
+MediaDecoderReader::InitializationTask()
+{
+  if (mDecoder->CanonicalDurationOrNull()) {
+    mDuration.Connect(mDecoder->CanonicalDurationOrNull());
+  }
+
+  // Initialize watchers.
+  mWatchManager.Watch(mDuration, &MediaDecoderReader::UpdateBuffered);
 }
 
 MediaDecoderReader::~MediaDecoderReader()
@@ -145,37 +168,73 @@ VideoData* MediaDecoderReader::DecodeToFirstVideoData()
 }
 
 void
-MediaDecoderReader::SetStartTime(int64_t aStartTime)
+MediaDecoderReader::UpdateBuffered()
 {
-  mDecoder->GetReentrantMonitor().AssertCurrentThreadIn();
-  mStartTime = aStartTime;
+  MOZ_ASSERT(OnTaskQueue());
+  NS_ENSURE_TRUE_VOID(!mShutdown);
+  mBuffered = GetBuffered();
 }
 
-nsresult
-MediaDecoderReader::GetBuffered(mozilla::dom::TimeRanges* aBuffered)
+void
+MediaDecoderReader::ThrottledNotifyDataArrived(const Interval<int64_t>& aInterval)
 {
+  MOZ_ASSERT(OnTaskQueue());
+  NS_ENSURE_TRUE_VOID(!mShutdown);
+
+  if (mThrottledInterval.isNothing()) {
+    mThrottledInterval.emplace(aInterval);
+  } else if (!mThrottledInterval.ref().Contiguous(aInterval)) {
+    DoThrottledNotify();
+    mThrottledInterval.emplace(aInterval);
+  } else {
+    mThrottledInterval = Some(mThrottledInterval.ref().Span(aInterval));
+  }
+
+  // If it's been long enough since our last update, do it.
+  if (TimeStamp::Now() - mLastThrottledNotify > mThrottleDuration) {
+    DoThrottledNotify();
+  } else if (!mThrottledNotify.Exists()) {
+    // Otherwise, schedule an update if one isn't scheduled already.
+    nsRefPtr<MediaDecoderReader> self = this;
+    mThrottledNotify.Begin(
+      mTimer->WaitUntil(mLastThrottledNotify + mThrottleDuration, __func__)
+      ->Then(TaskQueue(), __func__,
+             [self] () -> void {
+               self->mThrottledNotify.Complete();
+               NS_ENSURE_TRUE_VOID(!self->mShutdown);
+               self->DoThrottledNotify();
+             },
+             [self] () -> void {
+               self->mThrottledNotify.Complete();
+               NS_WARNING("throttle callback rejected");
+             })
+    );
+  }
+}
+
+void
+MediaDecoderReader::DoThrottledNotify()
+{
+  MOZ_ASSERT(OnTaskQueue());
+  mLastThrottledNotify = TimeStamp::Now();
+  mThrottledNotify.DisconnectIfExists();
+  Interval<int64_t> interval = mThrottledInterval.ref();
+  mThrottledInterval.reset();
+  NotifyDataArrived(interval);
+}
+
+media::TimeIntervals
+MediaDecoderReader::GetBuffered()
+{
+  MOZ_ASSERT(OnTaskQueue());
+  NS_ENSURE_TRUE(HaveStartTime(), media::TimeIntervals());
   AutoPinned<MediaResource> stream(mDecoder->GetResource());
-  int64_t durationUs = 0;
-  {
-    ReentrantMonitorAutoEnter mon(mDecoder->GetReentrantMonitor());
-    durationUs = mDecoder->GetMediaDuration();
-  }
-  GetEstimatedBufferedTimeRanges(stream, durationUs, aBuffered);
-  return NS_OK;
-}
 
-int64_t
-MediaDecoderReader::ComputeStartTime(const VideoData* aVideo, const AudioData* aAudio)
-{
-  int64_t startTime = std::min<int64_t>(aAudio ? aAudio->mTime : INT64_MAX,
-                                        aVideo ? aVideo->mTime : INT64_MAX);
-  if (startTime == INT64_MAX) {
-    startTime = 0;
+  if (!mDuration.ReadOnWrongThread().isSome()) {
+    return TimeIntervals();
   }
-  DECODER_LOG("ComputeStartTime first video frame start %lld", aVideo ? aVideo->mTime : -1);
-  DECODER_LOG("ComputeStartTime first audio frame start %lld", aAudio ? aAudio->mTime : -1);
-  NS_ASSERTION(startTime >= 0, "Start time is negative");
-  return startTime;
+
+  return GetEstimatedBufferedTimeRanges(stream, mDuration.ReadOnWrongThread().ref().ToMicroseconds());
 }
 
 nsRefPtr<MediaDecoderReader::MetadataPromise>
@@ -187,9 +246,6 @@ MediaDecoderReader::AsyncReadMetadata()
   mDecoder->GetReentrantMonitor().AssertNotCurrentThreadIn();
   DECODER_LOG("MediaDecoderReader::AsyncReadMetadata");
 
-  // PreReadMetadata causes us to try to allocate various hardware and OS
-  // resources, which may not be available at the moment.
-  PreReadMetadata();
   if (IsWaitingMediaResources()) {
     return MetadataPromise::CreateAndReject(Reason::WAITING_FOR_RESOURCES, __func__);
   }
@@ -227,7 +283,7 @@ public:
 
   NS_METHOD Run()
   {
-    MOZ_ASSERT(mReader->GetTaskQueue()->IsCurrentThreadIn());
+    MOZ_ASSERT(mReader->OnTaskQueue());
 
     // Make sure ResetDecode hasn't been called in the mean time.
     if (!mReader->mBaseVideoPromise.IsEmpty()) {
@@ -252,7 +308,7 @@ public:
 
   NS_METHOD Run()
   {
-    MOZ_ASSERT(mReader->GetTaskQueue()->IsCurrentThreadIn());
+    MOZ_ASSERT(mReader->OnTaskQueue());
 
     // Make sure ResetDecode hasn't been called in the mean time.
     if (!mReader->mBaseAudioPromise.IsEmpty()) {
@@ -282,7 +338,7 @@ MediaDecoderReader::RequestVideoData(bool aSkipToNextKeyframe,
       // again. We don't just decode straight in a loop here, as that
       // would hog the decode task queue.
       RefPtr<nsIRunnable> task(new ReRequestVideoWithSkipTask(this, aTimeThreshold));
-      mTaskQueue->Dispatch(task);
+      mTaskQueue->Dispatch(task.forget());
       return p;
     }
   }
@@ -318,7 +374,7 @@ MediaDecoderReader::RequestAudioData()
     // consumed. (|mVideoSinkBufferCount| > 0)
     if (AudioQueue().GetSize() == 0 && mTaskQueue) {
       RefPtr<nsIRunnable> task(new ReRequestAudioTask(this));
-      mTaskQueue->Dispatch(task);
+      mTaskQueue->Dispatch(task.forget());
       return p;
     }
   }
@@ -339,23 +395,12 @@ MediaDecoderReader::RequestAudioData()
   return p;
 }
 
-MediaTaskQueue*
-MediaDecoderReader::EnsureTaskQueue()
-{
-  if (!mTaskQueue) {
-    MOZ_ASSERT(!mTaskQueueIsBorrowed);
-    RefPtr<SharedThreadPool> pool(GetMediaThreadPool(MediaThreadType::PLAYBACK));
-    MOZ_DIAGNOSTIC_ASSERT(pool);
-    mTaskQueue = new MediaTaskQueue(pool.forget());
-  }
-
-  return mTaskQueue;
-}
-
 void
 MediaDecoderReader::BreakCycles()
 {
-  mTaskQueue = nullptr;
+  // Nothing left to do here these days. We keep this method around so that, if
+  // we need it, we don't have to make all of the subclass implementations call
+  // the superclass method again.
 }
 
 nsRefPtr<ShutdownPromise>
@@ -367,12 +412,20 @@ MediaDecoderReader::Shutdown()
   mBaseAudioPromise.RejectIfExists(END_OF_STREAM, __func__);
   mBaseVideoPromise.RejectIfExists(END_OF_STREAM, __func__);
 
+  mThrottledNotify.DisconnectIfExists();
+
   ReleaseMediaResources();
+  mDuration.DisconnectIfConnected();
+  mBuffered.DisconnectAll();
+
+  // Shut down the watch manager before shutting down our task queue.
+  mWatchManager.Shutdown();
+
   nsRefPtr<ShutdownPromise> p;
 
   // Spin down the task queue if necessary. We wait until BreakCycles to null
   // out mTaskQueue, since otherwise any remaining tasks could crash when they
-  // invoke GetTaskQueue()->IsCurrentThreadIn().
+  // invoke OnTaskQueue().
   if (mTaskQueue && !mTaskQueueIsBorrowed) {
     // If we own our task queue, shutdown ends when the task queue is done.
     p = mTaskQueue->BeginShutdown();
@@ -382,6 +435,7 @@ MediaDecoderReader::Shutdown()
     p = ShutdownPromise::CreateAndResolve(true, __func__);
   }
 
+  mTimer = nullptr;
   mDecoder = nullptr;
 
   return p;

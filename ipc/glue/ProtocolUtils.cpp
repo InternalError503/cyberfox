@@ -26,6 +26,18 @@ using base::ProcessId;
 namespace mozilla {
 namespace ipc {
 
+ProtocolCloneContext::ProtocolCloneContext()
+  : mNeckoParent(nullptr)
+{}
+
+ProtocolCloneContext::~ProtocolCloneContext()
+{}
+
+void ProtocolCloneContext::SetContentParent(ContentParent* aContentParent)
+{
+  mContentParent = aContentParent;
+}
+
 static StaticMutex gProtocolMutex;
 
 IToplevelProtocol::IToplevelProtocol(ProtocolId aProtoId)
@@ -167,34 +179,41 @@ public:
   }
 };
 
-bool
+nsresult
 Bridge(const PrivateIPDLInterface&,
        MessageChannel* aParentChannel, ProcessId aParentPid,
        MessageChannel* aChildChannel, ProcessId aChildPid,
        ProtocolId aProtocol, ProtocolId aChildProtocol)
 {
   if (!aParentPid || !aChildPid) {
-    return false;
+    return NS_ERROR_INVALID_ARG;
   }
 
   TransportDescriptor parentSide, childSide;
-  if (!CreateTransport(aParentPid, &parentSide, &childSide)) {
-    return false;
+  nsresult rv;
+  if (NS_FAILED(rv = CreateTransport(aParentPid, &parentSide, &childSide))) {
+    return rv;
   }
 
   if (!aParentChannel->Send(new ChannelOpened(parentSide,
                                               aChildPid,
                                               aProtocol,
-                                              IPC::Message::PRIORITY_URGENT)) ||
-      !aChildChannel->Send(new ChannelOpened(childSide,
-                                             aParentPid,
-                                             aChildProtocol,
-                                             IPC::Message::PRIORITY_URGENT))) {
+                                              IPC::Message::PRIORITY_URGENT))) {
     CloseDescriptor(parentSide);
     CloseDescriptor(childSide);
-    return false;
+    return NS_ERROR_BRIDGE_OPEN_PARENT;
   }
-  return true;
+
+  if (!aChildChannel->Send(new ChannelOpened(childSide,
+                                            aParentPid,
+                                            aChildProtocol,
+                                            IPC::Message::PRIORITY_URGENT))) {
+    CloseDescriptor(parentSide);
+    CloseDescriptor(childSide);
+    return NS_ERROR_BRIDGE_OPEN_CHILD;
+  }
+
+  return NS_OK;
 }
 
 bool
@@ -212,7 +231,7 @@ Open(const PrivateIPDLInterface&,
   }
 
   TransportDescriptor parentSide, childSide;
-  if (!CreateTransport(parentId, &parentSide, &childSide)) {
+  if (NS_FAILED(CreateTransport(parentId, &parentSide, &childSide))) {
     return false;
   }
 

@@ -108,7 +108,8 @@ using mozilla::UniquePtr;
     D(FULL_GC_TIMER)                            \
     D(SHUTDOWN_CC)                              \
     D(FINISH_LARGE_EVALUATE)                    \
-    D(USER_INACTIVE)
+    D(USER_INACTIVE)                            \
+    D(XPCONNECT_SHUTDOWN)
 
 namespace gcreason {
 
@@ -284,8 +285,8 @@ class GarbageCollectionEvent
     // Represents a single slice of a possibly multi-slice incremental garbage
     // collection.
     struct Collection {
-        int64_t startTimestamp;
-        int64_t endTimestamp;
+        double startTimestamp;
+        double endTimestamp;
     };
 
     // The set of garbage collection slices that made up this GC cycle.
@@ -332,11 +333,13 @@ enum GCProgress {
 struct JS_PUBLIC_API(GCDescription) {
     bool isCompartment_;
     JSGCInvocationKind invocationKind_;
+    gcreason::Reason reason_;
 
-    GCDescription(bool isCompartment, JSGCInvocationKind kind)
-      : isCompartment_(isCompartment), invocationKind_(kind) {}
+    GCDescription(bool isCompartment, JSGCInvocationKind kind, gcreason::Reason reason)
+      : isCompartment_(isCompartment), invocationKind_(kind), reason_(reason) {}
 
-    char16_t* formatMessage(JSRuntime* rt) const;
+    char16_t* formatSliceMessage(JSRuntime* rt) const;
+    char16_t* formatSummaryMessage(JSRuntime* rt) const;
     char16_t* formatJSON(JSRuntime* rt, uint64_t timestamp) const;
 
     JS::dbg::GarbageCollectionEvent::Ptr toGCEvent(JSRuntime* rt) const;
@@ -553,7 +556,7 @@ class JS_PUBLIC_API(AutoCheckCannotGC) : public AutoAssertOnGC
 
 /*
  * Unsets the gray bit for anything reachable from |thing|. |kind| should not be
- * JSTRACE_SHAPE. |thing| should be non-null.
+ * JS::TraceKind::Shape. |thing| should be non-null.
  */
 extern JS_FRIEND_API(bool)
 UnmarkGrayGCThingRecursively(GCCellPtr thing);
@@ -566,7 +569,7 @@ namespace gc {
 static MOZ_ALWAYS_INLINE void
 ExposeGCThingToActiveJS(JS::GCCellPtr thing)
 {
-    MOZ_ASSERT(thing.kind() != JSTRACE_SHAPE);
+    MOZ_ASSERT(thing.kind() != JS::TraceKind::Shape);
 
     /*
      * GC things residing in the nursery cannot be gray: they have no mark bits.

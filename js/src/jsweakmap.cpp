@@ -39,7 +39,10 @@ WeakMapBase::WeakMapBase(JSObject* memOf, JSCompartment* c)
 
 WeakMapBase::~WeakMapBase()
 {
-    MOZ_ASSERT(!isInList());
+    MOZ_ASSERT(CurrentThreadIsGCSweeping() || CurrentThreadIsHandlingInitFailure());
+    MOZ_ASSERT_IF(CurrentThreadIsGCSweeping(), !isInList());
+    if (isInList())
+        removeWeakMapFromList(this);
 }
 
 void
@@ -48,9 +51,9 @@ WeakMapBase::trace(JSTracer* tracer)
     MOZ_ASSERT(isInList());
     if (tracer->isMarkingTracer()) {
         // We don't trace any of the WeakMap entries at this time, just record
-        // record the fact that the WeakMap has been marked. Enties are marked
+        // record the fact that the WeakMap has been marked. Entries are marked
         // in the iterative marking phase by markAllIteratively(), which happens
-        // when many keys as possible have been marked already.
+        // when as many keys as possible have been marked already.
         MOZ_ASSERT(tracer->eagerlyTraceWeakMaps() == DoNotTraceWeakMaps);
         marked = true;
     } else {
@@ -345,7 +348,7 @@ WeakMapPostWriteBarrier(JSRuntime* rt, ObjectValueMap* weakMap, JSObject* key)
     // Strip the barriers from the type before inserting into the store buffer.
     // This will automatically ensure that barriers do not fire during GC.
     if (key && IsInsideNursery(key))
-        rt->gc.storeBuffer.putGeneric(UnbarrieredRef(weakMap, key));
+        rt->gc.storeBuffer.putGeneric(gc::HashKeyRef<ObjectValueMap, JSObject*>(weakMap, key));
 }
 
 static MOZ_ALWAYS_INLINE bool
@@ -392,7 +395,7 @@ WeakMap_set_impl(JSContext* cx, CallArgs args)
 
     if (!args.get(0).isObject()) {
         UniquePtr<char[], JS::FreePolicy> bytes =
-            DecompileValueGenerator(cx, JSDVG_SEARCH_STACK, args.get(0), NullPtr());
+            DecompileValueGenerator(cx, JSDVG_SEARCH_STACK, args.get(0), nullptr);
         if (!bytes)
             return false;
         JS_ReportErrorNumber(cx, GetErrorMessage, nullptr, JSMSG_NOT_NONNULL_OBJECT, bytes.get());
@@ -577,7 +580,7 @@ WeakMap_construct(JSContext* cx, unsigned argc, Value* vp)
             if (isOriginalAdder) {
                 if (keyVal.isPrimitive()) {
                     UniquePtr<char[], JS::FreePolicy> bytes =
-                        DecompileValueGenerator(cx, JSDVG_SEARCH_STACK, keyVal, NullPtr());
+                        DecompileValueGenerator(cx, JSDVG_SEARCH_STACK, keyVal, nullptr);
                     if (!bytes)
                         return false;
                     JS_ReportErrorNumber(cx, GetErrorMessage, nullptr, JSMSG_NOT_NONNULL_OBJECT, bytes.get());

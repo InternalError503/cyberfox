@@ -337,6 +337,7 @@ let AboutReaderListener = {
         break;
 
       case "pagehide":
+        this.cancelPotentialPendingReadabilityCheck();
         sendAsyncMessage("Reader:UpdateReaderButton", { isArticle: false });
         break;
 
@@ -353,12 +354,42 @@ let AboutReaderListener = {
 
     }
   },
+
+  /**
+   * NB: this function will update the state of the reader button asynchronously
+   * after the next mozAfterPaint call (assuming reader mode is enabled and 
+   * this is a suitable document). Calling it on things which won't be
+   * painted is not going to work.
+   */
   updateReaderButton: function(forceNonArticle) {
     if (!ReaderMode.isEnabledForParseOnLoad || this.isAboutReader ||
         !(content.document instanceof content.HTMLDocument) ||
         content.document.mozSyntheticDocument) {
       return;
     }
+
+    this.scheduleReadabilityCheckPostPaint(forceNonArticle);
+  },
+
+  cancelPotentialPendingReadabilityCheck: function() {
+    if (this._pendingReadabilityCheck) {
+      removeEventListener("MozAfterPaint", this._pendingReadabilityCheck);
+      delete this._pendingReadabilityCheck;
+    }
+  },
+
+  scheduleReadabilityCheckPostPaint: function(forceNonArticle) {
+    if (this._pendingReadabilityCheck) {
+      // We need to stop this check before we re-add one because we don't know
+      // if forceNonArticle was true or false last time.
+      this.cancelPotentialPendingReadabilityCheck();
+    }
+    this._pendingReadabilityCheck = this.onPaintWhenWaitedFor.bind(this, forceNonArticle);
+    addEventListener("MozAfterPaint", this._pendingReadabilityCheck);
+  },
+
+  onPaintWhenWaitedFor: function(forceNonArticle) {
+    this.cancelPotentialPendingReadabilityCheck();
     // Only send updates when there are articles; there's no point updating with
     // |false| all the time.
     if (ReaderMode.isProbablyReaderable(content.document)) {
@@ -589,14 +620,31 @@ let DOMFullscreenHandler = {
   _fullscreenDoc: null,
 
   init: function() {
+    addMessageListener("DOMFullscreen:Entered", this);
     addMessageListener("DOMFullscreen:Approved", this);
     addMessageListener("DOMFullscreen:CleanUp", this);
-    addEventListener("MozEnteredDomFullscreen", this);
-    addEventListener("MozExitedDomFullscreen", this);
+    addEventListener("MozDOMFullscreen:Request", this);
+    addEventListener("MozDOMFullscreen:NewOrigin", this);
+    addEventListener("MozDOMFullscreen:Exit", this);
+  },
+
+  get _windowUtils() {
+    return content.QueryInterface(Ci.nsIInterfaceRequestor)
+                  .getInterface(Ci.nsIDOMWindowUtils);
   },
 
   receiveMessage: function(aMessage) {
     switch(aMessage.name) {
+      case "DOMFullscreen:Entered": {
+        if (!this._windowUtils.handleFullscreenRequests() &&
+            !content.document.mozFullScreen) {
+          // If we don't actually have any pending fullscreen request
+          // to handle, neither we have been in fullscreen, tell the
+          // parent to just exit.
+          sendAsyncMessage("DOMFullscreen:Exit");
+        }
+        break;
+      }
       case "DOMFullscreen:Approved": {
         if (this._fullscreenDoc) {
           Services.obs.notifyObservers(this._fullscreenDoc,
@@ -606,6 +654,7 @@ let DOMFullscreenHandler = {
         break;
       }
       case "DOMFullscreen:CleanUp": {
+        this._windowUtils.exitFullscreen();
         this._fullscreenDoc = null;
         break;
       }
@@ -613,13 +662,22 @@ let DOMFullscreenHandler = {
   },
 
   handleEvent: function(aEvent) {
-    if (aEvent.type == "MozEnteredDomFullscreen") {
-      this._fullscreenDoc = aEvent.target;
-      sendAsyncMessage("MozEnteredDomFullscreen", {
-        origin: this._fullscreenDoc.nodePrincipal.origin,
-      });
-    } else if (aEvent.type == "MozExitedDomFullscreen") {
-      sendAsyncMessage("MozExitedDomFullscreen");
+    switch (aEvent.type) {
+      case "MozDOMFullscreen:Request": {
+        sendAsyncMessage("DOMFullscreen:Request");
+        break;
+      }
+      case "MozDOMFullscreen:NewOrigin": {
+        this._fullscreenDoc = aEvent.target;
+        sendAsyncMessage("DOMFullscreen:NewOrigin", {
+          originNoSuffix: this._fullscreenDoc.nodePrincipal.originNoSuffix,
+        });
+        break;
+      }
+      case "MozDOMFullscreen:Exit": {
+        sendAsyncMessage("DOMFullscreen:Exit");
+        break;
+      }
     }
   }
 };

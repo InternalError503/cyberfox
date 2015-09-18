@@ -30,7 +30,7 @@ prefpane {
 }
 
 * {
-  -moz-user-select: text;
+  -moz-user-select: none;
 }
 
 button,

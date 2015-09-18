@@ -21,6 +21,7 @@ const {
   SwatchFilterTooltip
 } = require("devtools/shared/widgets/Tooltip");
 const {CssLogic} = require("devtools/styleinspector/css-logic");
+const EventEmitter = require("devtools/toolkit/event-emitter");
 const {Promise:promise} = Cu.import("resource://gre/modules/Promise.jsm", {});
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
@@ -36,6 +37,7 @@ const VIEW_NODE_SELECTOR_TYPE = exports.VIEW_NODE_SELECTOR_TYPE = 1;
 const VIEW_NODE_PROPERTY_TYPE = exports.VIEW_NODE_PROPERTY_TYPE = 2;
 const VIEW_NODE_VALUE_TYPE = exports.VIEW_NODE_VALUE_TYPE = 3;
 const VIEW_NODE_IMAGE_URL_TYPE = exports.VIEW_NODE_IMAGE_URL_TYPE = 4;
+const VIEW_NODE_LOCATION_TYPE = exports.VIEW_NODE_LOCATION_TYPE = 5;
 
 /**
  * Manages all highlighters in the style-inspector.
@@ -59,6 +61,8 @@ function HighlightersOverlay(view) {
   // Only initialize the overlay if at least one of the highlighter types is
   // supported
   this.supportsHighlighters = this.highlighterUtils.supportsCustomHighlighters();
+
+  EventEmitter.decorate(this);
 }
 
 exports.HighlightersOverlay = HighlightersOverlay;
@@ -124,9 +128,13 @@ HighlightersOverlay.prototype = {
     if (type) {
       this.highlighterShown = type;
       let node = this.view.inspector.selection.nodeFront;
-      this._getHighlighter(type).then(highlighter => {
-        highlighter.show(node);
-      });
+      this._getHighlighter(type)
+          .then(highlighter => highlighter.show(node))
+          .then(shown => {
+            if (shown) {
+              this.emit("highlighter-shown");
+            }
+          });
     }
   },
 
@@ -176,6 +184,7 @@ HighlightersOverlay.prototype = {
           promise.then(null, Cu.reportError);
         }
         this.highlighterShown = null;
+        this.emit("highlighter-hidden");
       });
     }
   },

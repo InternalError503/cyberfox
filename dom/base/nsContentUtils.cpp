@@ -92,6 +92,7 @@
 #include "nsHostObjectProtocolHandler.h"
 #include "nsHtml5Module.h"
 #include "nsHtml5StringParser.h"
+#include "nsIAppShell.h"
 #include "nsIAsyncVerifyRedirectCallback.h"
 #include "nsICategoryManager.h"
 #include "nsIChannelEventSink.h"
@@ -129,7 +130,6 @@
 #include "nsIInterfaceRequestor.h"
 #include "nsIInterfaceRequestorUtils.h"
 #include "nsIIOService.h"
-#include "nsIJSRuntimeService.h"
 #include "nsILineBreaker.h"
 #include "nsILoadContext.h"
 #include "nsILoadGroup.h"
@@ -183,6 +183,7 @@
 #include "nsUnicodeProperties.h"
 #include "nsViewManager.h"
 #include "nsViewportInfo.h"
+#include "nsWidgetsCID.h"
 #include "nsWrapperCacheInlines.h"
 #include "nsXULPopupManager.h"
 #include "xpcprivate.h" // nsXPConnect
@@ -217,6 +218,7 @@ nsIPrincipal *nsContentUtils::sNullSubjectPrincipal;
 nsIParserService *nsContentUtils::sParserService = nullptr;
 nsNameSpaceManager *nsContentUtils::sNameSpaceManager;
 nsIIOService *nsContentUtils::sIOService;
+nsIUUIDGenerator *nsContentUtils::sUUIDGenerator;
 nsIConsoleService *nsContentUtils::sConsoleService;
 nsDataHashtable<nsISupportsHashKey, EventNameMapping>* nsContentUtils::sAtomEventTable = nullptr;
 nsDataHashtable<nsStringHashKey, EventNameMapping>* nsContentUtils::sStringEventTable = nullptr;
@@ -248,12 +250,14 @@ nsString* nsContentUtils::sModifierSeparator = nullptr;
 bool nsContentUtils::sInitialized = false;
 bool nsContentUtils::sIsFullScreenApiEnabled = false;
 bool nsContentUtils::sTrustedFullScreenOnly = true;
-bool nsContentUtils::sFullscreenApiIsContentOnly = false;
+bool nsContentUtils::sIsCutCopyAllowed = true;
 bool nsContentUtils::sIsPerformanceTimingEnabled = false;
 bool nsContentUtils::sIsResourceTimingEnabled = false;
 bool nsContentUtils::sIsUserTimingLoggingEnabled = false;
 bool nsContentUtils::sIsExperimentalAutocompleteEnabled = false;
 bool nsContentUtils::sEncodeDecodeURLHash = false;
+bool nsContentUtils::sGettersDecodeURLHash = false;
+bool nsContentUtils::sPrivacyResistFingerprinting = false;
 
 uint32_t nsContentUtils::sHandlingInputTimeout = 1000;
 
@@ -337,8 +341,9 @@ namespace {
 
 static NS_DEFINE_CID(kParserServiceCID, NS_PARSERSERVICE_CID);
 static NS_DEFINE_CID(kCParserCID, NS_PARSER_CID);
+static NS_DEFINE_CID(kAppShellCID, NS_APPSHELL_CID);
 
-static PLDHashTable sEventListenerManagersHash;
+static PLDHashTable* sEventListenerManagersHash;
 
 class DOMEventListenerManagersHashReporter final : public nsIMemoryReporter
 {
@@ -354,9 +359,9 @@ public:
   {
     // We don't measure the |EventListenerManager| objects pointed to by the
     // entries because those references are non-owning.
-    int64_t amount = sEventListenerManagersHash.IsInitialized()
+    int64_t amount = sEventListenerManagersHash
                    ? PL_DHashTableSizeOfExcludingThis(
-                       &sEventListenerManagersHash, nullptr, MallocSizeOf)
+                       sEventListenerManagersHash, nullptr, MallocSizeOf)
                    : 0;
 
     return MOZ_COLLECT_REPORT(
@@ -489,7 +494,7 @@ nsContentUtils::Init()
   if (!InitializeEventTable())
     return NS_ERROR_FAILURE;
 
-  if (!sEventListenerManagersHash.IsInitialized()) {
+  if (!sEventListenerManagersHash) {
     static const PLDHashTableOps hash_table_ops =
     {
       PL_DHashVoidPtrKeyStub,
@@ -499,8 +504,8 @@ nsContentUtils::Init()
       EventListenerManagerHashInitEntry
     };
 
-    PL_DHashTableInit(&sEventListenerManagersHash, &hash_table_ops,
-                      sizeof(EventListenerManagerMapEntry));
+    sEventListenerManagersHash =
+      new PLDHashTable(&hash_table_ops, sizeof(EventListenerManagerMapEntry));
 
     RegisterStrongMemoryReporter(new DOMEventListenerManagersHashReporter());
   }
@@ -513,14 +518,11 @@ nsContentUtils::Init()
   Preferences::AddBoolVarCache(&sIsFullScreenApiEnabled,
                                "full-screen-api.enabled");
 
-  // Note: We deliberately read this pref here because this code runs
-  // before the profile loads, so users' changes to this pref in about:config
-  // won't have any effect on behaviour. We don't really want users messing
-  // with this pref, as it affects the security model of the fullscreen API.
-  sFullscreenApiIsContentOnly = Preferences::GetBool("full-screen-api.content-only", false);
-
   Preferences::AddBoolVarCache(&sTrustedFullScreenOnly,
                                "full-screen-api.allow-trusted-requests-only");
+
+  Preferences::AddBoolVarCache(&sIsCutCopyAllowed,
+                               "dom.allow_cut_copy", true);
 
   Preferences::AddBoolVarCache(&sIsPerformanceTimingEnabled,
                                "dom.enable_performance", true);
@@ -537,6 +539,12 @@ nsContentUtils::Init()
   Preferences::AddBoolVarCache(&sEncodeDecodeURLHash,
                                "dom.url.encode_decode_hash", false);
 
+  Preferences::AddBoolVarCache(&sGettersDecodeURLHash,
+                               "dom.url.getters_decode_hash", false);
+
+  Preferences::AddBoolVarCache(&sPrivacyResistFingerprinting,
+                               "privacy.resistFingerprinting", false);
+
   Preferences::AddUintVarCache(&sHandlingInputTimeout,
                                "dom.event.handling-user-input-time-limit",
                                1000);
@@ -547,6 +555,13 @@ nsContentUtils::Init()
 #endif
 
   Element::InitCCCallbacks();
+
+  nsCOMPtr<nsIUUIDGenerator> uuidGenerator =
+    do_GetService("@mozilla.org/uuid-generator;1", &rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+  uuidGenerator.forget(&sUUIDGenerator);
 
   sInitialized = true;
 
@@ -1668,7 +1683,7 @@ nsContentUtils::ParseLegacyFontSize(const nsAString& aValue)
     ++iter;
   }
 
-  if (*iter < char16_t('0') || *iter > char16_t('9')) {
+  if (iter == end || *iter < char16_t('0') || *iter > char16_t('9')) {
     return 0;
   }
 
@@ -1800,6 +1815,7 @@ nsContentUtils::Shutdown()
   NS_IF_RELEASE(sNullSubjectPrincipal);
   NS_IF_RELEASE(sParserService);
   NS_IF_RELEASE(sIOService);
+  NS_IF_RELEASE(sUUIDGenerator);
   NS_IF_RELEASE(sLineBreaker);
   NS_IF_RELEASE(sWordBreaker);
   NS_IF_RELEASE(sBidiKeyboard);
@@ -1811,8 +1827,8 @@ nsContentUtils::Shutdown()
   delete sUserDefinedEvents;
   sUserDefinedEvents = nullptr;
 
-  if (sEventListenerManagersHash.IsInitialized()) {
-    NS_ASSERTION(sEventListenerManagersHash.EntryCount() == 0,
+  if (sEventListenerManagersHash) {
+    NS_ASSERTION(sEventListenerManagersHash->EntryCount() == 0,
                  "Event listener manager hash not empty at shutdown!");
 
     // See comment above.
@@ -1824,8 +1840,9 @@ nsContentUtils::Shutdown()
     // it could leave dangling references in DOMClassInfo's preserved
     // wrapper table.
 
-    if (sEventListenerManagersHash.EntryCount() == 0) {
-      PL_DHashTableFinish(&sEventListenerManagersHash);
+    if (sEventListenerManagersHash->EntryCount() == 0) {
+      delete sEventListenerManagersHash;
+      sEventListenerManagersHash = nullptr;
     }
   }
 
@@ -1990,6 +2007,16 @@ nsContentUtils::IsCallerChrome()
 
   // If the check failed, look for UniversalXPConnect on the cx compartment.
   return xpc::IsUniversalXPConnectEnabled(GetCurrentJSContext());
+}
+
+bool
+nsContentUtils::ShouldResistFingerprinting(nsIDocShell* aDocShell)
+{
+  if (!aDocShell) {
+    return false;
+  }
+  bool isChrome = nsContentUtils::IsChromeDoc(aDocShell->GetDocument());
+  return !isChrome && sPrivacyResistFingerprinting;
 }
 
 namespace mozilla {
@@ -2962,18 +2989,29 @@ nsContentUtils::IsInPrivateBrowsing(nsIDocument* aDoc)
   if (!aDoc) {
     return false;
   }
-  bool isPrivate = false;
+
   nsCOMPtr<nsILoadGroup> loadGroup = aDoc->GetDocumentLoadGroup();
-  nsCOMPtr<nsIInterfaceRequestor> callbacks;
   if (loadGroup) {
-    loadGroup->GetNotificationCallbacks(getter_AddRefs(callbacks));
-    if (callbacks) {
-      nsCOMPtr<nsILoadContext> loadContext = do_GetInterface(callbacks);
-      isPrivate = loadContext && loadContext->UsePrivateBrowsing();
-    }
-  } else {
-    nsCOMPtr<nsIChannel> channel = aDoc->GetChannel();
-    isPrivate = channel && NS_UsePrivateBrowsing(channel);
+    return IsInPrivateBrowsing(loadGroup);
+  }
+
+  nsCOMPtr<nsIChannel> channel = aDoc->GetChannel();
+  return channel && NS_UsePrivateBrowsing(channel);
+}
+
+// static
+bool
+nsContentUtils::IsInPrivateBrowsing(nsILoadGroup* aLoadGroup)
+{
+  if (!aLoadGroup) {
+    return false;
+  }
+  bool isPrivate = false;
+  nsCOMPtr<nsIInterfaceRequestor> callbacks;
+  aLoadGroup->GetNotificationCallbacks(getter_AddRefs(callbacks));
+  if (callbacks) {
+    nsCOMPtr<nsILoadContext> loadContext = do_GetInterface(callbacks);
+    isPrivate = loadContext && loadContext->UsePrivateBrowsing();
   }
   return isPrivate;
 }
@@ -3346,7 +3384,7 @@ nsContentUtils::LogSimpleConsoleError(const nsAString& aErrorText,
 /* static */ nsresult
 nsContentUtils::ReportToConsole(uint32_t aErrorFlags,
                                 const nsACString& aCategory,
-                                nsIDocument* aDocument,
+                                const nsIDocument* aDocument,
                                 PropertiesFile aFile,
                                 const char *aMessageName,
                                 const char16_t **aParams,
@@ -3381,7 +3419,7 @@ nsContentUtils::ReportToConsole(uint32_t aErrorFlags,
 nsContentUtils::ReportToConsoleNonLocalized(const nsAString& aErrorText,
                                             uint32_t aErrorFlags,
                                             const nsACString& aCategory,
-                                            nsIDocument* aDocument,
+                                            const nsIDocument* aDocument,
                                             nsIURI* aURI,
                                             const nsAFlatString& aSourceLine,
                                             uint32_t aLineNumber,
@@ -3971,28 +4009,20 @@ nsContentUtils::MaybeFireNodeRemoved(nsINode* aChild, nsINode* aParent,
   }
 }
 
-PLDHashOperator
-ListenerEnumerator(PLDHashTable* aTable, PLDHashEntryHdr* aEntry,
-                   uint32_t aNumber, void* aArg)
+void
+nsContentUtils::UnmarkGrayJSListenersInCCGenerationDocuments()
 {
-  EventListenerManagerMapEntry* entry =
-    static_cast<EventListenerManagerMapEntry*>(aEntry);
-  if (entry) {
+  if (!sEventListenerManagersHash) {
+    return;
+  }
+
+  for (auto i = sEventListenerManagersHash->Iter(); !i.Done(); i.Next()) {
+    auto entry = static_cast<EventListenerManagerMapEntry*>(i.Get());
     nsINode* n = static_cast<nsINode*>(entry->mListenerManager->GetTarget());
     if (n && n->IsInDoc() &&
         nsCCUncollectableMarker::InGeneration(n->OwnerDoc()->GetMarkedCCGeneration())) {
       entry->mListenerManager->MarkForCC();
     }
-  }
-  return PL_DHASH_NEXT;
-}
-
-void
-nsContentUtils::UnmarkGrayJSListenersInCCGenerationDocuments(uint32_t aGeneration)
-{
-  if (sEventListenerManagersHash.IsInitialized()) {
-    PL_DHashTableEnumerate(&sEventListenerManagersHash, ListenerEnumerator,
-                           &aGeneration);
   }
 }
 
@@ -4001,14 +4031,14 @@ void
 nsContentUtils::TraverseListenerManager(nsINode *aNode,
                                         nsCycleCollectionTraversalCallback &cb)
 {
-  if (!sEventListenerManagersHash.IsInitialized()) {
+  if (!sEventListenerManagersHash) {
     // We're already shut down, just return.
     return;
   }
 
   EventListenerManagerMapEntry *entry =
     static_cast<EventListenerManagerMapEntry *>
-               (PL_DHashTableSearch(&sEventListenerManagersHash, aNode));
+               (PL_DHashTableSearch(sEventListenerManagersHash, aNode));
   if (entry) {
     CycleCollectionNoteChild(cb, entry->mListenerManager.get(),
                              "[via hash] mListenerManager");
@@ -4018,7 +4048,7 @@ nsContentUtils::TraverseListenerManager(nsINode *aNode,
 EventListenerManager*
 nsContentUtils::GetListenerManagerForNode(nsINode *aNode)
 {
-  if (!sEventListenerManagersHash.IsInitialized()) {
+  if (!sEventListenerManagersHash) {
     // We're already shut down, don't bother creating an event listener
     // manager.
 
@@ -4027,7 +4057,7 @@ nsContentUtils::GetListenerManagerForNode(nsINode *aNode)
 
   EventListenerManagerMapEntry *entry =
     static_cast<EventListenerManagerMapEntry *>
-      (PL_DHashTableAdd(&sEventListenerManagersHash, aNode, fallible));
+      (PL_DHashTableAdd(sEventListenerManagersHash, aNode, fallible));
 
   if (!entry) {
     return nullptr;
@@ -4049,7 +4079,7 @@ nsContentUtils::GetExistingListenerManagerForNode(const nsINode *aNode)
     return nullptr;
   }
 
-  if (!sEventListenerManagersHash.IsInitialized()) {
+  if (!sEventListenerManagersHash) {
     // We're already shut down, don't bother creating an event listener
     // manager.
 
@@ -4058,7 +4088,7 @@ nsContentUtils::GetExistingListenerManagerForNode(const nsINode *aNode)
 
   EventListenerManagerMapEntry *entry =
     static_cast<EventListenerManagerMapEntry *>
-               (PL_DHashTableSearch(&sEventListenerManagersHash, aNode));
+               (PL_DHashTableSearch(sEventListenerManagersHash, aNode));
   if (entry) {
     return entry->mListenerManager;
   }
@@ -4070,16 +4100,16 @@ nsContentUtils::GetExistingListenerManagerForNode(const nsINode *aNode)
 void
 nsContentUtils::RemoveListenerManager(nsINode *aNode)
 {
-  if (sEventListenerManagersHash.IsInitialized()) {
+  if (sEventListenerManagersHash) {
     EventListenerManagerMapEntry *entry =
       static_cast<EventListenerManagerMapEntry *>
-                 (PL_DHashTableSearch(&sEventListenerManagersHash, aNode));
+                 (PL_DHashTableSearch(sEventListenerManagersHash, aNode));
     if (entry) {
       nsRefPtr<EventListenerManager> listenerManager;
       listenerManager.swap(entry->mListenerManager);
       // Remove the entry and *then* do operations that could cause further
       // modification of sEventListenerManagersHash.  See bug 334177.
-      PL_DHashTableRawRemove(&sEventListenerManagersHash, entry);
+      PL_DHashTableRawRemove(sEventListenerManagersHash, entry);
       if (listenerManager) {
         listenerManager->Disconnect();
       }
@@ -5137,6 +5167,20 @@ nsContentUtils::AddScriptRunner(nsIRunnable* aRunnable)
   return true;
 }
 
+/* static */
+void
+nsContentUtils::RunInStableState(already_AddRefed<nsIRunnable> aRunnable,
+                                 DispatchFailureHandling aHandling)
+{
+  nsCOMPtr<nsIRunnable> runnable = aRunnable;
+  nsCOMPtr<nsIAppShell> appShell(do_GetService(kAppShellCID));
+  if (!appShell) {
+    MOZ_ASSERT(aHandling == DispatchFailureHandling::IgnoreFailure);
+    return;
+  }
+  appShell->RunInStableState(runnable.forget());
+}
+
 void
 nsContentUtils::EnterMicroTask()
 {
@@ -6091,16 +6135,16 @@ nsContentUtils::CreateBlobBuffer(JSContext* aCx,
 {
   uint32_t blobLen = aData.Length();
   void* blobData = malloc(blobLen);
-  nsRefPtr<File> blob;
+  nsRefPtr<Blob> blob;
   if (blobData) {
     memcpy(blobData, aData.BeginReading(), blobLen);
-    blob = mozilla::dom::File::CreateMemoryFile(aParent, blobData, blobLen,
+    blob = mozilla::dom::Blob::CreateMemoryBlob(aParent, blobData, blobLen,
                                                 EmptyString());
   } else {
     return NS_ERROR_OUT_OF_MEMORY;
   }
 
-  if (!GetOrCreateDOMReflector(aCx, blob, aBlob)) {
+  if (!ToJSValue(aCx, blob, aBlob)) {
     return NS_ERROR_FAILURE;
   }
 
@@ -6284,10 +6328,7 @@ nsContentUtils::FlushLayoutForTree(nsIDOMWindow* aWindow)
     // is O(N^2) in docshell tree depth.  However, the docshell tree is
     // usually pretty shallow.
 
-    nsCOMPtr<nsIDOMDocument> domDoc;
-    aWindow->GetDocument(getter_AddRefs(domDoc));
-    nsCOMPtr<nsIDocument> doc = do_QueryInterface(domDoc);
-    if (doc) {
+    if (nsCOMPtr<nsIDocument> doc = piWin->GetDoc()) {
         doc->FlushPendingNotifications(Flush_Layout);
     }
 
@@ -6650,9 +6691,11 @@ nsContentUtils::IsRequestFullScreenAllowed()
 
 /* static */
 bool
-nsContentUtils::IsFullscreenApiContentOnly()
+nsContentUtils::IsCutCopyAllowed()
 {
-  return sFullscreenApiIsContentOnly;
+  return (!IsCutCopyRestricted() &&
+          EventStateManager::IsHandlingUserInput()) ||
+         IsCallerChrome();
 }
 
 /* static */
@@ -6765,16 +6808,16 @@ nsContentUtils::FireMutationEventsForDirectParsing(nsIDocument* aDoc,
 
 /* static */
 nsIDocument*
-nsContentUtils::GetFullscreenAncestor(nsIDocument* aDoc)
+nsContentUtils::GetRootDocument(nsIDocument* aDoc)
 {
+  if (!aDoc) {
+    return nullptr;
+  }
   nsIDocument* doc = aDoc;
-  while (doc) {
-    if (doc->IsFullScreenDoc()) {
-      return doc;
-    }
+  while (doc->GetParentDocument()) {
     doc = doc->GetParentDocument();
   }
-  return nullptr;
+  return doc;
 }
 
 /* static */
@@ -7084,10 +7127,19 @@ nsContentUtils::DOMWindowDumpEnabled()
 }
 
 bool
-nsContentUtils::GetNodeTextContent(nsINode* aNode, bool aDeep, nsAString& aResult)
+nsContentUtils::GetNodeTextContent(nsINode* aNode, bool aDeep, nsAString& aResult,
+                                   const fallible_t& aFallible)
 {
   aResult.Truncate();
-  return AppendNodeTextContent(aNode, aDeep, aResult, fallible);
+  return AppendNodeTextContent(aNode, aDeep, aResult, aFallible);
+}
+
+void
+nsContentUtils::GetNodeTextContent(nsINode* aNode, bool aDeep, nsAString& aResult)
+{
+  if (!GetNodeTextContent(aNode, aDeep, aResult, fallible)) {
+    NS_ABORT_OOM(0); // Unfortunately we don't know the allocation size
+  }
 }
 
 void
@@ -7130,6 +7182,19 @@ nsContentUtils::IsJavascriptMIMEType(const nsAString& aMIMEType)
   }
 
   return false;
+}
+
+nsresult
+nsContentUtils::GenerateUUIDInPlace(nsID& aUUID)
+{
+  MOZ_ASSERT(sUUIDGenerator);
+
+  nsresult rv = sUUIDGenerator->GenerateUUIDInPlace(&aUUID);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  return NS_OK;
 }
 
 uint64_t
@@ -7361,27 +7426,27 @@ nsContentUtils::TransferableToIPCTransferable(nsITransferable* aTransferable,
           }
 
           // Otherwise, handle this as a file.
-          nsCOMPtr<FileImpl> fileImpl;
+          nsCOMPtr<BlobImpl> blobImpl;
           nsCOMPtr<nsIFile> file = do_QueryInterface(data);
           if (file) {
-            fileImpl = new FileImplFile(file, false);
+            blobImpl = new BlobImplFile(file, false);
             ErrorResult rv;
-            fileImpl->GetSize(rv);
-            fileImpl->GetLastModified(rv);
+            blobImpl->GetSize(rv);
+            blobImpl->GetLastModified(rv);
           } else {
-            fileImpl = do_QueryInterface(data);
+            blobImpl = do_QueryInterface(data);
           }
-          if (fileImpl) {
+          if (blobImpl) {
             IPCDataTransferItem* item = aIPCDataTransfer->items().AppendElement();
             item->flavor() = nsCString(flavorStr);
             if (aChild) {
               item->data() =
                 mozilla::dom::BlobChild::GetOrCreate(aChild,
-                  static_cast<FileImpl*>(fileImpl.get()));
+                  static_cast<BlobImpl*>(blobImpl.get()));
             } else if (aParent) {
               item->data() =
                 mozilla::dom::BlobParent::GetOrCreate(aParent,
-                  static_cast<FileImpl*>(fileImpl.get()));
+                  static_cast<BlobImpl*>(blobImpl.get()));
             }
           } else {
             // This is a hack to support kFilePromiseMime.
@@ -7535,7 +7600,7 @@ nsContentUtils::GetViewToDispatchEvent(nsPresContext* presContext,
 }
 
 nsresult
-nsContentUtils::SendKeyEvent(nsCOMPtr<nsIWidget> aWidget,
+nsContentUtils::SendKeyEvent(nsIWidget* aWidget,
                              const nsAString& aType,
                              int32_t aKeyCode,
                              int32_t aCharCode,
@@ -7779,4 +7844,96 @@ nsContentUtils::FirePageShowEvent(nsIDocShellTreeItem* aItem,
   if (doc->IsShowing() == aFireIfShowing) {
     doc->OnPageShow(true, aChromeEventHandler);
   }
+}
+
+/* static */
+already_AddRefed<nsPIWindowRoot>
+nsContentUtils::GetWindowRoot(nsIDocument* aDoc)
+{
+  if (aDoc) {
+    nsPIDOMWindow* win = aDoc->GetWindow();
+    if (win) {
+      return win->GetTopWindowRoot();
+    }
+  }
+  return nullptr;
+}
+
+/* static */
+nsContentPolicyType
+nsContentUtils::InternalContentPolicyTypeToExternal(nsContentPolicyType aType)
+{
+  switch (aType) {
+  case nsIContentPolicy::TYPE_INTERNAL_SCRIPT:
+  case nsIContentPolicy::TYPE_INTERNAL_WORKER:
+  case nsIContentPolicy::TYPE_INTERNAL_SHARED_WORKER:
+    return nsIContentPolicy::TYPE_SCRIPT;
+
+  case nsIContentPolicy::TYPE_INTERNAL_EMBED:
+  case nsIContentPolicy::TYPE_INTERNAL_OBJECT:
+    return nsIContentPolicy::TYPE_OBJECT;
+
+  case nsIContentPolicy::TYPE_INTERNAL_FRAME:
+  case nsIContentPolicy::TYPE_INTERNAL_IFRAME:
+    return nsIContentPolicy::TYPE_SUBDOCUMENT;
+
+  case nsIContentPolicy::TYPE_INTERNAL_AUDIO:
+  case nsIContentPolicy::TYPE_INTERNAL_VIDEO:
+  case nsIContentPolicy::TYPE_INTERNAL_TRACK:
+    return nsIContentPolicy::TYPE_MEDIA;
+
+  default:
+    return aType;
+  }
+}
+
+
+nsresult
+nsContentUtils::SetFetchReferrerURIWithPolicy(nsIPrincipal* aPrincipal,
+                                              nsIDocument* aDoc,
+                                              nsIHttpChannel* aChannel)
+{
+  NS_ENSURE_ARG_POINTER(aPrincipal);
+  NS_ENSURE_ARG_POINTER(aChannel);
+
+  nsCOMPtr<nsIURI> principalURI;
+
+  if (IsSystemPrincipal(aPrincipal)) {
+    return NS_OK;
+  }
+
+  aPrincipal->GetURI(getter_AddRefs(principalURI));
+
+  if (!aDoc) {
+    return aChannel->SetReferrerWithPolicy(principalURI, net::RP_Default);
+  }
+
+  // If it weren't for history.push/replaceState, we could just use the
+  // principal's URI here.  But since we want changes to the URI effected
+  // by push/replaceState to be reflected in the XHR referrer, we have to
+  // be more clever.
+  //
+  // If the document's original URI (before any push/replaceStates) matches
+  // our principal, then we use the document's current URI (after
+  // push/replaceStates).  Otherwise (if the document is, say, a data:
+  // URI), we just use the principal's URI.
+  nsCOMPtr<nsIURI> docCurURI = aDoc->GetDocumentURI();
+  nsCOMPtr<nsIURI> docOrigURI = aDoc->GetOriginalURI();
+
+  nsCOMPtr<nsIURI> referrerURI;
+
+  if (principalURI && docCurURI && docOrigURI) {
+    bool equal = false;
+    principalURI->Equals(docOrigURI, &equal);
+    if (equal) {
+      referrerURI = docCurURI;
+    }
+  }
+
+  if (!referrerURI) {
+    referrerURI = principalURI;
+  }
+
+  net::ReferrerPolicy referrerPolicy = aDoc->GetReferrerPolicy();
+  return aChannel->SetReferrerWithPolicy(referrerURI, referrerPolicy);
 }

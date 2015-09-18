@@ -133,30 +133,15 @@ nsPropertyTable::Enumerate(nsPropertyOwner aObject,
   }
 }
 
-struct PropertyEnumeratorData
-{
-  nsIAtom* mName;
-  NSPropertyFunc mCallBack;
-  void* mData;
-};
-
-static PLDHashOperator
-PropertyEnumerator(PLDHashTable* aTable, PLDHashEntryHdr* aHdr,
-                   uint32_t aNumber, void* aArg)
-{
-  PropertyListMapEntry* entry = static_cast<PropertyListMapEntry*>(aHdr);
-  PropertyEnumeratorData* data = static_cast<PropertyEnumeratorData*>(aArg);
-  data->mCallBack(const_cast<void*>(entry->key), data->mName, entry->value,
-                  data->mData);
-  return PL_DHASH_NEXT;
-}
-
 void
 nsPropertyTable::EnumerateAll(NSPropertyFunc aCallBack, void* aData)
 {
   for (PropertyList* prop = mPropertyList; prop; prop = prop->mNext) {
-    PropertyEnumeratorData data = { prop->mName, aCallBack, aData };
-    PL_DHashTableEnumerate(&prop->mObjectValueMap, PropertyEnumerator, &data);
+    for (auto iter = prop->mObjectValueMap.Iter(); !iter.Done(); iter.Next()) {
+      auto entry = static_cast<PropertyListMapEntry*>(iter.Get());
+      aCallBack(const_cast<void*>(entry->key), prop->mName, entry->value,
+                aData);
+    }
   }
 }
 
@@ -216,11 +201,6 @@ nsPropertyTable::SetPropertyInternal(nsPropertyOwner     aObject,
   } else {
     propertyList = new PropertyList(aPropertyName, aPropDtorFunc,
                                     aPropDtorData, aTransfer);
-    if (!propertyList || !propertyList->mObjectValueMap.IsInitialized()) {
-      delete propertyList;
-      return NS_ERROR_OUT_OF_MEMORY;
-    }
-
     propertyList->mNext = mPropertyList;
     mPropertyList = propertyList;
   }
@@ -229,7 +209,7 @@ nsPropertyTable::SetPropertyInternal(nsPropertyOwner     aObject,
   // value is destroyed
   nsresult result = NS_OK;
   PropertyListMapEntry *entry = static_cast<PropertyListMapEntry*>
-    (PL_DHashTableAdd(&propertyList->mObjectValueMap, aObject, fallible));
+    (PL_DHashTableAdd(&propertyList->mObjectValueMap, aObject, mozilla::fallible));
   if (!entry)
     return NS_ERROR_OUT_OF_MEMORY;
   // A nullptr entry->key is the sign that the entry has just been allocated
@@ -299,25 +279,16 @@ nsPropertyTable::PropertyList::~PropertyList()
 {
 }
 
-static PLDHashOperator
-DestroyPropertyEnumerator(PLDHashTable *table, PLDHashEntryHdr *hdr,
-                          uint32_t number, void *arg)
-{
-  nsPropertyTable::PropertyList *propList =
-      static_cast<nsPropertyTable::PropertyList*>(arg);
-  PropertyListMapEntry* entry = static_cast<PropertyListMapEntry*>(hdr);
-
-  propList->mDtorFunc(const_cast<void*>(entry->key), propList->mName,
-                      entry->value, propList->mDtorData);
-  return PL_DHASH_NEXT;
-}
-
 void
 nsPropertyTable::PropertyList::Destroy()
 {
-  // Enumerate any remaining object/value pairs and destroy the value object
-  if (mDtorFunc)
-    PL_DHashTableEnumerate(&mObjectValueMap, DestroyPropertyEnumerator, this);
+  // Enumerate any remaining object/value pairs and destroy the value object.
+  if (mDtorFunc) {
+    for (auto iter = mObjectValueMap.Iter(); !iter.Done(); iter.Next()) {
+      auto entry = static_cast<PropertyListMapEntry*>(iter.Get());
+      mDtorFunc(const_cast<void*>(entry->key), mName, entry->value, mDtorData);
+    }
+  }
 }
 
 bool

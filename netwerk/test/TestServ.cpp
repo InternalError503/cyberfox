@@ -11,13 +11,13 @@
 #include "nsNetUtil.h"
 #include "nsStringAPI.h"
 #include "nsCOMPtr.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 //
 // set NSPR_LOG_MODULES=Test:5
 //
 static PRLogModuleInfo *gTestLog = nullptr;
-#define LOG(args) PR_LOG(gTestLog, PR_LOG_DEBUG, args)
+#define LOG(args) MOZ_LOG(gTestLog, mozilla::LogLevel::Debug, args)
 
 class MySocketListener : public nsIServerSocketListener
 {

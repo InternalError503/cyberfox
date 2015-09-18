@@ -23,7 +23,6 @@
 #include "nsDebug.h"                    // for NS_ASSERTION
 #include "nsISupportsImpl.h"            // for Image::Release, etc
 #include "nsRect.h"                     // for mozilla::gfx::IntRect
-#include "nsSize.h"                     // for nsIntSize
 #include "nsTArray.h"                   // for nsTArray
 #include "mozilla/Atomics.h"
 #include "mozilla/WeakPtr.h"
@@ -292,9 +291,9 @@ class ImageContainer final : public SupportsWeakPtr<ImageContainer> {
 public:
   MOZ_DECLARE_WEAKREFERENCE_TYPENAME(ImageContainer)
 
-  enum { DISABLE_ASYNC = 0x0, ENABLE_ASYNC = 0x01 };
+  enum Mode { SYNCHRONOUS = 0x0, ASYNCHRONOUS = 0x01, ASYNCHRONOUS_OVERLAY = 0x02 };
 
-  explicit ImageContainer(int flag = 0);
+  explicit ImageContainer(ImageContainer::Mode flag = SYNCHRONOUS);
 
   /**
    * Create an Image in one of the given formats.
@@ -804,7 +803,8 @@ public:
 
   virtual TemporaryRef<gfx::SourceSurface> GetAsSourceSurface() override
   {
-    return mSourceSurface.get();
+    RefPtr<gfx::SourceSurface> surface(mSourceSurface);
+    return surface.forget();
   }
 
   virtual TextureClient* GetTextureClient(CompositableClient* aClient) override;

@@ -30,6 +30,7 @@
 #include "nsGkAtoms.h"
 #include "nsImageFrame.h"
 #include "nsLayoutStylesheetCache.h"
+#include "mozilla/RuleProcessorCache.h"
 #include "nsPrincipal.h"
 #include "nsRange.h"
 #include "nsRegion.h"
@@ -94,10 +95,6 @@
 #include "AndroidMediaPluginHost.h"
 #endif
 
-#ifdef MOZ_WMF
-#include "WMFDecoder.h"
-#endif
-
 #ifdef MOZ_GSTREAMER
 #include "GStreamerFormatHelper.h"
 #endif
@@ -139,6 +136,7 @@ using namespace mozilla::system;
 #include "CameraPreferences.h"
 #include "TouchManager.h"
 #include "MediaDecoder.h"
+#include "mozilla/layers/CompositorLRU.h"
 
 using namespace mozilla;
 using namespace mozilla::net;
@@ -320,6 +318,8 @@ nsLayoutStatics::Initialize()
 
   PromiseDebugging::Init();
 
+  layers::CompositorLRU::Init();
+
   return NS_OK;
 }
 
@@ -377,6 +377,7 @@ nsLayoutStatics::Shutdown()
   nsAttrValue::Shutdown();
   nsContentUtils::Shutdown();
   nsLayoutStylesheetCache::Shutdown();
+  RuleProcessorCache::Shutdown();
 
   ShutdownJSEnvironment();
   nsGlobalWindow::ShutDown();
@@ -401,10 +402,6 @@ nsLayoutStatics::Shutdown()
   CubebUtils::ShutdownLibrary();
   AsyncLatencyLogger::ShutdownLogger();
   WebAudioUtils::Shutdown();
-
-#ifdef MOZ_WMF
-  WMFDecoder::UnloadDLLs();
-#endif
 
 #ifdef MOZ_WIDGET_GONK
   nsVolumeService::Shutdown();

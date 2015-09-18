@@ -79,7 +79,7 @@ void mozilla_dump_image(void* bytes, int width, int height, int bytepp,
 
     RefPtr<DataSourceSurface> surf =
         Factory::CreateWrappingDataSourceSurface((uint8_t*)bytes, strideBytes,
-                                                 gfx::IntSize(width, height),
+                                                 IntSize(width, height),
                                                  format);
     gfxUtils::DumpAsDataURI(surf);
 }
@@ -331,7 +331,8 @@ gfxUtils::CreatePremultipliedDataSurface(DataSourceSurface* srcSurf)
     DataSourceSurface::MappedSurface destMap;
     if (!MapSrcAndCreateMappedDest(srcSurf, &destSurf, &srcMap, &destMap)) {
         MOZ_ASSERT(false, "MapSrcAndCreateMappedDest failed.");
-        return srcSurf;
+        RefPtr<DataSourceSurface> surface(srcSurf);
+        return surface.forget();
     }
 
     PremultiplyData(srcMap.mData, srcMap.mStride,
@@ -340,7 +341,7 @@ gfxUtils::CreatePremultipliedDataSurface(DataSourceSurface* srcSurf)
                     srcSurf->GetSize().height);
 
     UnmapSrcDest(srcSurf, destSurf);
-    return destSurf;
+    return destSurf.forget();
 }
 
 TemporaryRef<DataSourceSurface>
@@ -351,7 +352,8 @@ gfxUtils::CreateUnpremultipliedDataSurface(DataSourceSurface* srcSurf)
     DataSourceSurface::MappedSurface destMap;
     if (!MapSrcAndCreateMappedDest(srcSurf, &destSurf, &srcMap, &destMap)) {
         MOZ_ASSERT(false, "MapSrcAndCreateMappedDest failed.");
-        return srcSurf;
+        RefPtr<DataSourceSurface> surface(srcSurf);
+        return surface.forget();
     }
 
     UnpremultiplyData(srcMap.mData, srcMap.mStride,
@@ -360,7 +362,7 @@ gfxUtils::CreateUnpremultipliedDataSurface(DataSourceSurface* srcSurf)
                       srcSurf->GetSize().height);
 
     UnmapSrcDest(srcSurf, destSurf);
-    return destSurf;
+    return destSurf.forget();
 }
 
 void
@@ -438,7 +440,7 @@ CreateSamplingRestrictedDrawable(gfxDrawable* aDrawable,
     if (needed.IsEmpty())
         return nullptr;
 
-    gfxIntSize size(int32_t(needed.Width()), int32_t(needed.Height()));
+    IntSize size(int32_t(needed.Width()), int32_t(needed.Height()));
 
     RefPtr<DrawTarget> target =
       gfxPlatform::GetPlatform()->CreateOffscreenContentDrawTarget(size, aFormat);
@@ -717,8 +719,7 @@ PathFromRegionInternal(DrawTarget* aTarget, const nsIntRegion& aRegion)
     pb->LineTo(Point(r->x, r->YMost()));
     pb->Close();
   }
-  RefPtr<Path> path = pb->Finish();
-  return path;
+  return pb->Finish();
 }
 
 static void
@@ -857,7 +858,7 @@ gfxUtils::GfxRectToIntRect(const gfxRect& aIn, IntRect* aOut)
 void
 gfxUtils::GetYCbCrToRGBDestFormatAndSize(const PlanarYCbCrData& aData,
                                          gfxImageFormat& aSuggestedFormat,
-                                         gfxIntSize& aSuggestedSize)
+                                         IntSize& aSuggestedSize)
 {
   YUVType yuvtype =
     TypeFromSize(aData.mYSize.width,
@@ -911,7 +912,7 @@ gfxUtils::GetYCbCrToRGBDestFormatAndSize(const PlanarYCbCrData& aData,
 void
 gfxUtils::ConvertYCbCrToRGB(const PlanarYCbCrData& aData,
                             const gfxImageFormat& aDestFormat,
-                            const gfxIntSize& aDestSize,
+                            const IntSize& aDestSize,
                             unsigned char* aDestBuffer,
                             int32_t aStride)
 {
@@ -1262,7 +1263,7 @@ EncodeSourceSurfaceInternal(SourceSurface* aSurface,
   } else {
     nsCOMPtr<nsIClipboardHelper> clipboard(do_GetService("@mozilla.org/widget/clipboardhelper;1", &rv));
     if (clipboard) {
-      clipboard->CopyString(NS_ConvertASCIItoUTF16(string), nullptr);
+      clipboard->CopyString(NS_ConvertASCIItoUTF16(string));
     }
   }
   return NS_OK;
@@ -1452,10 +1453,14 @@ FILE *gfxUtils::sDumpPaintFile = stderr;
 
 #ifdef MOZ_DUMP_PAINTING
 bool gfxUtils::sDumpPainting = getenv("MOZ_DUMP_PAINT") != 0;
+bool gfxUtils::sDumpPaintingIntermediate = getenv("MOZ_DUMP_PAINT_INTERMEDIATE") != 0;
 bool gfxUtils::sDumpPaintingToFile = getenv("MOZ_DUMP_PAINT_TO_FILE") != 0;
+bool gfxUtils::sDumpPaintItems = getenv("MOZ_DUMP_PAINT_ITEMS") != 0;
 #else
 bool gfxUtils::sDumpPainting = false;
+bool gfxUtils::sDumpPaintingIntermediate = false;
 bool gfxUtils::sDumpPaintingToFile = false;
+bool gfxUtils::sDumpPaintItems = false;
 #endif
 
 namespace mozilla {

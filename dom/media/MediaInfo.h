@@ -15,6 +15,7 @@
 #include "ImageTypes.h"
 #include "MediaData.h"
 #include "StreamBuffer.h" // for TrackID
+#include "TimeUnits.h"
 
 namespace mozilla {
 
@@ -285,6 +286,11 @@ public:
 
 class EncryptionInfo {
 public:
+  EncryptionInfo()
+    : mEncrypted(false)
+  {
+  }
+
   struct InitData {
     template<typename AInitDatas>
     InitData(const nsAString& aType, AInitDatas&& aInitData)
@@ -304,22 +310,26 @@ public:
   // True if the stream has encryption metadata
   bool IsEncrypted() const
   {
-    return !mInitDatas.IsEmpty();
+    return mEncrypted;
   }
 
   template<typename AInitDatas>
   void AddInitData(const nsAString& aType, AInitDatas&& aInitData)
   {
     mInitDatas.AppendElement(InitData(aType, Forward<AInitDatas>(aInitData)));
+    mEncrypted = true;
   }
 
   void AddInitData(const EncryptionInfo& aInfo)
   {
     mInitDatas.AppendElements(aInfo.mInitDatas);
+    mEncrypted = !!mInitDatas.Length();
   }
 
   // One 'InitData' per encrypted buffer.
   InitDatas mInitDatas;
+private:
+  bool mEncrypted;
 };
 
 class MediaInfo {
@@ -369,7 +379,66 @@ public:
   VideoInfo mVideo;
   AudioInfo mAudio;
 
+  // If the metadata includes a duration, we store it here.
+  media::NullableTimeUnit mMetadataDuration;
+
+  // The Ogg reader tries to kinda-sorta compute the duration by seeking to the
+  // end and determining the timestamp of the last frame. This isn't useful as
+  // a duration until we know the start time, so we need to track it separately.
+  media::NullableTimeUnit mUnadjustedMetadataEndTime;
+
   EncryptionInfo mCrypto;
+};
+
+class SharedTrackInfo {
+  NS_INLINE_DECL_THREADSAFE_REFCOUNTING(SharedTrackInfo)
+public:
+  SharedTrackInfo(const TrackInfo& aOriginal, uint32_t aStreamID)
+    : mInfo(aOriginal.Clone())
+    , mStreamSourceID(aStreamID)
+    , mMimeType(mInfo->mMimeType)
+  {
+  }
+
+  uint32_t GetID() const
+  {
+    return mStreamSourceID;
+  }
+
+  const TrackInfo* operator*() const
+  {
+    return mInfo.get();
+  }
+
+  const TrackInfo* operator->() const
+  {
+    MOZ_ASSERT(mInfo.get(), "dereferencing a UniquePtr containing nullptr");
+    return mInfo.get();
+  }
+
+  const AudioInfo* GetAsAudioInfo() const
+  {
+    return mInfo ? mInfo->GetAsAudioInfo() : nullptr;
+  }
+
+  const VideoInfo* GetAsVideoInfo() const
+  {
+    return mInfo ? mInfo->GetAsVideoInfo() : nullptr;
+  }
+
+  const TextInfo* GetAsTextInfo() const
+  {
+    return mInfo ? mInfo->GetAsTextInfo() : nullptr;
+  }
+
+private:
+  ~SharedTrackInfo() {};
+  UniquePtr<TrackInfo> mInfo;
+  // A unique ID, guaranteed to change when changing streams.
+  uint32_t mStreamSourceID;
+
+public:
+  const nsAutoCString& mMimeType;
 };
 
 } // namespace mozilla

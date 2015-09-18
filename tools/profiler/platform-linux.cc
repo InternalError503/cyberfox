@@ -320,7 +320,7 @@ static void* SignalSender(void* arg) {
     SamplerRegistry::sampler->DeleteExpiredMarkers();
 
     if (!SamplerRegistry::sampler->IsPaused()) {
-      mozilla::MutexAutoLock lock(*Sampler::sRegisteredThreadsMutex);
+      ::MutexAutoLock lock(*Sampler::sRegisteredThreadsMutex);
       std::vector<ThreadInfo*> threads =
         SamplerRegistry::sampler->GetRegisteredThreads();
 
@@ -513,7 +513,7 @@ bool Sampler::RegisterCurrentThread(const char* aName,
   if (!Sampler::sRegisteredThreadsMutex)
     return false;
 
-  mozilla::MutexAutoLock lock(*Sampler::sRegisteredThreadsMutex);
+  ::MutexAutoLock lock(*Sampler::sRegisteredThreadsMutex);
 
   int id = gettid();
   for (uint32_t i = 0; i < sRegisteredThreads->size(); i++) {
@@ -561,7 +561,7 @@ void Sampler::UnregisterCurrentThread()
 
   tlsStackTop.set(nullptr);
 
-  mozilla::MutexAutoLock lock(*Sampler::sRegisteredThreadsMutex);
+  ::MutexAutoLock lock(*Sampler::sRegisteredThreadsMutex);
 
   int id = gettid();
 
@@ -646,11 +646,7 @@ static void ReadProfilerVars(const char* fileName, const char** features,
   }
 }
 
-
-static void StartSignalHandler(int signal, siginfo_t* info, void* context) {
-  // XXX: Everything we do here is NOT async signal safe. We risk nasty things
-  // like deadlocks but we typically only do this once so it tends to be ok.
-  // See bug 909403
+static void DoStartTask() {
   uint32_t featureCount = 0;
   uint32_t threadCount = 0;
 
@@ -672,6 +668,20 @@ static void StartSignalHandler(int signal, siginfo_t* info, void* context) {
 
   freeArray(threadNames, threadCount);
   freeArray(features, featureCount);
+}
+
+static void StartSignalHandler(int signal, siginfo_t* info, void* context) {
+  class StartTask : public nsRunnable {
+  public:
+    NS_IMETHOD Run() {
+      DoStartTask();
+      return NS_OK;
+    }
+  };
+  // XXX: technically NS_DispatchToMainThread is NOT async signal safe. We risk
+  // nasty things like deadlocks, but the probability is very low and we
+  // typically only do this once so it tends to be ok. See bug 909403.
+  NS_DispatchToMainThread(new StartTask());
 }
 
 void OS::Startup()

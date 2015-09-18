@@ -8,13 +8,13 @@
 #define mozilla_tabs_TabParent_h
 
 #include "js/TypeDecls.h"
+#include "mozilla/ContentCache.h"
 #include "mozilla/dom/ipc/IdType.h"
 #include "mozilla/dom/PBrowserParent.h"
 #include "mozilla/dom/PFilePickerParent.h"
 #include "mozilla/dom/TabContext.h"
 #include "mozilla/EventForwards.h"
 #include "mozilla/dom/File.h"
-#include "mozilla/WritingModes.h"
 #include "mozilla/RefPtr.h"
 #include "nsCOMPtr.h"
 #include "nsIAuthPromptProvider.h"
@@ -78,6 +78,7 @@ class TabParent final : public PBrowserParent
                       , public nsAPostRefreshObserver
 {
     typedef mozilla::dom::ClonedMessageData ClonedMessageData;
+    typedef mozilla::OwningSerializedStructuredCloneBuffer OwningSerializedStructuredCloneBuffer;
 
     virtual ~TabParent();
 
@@ -142,6 +143,7 @@ public:
                                   const nsString& aName,
                                   const nsString& aFeatures,
                                   const nsString& aBaseURI,
+                                  nsresult* aResult,
                                   bool* aWindowIsNew,
                                   InfallibleTArray<FrameScriptInfo>* aFrameScripts,
                                   nsCString* aURLToLoad) override;
@@ -149,41 +151,32 @@ public:
                                  const ClonedMessageData& aData,
                                  InfallibleTArray<CpowEntry>&& aCpows,
                                  const IPC::Principal& aPrincipal,
-                                 InfallibleTArray<nsString>* aJSONRetVal) override;
+                                 nsTArray<OwningSerializedStructuredCloneBuffer>* aRetVal) override;
     virtual bool RecvRpcMessage(const nsString& aMessage,
                                 const ClonedMessageData& aData,
                                 InfallibleTArray<CpowEntry>&& aCpows,
                                 const IPC::Principal& aPrincipal,
-                                InfallibleTArray<nsString>* aJSONRetVal) override;
+                                nsTArray<OwningSerializedStructuredCloneBuffer>* aRetVal) override;
     virtual bool RecvAsyncMessage(const nsString& aMessage,
                                   const ClonedMessageData& aData,
                                   InfallibleTArray<CpowEntry>&& aCpows,
                                   const IPC::Principal& aPrincipal) override;
     virtual bool RecvNotifyIMEFocus(const bool& aFocus,
-                                    nsIMEUpdatePreference* aPreference,
-                                    uint32_t* aSeqno) override;
-    virtual bool RecvNotifyIMETextChange(const uint32_t& aStart,
+                                    const ContentCache& aContentCache,
+                                    nsIMEUpdatePreference* aPreference)
+                                      override;
+    virtual bool RecvNotifyIMETextChange(const ContentCache& aContentCache,
+                                         const uint32_t& aStart,
                                          const uint32_t& aEnd,
                                          const uint32_t& aNewEnd,
                                          const bool& aCausedByComposition) override;
-    virtual bool RecvNotifyIMESelectedCompositionRect(
-                   const uint32_t& aOffset,
-                   InfallibleTArray<LayoutDeviceIntRect>&& aRects,
-                   const uint32_t& aCaretOffset,
-                   const LayoutDeviceIntRect& aCaretRect) override;
-    virtual bool RecvNotifyIMESelection(const uint32_t& aSeqno,
-                                        const uint32_t& aAnchor,
-                                        const uint32_t& aFocus,
-                                        const mozilla::WritingMode& aWritingMode,
+    virtual bool RecvNotifyIMESelectedCompositionRect(const ContentCache& aContentCache) override;
+    virtual bool RecvNotifyIMESelection(const ContentCache& aContentCache,
                                         const bool& aCausedByComposition) override;
-    virtual bool RecvNotifyIMETextHint(const nsString& aText) override;
+    virtual bool RecvUpdateContentCache(const ContentCache& aContentCache) override;
     virtual bool RecvNotifyIMEMouseButtonEvent(const widget::IMENotification& aEventMessage,
                                                bool* aConsumedByIME) override;
-    virtual bool RecvNotifyIMEEditorRect(const LayoutDeviceIntRect& aRect) override;
-    virtual bool RecvNotifyIMEPositionChange(
-                   const LayoutDeviceIntRect& aEditorRect,
-                   InfallibleTArray<LayoutDeviceIntRect>&& aCompositionRects,
-                   const LayoutDeviceIntRect& aCaretRect) override;
+    virtual bool RecvNotifyIMEPositionChange(const ContentCache& aContentCache) override;
     virtual bool RecvEndIMEComposition(const bool& aCancel,
                                        bool* aNoCompositionEvent,
                                        nsString* aComposition) override;
@@ -207,6 +200,14 @@ public:
                                            nsTArray<nsCString>&& aEnabledCommands,
                                            nsTArray<nsCString>&& aDisabledCommands) override;
     virtual bool RecvSetCursor(const uint32_t& aValue, const bool& aForce) override;
+    virtual bool RecvSetCustomCursor(const nsCString& aUri,
+                                     const uint32_t& aWidth,
+                                     const uint32_t& aHeight,
+                                     const uint32_t& aStride,
+                                     const uint8_t& aFormat,
+                                     const uint32_t& aHotspotX,
+                                     const uint32_t& aHotspotY,
+                                     const bool& aForce) override;
     virtual bool RecvSetBackgroundColor(const nscolor& aValue) override;
     virtual bool RecvSetStatus(const uint32_t& aType, const nsString& aStatus) override;
     virtual bool RecvIsParentWindowMainWidgetVisible(bool* aIsVisible) override;
@@ -215,14 +216,15 @@ public:
     virtual bool RecvGetTabOffset(LayoutDeviceIntPoint* aPoint) override;
     virtual bool RecvGetDPI(float* aValue) override;
     virtual bool RecvGetDefaultScale(double* aValue) override;
+    virtual bool RecvGetMaxTouchPoints(uint32_t* aTouchPoints) override;
     virtual bool RecvGetWidgetNativeData(WindowsHandle* aValue) override;
+    virtual bool RecvSetNativeChildOfShareableWindow(const uintptr_t& childWindow) override;
     virtual bool RecvZoomToRect(const uint32_t& aPresShellId,
                                 const ViewID& aViewId,
                                 const CSSRect& aRect) override;
     virtual bool RecvUpdateZoomConstraints(const uint32_t& aPresShellId,
                                            const ViewID& aViewId,
-                                           const bool& aIsRoot,
-                                           const ZoomConstraints& aConstraints) override;
+                                           const MaybeZoomConstraints& aConstraints) override;
     virtual bool RecvContentReceivedInputBlock(const ScrollableLayerGuid& aGuid,
                                                const uint64_t& aInputBlockId,
                                                const bool& aPreventDefault) override;
@@ -237,6 +239,14 @@ public:
     virtual PColorPickerParent*
     AllocPColorPickerParent(const nsString& aTitle, const nsString& aInitialColor) override;
     virtual bool DeallocPColorPickerParent(PColorPickerParent* aColorPicker) override;
+
+    virtual PDocAccessibleParent*
+    AllocPDocAccessibleParent(PDocAccessibleParent*, const uint64_t&) override;
+    virtual bool DeallocPDocAccessibleParent(PDocAccessibleParent*) override;
+    virtual bool
+    RecvPDocAccessibleConstructor(PDocAccessibleParent* aDoc,
+                                  PDocAccessibleParent* aParentDoc,
+                                  const uint64_t& aParentID) override;
 
     void LoadURL(nsIURI* aURI);
     // XXX/cjones: it's not clear what we gain by hiding these
@@ -264,6 +274,7 @@ public:
                               APZStateChange aChange,
                               int aArg);
     void NotifyMouseScrollTestEvent(const ViewID& aScrollId, const nsString& aEvent);
+    void NotifyFlushComplete();
     void Activate();
     void Deactivate();
 
@@ -418,13 +429,14 @@ public:
 
     void TakeDragVisualization(RefPtr<mozilla::gfx::SourceSurface>& aSurface,
                                int32_t& aDragAreaX, int32_t& aDragAreaY);
+    layout::RenderFrameParent* GetRenderFrame();
 protected:
     bool ReceiveMessage(const nsString& aMessage,
                         bool aSync,
                         const StructuredCloneData* aCloneData,
                         mozilla::jsipc::CpowHolder* aCpows,
                         nsIPrincipal* aPrincipal,
-                        InfallibleTArray<nsString>* aJSONRetVal = nullptr);
+                        nsTArray<OwningSerializedStructuredCloneBuffer>* aJSONRetVal = nullptr);
 
     virtual bool RecvAsyncAuthPrompt(const nsCString& aUri,
                                      const nsString& aRealm,
@@ -452,31 +464,14 @@ protected:
                                    const int32_t& aX, const int32_t& aY,
                                    const int32_t& aCx, const int32_t& aCy) override;
 
-    bool SendCompositionChangeEvent(mozilla::WidgetCompositionEvent& event);
-
     bool InitBrowserConfiguration(const nsCString& aURI,
                                   BrowserConfiguration& aConfiguration);
 
+    void SetHasContentOpener(bool aHasContentOpener);
+
     // IME
     static TabParent *mIMETabParent;
-    nsString mIMECacheText;
-    uint32_t mIMESelectionAnchor;
-    uint32_t mIMESelectionFocus;
-    mozilla::WritingMode mWritingMode;
-    bool mIMEComposing;
-    bool mIMECompositionEnding;
-    uint32_t mIMEEventCountAfterEnding;
-    // Buffer to store composition text during ResetInputState
-    // Compositions in almost all cases are small enough for nsAutoString
-    nsAutoString mIMECompositionText;
-    uint32_t mIMECompositionStart;
-    uint32_t mIMESeqno;
-
-    uint32_t mIMECompositionRectOffset;
-    InfallibleTArray<LayoutDeviceIntRect> mIMECompositionRects;
-    uint32_t mIMECaretOffset;
-    LayoutDeviceIntRect mIMECaretRect;
-    LayoutDeviceIntRect mIMEEditorRect;
+    ContentCacheInParent mContentCache;
 
     nsIntRect mRect;
     ScreenIntSize mDimensions;
@@ -488,7 +483,6 @@ protected:
 
 private:
     already_AddRefed<nsFrameLoader> GetFrameLoader(bool aUseCachedFrameLoaderAfterDestroy = false) const;
-    layout::RenderFrameParent* GetRenderFrame();
     nsRefPtr<nsIContentParent> mManager;
     void TryCacheDPIAndScale();
 
@@ -496,20 +490,21 @@ private:
 
     CSSPoint AdjustTapToChildWidget(const CSSPoint& aPoint);
 
+    bool AsyncPanZoomEnabled() const;
+
     // Update state prior to routing an APZ-aware event to the child process.
     // |aOutTargetGuid| will contain the identifier
-    // of the APZC instance that handled the event. aOutTargetGuid may be
-    // null.
+    // of the APZC instance that handled the event. aOutTargetGuid may be null.
     // |aOutInputBlockId| will contain the identifier of the input block
-    // that this event was added to, if there was one. aOutInputBlockId may
-    // be null.
+    // that this event was added to, if there was one. aOutInputBlockId may be null.
+    // |aOutApzResponse| will contain the response that the APZ gave when processing
+    // the input block; this is used for generating appropriate pointercancel events.
     void ApzAwareEventRoutingToChild(ScrollableLayerGuid* aOutTargetGuid,
-                                     uint64_t* aOutInputBlockId);
-    // When true, we've initiated normal shutdown and notified our
-    // managing PContent.
+                                     uint64_t* aOutInputBlockId,
+                                     nsEventStatus* aOutApzResponse);
+    // When true, we've initiated normal shutdown and notified our managing PContent.
     bool mMarkedDestroying;
-    // When true, the TabParent is invalid and we should not send IPC messages
-    // anymore.
+    // When true, the TabParent is invalid and we should not send IPC messages anymore.
     bool mIsDestroyed;
     // Whether we have already sent a FileDescriptor for the app package.
     bool mAppPackageFileDescriptorSent;
@@ -524,7 +519,7 @@ private:
     {
       nsCString mFlavor;
       nsString mStringData;
-      nsRefPtr<mozilla::dom::FileImpl> mBlobData;
+      nsRefPtr<mozilla::dom::BlobImpl> mBlobData;
       enum DataType
       {
         eString,
@@ -597,6 +592,8 @@ private:
     // Cached cursor setting from TabChild.  When the cursor is over the tab,
     // it should take this appearance.
     nsCursor mCursor;
+    nsCOMPtr<imgIContainer> mCustomCursor;
+    uint32_t mCustomCursorHotspotX, mCustomCursorHotspotY;
 
     // True if the cursor changes from the TabChild should change the widget
     // cursor.  This happens whenever the cursor is in the tab's region.
@@ -604,6 +601,7 @@ private:
 
     nsRefPtr<nsIPresShell> mPresShellWithRefreshListener;
 
+    bool mHasContentOpener;
 private:
     // This is used when APZ needs to find the TabParent associated with a layer
     // to dispatch events.

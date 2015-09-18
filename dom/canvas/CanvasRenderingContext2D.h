@@ -27,6 +27,7 @@
 #include "mozilla/EnumeratedArray.h"
 #include "FilterSupport.h"
 #include "nsSVGEffects.h"
+#include "Layers.h"
 
 class nsGlobalWindow;
 class nsXULElement;
@@ -187,7 +188,7 @@ public:
   void Fill(const CanvasPath& path, const CanvasWindingRule& winding);
   void Stroke();
   void Stroke(const CanvasPath& path);
-  void DrawFocusIfNeeded(mozilla::dom::Element& element);
+  void DrawFocusIfNeeded(mozilla::dom::Element& element, ErrorResult& aRv);
   bool DrawCustomFocusRing(mozilla::dom::Element& element);
   void Clip(const CanvasWindingRule& winding);
   void Clip(const CanvasPath& path, const CanvasWindingRule& winding);
@@ -363,7 +364,8 @@ public:
   void SetMozDash(JSContext* cx, const JS::Value& mozDash,
                   mozilla::ErrorResult& error);
 
-  void SetLineDash(const Sequence<double>& mSegments);
+  void SetLineDash(const Sequence<double>& mSegments,
+                   mozilla::ErrorResult& aRv);
   void GetLineDash(nsTArray<double>& mSegments) const;
 
   void SetLineDashOffset(double mOffset);
@@ -401,6 +403,7 @@ public:
   void DrawWindow(nsGlobalWindow& window, double x, double y, double w, double h,
                   const nsAString& bgColor, uint32_t flags,
                   mozilla::ErrorResult& error);
+  void DrawWidgetAsOnScreen(nsGlobalWindow& aWindow, mozilla::ErrorResult& error);
   void AsyncDrawXULElement(nsXULElement& elem, double x, double y, double w,
                            double h, const nsAString& bgColor, uint32_t flags,
                            mozilla::ErrorResult& error);
@@ -454,6 +457,7 @@ public:
   NS_IMETHOD SetIsOpaque(bool isOpaque) override;
   bool GetIsOpaque() override { return mOpaque; }
   NS_IMETHOD Reset() override;
+  mozilla::layers::PersistentBufferProvider* GetBufferProvider(mozilla::layers::LayerManager* aManager);
   already_AddRefed<CanvasLayer> GetCanvasLayer(nsDisplayListBuilder* aBuilder,
                                                CanvasLayer *aOldLayer,
                                                LayerManager *aManager) override;
@@ -639,11 +643,17 @@ protected:
    */
   void ClearTarget();
 
+  /*
+   * Returns the target to the buffer provider. i.e. this will queue a frame for
+   * rendering.
+   */
+  void ReturnTarget();
+
   /**
    * Check if the target is valid after calling EnsureTarget.
    */
   bool IsTargetValid() const {
-    return mTarget != sErrorTarget && mTarget != nullptr;
+    return (sErrorTarget == nullptr || mTarget != sErrorTarget) && (mBufferProvider != nullptr || mTarget);
   }
 
   /**
@@ -716,6 +726,8 @@ protected:
   // accessing it. In the event of an error it will be equal to
   // sErrorTarget.
   mozilla::RefPtr<mozilla::gfx::DrawTarget> mTarget;
+
+  mozilla::RefPtr<mozilla::layers::PersistentBufferProvider> mBufferProvider;
 
   uint32_t SkiaGLTex() const;
 
@@ -886,6 +898,7 @@ protected:
                      fillRule(mozilla::gfx::FillRule::FILL_WINDING),
                      lineCap(mozilla::gfx::CapStyle::BUTT),
                      lineJoin(mozilla::gfx::JoinStyle::MITER_OR_BEVEL),
+                     filterString(MOZ_UTF16("none")),
                      imageSmoothingEnabled(true),
                      fontExplicitLanguage(false)
     { }

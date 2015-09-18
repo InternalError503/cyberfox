@@ -417,7 +417,7 @@ LayerManagerComposite::RenderDebugOverlay(const Rect& aBounds)
     // Draw a translation delay warning overlay
     int width;
     int border;
-    if ((now - mWarnTime).ToMilliseconds() < kVisualWarningDuration) {
+    if (!mWarnTime.IsNull() && (now - mWarnTime).ToMilliseconds() < kVisualWarningDuration) {
       EffectChain effects;
 
       // Black blorder
@@ -666,7 +666,8 @@ LayerManagerComposite::Render()
   // We can't use composert2D if we have layer effects
   if (!mTarget && !haveLayerEffects &&
       gfxPrefs::Composer2DCompositionEnabled() &&
-      composer2D && composer2D->HasHwc() && composer2D->TryRenderWithHwc(mRoot, mGeometryChanged))
+      composer2D && composer2D->HasHwc() && composer2D->TryRenderWithHwc(mRoot,
+          mCompositor->GetWidget(), mGeometryChanged))
   {
     LayerScope::SetHWComposed();
     if (mFPS) {
@@ -772,7 +773,7 @@ LayerManagerComposite::Render()
   }
 
   if (composer2D) {
-    composer2D->Render();
+    composer2D->Render(mCompositor->GetWidget());
   }
 
   mCompositor->GetWidget()->PostRender(this);
@@ -1327,6 +1328,12 @@ LayerComposite::SetLayerManager(LayerManagerComposite* aManager)
 {
   mCompositeManager = aManager;
   mCompositor = aManager->GetCompositor();
+}
+
+bool
+LayerManagerComposite::AsyncPanZoomEnabled() const
+{
+  return mCompositor->GetWidget()->AsyncPanZoomEnabled();
 }
 
 nsIntRegion

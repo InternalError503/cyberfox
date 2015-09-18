@@ -33,7 +33,7 @@
 #include "nsAsyncRedirectVerifyHelper.h"
 #include "mozilla/LoadInfo.h"
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 using namespace mozilla;
 
@@ -271,7 +271,7 @@ nsMixedContentBlocker::AsyncOnChannelRedirect(nsIChannel* aOldChannel,
   }
 
   int16_t decision = REJECT_REQUEST;
-  rv = ShouldLoad(contentPolicyType,
+  rv = ShouldLoad(nsContentUtils::InternalContentPolicyTypeToExternal(contentPolicyType),
                   newUri,
                   requestingLocation,
                   loadInfo->LoadingNode(),
@@ -338,6 +338,9 @@ nsMixedContentBlocker::ShouldLoad(bool aHadInsecureImageRedirect,
   // and unlock sBlockMixedScript and sBlockMixedDisplay before reading/writing
   // to them.
   MOZ_ASSERT(NS_IsMainThread());
+
+  MOZ_ASSERT(aContentType == nsContentUtils::InternalContentPolicyTypeToExternal(aContentType),
+             "We should only see external content policy types here.");
 
   // Assume active (high risk) content and blocked by default
   MixedContentTypes classification = eMixedScript;
@@ -439,6 +442,7 @@ nsMixedContentBlocker::ShouldLoad(bool aHadInsecureImageRedirect,
     case TYPE_SCRIPT:
     case TYPE_STYLESHEET:
     case TYPE_SUBDOCUMENT:
+    case TYPE_WEB_MANIFEST:
     case TYPE_XBL:
     case TYPE_XMLHTTPREQUEST:
     case TYPE_XSLT:
@@ -783,6 +787,9 @@ nsMixedContentBlocker::ShouldProcess(uint32_t aContentType,
                                      nsIPrincipal* aRequestPrincipal,
                                      int16_t* aDecision)
 {
+  MOZ_ASSERT(aContentType == nsContentUtils::InternalContentPolicyTypeToExternal(aContentType),
+             "We should only see external content policy types here.");
+
   if (!aContentLocation) {
     // aContentLocation may be null when a plugin is loading without an associated URI resource
     if (aContentType == TYPE_OBJECT) {

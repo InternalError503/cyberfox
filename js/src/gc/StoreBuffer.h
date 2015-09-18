@@ -335,6 +335,8 @@ class StoreBuffer
     };
 
     bool isOkayToUseBuffer() const {
+        MOZ_ASSERT(!JS::shadow::Runtime::asShadowRuntime(runtime_)->isHeapBusy());
+
         /*
          * Disabled store buffers may not have a valid state; e.g. when stored
          * inline in the ChunkTrailer.
@@ -386,6 +388,7 @@ class StoreBuffer
     MonoTypeBuffer<ValueEdge> bufferRelocVal;
     MonoTypeBuffer<CellPtrEdge> bufferRelocCell;
     GenericBuffer bufferGeneric;
+    bool cancelIonCompilations_;
 
     JSRuntime* runtime_;
     const Nursery& nursery_;
@@ -397,7 +400,7 @@ class StoreBuffer
   public:
     explicit StoreBuffer(JSRuntime* rt, const Nursery& nursery)
       : bufferVal(), bufferCell(), bufferSlot(), bufferWholeCell(),
-        bufferRelocVal(), bufferRelocCell(), bufferGeneric(),
+        bufferRelocVal(), bufferRelocCell(), bufferGeneric(), cancelIonCompilations_(false),
         runtime_(rt), nursery_(nursery), aboutToOverflow_(false), enabled_(false),
         mEntered(false)
     {
@@ -411,6 +414,8 @@ class StoreBuffer
 
     /* Get the overflowed status. */
     bool isAboutToOverflow() const { return aboutToOverflow_; }
+
+    bool cancelIonCompilations() const { return cancelIonCompilations_; }
 
     /* Insert a single edge into the buffer/remembered set. */
     void putValueFromAnyThread(JS::Value* valuep) { putFromAnyThread(bufferVal, ValueEdge(valuep)); }
@@ -445,6 +450,10 @@ class StoreBuffer
     template <typename Key>
     void putCallback(void (*callback)(JSTracer* trc, Key* key, void* data), Key* key, void* data) {
         putFromAnyThread(bufferGeneric, CallbackRef<Key>(callback, key, data));
+    }
+
+    void setShouldCancelIonCompilations() {
+        cancelIonCompilations_ = true;
     }
 
     /* Methods to trace the source of all edges in the store buffer. */

@@ -127,19 +127,20 @@ bool isInIgnoredNamespaceForImplicitCtor(const Decl *decl) {
     return false;
   }
 
-  return name == "std" ||              // standard C++ lib
-         name == "__gnu_cxx" ||        // gnu C++ lib
-         name == "boost" ||            // boost
-         name == "webrtc" ||           // upstream webrtc
-         name == "icu_52" ||           // icu
-         name == "google" ||           // protobuf
-         name == "google_breakpad" ||  // breakpad
-         name == "soundtouch" ||       // libsoundtouch
-         name == "stagefright" ||      // libstagefright
-         name == "MacFileUtilities" || // MacFileUtilities
-         name == "dwarf2reader" ||     // dwarf2reader
-         name == "arm_ex_to_module" || // arm_ex_to_module
-         name == "testing";            // gtest
+
+  return name == "std" ||               // standard C++ lib
+         name == "__gnu_cxx" ||         // gnu C++ lib
+         name == "boost" ||             // boost
+         name == "webrtc" ||            // upstream webrtc
+         name.substr(0, 4) == "icu_" || // icu
+         name == "google" ||            // protobuf
+         name == "google_breakpad" ||   // breakpad
+         name == "soundtouch" ||        // libsoundtouch
+         name == "stagefright" ||       // libstagefright
+         name == "MacFileUtilities" ||  // MacFileUtilities
+         name == "dwarf2reader" ||      // dwarf2reader
+         name == "arm_ex_to_module" ||  // arm_ex_to_module
+         name == "testing";             // gtest
 }
 
 bool isInIgnoredNamespaceForImplicitConversion(const Decl *decl) {
@@ -421,7 +422,7 @@ bool classHasAddRefRelease(const CXXRecordDecl *D) {
   bool seenRelease = false;
   for (CXXRecordDecl::method_iterator method = D->method_begin();
        method != D->method_end(); ++method) {
-    std::string name = method->getNameAsString();
+    const auto &name = method->getName();
     if (name == "AddRef") {
       seenAddRef = true;
     } else if (name == "Release") {
@@ -588,7 +589,7 @@ AST_MATCHER(MemberExpr, isAddRefOrRelease) {
   ValueDecl *Member = Node.getMemberDecl();
   CXXMethodDecl *Method = dyn_cast<CXXMethodDecl>(Member);
   if (Method) {
-    std::string Name = Method->getNameAsString();
+    const auto &Name = Method->getName();
     return Name == "AddRef" || Name == "Release";
   }
   return false;
@@ -598,6 +599,33 @@ AST_MATCHER(MemberExpr, isAddRefOrRelease) {
 AST_MATCHER(QualType, isRefCounted) {
   return isClassRefCounted(Node);
 }
+
+#if CLANG_VERSION_FULL < 304
+
+/// The 'equalsBoundeNode' matcher was added in clang 3.4.
+/// Since infra runs clang 3.3, we polyfill it here.
+AST_POLYMORPHIC_MATCHER_P(equalsBoundNode,
+                          std::string, ID) {
+  BoundNodesTree bindings = Builder->build();
+  bool haveMatchingResult = false;
+  struct Visitor : public BoundNodesTree::Visitor {
+    const NodeType &Node;
+    std::string ID;
+    bool &haveMatchingResult;
+    Visitor(const NodeType &Node, const std::string &ID, bool &haveMatchingResult)
+      : Node(Node), ID(ID), haveMatchingResult(haveMatchingResult) {}
+    void visitMatch(const BoundNodes &BoundNodesView) override {
+      if (BoundNodesView.getNodeAs<NodeType>(ID) == &Node) {
+        haveMatchingResult = true;
+      }
+    }
+  };
+  Visitor visitor(Node, ID, haveMatchingResult);
+  bindings.visitMatches(&visitor);
+  return haveMatchingResult;
+}
+
+#endif
 
 }
 }
@@ -690,14 +718,28 @@ DiagnosticsMatcher::DiagnosticsMatcher()
       )).bind("node"),
     &nanExprChecker);
 
+  // First, look for direct parents of the MemberExpr.
   astMatcher.addMatcher(callExpr(callee(functionDecl(hasNoAddRefReleaseOnReturnAttr()).bind("func")),
                                  hasParent(memberExpr(isAddRefOrRelease(),
                                                       hasParent(callExpr())).bind("member")
       )).bind("node"),
     &noAddRefReleaseOnReturnChecker);
+  // Then, look for MemberExpr that need to be casted to the right type using
+  // an intermediary CastExpr before we get to the CallExpr.
+  astMatcher.addMatcher(callExpr(callee(functionDecl(hasNoAddRefReleaseOnReturnAttr()).bind("func")),
+                                 hasParent(castExpr(hasParent(memberExpr(isAddRefOrRelease(),
+                                                                         hasParent(callExpr())).bind("member"))))
+      ).bind("node"),
+    &noAddRefReleaseOnReturnChecker);
 
+  // Match declrefs with type "pointer to object of ref-counted type" inside a
+  // lambda, where the declaration they reference is not inside the lambda.
+  // This excludes arguments and local variables, leaving only captured
+  // variables.
   astMatcher.addMatcher(lambdaExpr(
-            hasDescendant(declRefExpr(hasType(pointerType(pointee(isRefCounted())))).bind("node"))
+            hasDescendant(declRefExpr(hasType(pointerType(pointee(isRefCounted()))),
+                                      to(decl().bind("decl"))).bind("declref")),
+            unless(hasDescendant(decl(equalsBoundNode("decl"))))
         ),
     &refCountedInsideLambdaChecker);
 
@@ -909,14 +951,14 @@ void DiagnosticsMatcher::RefCountedInsideLambdaChecker::run(
     const MatchFinder::MatchResult &Result) {
   DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
   unsigned errorID = Diag.getDiagnosticIDs()->getCustomDiagID(
-      DiagnosticIDs::Error, "Refcounted variable %0 of type %1 cannot be used inside a lambda");
+      DiagnosticIDs::Error, "Refcounted variable %0 of type %1 cannot be captured by a lambda");
   unsigned noteID = Diag.getDiagnosticIDs()->getCustomDiagID(
       DiagnosticIDs::Note, "Please consider using a smart pointer");
-  const DeclRefExpr *node = Result.Nodes.getNodeAs<DeclRefExpr>("node");
+  const DeclRefExpr *declref = Result.Nodes.getNodeAs<DeclRefExpr>("declref");
 
-  Diag.Report(node->getLocStart(), errorID) << node->getFoundDecl() <<
-    node->getType()->getPointeeType();
-  Diag.Report(node->getLocStart(), noteID);
+  Diag.Report(declref->getLocStart(), errorID) << declref->getFoundDecl() <<
+    declref->getType()->getPointeeType();
+  Diag.Report(declref->getLocStart(), noteID);
 }
 
 void DiagnosticsMatcher::ExplicitOperatorBoolChecker::run(

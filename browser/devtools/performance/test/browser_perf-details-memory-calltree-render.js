@@ -4,12 +4,12 @@
 /**
  * Tests that the memory call tree view renders content after recording.
  */
-function spawnTest () {
+function* spawnTest() {
   let { panel } = yield initPerformance(SIMPLE_URL);
   let { EVENTS, DetailsView, MemoryCallTreeView } = panel.panelWin;
 
   // Enable memory to test.
-  Services.prefs.setBoolPref(MEMORY_PREF, true);
+  Services.prefs.setBoolPref(ALLOCATIONS_PREF, true);
 
   yield startRecording(panel);
   yield busyWait(100);

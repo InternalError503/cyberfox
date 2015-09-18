@@ -124,6 +124,18 @@ extern bool gBluetoothDebugFlag;
   } while(0)                                                         \
 
 /**
+ * Convert an enum value to string then append it to a fallible array.
+ */
+#define BT_APPEND_ENUM_STRING_FALLIBLE(array, enumType, enumValue)   \
+  do {                                                               \
+    uint32_t index = uint32_t(enumValue);                            \
+    nsAutoString name;                                               \
+    name.AssignASCII(enumType##Values::strings[index].value,         \
+                     enumType##Values::strings[index].length);       \
+    array.AppendElement(name, mozilla::fallible);                    \
+  } while(0)                                                         \
+
+/**
  * Resolve |promise| with |ret| if |x| is false.
  */
 #define BT_ENSURE_TRUE_RESOLVE(x, promise, ret)                      \
@@ -729,9 +741,9 @@ struct BluetoothGattReadParam {
   BluetoothGattServiceId mServiceId;
   BluetoothGattId mCharId;
   BluetoothGattId mDescriptorId;
-  uint8_t mValue[BLUETOOTH_GATT_MAX_ATTR_LEN];
-  uint16_t mValueLength;
   uint16_t mValueType;
+  uint16_t mValueLength;
+  uint8_t mValue[BLUETOOTH_GATT_MAX_ATTR_LEN];
   uint8_t mStatus;
 };
 
@@ -743,12 +755,22 @@ struct BluetoothGattWriteParam {
 };
 
 struct BluetoothGattNotifyParam {
-  uint8_t mValue[BLUETOOTH_GATT_MAX_ATTR_LEN];
   nsString mBdAddr;
   BluetoothGattServiceId mServiceId;
   BluetoothGattId mCharId;
   uint16_t mLength;
+  uint8_t mValue[BLUETOOTH_GATT_MAX_ATTR_LEN];
   bool mIsNotify;
+};
+
+struct BluetoothGattTestParam {
+  nsString mBdAddr;
+  BluetoothUuid mUuid;
+  uint16_t mU1;
+  uint16_t mU2;
+  uint16_t mU3;
+  uint16_t mU4;
+  uint16_t mU5;
 };
 
 /**

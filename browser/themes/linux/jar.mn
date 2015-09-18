@@ -23,6 +23,14 @@ browser.jar:
 #endif
   skin/classic/browser/aboutTabCrashed.css                      (../shared/aboutTabCrashed.css)
   skin/classic/browser/actionicon-tab.png
+  skin/classic/browser/addons/addon-install-blocked.svg     (../shared/addons/addon-install-blocked.svg)
+  skin/classic/browser/addons/addon-install-confirm.svg     (../shared/addons/addon-install-confirm.svg)
+  skin/classic/browser/addons/addon-install-downloading.svg (../shared/addons/addon-install-downloading.svg)
+  skin/classic/browser/addons/addon-install-error.svg       (../shared/addons/addon-install-error.svg)
+  skin/classic/browser/addons/addon-install-installed.svg   (../shared/addons/addon-install-installed.svg)
+  skin/classic/browser/addons/addon-install-restart.svg     (../shared/addons/addon-install-restart.svg)
+  skin/classic/browser/addons/addon-install-warning.svg     (../shared/addons/addon-install-warning.svg)
+  skin/classic/browser/addons/addon-install-anchor.svg      (../shared/addons/addon-install-anchor.svg)
 * skin/classic/browser/browser.css
 * skin/classic/browser/devedition.css
 * skin/classic/browser/browser-lightweightTheme.css
@@ -38,7 +46,6 @@ browser.jar:
   skin/classic/browser/heartbeat-icon.svg                   (../shared/heartbeat-icon.svg)
   skin/classic/browser/heartbeat-star-lit.svg               (../shared/heartbeat-star-lit.svg)
   skin/classic/browser/heartbeat-star-off.svg               (../shared/heartbeat-star-off.svg)
-  skin/classic/browser/identity.png
   skin/classic/browser/identity-icons-generic.png
   skin/classic/browser/identity-icons-generic@2x.png
   skin/classic/browser/identity-icons-https.png
@@ -89,7 +96,6 @@ browser.jar:
   skin/classic/browser/badge-add-engine.png                 (../shared/search/badge-add-engine.png)
   skin/classic/browser/search-indicator-badge-add.png       (../shared/search/search-indicator-badge-add.png)
   skin/classic/browser/search-history-icon.svg              (../shared/search/history-icon.svg)
-  skin/classic/browser/Secure.png
   skin/classic/browser/Security-broken.png
   skin/classic/browser/setDesktopBackground.css
   skin/classic/browser/slowStartup-16.png
@@ -138,6 +144,11 @@ browser.jar:
   skin/classic/browser/loop/toolbar@2x.png            (loop/toolbar@2x.png)
   skin/classic/browser/loop/toolbar-inverted.png      (loop/toolbar-inverted.png)
   skin/classic/browser/loop/toolbar-inverted@2x.png   (loop/toolbar-inverted@2x.png)
+* skin/classic/browser/controlcenter/panel.css        (controlcenter/panel.css)
+  skin/classic/browser/controlcenter/arrow-subview.svg  (../shared/controlcenter/arrow-subview.svg)
+  skin/classic/browser/controlcenter/conn-not-secure.svg  (../shared/controlcenter/conn-not-secure.svg)
+  skin/classic/browser/controlcenter/conn-secure.svg  (../shared/controlcenter/conn-secure.svg)
+  skin/classic/browser/controlcenter/permissions.svg  (../shared/controlcenter/permissions.svg)
   skin/classic/browser/customizableui/background-noise-toolbar.png  (customizableui/background-noise-toolbar.png)
   skin/classic/browser/customizableui/customize-illustration.png  (../shared/customizableui/customize-illustration.png)
   skin/classic/browser/customizableui/customize-illustration-rtl.png  (../shared/customizableui/customize-illustration-rtl.png)
@@ -210,7 +221,7 @@ browser.jar:
   skin/classic/browser/preferences/in-content/search.css      (../shared/incontentprefs/search.css)
   skin/classic/browser/preferences/in-content/check.png       (../shared/incontentprefs/check.png)
   skin/classic/browser/preferences/in-content/check@2x.png    (../shared/incontentprefs/check@2x.png)
-  skin/classic/browser/preferences/in-content/default-profile-image.svg   (../shared/incontentprefs/default-profile-image.svg)
+  skin/classic/browser/fxa/default-profile-image.svg   (../shared/fxa/default-profile-image.svg)
   skin/classic/browser/preferences/applications.css   (preferences/applications.css)
   skin/classic/browser/preferences/aboutPermissions.css (preferences/aboutPermissions.css)
   skin/classic/browser/preferences/search.css         (preferences/search.css)
@@ -242,7 +253,6 @@ browser.jar:
   skin/classic/browser/tabbrowser/tab-stroke-end.png        (tabbrowser/tab-stroke-end.png)
   skin/classic/browser/tabbrowser/tab-stroke-start.png      (tabbrowser/tab-stroke-start.png)
   skin/classic/browser/tabbrowser/tabDragIndicator.png      (tabbrowser/tabDragIndicator.png)
-  skin/classic/browser/tabbrowser/tab-separator.png         (tabbrowser/tab-separator.png)
 
   skin/classic/browser/tabbrowser/pendingpaint.png          (../shared/tabbrowser/pendingpaint.png)
 
@@ -263,8 +273,10 @@ browser.jar:
   skin/classic/browser/devtools/add.svg               (../shared/devtools/images/add.svg)
   skin/classic/browser/devtools/filters.svg           (../shared/devtools/filters.svg)
   skin/classic/browser/devtools/filter-swatch.svg     (../shared/devtools/images/filter-swatch.svg)
+  skin/classic/browser/devtools/pseudo-class.svg      (../shared/devtools/images/pseudo-class.svg)
   skin/classic/browser/devtools/controls.png          (../shared/devtools/images/controls.png)
   skin/classic/browser/devtools/controls@2x.png       (../shared/devtools/images/controls@2x.png)
+  skin/classic/browser/devtools/animation-fast-track.svg (../shared/devtools/images/animation-fast-track.svg)
   skin/classic/browser/devtools/performance-icons.svg  (../shared/devtools/images/performance-icons.svg)
   skin/classic/browser/devtools/newtab.png             (../shared/devtools/images/newtab.png)
   skin/classic/browser/devtools/newtab@2x.png          (../shared/devtools/images/newtab@2x.png)
@@ -303,8 +315,7 @@ browser.jar:
 * skin/classic/browser/devtools/ruleview.css          (../shared/devtools/ruleview.css)
 * skin/classic/browser/devtools/webconsole.css                  (devtools/webconsole.css)
   skin/classic/browser/devtools/webconsole_networkpanel.css     (devtools/webconsole_networkpanel.css)
-  skin/classic/browser/devtools/webconsole.png                  (../shared/devtools/images/webconsole.png)
-  skin/classic/browser/devtools/webconsole@2x.png               (../shared/devtools/images/webconsole@2x.png)
+  skin/classic/browser/devtools/webconsole.svg                  (../shared/devtools/images/webconsole.svg)
   skin/classic/browser/devtools/commandline.css              (../shared/devtools/commandline.css)
   skin/classic/browser/devtools/markup-view.css       (../shared/devtools/markup-view.css)
   skin/classic/browser/devtools/editor-error.png       (../shared/devtools/images/editor-error.png)
@@ -319,7 +330,6 @@ browser.jar:
 * skin/classic/browser/devtools/debugger.css          (devtools/debugger.css)
   skin/classic/browser/devtools/eyedropper.css        (../shared/devtools/eyedropper.css)
 * skin/classic/browser/devtools/netmonitor.css        (devtools/netmonitor.css)
-* skin/classic/browser/devtools/profiler.css          (devtools/profiler.css)
 * skin/classic/browser/devtools/performance.css       (devtools/performance.css)
   skin/classic/browser/devtools/timeline-filter.svg   (../shared/devtools/images/timeline-filter.svg)
 * skin/classic/browser/devtools/scratchpad.css        (devtools/scratchpad.css)
@@ -382,6 +392,8 @@ browser.jar:
   skin/classic/browser/devtools/toggle-tools.png          (../shared/devtools/images/toggle-tools.png)
   skin/classic/browser/devtools/toggle-tools@2x.png       (../shared/devtools/images/toggle-tools@2x.png)
   skin/classic/browser/devtools/dock-bottom@2x.png        (../shared/devtools/images/dock-bottom@2x.png)
+  skin/classic/browser/devtools/dock-bottom-minimize@2x.png (../shared/devtools/images/dock-bottom-minimize@2x.png)
+  skin/classic/browser/devtools/dock-bottom-maximize@2x.png (../shared/devtools/images/dock-bottom-maximize@2x.png)
   skin/classic/browser/devtools/dock-side@2x.png          (../shared/devtools/images/dock-side@2x.png)
   skin/classic/browser/devtools/floating-scrollbars.css   (devtools/floating-scrollbars.css)
   skin/classic/browser/devtools/floating-scrollbars-light.css (devtools/floating-scrollbars-light.css)
@@ -394,6 +406,7 @@ browser.jar:
   skin/classic/browser/devtools/tool-debugger-paused.svg    (../shared/devtools/images/tool-debugger-paused.svg)
   skin/classic/browser/devtools/tool-inspector.svg          (../shared/devtools/images/tool-inspector.svg)
   skin/classic/browser/devtools/tool-inspector.svg          (../shared/devtools/images/tool-inspector.svg)
+  skin/classic/browser/devtools/tool-shadereditor.svg       (../shared/devtools/images/tool-shadereditor.svg)
   skin/classic/browser/devtools/tool-styleeditor.svg        (../shared/devtools/images/tool-styleeditor.svg)
   skin/classic/browser/devtools/tool-storage.svg            (../shared/devtools/images/tool-storage.svg)
   skin/classic/browser/devtools/tool-profiler.svg           (../shared/devtools/images/tool-profiler.svg)
@@ -454,7 +467,6 @@ browser.jar:
   skin/classic/browser/syncSetup.css
   skin/classic/browser/syncCommon.css
   skin/classic/browser/syncQuota.css
-  skin/classic/browser/syncProgress.css
   skin/classic/browser/syncProgress-horizontalbar.png
   skin/classic/browser/syncProgress-horizontalbar@2x.png
 #endif
