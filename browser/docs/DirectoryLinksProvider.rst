@@ -23,7 +23,7 @@ data from the server.
 
 For the directory source and ping endpoints, the default preference values point
 to Mozilla key-pinned servers with encryption. No cookies are set by the servers
-but not enforced by Firefox.
+and Firefox enforces this by making anonymous requests.
 
 - default directory source endpoint:
   https://tiles.services.mozilla.com/v3/links/fetch/%LOCALE%/%CHANNEL%
@@ -90,7 +90,9 @@ Users can turn off the ping with in-new-tab-page controls.
 
 As the new tab page is rendered, any images for tiles are downloaded if not
 already cached. The default servers hosting the images are Mozilla CDN that
-don't use cookies: https://tiles.cdn.mozilla.net/
+don't use cookies: https://tiles.cdn.mozilla.net/ and Firefox enforces that the
+images come from mozilla.net or data URIs when using the default directory
+source.
 
 
 Source JSON Format

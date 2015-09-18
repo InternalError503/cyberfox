@@ -45,7 +45,7 @@ public:
       caps.preserve = false;
       caps.bpp16 = false;
       nsRefPtr<GLContext> context = GLContextProvider::CreateOffscreen(
-        gfxIntSize(gCompWidth, gCompHeight), caps, true);
+        IntSize(gCompWidth, gCompHeight), caps, true);
       return context.forget().take();
     }
     return nullptr;
@@ -125,7 +125,7 @@ static TemporaryRef<Compositor> CreateTestCompositor(LayersBackend backend, Mock
     abort();
   }
 
-  return compositor;
+  return compositor.forget();
 }
 
 /**
@@ -172,10 +172,8 @@ static std::vector<LayersBackend> GetPlatformBackends()
 
 static TemporaryRef<DrawTarget> CreateDT()
 {
-  RefPtr<DrawTarget> dt = gfxPlatform::GetPlatform()->CreateOffscreenContentDrawTarget(
+  return gfxPlatform::GetPlatform()->CreateOffscreenContentDrawTarget(
     IntSize(gCompWidth, gCompHeight), SurfaceFormat::B8G8R8A8);
-
-  return dt;
 }
 
 static bool CompositeAndCompare(nsRefPtr<LayerManagerComposite> layerManager, DrawTarget* refDT)

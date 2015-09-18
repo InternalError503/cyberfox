@@ -30,7 +30,11 @@
 #include "nsExpirationTracker.h"
 #include "nsClassHashtable.h"
 #include "prclist.h"
+#include "mozilla/UniquePtr.h"
+#include "mozilla/CORSMode.h"
+#include <bitset>                        // for member
 
+class gfxUserFontSet;
 class imgIRequest;
 class nsAString;
 class nsBindingManager;
@@ -47,6 +51,7 @@ class nsIChannel;
 class nsIContent;
 class nsIContentSink;
 class nsIDocShell;
+class nsIDocShellTreeItem;
 class nsIDocumentEncoder;
 class nsIDocumentObserver;
 class nsIDOMDocument;
@@ -117,6 +122,7 @@ class Event;
 class EventTarget;
 class FontFaceSet;
 class FrameRequestCallback;
+struct FullscreenRequest;
 class ImportManager;
 class HTMLBodyElement;
 struct LifecycleCallbackArgs;
@@ -142,17 +148,12 @@ template<typename> class Sequence;
 template<typename, typename> class CallbackObjectHolder;
 typedef CallbackObjectHolder<NodeFilter, nsIDOMNodeFilter> NodeFilterHolder;
 
-struct FullScreenOptions {
-  FullScreenOptions();
-  nsRefPtr<gfx::VRHMDInfo> mVRHMDDevice;
-};
-
 } // namespace dom
 } // namespace mozilla
 
 #define NS_IDOCUMENT_IID \
-{ 0x0b78eabe, 0x8b94, 0x4ea1, \
-  { 0x93, 0x31, 0x5d, 0x48, 0xe8, 0x3a, 0xda, 0x95 } }
+{ 0x21bbd52a, 0xc2d2, 0x4b2f, \
+  { 0xbc, 0x6c, 0xc9, 0x52, 0xbe, 0x23, 0x6b, 0x19 } }
 
 // Enum for requesting a particular type of document when creating a doc
 enum DocumentFlavor {
@@ -184,9 +185,11 @@ NS_GetContentList(nsINode* aRootNode,
 class nsIDocument : public nsINode
 {
   typedef mozilla::dom::GlobalObject GlobalObject;
+
 public:
   typedef mozilla::net::ReferrerPolicy ReferrerPolicyEnum;
   typedef mozilla::dom::Element Element;
+  typedef mozilla::dom::FullscreenRequest FullscreenRequest;
 
   NS_DECLARE_STATIC_IID_ACCESSOR(NS_IDOCUMENT_IID)
   NS_DECL_AND_IMPL_ZEROING_OPERATOR_NEW
@@ -1049,7 +1052,7 @@ public:
   /**
    * Return the inner window ID.
    */
-  uint64_t InnerWindowID()
+  uint64_t InnerWindowID() const
   {
     nsPIDOMWindow *window = GetInnerWindow();
     return window ? window->WindowID() : 0;
@@ -1087,18 +1090,17 @@ public:
    * the <iframe> or <browser> that contains this document is also mode
    * fullscreen. This happens recursively in all ancestor documents.
    */
-  virtual void AsyncRequestFullScreen(Element* aElement,
-                                      mozilla::dom::FullScreenOptions& aOptions) = 0;
+  virtual void AsyncRequestFullScreen(
+    mozilla::UniquePtr<FullscreenRequest>&& aRequest) = 0;
 
   /**
    * Called when a frame in a child process has entered fullscreen or when a
    * fullscreen frame in a child process changes to another origin.
    * aFrameElement is the frame element which contains the child-process
-   * fullscreen document, and aNewOrigin is the origin of the new fullscreen
-   * document.
+   * fullscreen document.
    */
-  virtual nsresult RemoteFrameFullscreenChanged(nsIDOMElement* aFrameElement,
-                                                const nsAString& aNewOrigin) = 0;
+  virtual nsresult
+    RemoteFrameFullscreenChanged(nsIDOMElement* aFrameElement) = 0;
 
   /**
    * Called when a frame in a remote child document has rolled back fullscreen
@@ -1161,10 +1163,7 @@ public:
    *
    * Note that the fullscreen leaf is the bottom-most document which is
    * fullscreen, it may have non-fullscreen child documents. The fullscreen
-   * root is usually the chrome document, but if fullscreen is content-only,
-   * (see the comment in nsContentUtils.h on IsFullscreenApiContentOnly())
-   * the fullscreen root will be a direct child of the chrome document, and
-   * there may be other branches of the same doctree that are fullscreen.
+   * root is normally the chrome document.
    *
    * If aRunAsync is true, fullscreen is executed asynchronously.
    *
@@ -1172,6 +1171,22 @@ public:
    * aDocument has fullscreen ancestors.
    */
   static void ExitFullscreen(nsIDocument* aDocument, bool aRunAsync);
+
+  /**
+   * Handles one single fullscreen request, updates `aHandled` if the request
+   * is handled, and returns whether this request should be removed from the
+   * request queue.
+   */
+  static bool HandlePendingFullscreenRequest(const FullscreenRequest& aRequest,
+                                             nsIDocShellTreeItem* aRootShell,
+                                             bool* aHandled);
+
+  /**
+   * Handles any pending fullscreen in aDocument or its subdocuments.
+   *
+   * Returns whether there is any fullscreen request handled.
+   */
+  static bool HandlePendingFullscreenRequests(nsIDocument* aDocument);
 
   virtual void RequestPointerLock(Element* aElement) = 0;
 
@@ -2021,6 +2036,12 @@ public:
    */
   virtual bool IsDocumentRightToLeft() { return false; }
 
+  /**
+   * Called by Parser for link rel=preconnect
+   */
+  virtual void MaybePreconnect(nsIURI* uri,
+                               mozilla::CORSMode aCORSMode) = 0;
+
   enum DocumentTheme {
     Doc_Theme_Uninitialized, // not determined yet
     Doc_Theme_None,
@@ -2136,6 +2157,10 @@ public:
   virtual void RemovePlugin(nsIObjectLoadingContent* aPlugin) = 0;
   virtual void GetPlugins(nsTArray<nsIObjectLoadingContent*>& aPlugins) = 0;
 
+  virtual nsresult AddResponsiveContent(nsIContent* aContent) = 0;
+  virtual void RemoveResponsiveContent(nsIContent* aContent) = 0;
+  virtual void NotifyMediaFeatureValuesChanged() = 0;
+
   virtual nsresult GetStateObject(nsIVariant** aResult) = 0;
 
   virtual nsDOMNavigationTiming* GetNavigationTiming() const = 0;
@@ -2161,8 +2186,9 @@ public:
     eDeprecatedOperationCount
   };
 #undef DEPRECATED_OPERATION
-  bool HasWarnedAbout(DeprecatedOperations aOperation);
-  void WarnOnceAbout(DeprecatedOperations aOperation, bool asError = false);
+  bool HasWarnedAbout(DeprecatedOperations aOperation) const;
+  void WarnOnceAbout(DeprecatedOperations aOperation,
+                     bool asError = false) const;
 
 #define DOCUMENT_WARNING(_op) e##_op,
   enum DocumentWarnings {
@@ -2170,11 +2196,11 @@ public:
     eDocumentWarningCount
   };
 #undef DOCUMENT_WARNING
-  bool HasWarnedAbout(DocumentWarnings aWarning);
+  bool HasWarnedAbout(DocumentWarnings aWarning) const;
   void WarnOnceAbout(DocumentWarnings aWarning,
                      bool asError = false,
                      const char16_t **aParams = nullptr,
-                     uint32_t aParamsLength = 0);
+                     uint32_t aParamsLength = 0) const;
 
   virtual void PostVisibilityUpdateEvent() = 0;
   
@@ -2374,7 +2400,7 @@ public:
     CreateAttributeNS(const nsAString& aNamespaceURI,
                       const nsAString& aQualifiedName,
                       mozilla::ErrorResult& rv);
-  void GetInputEncoding(nsAString& aInputEncoding);
+  void GetInputEncoding(nsAString& aInputEncoding) const;
   already_AddRefed<nsLocation> GetLocation() const;
   void GetReferrer(nsAString& aReferrer) const;
   void GetLastModified(nsAString& aLastModified) const;
@@ -2419,16 +2445,16 @@ public:
   {
     return mVisibilityState != mozilla::dom::VisibilityState::Visible;
   }
-  bool MozHidden() // Not const because of WarnOnceAbout
+  bool MozHidden() const
   {
     WarnOnceAbout(ePrefixedVisibilityAPI);
     return Hidden();
   }
-  mozilla::dom::VisibilityState VisibilityState()
+  mozilla::dom::VisibilityState VisibilityState() const
   {
     return mVisibilityState;
   }
-  mozilla::dom::VisibilityState MozVisibilityState()
+  mozilla::dom::VisibilityState MozVisibilityState() const
   {
     WarnOnceAbout(ePrefixedVisibilityAPI);
     return VisibilityState();
@@ -2535,14 +2561,19 @@ public:
     }
   }
 
+  gfxUserFontSet* GetUserFontSet();
+  void FlushUserFontSet();
+  void RebuildUserFontSet(); // asynchronously
+  mozilla::dom::FontFaceSet* GetFonts() { return mFontFaceSet; }
+
   // FontFaceSource
-  mozilla::dom::FontFaceSet* GetFonts(mozilla::ErrorResult& aRv);
+  mozilla::dom::FontFaceSet* Fonts();
 
   bool DidFireDOMContentLoaded() const { return mDidFireDOMContentLoaded; }
 
 private:
-  uint64_t mDeprecationWarnedAbout;
-  uint64_t mDocWarningWarnedAbout;
+  mutable std::bitset<eDeprecatedOperationCount> mDeprecationWarnedAbout;
+  mutable std::bitset<eDocumentWarningCount> mDocWarningWarnedAbout;
   SelectorCache mSelectorCache;
 
 protected:
@@ -2580,6 +2611,11 @@ protected:
   }
 
   mozilla::dom::XPathEvaluator* XPathEvaluator();
+
+  void HandleRebuildUserFontSet() {
+    mPostedFlushUserFontSet = false;
+    FlushUserFontSet();
+  }
 
   nsCString mReferrer;
   nsString mLastModified;
@@ -2636,6 +2672,9 @@ protected:
 
   // Our cached .children collection
   nsCOMPtr<nsIHTMLCollection> mChildrenCollection;
+
+  // container for per-context fonts (downloadable, SVG, etc.)
+  nsRefPtr<mozilla::dom::FontFaceSet> mFontFaceSet;
 
   // Compatibility mode
   nsCompatibility mCompatMode;
@@ -2769,6 +2808,15 @@ protected:
   bool mIsLinkUpdateRegistrationsForbidden;
 #endif
 
+  // Is the current mFontFaceSet valid?
+  bool mFontFaceSetDirty;
+
+  // Has GetUserFontSet() been called?
+  bool mGetUserFontSetCalled;
+
+  // Do we currently have an event posted to call FlushUserFontSet?
+  bool mPostedFlushUserFontSet;
+
   enum Type {
     eUnknown, // should never be used
     eHTML,
@@ -2868,7 +2916,7 @@ protected:
   nsTArray<nsWeakPtr> mBlockedTrackingNodes;
 
   // Weak reference to mScriptGlobalObject QI:d to nsPIDOMWindow,
-  // updated on every set of mSecriptGlobalObject.
+  // updated on every set of mScriptGlobalObject.
   nsPIDOMWindow *mWindow;
 
   nsCOMPtr<nsIDocumentEncoder> mCachedEncoder;

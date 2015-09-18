@@ -931,6 +931,7 @@ moz_gtk_toggle_paint(cairo_t *cr, GdkRectangle* rect,
                      gboolean selected, gboolean inconsistent,
                      gboolean isradio, GtkTextDirection direction)
 {
+    GtkStateFlags state_flags = GetStateFlagsFromGtkWidgetState(state);
     gint indicator_size, indicator_spacing;
     gint x, y, width, height;
     gint focus_x, focus_y, focus_width, focus_height;
@@ -967,10 +968,16 @@ moz_gtk_toggle_paint(cairo_t *cr, GdkRectangle* rect,
     gtk_widget_set_direction(w, direction);
     gtk_style_context_save(style);
 
+    if (selected)
+        state_flags |= checkbox_check_state;
+
+    if (inconsistent)
+        state_flags |= GTK_STATE_FLAG_INCONSISTENT;
+
+    gtk_style_context_set_state(style, state_flags);
+
     if (isradio) {
         gtk_style_context_add_class(style, GTK_STYLE_CLASS_RADIO);
-        gtk_style_context_set_state(style, selected ? checkbox_check_state :
-                                                      GTK_STATE_FLAG_NORMAL);
         gtk_render_option(style, cr, x, y, width, height);
         if (state->focused) {
             gtk_render_focus(style, cr, focus_x, focus_y,
@@ -983,14 +990,7 @@ moz_gtk_toggle_paint(cairo_t *cr, GdkRectangle* rect,
         * must also be changed for the state to be drawn.
         */        
         gtk_style_context_add_class(style, GTK_STYLE_CLASS_CHECK);
-        if (inconsistent) {
-            gtk_style_context_set_state(style, GTK_STATE_FLAG_INCONSISTENT);
-            gtk_toggle_button_set_inconsistent(GTK_TOGGLE_BUTTON(gCheckboxWidget), TRUE);
-        } else if (selected) {
-            gtk_style_context_set_state(style, checkbox_check_state);
-        } else {
-            gtk_toggle_button_set_inconsistent(GTK_TOGGLE_BUTTON(gCheckboxWidget), FALSE);
-        }
+        gtk_toggle_button_set_inconsistent(GTK_TOGGLE_BUTTON(gCheckboxWidget), inconsistent);
         gtk_render_check(style, cr, x, y, width, height);        
         if (state->focused) {
             gtk_render_focus(style, cr, 
@@ -1568,7 +1568,7 @@ moz_gtk_treeview_expander_paint(cairo_t *cr, GdkRectangle* rect,
 
     /* Because the frame we get is of the entire treeview, we can't get the precise
      * event state of one expander, thus rendering hover and active feedback useless. */
-    state_flags = state->disabled ? GTK_STATE_INSENSITIVE : GTK_STATE_NORMAL;
+    state_flags = state->disabled ? GTK_STATE_FLAG_INSENSITIVE : GTK_STATE_FLAG_NORMAL;
 
     /* GTK_STATE_FLAG_ACTIVE controls expanded/colapsed state rendering
      * in gtk_render_expander()
@@ -2635,12 +2635,6 @@ moz_gtk_get_widget_border(GtkThemeWidgetType widget, gint* left, gint* top,
             style = gtk_widget_get_style_context(gEntryWidget);
             moz_gtk_add_style_border(style, left, top, right, bottom);
 
-            /* Use the document padding in HTML
-               and GTK style padding in XUL. */
-            if (!inhtml) {
-                moz_gtk_add_style_padding(style, left, top, right, bottom);
-            }
-
             return MOZ_GTK_SUCCESS;
         }
     case MOZ_GTK_TREEVIEW:
@@ -3269,6 +3263,20 @@ GtkWidget* moz_gtk_get_scrollbar_widget(void)
     MOZ_ASSERT(is_initialized, "Forgot to call moz_gtk_init()");
     ensure_scrollbar_widget();
     return gHorizScrollbarWidget;
+}
+
+gboolean moz_gtk_has_scrollbar_buttons(void)
+{
+    gboolean backward, forward, secondary_backward, secondary_forward;
+    MOZ_ASSERT(is_initialized, "Forgot to call moz_gtk_init()");
+    ensure_scrollbar_widget();
+    gtk_widget_style_get (gHorizScrollbarWidget,
+                          "has-backward-stepper", &backward,
+                          "has-forward-stepper", &forward,
+                          "has-secondary-backward-stepper", &secondary_backward,
+                          "has-secondary-forward-stepper", &secondary_forward,
+                          NULL);
+    return backward | forward | secondary_forward | secondary_forward;
 }
 
 gint

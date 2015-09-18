@@ -71,3 +71,8 @@ testing/web-platform/sync/
 
 # Android Gradle artifacts.
 mobile/android/gradle/.gradle
+
+#######
+/browser/branding/cyberfox-intel*/
+/browser/branding/cyberfox-amd*/
+/browser/branding/cyberfox-beta*/

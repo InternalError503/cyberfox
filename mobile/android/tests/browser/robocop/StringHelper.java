@@ -32,7 +32,7 @@ public class StringHelper {
     public final String ABOUT_DOWNLOADS_URL = "about:downloads";
     public final String ABOUT_HOME_URL = "about:home";
     public final String ABOUT_ADDONS_URL = "about:addons";
-    public static final String ABOUT_PASSWORDS_URL = "about:passwords";
+    public static final String ABOUT_LOGINS_URL = "about:logins";
     public final String ABOUT_APPS_URL = "about:apps";
     public final String ABOUT_ABOUT_URL = "about:about";
     public final String ABOUT_SCHEME = "about:";
@@ -133,6 +133,8 @@ public class StringHelper {
     public final String TEXT_SIZE_LABEL;
     public final String TITLE_BAR_LABEL = "Title bar";
     public final String SCROLL_TITLE_BAR_LABEL;
+    public final String VOICE_INPUT_TITLE_LABEL;
+    public final String VOICE_INPUT_SUMMARY_LABEL;
     public final String TEXT_REFLOW_LABEL;
     public final String CHARACTER_ENCODING_LABEL;
     public final String PLUGINS_LABEL;
@@ -145,7 +147,7 @@ public class StringHelper {
     public final String TRACKING_PROTECTION_LABEL;
     public final String DNT_LABEL;
     public final String COOKIES_LABEL;
-    public final String REMEMBER_PASSWORDS_LABEL;
+    public final String REMEMBER_LOGINS_LABEL;
     public final String MANAGE_LOGINS_LABEL;
     public final String MASTER_PASSWORD_LABEL;
     public final String CLEAR_PRIVATE_DATA_LABEL;
@@ -193,6 +195,7 @@ public class StringHelper {
     public final String SETTINGS_LABEL;
     public final String GUEST_MODE_LABEL;
     public final String TAB_QUEUE_LABEL;
+    public final String TAB_QUEUE_SUMMARY;
 
     // Android 3.0+
     public final String TOOLS_LABEL;
@@ -317,6 +320,8 @@ public class StringHelper {
         // Display
         TEXT_SIZE_LABEL = res.getString(R.string.pref_text_size);
         SCROLL_TITLE_BAR_LABEL = res.getString(R.string.pref_scroll_title_bar2);
+        VOICE_INPUT_TITLE_LABEL = res.getString(R.string.pref_voice_input);
+        VOICE_INPUT_SUMMARY_LABEL = res.getString(R.string.pref_voice_input_summary);
         TEXT_REFLOW_LABEL = res.getString(R.string.pref_reflow_on_zoom);
         CHARACTER_ENCODING_LABEL = res.getString(R.string.pref_char_encoding);
         PLUGINS_LABEL = res.getString(R.string.pref_plugins);
@@ -325,7 +330,7 @@ public class StringHelper {
         TRACKING_PROTECTION_LABEL = res.getString(R.string.pref_tracking_protection_title);
         DNT_LABEL = res.getString(R.string.pref_donottrack_title);
         COOKIES_LABEL = res.getString(R.string.pref_cookies_menu);
-        REMEMBER_PASSWORDS_LABEL = res.getString(R.string.pref_remember_signons);
+        REMEMBER_LOGINS_LABEL = res.getString(R.string.pref_remember_signons);
         MANAGE_LOGINS_LABEL = res.getString(R.string.pref_manage_logins);
         MASTER_PASSWORD_LABEL = res.getString(R.string.pref_use_master_password);
         CLEAR_PRIVATE_DATA_LABEL = res.getString(R.string.pref_clear_private_data);
@@ -367,6 +372,7 @@ public class StringHelper {
         SETTINGS_LABEL = res.getString(R.string.settings);
         GUEST_MODE_LABEL = res.getString(R.string.new_guest_session);
         TAB_QUEUE_LABEL = res.getString(R.string.pref_tab_queue_title);
+        TAB_QUEUE_SUMMARY = res.getString(R.string.pref_tab_queue_summary);
 
         // Android 3.0+
         TOOLS_LABEL = res.getString(R.string.tools);

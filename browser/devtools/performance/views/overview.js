@@ -42,7 +42,7 @@ let OverviewView = {
   initialize: function () {
     this.graphs = new GraphsController({
       root: $("#overview-pane"),
-      getBlueprint: () => PerformanceController.getTimelineBlueprint(),
+      getFilter: () => PerformanceController.getPref("hidden-markers"),
       getTheme: () => PerformanceController.getTheme(),
     });
 
@@ -165,8 +165,10 @@ let OverviewView = {
     let mapEnd = () => recording.getDuration();
     let selection = this.graphs.getMappedSelection({ mapStart, mapEnd });
     // If no selection returned, this means the overview graphs have not been rendered
-    // yet, so act as if we have no selection (the full recording).
-    if (!selection) {
+    // yet, so act as if we have no selection (the full recording). Also
+    // if the selection range distance is tiny, assume the range was cleared or just
+    // clicked, and we do not have a range.
+    if (!selection || (selection.max - selection.min) < 1) {
       return { startTime: 0, endTime: recording.getDuration() };
     }
     return { startTime: selection.min, endTime: selection.max };
@@ -176,7 +178,7 @@ let OverviewView = {
    * Method for handling all the set up for rendering the overview graphs.
    *
    * @param number resolution
-   *        The fps graph resolution. @see Graphs.jsm
+   *        The fps graph resolution. @see Graphs.js
    */
   render: Task.async(function *(resolution) {
     if (this.isDisabled()) {
@@ -300,14 +302,8 @@ let OverviewView = {
     if (this._stopSelectionChangeEventPropagation) {
       return;
     }
-    // If the range is smaller than a pixel (which can happen when performing
-    // a click on the graphs), treat this as a cleared selection.
-    let interval = this.getTimeInterval();
-    if (interval.endTime - interval.startTime < 1) {
-      this.emit(EVENTS.OVERVIEW_RANGE_CLEARED);
-    } else {
-      this.emit(EVENTS.OVERVIEW_RANGE_SELECTED, interval);
-    }
+
+    this.emit(EVENTS.OVERVIEW_RANGE_SELECTED, this.getTimeInterval());
   },
 
   _onGraphRendered: function (_, graphName) {
@@ -335,8 +331,8 @@ let OverviewView = {
       case "hidden-markers": {
         let graph;
         if (graph = yield this.graphs.isAvailable("timeline")) {
-          let blueprint = PerformanceController.getTimelineBlueprint();
-          graph.setBlueprint(blueprint);
+          let filter = PerformanceController.getPref("hidden-markers");
+          graph.setFilter(filter);
           graph.refresh({ force: true });
         }
         break;

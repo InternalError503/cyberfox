@@ -2938,7 +2938,7 @@ LinearSum::add(int32_t constant)
 }
 
 void
-LinearSum::print(Sprinter& sp) const
+LinearSum::dump(GenericPrinter& out) const
 {
     for (size_t i = 0; i < terms_.length(); i++) {
         int32_t scale = terms_[i].scale;
@@ -2946,36 +2946,29 @@ LinearSum::print(Sprinter& sp) const
         MOZ_ASSERT(scale);
         if (scale > 0) {
             if (i)
-                sp.printf("+");
+                out.printf("+");
             if (scale == 1)
-                sp.printf("#%d", id);
+                out.printf("#%d", id);
             else
-                sp.printf("%d*#%d", scale, id);
+                out.printf("%d*#%d", scale, id);
         } else if (scale == -1) {
-            sp.printf("-#%d", id);
+            out.printf("-#%d", id);
         } else {
-            sp.printf("%d*#%d", scale, id);
+            out.printf("%d*#%d", scale, id);
         }
     }
     if (constant_ > 0)
-        sp.printf("+%d", constant_);
+        out.printf("+%d", constant_);
     else if (constant_ < 0)
-        sp.printf("%d", constant_);
-}
-
-void
-LinearSum::dump(FILE* fp) const
-{
-    Sprinter sp(GetJitContext()->cx);
-    sp.init();
-    print(sp);
-    fprintf(fp, "%s\n", sp.string());
+        out.printf("%d", constant_);
 }
 
 void
 LinearSum::dump() const
 {
-    dump(stderr);
+    Fprinter out(stderr);
+    dump(out);
+    out.finish();
 }
 
 MDefinition*
@@ -3513,8 +3506,11 @@ jit::AnalyzeArgumentsUsage(JSContext* cx, JSScript* scriptArg)
 
     MIRGraph graph(&temp);
     InlineScriptTree* inlineScriptTree = InlineScriptTree::New(&temp, nullptr, nullptr, script);
-    if (!inlineScriptTree)
+    if (!inlineScriptTree) {
+        ReportOutOfMemory(cx);
         return false;
+    }
+
     CompileInfo info(script, script->functionNonDelazifying(),
                      /* osrPc = */ nullptr, /* constructing = */ false,
                      Analysis_ArgumentsUsage,
@@ -3524,8 +3520,10 @@ jit::AnalyzeArgumentsUsage(JSContext* cx, JSScript* scriptArg)
     const OptimizationInfo* optimizationInfo = js_IonOptimizations.get(Optimization_Normal);
 
     CompilerConstraintList* constraints = NewCompilerConstraintList(temp);
-    if (!constraints)
+    if (!constraints) {
+        ReportOutOfMemory(cx);
         return false;
+    }
 
     BaselineInspector inspector(script);
     const JitCompileOptions options(cx);

@@ -16,7 +16,7 @@
 #include "mozilla/UniquePtr.h"
 #include "mozilla/unused.h"
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "nsISupportsImpl.h"
 
 /*
@@ -50,7 +50,7 @@ namespace mozilla {
 // the same log module.
 #define MIRROR_LOG(x, ...) \
   MOZ_ASSERT(gStateWatchingLog); \
-  PR_LOG(gStateWatchingLog, PR_LOG_DEBUG, (x, ##__VA_ARGS__))
+  MOZ_LOG(gStateWatchingLog, LogLevel::Debug, (x, ##__VA_ARGS__))
 
 template<typename T> class AbstractMirror;
 
@@ -130,7 +130,7 @@ private:
       : AbstractCanonical<T>(aThread), WatchTarget(aName), mValue(aInitialValue)
     {
       MIRROR_LOG("%s [%p] initialized", mName, this);
-      MOZ_ASSERT(aThread->RequiresTailDispatch(), "Can't get coherency without tail dispatch");
+      MOZ_ASSERT(aThread->SupportsTailDispatch(), "Can't get coherency without tail dispatch");
     }
 
     void AddMirror(AbstractMirror<T>* aMirror) override
@@ -167,6 +167,9 @@ private:
       return mValue;
     }
 
+    // Temporary workaround for naughty code.
+    const T& ReadOnWrongThread() { return mValue; }
+
     void Set(const T& aNewValue)
     {
       MOZ_ASSERT(OwnerThread()->IsCurrentThreadIn());
@@ -194,7 +197,7 @@ private:
       // updates at all if the value ends up where it started.
       if (!alreadyNotifying) {
         nsCOMPtr<nsIRunnable> r = NS_NewRunnableMethod(this, &Impl::DoNotify);
-        AbstractThread::GetCurrent()->TailDispatcher().AddDirectTask(r.forget());
+        AbstractThread::DispatchDirectTask(r.forget());
       }
     }
 
@@ -219,7 +222,7 @@ private:
       }
 
       for (size_t i = 0; i < mMirrors.Length(); ++i) {
-        OwnerThread()->TailDispatcher().AddStateChangeTask(mMirrors[i]->OwnerThread(), MakeNotifier(mMirrors[i]));
+        mMirrors[i]->OwnerThread()->DispatchStateChange(MakeNotifier(mMirrors[i]));
       }
     }
 
@@ -247,6 +250,7 @@ public:
 
   // Access to the T.
   const T& Ref() const { return *mImpl; }
+  const T& ReadOnWrongThread() const { return mImpl->ReadOnWrongThread(); }
   operator const T&() const { return Ref(); }
   void Set(const T& aNewValue) { mImpl->Set(aNewValue); }
   Canonical& operator=(const T& aNewValue) { Set(aNewValue); return *this; }
@@ -279,14 +283,11 @@ public:
 
   ~Mirror()
   {
-    if (mImpl->OwnerThread()->IsCurrentThreadIn()) {
-      mImpl->DisconnectIfConnected();
-    } else {
-      // If holder destruction happens on a thread other than the mirror's
-      // owner thread, manual disconnection is mandatory. We should make this
-      // more automatic by hooking it up to task queue shutdown.
-      MOZ_DIAGNOSTIC_ASSERT(!mImpl->IsConnected());
-    }
+    // As a member of complex objects, a Mirror<T> may be destroyed on a
+    // different thread than its owner, or late in shutdown during CC. Given
+    // that, we require manual disconnection so that callers can put things in
+    // the right place.
+    MOZ_DIAGNOSTIC_ASSERT(!mImpl->IsConnected());
   }
 
 private:
@@ -299,6 +300,7 @@ private:
       : AbstractMirror<T>(aThread), WatchTarget(aName), mValue(aInitialValue)
     {
       MIRROR_LOG("%s [%p] initialized", mName, this);
+      MOZ_ASSERT(aThread->SupportsTailDispatch(), "Can't get coherency without tail dispatch");
     }
 
     operator const T&()
@@ -306,6 +308,9 @@ private:
       MOZ_ASSERT(OwnerThread()->IsCurrentThreadIn());
       return mValue;
     }
+
+    // Temporary workaround for naughty code.
+    const T& ReadOnWrongThread() { return mValue; }
 
     virtual void UpdateValue(const T& aNewValue) override
     {
@@ -330,6 +335,7 @@ private:
       MIRROR_LOG("%s [%p] Connecting to %p", mName, this, aCanonical);
       MOZ_ASSERT(OwnerThread()->IsCurrentThreadIn());
       MOZ_ASSERT(!IsConnected());
+      MOZ_ASSERT(OwnerThread()->RequiresTailDispatch(aCanonical->OwnerThread()), "Can't get coherency without tail dispatch");
 
       nsCOMPtr<nsIRunnable> r = NS_NewRunnableMethodWithArg<StorensRefPtrPassByPtr<AbstractMirror<T>>>
                                   (aCanonical, &AbstractCanonical<T>::AddMirror, this);
@@ -371,6 +377,7 @@ public:
 
   // Access to the T.
   const T& Ref() const { return *mImpl; }
+  const T& ReadOnWrongThread() const { return mImpl->ReadOnWrongThread(); }
   operator const T&() const { return Ref(); }
 
 private:

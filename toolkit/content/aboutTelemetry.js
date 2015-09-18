@@ -505,8 +505,8 @@ let EnvironmentData = {
       table.appendChild(caption);
 
       let headings = document.createElement("tr");
-      this.appendColumn(headings, "th", "Name" + "\t");
-      this.appendColumn(headings, "th", "Value" + "\t");
+      this.appendColumn(headings, "th", bundle.GetStringFromName("environmentDataHeadingName") + "\t");
+      this.appendColumn(headings, "th", bundle.GetStringFromName("environmentDataHeadingValue") + "\t");
       table.appendChild(headings);
 
       for (let [path, value] of sectionData) {
@@ -1063,7 +1063,7 @@ let Histogram = {
     if (aHgram.values.length) {
       labelPadTo = String(aHgram.values[aHgram.values.length - 1][0]).length;
     }
-    let maxBarValue = aOptions.exponential ? this.getLogValue(aHgram.max_value) : aHgram.max;
+    let maxBarValue = aOptions.exponential ? this.getLogValue(aHgram.max) : aHgram.max;
 
     for (let [label, value] of aHgram.values) {
       let barValue = aOptions.exponential ? this.getLogValue(value) : value;

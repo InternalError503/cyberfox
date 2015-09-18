@@ -29,6 +29,8 @@ function get_observer_topic(aNotificationId) {
     topic = "addon-install-disabled";
   else if (topic == "addon-progress")
     topic = "addon-install-started";
+  else if (topic == "addon-install-restart")
+    topic = "addon-install-complete";
   return topic;
 }
 
@@ -223,7 +225,7 @@ function test_blocked_install() {
     // Wait for the install confirmation dialog
     wait_for_install_dialog(function() {
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.button.label, "Restart Now", "Should have seen the right button");
         is(notification.getAttribute("label"),
@@ -269,7 +271,7 @@ function test_whitelisted_install() {
          "tab selected in response to the addon-install-confirmation notification");
 
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.button.label, "Restart Now", "Should have seen the right button");
         is(notification.getAttribute("label"),
@@ -309,8 +311,7 @@ function test_failed_download() {
     wait_for_notification("addon-install-failed", function(aPanel) {
       let notification = aPanel.childNodes[0];
       is(notification.getAttribute("label"),
-         "The add-on could not be downloaded because of a connection failure " +
-         "on example.com.",
+         "The add-on could not be downloaded because of a connection failure.",
          "Should have seen the right message");
 
       Services.perms.remove("example.com", "install");
@@ -336,7 +337,7 @@ function test_corrupt_file() {
     wait_for_notification("addon-install-failed", function(aPanel) {
       let notification = aPanel.childNodes[0];
       is(notification.getAttribute("label"),
-         "The add-on downloaded from example.com could not be installed " +
+         "The add-on downloaded from this site could not be installed " +
          "because it appears to be corrupt.",
          "Should have seen the right message");
 
@@ -428,7 +429,7 @@ function test_multiple() {
     // Wait for the install confirmation dialog
     wait_for_install_dialog(function() {
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.button.label, "Restart Now", "Should have seen the right button");
         is(notification.getAttribute("label"),
@@ -569,7 +570,7 @@ function test_someunverified() {
       is(container.childNodes[1].childNodes.length, 1, "Shouldn't have the unverified marker");
 
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         AddonManager.getAddonsByIDs(["restartless-xpi@tests.mozilla.org",
                                      "theme-xpi@tests.mozilla.org"], function([a, t]) {
           a.uninstall();
@@ -652,7 +653,7 @@ function test_url() {
     // Wait for the install confirmation dialog
     wait_for_install_dialog(function() {
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.button.label, "Restart Now", "Should have seen the right button");
         is(notification.getAttribute("label"),
@@ -814,7 +815,7 @@ function test_wronghost() {
       wait_for_notification("addon-install-failed", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.getAttribute("label"),
-           "The add-on downloaded from example.com could not be installed " +
+           "The add-on downloaded from this site could not be installed " +
            "because it appears to be corrupt.",
            "Should have seen the right message");
 
@@ -834,7 +835,7 @@ function test_reload() {
     // Wait for the install confirmation dialog
     wait_for_install_dialog(function() {
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.button.label, "Restart Now", "Should have seen the right button");
         is(notification.getAttribute("label"),
@@ -887,7 +888,7 @@ function test_theme() {
     // Wait for the install confirmation dialog
     wait_for_install_dialog(function() {
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         let notification = aPanel.childNodes[0];
         is(notification.button.label, "Restart Now", "Should have seen the right button");
         is(notification.getAttribute("label"),
@@ -969,7 +970,7 @@ function test_renotify_installed() {
     // Wait for the install confirmation dialog
     wait_for_install_dialog(function() {
       // Wait for the complete notification
-      wait_for_notification("addon-install-complete", function(aPanel) {
+      wait_for_notification("addon-install-restart", function(aPanel) {
         // Dismiss the notification
         wait_for_notification_close(function () {
           // Install another
@@ -981,7 +982,7 @@ function test_renotify_installed() {
                 info("Timeouts after this probably mean bug 589954 regressed");
 
                 // Wait for the complete notification
-                wait_for_notification("addon-install-complete", function(aPanel) {
+                wait_for_notification("addon-install-restart", function(aPanel) {
                   AddonManager.getAllInstalls(function(aInstalls) {
                   is(aInstalls.length, 1, "Should be one pending installs");
                     aInstalls[0].cancel();

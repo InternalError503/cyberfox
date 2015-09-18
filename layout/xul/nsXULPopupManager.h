@@ -10,7 +10,7 @@
 #ifndef nsXULPopupManager_h__
 #define nsXULPopupManager_h__
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "nsIContent.h"
 #include "nsIRollupListener.h"
 #include "nsIDOMEventListener.h"
@@ -404,6 +404,16 @@ public:
                          int32_t aXPos, int32_t aYPos,
                          bool aIsContextMenu,
                          nsIDOMEvent* aTriggerEvent);
+
+  /* Open a popup anchored at a screen rectangle specified by aRect.
+   * The remaining arguments are similar to ShowPopup.
+   */
+  void ShowPopupAtScreenRect(nsIContent* aPopup,
+                             const nsAString& aPosition,
+                             const nsIntRect& aRect,
+                             bool aIsContextMenu,
+                             bool aAttributesOverride,
+                             nsIDOMEvent* aTriggerEvent);
 
   /**
    * Open a tooltip at a specific screen position specified by aXPos and aYPos,

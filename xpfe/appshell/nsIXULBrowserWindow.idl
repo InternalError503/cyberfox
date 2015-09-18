@@ -62,6 +62,7 @@ interface nsIXULBrowserWindow : nsISupports
   bool shouldLoadURI(in nsIDocShell    aDocShell,
                      in nsIURI         aURI,
                      in nsIURI         aReferrer);
+
   /**
    * Show/hide a tooltip (when the user mouses over a link, say).
    */

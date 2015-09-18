@@ -183,11 +183,7 @@ class LAllocation : public TempObject
         return bits_;
     }
 
-#ifdef DEBUG
     const char* toString() const;
-#else
-    const char* toString() const { return "???"; }
-#endif
     bool aliases(const LAllocation& other) const;
     void dump() const;
 
@@ -580,11 +576,7 @@ class LDefinition
         }
     }
 
-#ifdef DEBUG
     const char* toString() const;
-#else
-    const char* toString() const { return "???"; }
-#endif
 
     void dump() const;
 };
@@ -702,11 +694,11 @@ class LNode
         return false;
     }
 
-    virtual void dump(FILE* fp);
+    virtual void dump(GenericPrinter& out);
     void dump();
-    static void printName(FILE* fp, Opcode op);
-    virtual void printName(FILE* fp);
-    virtual void printOperands(FILE* fp);
+    static void printName(GenericPrinter& out, Opcode op);
+    virtual void printName(GenericPrinter& out);
+    virtual void printOperands(GenericPrinter& out);
 
   public:
     // Opcode testing and casts.
@@ -986,7 +978,7 @@ class LBlock
         return begin()->isGoto() && !mir()->isLoopHeader();
     }
 
-    void dump(FILE* fp);
+    void dump(GenericPrinter& out);
     void dump();
 };
 
@@ -1799,7 +1791,7 @@ class LIRGraph
         return safepoints_[i];
     }
 
-    void dump(FILE* fp);
+    void dump(GenericPrinter& out);
     void dump();
 };
 

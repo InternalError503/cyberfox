@@ -12,20 +12,31 @@
 #include "platform.h"
 #include "ProfileJSONWriter.h"
 #include "ProfilerBacktrace.h"
-#include "nsRefPtr.h"
-#include "nsHashKeys.h"
-#include "nsDataHashtable.h"
+#include "mozilla/RefPtr.h"
+#include <string>
+#include <map>
+#ifndef SPS_STANDALONE
 #include "js/ProfilingFrameIterator.h"
 #include "js/TrackedOptimizationInfo.h"
+#include "nsHashKeys.h"
+#include "nsDataHashtable.h"
+#endif
 #include "mozilla/Maybe.h"
-#include "mozilla/Mutex.h"
 #include "mozilla/Vector.h"
+#ifndef SPS_STANDALONE
 #include "gtest/MozGtestFriend.h"
+#else
+#define FRIEND_TEST(a, b) // TODO Support standalone gtest
+#endif
+#include "mozilla/HashFunctions.h"
 #include "mozilla/UniquePtr.h"
 
 class ThreadProfile;
 
+// NB: Packing this structure has been shown to cause SIGBUS issues on ARM.
+#ifndef __arm__
 #pragma pack(push, 1)
+#endif
 
 class ProfileEntry
 {
@@ -36,7 +47,7 @@ public:
   ProfileEntry(char aTagName, const char *aTagData);
   ProfileEntry(char aTagName, void *aTagPtr);
   ProfileEntry(char aTagName, ProfilerMarker *aTagMarker);
-  ProfileEntry(char aTagName, float aTagFloat);
+  ProfileEntry(char aTagName, double aTagDouble);
   ProfileEntry(char aTagName, uintptr_t aTagOffset);
   ProfileEntry(char aTagName, Address aTagAddress);
   ProfileEntry(char aTagName, int aTagLine);
@@ -64,7 +75,7 @@ private:
     char        mTagChars[sizeof(void*)];
     void*       mTagPtr;
     ProfilerMarker* mTagMarker;
-    float       mTagFloat;
+    double      mTagDouble;
     Address     mTagAddress;
     uintptr_t   mTagOffset;
     int         mTagInt;
@@ -73,9 +84,9 @@ private:
   char mTagName;
 };
 
+#ifndef __arm__
 #pragma pack(pop)
-
-typedef void (*IterateTagsCallback)(const ProfileEntry& entry, const char* tagStringData);
+#endif
 
 class UniqueJSONStrings
 {
@@ -84,12 +95,8 @@ public:
     mStringTableWriter.StartBareList();
   }
 
-  ~UniqueJSONStrings() {
-    mStringTableWriter.EndBareList();
-  }
-
-  void SpliceStringTableElements(SpliceableJSONWriter& aWriter) const {
-    aWriter.Splice(mStringTableWriter.WriteFunc());
+  void SpliceStringTableElements(SpliceableJSONWriter& aWriter) {
+    aWriter.TakeAndSplice(mStringTableWriter.WriteFunc());
   }
 
   void WriteProperty(mozilla::JSONWriter& aWriter, const char* aName, const char* aStr) {
@@ -102,16 +109,46 @@ public:
 
   uint32_t GetOrAddIndex(const char* aStr);
 
+  struct StringKey {
+
+    explicit StringKey(const char* aStr)
+     : mStr(strdup(aStr))
+    {
+      mHash = mozilla::HashString(mStr);
+    }
+
+    StringKey(const StringKey& aOther)
+      : mStr(strdup(aOther.mStr))
+    {
+      mHash = aOther.mHash;
+    }
+
+    ~StringKey() {
+      free(mStr);
+    }
+
+    uint32_t Hash() const;
+    bool operator==(const StringKey& aOther) const {
+      return strcmp(mStr, aOther.mStr) == 0;
+    }
+    bool operator<(const StringKey& aOther) const {
+      return mHash < aOther.mHash;
+    }
+
+  private:
+    uint32_t mHash;
+    char* mStr;
+  };
 private:
   SpliceableChunkedJSONWriter mStringTableWriter;
-  nsDataHashtable<nsCharPtrHashKey, uint32_t> mStringToIndexMap;
+  std::map<StringKey, uint32_t> mStringToIndexMap;
 };
 
 class UniqueStacks
 {
 public:
   struct FrameKey {
-    nsCString mLocation;
+    std::string mLocation;
     mozilla::Maybe<unsigned> mLine;
     mozilla::Maybe<unsigned> mCategory;
     mozilla::Maybe<void*> mJITAddress;
@@ -119,7 +156,9 @@ public:
 
     explicit FrameKey(const char* aLocation)
      : mLocation(aLocation)
-    { }
+    {
+      mHash = Hash();
+    }
 
     FrameKey(const FrameKey& aToCopy)
      : mLocation(aToCopy.mLocation)
@@ -127,30 +166,45 @@ public:
      , mCategory(aToCopy.mCategory)
      , mJITAddress(aToCopy.mJITAddress)
      , mJITDepth(aToCopy.mJITDepth)
-    { }
+    {
+      mHash = Hash();
+    }
 
     FrameKey(void* aJITAddress, uint32_t aJITDepth)
      : mJITAddress(mozilla::Some(aJITAddress))
      , mJITDepth(mozilla::Some(aJITDepth))
-    { }
+    {
+      mHash = Hash();
+    }
 
     uint32_t Hash() const;
     bool operator==(const FrameKey& aOther) const;
+    bool operator<(const FrameKey& aOther) const {
+      return mHash < aOther.mHash;
+    }
+
+  private:
+    uint32_t mHash;
   };
 
   // A FrameKey that holds a scoped reference to a JIT FrameHandle.
   struct MOZ_STACK_CLASS OnStackFrameKey : public FrameKey {
-    const JS::ForEachProfiledFrameOp::FrameHandle* mJITFrameHandle;
-
     explicit OnStackFrameKey(const char* aLocation)
       : FrameKey(aLocation)
+#ifndef SPS_STANDALONE
       , mJITFrameHandle(nullptr)
+#endif
     { }
 
     OnStackFrameKey(const OnStackFrameKey& aToCopy)
       : FrameKey(aToCopy)
+#ifndef SPS_STANDALONE
       , mJITFrameHandle(aToCopy.mJITFrameHandle)
+#endif
     { }
+
+#ifndef SPS_STANDALONE
+    const JS::ForEachProfiledFrameOp::FrameHandle* mJITFrameHandle;
 
     OnStackFrameKey(void* aJITAddress, unsigned aJITDepth)
       : FrameKey(aJITAddress, aJITDepth)
@@ -162,6 +216,7 @@ public:
       : FrameKey(aJITAddress, aJITDepth)
       , mJITFrameHandle(&aJITFrameHandle)
     { }
+#endif
   };
 
   struct StackKey {
@@ -171,10 +226,25 @@ public:
 
     explicit StackKey(uint32_t aFrame)
      : mFrame(aFrame)
-    { }
+    {
+      mHash = Hash();
+    }
 
     uint32_t Hash() const;
     bool operator==(const StackKey& aOther) const;
+    bool operator<(const StackKey& aOther) const {
+      return mHash < aOther.mHash;
+    }
+
+    void UpdateHash(uint32_t aPrefixHash, uint32_t aPrefix, uint32_t aFrame) {
+      mPrefixHash = mozilla::Some(aPrefixHash);
+      mPrefix = mozilla::Some(aPrefix);
+      mFrame = aFrame;
+      mHash = Hash();
+    }
+
+  private:
+    uint32_t mHash;
   };
 
   class Stack {
@@ -190,13 +260,12 @@ public:
   };
 
   explicit UniqueStacks(JSRuntime* aRuntime);
-  ~UniqueStacks();
 
   Stack BeginStack(const OnStackFrameKey& aRoot);
   uint32_t LookupJITFrameDepth(void* aAddr);
   void AddJITFrameDepth(void* aAddr, unsigned depth);
-  void SpliceFrameTableElements(SpliceableJSONWriter& aWriter) const;
-  void SpliceStackTableElements(SpliceableJSONWriter& aWriter) const;
+  void SpliceFrameTableElements(SpliceableJSONWriter& aWriter);
+  void SpliceStackTableElements(SpliceableJSONWriter& aWriter);
 
 private:
   uint32_t GetOrAddFrameIndex(const OnStackFrameKey& aFrame);
@@ -214,27 +283,40 @@ private:
   // we cache the depth of frames keyed by JIT code address. If an address a
   // maps to a depth d, then frames keyed by a for depths 0 to d are
   // guaranteed to be in mFrameToIndexMap.
-  nsDataHashtable<nsVoidPtrHashKey, uint32_t> mJITFrameDepthMap;
+  std::map<void*, uint32_t> mJITFrameDepthMap;
 
   uint32_t mFrameCount;
   SpliceableChunkedJSONWriter mFrameTableWriter;
+#ifdef SPS_STANDALNOE
+  std::map<FrameKey, uint32_t> mFrameToIndexMap;
+#else
   nsDataHashtable<nsGenericHashKey<FrameKey>, uint32_t> mFrameToIndexMap;
+#endif
 
   SpliceableChunkedJSONWriter mStackTableWriter;
+
+  // This sucks but this is really performance critical, nsDataHashtable is way faster
+  // than map/unordered_map but nsDataHashtable is tied to xpcom so we ifdef
+  // until we can find a better solution.
+#ifdef SPS_STANDALONE
+  std::map<StackKey, uint32_t> mStackToIndexMap;
+#else
   nsDataHashtable<nsGenericHashKey<StackKey>, uint32_t> mStackToIndexMap;
+#endif
 };
 
-class ProfileBuffer {
+class ProfileBuffer : public mozilla::RefCounted<ProfileBuffer> {
 public:
-  NS_INLINE_DECL_THREADSAFE_REFCOUNTING(ProfileBuffer)
+  MOZ_DECLARE_REFCOUNTED_VIRTUAL_TYPENAME(ProfileBuffer)
 
   explicit ProfileBuffer(int aEntrySize);
 
+  virtual ~ProfileBuffer();
+
   void addTag(const ProfileEntry& aTag);
-  void IterateTagsForThread(IterateTagsCallback aCallback, int aThreadId);
-  void StreamSamplesToJSON(SpliceableJSONWriter& aWriter, int aThreadId, float aSinceTime,
+  void StreamSamplesToJSON(SpliceableJSONWriter& aWriter, int aThreadId, double aSinceTime,
                            JSRuntime* rt, UniqueStacks& aUniqueStacks);
-  void StreamMarkersToJSON(SpliceableJSONWriter& aWriter, int aThreadId, float aSinceTime,
+  void StreamMarkersToJSON(SpliceableJSONWriter& aWriter, int aThreadId, double aSinceTime,
                            UniqueStacks& aUniqueStacks);
   void DuplicateLastSample(int aThreadId);
 
@@ -247,8 +329,6 @@ public:
 protected:
   char* processDynamicTag(int readPos, int* tagsConsumed, char* tagBuff);
   int FindLastSampleOfThread(int aThreadId);
-
-  ~ProfileBuffer();
 
 public:
   // Circular buffer 'Keep One Slot Open' implementation for simplicity
@@ -377,12 +457,9 @@ public:
    * expired.
    */
   void addStoredMarker(ProfilerMarker *aStoredMarker);
-  void IterateTags(IterateTagsCallback aCallback);
-  void ToStreamAsJSON(std::ostream& stream, float aSinceTime = 0);
-  JSObject* ToJSObject(JSContext *aCx, float aSinceTime = 0);
   PseudoStack* GetPseudoStack();
-  mozilla::Mutex* GetMutex();
-  void StreamJSON(SpliceableJSONWriter& aWriter, float aSinceTime = 0);
+  Mutex& GetMutex();
+  void StreamJSON(SpliceableJSONWriter& aWriter, double aSinceTime = 0);
 
   /**
    * Call this method when the JS entries inside the buffer are about to
@@ -403,7 +480,9 @@ public:
   void DuplicateLastSample();
 
   ThreadInfo* GetThreadInfo() const { return mThreadInfo; }
+#ifndef SPS_STANDALONE
   ThreadResponsiveness* GetThreadResponsiveness() { return &mRespInfo; }
+#endif
   void SetPendingDelete()
   {
     mPseudoStack = nullptr;
@@ -415,7 +494,7 @@ public:
   }
 
 protected:
-  void StreamSamplesAndMarkers(SpliceableJSONWriter& aWriter, float aSinceTime,
+  void StreamSamplesAndMarkers(SpliceableJSONWriter& aWriter, double aSinceTime,
                                UniqueStacks& aUniqueStacks);
 
 private:
@@ -426,7 +505,7 @@ private:
   FRIEND_TEST(ThreadProfile, MemoryMeasure);
   ThreadInfo* mThreadInfo;
 
-  const nsRefPtr<ProfileBuffer> mBuffer;
+  const mozilla::RefPtr<ProfileBuffer> mBuffer;
 
   // JS frames in the buffer may require a live JSRuntime to stream (e.g.,
   // stringifying JIT frames). In the case of JSRuntime destruction,
@@ -437,17 +516,19 @@ private:
   mozilla::Maybe<UniqueStacks> mUniqueStacks;
 
   PseudoStack*   mPseudoStack;
-  mozilla::Mutex mMutex;
+  mozilla::UniquePtr<Mutex>  mMutex;
   int            mThreadId;
   bool           mIsMainThread;
   PlatformData*  mPlatformData;  // Platform specific data.
   void* const    mStackTop;
+#ifndef SPS_STANDALONE
   ThreadResponsiveness mRespInfo;
+#endif
 
-  // Linux and OSX use a signal sender, instead of stopping the thread, so we
+  // Only Linux is using a signal sender, instead of stopping the thread, so we
   // need some space to store the data which cannot be collected in the signal
   // handler code.
-#if defined(XP_LINUX) || defined(XP_MACOSX)
+#ifdef XP_LINUX
 public:
   int64_t        mRssMemory;
   int64_t        mUssMemory;

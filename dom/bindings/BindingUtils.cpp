@@ -34,8 +34,6 @@
 #include "mozilla/dom/ScriptSettings.h"
 #include "mozilla/dom/DOMError.h"
 #include "mozilla/dom/DOMErrorBinding.h"
-#include "mozilla/dom/DOMException.h"
-#include "mozilla/dom/DOMExceptionBinding.h"
 #include "mozilla/dom/ElementBinding.h"
 #include "mozilla/dom/HTMLObjectElement.h"
 #include "mozilla/dom/HTMLObjectElementBinding.h"
@@ -279,43 +277,6 @@ ErrorResult::ReportJSException(JSContext* cx)
 }
 
 void
-ErrorResult::ReportJSExceptionFromJSImplementation(JSContext* aCx)
-{
-  MOZ_ASSERT(!mMightHaveUnreportedJSException,
-             "Why didn't you tell us you planned to handle JS exceptions?");
-
-  dom::DOMException* domException;
-  nsresult rv =
-    UNWRAP_OBJECT(DOMException, &mJSException.toObject(), domException);
-  if (NS_SUCCEEDED(rv)) {
-    ReportJSException(aCx);
-    return;
-  }
-
-  dom::DOMError* domError;
-  rv = UNWRAP_OBJECT(DOMError, &mJSException.toObject(), domError);
-  if (NS_FAILED(rv)) {
-    // Unwrapping really shouldn't fail here: if mExceptionHandling is set to
-    // eRethrowContentExceptions then the CallSetup destructor only stores an
-    // exception if it unwraps to DOMError or DOMException. If we reach this
-    // then either mExceptionHandling wasn't set to eRethrowContentExceptions
-    // and we shouldn't be calling ReportJSExceptionFromJSImplementation or
-    // something went really wrong.
-    NS_RUNTIMEABORT("We stored a non-DOMError exception!");
-  }
-
-  nsString message;
-  domError->GetMessage(message);
-
-  JS_ReportError(aCx, "%hs", message.get());
-  js::RemoveRawValueRoot(aCx, &mJSException);
-
-  // We no longer have a useful exception but we do want to signal that an error
-  // occured.
-  mResult = NS_ERROR_FAILURE;
-}
-
-void
 ErrorResult::StealJSException(JSContext* cx,
                               JS::MutableHandle<JS::Value> value)
 {
@@ -550,7 +511,7 @@ DefineConstructor(JSContext* cx, JS::Handle<JSObject*> global, const char* name,
 
   // This is Enumerable: False per spec.
   return alreadyDefined ||
-         JS_DefineProperty(cx, global, name, constructor, 0);
+         JS_DefineProperty(cx, global, name, constructor, JSPROP_RESOLVING);
 }
 
 static JSObject*
@@ -854,7 +815,7 @@ NativeInterface2JSObjectAndThrowIfFailed(JSContext* aCx,
   if (cache && cache->IsDOMBinding()) {
       JS::Rooted<JSObject*> obj(aCx, cache->GetWrapper());
       if (!obj) {
-        obj = cache->WrapObject(aCx, JS::NullPtr());
+        obj = cache->WrapObject(aCx, nullptr);
       }
 
       if (obj && aAllowNativeWrapper && !JS_WrapObject(aCx, &obj)) {
@@ -1820,7 +1781,7 @@ DictionaryBase::StringifyToJSON(JSContext* aCx,
                                 JS::MutableHandle<JS::Value> aValue,
                                 nsAString& aJSON) const
 {
-  return JS_Stringify(aCx, aValue, JS::NullPtr(), JS::NullHandleValue,
+  return JS_Stringify(aCx, aValue, nullptr, JS::NullHandleValue,
                       AppendJSONToString, &aJSON);
 }
 
@@ -1895,7 +1856,7 @@ ReparentWrapper(JSContext* aCx, JS::Handle<JSObject*> aObjArg)
   JS::Rooted<JSObject*> propertyHolder(aCx);
   JS::Rooted<JSObject*> copyFrom(aCx, isProxy ? expandoObject : aObj);
   if (copyFrom) {
-    propertyHolder = JS_NewObjectWithGivenProto(aCx, nullptr, JS::NullPtr());
+    propertyHolder = JS_NewObjectWithGivenProto(aCx, nullptr, nullptr);
     if (!propertyHolder) {
       return NS_ERROR_OUT_OF_MEMORY;
     }
@@ -2407,16 +2368,6 @@ IsInCertifiedApp(JSContext* aCx, JSObject* aObj)
   return principal->GetAppStatus() == nsIPrincipal::APP_STATUS_CERTIFIED ||
          Preferences::GetBool("dom.ignore_webidl_scope_checks", false);
 }
-
-#ifdef DEBUG
-void
-VerifyTraceProtoAndIfaceCacheCalled(JS::CallbackTracer *trc, void **thingp,
-                                    JSGCTraceKind kind)
-{
-    // We don't do anything here, we only want to verify that
-    // TraceProtoAndIfaceCache was called.
-}
-#endif
 
 void
 FinalizeGlobal(JSFreeOp* aFreeOp, JSObject* aObj)

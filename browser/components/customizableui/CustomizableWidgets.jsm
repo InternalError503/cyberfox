@@ -369,12 +369,10 @@ const CustomizableWidgets = [
       // Hardcode the addition of the "work offline" menuitem at the bottom:
       itemsToDisplay.push({localName: "menuseparator", getAttribute: () => {}});
       itemsToDisplay.push(doc.getElementById("goOfflineMenuitem"));
-      fillSubviewFromMenuItems(itemsToDisplay, doc.getElementById("PanelUI-developerItems"));
 
-    },
-    onViewHiding: function(aEvent) {
-      let doc = aEvent.target.ownerDocument;
-      clearSubview(doc.getElementById("PanelUI-developerItems"));
+      let developerItems = doc.getElementById("PanelUI-developerItems");
+      clearSubview(developerItems);
+      fillSubviewFromMenuItems(itemsToDisplay, developerItems);
     }
   }, {
     id: "sidebar-button",
@@ -399,11 +397,9 @@ const CustomizableWidgets = [
       if (providerMenuSeps.length > 0)
         win.SocialSidebar.populateProviderMenu(providerMenuSeps[0]);
 
-      fillSubviewFromMenuItems([...menu.children], doc.getElementById("PanelUI-sidebarItems"));
-    },
-    onViewHiding: function(aEvent) {
-      let doc = aEvent.target.ownerDocument;
-      clearSubview(doc.getElementById("PanelUI-sidebarItems"));
+      let sidebarItems = doc.getElementById("PanelUI-sidebarItems");
+      clearSubview(sidebarItems);
+      fillSubviewFromMenuItems([...menu.children], sidebarItems);
     }
   }, {
     id: "social-share-button",
@@ -1065,11 +1061,10 @@ if (Services.prefs.getBoolPref("privacy.panicButton.enabled")) {
 
 if (Services.prefs.getBoolPref("browser.pocket.enabled")) {
   let isEnabledForLocale = true;
-  let browserLocale;
   if (Services.prefs.getBoolPref("browser.pocket.useLocaleList")) {
     let chromeRegistry = Cc["@mozilla.org/chrome/chrome-registry;1"]
                            .getService(Ci.nsIXULChromeRegistry);
-    browserLocale = chromeRegistry.getSelectedLocale("browser");
+    let browserLocale = chromeRegistry.getSelectedLocale("browser");
     let enabledLocales = [];
     try {
       enabledLocales = Services.prefs.getCharPref("browser.pocket.enabledLocales").split(' ');
@@ -1080,34 +1075,12 @@ if (Services.prefs.getBoolPref("browser.pocket.enabled")) {
   }
 
   if (isEnabledForLocale) {
-    if (browserLocale == "en-GB" || browserLocale == "en-ZA")
-      browserLocale = "en-US";
-    else if (browserLocale == "ja-JP-mac")
-      browserLocale = "ja";
-    let url = "chrome://browser/content/browser-pocket-" + browserLocale + ".properties";
-    let strings = Services.strings.createBundle(url);
-    let label;
-    let tooltiptext;
-    try {
-      label = strings.GetStringFromName("pocket-button.label");
-      tooltiptext = strings.GetStringFromName("pocket-button.tooltiptext");
-    } catch (err) {
-      // GetStringFromName throws when the bundle doesn't exist.  In that case,
-      // fall back to the en-US browser-pocket.properties.
-      url = "chrome://browser/content/browser-pocket-en-US.properties";
-      strings = Services.strings.createBundle(url);
-      label = strings.GetStringFromName("pocket-button.label");
-      tooltiptext = strings.GetStringFromName("pocket-button.tooltiptext");
-    }
-
     let pocketButton = {
       id: "pocket-button",
       defaultArea: CustomizableUI.AREA_NAVBAR,
       introducedInVersion: "pref",
       type: "view",
       viewId: "PanelUI-pocketView",
-      label: label,
-      tooltiptext: tooltiptext,
       // Use forwarding functions here to avoid loading Pocket.jsm on startup:
       onViewShowing: function() {
         return Pocket.onPanelViewShowing.apply(this, arguments);
@@ -1159,10 +1132,12 @@ e10sDisabled |= Services.prefs.getBoolPref("layers.acceleration.disabled");
 if (Services.appinfo.browserTabsRemoteAutostart) {
   CustomizableWidgets.push({
     id: "e10s-button",
-    label: "New Non-e10s Window",
-    tooltiptext: "New Non-e10s Window",
     disabled: e10sDisabled,
     defaultArea: CustomizableUI.AREA_PANEL,
+    onBuild: function(aDocument) {
+        node.setAttribute("label", CustomizableUI.getLocalizedProperty(this, "label"));
+        node.setAttribute("tooltiptext", CustomizableUI.getLocalizedProperty(this, "tooltiptext"));
+    },
     onCommand: function(aEvent) {
       let win = aEvent.view;
       if (win && typeof win.OpenBrowserWindow == "function") {

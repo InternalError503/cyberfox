@@ -6,7 +6,10 @@
 
 #include "vm/ReceiverGuard.h"
 
+#include "builtin/TypedObject.h"
 #include "vm/UnboxedObject.h"
+
+using namespace js;
 
 ReceiverGuard::ReceiverGuard(JSObject* obj)
   : group(nullptr), shape(nullptr)
@@ -59,6 +62,6 @@ HeapReceiverGuard::trace(JSTracer* trc)
 {
     if (shape_)
         TraceEdge(trc, &shape_, "receiver_guard_shape");
-    else
+    if (group_)
         TraceEdge(trc, &group_, "receiver_guard_group");
 }

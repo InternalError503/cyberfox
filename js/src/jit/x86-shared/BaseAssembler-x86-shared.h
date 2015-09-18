@@ -1311,6 +1311,14 @@ public:
         }
     }
 
+#ifdef JS_CODEGEN_X64
+    void imulq_rr(RegisterID src, RegisterID dst)
+    {
+        spew("imulq      %s, %s", GPReg64Name(src), GPReg64Name(dst));
+        m_formatter.twoByteOp64(OP2_IMUL_GvEv, src, dst);
+    }
+#endif
+
     void idivl_r(RegisterID divisor)
     {
         spew("idivl      %s", GPReg32Name(divisor));
@@ -2771,6 +2779,13 @@ public:
     }
 #endif
 
+#ifdef JS_CODEGEN_X64
+    void vcvtsi2sdq_rr(RegisterID src, XMMRegisterID dst)
+    {
+        twoByteOpInt64Simd("vcvtsi2sdq", VEX_SD, OP2_CVTSI2SD_VsdEd, src, invalid_xmm, dst);
+    }
+#endif
+
     void vcvttsd2si_rr(XMMRegisterID src, RegisterID dst)
     {
         twoByteOpSimdInt32("vcvttsd2si", VEX_SD, OP2_CVTTSD2SI_GdWsd, src, dst);
@@ -3729,12 +3744,12 @@ threeByteOpImmSimd("vblendps", VEX_PD, OP3_BLENDPS_VpsWpsIb, ESCAPE_3A, imm, off
 
     void doubleConstant(double d)
     {
-        spew(".double %.20f", d);
+        spew(".double %.16g", d);
         m_formatter.doubleConstant(d);
     }
     void floatConstant(float f)
     {
-        spew(".float %.20f", f);
+        spew(".float %.16g", f);
         m_formatter.floatConstant(f);
     }
 
@@ -3746,7 +3761,7 @@ threeByteOpImmSimd("vblendps", VEX_PD, OP3_BLENDPS_VpsWpsIb, ESCAPE_3A, imm, off
     }
     void float32x4Constant(const float f[4])
     {
-        spew(".float %f,%f,%f,%f", f[0], f[1], f[2], f[3]);
+        spew(".float %g,%g,%g,%g", f[0], f[1], f[2], f[3]);
         MOZ_ASSERT(m_formatter.isAligned(16));
         m_formatter.float32x4Constant(f);
     }

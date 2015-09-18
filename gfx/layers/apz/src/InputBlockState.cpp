@@ -45,9 +45,7 @@ InputBlockState::SetConfirmedTargetApzc(const nsRefPtr<AsyncPanZoomController>& 
     return true;
   }
 
-  // Log enabled by default for now, we will put it in a TBS_LOG eventually
-  // once this code is more baked
-  printf_stderr("%p replacing unconfirmed target %p with real target %p\n",
+  TBS_LOG("%p replacing unconfirmed target %p with real target %p\n",
       this, mTargetApzc.get(), aTargetApzc.get());
 
   UpdateTargetApzc(aTargetApzc);
@@ -127,6 +125,12 @@ CancelableBlockState::TimeoutContentResponse()
 }
 
 bool
+CancelableBlockState::IsContentResponseTimerExpired() const
+{
+  return mContentResponseTimerExpired;
+}
+
+bool
 CancelableBlockState::IsDefaultPrevented() const
 {
   MOZ_ASSERT(mContentResponded || mContentResponseTimerExpired);
@@ -136,8 +140,9 @@ CancelableBlockState::IsDefaultPrevented() const
 bool
 CancelableBlockState::IsReadyForHandling() const
 {
-  if (!IsTargetConfirmed())
+  if (!IsTargetConfirmed()) {
     return false;
+  }
   return mContentResponded || mContentResponseTimerExpired;
 }
 
@@ -414,7 +419,7 @@ TouchBlockState::TouchBlockState(const nsRefPtr<AsyncPanZoomController>& aTarget
                                  bool aTargetConfirmed)
   : CancelableBlockState(aTargetApzc, aTargetConfirmed)
   , mAllowedTouchBehaviorSet(false)
-  , mDuringFastMotion(false)
+  , mDuringFastFling(false)
   , mSingleTapOccurred(false)
 {
   TBS_LOG("Creating %p\n", this);
@@ -447,7 +452,7 @@ TouchBlockState::CopyPropertiesFrom(const TouchBlockState& aOther)
 {
   TBS_LOG("%p copying properties from %p\n", this, &aOther);
   if (gfxPrefs::TouchActionEnabled()) {
-    MOZ_ASSERT(aOther.mAllowedTouchBehaviorSet);
+    MOZ_ASSERT(aOther.mAllowedTouchBehaviorSet || aOther.IsContentResponseTimerExpired());
     SetAllowedTouchBehaviors(aOther.mAllowedTouchBehaviors);
   }
   mTransformToApzc = aOther.mTransformToApzc;
@@ -460,32 +465,32 @@ TouchBlockState::IsReadyForHandling() const
     return false;
   }
 
-  // TODO: for long-tap blocks we probably don't need the touch behaviour?
-  if (gfxPrefs::TouchActionEnabled() && !mAllowedTouchBehaviorSet) {
-    return false;
+  if (!gfxPrefs::TouchActionEnabled()) {
+    return true;
   }
-  return true;
+
+  return mAllowedTouchBehaviorSet || IsContentResponseTimerExpired();
 }
 
 void
-TouchBlockState::SetDuringFastMotion()
+TouchBlockState::SetDuringFastFling()
 {
   TBS_LOG("%p setting fast-motion flag\n", this);
-  mDuringFastMotion = true;
+  mDuringFastFling = true;
 }
 
 bool
-TouchBlockState::IsDuringFastMotion() const
+TouchBlockState::IsDuringFastFling() const
 {
-  return mDuringFastMotion;
+  return mDuringFastFling;
 }
 
 bool
 TouchBlockState::SetSingleTapOccurred()
 {
   TBS_LOG("%p attempting to set single-tap occurred; disallowed=%d\n",
-    this, mDuringFastMotion);
-  if (!mDuringFastMotion) {
+    this, mDuringFastFling);
+  if (!mDuringFastFling) {
     mSingleTapOccurred = true;
     return true;
   }

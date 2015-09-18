@@ -14,7 +14,7 @@
 #include "nsIScriptObjectPrincipal.h"
 #include "nsIURI.h"
 #include "nsThreadUtils.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 NS_IMPL_ISUPPORTS(ThirdPartyUtil, mozIThirdPartyUtil)
 
@@ -23,7 +23,7 @@ NS_IMPL_ISUPPORTS(ThirdPartyUtil, mozIThirdPartyUtil)
 //
 static PRLogModuleInfo *gThirdPartyLog;
 #undef LOG
-#define LOG(args)     PR_LOG(gThirdPartyLog, PR_LOG_DEBUG, args)
+#define LOG(args)     MOZ_LOG(gThirdPartyLog, mozilla::LogLevel::Debug, args)
 
 nsresult
 ThirdPartyUtil::Init()

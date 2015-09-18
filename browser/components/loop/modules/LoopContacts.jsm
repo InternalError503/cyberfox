@@ -267,8 +267,8 @@ const validateContact = function(obj, def = kContactFields) {
 const batch = function(operation, data, callback) {
   let processed = [];
   if (!LoopContactsInternal.hasOwnProperty(operation) ||
-    typeof LoopContactsInternal[operation] != 'function') {
-    callback(new Error ("LoopContactsInternal does not contain a '" +
+    typeof LoopContactsInternal[operation] != "function") {
+    callback(new Error("LoopContactsInternal does not contain a '" +
              operation + "' method"));
     return;
   }
@@ -426,9 +426,9 @@ let LoopContactsInternal = Object.freeze({
         return;
       }
 
-      LoopStorage.getStore(kObjectStoreName, (err, store) => {
-        if (err) {
-          callback(err);
+      LoopStorage.getStore(kObjectStoreName, (error, store) => {
+        if (error) {
+          callback(error);
           return;
         }
 
@@ -684,9 +684,9 @@ let LoopContactsInternal = Object.freeze({
         return;
       }
 
-      LoopStorage.getStore(kObjectStoreName, (err, store) => {
-        if (err) {
-          callback(err);
+      LoopStorage.getStore(kObjectStoreName, (error, store) => {
+        if (error) {
+          callback(error);
           return;
         }
 

@@ -13,8 +13,9 @@ task:
 
   scopes:
     - 'docker-worker:image:{{#docker_image}}tester-device{{/docker_image}}'
-    - 'queue:create-task:aws-provisioner/testdroid-device'
+    - 'queue:create-task:aws-provisioner-v1/testdroid-device'
     - 'docker-worker:cache:tc-vcs'
+    - 'docker-worker:capability:device:phone'
 
   payload:
     image: '{{#docker_image}}tester-device{{/docker_image}}'

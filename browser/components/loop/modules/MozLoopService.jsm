@@ -42,6 +42,49 @@ const SHARING_STATE_CHANGE = {
   BROWSER_DISABLED: 3
 };
 
+/**
+ * Values that we segment sharing a room URL action telemetry probes into.
+ *
+ * @type {{COPY_FROM_PANEL: Number, COPY_FROM_CONVERSATION: Number,
+ *   EMAIL_FROM_CALLFAILED: Number, EMAIL_FROM_CONVERSATION: Number}}
+ */
+const SHARING_ROOM_URL = {
+  COPY_FROM_PANEL: 0,
+  COPY_FROM_CONVERSATION: 1,
+  EMAIL_FROM_CALLFAILED: 2,
+  EMAIL_FROM_CONVERSATION: 3
+};
+
+/**
+ * Values that we segment room create action telemetry probes into.
+ *
+ * @type {{CREATE_SUCCESS: Number, CREATE_FAIL: Number}}
+ */
+const ROOM_CREATE = {
+  CREATE_SUCCESS: 0,
+  CREATE_FAIL: 1
+};
+
+/**
+ * Values that we segment room delete action telemetry probes into.
+ *
+ * @type {{DELETE_SUCCESS: Number, DELETE_FAIL: Number}}
+ */
+const ROOM_DELETE = {
+  DELETE_SUCCESS: 0,
+  DELETE_FAIL: 1
+};
+
+/**
+ * Values that we segment room context action telemetry probes into.
+ *
+ * @type {{ADD_FROM_PANEL: Number, ADD_FROM_CONVERSATION: Number}}
+ */
+const ROOM_CONTEXT_ADD = {
+  ADD_FROM_PANEL: 0,
+  ADD_FROM_CONVERSATION: 1
+};
+
 // See LOG_LEVELS in Console.jsm. Common examples: "All", "Info", "Warn", & "Error".
 const PREF_LOG_LEVEL = "loop.debug.loglevel";
 
@@ -56,7 +99,8 @@ Cu.import("resource://gre/modules/FxAccountsOAuthClient.jsm");
 Cu.importGlobalProperties(["URL"]);
 
 this.EXPORTED_SYMBOLS = ["MozLoopService", "LOOP_SESSION_TYPE",
-  "TWO_WAY_MEDIA_CONN_LENGTH", "SHARING_STATE_CHANGE"];
+  "TWO_WAY_MEDIA_CONN_LENGTH", "SHARING_STATE_CHANGE", "SHARING_ROOM_URL",
+  "ROOM_CREATE", "ROOM_DELETE", "ROOM_CONTEXT_ADD"];
 
 XPCOMUtils.defineLazyModuleGetter(this, "injectLoopAPI",
   "resource:///modules/loop/MozLoopAPI.jsm");
@@ -122,7 +166,7 @@ XPCOMUtils.defineLazyServiceGetter(this, "gWM",
 XPCOMUtils.defineLazyGetter(this, "log", () => {
   let ConsoleAPI = Cu.import("resource://gre/modules/devtools/Console.jsm", {}).ConsoleAPI;
   let consoleOptions = {
-    maxLogLevel: Services.prefs.getCharPref(PREF_LOG_LEVEL).toLowerCase(),
+    maxLogLevelPref: PREF_LOG_LEVEL,
     prefix: "Loop"
   };
   return new ConsoleAPI(consoleOptions);
@@ -190,7 +234,6 @@ let MozLoopServiceInternal = {
       // Default to 5 seconds
       return 5000;
     }
-    return initialDelay;
   },
 
   /**
@@ -358,8 +401,8 @@ let MozLoopServiceInternal = {
     log.debug("createNotificationChannel", channelID, sessionType, serviceType);
     // Wrap the push notification registration callback in a Promise.
     return new Promise((resolve, reject) => {
-      let onRegistered = (error, pushURL, channelID) => {
-        log.debug("createNotificationChannel onRegistered:", error, pushURL, channelID);
+      let onRegistered = (error, pushURL, chID) => {
+        log.debug("createNotificationChannel onRegistered:", error, pushURL, chID);
         if (error) {
           reject(Error(error));
         } else {
@@ -512,26 +555,26 @@ let MozLoopServiceInternal = {
         roomsPushURL = pushURLs ? pushURLs.rooms : null;
     this.pushURLs.delete(sessionType);
 
-    let unregister = (sessionType, pushURL) => {
+    let unregister = (sessType, pushURL) => {
       if (!pushURL) {
         return Promise.resolve("no pushURL of this type to unregister");
       }
 
       let unregisterURL = "/registration?simplePushURL=" + encodeURIComponent(pushURL);
-      return this.hawkRequestInternal(sessionType, unregisterURL, "DELETE").then(
+      return this.hawkRequestInternal(sessType, unregisterURL, "DELETE").then(
         () => {
-          log.debug("Successfully unregistered from server for sessionType = ", sessionType);
-          return "unregistered sessionType " + sessionType;
+          log.debug("Successfully unregistered from server for sessionType = ", sessType);
+          return "unregistered sessionType " + sessType;
         },
-        error => {
-          if (error.code === 401) {
+        err => {
+          if (err.code === 401) {
             // Authorization failed, invalid token. This is fine since it may mean we already logged out.
-            log.debug("already unregistered - invalid token", sessionType);
-            return "already unregistered, sessionType = " + sessionType;
+            log.debug("already unregistered - invalid token", sessType);
+            return "already unregistered, sessionType = " + sessType;
           }
 
           log.error("Failed to unregister with the loop server. Error: ", error);
-          throw error;
+          throw err;
         });
     };
 
@@ -724,8 +767,9 @@ let MozLoopServiceInternal = {
    * @returns {Map} a map of element ids with localized string values
    */
   get localizedStrings() {
-    if (gLocalizedStrings.size)
+    if (gLocalizedStrings.size) {
       return gLocalizedStrings;
+    }
 
     let stringBundle =
       Services.strings.createBundle("chrome://browser/locale/loop/loop.properties");
@@ -752,7 +796,7 @@ let MozLoopServiceInternal = {
   stageForTelemetryUpload: function(window, pc) {
     window.WebrtcGlobalInformation.getAllStats(allStats => {
       let internalFormat = allStats.reports[0]; // filtered on pc.id
-      window.WebrtcGlobalInformation.getLogging('', logs => {
+      window.WebrtcGlobalInformation.getLogging("", logs => {
         let report = convertToRTCStatsReport(internalFormat);
         let logStr = "";
         logs.forEach(s => { logStr += s + "\n"; });
@@ -765,7 +809,7 @@ let MozLoopServiceInternal = {
 
         let ai = Services.appinfo;
         let uuid = uuidgen.generateUUID().toString();
-        uuid = uuid.substr(1, uuid.length-2); // remove uuid curly braces
+        uuid = uuid.substr(1, uuid.length - 2); // remove uuid curly braces
 
         let directory = OS.Path.join(OS.Constants.Path.profileDir,
                                      "saved-telemetry-pings");
@@ -853,26 +897,53 @@ let MozLoopServiceInternal = {
         return;
       }
 
-      chatbox.setAttribute("dark", true);
-      chatbox.setAttribute("large", true);
-
       chatbox.addEventListener("DOMContentLoaded", function loaded(event) {
         if (event.target != chatbox.contentDocument) {
           return;
         }
         chatbox.removeEventListener("DOMContentLoaded", loaded, true);
 
+        let chatbar = chatbox.parentNode;
         let window = chatbox.contentWindow;
 
         function socialFrameChanged(eventName) {
           UITour.availableTargetsCache.clear();
           UITour.notify(eventName);
+
+          if (eventName == "Loop:ChatWindowDetached" || eventName == "Loop:ChatWindowAttached") {
+            // After detach, re-attach of the chatbox, refresh its reference so
+            // we can keep using it here.
+            let ref = chatbar.chatboxForURL.get(chatbox.src);
+            chatbox = ref && ref.get() || chatbox;
+          }
         }
 
         window.addEventListener("socialFrameHide", socialFrameChanged.bind(null, "Loop:ChatWindowHidden"));
         window.addEventListener("socialFrameShow", socialFrameChanged.bind(null, "Loop:ChatWindowShown"));
         window.addEventListener("socialFrameDetached", socialFrameChanged.bind(null, "Loop:ChatWindowDetached"));
+        window.addEventListener("socialFrameAttached", socialFrameChanged.bind(null, "Loop:ChatWindowAttached"));
         window.addEventListener("unload", socialFrameChanged.bind(null, "Loop:ChatWindowClosed"));
+
+        const kSizeMap = {
+          LoopChatEnabled: "loopChatEnabled",
+          LoopChatMessageAppended: "loopChatMessageAppended"
+        };
+
+        function onChatEvent(ev) {
+          // When the chat box or messages are shown, resize the panel or window
+          // to be slightly higher to accomodate them.
+          let customSize = kSizeMap[ev.type];
+          let currSize = chatbox.getAttribute("customSize");
+          // If the size is already at the requested one or at the maximum size
+          // already, don't do anything. Especially don't make it shrink.
+          if (customSize && currSize != customSize && currSize != "loopChatMessageAppended") {
+            chatbox.setAttribute("customSize", customSize);
+            chatbox.parentNode.setAttribute("customSize", customSize);
+          }
+        }
+
+        window.addEventListener("LoopChatEnabled", onChatEvent);
+        window.addEventListener("LoopChatMessageAppended", onChatEvent);
 
         injectLoopAPI(window);
 
@@ -885,8 +956,8 @@ let MozLoopServiceInternal = {
           }
 
           // Chat Window Id, this is different that the internal winId
-          let windowId = window.location.hash.slice(1);
-          var context = this.conversationContexts.get(windowId);
+          let chatWindowId = window.location.hash.slice(1);
+          var context = this.conversationContexts.get(chatWindowId);
           var exists = pc.id.match(/session=(\S+)/);
           if (context && !exists) {
             // Not ideal but insert our data amidst existing data like this:
@@ -895,7 +966,7 @@ let MozLoopServiceInternal = {
             var pair = pc.id.split("(");  //)
             if (pair.length == 2) {
               pc.id = pair[0] + "(session=" + context.sessionId +
-                  (context.callId? " call=" + context.callId : "") + " " + pair[1]; //)
+                  (context.callId ? " call=" + context.callId : "") + " " + pair[1]; //)
             }
           }
 
@@ -918,8 +989,17 @@ let MozLoopServiceInternal = {
       }.bind(this), true);
     };
 
-    if (!Chat.open(null, origin, "", url, undefined, undefined, callback)) {
+    let chatboxInstance = Chat.open(null, origin, "", url, undefined, undefined,
+                                    callback);
+    if (!chatboxInstance) {
       return null;
+    // It's common for unit tests to overload Chat.open.
+    } else if (chatboxInstance.setAttribute) {
+      // Set properties that influence visual appeara nce of the chatbox right
+      // away to circumvent glitches.
+      chatboxInstance.setAttribute("dark", true);
+      chatboxInstance.setAttribute("customSize", "loopDefault");
+      chatboxInstance.parentNode.setAttribute("customSize", "loopDefault");
     }
     return windowId;
   },
@@ -1200,10 +1280,10 @@ this.MozLoopService = {
       return;
     }
 
-    // The particpant that joined isn't necessarily included in room.participants (depending on
+    // The participant that joined isn't necessarily included in room.participants (depending on
     // when the broadcast happens) so concatenate.
-    for (let participant of room.participants.concat(participant)) {
-      if (participant.owner) {
+    for (let roomParticipant of room.participants.concat(participant)) {
+      if (roomParticipant.owner) {
         isOwnerInRoom = true;
       } else {
         isOtherInRoom = true;

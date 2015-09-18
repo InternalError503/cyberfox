@@ -118,7 +118,7 @@ DOMProxyHandler::EnsureExpandoObject(JSContext* cx, JS::Handle<JSObject*> obj)
   }
 
   JS::Rooted<JSObject*> expando(cx,
-    JS_NewObjectWithGivenProto(cx, nullptr, JS::NullPtr()));
+    JS_NewObjectWithGivenProto(cx, nullptr, nullptr));
   if (!expando) {
     return nullptr;
   }
@@ -181,12 +181,12 @@ DOMProxyHandler::defineProperty(JSContext* cx, JS::Handle<JSObject*> proxy, JS::
     return result.succeed();
   }
 
-  JSObject* expando = EnsureExpandoObject(cx, proxy);
+  JS::Rooted<JSObject*> expando(cx, EnsureExpandoObject(cx, proxy));
   if (!expando) {
     return false;
   }
 
-  if (!js::DefineOwnProperty(cx, expando, id, desc, result)) {
+  if (!JS_DefinePropertyById(cx, expando, id, desc, result)) {
     return false;
   }
   *defined = true;

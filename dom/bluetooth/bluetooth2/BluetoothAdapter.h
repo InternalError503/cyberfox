@@ -17,8 +17,8 @@
 
 namespace mozilla {
 namespace dom {
+class Blob;
 class DOMRequest;
-class File;
 struct MediaMetaData;
 struct MediaPlayStatus;
 }
@@ -132,7 +132,7 @@ public:
 
   // OPP file transfer related methods
   already_AddRefed<DOMRequest> SendFile(const nsAString& aDeviceAddress,
-                                        File& aBlob,
+                                        Blob& aBlob,
                                         ErrorResult& aRv);
   already_AddRefed<DOMRequest> StopSendingFile(const nsAString& aDeviceAddress,
                                                ErrorResult& aRv);
@@ -203,6 +203,11 @@ public:
 private:
   BluetoothAdapter(nsPIDOMWindow* aOwner, const BluetoothValue& aValue);
   ~BluetoothAdapter();
+
+  /**
+   * Unregister signal handler and clean up LE scan handles.
+   */
+  void Cleanup();
 
   /**
    * Set adapter properties according to properties array.

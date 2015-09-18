@@ -19,7 +19,7 @@
 
 namespace mozilla {
 namespace dom {
-class File;
+class Blob;
 }
 }
 
@@ -28,6 +28,7 @@ BEGIN_WORKERS_NAMESPACE
 class Proxy;
 class XMLHttpRequestUpload;
 class WorkerPrivate;
+class WorkerStructuredCloneClosure;
 
 class XMLHttpRequest final: public nsXHREventTarget,
                             public WorkerFeature
@@ -171,7 +172,7 @@ public:
   Send(JS::Handle<JSObject*> aBody, ErrorResult& aRv);
 
   void
-  Send(File& aBody, ErrorResult& aRv);
+  Send(Blob& aBody, ErrorResult& aRv);
 
   void
   Send(nsFormData& aBody, ErrorResult& aRv);
@@ -292,7 +293,7 @@ private:
   void
   SendInternal(const nsAString& aStringBody,
                JSAutoStructuredCloneBuffer&& aBody,
-               nsTArray<nsCOMPtr<nsISupports> >& aClonedObjects,
+               WorkerStructuredCloneClosure& aClosure,
                ErrorResult& aRv);
 };
 

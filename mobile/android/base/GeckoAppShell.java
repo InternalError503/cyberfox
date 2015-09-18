@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Proxy;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
@@ -52,6 +54,7 @@ import org.mozilla.gecko.util.NativeJSObject;
 import org.mozilla.gecko.util.ProxySelector;
 import org.mozilla.gecko.util.ThreadUtils;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
@@ -97,6 +100,7 @@ import android.os.Message;
 import android.os.MessageQueue;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.provider.Browser;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -849,8 +853,6 @@ public class GeckoAppShell
         shortcutIntent.setClassName(AppConstants.ANDROID_PACKAGE_NAME,
                                     AppConstants.MOZ_ANDROID_BROWSER_INTENT_CLASS);
 
-        // The resultant chooser can return non-exported activities in 4.1 and earlier.
-        // https://code.google.com/p/android/issues/detail?id=29535
         Intent intent = new Intent();
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, getLauncherIcon(aIcon));
@@ -1190,6 +1192,23 @@ public class GeckoAppShell
                                    final String action,
                                    final String title) {
 
+        // The resultant chooser can return non-exported activities in 4.1 and earlier.
+        // https://code.google.com/p/android/issues/detail?id=29535
+        final Intent intent = getOpenURIIntentInner(context, targetURI, mimeType, action, title);
+
+        if (intent != null) {
+            // Some applications use this field to return to the same browser after processing the
+            // Intent. While there is some danger (e.g. denial of service), other major browsers already
+            // use it and so it's the norm.
+            intent.putExtra(Browser.EXTRA_APPLICATION_ID, GeckoApp.class.getPackage().getName());
+        }
+
+        return intent;
+    }
+
+    private static Intent getOpenURIIntentInner(final Context context,  final String targetURI,
+            final String mimeType, final String action, final String title) {
+
         if (action.equalsIgnoreCase(Intent.ACTION_SEND)) {
             Intent shareIntent = getShareIntent(context, targetURI, mimeType, title);
             return Intent.createChooser(shareIntent,
@@ -1208,6 +1227,24 @@ public class GeckoAppShell
         }
 
         final String scheme = uri.getScheme();
+        if ("intent".equals(scheme) || "android-app".equals(scheme)) {
+            final Intent intent;
+            try {
+                intent = Intent.parseUri(targetURI, 0);
+            } catch (final URISyntaxException e) {
+                Log.e(LOGTAG, "Unable to parse URI - " + e);
+                return null;
+            }
+
+            // Only open applications which can accept arbitrary data from a browser.
+            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+
+            // Prevent site from explicitly opening our internal activities, which can leak data.
+            intent.setComponent(null);
+            nullIntentSelector(intent);
+
+            return intent;
+        }
 
         // Compute our most likely intent, then check to see if there are any
         // custom handlers that would apply.
@@ -1281,6 +1318,16 @@ public class GeckoAppShell
         intent.setData(pruned);
 
         return intent;
+    }
+
+    // We create a separate method to better encapsulate the @TargetApi use.
+    @TargetApi(15)
+    private static void nullIntentSelector(final Intent intent) {
+        if (!Versions.feature15Plus) {
+            return;
+        }
+
+        intent.setSelector(null);
     }
 
     /**
@@ -1762,7 +1809,7 @@ public class GeckoAppShell
                 String[] split = output.split("\\s+");
                 if (split.length <= pidColumn || split.length <= nameColumn)
                     continue;
-                Integer pid = new Integer(split[pidColumn]);
+                final Integer pid = Integer.valueOf(split[pidColumn]);
                 String name = pidNameMap.get(pid);
                 if (name == null) {
                     name = getAppNameByPID(pid.intValue());
@@ -2412,17 +2459,6 @@ public class GeckoAppShell
                 GeckoNetworkManager.getInstance().disableNotifications();
             }
         });
-    }
-
-    /**
-     * Decodes a byte array from Base64 format.
-     * No blanks or line breaks are allowed within the Base64 encoded input data.
-     * @param s     A string containing the Base64 encoded data.
-     * @return      An array containing the decoded data bytes.
-     * @throws      IllegalArgumentException If the input is not valid Base64 encoded data.
-     */
-    public static byte[] decodeBase64(String s, int flags) {
-        return Base64.decode(s.getBytes(), flags);
     }
 
     @WrapElementForJNI(stubName = "GetScreenOrientationWrapper")

@@ -48,6 +48,7 @@ EXPORTS.mozilla += [
 ]
 
 UNIFIED_SOURCES += [
+    'AutoTimelineMarker.cpp',
     'LoadContext.cpp',
     'nsAboutRedirector.cpp',
     'nsDefaultURIFixup.cpp',
@@ -69,7 +70,7 @@ include('/ipc/chromium/chromium-config.mozbuild')
 
 FINAL_LIBRARY = 'xul'
 LOCAL_INCLUDES += [
-    '../shistory/src',
+    '/docshell/shistory',
     '/dom/base',
     '/layout/base',
     '/layout/generic',

@@ -8,6 +8,7 @@
 
 #include "mozilla/MemoryReporting.h"
 #include "mozilla/ArrayUtils.h"
+#include "mozilla/Maybe.h"
 #include "nsBoundingMetrics.h"
 #include "nsChangeHint.h"
 #include "nsAutoPtr.h"
@@ -163,6 +164,16 @@ public:
    * Get display port for the given element.
    */
   static bool GetDisplayPort(nsIContent* aContent, nsRect *aResult = nullptr);
+
+  /**
+   * @return the display port for the given element which should be used for
+   * visibility testing purposes.
+   *
+   * If low-precision buffers are enabled, this is the critical display port;
+   * otherwise, it's the same display port returned by GetDisplayPort().
+   */
+  static bool GetDisplayPortForVisibilityTesting(nsIContent* aContent,
+                                                 nsRect* aResult = nullptr);
 
   enum class RepaintMode : uint8_t {
     Repaint,
@@ -859,6 +870,13 @@ public:
                                           const nsRect& aRect);
 
   /**
+   * Clamp aRect relative to aFrame to the scroll frames boundary searching from
+   * aFrame.
+   */
+  static nsRect ClampRectToScrollFrames(nsIFrame* aFrame,
+                                        const nsRect& aRect);
+
+  /**
    * Return true if a "layer transform" could be computed for aFrame,
    * and optionally return the computed transform.  The returned
    * transform is what would be set on the layer currently if a layers
@@ -1281,18 +1299,27 @@ public:
 
   /**
    * Get the contribution of aFrame to its containing block's intrinsic
-   * width.  This considers the child's intrinsic width, its 'width',
-   * 'min-width', and 'max-width' properties, and its padding, border,
-   * and margin.
+   * size for the given physical axis.  This considers the child's intrinsic
+   * width, its 'width', 'min-width', and 'max-width' properties (or 'height'
+   * variations if that's what matches aAxis) and its padding, border and margin
+   * in the corresponding dimension.
    */
   enum IntrinsicISizeType { MIN_ISIZE, PREF_ISIZE };
   enum {
     IGNORE_PADDING = 0x01
   };
+  static nscoord IntrinsicForAxis(mozilla::PhysicalAxis aAxis,
+                                  nsRenderingContext*   aRenderingContext,
+                                  nsIFrame*             aFrame,
+                                  IntrinsicISizeType    aType,
+                                  uint32_t              aFlags = 0);
+  /**
+   * Calls IntrinsicForAxis with aFrame's parent's inline physical axis.
+   */
   static nscoord IntrinsicForContainer(nsRenderingContext* aRenderingContext,
-                                       nsIFrame* aFrame,
-                                       IntrinsicISizeType aType,
-                                       uint32_t aFlags = 0);
+                                       nsIFrame*           aFrame,
+                                       IntrinsicISizeType  aType,
+                                       uint32_t            aFlags = 0);
 
   /*
    * Convert nsStyleCoord to nscoord when percentages depend on the
@@ -2297,6 +2324,10 @@ public:
     return sFontSizeInflationDisabledInMasterProcess;
   }
 
+  static bool SVGTransformOriginEnabled() {
+    return sSVGTransformOriginEnabled;
+  }
+
   /**
    * See comment above "font.size.inflation.mappingIntercept" in
    * modules/libpref/src/init/all.js .
@@ -2507,10 +2538,16 @@ public:
   CalculateExpandedScrollableRect(nsIFrame* aFrame);
 
   /**
-   * Returns true if we're using asynchronous scrolling (either through
-   * APZ or the android frontend).
+   * Returns true if the widget owning the given frame uses asynchronous
+   * scrolling.
    */
-  static bool UsesAsyncScrolling();
+  static bool UsesAsyncScrolling(nsIFrame* aFrame);
+
+  /**
+   * Returns true if the widget owning the given frame has builtin APZ support
+   * enabled.
+   */
+  static bool AsyncPanZoomEnabled(nsIFrame* aFrame);
 
   /**
    * Log a key/value pair for APZ testing during a paint.
@@ -2621,8 +2658,31 @@ public:
                                           Layer* aLayer,
                                           ViewID aScrollParentId,
                                           const nsRect& aViewport,
+                                          const mozilla::Maybe<nsRect>& aClipRect,
                                           bool aIsRoot,
                                           const ContainerLayerParameters& aContainerParameters);
+
+  /**
+   * If the given scroll frame needs an area excluded from its composition
+   * bounds due to scrollbars, return that area, otherwise return an empty
+   * margin.
+   * There is no need to exclude scrollbars in the following cases:
+   *   - If the scroll frame is not the RCD-RSF; in that case, the composition
+   *     bounds is calculated based on the scroll port which already excludes
+   *     the scrollbar area.
+   *   - If the scrollbars are overlay, since then they are drawn on top of the
+   *     scrollable content.
+   */
+  static nsMargin ScrollbarAreaToExcludeFromCompositionBoundsFor(nsIFrame* aScrollFrame);
+
+  /**
+   * Looks in the layer subtree rooted at aLayer for a metrics with scroll id
+   * aScrollId. Returns true if such is found.
+   */
+  static bool ContainsMetricsWithId(const Layer* aLayer, const ViewID& aScrollId);
+
+  static bool ShouldUseNoScriptSheet(nsIDocument* aDocument);
+  static bool ShouldUseNoFramesSheet(nsIDocument* aDocument);
 
 private:
   static uint32_t sFontSizeInflationEmPerLine;
@@ -2635,6 +2695,7 @@ private:
   static bool sInvalidationDebuggingIsEnabled;
   static bool sCSSVariablesEnabled;
   static bool sInterruptibleReflowEnabled;
+  static bool sSVGTransformOriginEnabled;
 
   /**
    * Helper function for LogTestDataForPaint().

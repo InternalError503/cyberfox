@@ -37,6 +37,8 @@
 #endif
 #include "vm/MatchPairs.h"
 
+#include "jit/MacroAssembler-inl.h"
+
 using namespace js;
 using namespace js::irregexp;
 using namespace js::jit;
@@ -439,6 +441,8 @@ NativeRegExpMacroAssembler::GenerateCode(JSContext* cx, bool match_only)
 #ifdef JS_ION_PERF
     writePerfSpewerJitCodeProfile(code, "RegExp");
 #endif
+
+    AutoWritableJitCode awjc(code);
 
     for (size_t i = 0; i < labelPatches.length(); i++) {
         LabelPatch& v = labelPatches[i];

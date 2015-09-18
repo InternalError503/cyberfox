@@ -132,12 +132,6 @@ pref("dom.workers.maxPerDomain", 20);
 // Whether or not Shared Web Workers are enabled.
 pref("dom.workers.sharedWorkers.enabled", true);
 
-// Whether or not WebSockets in workers are enabled.
-// Note: we need this pref because WebSocket in Workers is a new implementation
-// and we want to be able to disable it quickly in case of regressions.
-// When this feature is stable enough we can get rid of this pref: Bug 1159792
-pref("dom.workers.websocket.enabled", true);
-
 // Service workers
 pref("dom.serviceWorkers.enabled", false);
 
@@ -175,6 +169,8 @@ pref("dom.undo_manager.enabled", false);
 // Whether URL,nsLocation,Link::GetHash should be percent encoded
 // in setter and percent decoded in getter (old behaviour = true)
 pref("dom.url.encode_decode_hash", true);
+// Whether ::GetHash should do percent decoding (old behaviour = true)
+pref("dom.url.getters_decode_hash", false);
 
 // Whether to run add-on code in different compartments from browser code. This
 // causes a separate compartment for each (addon, global) combination, which may
@@ -376,12 +372,15 @@ pref("media.peerconnection.video.start_bitrate", 300);
 pref("media.peerconnection.video.max_bitrate", 2000);
 #endif
 pref("media.navigator.permission.disabled", false);
-pref("media.peerconnection.default_iceservers", "[{\"urls\": [\"stun:stun.services.mozilla.com\"]}]");
+pref("media.peerconnection.default_iceservers", "[]");
 pref("media.peerconnection.ice.loopback", false); // Set only for testing in offline environments.
+pref("media.peerconnection.ice.tcp", false);
+pref("media.peerconnection.ice.force_interface", ""); // Limit to only a single interface
 pref("media.peerconnection.use_document_iceservers", true);
 pref("media.peerconnection.identity.enabled", true);
 pref("media.peerconnection.identity.timeout", 10000);
-pref("media.peerconnection.ice.loopback", false); // Set only for testing in offline environments.
+pref("media.peerconnection.ice.stun_client_maximum_transmits", 7);
+pref("media.peerconnection.ice.trickle_grace_period", 5000);
 // These values (aec, agc, and noice) are from media/webrtc/trunk/webrtc/common_types.h
 // kXxxUnchanged = 0, kXxxDefault = 1, and higher values are specific to each
 // setting (for Xxx = Ec, Agc, or Ns).  Defaults are all set to kXxxDefault here.
@@ -458,6 +457,14 @@ pref("media.mediasource.whitelist", false);
 
 pref("media.mediasource.mp4.enabled", true);
 pref("media.mediasource.webm.enabled", false);
+
+// Enable new MediaSource architecture.
+pref("media.mediasource.format-reader", false);
+
+// Enable new MediaFormatReader architecture for mp4 in MSE
+pref("media.mediasource.format-reader.mp4", true);
+// Enable new MediaFormatReader architecture for plain mp4.
+pref("media.format-reader.mp4", true);
 
 #ifdef MOZ_WEBSPEECH
 pref("media.webspeech.recognition.enable", false);
@@ -571,9 +578,8 @@ pref("apz.test.logging_enabled", false);
 pref("gfx.hidpi.enabled", 2);
 #endif
 
-#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
-// Containerless scrolling for root frames does not yet pass tests on Android
-// or B2G.
+#if !defined(MOZ_WIDGET_ANDROID)
+// Containerless scrolling for root frames does not yet pass tests on Android.
 pref("layout.scroll.root-frame-containers", false);
 #endif
 
@@ -701,6 +707,8 @@ pref("canvas.hitregions.enabled", false);
 pref("canvas.filters.enabled", false);
 // Add support for canvas path objects
 pref("canvas.path.enabled", true);
+// captureStream() on canvas disabled by default
+pref("canvas.capturestream.enabled", false);
 
 // We want the ability to forcibly disable platform a11y, because
 // some non-a11y-related components attempt to bring it up.  See bug
@@ -790,6 +798,8 @@ pref("toolkit.identity.debug", false);
 
 // AsyncShutdown delay before crashing in case of shutdown freeze
 pref("toolkit.asyncshutdown.timeout.crash", 60000);
+// Extra logging for AsyncShutdown barriers and phases
+pref("toolkit.asyncshutdown.log", false);
 
 // Enable deprecation warnings.
 pref("devtools.errorconsole.deprecation_warnings", true);
@@ -1098,6 +1108,11 @@ pref("javascript.options.mem.log", false);
 pref("javascript.options.mem.notify", false);
 pref("javascript.options.gc_on_memory_pressure", true);
 pref("javascript.options.compact_on_user_inactive", true);
+#ifdef NIGHTLY_BUILD
+pref("javascript.options.compact_on_user_inactive_delay", 15000); // ms
+#else
+pref("javascript.options.compact_on_user_inactive_delay", 300000); // ms
+#endif
 
 pref("javascript.options.mem.gc_high_frequency_time_limit_ms", 1000);
 pref("javascript.options.mem.gc_high_frequency_low_limit_mb", 100);
@@ -1193,7 +1208,7 @@ pref("network.warnOnAboutNetworking", true);
 // pref("network.protocol-handler.expose.imap", true);
 
 // Whether IOService.connectivity and NS_IsOffline depends on connectivity status
-pref("network.manage-offline-status", false);
+pref("network.manage-offline-status", true);
 // If set to true, IOService.offline depends on IOService.connectivity
 pref("network.offline-mirrors-connectivity", true);
 
@@ -1347,7 +1362,6 @@ pref("network.http.bypass-cachelock-threshold", 250);
 // Try and use SPDY when using SSL
 pref("network.http.spdy.enabled", true);
 pref("network.http.spdy.enabled.v3-1", true);
-pref("network.http.spdy.enabled.http2draft", true);
 pref("network.http.spdy.enabled.http2", true);
 pref("network.http.spdy.enabled.deps", true);
 pref("network.http.spdy.enforce-tls-profile", true);
@@ -1386,6 +1400,12 @@ pref("network.http.tcp_keepalive.long_lived_idle_time", 600);
 
 pref("network.http.enforce-framing.http1", false); // should be named "strict"
 pref("network.http.enforce-framing.soft", true);
+
+// Whether nsHttpChannel should use the PackagedAppService to load
+// resources from a package when directed to a URL
+// such as http://domain.com/package.pak!//resource.html
+// See http://www.w3.org/TR/web-packaging/#streamable-package-format
+pref("network.http.enable-packaged-apps", false);
 
 // default values for FTP
 // in a DSCP environment this should be 40 (0x28, or AF11), per RFC-4594,
@@ -1608,7 +1628,7 @@ pref("network.dnsCacheEntries", 400);
 pref("network.dnsCacheExpiration", 60);
 
 // Get TTL; not supported on all platforms; nop on the unsupported ones.
-pref("network.dns.get-ttl", false);
+pref("network.dns.get-ttl", true);
 
 // The grace period allows the DNS cache to use expired entries, while kicking off
 // a revalidation in the background.
@@ -1720,7 +1740,7 @@ pref("network.automatic-ntlm-auth.trusted-uris", "");
 //   1 - allow sub-resources to open HTTP authentication credentials dialogs,
 //       but don't allow it for cross-origin sub-resources
 //   2 - allow the cross-origin authentication as well.
-pref("network.auth.allow-subresource-auth", 1);
+pref("network.auth.subresource-http-auth-allow", 2);
 
 pref("permissions.default.image",           1); // 1-Accept, 2-Deny, 3-dontAcceptForeign
 
@@ -1781,6 +1801,13 @@ pref("intl.locale.matchOS",                 false);
 // for ISO-8859-1
 pref("intl.fallbackCharsetList.ISO-8859-1", "windows-1252");
 pref("font.language.group",                 "chrome://global/locale/intl.properties");
+
+// Android-specific pref to use key-events-only mode for IME-unaware webapps.
+#ifdef MOZ_WIDGET_ANDROID
+pref("intl.ime.hack.on_ime_unaware_apps.fire_key_events_for_composition", true);
+#else
+pref("intl.ime.hack.on_ime_unaware_apps.fire_key_events_for_composition", false);
+#endif
 
 // these locales have right-to-left UI
 pref("intl.uidirection.ar", "rtl");
@@ -1848,7 +1875,10 @@ pref("intl.hyphenation-alias.no-*", "nb");
 pref("intl.hyphenation-alias.nb-*", "nb");
 pref("intl.hyphenation-alias.nn-*", "nn");
 
-pref("font.mathfont-family", "Latin Modern Math, XITS Math, STIX Math, Cambria Math, Asana Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Termes Math, Neo Euler, Lucida Bright Math, MathJax_Main, STIXNonUnicode, STIXSizeOneSym, STIXGeneral, Standard Symbols L, DejaVu Sans");
+pref("font.name.serif.x-math", "Latin Modern Math");
+pref("font.name-list.serif.x-math", "Latin Modern Math, XITS Math, Cambria Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Schola, TeX Gyre Termes Math, STIX Math, Asana Math, STIXGeneral, DejaVu Serif, DejaVu Sans, serif");
+pref("font.name.sans-serif.x-math", "sans-serif");
+pref("font.name.monospace.x-math", "monospace");
 
 // Some CJK fonts have bad underline offset, their CJK character glyphs are overlapped (or adjoined)  to its underline.
 // These fonts are ignored the underline offset, instead of it, the underline is lowered to bottom of its em descent.
@@ -2222,11 +2252,10 @@ pref("layout.css.scope-pseudo.enabled", true);
 pref("layout.css.background-blend-mode.enabled", true);
 
 // Is support for CSS vertical text enabled?
-#ifdef RELEASE_BUILD
-pref("layout.css.vertical-text.enabled", false);
-#else
 pref("layout.css.vertical-text.enabled", true);
-#endif
+
+// Is support for CSS text-combine-upright (tate-chu-yoko) enabled?
+pref("layout.css.text-combine-upright.enabled", false);
 
 // Is support for object-fit and object-position enabled?
 pref("layout.css.object-fit-and-position.enabled", true);
@@ -2253,6 +2282,9 @@ pref("layout.css.overflow-clip-box.enabled", false);
 
 // Is support for CSS grid enabled?
 pref("layout.css.grid.enabled", false);
+
+// Is support for CSS contain enabled?
+pref("layout.css.contain.enabled", false);
 
 // Is support for CSS Ruby enabled?
 //
@@ -2297,11 +2329,7 @@ pref("layout.css.scroll-behavior.damping-ratio", "1.0");
 pref("layout.css.scroll-snap.enabled", true);
 
 // Is support for document.fonts enabled?
-#ifdef RELEASE_BUILD
-pref("layout.css.font-loading-api.enabled", false);
-#else
 pref("layout.css.font-loading-api.enabled", true);
-#endif
 
 // Are the MouseEvent.offsetX/Y properties enabled?
 pref("dom.mouseEvent.offsetXY.enabled", true);
@@ -2392,14 +2420,6 @@ pref("plugins.load_appdir_plugins", false);
 // If true, plugins will be click to play
 pref("plugins.click_to_play", false);
 
-// A comma-delimited list of plugin name prefixes matching plugins that will be
-// exposed when enumerating navigator.plugins[]. For example, prefix "Shockwave"
-// matches both Adobe Flash Player ("Shockwave Flash") and Adobe Shockwave
-// Player ("Shockwave for Director"). To hide all plugins from enumeration, use
-// the empty string "" to match no plugin names. To allow all plugins to be
-// enumerated, use the string "*" to match all plugin names.
-pref("plugins.enumerable_names", "*");
-
 // The default value for nsIPluginTag.enabledState (STATE_ENABLED = 2)
 pref("plugin.default.state", 2);
 
@@ -2468,9 +2488,13 @@ pref("dom.ipc.plugins.reportCrashURL", true);
 // Defaults to 30 seconds.
 pref("dom.ipc.plugins.unloadTimeoutSecs", 30);
 
-// Asynchronous plugin initialization is disabled in release
-// See bug #1198590
-pref("dom.ipc.plugins.asyncInit", false);
+// Asynchronous plugin initialization should only be enabled on non-e10s
+// channels until some remaining bugs are resolved.
+#ifdef E10S_TESTING_ONLY
+pref("dom.ipc.plugins.asyncInit.enabled", false);
+#else
+pref("dom.ipc.plugins.asyncInit.enabled", false);
+#endif
 
 pref("dom.ipc.processCount", 1);
 
@@ -2490,6 +2514,12 @@ pref("svg.marker-improvements.enabled", true);
 // Is support for the new getBBox method from SVG 2 enabled?
 // See https://svgwg.org/svg2-draft/single-page.html#types-SVGBoundingBoxOptions
 pref("svg.new-getBBox.enabled", false);
+
+#ifdef RELEASE_BUILD
+pref("svg.transform-origin.enabled", false);
+#else
+pref("svg.transform-origin.enabled", true);
+#endif // RELEASE_BUILD
 
 // Default font types and sizes by locale
 pref("font.default.ar", "sans-serif");
@@ -2517,7 +2547,7 @@ pref("font.minimum-size.ko", 0);
 pref("font.size.variable.ko", 16);
 pref("font.size.fixed.ko", 16);
 
-pref("font.default.th", "serif");
+pref("font.default.th", "sans-serif");
 pref("font.minimum-size.th", 0);
 pref("font.size.variable.th", 16);
 pref("font.size.fixed.th", 13);
@@ -2631,6 +2661,10 @@ pref("font.default.zh-TW", "sans-serif");
 pref("font.minimum-size.zh-TW", 0);
 pref("font.size.variable.zh-TW", 16);
 pref("font.size.fixed.zh-TW", 16);
+
+// mathml.css sets font-size to "inherit" and font-family to "serif" so only
+// font.name.*.x-math and font.minimum-size.x-math are really relevant.
+pref("font.minimum-size.x-math", 0);
 
 /*
  * A value greater than zero enables font size inflation for
@@ -2954,8 +2988,12 @@ pref("font.name-list.monospace.x-tibt", "Tibetan Machine Uni, Jomolhari, Microso
 pref("font.minimum-size.th", 10);
 
 pref("font.default.x-devanagari", "sans-serif");
+pref("font.name.serif.x-math", "Latin Modern Math");
 // We have special support for Monotype Symbol on Windows.
-pref("font.mathfont-family", "MathJax_Main, STIXNonUnicode, STIXSizeOneSym, STIXGeneral, Asana Math, Symbol, DejaVu Sans, Cambria Math");
+pref("font.name-list.serif.x-math", "Latin Modern Math, XITS Math, Cambria Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Schola, TeX Gyre Termes Math, STIX Math, Asana Math, STIXGeneral, DejaVu Serif, DejaVu Sans, Symbol, Times New Roman");
+pref("font.name.sans-serif.x-math", "Arial");
+pref("font.name.monospace.x-math", "Courier New");
+pref("font.name.cursive.x-math", "Comic Sans MS");
 
 // cleartype settings - false implies default system settings
 
@@ -3049,7 +3087,7 @@ pref("intl.keyboard.per_window_layout", false);
 
 #ifdef NS_ENABLE_TSF
 // Enable/Disable TSF support on Vista or later.
-pref("intl.tsf.enable", false);
+pref("intl.tsf.enable", true);
 
 // Force enable TSF even on WinXP or WinServer 2003.
 // Be aware, TSF framework on prior to Vista is not enough stable.
@@ -3077,7 +3115,44 @@ pref("intl.tsf.hack.google_ja_input.do_not_return_no_layout_error_at_first_char"
 // ITfContextView::GetTextExt() if the specified range is the caret of
 // composition string.
 pref("intl.tsf.hack.google_ja_input.do_not_return_no_layout_error_at_caret", true);
+// Whether hack ITextStoreACP::QueryInsert() or not.  The method should return
+// new selection after specified length text is inserted at specified range.
+// However, Microsoft's some Chinese TIPs expect that the result is same as
+// specified range.  If following prefs are true, ITextStoreACP::QueryInsert()
+// returns specified range only when one of the TIPs is active.
+// For Microsoft Pinyin and Microsoft Wubi
+pref("intl.tsf.hack.ms_simplified_chinese.query_insert_result", true);
+// For Microsoft ChangJie and Microsoft Quick
+pref("intl.tsf.hack.ms_traditional_chinese.query_insert_result", true);
 #endif
+
+// If composition_font is set, Gecko sets the font to IME.  IME may use
+// the fonts on their window like candidate window.  If they are empty,
+// Gecko uses the system default font which is set to the IM context.
+// The font name must not start with '@'.  When the writing mode is vertical,
+// Gecko inserts '@' to the start of the font name automatically.
+// FYI: Changing these prefs requires to restart.
+pref("intl.imm.composition_font", "");
+
+// Japanist 2003's candidate window is broken if the font is "@System" which
+// is default composition font for vertical writing mode.
+// You can specify font to use on candidate window of Japanist 2003.
+// This value must not start with '@'.
+// FYI: Changing this pref requires to restart.
+pref("intl.imm.composition_font.japanist_2003", "MS PGothic");
+
+// Even if IME claims that they support vertical writing mode but it may not
+// support vertical writing mode for its candidate window.  This pref allows
+// to ignore the claim.
+// FYI: Changing this pref requires to restart.
+pref("intl.imm.vertical_writing.always_assume_not_supported", false);
+
+// We cannot retrieve active IME name with IMM32 API if a TIP of TSF is active.
+// This pref can specify active IME name when Japanese TIP is active.
+// For example:
+//   Google Japanese Input: "Google 日本語入力 IMM32 モジュール"
+//   ATOK 2011: "ATOK 2011" (similarly, e.g., ATOK 2013 is "ATOK 2013")
+pref("intl.imm.japanese.assume_active_tip_name_as", "");
 
 // See bug 448927, on topmost panel, some IMEs are not usable on Windows.
 pref("ui.panel.default_level_parent", false);
@@ -3353,8 +3428,13 @@ pref("font.size.variable.zh-CN", 15);
 pref("font.size.variable.zh-HK", 15);
 pref("font.size.variable.zh-TW", 15);
 
+pref("font.name.serif.x-math", "Latin Modern Math");
 // Apple's Symbol is Unicode so use it
-pref("font.mathfont-family", "Latin Modern Math, XITS Math, STIX Math, Cambria Math, Asana Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Termes Math, Neo Euler, Lucida Bright Math, MathJax_Main, STIXNonUnicode, STIXSizeOneSym, STIXGeneral, Symbol, DejaVu Sans");
+pref("font.name-list.serif.x-math", "Latin Modern Math, XITS Math, Cambria Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Schola, TeX Gyre Termes Math, STIX Math, Asana Math, STIXGeneral, DejaVu Serif, DejaVu Sans, Symbol, Times");
+pref("font.name.sans-serif.x-math", "Helvetica");
+pref("font.name.monospace.x-math", "Courier");
+pref("font.name.cursive.x-math", "Apple Chancery");
+pref("font.name.fantasy.x-math", "Papyrus");
 
 // individual font faces to be treated as independent families
 // names are Postscript names of each face
@@ -3449,7 +3529,6 @@ pref("helpers.global_mime_types_file", "/etc/mime.types");
 pref("helpers.global_mailcap_file", "/etc/mailcap");
 pref("helpers.private_mime_types_file", "~/.mime.types");
 pref("helpers.private_mailcap_file", "~/.mailcap");
-pref("print.print_command", "lpr ${MOZ_PRINTER_NAME:+-P\"$MOZ_PRINTER_NAME\"}");
 pref("print.printer_list", ""); // list of printers, separated by spaces
 pref("print.print_reversed", false);
 pref("print.print_color", true);
@@ -3469,9 +3548,6 @@ pref("layout.css.scroll-snap.enabled", false);
 
 /* PostScript print module prefs */
 // pref("print.postscript.enabled",      true);
-pref("print.postscript.paper_size",    "letter");
-pref("print.postscript.orientation",   "portrait");
-pref("print.postscript.print_command", "lpr ${MOZ_PRINTER_NAME:+-P\"$MOZ_PRINTER_NAME\"}");
 
 // Setting default_level_parent to true makes the default level for popup
 // windows "top" instead of "parent".  On GTK2 platform, this is implemented
@@ -3522,7 +3598,6 @@ pref("helpers.global_mime_types_file", "/etc/mime.types");
 pref("helpers.global_mailcap_file", "/etc/mailcap");
 pref("helpers.private_mime_types_file", "~/.mime.types");
 pref("helpers.private_mailcap_file", "~/.mailcap");
-pref("print.print_command", "lpr ${MOZ_PRINTER_NAME:+-P\"$MOZ_PRINTER_NAME\"}");
 pref("print.printer_list", ""); // list of printers, separated by spaces
 pref("print.print_reversed", false);
 pref("print.print_color", true);
@@ -3535,6 +3610,9 @@ pref("print.print_extra_margin", 0); // twips
 
 // font names
 
+pref("font.name.serif.ar", "serif");
+pref("font.name.sans-serif.ar", "sans-serif");
+pref("font.name.monospace.ar", "monospace");
 pref("font.size.fixed.ar", 12);
 
 pref("font.name.serif.el", "serif");
@@ -3557,13 +3635,77 @@ pref("font.name.monospace.ko", "monospace");
 
 pref("font.name.serif.th", "serif");
 pref("font.name.sans-serif.th", "sans-serif");
-pref("font.minimum-size.th", 13);
 pref("font.name.monospace.th", "monospace");
+pref("font.minimum-size.th", 13);
+
+pref("font.name.serif.x-armn", "serif");
+pref("font.name.sans-serif.x-armn", "sans-serif");
+pref("font.name.monospace.x-armn", "monospace");
+
+pref("font.name.serif.x-beng", "serif");
+pref("font.name.sans-serif.x-beng", "sans-serif");
+pref("font.name.monospace.x-beng", "monospace");
+
+pref("font.name.serif.x-cans", "serif");
+pref("font.name.sans-serif.x-cans", "sans-serif");
+pref("font.name.monospace.x-cans", "monospace");
 
 pref("font.name.serif.x-cyrillic", "serif");
 pref("font.name.sans-serif.x-cyrillic", "sans-serif");
 pref("font.name.monospace.x-cyrillic", "monospace");
 pref("font.size.fixed.x-cyrillic", 12);
+
+pref("font.name.serif.x-devanagari", "serif");
+pref("font.name.sans-serif.x-devanagari", "sans-serif");
+pref("font.name.monospace.x-devanagari", "monospace");
+
+pref("font.name.serif.x-ethi", "serif");
+pref("font.name.sans-serif.x-ethi", "sans-serif");
+pref("font.name.monospace.x-ethi", "monospace");
+
+pref("font.name.serif.x-geor", "serif");
+pref("font.name.sans-serif.x-geor", "sans-serif");
+pref("font.name.monospace.x-geor", "monospace");
+
+pref("font.name.serif.x-gujr", "serif");
+pref("font.name.sans-serif.x-gujr", "sans-serif");
+pref("font.name.monospace.x-gujr", "monospace");
+
+pref("font.name.serif.x-guru", "serif");
+pref("font.name.sans-serif.x-guru", "sans-serif");
+pref("font.name.monospace.x-guru", "monospace");
+
+pref("font.name.serif.x-khmr", "serif");
+pref("font.name.sans-serif.x-khmr", "sans-serif");
+pref("font.name.monospace.x-khmr", "monospace");
+
+pref("font.name.serif.x-knda", "serif");
+pref("font.name.sans-serif.x-knda", "sans-serif");
+pref("font.name.monospace.x-knda", "monospace");
+
+pref("font.name.serif.x-mlym", "serif");
+pref("font.name.sans-serif.x-mlym", "sans-serif");
+pref("font.name.monospace.x-mlym", "monospace");
+
+pref("font.name.serif.x-orya", "serif");
+pref("font.name.sans-serif.x-orya", "sans-serif");
+pref("font.name.monospace.x-orya", "monospace");
+
+pref("font.name.serif.x-sinh", "serif");
+pref("font.name.sans-serif.x-sinh", "sans-serif");
+pref("font.name.monospace.x-sinh", "monospace");
+
+pref("font.name.serif.x-tamil", "serif");
+pref("font.name.sans-serif.x-tamil", "sans-serif");
+pref("font.name.monospace.x-tamil", "monospace");
+
+pref("font.name.serif.x-telu", "serif");
+pref("font.name.sans-serif.x-telu", "sans-serif");
+pref("font.name.monospace.x-telu", "monospace");
+
+pref("font.name.serif.x-tibt", "serif");
+pref("font.name.sans-serif.x-tibt", "sans-serif");
+pref("font.name.monospace.x-tibt", "monospace");
 
 pref("font.name.serif.x-unicode", "serif");
 pref("font.name.sans-serif.x-unicode", "sans-serif");
@@ -3579,19 +3721,16 @@ pref("font.name.serif.zh-CN", "serif");
 pref("font.name.sans-serif.zh-CN", "sans-serif");
 pref("font.name.monospace.zh-CN", "monospace");
 
-// ming_uni.ttf (HKSCS-2001)
-// http://www.info.gov.hk/digital21/eng/hkscs/download/uime.exe
 pref("font.name.serif.zh-HK", "serif");
 pref("font.name.sans-serif.zh-HK", "sans-serif");
 pref("font.name.monospace.zh-HK", "monospace");
 
-// zh-TW
+pref("font.name.serif.zh-TW", "serif");
+pref("font.name.sans-serif.zh-TW", "sans-serif");
+pref("font.name.monospace.zh-TW", "monospace");
 
 /* PostScript print module prefs */
 // pref("print.postscript.enabled",      true);
-pref("print.postscript.paper_size",    "letter");
-pref("print.postscript.orientation",   "portrait");
-pref("print.postscript.print_command", "lpr ${MOZ_PRINTER_NAME:+-P\"$MOZ_PRINTER_NAME\"}");
 
 // On GTK2 platform, we should use topmost window level for the default window
 // level of <panel> element of XUL. GTK2 has only two window types. One is
@@ -3610,6 +3749,18 @@ pref("mousewheel.system_scroll_override_on_root_content.enabled", false);
 pref("intl.ime.use_simple_context_on_password_field", true);
 #else
 pref("intl.ime.use_simple_context_on_password_field", false);
+#endif
+
+# enable new platform fontlist for linux on GTK platforms
+# temporary pref to allow flipping back to the existing
+# gfxPangoFontGroup/gfxFontconfigUtils code for handling system fonts
+
+#ifdef MOZ_WIDGET_GTK
+#ifdef RELEASE_BUILD
+pref("gfx.font_rendering.fontconfig.fontlist.enabled", false);
+#else
+pref("gfx.font_rendering.fontconfig.fontlist.enabled", true);
+#endif
 #endif
 
 # XP_UNIX
@@ -3696,6 +3847,11 @@ pref("font.name.sans-serif.zh-TW", "Fira Sans");
 pref("font.name.monospace.zh-TW", "Fira Mono");
 pref("font.name-list.sans-serif.zh-TW", "Fira Sans,Droid Sans Fallback");
 
+pref("font.name.serif.x-math", "Latin Modern Math");
+pref("font.name-list.serif.x-math", "Latin Modern Math, XITS Math, Cambria Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Schola, TeX Gyre Termes Math, STIX Math, Asana Math, STIXGeneral, DejaVu Serif, DejaVu Sans, Charis SIL Compact");
+pref("font.name.sans-serif.x-math", "Fira Sans");
+pref("font.name.monospace.x-math", "Fira Mono");
+
 #elif defined(ANDROID)
 // We use the bundled fonts for Firefox for Android
 
@@ -3769,6 +3925,11 @@ pref("font.name-list.serif.zh-TW", "Droid Serif, Droid Sans Fallback");
 pref("font.name-list.sans-serif.zh-TW", "Roboto, Droid Sans, Noto Sans TC, Noto Sans SC, Droid Sans Fallback");
 pref("font.name-list.monospace.zh-TW", "Droid Sans Fallback");
 
+pref("font.name.serif.x-math", "Latin Modern Math");
+pref("font.name-list.serif.x-math", "Latin Modern Math, XITS Math, Cambria Math, TeX Gyre Bonum Math, TeX Gyre Pagella Math, TeX Gyre Schola, TeX Gyre Termes Math, STIX Math, Asana Math, STIXGeneral, DejaVu Serif, DejaVu Sans, Charis SIL Compact");
+pref("font.name.sans-serif.x-math", "Clear Sans");
+pref("font.name.monospace.x-math", "Droid Sans Mono");
+
 #endif
 
 #if OS_ARCH==AIX
@@ -3791,20 +3952,13 @@ pref("font.name.monospace.x-unicode", "dt-interface user-ucs2.cjk_japan-0");
 # AIX
 #endif
 
-#ifdef SOLARIS
-
-pref("print.postscript.print_command", "lp -c -s ${MOZ_PRINTER_NAME:+-d\"$MOZ_PRINTER_NAME\"}");
-pref("print.print_command", "lp -c -s ${MOZ_PRINTER_NAME:+-d\"$MOZ_PRINTER_NAME\"}");
-
-# Solaris
-#endif
-
 // Login Manager prefs
 pref("signon.rememberSignons",              true);
 pref("signon.rememberSignons.visibilityToggle", false);
 pref("signon.autofillForms",                true);
 pref("signon.autologin.proxy",              false);
 pref("signon.storeWhenAutocompleteOff",     true);
+pref("signon.ui.experimental",              false);
 pref("signon.debug",                        false);
 
 // Satchel (Form Manager) prefs
@@ -3947,6 +4101,8 @@ pref("gl.msaa-level", 0);
 #else
 pref("gl.msaa-level", 2);
 #endif
+pref("gl.require-hardware", false);
+
 pref("webgl.force-enabled", false);
 pref("webgl.disabled", false);
 pref("webgl.disable-angle", false);
@@ -3964,7 +4120,10 @@ pref("webgl.enable-draft-extensions", false);
 pref("webgl.enable-privileged-extensions", false);
 pref("webgl.bypass-shader-validation", false);
 pref("webgl.enable-prototype-webgl2", false);
-pref("gl.require-hardware", false);
+pref("webgl.disable-fail-if-major-performance-caveat", false);
+pref("webgl.disable-debug-renderer-info", false);
+pref("webgl.renderer-string-override", "");
+pref("webgl.vendor-string-override", "");
 
 #ifdef XP_WIN
 pref("webgl.angle.try-d3d11", true);
@@ -4020,6 +4179,15 @@ pref("layers.acceleration.force-enabled", false);
 
 pref("layers.acceleration.draw-fps", false);
 
+// Enable DEAA antialiasing for transformed layers in the compositor
+#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
+// Desktop prefs
+pref("layers.deaa.enabled", true);
+#else
+// Mobile prefs
+pref("layers.deaa.enabled", false);
+#endif
+
 pref("layers.dump", false);
 #ifdef MOZ_DUMP_PAINTING
 // If we're dumping layers, also dump the texture data
@@ -4060,10 +4228,19 @@ pref("layers.offmainthreadcomposition.frame-rate", -1);
 pref("layers.async-video.enabled", true);
 pref("layers.async-video-oop.enabled",true);
 
+#ifdef MOZ_WIDGET_UIKIT
+pref("layers.async-pan-zoom.enabled", true);
+#endif
+
+#ifdef MOZ_WIDGET_UIKIT
+pref("layers.async-pan-zoom.enabled", true);
+#endif
+
 #ifdef XP_MACOSX
 pref("layers.enable-tiles", true);
 pref("layers.tiled-drawtarget.enabled", true);
 #endif
+
 
 // same effect as layers.offmainthreadcomposition.enabled, but specifically for
 // use with tests.
@@ -4073,11 +4250,7 @@ pref("layers.offmainthreadcomposition.testing.enabled", false);
 pref("layers.offmainthreadcomposition.force-basic", false);
 
 // Whether to animate simple opacity and transforms on the compositor
-#ifdef RELEASE_BUILD
-pref("layers.offmainthreadcomposition.async-animations", false);
-#else
 pref("layers.offmainthreadcomposition.async-animations", true);
-#endif
 
 // Whether to log information about off main thread animations to stderr
 pref("layers.offmainthreadcomposition.log-animations", false);
@@ -4117,6 +4290,9 @@ pref("layers.force-active", false);
 // Never use gralloc surfaces, even when they're available on this
 // platform and are the optimal surface type.
 pref("layers.gralloc.disable", false);
+
+// Don't use compositor-lru on this platform
+pref("layers.compositor-lru-size", 0);
 
 // Enable/Disable the geolocation API for content
 pref("geo.enabled", true);
@@ -4165,7 +4341,6 @@ pref("alerts.disableSlidingEffect", false);
 // DOM full-screen API.
 pref("full-screen-api.enabled", false);
 pref("full-screen-api.allow-trusted-requests-only", true);
-pref("full-screen-api.content-only", false);
 pref("full-screen-api.pointer-lock.enabled", true);
 
 // DOM idle observers API
@@ -4263,6 +4438,11 @@ pref("dom.push.adaptive.upperLimit", 1740000); // 29 min
 // enable udp wakeup support
 pref("dom.push.udp.wakeupEnabled", false);
 
+// WebPush prefs:
+pref("dom.push.http2.reset_retry_count_after_ms", 60000);
+pref("dom.push.http2.maxRetries", 2);
+pref("dom.push.http2.retryInterval", 5000);
+
 // WebNetworkStats
 pref("dom.mozNetworkStats.enabled", false);
 
@@ -4278,12 +4458,11 @@ pref("dom.w3c_touch_events.enabled", 2);
 
 // W3C draft pointer events
 pref("dom.w3c_pointer_events.enabled", false);
+// W3C touch-action css property (related to touch and pointer events)
+pref("layout.css.touch_action.enabled", false);
 
 // W3C draft ImageCapture API
 pref("dom.imagecapture.enabled", false);
-
-// W3C touch-action css property (related to touch and pointer events)
-pref("layout.css.touch_action.enabled", false);
 
 // Enables some assertions in nsStyleContext that are too expensive
 // for general use, but might be useful to enable for specific tests.
@@ -4557,6 +4736,35 @@ pref("selectioncaret.inflatesize.threshold", 40);
 // Selection carets will fall-back to internal LongTap detector.
 pref("selectioncaret.detects.longtap", true);
 
+// Selection carets do not affect caret visibility.
+pref("selectioncaret.visibility.affectscaret", false);
+
+// Selection caret visibility does not observe composition
+// selections generated by soft keyboard managers.
+pref("selectioncaret.observes.compositions", false);
+
+// The Touch caret by default observes the b2g visibility rules, and
+// not the extended Android visibility rules that allow for touchcaret
+// display in empty editable fields, for example.
+pref("touchcaret.extendedvisibility", false);
+
+// Desktop and b2g don't need to open or close the Android
+// TextSelection (Actionbar) utility.
+pref("caret.manages-android-actionbar", false);
+
+// New implementation to unify touch-caret and selection-carets.
+pref("layout.accessiblecaret.enabled", false);
+
+// CSS attributes of the AccessibleCaret in CSS pixels.
+pref("layout.accessiblecaret.width", "44.0");
+pref("layout.accessiblecaret.height", "47.0");
+pref("layout.accessiblecaret.margin-left", "-23.5");
+pref("layout.accessiblecaret.bar.width", "2.0");
+
+// Timeout in milliseconds to hide the accessiblecaret under cursor mode while
+// no one touches it. Set the value to 0 to disable this feature.
+pref("layout.accessiblecaret.timeout_ms", 3000);
+
 // Wakelock is disabled by default.
 pref("dom.wakelock.enabled", false);
 
@@ -4577,11 +4785,7 @@ pref("camera.control.face_detection.enabled", true);
 
 
 // SW Cache API
-#ifdef RELEASE_BUILD
-pref("dom.caches.enabled", false);
-#else
 pref("dom.caches.enabled", true);
-#endif // RELEASE_BUILD
 
 #ifdef MOZ_WIDGET_GONK
 // Empirically, this is the value returned by hal::GetTotalSystemMemory()
@@ -4595,6 +4799,9 @@ pref("camera.control.low_memory_thresholdMB", 404);
 // UDPSocket API
 pref("dom.udpsocket.enabled", false);
 
+// MessageChannel enabled by default.
+pref("dom.messageChannel.enabled", true);
+
 // Disable before keyboard events and after keyboard events by default.
 pref("dom.beforeAfterKeyboardEvent.enabled", false);
 
@@ -4602,10 +4809,17 @@ pref("dom.beforeAfterKeyboardEvent.enabled", false);
 pref("dom.presentation.enabled", false);
 pref("dom.presentation.tcp_server.debug", false);
 
-// Use raw ICU instead of CoreServices API in Unicode collation
 #ifdef XP_MACOSX
+// Use raw ICU instead of CoreServices API in Unicode collation
 pref("intl.collation.mac.use_icu", true);
+
+#if !defined(RELEASE_BUILD) || defined(DEBUG)
+// In non-release builds we crash by default on insecure text input (when a
+// password editor has focus but secure event input isn't enabled).  The
+// following pref, when turned on, disables this behavior.  See bug 1188425.
+pref("intl.allow-insecure-text-input", false);
 #endif
+#endif // XP_MACOSX
 
 // Enable meta-viewport support in remote APZ-enabled frames.
 pref("dom.meta-viewport.enabled", false);

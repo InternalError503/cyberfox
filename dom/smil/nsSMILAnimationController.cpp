@@ -32,7 +32,7 @@ nsSMILAnimationController::nsSMILAnimationController(nsIDocument* aDoc)
     mDeferredStartSampling(false),
     mRunningSample(false),
     mRegisteredWithRefreshDriver(false),
-	mMightHavePendingStyleUpdates(false),
+    mMightHavePendingStyleUpdates(false),
     mDocument(aDoc)
 {
   MOZ_ASSERT(aDoc, "need a non-null document");
@@ -460,10 +460,10 @@ nsSMILAnimationController::DoSample(bool aSkipUnchangedContainers)
   // when the inherited value is *also* being animated, we really should be
   // traversing our animated nodes in an ancestors-first order (bug 501183)
   currentCompositorTable->EnumerateEntries(DoComposeAttribute, nullptr);
-  mMightHavePendingStyleUpdates = true;
 
   // Update last compositor table
   mLastCompositorTable = currentCompositorTable.forget();
+  mMightHavePendingStyleUpdates = true;
 
   NS_ASSERTION(!mResampleNeeded, "Resample dirty flag set during sample!");
 }

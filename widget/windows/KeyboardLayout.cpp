@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 #include "mozilla/ArrayUtils.h"
 #include "mozilla/DebugOnly.h"
@@ -1297,6 +1297,14 @@ NativeKey::HandleAppCommandMessage() const
   // This allow web applications to provide better UX for multimedia keyboard
   // users.
   bool dispatchKeyEvent = (GET_DEVICE_LPARAM(mMsg.lParam) == FAPPCOMMAND_KEY);
+  if (dispatchKeyEvent) {
+    // If a plug-in window has focus but it didn't consume the message, our
+    // window receive WM_APPCOMMAND message.  In this case, we shouldn't
+    // dispatch KeyboardEvents because an event handler may access the
+    // plug-in process synchronously.
+    dispatchKeyEvent =
+      WinUtils::IsOurProcessWindow(reinterpret_cast<HWND>(mMsg.wParam));
+  }
 
   bool consumed = false;
 
@@ -2540,11 +2548,11 @@ KeyboardLayout::LoadLayout(HKL aLayout)
 
   ::SetKeyboardState(originalKbdState);
 
-  if (PR_LOG_TEST(sKeyboardLayoutLogger, PR_LOG_DEBUG)) {
+  if (MOZ_LOG_TEST(sKeyboardLayoutLogger, LogLevel::Debug)) {
     static const UINT kExtendedScanCode[] = { 0x0000, 0xE000 };
     static const UINT kMapType =
       IsVistaOrLater() ? MAPVK_VSC_TO_VK_EX : MAPVK_VSC_TO_VK;
-    PR_LOG(sKeyboardLayoutLogger, PR_LOG_DEBUG,
+    MOZ_LOG(sKeyboardLayoutLogger, LogLevel::Debug,
            ("Logging virtual keycode values for scancode (0x%p)...",
             mKeyboardLayout));
     for (uint32_t i = 0; i < ArrayLength(kExtendedScanCode); i++) {
@@ -2552,7 +2560,7 @@ KeyboardLayout::LoadLayout(HKL aLayout)
         UINT scanCode = kExtendedScanCode[i] + j;
         UINT virtualKeyCode =
           ::MapVirtualKeyEx(scanCode, kMapType, mKeyboardLayout);
-        PR_LOG(sKeyboardLayoutLogger, PR_LOG_DEBUG,
+        MOZ_LOG(sKeyboardLayoutLogger, LogLevel::Debug,
                ("0x%04X, %s", scanCode, kVirtualKeyName[virtualKeyCode]));
       }
       // XP and Server 2003 don't support 0xE0 prefix of the scancode.

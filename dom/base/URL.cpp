@@ -27,7 +27,6 @@ NS_IMPL_CYCLE_COLLECTION_CLASS(URL)
 
 NS_IMPL_CYCLE_COLLECTION_UNLINK_BEGIN(URL)
   if (tmp->mSearchParams) {
-    tmp->mSearchParams->RemoveObserver(tmp);
     NS_IMPL_CYCLE_COLLECTION_UNLINK(mSearchParams)
   }
 NS_IMPL_CYCLE_COLLECTION_UNLINK_END
@@ -112,7 +111,7 @@ URL::Constructor(const nsAString& aUrl, nsIURI* aBase, ErrorResult& aRv)
 
 void
 URL::CreateObjectURL(const GlobalObject& aGlobal,
-                     File& aBlob,
+                     Blob& aBlob,
                      const objectURLOptions& aOptions,
                      nsAString& aResult,
                      ErrorResult& aError)
@@ -139,9 +138,25 @@ URL::CreateObjectURL(const GlobalObject& aGlobal, MediaSource& aSource,
                      nsAString& aResult,
                      ErrorResult& aError)
 {
-  CreateObjectURLInternal(aGlobal, &aSource,
-                          NS_LITERAL_CSTRING(MEDIASOURCEURI_SCHEME), aOptions,
-                          aResult, aError);
+  nsCOMPtr<nsIPrincipal> principal = nsContentUtils::ObjectPrincipal(aGlobal.Get());
+
+  nsCString url;
+  nsresult rv = nsHostObjectProtocolHandler::
+    AddDataEntry(NS_LITERAL_CSTRING(MEDIASOURCEURI_SCHEME),
+                 &aSource, principal, url);
+  if (NS_FAILED(rv)) {
+    aError.Throw(rv);
+    return;
+  }
+
+  nsCOMPtr<nsIRunnable> revocation = NS_NewRunnableFunction(
+    [url] {
+      nsHostObjectProtocolHandler::RemoveDataEntry(url);
+    });
+
+  nsContentUtils::RunInStableState(revocation.forget());
+
+  CopyASCIItoUTF16(url, aResult);
 }
 
 void
@@ -358,7 +373,7 @@ URL::UpdateURLSearchParams()
     }
   }
 
-  mSearchParams->ParseInput(search, this);
+  mSearchParams->ParseInput(search);
 }
 
 void
@@ -485,22 +500,6 @@ URL::SearchParams()
 }
 
 void
-URL::SetSearchParams(URLSearchParams& aSearchParams)
-{
-  if (mSearchParams) {
-    mSearchParams->RemoveObserver(this);
-  }
-
-  // the observer will be cleared using the cycle collector.
-  mSearchParams = &aSearchParams;
-  mSearchParams->AddObserver(this);
-
-  nsAutoString search;
-  mSearchParams->Serialize(search);
-  SetSearchInternal(search);
-}
-
-void
 URL::GetHash(nsAString& aHash, ErrorResult& aRv) const
 {
   aHash.Truncate();
@@ -509,7 +508,7 @@ URL::GetHash(nsAString& aHash, ErrorResult& aRv) const
   nsresult rv = mURI->GetRef(ref);
   if (NS_SUCCEEDED(rv) && !ref.IsEmpty()) {
     aHash.Assign(char16_t('#'));
-    if (nsContentUtils::EncodeDecodeURLHash()) {
+    if (nsContentUtils::GettersDecodeURLHash()) {
       NS_UnescapeURL(ref); // XXX may result in random non-ASCII bytes!
     }
     AppendUTF8toUTF16(ref, aHash);
@@ -534,8 +533,7 @@ void
 URL::CreateSearchParamsIfNeeded()
 {
   if (!mSearchParams) {
-    mSearchParams = new URLSearchParams();
-    mSearchParams->AddObserver(this);
+    mSearchParams = new URLSearchParams(this);
     UpdateURLSearchParams();
   }
 }

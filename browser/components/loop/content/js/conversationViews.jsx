@@ -1,10 +1,6 @@
-/** @jsx React.DOM */
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-/* global loop:true, React */
 
 var loop = loop || {};
 loop.conversationViews = (function(mozL10n) {
@@ -12,7 +8,6 @@ loop.conversationViews = (function(mozL10n) {
   var CALL_STATES = loop.store.CALL_STATES;
   var CALL_TYPES = loop.shared.utils.CALL_TYPES;
   var FAILURE_DETAILS = loop.shared.utils.FAILURE_DETAILS;
-  var REST_ERRNOS = loop.shared.utils.REST_ERRNOS;
   var WEBSOCKET_REASONS = loop.shared.utils.WEBSOCKET_REASONS;
   var sharedActions = loop.shared.actions;
   var sharedUtils = loop.shared.utils;
@@ -119,6 +114,10 @@ loop.conversationViews = (function(mozL10n) {
    */
   var ConversationDetailView = React.createClass({
     propTypes: {
+      children: React.PropTypes.oneOfType([
+        React.PropTypes.element,
+        React.PropTypes.arrayOf(React.PropTypes.element)
+      ]).isRequired,
       contact: React.PropTypes.object
     },
 
@@ -167,7 +166,7 @@ loop.conversationViews = (function(mozL10n) {
 
     clickHandler: function(e) {
       var target = e.target;
-      if (!target.classList.contains('btn-chevron')) {
+      if (!target.classList.contains("btn-chevron")) {
         this._hideDeclineMenu();
       }
     },
@@ -236,9 +235,10 @@ loop.conversationViews = (function(mozL10n) {
 
       return (
         <div className="call-window">
-          <CallIdentifierView video={this.props.callType === CALL_TYPES.AUDIO_VIDEO}
+          <CallIdentifierView
             peerIdentifier={this.props.callerId}
-            showIcons={true} />
+            showIcons={true}
+            video={this.props.callType === CALL_TYPES.AUDIO_VIDEO} />
 
           <div className="btn-group call-action-group">
 
@@ -334,6 +334,7 @@ loop.conversationViews = (function(mozL10n) {
 
       var errorString;
       switch (this.props.failureReason) {
+        case FAILURE_DETAILS.NO_MEDIA:
         case FAILURE_DETAILS.UNABLE_TO_PUBLISH_MEDIA:
           errorString = mozL10n.get("no_media_failure_message");
           break;
@@ -364,9 +365,9 @@ loop.conversationViews = (function(mozL10n) {
     mixins: [sharedMixins.AudioMixin],
 
     propTypes: {
-      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       callState: React.PropTypes.string,
       contact: React.PropTypes.object,
+      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       enableCancelButton: React.PropTypes.bool
     },
 
@@ -428,8 +429,8 @@ loop.conversationViews = (function(mozL10n) {
     ],
 
     propTypes: {
-      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       contact: React.PropTypes.object.isRequired,
+      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       // This is used by the UI showcase.
       emailLinkError: React.PropTypes.bool,
       outgoing: React.PropTypes.bool.isRequired
@@ -457,7 +458,7 @@ loop.conversationViews = (function(mozL10n) {
     _onEmailLinkReceived: function() {
       var emailLink = this.getStoreState().emailLink;
       var contactEmail = _getPreferredEmail(this.props.contact).value;
-      sharedUtils.composeCallUrlEmail(emailLink, contactEmail);
+      sharedUtils.composeCallUrlEmail(emailLink, contactEmail, null, "callfailed");
       this.closeWindow();
     },
 
@@ -479,7 +480,7 @@ loop.conversationViews = (function(mozL10n) {
       switch (this.getStoreState().callStateReason) {
         case WEBSOCKET_REASONS.REJECT:
         case WEBSOCKET_REASONS.BUSY:
-        case REST_ERRNOS.USER_UNAVAILABLE:
+        case FAILURE_DETAILS.USER_UNAVAILABLE:
           var contactDisplayName = _getContactDisplayName(this.props.contact);
           if (contactDisplayName.length) {
             return mozL10n.get(
@@ -556,8 +557,8 @@ loop.conversationViews = (function(mozL10n) {
               {mozL10n.get("retry_call_button")}
             </button>
             <button className={emailClasses}
-                    onClick={this.emailLink}
-                    disabled={this.state.emailLinkButtonDisabled}>
+                    disabled={this.state.emailLinkButtonDisabled}
+                    onClick={this.emailLink}>
               {mozL10n.get("share_button3")}
             </button>
           </div>
@@ -568,13 +569,23 @@ loop.conversationViews = (function(mozL10n) {
 
   var OngoingConversationView = React.createClass({
     mixins: [
+      loop.store.StoreMixin("conversationStore"),
       sharedMixins.MediaSetupMixin
     ],
 
     propTypes: {
+      // local
+      audio: React.PropTypes.object,
       dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
-      video: React.PropTypes.object,
-      audio: React.PropTypes.object
+      // The poster URLs are for UI-showcase testing and development.
+      localPosterUrl: React.PropTypes.string,
+      // This is used from the props rather than the state to make it easier for
+      // the ui-showcase.
+      mediaConnected: React.PropTypes.bool,
+      remotePosterUrl: React.PropTypes.string,
+      remoteVideoEnabled: React.PropTypes.bool,
+      // local
+      video: React.PropTypes.object
     },
 
     getDefaultProps: function() {
@@ -584,6 +595,10 @@ loop.conversationViews = (function(mozL10n) {
       };
     },
 
+    getInitialState: function() {
+      return this.getStoreState();
+    },
+
     componentDidMount: function() {
       // The SDK needs to know about the configuration and the elements to use
       // for display. So the best way seems to pass the information here - ideally
@@ -591,9 +606,7 @@ loop.conversationViews = (function(mozL10n) {
       this.props.dispatcher.dispatch(new sharedActions.SetupStreamElements({
         publisherConfig: this.getDefaultPublisherConfig({
           publishVideo: this.props.video.enabled
-        }),
-        getLocalElementFunc: this._getElement.bind(this, ".local"),
-        getRemoteElementFunc: this._getElement.bind(this, ".remote")
+        })
       }));
     },
 
@@ -619,6 +632,18 @@ loop.conversationViews = (function(mozL10n) {
         }));
     },
 
+    shouldRenderRemoteVideo: function() {
+      if (this.props.mediaConnected) {
+        // If remote video is not enabled, we're muted, so we'll show an avatar
+        // instead.
+        return this.props.remoteVideoEnabled;
+      }
+
+      // We're not yet connected, but we don't want to show the avatar, and in
+      // the common case, we'll just transition to the video.
+      return true;
+    },
+
     render: function() {
       var localStreamClasses = React.addons.classSet({
         local: true,
@@ -631,15 +656,29 @@ loop.conversationViews = (function(mozL10n) {
           <div className="conversation">
             <div className="media nested">
               <div className="video_wrapper remote_wrapper">
-                <div className="video_inner remote focus-stream"></div>
+                <div className="video_inner remote focus-stream">
+                  <sharedViews.MediaView displayAvatar={!this.shouldRenderRemoteVideo()}
+                    isLoading={false}
+                    mediaType="remote"
+                    posterUrl={this.props.remotePosterUrl}
+                    srcVideoObject={this.state.remoteSrcVideoObject} />
+                </div>
               </div>
-              <div className={localStreamClasses}></div>
+              <div className={localStreamClasses}>
+                <sharedViews.MediaView displayAvatar={!this.props.video.enabled}
+                  isLoading={false}
+                  mediaType="local"
+                  posterUrl={this.props.localPosterUrl}
+                  srcVideoObject={this.state.localSrcVideoObject} />
+              </div>
             </div>
             <loop.shared.views.ConversationToolbar
-              video={this.props.video}
               audio={this.props.audio}
+              dispatcher={this.props.dispatcher}
+              edit={{ visible: false, enabled: false }}
+              hangup={this.hangup}
               publishStream={this.publishStream}
-              hangup={this.hangup} />
+              video={this.props.video} />
           </div>
         </div>
       );
@@ -697,11 +736,10 @@ loop.conversationViews = (function(mozL10n) {
       // for any state that render() doesn't manage.
       if (this.state.outgoing) {
         return (<PendingConversationView
-          dispatcher={this.props.dispatcher}
           callState={this.state.callState}
           contact={this.state.contact}
-          enableCancelButton={this._isCancellable()}
-        />);
+          dispatcher={this.props.dispatcher}
+          enableCancelButton={this._isCancellable()} />);
       }
 
       // For incoming calls that are in accepting state, display the
@@ -736,17 +774,18 @@ loop.conversationViews = (function(mozL10n) {
         }
         case CALL_STATES.TERMINATED: {
           return (<CallFailedView
-            dispatcher={this.props.dispatcher}
             contact={this.state.contact}
-            outgoing={this.state.outgoing}
-          />);
+            dispatcher={this.props.dispatcher}
+            outgoing={this.state.outgoing} />);
         }
         case CALL_STATES.ONGOING: {
           return (<OngoingConversationView
-            dispatcher={this.props.dispatcher}
-            video={{enabled: !this.state.videoMuted}}
             audio={{enabled: !this.state.audioMuted}}
-            />
+            dispatcher={this.props.dispatcher}
+            mediaConnected={this.state.mediaConnected}
+            remoteSrcVideoObject={this.state.remoteSrcVideoObject}
+            remoteVideoEnabled={this.state.remoteVideoEnabled}
+            video={{enabled: !this.state.videoMuted}} />
           );
         }
         case CALL_STATES.FINISHED: {

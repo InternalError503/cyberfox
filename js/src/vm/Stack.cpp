@@ -33,7 +33,8 @@ using mozilla::PodCopy;
 
 void
 InterpreterFrame::initExecuteFrame(JSContext* cx, HandleScript script, AbstractFramePtr evalInFramePrev,
-                                   const Value& thisv, HandleObject scopeChain, ExecuteType type)
+                                   const Value& thisv, const Value& newTargetValue, HandleObject scopeChain,
+                                   ExecuteType type)
 {
     /*
      * See encoding of ExecuteType. When GLOBAL isn't set, we are executing a
@@ -43,11 +44,17 @@ InterpreterFrame::initExecuteFrame(JSContext* cx, HandleScript script, AbstractF
     flags_ = type | HAS_SCOPECHAIN;
 
     JSObject* callee = nullptr;
+
+    // newTarget = NullValue is an initial sentinel for "please fill me in from the stack".
+    // It should never be passed from Ion code.
+    RootedValue newTarget(cx, newTargetValue);
     if (!(flags_ & (GLOBAL))) {
         if (evalInFramePrev) {
             MOZ_ASSERT(evalInFramePrev.isFunctionFrame() || evalInFramePrev.isGlobalFrame());
             if (evalInFramePrev.isFunctionFrame()) {
                 callee = evalInFramePrev.callee();
+                if (newTarget.isNull())
+                    newTarget = evalInFramePrev.newTarget();
                 flags_ |= FUNCTION;
             } else {
                 flags_ |= GLOBAL;
@@ -57,6 +64,8 @@ InterpreterFrame::initExecuteFrame(JSContext* cx, HandleScript script, AbstractF
             MOZ_ASSERT(iter.isFunctionFrame() || iter.isGlobalFrame());
             MOZ_ASSERT(!iter.isAsmJS());
             if (iter.isFunctionFrame()) {
+                if (newTarget.isNull())
+                    newTarget = iter.newTarget();
                 callee = iter.callee(cx);
                 flags_ |= FUNCTION;
             } else {
@@ -65,21 +74,22 @@ InterpreterFrame::initExecuteFrame(JSContext* cx, HandleScript script, AbstractF
         }
     }
 
-    Value* dstvp = (Value*)this - 2;
-    dstvp[1] = thisv;
+    Value* dstvp = (Value*)this - 3;
+    dstvp[2] = thisv;
 
     if (isFunctionFrame()) {
-        dstvp[0] = ObjectValue(*callee);
+        dstvp[1] = ObjectValue(*callee);
         exec.fun = &callee->as<JSFunction>();
         u.evalScript = script;
     } else {
         MOZ_ASSERT(isGlobalFrame());
-        dstvp[0] = NullValue();
+        dstvp[1] = NullValue();
         exec.script = script;
 #ifdef DEBUG
         u.evalScript = (JSScript*)0xbad;
 #endif
     }
+    dstvp[0] = newTarget;
 
     scopeChain_ = scopeChain.get();
     prev_ = nullptr;
@@ -95,25 +105,6 @@ InterpreterFrame::initExecuteFrame(JSContext* cx, HandleScript script, AbstractF
 #ifdef DEBUG
     Debug_SetValueRangeToCrashOnTouch(&rval_, 1);
 #endif
-}
-
-void
-InterpreterFrame::writeBarrierPost()
-{
-    /* This needs to follow the same rules as in InterpreterFrame::mark. */
-    if (scopeChain_)
-        JSObject::writeBarrierPost(scopeChain_, &scopeChain_);
-    if (flags_ & HAS_ARGS_OBJ)
-        JSObject::writeBarrierPost(argsObj_, &argsObj_);
-    if (isFunctionFrame()) {
-        JSFunction::writeBarrierPost(exec.fun, &exec.fun);
-        if (isEvalFrame())
-            JSScript::writeBarrierPost(u.evalScript, &u.evalScript);
-    } else {
-        JSScript::writeBarrierPost(exec.script, &exec.script);
-    }
-    if (hasReturnValue())
-        HeapValue::writeBarrierPost(rval_, &rval_);
 }
 
 bool
@@ -133,11 +124,8 @@ InterpreterFrame::createRestParameter(JSContext* cx)
     unsigned nformal = fun()->nargs() - 1, nactual = numActualArgs();
     unsigned nrest = (nactual > nformal) ? nactual - nformal : 0;
     Value* restvp = argv() + nformal;
-    ArrayObject* obj = NewDenseCopiedArray(cx, nrest, restvp, NullPtr());
-    if (!obj)
-        return nullptr;
-    ObjectGroup::fixRestArgumentsGroup(cx, obj);
-    return obj;
+    return ObjectGroup::newArrayObject(cx, restvp, nrest, GenericObject,
+                                       ObjectGroup::NewArrayKind::UnknownIndex);
 }
 
 static inline void
@@ -146,7 +134,12 @@ AssertDynamicScopeMatchesStaticScope(JSContext* cx, JSScript* script, JSObject* 
 #ifdef DEBUG
     RootedObject enclosingScope(cx, script->enclosingStaticScope());
     for (StaticScopeIter<NoGC> i(enclosingScope); !i.done(); i++) {
-        if (i.hasDynamicScopeObject()) {
+        if (i.type() == StaticScopeIter<NoGC>::NonSyntactic) {
+            while (scope->is<DynamicWithObject>() || scope->is<NonSyntacticVariablesObject>()) {
+                MOZ_ASSERT(!IsSyntacticScope(scope));
+                scope = &scope->as<ScopeObject>().enclosingScope();
+            }
+        } else if (i.hasSyntacticDynamicScopeObject()) {
             switch (i.type()) {
               case StaticScopeIter<NoGC>::Function:
                 MOZ_ASSERT(scope->as<CallObject>().callee().nonLazyScript() == i.funScript());
@@ -166,13 +159,14 @@ AssertDynamicScopeMatchesStaticScope(JSContext* cx, JSScript* script, JSObject* 
               case StaticScopeIter<NoGC>::Eval:
                 scope = &scope->as<CallObject>().enclosingScope();
                 break;
+              case StaticScopeIter<NoGC>::NonSyntactic:
+                MOZ_CRASH("NonSyntactic should not have a syntactic scope");
+                break;
             }
         }
     }
 
-    // The scope chain is always ended by one or more non-syntactic
-    // ScopeObjects (viz. GlobalObject or a non-syntactic WithObject).
-    MOZ_ASSERT(!IsSyntacticScope(scope));
+    MOZ_ASSERT(scope->is<GlobalObject>() || scope->is<DebugScopeObject>());
 #endif
 }
 
@@ -238,8 +232,7 @@ InterpreterFrame::epilogue(JSContext* cx)
             if (MOZ_UNLIKELY(cx->compartment()->isDebuggee()))
                 DebugScopes::onPopStrictEvalScope(this);
         } else if (isDirectEvalFrame()) {
-            if (isDebuggerEvalFrame())
-                MOZ_ASSERT(!IsSyntacticScope(scopeChain()));
+            MOZ_ASSERT_IF(isDebuggerEvalFrame(), !IsSyntacticScope(scopeChain()));
         } else {
             /*
              * Debugger.Object.prototype.evalInGlobal creates indirect eval
@@ -275,7 +268,7 @@ InterpreterFrame::epilogue(JSContext* cx)
     if (MOZ_UNLIKELY(cx->compartment()->isDebuggee()))
         DebugScopes::onPopCall(this, cx);
 
-    if (isConstructing() && thisValue().isObject() && returnValue().isPrimitive())
+    if (!fun()->isGenerator() && isConstructing() && thisValue().isObject() && returnValue().isPrimitive())
         setReturnValue(ObjectValue(constructorThis()));
 }
 
@@ -397,10 +390,10 @@ InterpreterFrame::markValues(JSTracer* trc, Value* sp, jsbytecode* pc)
     if (hasArgs()) {
         // Mark callee, |this| and arguments.
         unsigned argc = Max(numActualArgs(), numFormalArgs());
-        TraceRootRange(trc, argc + 2, argv_ - 2, "fp argv");
+        TraceRootRange(trc, argc + 2 + isConstructing(), argv_ - 2, "fp argv");
     } else {
-        // Mark callee and |this|
-        TraceRootRange(trc, 2, ((Value*)this) - 2, "stack callee and this");
+        // Mark callee, |this|, and newTarget
+        TraceRootRange(trc, 3, ((Value*)this) - 3, "stack callee, this, newTarget");
     }
 }
 
@@ -458,19 +451,19 @@ InterpreterStack::pushInvokeFrame(JSContext* cx, const CallArgs& args, InitialFr
 
 InterpreterFrame*
 InterpreterStack::pushExecuteFrame(JSContext* cx, HandleScript script, const Value& thisv,
-                                   HandleObject scopeChain, ExecuteType type,
-                                   AbstractFramePtr evalInFrame)
+                                   const Value& newTargetValue, HandleObject scopeChain,
+                                   ExecuteType type, AbstractFramePtr evalInFrame)
 {
     LifoAlloc::Mark mark = allocator_.mark();
 
-    unsigned nvars = 2 /* callee, this */ + script->nslots();
+    unsigned nvars = 3 /* callee, this, newTarget */ + script->nslots();
     uint8_t* buffer = allocateFrame(cx, sizeof(InterpreterFrame) + nvars * sizeof(Value));
     if (!buffer)
         return nullptr;
 
-    InterpreterFrame* fp = reinterpret_cast<InterpreterFrame*>(buffer + 2 * sizeof(Value));
+    InterpreterFrame* fp = reinterpret_cast<InterpreterFrame*>(buffer + 3 * sizeof(Value));
     fp->mark_ = mark;
-    fp->initExecuteFrame(cx, script, evalInFrame, thisv, scopeChain, type);
+    fp->initExecuteFrame(cx, script, evalInFrame, thisv, newTargetValue, scopeChain, type);
     fp->initLocals();
 
     return fp;
@@ -1131,7 +1124,7 @@ FrameIter::matchCallee(JSContext* cx, HandleFunction fun) const
     // expect both functions to have the same JSScript. If so, and if they are
     // different, then they cannot be equal.
     RootedObject global(cx, &fun->global());
-    bool useSameScript = CloneFunctionObjectUseSameScript(fun->compartment(), currentCallee, global);
+    bool useSameScript = CanReuseScriptForClone(fun->compartment(), currentCallee, global);
     if (useSameScript &&
         (currentCallee->hasScript() != fun->hasScript() ||
          currentCallee->nonLazyScript() != fun->nonLazyScript()))
@@ -1253,6 +1246,22 @@ FrameIter::thisv(JSContext* cx) const
 }
 
 Value
+FrameIter::newTarget() const
+{
+    switch (data_.state_) {
+      case DONE:
+      case ASMJS:
+        break;
+      case INTERP:
+        return interpFrame()->newTarget();
+      case JIT:
+        MOZ_ASSERT(data_.jitFrames_.isBaselineJS());
+        return data_.jitFrames_.baselineFrame()->newTarget();
+    }
+    MOZ_CRASH("Unexpected state");
+}
+
+Value
 FrameIter::returnValue() const
 {
     switch (data_.state_) {
@@ -1367,26 +1376,6 @@ NonBuiltinScriptFrameIter::settle()
 }
 
 /*****************************************************************************/
-
-JSObject*
-AbstractFramePtr::evalPrevScopeChain(JSContext* cx) const
-{
-    // Eval frames are not compiled by Ion, though their caller might be.
-    AllFramesIter iter(cx);
-    while (iter.isIon() || iter.abstractFramePtr() != *this)
-        ++iter;
-    ++iter;
-    return iter.scopeChain(cx);
-}
-
-bool
-AbstractFramePtr::hasPushedSPSFrame() const
-{
-    if (isInterpreterFrame())
-        return asInterpreterFrame()->hasPushedSPSFrame();
-    MOZ_ASSERT(isBaselineFrame());
-    return false;
-}
 
 jit::JitActivation::JitActivation(JSContext* cx, CalleeToken entryPoint, bool active)
   : Activation(cx, Jit),

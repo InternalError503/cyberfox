@@ -734,31 +734,42 @@ nsBidiPresUtils::ResolveParagraph(nsBlockFrame* aBlockFrame,
 #endif
 #endif
 
-  if (runCount == 1 && frameCount == 1 &&
+  nsIFrame* frame0 = frameCount > 0 ? aBpd->FrameAt(0) : nullptr;
+
+  // Non-bidi frames
+  if (runCount == 1 &&
       aBpd->mParagraphDepth == 0 && aBpd->GetDirection() == NSBIDI_LTR &&
-      aBpd->GetParaLevel() == 0) {
-    // We have a single left-to-right frame in a left-to-right paragraph,
+      aBpd->GetParaLevel() == 0 &&
+      frame0 && frame0 != NS_BIDI_CONTROL_FRAME &&
+      !frame0->Properties().Get(nsIFrame::EmbeddingLevelProperty()) &&
+      !frame0->Properties().Get(nsIFrame::BaseLevelProperty())) {
+    // We have a left-to-right frame in a left-to-right paragraph,
     // without bidi isolation from the surrounding text.
-    // Make sure that the embedding level and base level frame properties aren't
+    // The embedding level and base level frame properties aren't
     // set (because if they are this frame used to have some other direction,
-    // so we can't do this optimization), and we're done.
-    nsIFrame* frame = aBpd->FrameAt(0);
-    if (frame != NS_BIDI_CONTROL_FRAME &&
-        !frame->Properties().Get(nsIFrame::EmbeddingLevelProperty()) &&
-        !frame->Properties().Get(nsIFrame::BaseLevelProperty())) {
+    // so we can't do this optimization)
+
+    // Make all continuations fluid within this run
+    for (int i = 0; i < frameCount; ++i) {
+      nsIFrame* frame = aBpd->FrameAt(i);
+      if (frame && frame != NS_BIDI_CONTROL_FRAME) {
+        JoinInlineAncestors(frame);
+      }
+    }
+
 #ifdef DEBUG
 #ifdef NOISY_BIDI
-      printf("early return for single direction frame %p\n", (void*)frame);
+    printf("early return for single direction frame %p\n", (void*)frame);
 #endif
 #endif
-      frame->AddStateBits(NS_FRAME_IS_BIDI);
-      return NS_OK;
-    }
+
+    return NS_OK;
   }
 
   nsIFrame* firstFrame = nullptr;
   nsIFrame* lastFrame = nullptr;
 
+  // Bidi frames
   for (; ;) {
     if (fragmentLength <= 0) {
       // Get the next frame from mLogicalFrames
@@ -2278,125 +2289,6 @@ nsresult nsBidiPresUtils::ProcessTextForRenderingContext(const char16_t*       a
   nsBidi bidiEngine;
   return ProcessText(aText, aLength, aBaseLevel, aPresContext, processor,
                      aMode, aPosResolve, aPosResolveCount, aWidth, &bidiEngine);
-}
-
-/* static */
-void nsBidiPresUtils::WriteReverse(const char16_t* aSrc,
-                                   uint32_t aSrcLength,
-                                   char16_t* aDest)
-{
-  char16_t* dest = aDest + aSrcLength;
-  mozilla::unicode::ClusterIterator iter(aSrc, aSrcLength);
-
-  while (!iter.AtEnd()) {
-    iter.Next();
-    for (const char16_t *cp = iter; cp > aSrc; ) {
-      // Here we rely on the fact that there are no non-BMP mirrored pairs
-      // currently in Unicode, so we don't need to look for surrogates
-      *--dest = mozilla::unicode::GetMirroredChar(*--cp);
-    }
-    aSrc = iter;
-  }
-
-  NS_ASSERTION(dest == aDest, "Whole string not copied");
-}
-
-/* static */
-bool nsBidiPresUtils::WriteLogicalToVisual(const char16_t* aSrc,
-                                           uint32_t aSrcLength,
-                                           char16_t* aDest,
-                                           nsBidiLevel aBaseDirection,
-                                           nsBidi* aBidiEngine)
-{
-  const char16_t* src = aSrc;
-  nsresult rv = aBidiEngine->SetPara(src, aSrcLength, aBaseDirection, nullptr);
-  if (NS_FAILED(rv)) {
-    return false;
-  }
-
-  nsBidiDirection dir;
-  rv = aBidiEngine->GetDirection(&dir);
-  // NSBIDI_LTR returned from GetDirection means the whole text is LTR
-  if (NS_FAILED(rv) || dir == NSBIDI_LTR) {
-    return false;
-  }
-
-  int32_t runCount;
-  rv = aBidiEngine->CountRuns(&runCount);
-  if (NS_FAILED(rv)) {
-    return false;
-  }
-
-  int32_t runIndex, start, length;
-  char16_t* dest = aDest;
-
-  for (runIndex = 0; runIndex < runCount; ++runIndex) {
-    rv = aBidiEngine->GetVisualRun(runIndex, &start, &length, &dir);
-    if (NS_FAILED(rv)) {
-      return false;
-    }
-
-    src = aSrc + start;
-
-    if (dir == NSBIDI_RTL) {
-      WriteReverse(src, length, dest);
-      dest += length;
-    } else {
-      do {
-        NS_ASSERTION(src >= aSrc && src < aSrc + aSrcLength,
-                     "logical index out of range");
-        NS_ASSERTION(dest < aDest + aSrcLength, "visual index out of range");
-        *(dest++) = *(src++);
-      } while (--length);
-    }
-  }
-
-  NS_ASSERTION(static_cast<uint32_t>(dest - aDest) == aSrcLength,
-               "whole string not copied");
-  return true;
-}
-
-void nsBidiPresUtils::CopyLogicalToVisual(const nsAString& aSource,
-                                          nsAString& aDest,
-                                          nsBidiLevel aBaseDirection,
-                                          bool aOverride)
-{
-  aDest.SetLength(0);
-  uint32_t srcLength = aSource.Length();
-  if (srcLength == 0)
-    return;
-  if (!aDest.SetLength(srcLength, fallible)) {
-    return;
-  }
-  nsAString::const_iterator fromBegin, fromEnd;
-  nsAString::iterator toBegin;
-  aSource.BeginReading(fromBegin);
-  aSource.EndReading(fromEnd);
-  aDest.BeginWriting(toBegin);
-
-  if (aOverride) {
-    if (aBaseDirection == NSBIDI_RTL) {
-      // no need to use the converter -- just copy the string in reverse order
-      WriteReverse(fromBegin.get(), srcLength, toBegin.get());
-    } else {
-      // if aOverride && aBaseDirection == NSBIDI_LTR, fall through to the
-      // simple copy
-      aDest.SetLength(0);
-    }
-  } else {
-    nsBidi bidiEngine;
-    if (!WriteLogicalToVisual(fromBegin.get(), srcLength, toBegin.get(),
-                             aBaseDirection, &bidiEngine)) {
-      aDest.SetLength(0);
-    }
-  }
-
-  if (aDest.IsEmpty()) {
-    // Either there was an error or the source is unidirectional
-    //  left-to-right. In either case, just copy source to dest.
-    CopyUnicodeTo(aSource.BeginReading(fromBegin), aSource.EndReading(fromEnd),
-                  aDest);
-  }
 }
 
 /* static */

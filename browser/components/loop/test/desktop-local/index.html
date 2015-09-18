@@ -55,6 +55,8 @@
   <script src="../../content/shared/js/activeRoomStore.js"></script>
   <script src="../../content/shared/js/feedbackStore.js"></script>
   <script src="../../content/shared/js/views.js"></script>
+  <script src="../../content/shared/js/textChatStore.js"></script>
+  <script src="../../content/shared/js/textChatView.js"></script>
   <script src="../../content/shared/js/feedbackViews.js"></script>
   <script src="../../content/js/client.js"></script>
   <script src="../../content/js/conversationAppStore.js"></script>
@@ -82,7 +84,7 @@
 
     describe("Uncaught Error Check", function() {
       it("should load the tests without errors", function() {
-        expect(uncaughtError && uncaughtError.message).to.be.undefined;
+        chai.expect(uncaughtError && uncaughtError.message).to.be.undefined;
       });
     });
 

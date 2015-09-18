@@ -2,14 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global loop, sinon */
-/* jshint newcap:false */
-
-var expect = chai.expect;
-
 describe("loop.shared.utils", function() {
   "use strict";
 
+  var expect = chai.expect;
   var sandbox;
   var sharedUtils = loop.shared.utils;
 
@@ -24,20 +20,20 @@ describe("loop.shared.utils", function() {
 
   describe("#getUnsupportedPlatform", function() {
     it("should detect iOS", function() {
-      expect(sharedUtils.getUnsupportedPlatform("iPad")).eql('ios');
-      expect(sharedUtils.getUnsupportedPlatform("iPod")).eql('ios');
-      expect(sharedUtils.getUnsupportedPlatform("iPhone")).eql('ios');
-      expect(sharedUtils.getUnsupportedPlatform("iPhone Simulator")).eql('ios');
+      expect(sharedUtils.getUnsupportedPlatform("iPad")).eql("ios");
+      expect(sharedUtils.getUnsupportedPlatform("iPod")).eql("ios");
+      expect(sharedUtils.getUnsupportedPlatform("iPhone")).eql("ios");
+      expect(sharedUtils.getUnsupportedPlatform("iPhone Simulator")).eql("ios");
     });
 
     it("should detect Windows Phone", function() {
       expect(sharedUtils.getUnsupportedPlatform("Windows Phone"))
-        .eql('windows_phone');
+        .eql("windows_phone");
     });
 
     it("should detect BlackBerry", function() {
       expect(sharedUtils.getUnsupportedPlatform("BlackBerry"))
-        .eql('blackberry');
+        .eql("blackberry");
     });
 
     it("shouldn't detect other platforms", function() {
@@ -145,6 +141,177 @@ describe("loop.shared.utils", function() {
     });
   });
 
+  describe("#hasAudioOrVideoDevices", function() {
+    var fakeNavigatorObject, fakeWindowObject;
+
+    beforeEach(function() {
+      fakeNavigatorObject = {
+        mediaDevices: {
+          enumerateDevices: sinon.stub()
+        }
+      };
+
+      fakeWindowObject = {
+        MediaStreamTrack: {
+          getSources: sinon.stub()
+        }
+      };
+
+      sharedUtils.setRootObjects(fakeWindowObject, fakeNavigatorObject);
+    });
+
+    afterEach(function() {
+      sharedUtils.setRootObjects();
+    });
+
+    it("should return true if no APIs to detect devices exist", function(done) {
+      delete fakeNavigatorObject.mediaDevices;
+      delete fakeWindowObject.MediaStreamTrack;
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        expect(result).eql(true);
+        done();
+      });
+    });
+
+    it("should return true if enumerateDevices doesn't exist in navigator.mediaDevices", function(done) {
+      sharedUtils.setRootObjects(fakeWindowObject, {
+        mediaDevices: {}
+      });
+      delete fakeWindowObject.MediaStreamTrack;
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        expect(result).eql(true);
+        done();
+      });
+    });
+
+    it("should return true if getSources doesn't exist in window.MediaStreamTrack", function(done) {
+      sharedUtils.setRootObjects({
+        MediaStreamTrack: {}
+      }, fakeNavigatorObject);
+      delete fakeNavigatorObject.mediaDevices;
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        expect(result).eql(true);
+        done();
+      });
+    });
+
+    it("should return false if no audio nor video devices exist according to navigator.mediaDevices", function(done) {
+      delete fakeWindowObject.MediaStreamTrack;
+
+      fakeNavigatorObject.mediaDevices.enumerateDevices.returns(Promise.resolve([]));
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        try {
+          expect(result).eql(false);
+          done();
+        } catch (ex) {
+          done(ex);
+        }
+      });
+    });
+
+    it("should return true if audio devices exist according to navigator.mediaDevices", function(done) {
+      delete fakeWindowObject.MediaStreamTrack;
+
+      fakeNavigatorObject.mediaDevices.enumerateDevices.returns(
+        Promise.resolve([{
+          deviceId: "54321",
+          groupId: "",
+          kind: "audioinput",
+          label: ""
+        }])
+      );
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        try {
+          expect(result).eql(true);
+          done();
+        } catch (ex) {
+          done(ex);
+        }
+      });
+    });
+
+    it("should return true if video devices exist according to navigator.mediaDevices", function(done) {
+      delete fakeWindowObject.MediaStreamTrack;
+
+      fakeNavigatorObject.mediaDevices.enumerateDevices.returns(
+        Promise.resolve([{
+          deviceId: "15234",
+          groupId: "",
+          kind: "videoinput",
+          label: ""
+        }])
+      );
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        try {
+          expect(result).eql(true);
+          done();
+        } catch (ex) {
+          done(ex);
+        }
+      });
+    });
+
+    it("should return false if no audio nor video devices exist according to window.MediaStreamTrack", function(done) {
+      delete fakeNavigatorObject.mediaDevices;
+
+      fakeWindowObject.MediaStreamTrack.getSources.callsArgWith(0, []);
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        try {
+          expect(result).eql(false);
+          done();
+        } catch (ex) {
+          done(ex);
+        }
+      });
+    });
+
+    it("should return true if audio devices exist according to window.MediaStreamTrack", function(done) {
+      delete fakeNavigatorObject.mediaDevices;
+
+      fakeWindowObject.MediaStreamTrack.getSources.callsArgWith(0, [{
+        facing: "",
+        id: "54321",
+        kind: "audio",
+        label: ""
+      }]);
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        try {
+          expect(result).eql(true);
+          done();
+        } catch (ex) {
+          done(ex);
+        }
+      });
+    });
+
+    it("should return true if video devices exist according to window.MediaStreamTrack", function(done) {
+      delete fakeNavigatorObject.mediaDevices;
+
+      fakeWindowObject.MediaStreamTrack.getSources.callsArgWith(0, [{
+        facing: "",
+        id: "15234",
+        kind: "video",
+        label: ""
+      }]);
+
+      sharedUtils.hasAudioOrVideoDevices(function(result) {
+        try {
+          expect(result).eql(true);
+          done();
+        } catch (ex) {
+          done(ex);
+        }
+      });
+    });
+  });
+
   describe("#formatURL", function() {
     it("should decode encoded URIs", function() {
       expect(sharedUtils.formatURL("http://invalid.com/?a=Foo%20Bar"))
@@ -171,7 +338,7 @@ describe("loop.shared.utils", function() {
   });
 
   describe("#composeCallUrlEmail", function() {
-    var composeEmail;
+    var composeEmail, telemetryAddValue;
 
     beforeEach(function() {
       // fake mozL10n
@@ -188,9 +355,15 @@ describe("loop.shared.utils", function() {
         }
       });
       composeEmail = sandbox.spy();
+      telemetryAddValue = sandbox.spy();
       navigator.mozLoop = {
+        SHARING_ROOM_URL: {
+          EMAIL_FROM_CALLFAILED: 2,
+          EMAIL_FROM_CONVERSATION: 3
+        },
         getLoopPref: sandbox.spy(),
-        composeEmail: composeEmail
+        composeEmail: composeEmail,
+        telemetryAddValue: telemetryAddValue
       };
     });
 
@@ -207,6 +380,13 @@ describe("loop.shared.utils", function() {
 
       sinon.assert.calledOnce(composeEmail);
       sinon.assert.calledWith(composeEmail, "subject_context", "body_context");
+    });
+
+    it("should record a telemetry event when an email is composed", function() {
+      sharedUtils.composeCallUrlEmail("http://invalid", null,
+        "Hello, is me you're looking for?", "callfailed");
+
+      sinon.assert.calledOnce(telemetryAddValue, "LOOP_SHARING_ROOM_URL",  2);
     });
   });
 

@@ -28,7 +28,6 @@
 #include "mozilla/dom/StructuredCloneTags.h"
 #include "mozilla/dom/WindowBinding.h"
 #include "nsZipArchive.h"
-#include "nsIDOMFile.h"
 #include "nsIDOMFileList.h"
 #include "nsWindowMemoryReporter.h"
 #include "nsDOMClassInfo.h"
@@ -321,7 +320,8 @@ nsXPCComponents_Interfaces::Resolve(nsIXPConnectWrappedNative* wrapper,
                     *_retval = JS_DefinePropertyById(cx, obj, id, idobj,
                                                      JSPROP_ENUMERATE |
                                                      JSPROP_READONLY |
-                                                     JSPROP_PERMANENT);
+                                                     JSPROP_PERMANENT |
+                                                     JSPROP_RESOLVING);
                 }
             }
         }
@@ -559,7 +559,8 @@ nsXPCComponents_InterfacesByID::Resolve(nsIXPConnectWrappedNative* wrapper,
                     JS_DefinePropertyById(cx, obj, id, idobj,
                                           JSPROP_ENUMERATE |
                                           JSPROP_READONLY |
-                                          JSPROP_PERMANENT);
+                                          JSPROP_PERMANENT |
+                                          JSPROP_RESOLVING);
             }
         }
     }
@@ -777,7 +778,8 @@ nsXPCComponents_Classes::Resolve(nsIXPConnectWrappedNative* wrapper,
                     *_retval = JS_DefinePropertyById(cx, obj, id, idobj,
                                                      JSPROP_ENUMERATE |
                                                      JSPROP_READONLY |
-                                                     JSPROP_PERMANENT);
+                                                     JSPROP_PERMANENT |
+                                                     JSPROP_RESOLVING);
                 }
             }
         }
@@ -1015,7 +1017,8 @@ nsXPCComponents_ClassesByID::Resolve(nsIXPConnectWrappedNative* wrapper,
                     *_retval = JS_DefinePropertyById(cx, obj, id, idobj,
                                                      JSPROP_ENUMERATE |
                                                      JSPROP_READONLY |
-                                                     JSPROP_PERMANENT);
+                                                     JSPROP_PERMANENT |
+                                                     JSPROP_RESOLVING);
                 }
             }
         }
@@ -1210,7 +1213,8 @@ nsXPCComponents_Results::Resolve(nsIXPConnectWrappedNative* wrapper,
                 if (!JS_DefinePropertyById(cx, obj, id, (uint32_t)rv,
                                            JSPROP_ENUMERATE |
                                            JSPROP_READONLY |
-                                           JSPROP_PERMANENT)) {
+                                           JSPROP_PERMANENT |
+                                           JSPROP_RESOLVING)) {
                     return NS_ERROR_UNEXPECTED;
                 }
             }
@@ -2856,7 +2860,7 @@ nsXPCComponents_Utils::CallFunctionWithAsyncStack(HandleValue function,
 
     JS::AutoSetAsyncStackForNewCalls sas(cx, asyncStackObj, asyncCauseString);
 
-    if (!JS_CallFunctionValue(cx, JS::NullPtr(), function,
+    if (!JS_CallFunctionValue(cx, nullptr, function,
                               JS::HandleValueArray::empty(), retval))
     {
         return NS_ERROR_XPC_JAVASCRIPT_ERROR;
@@ -3301,7 +3305,7 @@ nsXPCComponents_Utils::GetIncumbentGlobal(HandleValue aCallback,
     // Invoke the callback, if passed.
     if (aCallback.isObject()) {
         RootedValue ignored(aCx);
-        if (!JS_CallFunctionValue(aCx, JS::NullPtr(), aCallback, JS::HandleValueArray(globalVal), &ignored))
+        if (!JS_CallFunctionValue(aCx, nullptr, aCallback, JS::HandleValueArray(globalVal), &ignored))
             return NS_ERROR_FAILURE;
     }
 

@@ -88,7 +88,7 @@ public:
 protected:
   // used to connect redirected-to channel in parent with just created
   // ChildChannel.  Used during redirects.
-  bool ConnectChannel(const uint32_t& channelId);
+  bool ConnectChannel(const uint32_t& channelId, const bool& shouldIntercept);
 
   bool DoAsyncOpen(const URIParams&           uri,
                    const OptionalURIParams&   originalUri,
@@ -116,12 +116,9 @@ protected:
                    const bool&                allowSpdy,
                    const bool&                allowAltSvc,
                    const OptionalFileDescriptorSet& aFds,
-                   const ipc::PrincipalInfo&  aRequestingPrincipalInfo,
-                   const ipc::PrincipalInfo&  aTriggeringPrincipalInfo,
-                   const uint32_t&            aSecurityFlags,
-                   const uint32_t&            aContentPolicyType,
-                   const uint32_t&            aInnerWindowID,
-                   const OptionalHttpResponseHead& aSynthesizedResponseHead);
+                   const LoadInfoArgs&        aLoadInfoArgs,
+                   const OptionalHttpResponseHead& aSynthesizedResponseHead,
+                   const uint32_t&            aCacheKey);
 
   virtual bool RecvSetPriority(const uint16_t& priority) override;
   virtual bool RecvSetClassOfService(const uint32_t& cos) override;
@@ -203,7 +200,15 @@ private:
 
   bool mSuspendedForDiversion;
 
+  // Set if this channel should be intercepted before it sets up the HTTP transaction.
+  bool mShouldIntercept : 1;
+  // Set if this channel should suspend on interception.
+  bool mShouldSuspendIntercept : 1;
+
   dom::TabId mNestedFrameId;
+
+  // Handle to the channel wrapper if this channel has been intercepted.
+  nsCOMPtr<nsIInterceptedChannel> mInterceptedChannel;
 };
 
 } // namespace net

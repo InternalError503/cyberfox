@@ -93,6 +93,7 @@ extern nsresult nsStringInputStreamConstructor(nsISupports*, REFNSIID, void**);
 #include "SpecialSystemDirectory.h"
 
 #if defined(XP_WIN)
+#include "mozilla/WindowsVersion.h"
 #include "nsWindowsRegKey.h"
 #endif
 
@@ -135,10 +136,6 @@ extern nsresult nsStringInputStreamConstructor(nsISupports*, REFNSIID, void**);
 
 #include "mozilla/ipc/GeckoChildProcessHost.h"
 
-#ifdef MOZ_VISUAL_EVENT_TRACER
-#include "mozilla/VisualEventTracer.h"
-#endif
-
 #include "ogg/ogg.h"
 #if defined(MOZ_VPX) && !defined(MOZ_VPX_NO_MEM_REPORTING)
 #if defined(HAVE_STDINT_H)
@@ -162,9 +159,6 @@ extern nsresult nsStringInputStreamConstructor(nsISupports*, REFNSIID, void**);
 using namespace mozilla;
 using base::AtExitManager;
 using mozilla::ipc::BrowserProcessSubThread;
-#ifdef MOZ_VISUAL_EVENT_TRACER
-using mozilla::eventtracer::VisualEventTracer;
-#endif
 
 namespace {
 
@@ -216,9 +210,6 @@ NS_GENERIC_FACTORY_CONSTRUCTOR(nsBinaryInputStream)
 NS_GENERIC_FACTORY_CONSTRUCTOR(nsStorageStream)
 NS_GENERIC_FACTORY_CONSTRUCTOR(nsVersionComparatorImpl)
 NS_GENERIC_FACTORY_CONSTRUCTOR(nsScriptableBase64Encoder)
-#ifdef MOZ_VISUAL_EVENT_TRACER
-NS_GENERIC_FACTORY_CONSTRUCTOR(VisualEventTracer)
-#endif
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(nsVariant)
 
@@ -347,12 +338,12 @@ const mozilla::Module kXPCOMModule = {
 };
 
 // gDebug will be freed during shutdown.
-static nsIDebug* gDebug = nullptr;
+static nsIDebug2* gDebug = nullptr;
 
 EXPORT_XPCOM_API(nsresult)
-NS_GetDebug(nsIDebug** aResult)
+NS_GetDebug(nsIDebug2** aResult)
 {
-  return nsDebugImpl::Create(nullptr,  NS_GET_IID(nsIDebug), (void**)aResult);
+  return nsDebugImpl::Create(nullptr,  NS_GET_IID(nsIDebug2), (void**)aResult);
 }
 
 EXPORT_XPCOM_API(nsresult)
@@ -481,6 +472,13 @@ NS_IMPL_ISUPPORTS(NesteggReporter, nsIMemoryReporter)
 CountingAllocatorBase<NesteggReporter>::sAmount(0);
 #endif /* MOZ_WEBM */
 
+static double
+TimeSinceProcessCreation()
+{
+  bool ignore;
+  return (TimeStamp::Now() - TimeStamp::ProcessCreation(ignore)).ToMilliseconds();
+}
+
 // Note that on OSX, aBinDirectory will point to .app/Contents/Resources/browser
 EXPORT_XPCOM_API(nsresult)
 NS_InitXPCOM2(nsIServiceManager** aResult,
@@ -495,6 +493,10 @@ NS_InitXPCOM2(nsIServiceManager** aResult,
   sInitialized = true;
 
   mozPoisonValueInit();
+
+  NS_LogInit();
+
+  JS_SetCurrentEmbedderTimeFunction(TimeSinceProcessCreation);
 
   char aLocal;
   profiler_init(&aLocal);
@@ -517,8 +519,6 @@ NS_InitXPCOM2(nsIServiceManager** aResult,
   nsSystemInfo::gUserUmask = ::umask(0777);
   ::umask(nsSystemInfo::gUserUmask);
 #endif
-
-  NS_LogInit();
 
   // Set up chromium libs
   NS_ASSERTION(!sExitManager && !sMessageLoop, "Bad logic!");
@@ -758,10 +758,6 @@ NS_InitXPCOM2(nsIServiceManager** aResult,
     loop->transient_hang_timeout(),
     loop->permanent_hang_timeout());
 
-#ifdef MOZ_VISUAL_EVENT_TRACER
-  mozilla::eventtracer::Init();
-#endif
-
   return NS_OK;
 }
 
@@ -968,7 +964,7 @@ ShutdownXPCOM(nsIServiceManager* aServMgr)
   // On Windows XP debug, there are intermittent failures in
   // dom/media/tests/mochitest/test_peerConnection_basicH264Video.html
   // if we don't exit early in a child process. See bug 1073310.
-  if (XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (XRE_GetProcessType() == GeckoProcessType_Content && !IsVistaOrLater()) {
       NS_WARNING("Exiting child process early!");
       exit(0);
   }
@@ -1042,10 +1038,6 @@ ShutdownXPCOM(nsIServiceManager* aServMgr)
   sMainHangMonitor = nullptr;
 
   BackgroundHangMonitor::Shutdown();
-
-#ifdef MOZ_VISUAL_EVENT_TRACER
-  eventtracer::Shutdown();
-#endif
 
   profiler_shutdown();
 

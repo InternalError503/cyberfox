@@ -19,6 +19,7 @@ Cu.import("resource://gre/modules/PromiseUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/TelemetryUtils.jsm", this);
 Cu.import("resource://gre/modules/ObjectUtils.jsm");
+Cu.import("resource://gre/modules/TelemetryController.jsm", this);
 
 const Utils = TelemetryUtils;
 
@@ -105,9 +106,11 @@ const DEFAULT_ENVIRONMENT_PREFS = new Map([
   ["devtools.chrome.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["devtools.debugger.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["devtools.debugger.remote-enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
-  ["dom.ipc.plugins.asyncInit", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["dom.ipc.plugins.asyncInit.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["dom.ipc.plugins.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["experiments.manifest.uri", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["extensions.autoDisableScopes", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["extensions.enabledScopes", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["extensions.blocklist.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["extensions.blocklist.url", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["extensions.strictCompatibility", TelemetryEnvironment.RECORD_PREF_VALUE],
@@ -137,6 +140,7 @@ const DEFAULT_ENVIRONMENT_PREFS = new Map([
   ["privacy.trackingprotection.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["privacy.donottrackheader.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["services.sync.serverURL", TelemetryEnvironment.RECORD_PREF_STATE],
+  ["xpinstall.signatures.required", TelemetryEnvironment.RECORD_PREF_STATE],
 ]);
 
 const LOGGER_NAME = "Toolkit.Telemetry";
@@ -146,7 +150,6 @@ const PREF_DISTRIBUTION_ID = "distribution.id";
 const PREF_DISTRIBUTION_VERSION = "distribution.version";
 const PREF_DISTRIBUTOR = "app.distributor";
 const PREF_DISTRIBUTOR_CHANNEL = "app.distributor.channel";
-const PREF_E10S_ENABLED = "browser.tabs.remote.autostart";
 const PREF_HOTFIX_LASTVERSION = "extensions.hotfix.lastVersion";
 const PREF_APP_PARTNER_BRANCH = "app.partner.";
 const PREF_PARTNER_ID = "mozilla.partner.id";
@@ -496,7 +499,11 @@ EnvironmentAddonBuilder.prototype = {
         hasBinaryComponents: addon.hasBinaryComponents,
         installDay: Utils.millisecondsToDays(installDate.getTime()),
         updateDay: Utils.millisecondsToDays(updateDate.getTime()),
+        signedState: addon.signedState,
       };
+
+      if (addon.signedState !== undefined)
+        activeAddons[addon.id].signedState = addon.signedState;
     }
 
     return activeAddons;
@@ -969,12 +976,16 @@ EnvironmentCache.prototype = {
     } catch (e) {}
 
     this._currentEnvironment.settings = {
+#ifndef MOZ_WIDGET_GONK
+      addonCompatibilityCheckEnabled: AddonManager.checkCompatibility,
+#endif
       blocklistEnabled: Preferences.get(PREF_BLOCKLIST_ENABLED, true),
 #ifndef MOZ_WIDGET_ANDROID
       isDefaultBrowser: this._isDefaultBrowser(),
 #endif
-      e10sEnabled: Preferences.get(PREF_E10S_ENABLED, false),
+      e10sEnabled: Services.appinfo.browserTabsRemoteAutostart,
       telemetryEnabled: Preferences.get(PREF_TELEMETRY_ENABLED, false),
+      isInOptoutSample: TelemetryController.isInOptoutSample,
       locale: getBrowserLocale(),
       update: {
         channel: updateChannel,
@@ -1128,7 +1139,17 @@ EnvironmentCache.prototype = {
       // again as part of bug 1154500.
       //DWriteVersion: getGfxField("DWriteVersion", null),
       adapters: [],
+      monitors: [],
     };
+
+#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
+    let gfxInfo = Cc["@mozilla.org/gfx/info;1"].getService(Ci.nsIGfxInfo);
+    try {
+      gfxData.monitors = gfxInfo.getMonitors();
+    } catch (e) {
+      this._log.error("nsIGfxInfo.getMonitors() caught error", e);
+    }
+#endif
 
     // GfxInfo does not yet expose a way to iterate through all the adapters.
     gfxData.adapters.push(getGfxAdapter(""));

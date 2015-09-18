@@ -110,7 +110,13 @@ public:
   InitOrigin(PersistenceType aPersistenceType, const nsACString& aGroup,
              const nsACString& aOrigin, UsageInfo* aUsageInfo) override
   {
-    return NS_OK;
+    // The QuotaManager passes a nullptr UsageInfo if there is no quota being
+    // enforced against the origin.
+    if (!aUsageInfo) {
+      return NS_OK;
+    }
+
+    return GetUsageForOrigin(aPersistenceType, aGroup, aOrigin, aUsageInfo);
   }
 
   virtual nsresult
@@ -118,6 +124,8 @@ public:
                     const nsACString& aOrigin,
                     UsageInfo* aUsageInfo) override
   {
+    MOZ_ASSERT(aUsageInfo);
+
     QuotaManager* qm = QuotaManager::Get();
     MOZ_ASSERT(qm);
 
@@ -161,10 +169,11 @@ public:
         continue;
       }
 
-      // Ignore transient sqlite files
+      // Ignore transient sqlite files and marker files
       if (leafName.EqualsLiteral("caches.sqlite-journal") ||
           leafName.EqualsLiteral("caches.sqlite-shm") ||
-          leafName.Find(NS_LITERAL_CSTRING("caches.sqlite-mj"), false, 0, 0) == 0) {
+          leafName.Find(NS_LITERAL_CSTRING("caches.sqlite-mj"), false, 0, 0) == 0 ||
+          leafName.EqualsLiteral("context_open.marker")) {
         continue;
       }
 
@@ -218,6 +227,9 @@ public:
     }
   }
 
+  virtual void
+  PerformIdleMaintenance() override
+  { }
 
   virtual void
   ShutdownWorkThreads() override

@@ -10,7 +10,7 @@
 #include "base/basictypes.h"
 #endif
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "prmem.h"
 #include "nscore.h"
 #include "prenv.h"
@@ -1603,15 +1603,6 @@ void
 nsNPAPIPluginInstance::SetOwner(nsPluginInstanceOwner *aOwner)
 {
   mOwner = aOwner;
-}
-
-nsresult
-nsNPAPIPluginInstance::ShowStatus(const char* message)
-{
-  if (mOwner)
-    return mOwner->ShowStatus(message);
-
-  return NS_ERROR_FAILURE;
 }
 
 nsresult

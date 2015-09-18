@@ -64,6 +64,8 @@
     window.onmessage = function(e) {
       if (e.data.status == "ok") {
         ok(e.data.result, e.data.message);
+      } else if (e.data.status == "todo") {
+        todo(e.data.result, e.data.message);
       } else if (e.data.status == "registrationdone") {
         iframe.src = "/tests/dom/workers/test/serviceworkers/fetch/context/index.html";
       } else if (e.data.status == "done") {
@@ -86,6 +88,7 @@
       ["dom.image.picture.enabled", true],
       ["dom.image.srcset.enabled", true],
       ["dom.serviceWorkers.exemptFromPerDomainMax", true],
+      ["dom.serviceWorkers.interception.enabled", true],
       ["dom.serviceWorkers.enabled", true],
       ["dom.serviceWorkers.testing.enabled", true],
     ]}, runTest);

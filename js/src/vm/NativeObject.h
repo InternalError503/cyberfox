@@ -291,20 +291,16 @@ static inline bool
 IsObjectValueInCompartment(Value v, JSCompartment* comp);
 #endif
 
-/*
- * NOTE: This is a placeholder for bug 619558.
- *
- * Run a post write barrier that encompasses multiple contiguous slots in a
- * single step.
- */
-inline void
-DenseRangeWriteBarrierPost(JSRuntime* rt, NativeObject* obj, uint32_t start, uint32_t count)
-{
-    if (count > 0) {
-        JS::shadow::Runtime* shadowRuntime = JS::shadow::Runtime::asShadowRuntime(rt);
-        shadowRuntime->gcStoreBufferPtr()->putSlotFromAnyThread(obj, HeapSlot::Element, start, count);
-    }
-}
+// Operations which change an object's dense elements can either succeed, fail,
+// or be unable to complete. For native objects, the latter is used when the
+// object's elements must become sparse instead. The enum below is used for
+// such operations, and for similar operations on unboxed arrays and methods
+// that work on both kinds of objects.
+enum class DenseElementResult {
+    Failure,
+    Success,
+    Incomplete
+};
 
 /*
  * NativeObject specifies the internal implementation of a native object.
@@ -600,6 +596,9 @@ class NativeObject : public JSObject
      */
     bool growSlots(ExclusiveContext* cx, uint32_t oldCount, uint32_t newCount);
     void shrinkSlots(ExclusiveContext* cx, uint32_t oldCount, uint32_t newCount);
+
+    /* This method is static because it's called from JIT code. */
+    static bool growSlotsStatic(ExclusiveContext* cx, NativeObject* obj, uint32_t newCount);
 
     bool hasDynamicSlots() const { return !!slots_; }
 
@@ -926,6 +925,20 @@ class NativeObject : public JSObject
     inline void ensureDenseInitializedLengthNoPackedCheck(ExclusiveContext* cx,
                                                           uint32_t index, uint32_t extra);
 
+    // Run a post write barrier that encompasses multiple contiguous elements in a
+    // single step.
+    inline void elementsRangeWriteBarrierPost(uint32_t start, uint32_t count) {
+        for (size_t i = 0; i < count; i++) {
+            const Value& v = elements_[start + i];
+            if (v.isObject() && IsInsideNursery(&v.toObject())) {
+                JS::shadow::Runtime* shadowRuntime = shadowRuntimeFromMainThread();
+                shadowRuntime->gcStoreBufferPtr()->putSlotFromAnyThread(this, HeapSlot::Element,
+                                                                        start + i, count - i);
+                return;
+            }
+        }
+    }
+
   public:
     void setDenseInitializedLength(uint32_t length) {
         MOZ_ASSERT(length <= getDenseCapacity());
@@ -973,7 +986,7 @@ class NativeObject : public JSObject
                 elements_[dstStart + i].set(this, HeapSlot::Element, dstStart + i, src[i]);
         } else {
             memcpy(&elements_[dstStart], src, count * sizeof(HeapSlot));
-            DenseRangeWriteBarrierPost(runtimeFromMainThread(), this, dstStart, count);
+            elementsRangeWriteBarrierPost(dstStart, count);
         }
     }
 
@@ -981,10 +994,8 @@ class NativeObject : public JSObject
         MOZ_ASSERT(dstStart + count <= getDenseCapacity());
         MOZ_ASSERT(!denseElementsAreCopyOnWrite());
         memcpy(&elements_[dstStart], src, count * sizeof(HeapSlot));
-        DenseRangeWriteBarrierPost(runtimeFromMainThread(), this, dstStart, count);
+        elementsRangeWriteBarrierPost(dstStart, count);
     }
-
-    void initDenseElementsUnbarriered(uint32_t dstStart, const Value* src, uint32_t count);
 
     void moveDenseElements(uint32_t dstStart, uint32_t srcStart, uint32_t count) {
         MOZ_ASSERT(dstStart + count <= getDenseCapacity());
@@ -1017,7 +1028,7 @@ class NativeObject : public JSObject
             }
         } else {
             memmove(elements_ + dstStart, elements_ + srcStart, count * sizeof(HeapSlot));
-            DenseRangeWriteBarrierPost(runtimeFromMainThread(), this, dstStart, count);
+            elementsRangeWriteBarrierPost(dstStart, count);
         }
     }
 
@@ -1029,7 +1040,7 @@ class NativeObject : public JSObject
         MOZ_ASSERT(!denseElementsAreCopyOnWrite());
 
         memmove(elements_ + dstStart, elements_ + srcStart, count * sizeof(Value));
-        DenseRangeWriteBarrierPost(runtimeFromMainThread(), this, dstStart, count);
+        elementsRangeWriteBarrierPost(dstStart, count);
     }
 
     bool shouldConvertDoubleElements() {
@@ -1047,21 +1058,16 @@ class NativeObject : public JSObject
     inline bool writeToIndexWouldMarkNotPacked(uint32_t index);
     inline void markDenseElementsNotPacked(ExclusiveContext* cx);
 
-    /*
-     * ensureDenseElements ensures that the object can hold at least
-     * index + extra elements. It returns ED_OK on success, ED_FAILED on
-     * failure to grow the array, ED_SPARSE when the object is too sparse to
-     * grow (this includes the case of index + extra overflow). In the last
-     * two cases the object is kept intact.
-     */
-    enum EnsureDenseResult { ED_OK, ED_FAILED, ED_SPARSE };
+    // Ensures that the object can hold at least index + extra elements. This
+    // returns DenseElement_Success on success, DenseElement_Failed on failure
+    // to grow the array, or DenseElement_Incomplete when the object is too
+    // sparse to grow (this includes the case of index + extra overflow). In
+    // the last two cases the object is kept intact.
+    inline DenseElementResult ensureDenseElements(ExclusiveContext* cx,
+                                                  uint32_t index, uint32_t extra);
 
-  public:
-    inline EnsureDenseResult ensureDenseElements(ExclusiveContext* cx,
-                                                 uint32_t index, uint32_t extra);
-
-    inline EnsureDenseResult extendDenseElements(ExclusiveContext* cx,
-                                                 uint32_t requiredCapacity, uint32_t extra);
+    inline DenseElementResult extendDenseElements(ExclusiveContext* cx,
+                                                  uint32_t requiredCapacity, uint32_t extra);
 
     /* Convert a single dense element to a sparse property. */
     static bool sparsifyDenseElement(ExclusiveContext* cx,
@@ -1089,8 +1095,8 @@ class NativeObject : public JSObject
      * After adding a sparse index to obj, see if it should be converted to use
      * dense elements.
      */
-    static EnsureDenseResult maybeDensifySparseElements(ExclusiveContext* cx,
-                                                        HandleNativeObject obj);
+    static DenseElementResult maybeDensifySparseElements(ExclusiveContext* cx,
+                                                         HandleNativeObject obj);
 
     inline HeapSlot* fixedElements() const {
         static_assert(2 * sizeof(Value) == sizeof(ObjectElements),

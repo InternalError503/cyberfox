@@ -101,8 +101,7 @@ ThrowInvalidThis(JSContext* aCx, const JS::CallArgs& aArgs,
 inline bool
 ThrowMethodFailedWithDetails(JSContext* cx, ErrorResult& rv,
                              const char* ifaceName,
-                             const char* memberName,
-                             bool reportJSContentExceptions = false)
+                             const char* memberName)
 {
   if (rv.IsUncatchableException()) {
     // Nuke any existing exception on aCx, to make sure we're uncatchable.
@@ -116,11 +115,7 @@ ThrowMethodFailedWithDetails(JSContext* cx, ErrorResult& rv,
     return false;
   }
   if (rv.IsJSException()) {
-    if (reportJSContentExceptions) {
-      rv.ReportJSExceptionFromJSImplementation(cx);
-    } else {
-      rv.ReportJSException(cx);
-    }
+    rv.ReportJSException(cx);
     return false;
   }
   if (rv.IsNotEnoughArgsError()) {
@@ -526,17 +521,20 @@ AllocateProtoAndIfaceCache(JSObject* obj, ProtoAndIfaceCache::Kind aKind)
 }
 
 #ifdef DEBUG
-void
-VerifyTraceProtoAndIfaceCacheCalled(JS::CallbackTracer *trc, void **thingp,
-                                    JSGCTraceKind kind);
-
 struct VerifyTraceProtoAndIfaceCacheCalledTracer : public JS::CallbackTracer
 {
-    bool ok;
+  bool ok;
 
-    explicit VerifyTraceProtoAndIfaceCacheCalledTracer(JSRuntime *rt)
-      : JS::CallbackTracer(rt, VerifyTraceProtoAndIfaceCacheCalled), ok(false)
-    {}
+  explicit VerifyTraceProtoAndIfaceCacheCalledTracer(JSRuntime *rt)
+    : JS::CallbackTracer(rt), ok(false)
+  {}
+
+  void onChild(const JS::GCCellPtr&) override {
+    // We don't do anything here, we only want to verify that
+    // TraceProtoAndIfaceCache was called.
+  }
+
+  TracerKind getTracerKind() const override { return TracerKind::VerifyTraceProtoAndIface; }
 };
 #endif
 
@@ -547,8 +545,8 @@ TraceProtoAndIfaceCache(JSTracer* trc, JSObject* obj)
 
 #ifdef DEBUG
   if (trc->isCallbackTracer() &&
-      trc->asCallbackTracer()->hasCallback(
-        VerifyTraceProtoAndIfaceCacheCalled)) {
+      (trc->asCallbackTracer()->getTracerKind() ==
+       JS::CallbackTracer::TracerKind::VerifyTraceProtoAndIface)) {
     // We don't do anything here, we only want to verify that
     // TraceProtoAndIfaceCache was called.
     static_cast<VerifyTraceProtoAndIfaceCacheCalledTracer*>(trc)->ok = true;
@@ -812,7 +810,7 @@ MaybeWrapStringValue(JSContext* cx, JS::MutableHandle<JS::Value> rval)
 {
   MOZ_ASSERT(rval.isString());
   JSString* str = rval.toString();
-  if (JS::GetTenuredGCThingZone(str) != js::GetContextZone(cx)) {
+  if (JS::GetStringZone(str) != js::GetContextZone(cx)) {
     return JS_WrapValue(cx, rval);
   }
   return true;
@@ -933,7 +931,7 @@ DoGetOrCreateDOMReflector(JSContext* cx, T* value,
       return false;
     }
 
-    obj = value->WrapObject(cx, JS::NullPtr());
+    obj = value->WrapObject(cx, nullptr);
     if (!obj) {
       // At this point, obj is null, so just return false.
       // Callers seem to be testing JS_IsExceptionPending(cx) to
@@ -1041,7 +1039,7 @@ WrapNewBindingNonWrapperCachedObject(JSContext* cx,
     }
 
     MOZ_ASSERT(js::IsObjectInContextCompartment(scope, cx));
-    if (!value->WrapObject(cx, JS::NullPtr(), &obj)) {
+    if (!value->WrapObject(cx, nullptr, &obj)) {
       return false;
     }
   }
@@ -1087,7 +1085,7 @@ WrapNewBindingNonWrapperCachedObject(JSContext* cx,
     }
 
     MOZ_ASSERT(js::IsObjectInContextCompartment(scope, cx));
-    if (!value->WrapObject(cx, JS::NullPtr(), &obj)) {
+    if (!value->WrapObject(cx, nullptr, &obj)) {
       return false;
     }
 
@@ -1523,7 +1521,7 @@ struct WrapNativeParentHelper
     if (!CouldBeDOMBinding(parent)) {
       obj = WrapNativeParentFallback<T>::Wrap(cx, parent, cache);
     } else {
-      obj = parent->WrapObject(cx, JS::NullPtr());
+      obj = parent->WrapObject(cx, nullptr);
     }
 
     return obj;
@@ -3024,7 +3022,7 @@ CreateGlobal(JSContext* aCx, T* aNative, nsWrapperCache* aCache,
                                  JS::DontFireOnNewGlobalHook, aOptions));
   if (!aGlobal) {
     NS_WARNING("Failed to create global");
-    return JS::NullPtr();
+    return nullptr;
   }
 
   JSAutoCompartment ac(aCx, aGlobal);
@@ -3039,7 +3037,7 @@ CreateGlobal(JSContext* aCx, T* aNative, nsWrapperCache* aCache,
                                     CreateGlobalOptions<T>::ProtoAndIfaceCacheKind);
 
     if (!CreateGlobalOptions<T>::PostCreateGlobal(aCx, aGlobal)) {
-      return JS::NullPtr();
+      return nullptr;
     }
   }
 
@@ -3047,13 +3045,13 @@ CreateGlobal(JSContext* aCx, T* aNative, nsWrapperCache* aCache,
       !CreateGlobalOptions<T>::ForceInitStandardClassesToFalse &&
       !JS_InitStandardClasses(aCx, aGlobal)) {
     NS_WARNING("Failed to init standard classes");
-    return JS::NullPtr();
+    return nullptr;
   }
 
   JS::Handle<JSObject*> proto = GetProto(aCx, aGlobal);
   if (!proto || !JS_SplicePrototype(aCx, aGlobal, proto)) {
     NS_WARNING("Failed to set proto");
-    return JS::NullPtr();
+    return nullptr;
   }
 
   return proto;

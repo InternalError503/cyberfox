@@ -684,6 +684,7 @@ nsDOMClassInfo::Init()
   DOM_CLASSINFO_MAP_BEGIN_NO_CLASS_IF(ChromeMessageBroadcaster, nsISupports)
     DOM_CLASSINFO_MAP_ENTRY(nsIFrameScriptLoader)
     DOM_CLASSINFO_MAP_ENTRY(nsIProcessScriptLoader)
+    DOM_CLASSINFO_MAP_ENTRY(nsIGlobalProcessScriptLoader)
     DOM_CLASSINFO_MAP_ENTRY(nsIMessageListenerManager)
     DOM_CLASSINFO_MAP_ENTRY(nsIMessageBroadcaster)
   DOM_CLASSINFO_MAP_END
@@ -1151,10 +1152,12 @@ nsDOMClassInfo::PostCreatePrototype(JSContext * cx, JSObject * aProto)
                                  mData, nullptr, nameSpaceManager, proto,
                                  &desc);
   NS_ENSURE_SUCCESS(rv, rv);
-  if (!contentDefinedProperty && desc.object() && !desc.value().isUndefined() &&
-      !JS_DefineUCProperty(cx, global, mData->mNameUTF16,
-                           NS_strlen(mData->mNameUTF16), desc)) {
-    return NS_ERROR_UNEXPECTED;
+  if (!contentDefinedProperty && desc.object() && !desc.value().isUndefined()) {
+    desc.attributesRef() |= JSPROP_RESOLVING;
+    if (!JS_DefineUCProperty(cx, global, mData->mNameUTF16,
+                             NS_strlen(mData->mNameUTF16), desc)) {
+      return NS_ERROR_UNEXPECTED;
+    }
   }
 
   return NS_OK;

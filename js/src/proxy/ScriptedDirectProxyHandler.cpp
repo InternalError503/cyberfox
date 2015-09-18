@@ -157,7 +157,7 @@ ReportInvalidTrapResult(JSContext* cx, JSObject* proxy, JSAtom* atom)
     if (!AtomToPrintableString(cx, atom, &bytes))
         return;
     ReportValueError2(cx, JSMSG_INVALID_TRAP_RESULT, JSDVG_IGNORE_STACK, v,
-                      js::NullPtr(), bytes.ptr());
+                      nullptr, bytes.ptr());
 }
 
 // This function is shared between ownPropertyKeys, enumerate, and
@@ -548,7 +548,7 @@ ScriptedDirectProxyHandler::defineProperty(JSContext* cx, HandleObject proxy, Ha
 
     // step 8
     if (trap.isUndefined())
-        return StandardDefineProperty(cx, target, id, desc, result);
+        return DefineProperty(cx, target, id, desc, result);
 
     // step 9
     RootedValue descObj(cx);
@@ -708,7 +708,7 @@ ScriptedDirectProxyHandler::delete_(JSContext* cx, HandleObject proxy, HandleId 
     // step 14-15
     if (desc.object() && !desc.configurable()) {
         RootedValue v(cx, IdToValue(id));
-        ReportValueError(cx, JSMSG_CANT_DELETE, JSDVG_IGNORE_STACK, v, js::NullPtr());
+        ReportValueError(cx, JSMSG_CANT_DELETE, JSDVG_IGNORE_STACK, v, nullptr);
         return false;
     }
 
@@ -1038,13 +1038,14 @@ ScriptedDirectProxyHandler::construct(JSContext* cx, HandleObject proxy, const C
     // step 6
     if (trap.isUndefined()) {
         RootedValue targetv(cx, ObjectValue(*target));
-        return InvokeConstructor(cx, targetv, args.length(), args.array(), args.rval());
+        return InvokeConstructor(cx, targetv, args.length(), args.array(), true, args.rval());
     }
 
     // step 8-9
     Value constructArgv[] = {
         ObjectValue(*target),
-        ObjectValue(*argsArray)
+        ObjectValue(*argsArray),
+        args.newTarget()
     };
     RootedValue thisValue(cx, ObjectValue(*handler));
     if (!Invoke(cx, thisValue, trap, ArrayLength(constructArgv), constructArgv, args.rval()))

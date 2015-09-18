@@ -14,7 +14,6 @@
 #include "nsNetUtil.h"
 #include "nsReadableUtils.h"
 
-#if defined(PR_LOGGING)
 static PRLogModuleInfo*
 GetCspUtilsLog()
 {
@@ -23,9 +22,9 @@ GetCspUtilsLog()
     gCspUtilsPRLog = PR_NewLogModule("CSPUtils");
   return gCspUtilsPRLog;
 }
-#endif
 
-#define CSPUTILSLOG(args) PR_LOG(GetCspUtilsLog(), 4, args)
+#define CSPUTILSLOG(args) MOZ_LOG(GetCspUtilsLog(), mozilla::LogLevel::Debug, args)
+#define CSPUTILSLOGENABLED() MOZ_LOG_TEST(GetCspUtilsLog(), mozilla::LogLevel::Debug)
 
 void
 CSP_GetLocalizedStr(const char16_t* aName,
@@ -150,6 +149,9 @@ CSP_ContentTypeToDirective(nsContentPolicyType aType)
     case nsIContentPolicy::TYPE_MEDIA:
       return nsIContentSecurityPolicy::MEDIA_SRC_DIRECTIVE;
 
+    case nsIContentPolicy::TYPE_WEB_MANIFEST:
+      return nsIContentSecurityPolicy::WEB_MANIFEST_SRC_DIRECTIVE;
+
     case nsIContentPolicy::TYPE_SUBDOCUMENT:
       return nsIContentSecurityPolicy::FRAME_SRC_DIRECTIVE;
 
@@ -269,13 +271,11 @@ nsCSPBaseSrc::~nsCSPBaseSrc()
 bool
 nsCSPBaseSrc::permits(nsIURI* aUri, const nsAString& aNonce, bool aWasRedirected) const
 {
-#ifdef PR_LOGGING
-  {
+  if (CSPUTILSLOGENABLED()) {
     nsAutoCString spec;
     aUri->GetSpec(spec);
     CSPUTILSLOG(("nsCSPBaseSrc::permits, aUri: %s", spec.get()));
   }
-#endif
   return false;
 }
 
@@ -306,13 +306,11 @@ nsCSPSchemeSrc::~nsCSPSchemeSrc()
 bool
 nsCSPSchemeSrc::permits(nsIURI* aUri, const nsAString& aNonce, bool aWasRedirected) const
 {
-#ifdef PR_LOGGING
-  {
+  if (CSPUTILSLOGENABLED()) {
     nsAutoCString spec;
     aUri->GetSpec(spec);
     CSPUTILSLOG(("nsCSPSchemeSrc::permits, aUri: %s", spec.get()));
   }
-#endif
 
   NS_ASSERTION((!mScheme.EqualsASCII("")), "scheme can not be the empty string");
   nsAutoCString scheme;
@@ -344,13 +342,11 @@ nsCSPHostSrc::~nsCSPHostSrc()
 bool
 nsCSPHostSrc::permits(nsIURI* aUri, const nsAString& aNonce, bool aWasRedirected) const
 {
-#ifdef PR_LOGGING
-  {
+  if (CSPUTILSLOGENABLED()) {
     nsAutoCString spec;
     aUri->GetSpec(spec);
     CSPUTILSLOG(("nsCSPHostSrc::permits, aUri: %s", spec.get()));
   }
-#endif
 
   // we are following the enforcement rules from the spec, see:
   // http://www.w3.org/TR/CSP11/#match-source-expression
@@ -596,14 +592,12 @@ nsCSPNonceSrc::~nsCSPNonceSrc()
 bool
 nsCSPNonceSrc::permits(nsIURI* aUri, const nsAString& aNonce, bool aWasRedirected) const
 {
-#ifdef PR_LOGGING
-  {
+  if (CSPUTILSLOGENABLED()) {
     nsAutoCString spec;
     aUri->GetSpec(spec);
     CSPUTILSLOG(("nsCSPNonceSrc::permits, aUri: %s, aNonce: %s",
                 spec.get(), NS_ConvertUTF16toUTF8(aNonce).get()));
   }
-#endif
 
   return mNonce.Equals(aNonce);
 }
@@ -726,13 +720,11 @@ nsCSPDirective::~nsCSPDirective()
 bool
 nsCSPDirective::permits(nsIURI* aUri, const nsAString& aNonce, bool aWasRedirected) const
 {
-#ifdef PR_LOGGING
-  {
+  if (CSPUTILSLOGENABLED()) {
     nsAutoCString spec;
     aUri->GetSpec(spec);
     CSPUTILSLOG(("nsCSPDirective::permits, aUri: %s", spec.get()));
   }
-#endif
 
   for (uint32_t i = 0; i < mSrcs.Length(); i++) {
     if (mSrcs[i]->permits(aUri, aNonce, aWasRedirected)) {
@@ -779,6 +771,97 @@ nsCSPDirective::toString(nsAString& outStr) const
     }
   }
 }
+
+void
+nsCSPDirective::toDomCSPStruct(mozilla::dom::CSP& outCSP) const
+{
+  mozilla::dom::Sequence<nsString> srcs;
+  nsString src;
+  for (uint32_t i = 0; i < mSrcs.Length(); i++) {
+    src.Truncate();
+    mSrcs[i]->toString(src);
+    srcs.AppendElement(src, mozilla::fallible);
+  }
+
+  switch(mDirective) {
+    case nsIContentSecurityPolicy::DEFAULT_SRC_DIRECTIVE:
+      outCSP.mDefault_src.Construct();
+      outCSP.mDefault_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::SCRIPT_SRC_DIRECTIVE:
+      outCSP.mScript_src.Construct();
+      outCSP.mScript_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::OBJECT_SRC_DIRECTIVE:
+      outCSP.mObject_src.Construct();
+      outCSP.mObject_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::STYLE_SRC_DIRECTIVE:
+      outCSP.mStyle_src.Construct();
+      outCSP.mStyle_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::IMG_SRC_DIRECTIVE:
+      outCSP.mImg_src.Construct();
+      outCSP.mImg_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::MEDIA_SRC_DIRECTIVE:
+      outCSP.mMedia_src.Construct();
+      outCSP.mMedia_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::FRAME_SRC_DIRECTIVE:
+      outCSP.mFrame_src.Construct();
+      outCSP.mFrame_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::FONT_SRC_DIRECTIVE:
+      outCSP.mFont_src.Construct();
+      outCSP.mFont_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::CONNECT_SRC_DIRECTIVE:
+      outCSP.mConnect_src.Construct();
+      outCSP.mConnect_src.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::REPORT_URI_DIRECTIVE:
+      outCSP.mReport_uri.Construct();
+      outCSP.mReport_uri.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::FRAME_ANCESTORS_DIRECTIVE:
+      outCSP.mFrame_ancestors.Construct();
+      outCSP.mFrame_ancestors.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::WEB_MANIFEST_SRC_DIRECTIVE:
+      outCSP.mManifest_src.Construct();
+      outCSP.mManifest_src.Value() = srcs;
+      return;
+    // not supporting REFLECTED_XSS_DIRECTIVE
+
+    case nsIContentSecurityPolicy::BASE_URI_DIRECTIVE:
+      outCSP.mBase_uri.Construct();
+      outCSP.mBase_uri.Value() = srcs;
+      return;
+
+    case nsIContentSecurityPolicy::FORM_ACTION_DIRECTIVE:
+      outCSP.mForm_action.Construct();
+      outCSP.mForm_action.Value() = srcs;
+      return;
+
+    // REFERRER_DIRECTIVE is handled in nsCSPPolicy::toDomCSPStruct()
+
+    default:
+      NS_ASSERTION(false, "cannot find directive to convert CSP to JSON");
+  }
+}
+
 
 bool
 nsCSPDirective::restrictsContentType(nsContentPolicyType aContentType) const
@@ -838,14 +921,12 @@ nsCSPPolicy::permits(CSPDirective aDir,
                      bool aSpecific,
                      nsAString& outViolatedDirective) const
 {
-#ifdef PR_LOGGING
-  {
+  if (CSPUTILSLOGENABLED()) {
     nsAutoCString spec;
     aUri->GetSpec(spec);
     CSPUTILSLOG(("nsCSPPolicy::permits, aUri: %s, aDir: %d, aSpecific: %s",
                  spec.get(), aDir, aSpecific ? "true" : "false"));
   }
-#endif
 
   NS_ASSERTION(aUri, "permits needs an uri to perform the check!");
 
@@ -945,6 +1026,23 @@ nsCSPPolicy::toString(nsAString& outStr) const
     }
     if (i != (length - 1)) {
       outStr.AppendASCII("; ");
+    }
+  }
+}
+
+void
+nsCSPPolicy::toDomCSPStruct(mozilla::dom::CSP& outCSP) const
+{
+  outCSP.mReport_only = mReportOnly;
+
+  for (uint32_t i = 0; i < mDirectives.Length(); ++i) {
+    if (mDirectives[i]->equals(nsIContentSecurityPolicy::REFERRER_DIRECTIVE)) {
+      mozilla::dom::Sequence<nsString> srcs;
+      srcs.AppendElement(mReferrerPolicy, mozilla::fallible);
+      outCSP.mReferrer.Construct();
+      outCSP.mReferrer.Value() = srcs;
+    } else {
+      mDirectives[i]->toDomCSPStruct(outCSP);
     }
   }
 }

@@ -32,6 +32,7 @@ Structure::
         hotfixVersion: <string>, // e.g. "20141211.01"
       },
       settings: {
+        addonCompatibilityCheckEnabled: <bool>, // Whether application compatibility is respected for add-ons
         blocklistEnabled: <bool>, // true on failure
         isDefaultBrowser: <bool>, // null on failure, not available on Android
         defaultSearchEngine: <string>, // e.g. "yahoo"
@@ -40,8 +41,9 @@ Structure::
           loadPath: <string>, // where the engine line is located; missing if no default
           submissionURL: <string> // missing if no default or for user-installed engines
         },
-        e10sEnabled: <bool>, // false on failure
+        e10sEnabled: <bool>, // whether e10s is on, i.e. browser tabs open by default in a different process
         telemetryEnabled: <bool>, // false on failure
+        isInOptoutSample: <bool>, // whether this client is part of the opt-out sample
         locale: <string>, // e.g. "it", null on failure
         update: {
           channel: <string>, // e.g. "release", null on failure
@@ -133,6 +135,18 @@ Structure::
               },
               ...
             ],
+            // Note: currently only added on Desktop. On Linux, only a single
+            // monitor is returned representing the entire virtual screen.
+            monitors: [
+              {
+                screenWidth: <number>,  // screen width in pixels
+                screenHeight: <number>, // screen height in pixels
+                refreshRate: <number>,  // refresh rate in hertz (present on Windows only)
+                pseudoDisplay: <bool>,  // networked screen (present on Windows only)
+                scale: <number>,        // backing scale factor (present on Mac only)
+              },
+              ...
+            ],
           },
       },
       addons: {
@@ -150,6 +164,7 @@ Structure::
             hasBinaryComponents: <bool>
             installDay: <number>, // days since UNIX epoch, 0 on failure
             updateDay: <number>, // days since UNIX epoch, 0 on failure
+            signedState: <integer>, // whether the add-on is signed by AMO, only present for extensions
           },
           ...
         },

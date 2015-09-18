@@ -523,7 +523,7 @@ let LoopUI;
      */
     getFavicon: function(callback) {
       let pageURI = gBrowser.selectedTab.linkedBrowser.currentURI.spec;
-      // If the tab page’s url starts with http(s), fetch icon.
+      // If the tab pageâ€™s url starts with http(s), fetch icon.
       if (!/^https?:/.test(pageURI)) {
         callback();
         return;

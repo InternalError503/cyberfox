@@ -38,10 +38,11 @@ namespace {
 // protocol 0.  Oops!  We can get away with this until protocol 0
 // starts approaching its 65,536th message.
 enum {
-    CHANNEL_OPENED_MESSAGE_TYPE = kuint16max - 5,
-    SHMEM_DESTROYED_MESSAGE_TYPE = kuint16max - 4,
-    SHMEM_CREATED_MESSAGE_TYPE = kuint16max - 3,
-    GOODBYE_MESSAGE_TYPE       = kuint16max - 2
+    CHANNEL_OPENED_MESSAGE_TYPE = kuint16max - 6,
+    SHMEM_DESTROYED_MESSAGE_TYPE = kuint16max - 5,
+    SHMEM_CREATED_MESSAGE_TYPE = kuint16max - 4,
+    GOODBYE_MESSAGE_TYPE       = kuint16max - 3,
+    CANCEL_MESSAGE_TYPE        = kuint16max - 2,
 
     // kuint16max - 1 is used by ipc_channel.h.
 };
@@ -126,19 +127,15 @@ class ProtocolCloneContext
   typedef mozilla::dom::ContentParent ContentParent;
   typedef mozilla::net::NeckoParent NeckoParent;
 
-  ContentParent* mContentParent;
+  nsRefPtr<ContentParent> mContentParent;
   NeckoParent* mNeckoParent;
 
 public:
-  ProtocolCloneContext()
-    : mContentParent(nullptr)
-    , mNeckoParent(nullptr)
-  {}
+  ProtocolCloneContext();
 
-  void SetContentParent(ContentParent* aContentParent)
-  {
-    mContentParent = aContentParent;
-  }
+  ~ProtocolCloneContext();
+
+  void SetContentParent(ContentParent* aContentParent);
 
   ContentParent* GetContentParent() { return mContentParent; }
 
@@ -151,7 +148,7 @@ public:
 };
 
 template<class ListenerT>
-class /*NS_INTERFACE_CLASS*/ IProtocolManager
+class IProtocolManager
 {
 public:
     enum ActorDestroyReason {
@@ -298,7 +295,7 @@ FatalError(const char* aProtocolName, const char* aMsg,
 
 struct PrivateIPDLInterface {};
 
-bool
+nsresult
 Bridge(const PrivateIPDLInterface&,
        MessageChannel*, base::ProcessId, MessageChannel*, base::ProcessId,
        ProtocolId, ProtocolId);

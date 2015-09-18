@@ -6,7 +6,7 @@
 
 #include "nsEventQueue.h"
 #include "nsAutoPtr.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "nsThreadUtils.h"
 #include "prthread.h"
 #include "mozilla/ChaosMode.h"
@@ -25,7 +25,7 @@ GetLog()
 #ifdef LOG
 #undef LOG
 #endif
-#define LOG(args) PR_LOG(GetLog(), PR_LOG_DEBUG, args)
+#define LOG(args) MOZ_LOG(GetLog(), mozilla::LogLevel::Debug, args)
 
 nsEventQueue::nsEventQueue()
   : mReentrantMonitor("nsEventQueue.mReentrantMonitor")

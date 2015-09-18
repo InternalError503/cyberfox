@@ -214,6 +214,12 @@ endif # !GNU_CC
 
 endif # WINNT
 
+ifeq (arm-Darwin,$(CPU_ARCH)-$(OS_TARGET))
+ifdef PROGRAM
+MOZ_PROGRAM_LDFLAGS += -Wl,-rpath -Wl,@executable_path/Frameworks
+endif
+endif
+
 ifeq ($(SOLARIS_SUNPRO_CXX),1)
 ifeq (86,$(findstring 86,$(OS_TEST)))
 OS_LDFLAGS += -M $(MOZILLA_DIR)/config/solaris_ia32.map
@@ -390,7 +396,12 @@ ifdef SHARED_LIBRARY
 ifdef IS_COMPONENT
 EXTRA_DSO_LDOPTS	+= -bundle
 else
-EXTRA_DSO_LDOPTS	+= -dynamiclib -install_name @executable_path/$(SHARED_LIBRARY) -compatibility_version 1 -current_version 1 -single_module
+ifdef MOZ_IOS
+_LOADER_PATH := @rpath
+else
+_LOADER_PATH := @executable_path
+endif
+EXTRA_DSO_LDOPTS	+= -dynamiclib -install_name $(_LOADER_PATH)/$(SHARED_LIBRARY) -compatibility_version 1 -current_version 1 -single_module
 endif
 endif
 endif
@@ -1168,21 +1179,6 @@ endif
 endif
 
 ################################################################################
-# Install a linked .xpt into the appropriate place.
-# This should ideally be performed by the non-recursive idl make file. Some day.
-ifdef XPT_NAME #{
-
-ifndef NO_DIST_INSTALL
-ifndef NO_INTERFACES_MANIFEST
-export:: $(call mkdir_deps,$(FINAL_TARGET)/components)
-	$(call py_action,buildlist,$(FINAL_TARGET)/components/interfaces.manifest 'interfaces $(XPT_NAME)')
-	$(call py_action,buildlist,$(FINAL_TARGET)/chrome.manifest 'manifest components/interfaces.manifest')
-endif
-endif
-
-endif #} XPT_NAME
-
-################################################################################
 # Copy each element of EXTRA_COMPONENTS to $(FINAL_TARGET)/components
 ifdef EXTRA_COMPONENTS
 misc:: $(EXTRA_COMPONENTS)
@@ -1320,7 +1316,7 @@ ifndef MOZ_DEBUG
 endif
 endif
 	@echo 'Packaging $(XPI_PKGNAME).xpi...'
-	cd $(FINAL_TARGET) && $(ZIP) -qr ../$(XPI_PKGNAME).xpi *
+	$(call py_action,zip,-C $(FINAL_TARGET) ../$(XPI_PKGNAME).xpi '*')
 endif
 
 # See comment above about moving this out of the tools tier.

@@ -10,7 +10,7 @@ const DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 const { dbg_assert, fetch } = DevToolsUtils;
 const EventEmitter = require("devtools/toolkit/event-emitter");
 const { OriginalLocation, GeneratedLocation, getOffsetColumn } = require("devtools/server/actors/common");
-const { resolve } = Promise;
+const { resolve } = require("promise");
 
 loader.lazyRequireGetter(this, "SourceActor", "devtools/server/actors/script", true);
 loader.lazyRequireGetter(this, "isEvalSource", "devtools/server/actors/script", true);
@@ -292,15 +292,19 @@ TabSources.prototype = {
       if (url) {
         try {
           let urlInfo = Services.io.newURI(url, null, null).QueryInterface(Ci.nsIURL);
-          if (urlInfo.fileExtension === "js") {
+          if (urlInfo.fileExtension === "xml") {
+            // XUL inline scripts may not correctly have the
+            // `source.element` property, so do a blunt check here if
+            // it's an xml page.
+            spec.isInlineSource = true;
+          }
+          else if (urlInfo.fileExtension === "js") {
             spec.contentType = "text/javascript";
           }
         } catch(ex) {
-          // Not a valid URI.
-
-          // bug 1124536: fix getSourceText on scripts associated "javascript:SOURCE" urls
-          // (e.g. 'evaluate(sandbox, sourcecode, "javascript:"+sourcecode)' )
-          if (url.indexOf("javascript:") === 0) {
+          // There are a few special URLs that we know are JavaScript:
+          // inline `javascript:` and code coming from the console
+          if (url.indexOf("javascript:") === 0 || url === 'debugger eval code') {
             spec.contentType = "text/javascript";
           }
         }
@@ -333,10 +337,9 @@ TabSources.prototype = {
     return this.fetchSourceMap(aSource)
       .then(map => {
         if (map) {
-          return [
-            this.source({ originalUrl: s, generatedSource: aSource })
-            for (s of map.sources)
-          ].filter(isNotNull);
+          return map.sources.map(s => {
+            return this.source({ originalUrl: s, generatedSource: aSource });
+          }).filter(isNotNull);
         }
         return null;
       });

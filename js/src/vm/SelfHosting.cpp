@@ -177,7 +177,7 @@ ThrowErrorWithType(JSContext* cx, JSExnType type, const CallArgs& args)
             errorArgs[i - 1].encodeLatin1(cx, val.toString());
         } else {
             UniquePtr<char[], JS::FreePolicy> bytes =
-                DecompileValueGenerator(cx, JSDVG_SEARCH_STACK, val, NullPtr());
+                DecompileValueGenerator(cx, JSDVG_SEARCH_STACK, val, nullptr);
             if (!bytes)
                 return;
             errorArgs[i - 1].initBytes(bytes.release());
@@ -240,6 +240,7 @@ intrinsic_MakeConstructible(JSContext* cx, unsigned argc, Value* vp)
     MOZ_ASSERT(args.length() == 2);
     MOZ_ASSERT(args[0].isObject());
     MOZ_ASSERT(args[0].toObject().is<JSFunction>());
+    MOZ_ASSERT(args[0].toObject().as<JSFunction>().isSelfHostedBuiltin());
     MOZ_ASSERT(args[1].isObject());
 
     // Normal .prototype properties aren't enumerable.  But for this to clone
@@ -252,7 +253,7 @@ intrinsic_MakeConstructible(JSContext* cx, unsigned argc, Value* vp)
         return false;
     }
 
-    ctor->as<JSFunction>().setIsSelfHostedConstructor();
+    ctor->as<JSFunction>().setIsConstructor();
     args.rval().setUndefined();
     return true;
 }
@@ -299,81 +300,11 @@ js::intrinsic_NewDenseArray(JSContext* cx, unsigned argc, Value* vp)
     uint32_t length = args[0].toInt32();
 
     // Make a new buffer and initialize it up to length.
-    RootedArrayObject buffer(cx, NewDenseFullyAllocatedArray(cx, length));
+    RootedObject buffer(cx, NewFullyAllocatedArrayForCallingAllocationSite(cx, length));
     if (!buffer)
         return false;
 
-    ObjectGroup* newgroup = ObjectGroup::callingAllocationSiteGroup(cx, JSProto_Array);
-    if (!newgroup)
-        return false;
-    buffer->setGroup(newgroup);
-
-    NativeObject::EnsureDenseResult edr = buffer->ensureDenseElements(cx, length, 0);
-    switch (edr) {
-      case NativeObject::ED_OK:
-        args.rval().setObject(*buffer);
-        return true;
-
-      case NativeObject::ED_SPARSE: // shouldn't happen!
-        MOZ_ASSERT(!"%EnsureDenseArrayElements() would yield sparse array");
-        JS_ReportError(cx, "%EnsureDenseArrayElements() would yield sparse array");
-        break;
-
-      case NativeObject::ED_FAILED:
-        break;
-    }
-    return false;
-}
-
-/*
- * UnsafePutElements(arr0, idx0, elem0, ..., arrN, idxN, elemN): For each set of
- * (arr, idx, elem) arguments that are passed, performs the assignment
- * |arr[idx] = elem|. |arr| must be either a dense array or a typed array.
- *
- * If |arr| is a dense array, the index must be an int32 less than the
- * initialized length of |arr|. Use |%EnsureDenseResultArrayElements|
- * to ensure that the initialized length is long enough.
- *
- * If |arr| is a typed array, the index must be an int32 less than the
- * length of |arr|.
- */
-bool
-js::intrinsic_UnsafePutElements(JSContext* cx, unsigned argc, Value* vp)
-{
-    CallArgs args = CallArgsFromVp(argc, vp);
-
-    if ((args.length() % 3) != 0) {
-        JS_ReportError(cx, "Incorrect number of arguments, not divisible by 3");
-        return false;
-    }
-
-    for (uint32_t base = 0; base < args.length(); base += 3) {
-        uint32_t arri = base;
-        uint32_t idxi = base+1;
-        uint32_t elemi = base+2;
-
-        MOZ_ASSERT(args[arri].isObject());
-        MOZ_ASSERT(args[arri].toObject().isNative() || IsTypedObjectArray(args[arri].toObject()));
-        MOZ_ASSERT(args[idxi].isInt32());
-
-        RootedObject arrobj(cx, &args[arri].toObject());
-        uint32_t idx = args[idxi].toInt32();
-
-        if (IsAnyTypedArray(arrobj.get()) || arrobj->is<TypedObject>()) {
-            MOZ_ASSERT_IF(IsAnyTypedArray(arrobj.get()), idx < AnyTypedArrayLength(arrobj.get()));
-            MOZ_ASSERT_IF(arrobj->is<TypedObject>(), idx < uint32_t(arrobj->as<TypedObject>().length()));
-            // XXX: Always non-strict.
-            ObjectOpResult ignored;
-            RootedValue receiver(cx, ObjectValue(*arrobj));
-            if (!SetElement(cx, arrobj, idx, args[elemi], receiver, ignored))
-                return false;
-        } else {
-            MOZ_ASSERT(idx < arrobj->as<ArrayObject>().getDenseInitializedLength());
-            arrobj->as<ArrayObject>().setDenseElementWithType(cx, idx, args[elemi]);
-        }
-    }
-
-    args.rval().setUndefined();
+    args.rval().setObject(*buffer);
     return true;
 }
 
@@ -382,38 +313,47 @@ js::intrinsic_DefineDataProperty(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
-    MOZ_ASSERT(args.length() == 4);
+    MOZ_ASSERT(args.length() >= 3);
     MOZ_ASSERT(args[0].isObject());
-    MOZ_ASSERT(args[3].isInt32());
 
     RootedObject obj(cx, &args[0].toObject());
     RootedId id(cx);
     if (!ValueToId<CanGC>(cx, args[1], &id))
         return false;
     RootedValue value(cx, args[2]);
-    unsigned attributes = args[3].toInt32();
+
+    unsigned attrs = 0;
+    if (args.length() >= 4) {
+        unsigned attributes = args[3].toInt32();
+
+        MOZ_ASSERT(bool(attributes & ATTR_ENUMERABLE) != bool(attributes & ATTR_NONENUMERABLE),
+                   "_DefineDataProperty must receive either ATTR_ENUMERABLE xor ATTR_NONENUMERABLE");
+        if (attributes & ATTR_ENUMERABLE)
+            attrs |= JSPROP_ENUMERATE;
+
+        MOZ_ASSERT(bool(attributes & ATTR_CONFIGURABLE) != bool(attributes & ATTR_NONCONFIGURABLE),
+                   "_DefineDataProperty must receive either ATTR_CONFIGURABLE xor "
+                   "ATTR_NONCONFIGURABLE");
+        if (attributes & ATTR_NONCONFIGURABLE)
+            attrs |= JSPROP_PERMANENT;
+
+        MOZ_ASSERT(bool(attributes & ATTR_WRITABLE) != bool(attributes & ATTR_NONWRITABLE),
+                   "_DefineDataProperty must receive either ATTR_WRITABLE xor ATTR_NONWRITABLE");
+        if (attributes & ATTR_NONWRITABLE)
+            attrs |= JSPROP_READONLY;
+    } else {
+        // If the fourth argument is unspecified, the attributes are for a
+        // plain data property.
+        attrs = JSPROP_ENUMERATE;
+    }
 
     Rooted<PropertyDescriptor> desc(cx);
-    unsigned attrs = 0;
-
-    MOZ_ASSERT(bool(attributes & ATTR_ENUMERABLE) != bool(attributes & ATTR_NONENUMERABLE),
-               "_DefineDataProperty must receive either ATTR_ENUMERABLE xor ATTR_NONENUMERABLE");
-    if (attributes & ATTR_ENUMERABLE)
-        attrs |= JSPROP_ENUMERATE;
-
-    MOZ_ASSERT(bool(attributes & ATTR_CONFIGURABLE) != bool(attributes & ATTR_NONCONFIGURABLE),
-               "_DefineDataProperty must receive either ATTR_CONFIGURABLE xor "
-               "ATTR_NONCONFIGURABLE");
-    if (attributes & ATTR_NONCONFIGURABLE)
-        attrs |= JSPROP_PERMANENT;
-
-    MOZ_ASSERT(bool(attributes & ATTR_WRITABLE) != bool(attributes & ATTR_NONWRITABLE),
-               "_DefineDataProperty must receive either ATTR_WRITABLE xor ATTR_NONWRITABLE");
-    if (attributes & ATTR_NONWRITABLE)
-        attrs |= JSPROP_READONLY;
-
     desc.setDataDescriptor(value, attrs);
-    return StandardDefineProperty(cx, obj, id, desc);
+    if (!DefineProperty(cx, obj, id, desc))
+        return false;
+
+    args.rval().setUndefined();
+    return true;
 }
 
 bool
@@ -1373,7 +1313,6 @@ static const JSFunctionSpec intrinsic_functions[] = {
     JS_FN("RuntimeDefaultLocale",    intrinsic_RuntimeDefaultLocale,    0,0),
     JS_FN("SubstringKernel",         intrinsic_SubstringKernel,         3,0),
 
-    JS_FN("UnsafePutElements",       intrinsic_UnsafePutElements,       3,0),
     JS_FN("_DefineDataProperty",     intrinsic_DefineDataProperty,      4,0),
     JS_FN("UnsafeSetReservedSlot",   intrinsic_UnsafeSetReservedSlot,   3,0),
     JS_FN("UnsafeGetReservedSlot",   intrinsic_UnsafeGetReservedSlot,   2,0),
@@ -1634,13 +1573,13 @@ JSRuntime::markSelfHostingGlobal(JSTracer* trc)
 }
 
 bool
-JSRuntime::isSelfHostingCompartment(JSCompartment* comp)
+JSRuntime::isSelfHostingCompartment(JSCompartment* comp) const
 {
     return selfHostingGlobal_->compartment() == comp;
 }
 
 bool
-JSRuntime::isSelfHostingZone(JS::Zone* zone)
+JSRuntime::isSelfHostingZone(const JS::Zone* zone) const
 {
     return selfHostingGlobal_ && selfHostingGlobal_->zoneFromAnyThread() == zone;
 }
@@ -1672,14 +1611,14 @@ GetUnclonedValue(JSContext* cx, HandleNativeObject selfHostedObject,
         MOZ_ASSERT(selfHostedObject->is<GlobalObject>());
         RootedValue value(cx, IdToValue(id));
         return ReportValueErrorFlags(cx, JSREPORT_ERROR, JSMSG_NO_SUCH_SELF_HOSTED_PROP,
-                                     JSDVG_IGNORE_STACK, value, NullPtr(), nullptr, nullptr);
+                                     JSDVG_IGNORE_STACK, value, nullptr, nullptr, nullptr);
     }
 
     RootedShape shape(cx, selfHostedObject->lookupPure(id));
     if (!shape) {
         RootedValue value(cx, IdToValue(id));
         return ReportValueErrorFlags(cx, JSREPORT_ERROR, JSMSG_NO_SUCH_SELF_HOSTED_PROP,
-                                     JSDVG_IGNORE_STACK, value, NullPtr(), nullptr, nullptr);
+                                     JSDVG_IGNORE_STACK, value, nullptr, nullptr, nullptr);
     }
 
     MOZ_ASSERT(shape->hasSlot() && shape->hasDefaultGetter());
@@ -1783,7 +1722,9 @@ CloneObject(JSContext* cx, HandleNativeObject selfHostedObject)
         js::gc::AllocKind kind = hasName
                                  ? gc::AllocKind::FUNCTION_EXTENDED
                                  : selfHostedFunction->getAllocKind();
-        clone = CloneFunctionObject(cx, selfHostedFunction, cx->global(), kind, TenuredObject);
+        MOZ_ASSERT(!CanReuseScriptForClone(cx->compartment(), selfHostedFunction, cx->global()));
+        clone = CloneFunctionAndScript(cx, selfHostedFunction, cx->global(),
+                                       /* newStaticScope = */ nullptr, kind);
         // To be able to re-lazify the cloned function, its name in the
         // self-hosting compartment has to be stored on the clone.
         if (clone && hasName)
@@ -1808,10 +1749,10 @@ CloneObject(JSContext* cx, HandleNativeObject selfHostedObject)
             return nullptr;
         clone = StringObject::create(cx, str);
     } else if (selfHostedObject->is<ArrayObject>()) {
-        clone = NewDenseEmptyArray(cx, NullPtr(), TenuredObject);
+        clone = NewDenseEmptyArray(cx, nullptr, TenuredObject);
     } else {
         MOZ_ASSERT(selfHostedObject->isNative());
-        clone = NewObjectWithGivenProto(cx, selfHostedObject->getClass(), NullPtr(),
+        clone = NewObjectWithGivenProto(cx, selfHostedObject->getClass(), nullptr,
                                         selfHostedObject->asTenured().getAllocKind(),
                                         SingletonObject);
     }
@@ -1867,22 +1808,17 @@ JSRuntime::cloneSelfHostedFunctionScript(JSContext* cx, HandlePropertyName name,
     // JSFunction::generatorKind can't handle lazy self-hosted functions, so we make sure there
     // aren't any.
     MOZ_ASSERT(!sourceFun->isGenerator());
-    RootedScript sourceScript(cx, sourceFun->getOrCreateScript(cx));
-    if (!sourceScript)
-        return false;
-    MOZ_ASSERT(!sourceScript->enclosingStaticScope());
-    JSScript* cscript = CloneScript(cx, NullPtr(), targetFun, sourceScript);
-    if (!cscript)
-        return false;
-    cscript->setFunction(targetFun);
-
     MOZ_ASSERT(sourceFun->nargs() == targetFun->nargs());
     // The target function might have been relazified after it's flags changed.
     targetFun->setFlags((targetFun->flags() & ~JSFunction::INTERPRETED_LAZY) |
                         sourceFun->flags() | JSFunction::EXTENDED);
-    targetFun->setScript(cscript);
     MOZ_ASSERT(targetFun->isExtended());
-    return true;
+
+    RootedScript sourceScript(cx, sourceFun->getOrCreateScript(cx));
+    if (!sourceScript)
+        return false;
+    MOZ_ASSERT(!sourceScript->enclosingStaticScope());
+    return !!CloneScriptIntoFunction(cx, /* enclosingScope = */ nullptr, targetFun, sourceScript);
 }
 
 bool

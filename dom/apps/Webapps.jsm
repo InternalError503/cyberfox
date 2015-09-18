@@ -203,6 +203,7 @@ this.DOMApplicationRegistry = {
   dirKey: DIRECTORY_NAME,
 
   init: function() {
+    // Keep the messages in sync with the lazy-loading in browser.js (bug 1171013).
     this.messages = ["Webapps:Install",
                      "Webapps:Uninstall",
                      "Webapps:GetSelf",
@@ -396,7 +397,7 @@ this.DOMApplicationRegistry = {
     if (aManifest.widgetPages) {
       let resolve = (aPage)=>{
         let filepath = AppsUtils.getFilePath(aPage);
-        return Services.io.newURI(aManifest.resolveURL(filepath), null, null);
+        return aManifest.resolveURL(filepath);
       };
       aDestApp.widgetPages = aManifest.widgetPages.map(resolve);
     } else {
@@ -3527,25 +3528,17 @@ this.DOMApplicationRegistry = {
                       appURI, aNewApp.localId, false);
 
     if (aIsLocalFileInstall) {
-      requestChannel = NetUtil.newChannel2(aFullPackagePath,
-                                           null,
-                                           null,
-                                           null,      // aLoadingNode
-                                           principal,
-                                           null,      // aTriggeringPrincipal
-                                           Ci.nsILoadInfo.SEC_NORMAL,
-                                           Ci.nsIContentPolicy.TYPE_OTHER)
-                              .QueryInterface(Ci.nsIFileChannel);
+      requestChannel = NetUtil.newChannel({
+        uri: aFullPackagePath,
+        loadingPrincipal: principal,
+        contentPolicyType: Ci.nsIContentPolicy.TYPE_OTHER}
+      ).QueryInterface(Ci.nsIFileChannel);
     } else {
-      requestChannel = NetUtil.newChannel2(aFullPackagePath,
-                                           null,
-                                           null,
-                                           null,      // aLoadingNode
-                                           principal,
-                                           null,      // aTriggeringPrincipal
-                                           Ci.nsILoadInfo.SEC_NORMAL,
-                                           Ci.nsIContentPolicy.TYPE_OTHER)
-                              .QueryInterface(Ci.nsIHttpChannel);
+      requestChannel = NetUtil.newChannel({
+        uri: aFullPackagePath,
+        loadingPrincipal: principal,
+        contentPolicyType: Ci.nsIContentPolicy.TYPE_OTHER}
+      ).QueryInterface(Ci.nsIHttpChannel);
       requestChannel.loadFlags |= Ci.nsIRequest.INHIBIT_CACHING;
     }
 
@@ -3640,7 +3633,10 @@ this.DOMApplicationRegistry = {
     let file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
     file.initWithPath(aFilePath);
 
-    NetUtil.asyncFetch2(file, function(inputStream, status) {
+    NetUtil.asyncFetch({
+      uri: NetUtil.newURI(file),
+      loadUsingSystemPrincipal: true
+    }, function(inputStream, status) {
       if (!Components.isSuccessCode(status)) {
         debug("Error reading " + aFilePath + ": " + e);
         deferred.reject();
@@ -3667,12 +3663,7 @@ this.DOMApplicationRegistry = {
       debug("File hash computed: " + hash);
 
       deferred.resolve(hash);
-    },
-    null,      // aLoadingNode
-    Services.scriptSecurityManager.getSystemPrincipal(),
-    null,      // aTriggeringPrincipal
-    Ci.nsILoadInfo.SEC_NORMAL,
-    Ci.nsIContentPolicy.TYPE_OTHER);
+    });
 
     return deferred.promise;
   },
@@ -4871,7 +4862,22 @@ this.DOMApplicationRegistry = {
       browserOnly: browserOnly,
       QueryInterface: XPCOMUtils.generateQI([Ci.mozIApplicationClearPrivateDataParams])
     };
+    this._clearCookieJarData(appId, browserOnly);
     this._notifyCategoryAndObservers(subject, "webapps-clear-data", null, msg);
+  },
+
+  _clearCookieJarData: function(appId, browserOnly) {
+    let browserCookieJar =
+      ChromeUtils.originAttributesToCookieJar({appId: appId,
+                                               inBrowser: true});
+    this._notifyCategoryAndObservers(null, "clear-cookiejar-data", browserCookieJar);
+
+    if (!browserOnly) {
+      let appCookieJar =
+        ChromeUtils.originAttributesToCookieJar({appId: appId,
+                                                 inBrowser: false});
+      this._notifyCategoryAndObservers(null, "clear-cookiejar-data", appCookieJar);
+    }
   }
 };
 

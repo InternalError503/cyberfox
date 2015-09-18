@@ -954,9 +954,8 @@ nsWindowsShellService::SetDefaultBrowser(bool aClaimAllTypes, bool aForAllUsers)
         }
       }
     } else {
-      // Windows 10 blocks attempts to load the HTTP Handler
-      // association dialog, so the modern Settings dialog
-      // is opened with the Default Apps view loaded.
+      // Windows 10 blocks attempts to load the
+      // HTTP Handler association dialog.
       if (IsWin10OrLater()) {
         rv = LaunchModernSettingsDialogDefaultApps();
       } else {

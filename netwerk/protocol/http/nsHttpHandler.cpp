@@ -182,10 +182,10 @@ nsHttpHandler::nsHttpHandler()
     , mParentalControlEnabled(false)
     , mTelemetryEnabled(false)
     , mAllowExperiments(true)
+    , mDebugObservations(false)
     , mHandlerActive(false)
     , mEnableSpdy(false)
     , mSpdyV31(true)
-    , mHttp2DraftEnabled(true)
     , mHttp2Enabled(true)
     , mUseH2Deps(true)
     , mEnforceHttp2TlsProfile(true)
@@ -283,6 +283,12 @@ nsHttpHandler::Init()
         prefBranch->AddObserver(HTTP_PREF("tcp_keepalive.long_lived_connections"), this, true);
         prefBranch->AddObserver(SAFE_HINT_HEADER_VALUE, this, true);
         PrefsChanged(prefBranch, nullptr);
+    }
+
+    rv = Preferences::AddBoolVarCache(&mPackagedAppsEnabled,
+        "network.http.enable-packaged-apps", false);
+    if (NS_FAILED(rv)) {
+        mPackagedAppsEnabled = false;
     }
 
     nsHttpChannelAuthProvider::InitializePrefs();
@@ -703,14 +709,32 @@ nsHttpHandler::InitUserAgentComponents()
     );
 #endif
 
-   // Add the `Mobile` or `Tablet` token when running on device or in the
-   // b2g desktop simulator.
+
 #if defined(ANDROID) || defined(FXOS_SIMULATOR)
     nsCOMPtr<nsIPropertyBag2> infoService = do_GetService("@mozilla.org/system-info;1");
     MOZ_ASSERT(infoService, "Could not find a system info service");
-
+    nsresult rv;
+    // Add the Android version number to the Fennec platform identifier.
+#if defined MOZ_WIDGET_ANDROID
+    nsAutoString androidVersion;
+    rv = infoService->GetPropertyAsAString(
+        NS_LITERAL_STRING("release_version"), androidVersion);
+    if (NS_SUCCEEDED(rv)) {
+      mPlatform += " ";
+      // If the 2nd character is a ".", we know the major version is a single
+      // digit. If we're running on a version below 4 we pretend to be on
+      // Android KitKat (4.4) to work around scripts sniffing for low versions.
+      if (androidVersion[1] == 46 && androidVersion[0] < 52) {
+        mPlatform += "4.4";
+      } else {
+        mPlatform += NS_LossyConvertUTF16toASCII(androidVersion);
+      }
+    }
+#endif
+    // Add the `Mobile` or `Tablet` token when running on device or in the
+    // b2g desktop simulator.
     bool isTablet;
-    nsresult rv = infoService->GetPropertyAsBool(NS_LITERAL_STRING("tablet"), &isTablet);
+    rv = infoService->GetPropertyAsBool(NS_LITERAL_STRING("tablet"), &isTablet);
     if (NS_SUCCEEDED(rv) && isTablet)
         mCompatDevice.AssignLiteral("Tablet");
     else
@@ -1196,12 +1220,6 @@ nsHttpHandler::PrefsChanged(nsIPrefBranch *prefs, const char *pref)
             mSpdyV31 = cVar;
     }
 
-    if (PREF_CHANGED(HTTP_PREF("spdy.enabled.http2draft"))) {
-        rv = prefs->GetBoolPref(HTTP_PREF("spdy.enabled.http2draft"), &cVar);
-        if (NS_SUCCEEDED(rv))
-            mHttp2DraftEnabled = cVar;
-    }
-
     if (PREF_CHANGED(HTTP_PREF("spdy.enabled.http2"))) {
         rv = prefs->GetBoolPref(HTTP_PREF("spdy.enabled.http2"), &cVar);
         if (NS_SUCCEEDED(rv))
@@ -1419,6 +1437,15 @@ nsHttpHandler::PrefsChanged(nsIPrefBranch *prefs, const char *pref)
         rv = prefs->GetBoolPref(ALLOW_EXPERIMENTS, &cVar);
         if (NS_SUCCEEDED(rv)) {
             mAllowExperiments = cVar;
+        }
+    }
+
+    // network.http.debug-observations
+    if (PREF_CHANGED("network.http.debug-observations")) {
+        cVar = false;
+        rv = prefs->GetBoolPref("network.http.debug-observations", &cVar);
+        if (NS_SUCCEEDED(rv)) {
+            mDebugObservations = cVar;
         }
     }
 
@@ -2036,6 +2063,17 @@ nsHttpHandler::SpeculativeConnectInternal(nsIURI *aURI,
 
     if (!mHandlerActive)
         return NS_OK;
+
+    MOZ_ASSERT(NS_IsMainThread());
+    if (mDebugObservations && mObserverService) {
+        // this is basically used for test coverage of an otherwise 'hintable' feature
+        nsAutoCString spec;
+        aURI->GetSpec(spec);
+        spec.Append(anonymous ? NS_LITERAL_CSTRING("[A]") : NS_LITERAL_CSTRING("[.]"));
+        mObserverService->NotifyObservers(nullptr,
+                                          "speculative-connect-request",
+                                          NS_ConvertUTF8toUTF16(spec).get());
+    }
 
     nsISiteSecurityService* sss = gHttpHandler->GetSSService();
     bool isStsHost = false;

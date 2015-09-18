@@ -94,7 +94,6 @@ DIRS += [
     '/dom',
     '/view',
     '/widget',
-    '/content',
     '/editor',
     '/layout',
     '/docshell',
@@ -117,8 +116,6 @@ else:
     DIRS += ['/accessible/ipc']
 
 # toolkit
-
-DIRS += ['/profile']
 
 # This must precede xpfe.
 if CONFIG['MOZ_JPROF']:

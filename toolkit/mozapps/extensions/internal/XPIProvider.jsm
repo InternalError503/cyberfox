@@ -710,7 +710,8 @@ function createAddonDetails(id, aAddon) {
   return {
     id: id || aAddon.id,
     type: aAddon.type,
-    version: aAddon.version
+    version: aAddon.version,
+    multiprocessCompatible: aAddon.multiprocessCompatible
   };
 }
 
@@ -1011,16 +1012,32 @@ function loadManifestFromRDF(aUri, aStream) {
   // to avoid a SQLite initialization error (bug 717904).
   let storage = Services.storage;
 
-  // Generate random GUID used for Sync.
-  // This was lifted from util.js:makeGUID() from services-sync.
-  let rng = Cc["@mozilla.org/security/random-generator;1"].
-            createInstance(Ci.nsIRandomGenerator);
-  let bytes = rng.generateRandomBytes(9);
-  let byte_string = [String.fromCharCode(byte) for each (byte in bytes)]
-                    .join("");
-  // Base64 encode
-  addon.syncGUID = btoa(byte_string).replace(/\+/g, '-')
-                                    .replace(/\//g, '_');
+  // Define .syncGUID as a lazy property which is also settable
+  Object.defineProperty(addon, "syncGUID", {
+    get: () => {
+
+      // Generate random GUID used for Sync.
+      // This was lifted from util.js:makeGUID() from services-sync.
+      let rng = Cc["@mozilla.org/security/random-generator;1"].
+        createInstance(Ci.nsIRandomGenerator);
+      let bytes = rng.generateRandomBytes(9);
+      let byte_string = [String.fromCharCode(byte) for each (byte in bytes)]
+                        .join("");
+      // Base64 encode
+      let guid = btoa(byte_string).replace(/\+/g, '-')
+        .replace(/\//g, '_');
+
+      delete addon.syncGUID;
+      addon.syncGUID = guid;
+      return guid;
+    },
+    set: (val) => {
+      delete addon.syncGUID;
+      addon.syncGUID = val;
+    },
+    configurable: true,
+    enumerable: true,
+  });
 
   return addon;
 }
@@ -1353,7 +1370,7 @@ function getSignedStatus(aRv, aCert, aExpectedID) {
  */
 function verifyZipSignedState(aFile, aAddon) {
   if (!ADDON_SIGNING || !SIGNED_TYPES.has(aAddon.type))
-    return Promise.resolve(undefined);
+    return Promise.resolve(AddonManager.SIGNEDSTATE_NOT_REQUIRED);
 
   let certDB = Cc["@mozilla.org/security/x509certdb;1"]
                .getService(Ci.nsIX509CertDB);
@@ -1383,7 +1400,7 @@ function verifyZipSignedState(aFile, aAddon) {
  */
 function verifyDirSignedState(aDir, aAddon) {
   if (!ADDON_SIGNING || !SIGNED_TYPES.has(aAddon.type))
-    return Promise.resolve(undefined);
+    return Promise.resolve(AddonManager.SIGNEDSTATE_NOT_REQUIRED);
 
   let certDB = Cc["@mozilla.org/security/x509certdb;1"]
                .getService(Ci.nsIX509CertDB);
@@ -2574,13 +2591,13 @@ this.XPIProvider = {
             continue;
 
           let signedState = yield verifyBundleSignedState(addon._sourceBundle, addon);
-          if (signedState == addon.signedState)
-            continue;
 
-          addon.signedState = signedState;
-          AddonManagerPrivate.callAddonListeners("onPropertyChanged",
-                                                 createWrapper(addon),
-                                                 ["signedState"]);
+          if (signedState != addon.signedState) {
+            addon.signedState = signedState;
+            AddonManagerPrivate.callAddonListeners("onPropertyChanged",
+                                                   createWrapper(addon),
+                                                   ["signedState"]);
+          }
 
           let disabled = XPIProvider.updateAddonDisabledState(addon);
           if (disabled !== undefined)
@@ -5471,7 +5488,7 @@ AddonInstall.prototype = {
       }
     }
     else if (this.addon.signedState == AddonManager.SIGNEDSTATE_UNKNOWN ||
-             this.addon.signedState == undefined) {
+             this.addon.signedState == AddonManager.SIGNEDSTATE_NOT_REQUIRED) {
       // Check object signing certificate, if any
       let x509 = zipreader.getSigningCert(null);
       if (x509) {
@@ -5589,14 +5606,9 @@ AddonInstall.prototype = {
       let requireBuiltIn = Preferences.get(PREF_INSTALL_REQUIREBUILTINCERTS, true);
       this.badCertHandler = new CertUtils.BadCertHandler(!requireBuiltIn);
 
-      this.channel = NetUtil.newChannel2(this.sourceURI,
-                                         null,
-                                         null,
-                                         null,      // aLoadingNode
-                                         Services.scriptSecurityManager.getSystemPrincipal(),
-                                         null,      // aTriggeringPrincipal
-                                         Ci.nsILoadInfo.SEC_NORMAL,
-                                         Ci.nsIContentPolicy.TYPE_OTHER);
+      this.channel = NetUtil.newChannel({
+        uri: this.sourceURI,
+        loadUsingSystemPrincipal: true});
       this.channel.notificationCallbacks = this;
       if (this.channel instanceof Ci.nsIHttpChannel) {
         this.channel.setRequestHeader("Moz-XPI-Update", "1", true);

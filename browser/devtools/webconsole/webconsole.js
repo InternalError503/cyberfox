@@ -243,7 +243,9 @@ WebConsoleFrame.prototype = {
    * Getter for the xul:popupset that holds any popups we open.
    * @type nsIDOMElement
    */
-  get popupset() this.owner.mainPopupSet,
+  get popupset() {
+    return this.owner.mainPopupSet;
+  },
 
   /**
    * Holds the initialization promise object.
@@ -356,7 +358,9 @@ WebConsoleFrame.prototype = {
    * Getter for the debugger WebConsoleClient.
    * @type object
    */
-  get webConsoleClient() this.proxy ? this.proxy.webConsoleClient : null,
+  get webConsoleClient() {
+    return this.proxy ? this.proxy.webConsoleClient : null;
+  },
 
   _destroyer: null,
 
@@ -1446,10 +1450,20 @@ WebConsoleFrame.prototype = {
       errorMessage = errorMessage.initial;
     }
 
+    let displayOrigin = aScriptError.sourceName;
+
+    // TLS errors are related to the connection and not the resource; therefore
+    // it makes sense to only display the protcol, host and port (prePath).
+    // This also means messages are grouped for a single origin.
+    if (aScriptError.category && aScriptError.category == "SHA-1 Signature") {
+      let sourceURI = Services.io.newURI(aScriptError.sourceName, null, null).QueryInterface(Ci.nsIURL);
+      displayOrigin = sourceURI.prePath;
+    }
+
     // Create a new message
     let msg = new Messages.Simple(errorMessage, {
       location: {
-        url: aScriptError.sourceName,
+        url: displayOrigin,
         line: aScriptError.lineNumber,
         column: aScriptError.columnNumber
       },
@@ -2874,7 +2888,7 @@ WebConsoleFrame.prototype = {
       }
     }
 
-    clipboardHelper.copyString(strings.join("\n"), this.document);
+    clipboardHelper.copyString(strings.join("\n"));
   },
 
   /**
@@ -3200,13 +3214,19 @@ JSTerm.prototype = {
    * Getter for the element that holds the messages we display.
    * @type nsIDOMElement
    */
-  get outputNode() this.hud.outputNode,
+  get outputNode()
+  {
+    return this.hud.outputNode;
+  },
 
   /**
    * Getter for the debugger WebConsoleClient.
    * @type object
    */
-  get webConsoleClient() this.hud.webConsoleClient,
+  get webConsoleClient()
+  {
+    return this.hud.webConsoleClient;
+  },
 
   COMPLETE_FORWARD: 0,
   COMPLETE_BACKWARD: 1,

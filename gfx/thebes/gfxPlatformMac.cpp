@@ -116,11 +116,11 @@ gfxPlatformMac::CreatePlatformFontList()
 }
 
 already_AddRefed<gfxASurface>
-gfxPlatformMac::CreateOffscreenSurface(const IntSize& size,
-                                       gfxContentType contentType)
+gfxPlatformMac::CreateOffscreenSurface(const IntSize& aSize,
+                                       gfxImageFormat aFormat)
 {
     nsRefPtr<gfxASurface> newSurface =
-      new gfxQuartzSurface(size, OptimalFormatForContent(contentType));
+      new gfxQuartzSurface(aSize, aFormat);
     return newSurface.forget();
 }
 
@@ -572,11 +572,25 @@ static CVReturn VsyncCallback(CVDisplayLinkRef aDisplayLink,
   // Executed on OS X hardware vsync thread
   OSXVsyncSource::OSXDisplay* display = (OSXVsyncSource::OSXDisplay*) aDisplayLinkContext;
   int64_t nextVsyncTimestamp = aOutputTime->hostTime;
-  mozilla::TimeStamp nextVsync = mozilla::TimeStamp::FromSystemTime(nextVsyncTimestamp);
 
+  mozilla::TimeStamp nextVsync = mozilla::TimeStamp::FromSystemTime(nextVsyncTimestamp);
   mozilla::TimeStamp previousVsync = display->mPreviousTimestamp;
+  mozilla::TimeStamp now = TimeStamp::Now();
+
+  // Snow leopard sometimes sends vsync timestamps very far in the past.
+  // Normalize the vsync timestamps to now.
+  if (nextVsync <= previousVsync) {
+    nextVsync = now;
+    previousVsync = now;
+  } else if (now < previousVsync) {
+    // Bug 1158321 - The VsyncCallback can sometimes execute before the reported
+    // vsync time. In those cases, normalize the timestamp to Now() as sending
+    // timestamps in the future has undefined behavior. See the comment above
+    // OSXDisplay::mPreviousTimestamp
+    previousVsync = now;
+  }
+
   display->mPreviousTimestamp = nextVsync;
-  MOZ_ASSERT(TimeStamp::Now() > previousVsync);
 
   display->NotifyVsync(previousVsync);
   return kCVReturnSuccess;

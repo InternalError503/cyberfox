@@ -13,6 +13,7 @@
 #include "mozilla/Assertions.h"
 #include "mozilla/Base64.h"
 #include "mozilla/CheckedInt.h"
+#include "mozilla/dom/CanvasCaptureMediaStream.h"
 #include "mozilla/dom/CanvasRenderingContext2D.h"
 #include "mozilla/dom/File.h"
 #include "mozilla/dom/HTMLCanvasElementBinding.h"
@@ -405,6 +406,53 @@ HTMLCanvasElement::GetMozPrintCallback() const
   return mPrintCallback;
 }
 
+already_AddRefed<CanvasCaptureMediaStream>
+HTMLCanvasElement::CaptureStream(const Optional<double>& aFrameRate,
+                                 ErrorResult& aRv)
+{
+  if (IsWriteOnly()) {
+    aRv.Throw(NS_ERROR_DOM_SECURITY_ERR);
+    return nullptr;
+  }
+
+  nsIDOMWindow* window = OwnerDoc()->GetInnerWindow();
+  if (!window) {
+    aRv.Throw(NS_ERROR_FAILURE);
+    return nullptr;
+  }
+
+  if (!mCurrentContext) {
+    aRv.Throw(NS_ERROR_NOT_INITIALIZED);
+    return nullptr;
+  }
+
+  if (mCurrentContextType != CanvasContextType::Canvas2D) {
+    WebGLContext* gl = static_cast<WebGLContext*>(mCurrentContext.get());
+    if (!gl->IsPreservingDrawingBuffer()) {
+      aRv.Throw(NS_ERROR_FAILURE);
+      return nullptr;
+    }
+  }
+
+  nsRefPtr<CanvasCaptureMediaStream> stream =
+    CanvasCaptureMediaStream::CreateSourceStream(window, this);
+  if (!stream) {
+    aRv.Throw(NS_ERROR_FAILURE);
+    return nullptr;
+  }
+
+  nsRefPtr<nsIPrincipal> principal = NodePrincipal();
+  stream->CombineWithPrincipal(principal);
+
+  TrackID videoTrackId = 1;
+  nsresult rv = stream->Init(aFrameRate, videoTrackId);
+  if (NS_FAILED(rv)) {
+    aRv.Throw(rv);
+    return nullptr;
+  }
+  return stream.forget();
+}
+
 nsresult
 HTMLCanvasElement::ExtractData(nsAString& aType,
                                const nsAString& aOptions,
@@ -555,27 +603,29 @@ HTMLCanvasElement::ToBlob(JSContext* aCx,
       , mFileCallback(aCallback) {}
 
     // This is called on main thread.
-    nsresult ReceiveBlob(already_AddRefed<File> aBlob)
+    nsresult ReceiveBlob(already_AddRefed<Blob> aBlob)
     {
-      nsRefPtr<File> blob = aBlob;
-      uint64_t size;
-      nsresult rv = blob->GetSize(&size);
-      if (NS_SUCCEEDED(rv)) {
+      nsRefPtr<Blob> blob = aBlob;
+
+      ErrorResult rv;
+      uint64_t size = blob->GetSize(rv);
+      if (rv.Failed()) {
+        rv.SuppressException();
+      } else {
         AutoJSAPI jsapi;
         if (jsapi.Init(mGlobal)) {
           JS_updateMallocCounter(jsapi.cx(), size);
         }
       }
 
-      nsRefPtr<File> newBlob = new File(mGlobal, blob->Impl());
+      nsRefPtr<Blob> newBlob = Blob::Create(mGlobal, blob->Impl());
 
-      mozilla::ErrorResult error;
-      mFileCallback->Call(*newBlob, error);
+      mFileCallback->Call(*newBlob, rv);
 
       mGlobal = nullptr;
       mFileCallback = nullptr;
 
-      return error.StealNSResult();
+      return rv.StealNSResult();
     }
 
     nsCOMPtr<nsIGlobalObject> mGlobal;
@@ -599,16 +649,22 @@ HTMLCanvasElement::MozGetAsFile(const nsAString& aName,
                                 const nsAString& aType,
                                 ErrorResult& aRv)
 {
-  nsCOMPtr<nsIDOMFile> file;
+  nsCOMPtr<nsISupports> file;
   aRv = MozGetAsFile(aName, aType, getter_AddRefs(file));
-  nsRefPtr<File> tmp = static_cast<File*>(file.get());
-  return tmp.forget();
+  if (NS_WARN_IF(aRv.Failed())) {
+    return nullptr;
+  }
+
+  nsCOMPtr<nsIDOMBlob> blob = do_QueryInterface(file);
+  nsRefPtr<Blob> domBlob = static_cast<Blob*>(blob.get());
+  MOZ_ASSERT(domBlob->IsFile());
+  return domBlob->ToFile();
 }
 
 NS_IMETHODIMP
 HTMLCanvasElement::MozGetAsFile(const nsAString& aName,
                                 const nsAString& aType,
-                                nsIDOMFile** aResult)
+                                nsISupports** aResult)
 {
   OwnerDoc()->WarnOnceAbout(nsIDocument::eMozGetAsFile);
 
@@ -618,13 +674,13 @@ HTMLCanvasElement::MozGetAsFile(const nsAString& aName,
     return NS_ERROR_DOM_SECURITY_ERR;
   }
 
-  return MozGetAsFileImpl(aName, aType, aResult);
+  return MozGetAsBlobImpl(aName, aType, aResult);
 }
 
 nsresult
-HTMLCanvasElement::MozGetAsFileImpl(const nsAString& aName,
+HTMLCanvasElement::MozGetAsBlobImpl(const nsAString& aName,
                                     const nsAString& aType,
-                                    nsIDOMFile** aResult)
+                                    nsISupports** aResult)
 {
   nsCOMPtr<nsIInputStream> stream;
   nsAutoString type(aType);
@@ -648,7 +704,7 @@ HTMLCanvasElement::MozGetAsFileImpl(const nsAString& aName,
   nsCOMPtr<nsPIDOMWindow> win = do_QueryInterface(OwnerDoc()->GetScopeObject());
 
   // The File takes ownership of the buffer
-  nsRefPtr<File> file =
+  nsCOMPtr<nsIDOMBlob> file =
     File::CreateMemoryFile(win, imgData, (uint32_t)imgSize, aName, type,
                            PR_Now());
 

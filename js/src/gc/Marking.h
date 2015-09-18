@@ -195,9 +195,6 @@ class GCMarker : public JSTracer
     bool shouldCheckCompartments() { return strictCompartmentChecking; }
 #endif
 
-    /* This is public exclusively for ScanRope. */
-    MarkStack stack;
-
   private:
 #ifdef DEBUG
     void checkZone(void* p);
@@ -257,7 +254,7 @@ class GCMarker : public JSTracer
             delayMarkingChildren(ptr);
     }
 
-    void pushValueArray(JSObject* obj, void* start, void* end) {
+    void pushValueArray(JSObject* obj, HeapSlot* start, HeapSlot* end) {
         checkZone(obj);
 
         MOZ_ASSERT(start <= end);
@@ -281,6 +278,9 @@ class GCMarker : public JSTracer
     void saveValueRanges();
     inline void processMarkStackTop(SliceBudget& budget);
 
+    /* The mark stack. Pointers in this stack are "gray" in the GC sense. */
+    MarkStack stack;
+
     /* The color is only applied to objects and functions. */
     uint32_t color;
 
@@ -300,21 +300,16 @@ class GCMarker : public JSTracer
     mozilla::DebugOnly<bool> strictCompartmentChecking;
 };
 
+#ifdef DEBUG
+// Return true if this trace is happening on behalf of gray buffering during
+// the marking phase of incremental GC.
 bool
-IsBufferingGrayRoots(JSTracer* trc);
+IsBufferGrayRootsTracer(JSTracer* trc);
+#endif
 
 namespace gc {
 
 /*** Special Cases ***/
-
-/*
- * Trace through a shape or group iteratively during cycle collection to avoid
- * deep or infinite recursion.
- */
-void
-MarkCycleCollectorChildren(JSTracer* trc, Shape* shape);
-void
-MarkCycleCollectorChildren(JSTracer* trc, ObjectGroup* group);
 
 void
 PushArena(GCMarker* gcmarker, ArenaHeader* aheader);

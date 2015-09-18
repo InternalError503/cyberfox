@@ -45,7 +45,7 @@ MediaTaskQueue::DispatchLocked(already_AddRefed<nsIRunnable> aRunnable,
 {
   nsCOMPtr<nsIRunnable> r = aRunnable;
   AbstractThread* currentThread;
-  if (aReason != TailDispatch && (currentThread = GetCurrent()) && currentThread->RequiresTailDispatch()) {
+  if (aReason != TailDispatch && (currentThread = GetCurrent()) && RequiresTailDispatch(currentThread)) {
     currentThread->TailDispatcher().AddTask(this, r.forget(), aFailureHandling);
     return NS_OK;
   }
@@ -159,17 +159,16 @@ MediaTaskQueue::AwaitShutdownAndIdle()
 nsRefPtr<ShutdownPromise>
 MediaTaskQueue::BeginShutdown()
 {
-  // Make sure there are no tasks for this queue waiting in the caller's tail
-  // dispatcher.
-  MOZ_ASSERT_IF(AbstractThread::GetCurrent(),
-                !AbstractThread::GetCurrent()->TailDispatcher().HasTasksFor(this));
+  // Dispatch any tasks for this queue waiting in the caller's tail dispatcher,
+  // since this is the last opportunity to do so.
+  if (AbstractThread* currentThread = AbstractThread::GetCurrent()) {
+    currentThread->TailDispatcher().DispatchTasksFor(this);
+  }
 
   MonitorAutoLock mon(mQueueMonitor);
   mIsShutdown = true;
   nsRefPtr<ShutdownPromise> p = mShutdownPromise.Ensure(__func__);
-  if (!mIsRunning) {
-    mShutdownPromise.Resolve(true, __func__);
-  }
+  MaybeResolveShutdown();
   mon.NotifyAll();
   return p;
 }
@@ -238,7 +237,7 @@ MediaTaskQueue::Runner::Run()
     MOZ_ASSERT(mQueue->mIsRunning);
     if (mQueue->mTasks.size() == 0) {
       mQueue->mIsRunning = false;
-      mQueue->mShutdownPromise.ResolveIfExists(true, __func__);
+      mQueue->MaybeResolveShutdown();
       mon.NotifyAll();
       return NS_OK;
     }
@@ -269,7 +268,7 @@ MediaTaskQueue::Runner::Run()
     if (mQueue->mTasks.size() == 0) {
       // No more events to run. Exit the task runner.
       mQueue->mIsRunning = false;
-      mQueue->mShutdownPromise.ResolveIfExists(true, __func__);
+      mQueue->MaybeResolveShutdown();
       mon.NotifyAll();
       return NS_OK;
     }
@@ -286,6 +285,7 @@ MediaTaskQueue::Runner::Run()
     MonitorAutoLock mon(mQueue->mQueueMonitor);
     mQueue->mIsRunning = false;
     mQueue->mIsShutdown = true;
+    mQueue->MaybeResolveShutdown();
     mon.NotifyAll();
   }
 

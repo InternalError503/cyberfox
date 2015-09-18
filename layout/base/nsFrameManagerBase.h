@@ -30,15 +30,7 @@ class nsStyleSet;
 class nsFrameManagerBase
 {
 public:
-  nsFrameManagerBase()
-    : mPresShell(nullptr)
-    , mStyleSet(nullptr)
-    , mRootFrame(nullptr)
-    , mUndisplayedMap(nullptr)
-    , mDisplayContentsMap(nullptr)
-    , mIsDestroyingFrames(false)
-  {
-  }
+  nsFrameManagerBase();
 
   bool IsDestroyingFrames() { return mIsDestroyingFrames; }
 

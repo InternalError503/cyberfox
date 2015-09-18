@@ -76,8 +76,7 @@
     _(GetDynamicName)               \
     _(FilterArgumentsOrEvalS)       \
     _(FilterArgumentsOrEvalV)       \
-    _(CallDirectEvalS)              \
-    _(CallDirectEvalV)              \
+    _(CallDirectEval)               \
     _(StackArgT)                    \
     _(StackArgV)                    \
     _(CreateThis)                   \
@@ -218,6 +217,7 @@
     _(UnboxedArrayLength)           \
     _(UnboxedArrayInitializedLength) \
     _(IncrementUnboxedArrayInitializedLength) \
+    _(SetUnboxedArrayInitializedLength) \
     _(BoundsCheck)                  \
     _(BoundsCheckRange)             \
     _(BoundsCheckLower)             \
@@ -238,6 +238,7 @@
     _(ArrayPushV)                   \
     _(ArrayPushT)                   \
     _(ArrayConcat)                  \
+    _(ArraySlice)                   \
     _(ArrayJoin)                    \
     _(StoreElementHoleV)            \
     _(StoreElementHoleT)            \
@@ -348,8 +349,9 @@
     _(AssertResultT)                \
     _(LexicalCheck)                 \
     _(ThrowUninitializedLexical)    \
-    _(NurseryObject)                \
-    _(Debugger)
+    _(Debugger)                     \
+    _(NewTarget)                    \
+    _(ArrowNewTarget)
 
 #if defined(JS_CODEGEN_X86)
 # include "jit/x86/LOpcodes-x86.h"

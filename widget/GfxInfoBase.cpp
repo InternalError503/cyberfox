@@ -32,6 +32,7 @@
 #include "mozilla/dom/ContentChild.h"
 #include "mozilla/gfx/2D.h"
 #include "mozilla/gfx/Logging.h"
+#include "gfxPrefs.h"
 
 #if defined(MOZ_CRASHREPORTER)
 #include "nsExceptionHandler.h"
@@ -165,7 +166,7 @@ GetPrefValueForFeature(int32_t aFeature, int32_t& aValue)
   if (!prefname)
     return false;
 
-  aValue = false;
+  aValue = nsIGfxInfo::FEATURE_STATUS_UNKNOWN;
   return NS_SUCCEEDED(Preferences::GetInt(prefname, &aValue));
 }
 
@@ -313,6 +314,7 @@ BlacklistDevicesToDeviceFamily(nsIDOMHTMLCollection* aDevices)
 static int32_t
 BlacklistFeatureToGfxFeature(const nsAString& aFeature)
 {
+  MOZ_ASSERT(!aFeature.IsEmpty());
   if (aFeature.EqualsLiteral("DIRECT2D"))
     return nsIGfxInfo::FEATURE_DIRECT2D;
   else if (aFeature.EqualsLiteral("DIRECT3D_9_LAYERS"))
@@ -339,7 +341,13 @@ BlacklistFeatureToGfxFeature(const nsAString& aFeature)
     return nsIGfxInfo::FEATURE_STAGEFRIGHT;
   else if (aFeature.EqualsLiteral("WEBRTC_HW_ACCELERATION"))
     return nsIGfxInfo::FEATURE_WEBRTC_HW_ACCELERATION;
-  return 0;
+
+  // If we don't recognize the feature, it may be new, and something
+  // this version doesn't understand.  So, nothing to do.  This is
+  // different from feature not being specified at all, in which case
+  // this method should not get called and we should continue with the
+  // "all features" blocklisting.
+  return -1;
 }
 
 static int32_t
@@ -356,7 +364,8 @@ BlacklistFeatureStatusToGfxFeatureStatus(const nsAString& aStatus)
   else if (aStatus.EqualsLiteral("BLOCKED_OS_VERSION"))
     return nsIGfxInfo::FEATURE_BLOCKED_OS_VERSION;
 
-  // Do not allow it to set STATUS_UNKNOWN.
+  // Do not allow it to set STATUS_UNKNOWN.  Also, we are not
+  // expecting the "mismatch" status showing up here.
 
   return nsIGfxInfo::FEATURE_STATUS_OK;
 }
@@ -527,6 +536,11 @@ BlacklistEntryToDriverInfo(nsIDOMNode* aBlacklistEntry,
                                   getter_AddRefs(dataNode))) {
     BlacklistNodeToTextValue(dataNode, dataValue);
     aDriverInfo.mFeature = BlacklistFeatureToGfxFeature(dataValue);
+    if (aDriverInfo.mFeature < 0) {
+      // If we don't recognize the feature, we do not want to proceed.
+      gfxWarning() << "Unrecognized feature " << NS_ConvertUTF16toUTF8(dataValue).get();
+      return false;
+    }
   }
 
   // <featureStatus> BLOCKED_DRIVER_VERSION </featureStatus>
@@ -643,6 +657,7 @@ nsresult
 GfxInfoBase::Init()
 {
   InitGfxDriverInfoShutdownObserver();
+  gfxPrefs::GetSingleton();
 
   nsCOMPtr<nsIObserverService> os = mozilla::services::GetObserverService();
   if (os) {
@@ -655,6 +670,17 @@ GfxInfoBase::Init()
 NS_IMETHODIMP
 GfxInfoBase::GetFeatureStatus(int32_t aFeature, int32_t* aStatus)
 {
+  int32_t blocklistAll = gfxPrefs::BlocklistAll();
+  if (blocklistAll > 0) {
+    gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Forcing blocklisting all features";
+    *aStatus = FEATURE_BLOCKED_DEVICE;
+    return NS_OK;
+  } else if (blocklistAll < 0) {
+    gfxCriticalErrorOnce(gfxCriticalError::DefaultOptions(false)) << "Ignoring any feature blocklisting.";
+    *aStatus = FEATURE_STATUS_OK;
+    return NS_OK;
+  }
+
   if (GetPrefValueForFeature(aFeature, *aStatus))
     return NS_OK;
 
@@ -857,6 +883,11 @@ GfxInfoBase::GetFeatureStatusImpl(int32_t aFeature,
                                   const nsTArray<GfxDriverInfo>& aDriverInfo,
                                   OperatingSystem* aOS /* = nullptr */)
 {
+  if (aFeature <= 0) {
+    gfxWarning() << "Invalid feature <= 0";
+    return NS_OK;
+  }
+
   if (*aStatus != nsIGfxInfo::FEATURE_STATUS_UNKNOWN) {
     // Terminate now with the status determined by the derived type (OS-specific
     // code).
@@ -971,6 +1002,7 @@ GfxInfoBase::EvaluateDownloadedBlacklist(nsTArray<GfxDriverInfo>& aDriverInfo)
           }
           // FALLTHROUGH
 
+        case nsIGfxInfo::FEATURE_BLOCKED_MISMATCHED_VERSION:
         case nsIGfxInfo::FEATURE_BLOCKED_DEVICE:
         case nsIGfxInfo::FEATURE_DISCOURAGED:
         case nsIGfxInfo::FEATURE_BLOCKED_OS_VERSION:
@@ -1131,6 +1163,20 @@ GfxInfoBase::RemoveCollector(GfxInfoCollectorBase* collector)
     delete sCollectors;
     sCollectors = nullptr;
   }
+}
+
+NS_IMETHODIMP
+GfxInfoBase::GetMonitors(JSContext* aCx, JS::MutableHandleValue aResult)
+{
+  JS::Rooted<JSObject*> array(aCx, JS_NewArrayObject(aCx, 0));
+
+  nsresult rv = FindMonitors(aCx, array);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  aResult.setObject(*array);
+  return NS_OK;
 }
 
 GfxInfoCollectorBase::GfxInfoCollectorBase()

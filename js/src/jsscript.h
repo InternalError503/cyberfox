@@ -55,6 +55,15 @@ namespace frontend {
     class UpvarCookie;
 }
 
+namespace detail {
+
+// Do not call this directly! It is exposed for the friend declarations in
+// this file.
+bool
+CopyScript(JSContext* cx, HandleObject scriptStaticScope, HandleScript src, HandleScript dst);
+
+} // namespace detail
+
 }
 
 /*
@@ -130,6 +139,10 @@ struct BlockScopeArray {
 };
 
 class YieldOffsetArray {
+    friend bool
+    detail::CopyScript(JSContext* cx, HandleObject scriptStaticScope, HandleScript src,
+                       HandleScript dst);
+
     uint32_t*       vector_;   // Array of bytecode offsets.
     uint32_t        length_;    // Count of bytecode offsets.
 
@@ -755,16 +768,6 @@ bool
 XDRScript(XDRState<mode>* xdr, HandleObject enclosingScope, HandleScript enclosingScript,
           HandleFunction fun, MutableHandleScript scriptp);
 
-enum PollutedGlobalScopeOption {
-    HasPollutedGlobalScope,
-    HasCleanGlobalScope
-};
-
-JSScript*
-CloneScript(JSContext* cx, HandleObject enclosingScope, HandleFunction fun, HandleScript script,
-            PollutedGlobalScopeOption polluted = HasCleanGlobalScope,
-            NewObjectKind newKind = GenericObject);
-
 template<XDRMode mode>
 bool
 XDRLazyScript(XDRState<mode>* xdr, HandleObject enclosingScope, HandleScript enclosingScript,
@@ -784,13 +787,13 @@ class JSScript : public js::gc::TenuredCell
     template <js::XDRMode mode>
     friend
     bool
-    js::XDRScript(js::XDRState<mode>* xdr, js::HandleObject enclosingScope, js::HandleScript enclosingScript,
+    js::XDRScript(js::XDRState<mode>* xdr, js::HandleObject enclosingScope,
+                  js::HandleScript enclosingScript,
                   js::HandleFunction fun, js::MutableHandleScript scriptp);
 
-    friend JSScript*
-    js::CloneScript(JSContext* cx, js::HandleObject enclosingScope, js::HandleFunction fun,
-                    js::HandleScript src, js::PollutedGlobalScopeOption polluted,
-                    js::NewObjectKind newKind);
+    friend bool
+    js::detail::CopyScript(JSContext* cx, js::HandleObject scriptStaticScope, js::HandleScript src,
+                           js::HandleScript dst);
 
   public:
     //
@@ -936,7 +939,7 @@ class JSScript : public js::gc::TenuredCell
     // True if the script has a non-syntactic scope on its dynamic scope chain.
     // That is, there are objects about which we know nothing between the
     // outermost syntactic scope and the global.
-    bool hasPollutedGlobalScope_:1;
+    bool hasNonSyntacticScope_:1;
 
     // see Parser::selfHostingMode.
     bool selfHosted_:1;
@@ -1025,6 +1028,8 @@ class JSScript : public js::gc::TenuredCell
 
     bool needsHomeObject_:1;
 
+    bool isDerivedClassConstructor_:1;
+
     // Add padding so JSScript is gc::Cell aligned. Make padding protected
     // instead of private to suppress -Wunused-private-field compiler warnings.
   protected:
@@ -1061,6 +1066,7 @@ class JSScript : public js::gc::TenuredCell
     inline JSPrincipals* principals();
 
     JSCompartment* compartment() const { return compartment_; }
+    JSCompartment* maybeCompartment() const { return compartment(); }
 
     void setVersion(JSVersion v) { version = v; }
 
@@ -1175,8 +1181,8 @@ class JSScript : public js::gc::TenuredCell
 
     bool explicitUseStrict() const { return explicitUseStrict_; }
 
-    bool hasPollutedGlobalScope() const {
-        return hasPollutedGlobalScope_;
+    bool hasNonSyntacticScope() const {
+        return hasNonSyntacticScope_;
     }
 
     bool selfHosted() const { return selfHosted_; }
@@ -1296,6 +1302,9 @@ class JSScript : public js::gc::TenuredCell
         return needsHomeObject_;
     }
 
+    bool isDerivedClassConstructor() const {
+        return isDerivedClassConstructor_;
+    }
 
     /*
      * As an optimization, even when argsHasLocalBinding, the function prologue
@@ -1373,7 +1382,6 @@ class JSScript : public js::gc::TenuredCell
         if (hasIonScript())
             js::jit::IonScript::writeBarrierPre(zone(), ion);
         ion = ionScript;
-        resetWarmUpResetCounter();
         MOZ_ASSERT_IF(hasIonScript(), hasBaselineScript());
         updateBaselineOrIonRaw(maybecx);
     }
@@ -1733,7 +1741,7 @@ class JSScript : public js::gc::TenuredCell
         JSContext* cx_;
         bool oldDoNotRelazify_;
       public:
-        explicit AutoDelazify(JSContext* cx, JS::HandleFunction fun = JS::NullPtr())
+        explicit AutoDelazify(JSContext* cx, JS::HandleFunction fun = nullptr)
             : script_(cx)
             , cx_(cx)
         {
@@ -1756,14 +1764,7 @@ class JSScript : public js::gc::TenuredCell
 
       private:
         void holdScript(JS::HandleFunction fun);
-
-        void dropScript()
-        {
-            if (script_) {
-                script_->setDoNotRelazify(oldDoNotRelazify_);
-                script_ = nullptr;
-            }
-        }
+        void dropScript();
     };
 };
 
@@ -1940,11 +1941,13 @@ class LazyScript : public gc::TenuredCell
         uint32_t version : 8;
 
         uint32_t numFreeVariables : 24;
-        uint32_t numInnerFunctions : 22;
+        uint32_t numInnerFunctions : 21;
 
         uint32_t generatorKindBits : 2;
 
         // N.B. These are booleans but need to be uint32_t to pack correctly on MSVC.
+        // If you add another boolean here, make sure to initialze it in
+        // LazyScript::CreateRaw().
         uint32_t strict : 1;
         uint32_t bindingsAccessedDynamically : 1;
         uint32_t hasDebuggerStatement : 1;
@@ -1953,6 +1956,7 @@ class LazyScript : public gc::TenuredCell
         uint32_t usesArgumentsApplyAndThis : 1;
         uint32_t hasBeenCloned : 1;
         uint32_t treatAsRunOnce : 1;
+        uint32_t isDerivedClassConstructor : 1;
     };
 
     union {
@@ -2124,6 +2128,13 @@ class LazyScript : public gc::TenuredCell
         p_.treatAsRunOnce = true;
     }
 
+    bool isDerivedClassConstructor() const {
+        return p_.isDerivedClassConstructor;
+    }
+    void setIsDerivedClassConstructor() {
+        p_.isDerivedClassConstructor = true;
+    }
+
     const char* filename() const {
         return scriptSource()->filename();
     }
@@ -2278,9 +2289,12 @@ DescribeScriptedCallerForCompilation(JSContext* cx, MutableHandleScript maybeScr
                                      uint32_t* pcOffset, bool* mutedErrors,
                                      LineOption opt = NOT_CALLED_FROM_JSOP_EVAL);
 
-bool
-CloneFunctionScript(JSContext* cx, HandleFunction original, HandleFunction clone,
-                    PollutedGlobalScopeOption polluted, NewObjectKind newKind);
+JSScript*
+CloneScriptIntoFunction(JSContext* cx, HandleObject enclosingScope, HandleFunction fun,
+                        HandleScript src);
+
+JSScript*
+CloneGlobalScript(JSContext* cx, Handle<ScopeObject*> enclosingScope, HandleScript src);
 
 } /* namespace js */
 

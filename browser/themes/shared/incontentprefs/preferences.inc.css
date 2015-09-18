@@ -270,7 +270,7 @@ description > html|a {
   border-radius: 50%;
   border-width: 5px;
   border-color: red;
-  background-image: url(chrome://browser/skin/preferences/in-content/default-profile-image.svg);
+  background-image: url(chrome://browser/skin/fxa/default-profile-image.svg);
   background-size: contain;
   cursor: pointer;
   -moz-margin-end: 15px;
@@ -371,15 +371,17 @@ description > html|a {
 
 #dialogTitle {
   text-align: center;
+  -moz-user-select: none;
 }
 
 .close-icon {
   background-color: transparent !important;
   border: none;
   box-shadow: none;
-  height: 18px;
   padding: 0;
-  min-width: 18px;
+  height: auto;
+  min-height: 16px;
+  min-width: 0;
 }
 
 #dialogBox > .groupbox-body {
@@ -437,7 +439,16 @@ description > html|a {
 }
 
 /**
- * End sub-dialog
+ * Sync
  */
+
+#fxaDeviceName {
+  margin: 14px 0px;
+}
+
+#fxaSyncComputerName.plain {
+  background-color: transparent;
+  opacity: 1;
+}
 
 %include preferences-cyberfox.inc

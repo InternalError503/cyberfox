@@ -22,8 +22,8 @@ class Image;
 class ImageContainer;
 }
 
-class MediaLargeByteBuffer;
 class MediaByteBuffer;
+class SharedTrackInfo;
 
 // Container that holds media samples.
 class MediaData {
@@ -74,6 +74,11 @@ public:
 
   int64_t GetEndTime() const { return mTime + mDuration; }
 
+  bool AdjustForStartTime(int64_t aStartTime)
+  {
+    mTime = mTime - aStartTime;
+    return mTime >= 0;
+  }
 protected:
   explicit MediaData(Type aType)
     : mType(aType)
@@ -100,11 +105,14 @@ public:
             AudioDataValue* aData,
             uint32_t aChannels,
             uint32_t aRate)
-    : MediaData(AUDIO_DATA, aOffset, aTime, aDuration)
+    : MediaData(sType, aOffset, aTime, aDuration)
     , mFrames(aFrames)
     , mChannels(aChannels)
     , mRate(aRate)
     , mAudioData(aData) {}
+
+  static const Type sType = AUDIO_DATA;
+  static const char* sTypeName;
 
   // Creates a new VideoData identical to aOther, but with a different
   // specified timestamp and duration. All data from aOther is copied
@@ -148,6 +156,9 @@ public:
   typedef layers::ImageContainer ImageContainer;
   typedef layers::Image Image;
   typedef layers::PlanarYCbCrImage PlanarYCbCrImage;
+
+  static const Type sType = VIDEO_DATA;
+  static const char* sTypeName;
 
   // YCbCr data obtained from decoding the video. The index's are:
   //   0 = Y
@@ -369,7 +380,7 @@ private:
   explicit MediaRawDataWriter(MediaRawData* aMediaRawData);
   bool EnsureSize(size_t aSize);
   MediaRawData* mTarget;
-  nsRefPtr<MediaLargeByteBuffer> mBuffer;
+  nsRefPtr<MediaByteBuffer> mBuffer;
 };
 
 class MediaRawData : public MediaData {
@@ -384,6 +395,8 @@ public:
 
   const CryptoSample& mCrypto;
   nsRefPtr<MediaByteBuffer> mExtraData;
+
+  nsRefPtr<SharedTrackInfo> mTrackInfo;
 
   // Return a deep copy or nullptr if out of memory.
   virtual already_AddRefed<MediaRawData> Clone() const;
@@ -403,21 +416,10 @@ private:
   // read as required by some data decoders.
   // Returns false if memory couldn't be allocated.
   bool EnsureCapacity(size_t aSize);
-  nsRefPtr<MediaLargeByteBuffer> mBuffer;
+  nsRefPtr<MediaByteBuffer> mBuffer;
   CryptoSample mCryptoInternal;
   uint32_t mPadding;
   MediaRawData(const MediaRawData&); // Not implemented
-};
-
-  // MediaLargeByteBuffer is a ref counted fallible TArray.
-  // It is designed to share potentially big byte arrays.
-class MediaLargeByteBuffer : public FallibleTArray<uint8_t> {
-  NS_INLINE_DECL_THREADSAFE_REFCOUNTING(MediaLargeByteBuffer);
-  MediaLargeByteBuffer() = default;
-  explicit MediaLargeByteBuffer(size_t aCapacity) : FallibleTArray<uint8_t>(aCapacity) {}
-
-private:
-  ~MediaLargeByteBuffer() {}
 };
 
   // MediaByteBuffer is a ref counted infallible TArray.

@@ -44,9 +44,10 @@ let gPage = {
   focus: function(){	 
 	//focus search
 	var aFocus = document.getElementById('newtab-search-text');
-		if (aFocus &&  typeof(aFocus)  != "undefined" || aFocus  != null &&
-				Services.prefs.getBoolPref("browser.newtab.preload") === false){
-			aFocus.focus();
+		if (aFocus &&  typeof(aFocus)  != "undefined" || aFocus  != null){
+			if (!Services.prefs.getBoolPref("browser.newtab.preload")){
+				aFocus.focus();
+			}
 		}	  
   },
 

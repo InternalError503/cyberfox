@@ -47,4 +47,5 @@ interface nsIWebBrowserChrome3 : nsIWebBrowserChrome2
   bool shouldLoadURI(in nsIDocShell    aDocShell,
                      in nsIURI         aURI,
                      in nsIURI         aReferrer);
+
 };

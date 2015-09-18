@@ -105,8 +105,6 @@
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 #endif
 
-        <!-- If the windowSoftInputMode adjust* flag changes below, the
-             setSoftInputMode call in BrowserSearch#onStop must also be updated. -->
         <activity android:name="@MOZ_ANDROID_BROWSER_INTENT_CLASS@"
                   android:label="@string/moz_app_displayname"
                   android:taskAffinity="@ANDROID_PACKAGE_NAME@.BROWSER"
@@ -256,6 +254,8 @@
         <activity android:name="org.mozilla.gecko.tabqueue.TabQueueDispatcher"
                   android:label="@MOZ_APP_DISPLAYNAME@"
                   android:launchMode="singleTask"
+                  android:excludeFromRecents="true"
+                  android:taskAffinity="@ANDROID_PACKAGE_NAME@.TABQUEUE"
                   android:theme="@style/TabQueueActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -279,10 +279,6 @@
             </intent-filter>
         </activity>
 #endif
-
-        <activity android:name="org.mozilla.gecko.StartPane"
-                  android:theme="@style/GeckoStartPane"
-                  android:excludeFromRecents="true"/>
 
         <activity android:name="org.mozilla.gecko.webapp.Dispatcher"
             android:noHistory="true" >

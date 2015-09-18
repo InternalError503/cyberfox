@@ -503,6 +503,12 @@
         ]]></getter>
       </property>
 
+      <property name="hasContentOpener">
+        <getter><![CDATA[
+          return !!this.contentWindow.opener;
+        ]]></getter>
+      </property>
+
       <field name="mPrefs" readonly="true">
         Components.classes['@mozilla.org/preferences-service;1']
                   .getService(Components.interfaces.nsIPrefBranch);
@@ -996,6 +1002,7 @@
               this._autoScrollPopup.setAttribute("translucent", /Win|Mac/.test(navigator.platform));
             }
 
+            this._autoScrollPopup.setAttribute("noautofocus", "true");
             this._autoScrollPopup.setAttribute("scrolldir", scrolldir);
             this._autoScrollPopup.addEventListener("popuphidden", this, true);
             this._autoScrollPopup.showPopup(document.documentElement,
@@ -1164,6 +1171,9 @@
         ]]>
         </body>
       </method>
+
+      <!-- This will go away if the binding has been removed for some reason. -->
+      <field name="_alive">true</field>
     </implementation>
 
     <handlers>

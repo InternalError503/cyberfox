@@ -224,15 +224,14 @@ Site.prototype = {
       if (target.classList.contains("newtab-control-block")) {
         this.block();
         action = "block";
-      } 
-    
-    else if (pinned) {
-      this.unpin();
-      action = "unpin";
-   }
-    else {
-      this.pin();
-      action = "pin";
+      }
+      else if (pinned && target.classList.contains("newtab-control-pin")) {
+        this.unpin();
+        action = "unpin";
+      }
+      else if (!pinned && target.classList.contains("newtab-control-pin")) {
+        this.pin();
+        action = "pin";
       }
     }
   },

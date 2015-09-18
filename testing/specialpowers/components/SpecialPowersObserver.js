@@ -12,8 +12,10 @@
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
+if (typeof(Cc) == "undefined") {
+  const Cc = Components.classes;
+  const Ci = Components.interfaces;
+}
 
 const CHILD_SCRIPT = "chrome://specialpowers/content/specialpowers.js"
 const CHILD_SCRIPT_API = "chrome://specialpowers/content/specialpowersAPI.js"
@@ -114,6 +116,20 @@ SpecialPowersObserver.prototype = new SpecialPowersObserverAPI();
     var obs = Services.obs;
     obs.addObserver(this, "xpcom-shutdown", false);
     obs.addObserver(this, "chrome-document-global-created", false);
+
+    // Register special testing modules.
+    var testsURI = Cc["@mozilla.org/file/directory_service;1"].
+                     getService(Ci.nsIProperties).
+                     get("ProfD", Ci.nsILocalFile);
+    testsURI.append("tests.manifest");
+    var ioSvc = Cc["@mozilla.org/network/io-service;1"].
+                  getService(Ci.nsIIOService);
+    var manifestFile = ioSvc.newFileURI(testsURI).
+                         QueryInterface(Ci.nsIFileURL).file;
+
+    Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
+                   autoRegister(manifestFile);
+
     obs.addObserver(this, "http-on-modify-request", false);
 
     if (messageManager) {
@@ -130,6 +146,9 @@ SpecialPowersObserver.prototype = new SpecialPowersObserverAPI();
     obs.removeObserver(this, "chrome-document-global-created");
     obs.removeObserver(this, "http-on-modify-request");
     obs.removeObserver(this, "xpcom-shutdown");
+    this._registerObservers._topics.forEach(function(element) {
+      obs.removeObserver(this._registerObservers, element);
+    });
     this._removeProcessCrashObservers();
 
     if (this._isFrameScriptLoaded) {
@@ -182,6 +201,27 @@ SpecialPowersObserver.prototype = new SpecialPowersObserverAPI();
     obs.removeObserver(this, "plugin-crashed");
     obs.removeObserver(this, "ipc:content-shutdown");
     this._processCrashObserversRegistered = false;
+  };
+
+  SpecialPowersObserver.prototype._registerObservers = {
+    _self: null,
+    _topics: [],
+    _add: function(topic) {
+      if (this._topics.indexOf(topic) < 0) {
+        this._topics.push(topic);
+        Services.obs.addObserver(this, topic, false);
+      }
+    },
+    observe: function (aSubject, aTopic, aData) {
+      var msg = { aData: aData };
+      switch (aTopic) {
+        case "perm-changed":
+          var permission = aSubject.QueryInterface(Ci.nsIPermission);
+          msg.permission = { appId: permission.appId, type: permission.type };
+        default:
+          this._self._sendAsyncMessage("specialpowers-" + aTopic, msg);
+      }
+    }
   };
 
   /**

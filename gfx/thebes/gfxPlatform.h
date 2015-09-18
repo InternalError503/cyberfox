@@ -6,7 +6,7 @@
 #ifndef GFX_PLATFORM_H
 #define GFX_PLATFORM_H
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "mozilla/gfx/Types.h"
 #include "nsTArray.h"
 #include "nsString.h"
@@ -203,8 +203,8 @@ public:
      * and image format.
      */
     virtual already_AddRefed<gfxASurface>
-      CreateOffscreenSurface(const IntSize& size,
-                             gfxContentType contentType) = 0;
+      CreateOffscreenSurface(const IntSize& aSize,
+                             gfxImageFormat aFormat) = 0;
 
     /**
      * Beware that these methods may return DrawTargets which are not fully supported
@@ -291,6 +291,8 @@ public:
     /// as different platforms may override the behaviour.
     virtual bool UseProgressivePaint() { return gfxPrefs::ProgressivePaintDoNotUseDirectly(); }
 
+    static bool AsyncPanZoomEnabled();
+
     void GetAzureBackendInfo(mozilla::widget::InfoObject &aObj) {
       aObj.DefineProperty("AzureCanvasBackend", GetBackendName(mPreferredCanvasBackend));
       aObj.DefineProperty("AzureSkiaAccelerated", UseAcceleratedSkiaCanvas());
@@ -306,7 +308,9 @@ public:
     mozilla::gfx::BackendType GetPreferredCanvasBackend() {
       return mPreferredCanvasBackend;
     }
-
+    mozilla::gfx::BackendType GetFallbackCanvasBackend() {
+      return mFallbackCanvasBackend;
+    }
     /*
      * Font bits
      */
@@ -472,6 +476,9 @@ public:
     // convert a lang group atom to enum constant
     static eFontPrefLang GetFontPrefLangFor(nsIAtom *aLang);
 
+    // convert an enum constant to a lang group atom
+    static nsIAtom* GetLangGroupForPrefLang(eFontPrefLang aLang);
+
     // convert a enum constant to lang group string (i.e. eFontPrefLang_ChineseTW ==> "zh-TW")
     static const char* GetPrefLangName(eFontPrefLang aLang);
    
@@ -633,6 +640,16 @@ public:
     }
 
     virtual void FlushContentDrawing() {}
+
+    /**
+     * Helper method, creates a draw target for a specific Azure backend.
+     * Used by CreateOffscreenDrawTarget.
+     */
+    mozilla::TemporaryRef<DrawTarget>
+      CreateDrawTargetForBackend(mozilla::gfx::BackendType aBackend,
+                                 const mozilla::gfx::IntSize& aSize,
+                                 mozilla::gfx::SurfaceFormat aFormat);
+
 protected:
     gfxPlatform();
     virtual ~gfxPlatform();
@@ -644,15 +661,6 @@ protected:
      * Initialized hardware vsync based on each platform.
      */
     virtual already_AddRefed<mozilla::gfx::VsyncSource> CreateHardwareVsyncSource();
-
-    /**
-     * Helper method, creates a draw target for a specific Azure backend.
-     * Used by CreateOffscreenDrawTarget.
-     */
-    mozilla::TemporaryRef<DrawTarget>
-      CreateDrawTargetForBackend(mozilla::gfx::BackendType aBackend,
-                                 const mozilla::gfx::IntSize& aSize,
-                                 mozilla::gfx::SurfaceFormat aFormat);
 
     /**
      * Initialise the preferred and fallback canvas backends

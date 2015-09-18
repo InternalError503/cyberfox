@@ -13,6 +13,7 @@
 #include <math.h>
 #include "mozilla/Attributes.h"
 #include "mozilla/DebugOnly.h"
+#include "mozilla/FloatingPoint.h"
 
 namespace mozilla {
 namespace gfx {
@@ -153,7 +154,22 @@ public:
 
     return *this;
   }
-  
+
+  /**
+   * Similar to PostTranslate, but applies a scale instead of a translation.
+   */
+  Matrix &PostScale(Float aScaleX, Float aScaleY)
+  {
+    _11 *= aScaleX;
+    _12 *= aScaleY;
+    _21 *= aScaleX;
+    _22 *= aScaleY;
+    _31 *= aScaleX;
+    _32 *= aScaleY;
+
+    return *this;
+  }
+
   GFX2D_API static Matrix Rotation(Float aAngle);
 
   /**
@@ -483,6 +499,19 @@ public:
   }
 
   Rect ProjectRectBounds(const Rect& aRect, const Rect &aClip) const;
+
+  /**
+   * TransformAndClipRect projects a rectangle and clips against view frustum
+   * clipping planes in homogenous space so that its projected vertices are
+   * constrained within the 2d rectangle passed in aClip.
+   * The resulting vertices are populated in aVerts.  aVerts must be
+   * pre-allocated to hold at least kTransformAndClipRectMaxVerts Points.
+   * The vertex count is returned by TransformAndClipRect.  It is possible to
+   * emit fewer that 3 vertices, indicating that aRect will not be visible
+   * within aClip.
+   */
+  size_t TransformAndClipRect(const Rect& aRect, const Rect& aClip, Point* aVerts) const;
+  static const size_t kTransformAndClipRectMaxVerts = 32;
 
   static Matrix4x4 From2D(const Matrix &aMatrix) {
     Matrix4x4 matrix;
@@ -829,6 +858,26 @@ public:
            gfx::FuzzyEqual(_43, o._43) && gfx::FuzzyEqual(_44, o._44);
   }
 
+  bool FuzzyEqualsMultiplicative(const Matrix4x4& o) const
+  {
+    return ::mozilla::FuzzyEqualsMultiplicative(_11, o._11) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_12, o._12) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_13, o._13) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_14, o._14) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_21, o._21) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_22, o._22) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_23, o._23) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_24, o._24) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_31, o._31) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_32, o._32) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_33, o._33) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_34, o._34) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_41, o._41) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_42, o._42) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_43, o._43) &&
+           ::mozilla::FuzzyEqualsMultiplicative(_44, o._44);
+  }
+
   bool IsBackfaceVisible() const
   {
     // Inverse()._33 < 0;
@@ -858,6 +907,24 @@ public:
     NudgeToInteger(&_42, error);
     NudgeToInteger(&_43, error);
     NudgeToInteger(&_44, error);
+    return *this;
+  }
+
+  // Nudge the 3D components to integer so that this matrix will become 2D if
+  // it's very close to already being 2D.
+  // This doesn't change the _41 and _42 components.
+  Matrix4x4 &NudgeTo2D()
+  {
+    NudgeToInteger(&_13);
+    NudgeToInteger(&_14);
+    NudgeToInteger(&_23);
+    NudgeToInteger(&_24);
+    NudgeToInteger(&_31);
+    NudgeToInteger(&_32);
+    NudgeToInteger(&_33);
+    NudgeToInteger(&_34);
+    NudgeToInteger(&_43);
+    NudgeToInteger(&_44);
     return *this;
   }
 

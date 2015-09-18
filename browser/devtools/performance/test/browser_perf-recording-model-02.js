@@ -7,15 +7,15 @@
 
 let BUFFER_SIZE = 20000;
 
-function spawnTest () {
+function* spawnTest() {
   let { target, front } = yield initBackend(SIMPLE_URL, { TEST_MOCK_PROFILER_CHECK_TIMER: 10 });
   let config = { bufferSize: BUFFER_SIZE };
 
   let model = yield front.startRecording(config);
   let [_, stats] = yield onceSpread(front, "profiler-status");
-  is(stats.totalSize, BUFFER_SIZE, `profiler-status event has correct totalSize: ${stats.totalSize}`);
-  ok(stats.position < BUFFER_SIZE, `profiler-status event has correct position: ${stats.position}`);
-  is(stats.generation, 0, `profiler-status event has correct generation: ${stats.generation}`);
+  is(stats.totalSize, BUFFER_SIZE, `profiler-status event has totalSize: ${stats.totalSize}`);
+  ok(stats.position < BUFFER_SIZE, `profiler-status event has position: ${stats.position}`);
+  ok(stats.generation >= 0, `profiler-status event has generation: ${stats.generation}`);
   ok(stats.isActive, `profiler-status event is isActive`);
   is(typeof stats.currentTime, "number", `profiler-status event has currentTime`);
 

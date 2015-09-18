@@ -36,14 +36,9 @@ namespace mozilla {
 #undef LOG
 #endif
 
-#ifdef PR_LOGGING
 extern PRLogModuleInfo* GetMediaManagerLog();
-#define LOG(msg) PR_LOG(GetMediaManagerLog(), PR_LOG_DEBUG, msg)
-#define LOG_FRAMES(msg) PR_LOG(GetMediaManagerLog(), 6, msg)
-#else
-#define LOG(msg)
-#define LOG_FRAMES(msg)
-#endif
+#define LOG(msg) MOZ_LOG(GetMediaManagerLog(), mozilla::LogLevel::Debug, msg)
+#define LOG_FRAMES(msg) MOZ_LOG(GetMediaManagerLog(), mozilla::LogLevel::Verbose, msg)
 
 /**
  * Webrtc audio source.
@@ -192,7 +187,7 @@ MediaEngineWebRTCAudioSource::GetName(nsAString& aName)
 }
 
 void
-MediaEngineWebRTCAudioSource::GetUUID(nsAString& aUUID)
+MediaEngineWebRTCAudioSource::GetUUID(nsACString& aUUID)
 {
   if (mInitDone) {
     aUUID.Assign(mDeviceUUID);
@@ -280,15 +275,13 @@ MediaEngineWebRTCAudioSource::Allocate(const dom::MediaTrackConstraints &aConstr
       LOG(("Audio device is not initalized"));
       return NS_ERROR_FAILURE;
     }
-  } else {
-#ifdef PR_LOGGING
+  } else if (MOZ_LOG_TEST(GetMediaManagerLog(), LogLevel::Debug)) {
     MonitorAutoLock lock(mMonitor);
     if (mSources.IsEmpty()) {
       LOG(("Audio device %d reallocated", mCapIndex));
     } else {
       LOG(("Audio device %d allocated shared", mCapIndex));
     }
-#endif
   }
   return NS_OK;
 }
@@ -485,11 +478,12 @@ MediaEngineWebRTCAudioSource::Shutdown()
 {
   if (!mInitDone) {
     // duplicate these here in case we failed during Init()
-    if (mChannel != -1) {
+    if (mChannel != -1 && mVoENetwork) {
       mVoENetwork->DeRegisterExternalTransport(mChannel);
     }
 
     delete mNullTransport;
+    mNullTransport = nullptr;
     return;
   }
 
@@ -521,6 +515,7 @@ MediaEngineWebRTCAudioSource::Shutdown()
   }
 
   delete mNullTransport;
+  mNullTransport = nullptr;
 
   mVoEProcessing = nullptr;
   mVoENetwork = nullptr;

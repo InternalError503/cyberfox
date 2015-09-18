@@ -260,8 +260,13 @@ const GcliActor = ActorClass({
           throw new Error("environment.chromeDocument is not available in runAt:server commands");
         },
 
-        get window() tabActor.window,
-        get document() tabActor.window.document
+        get window() {
+          return tabActor.window;
+        },
+
+        get document() {
+          return tabActor.window.document;
+        }
       };
 
       return new Requisition(this._system, { environment: environment });

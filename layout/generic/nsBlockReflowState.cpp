@@ -8,13 +8,13 @@
 
 #include "nsBlockReflowState.h"
 
-#include "mozilla/DebugOnly.h"
-
+#include "LayoutLogging.h"
 #include "nsBlockFrame.h"
 #include "nsLineLayout.h"
 #include "nsPresContext.h"
 #include "nsIFrameInlines.h"
 #include "mozilla/AutoRestore.h"
+#include "mozilla/DebugOnly.h"
 #include "mozilla/Preferences.h"
 #include <algorithm>
 
@@ -112,10 +112,10 @@ nsBlockReflowState::nsBlockReflowState(const nsHTMLReflowState& aReflowState,
 
   mNextInFlow = static_cast<nsBlockFrame*>(mBlock->GetNextInFlow());
 
-  NS_WARN_IF_FALSE(NS_UNCONSTRAINEDSIZE != aReflowState.ComputedISize(),
-                   "have unconstrained width; this should only result from "
-                   "very large sizes, not attempts at intrinsic width "
-                   "calculation");
+  LAYOUT_WARN_IF_FALSE(NS_UNCONSTRAINEDSIZE != aReflowState.ComputedISize(),
+                       "have unconstrained width; this should only result "
+                       "from very large sizes, not attempts at intrinsic "
+                       "width calculation");
   mContentArea.ISize(wm) = aReflowState.ComputedISize();
 
   // Compute content area height. Unlike the width, if we have a
@@ -182,7 +182,7 @@ nsBlockReflowState::ComputeReplacedBlockOffsetsForFloats(
   } else {
     LogicalMargin frameMargin(wm);
     nsCSSOffsetState os(aFrame, mReflowState.rendContext,
-                        mContentArea.ISize(wm));
+                        wm, mContentArea.ISize(wm));
     frameMargin =
       os.ComputedLogicalMargin().ConvertTo(wm, aFrame->GetWritingMode());
 
@@ -209,7 +209,8 @@ GetBEndMarginClone(nsIFrame* aFrame,
 {
   if (aFrame->StyleBorder()->mBoxDecorationBreak ==
         NS_STYLE_BOX_DECORATION_BREAK_CLONE) {
-    nsCSSOffsetState os(aFrame, aRenderingContext, aContentArea.Width(aWritingMode));
+    nsCSSOffsetState os(aFrame, aRenderingContext, aWritingMode,
+                        aContentArea.ISize(aWritingMode));
     return os.ComputedLogicalMargin().
                 ConvertTo(aWritingMode,
                           aFrame->GetWritingMode()).BEnd(aWritingMode);
@@ -721,7 +722,7 @@ nsBlockReflowState::FlowAndPlaceFloat(nsIFrame* aFloat)
                "Float frame has wrong parent");
 
   nsCSSOffsetState offsets(aFloat, mReflowState.rendContext,
-                           mReflowState.ComputedWidth());
+                           wm, mReflowState.ComputedISize());
 
   nscoord floatMarginISize = FloatMarginISize(mReflowState,
                                               adjustedAvailableSpace.ISize(wm),

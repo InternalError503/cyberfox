@@ -19,27 +19,7 @@
 namespace mozilla {
 namespace dom {
 
-NS_IMPL_CYCLE_COLLECTION_CLASS(AudioBufferSourceNode)
-
-NS_IMPL_CYCLE_COLLECTION_UNLINK_BEGIN(AudioBufferSourceNode)
-  NS_IMPL_CYCLE_COLLECTION_UNLINK(mBuffer)
-  NS_IMPL_CYCLE_COLLECTION_UNLINK(mPlaybackRate)
-  NS_IMPL_CYCLE_COLLECTION_UNLINK(mDetune)
-  if (tmp->Context()) {
-    // AudioNode's Unlink implementation disconnects us from the graph
-    // too, but we need to do this right here to make sure that
-    // UnregisterAudioBufferSourceNode can properly untangle us from
-    // the possibly connected PannerNodes.
-    tmp->DisconnectFromGraph();
-    tmp->Context()->UnregisterAudioBufferSourceNode(tmp);
-  }
-NS_IMPL_CYCLE_COLLECTION_UNLINK_END_INHERITED(AudioNode)
-
-NS_IMPL_CYCLE_COLLECTION_TRAVERSE_BEGIN_INHERITED(AudioBufferSourceNode, AudioNode)
-  NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mBuffer)
-  NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mPlaybackRate)
-  NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mDetune)
-NS_IMPL_CYCLE_COLLECTION_TRAVERSE_END
+NS_IMPL_CYCLE_COLLECTION_INHERITED(AudioBufferSourceNode, AudioNode, mBuffer, mPlaybackRate, mDetune)
 
 NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION_INHERITED(AudioBufferSourceNode)
 NS_INTERFACE_MAP_END_INHERITING(AudioNode)
@@ -66,7 +46,7 @@ public:
     mLoopStart(0), mLoopEnd(0),
     mBufferSampleRate(0), mBufferPosition(0), mChannels(0),
     mDopplerShift(1.0f),
-    mDestination(static_cast<AudioNodeStream*>(aDestination->Stream())),
+    mDestination(aDestination->Stream()),
     mPlaybackRateTimeline(1.0f),
     mDetuneTimeline(0.0f),
     mLoop(false)
@@ -175,7 +155,7 @@ public:
     if (!mResampler) {
       mChannels = aChannels;
       mResampler = speex_resampler_init(mChannels, mBufferSampleRate, aOutRate,
-                                        SPEEX_RESAMPLER_QUALITY_DEFAULT,
+                                        SPEEX_RESAMPLER_QUALITY_MIN,
                                         nullptr);
     } else {
       uint32_t currentOutSampleRate, currentInSampleRate;
@@ -562,17 +542,26 @@ AudioBufferSourceNode::AudioBufferSourceNode(AudioContext* aContext)
   , mDetune(new AudioParam(this, SendDetuneToStream, 0.0f, "detune"))
   , mLoop(false)
   , mStartCalled(false)
-  , mStopped(false)
 {
   AudioBufferSourceNodeEngine* engine = new AudioBufferSourceNodeEngine(this, aContext->Destination());
   mStream = aContext->Graph()->CreateAudioNodeStream(engine, MediaStreamGraph::SOURCE_STREAM);
-  engine->SetSourceStream(static_cast<AudioNodeStream*>(mStream.get()));
+  engine->SetSourceStream(mStream);
   mStream->AddMainThreadListener(this);
 }
 
 AudioBufferSourceNode::~AudioBufferSourceNode()
 {
-  if (Context()) {
+}
+
+void
+AudioBufferSourceNode::DestroyMediaStream()
+{
+  bool hadStream = mStream;
+  if (hadStream) {
+    mStream->RemoveMainThreadListener(this);
+  }
+  AudioNode::DestroyMediaStream();
+  if (hadStream && Context()) {
     Context()->UnregisterAudioBufferSourceNode(this);
   }
 }
@@ -618,7 +607,7 @@ AudioBufferSourceNode::Start(double aWhen, double aOffset,
   }
   mStartCalled = true;
 
-  AudioNodeStream* ns = static_cast<AudioNodeStream*>(mStream.get());
+  AudioNodeStream* ns = mStream;
   if (!ns) {
     // Nothing to play, or we're already dead for some reason
     return;
@@ -643,8 +632,10 @@ AudioBufferSourceNode::Start(double aWhen, double aOffset,
 void
 AudioBufferSourceNode::SendBufferParameterToStream(JSContext* aCx)
 {
-  AudioNodeStream* ns = static_cast<AudioNodeStream*>(mStream.get());
-  MOZ_ASSERT(ns, "Why don't we have a stream here?");
+  AudioNodeStream* ns = mStream;
+  if (!ns) {
+    return;
+  }
 
   if (mBuffer) {
     float rate = mBuffer->SampleRate();
@@ -700,7 +691,7 @@ AudioBufferSourceNode::Stop(double aWhen, ErrorResult& aRv)
     return;
   }
 
-  AudioNodeStream* ns = static_cast<AudioNodeStream*>(mStream.get());
+  AudioNodeStream* ns = mStream;
   if (!ns || !Context()) {
     // We've already stopped and had our stream shut down
     return;
@@ -710,44 +701,46 @@ AudioBufferSourceNode::Stop(double aWhen, ErrorResult& aRv)
 }
 
 void
-AudioBufferSourceNode::NotifyMainThreadStateChanged()
+AudioBufferSourceNode::NotifyMainThreadStreamFinished()
 {
-  if (mStream->IsFinished()) {
-    class EndedEventDispatcher final : public nsRunnable
-    {
-    public:
-      explicit EndedEventDispatcher(AudioBufferSourceNode* aNode)
-        : mNode(aNode) {}
-      NS_IMETHODIMP Run() override
-      {
-        // If it's not safe to run scripts right now, schedule this to run later
-        if (!nsContentUtils::IsSafeToRunScript()) {
-          nsContentUtils::AddScriptRunner(this);
-          return NS_OK;
-        }
+  MOZ_ASSERT(mStream->IsFinished());
 
-        mNode->DispatchTrustedEvent(NS_LITERAL_STRING("ended"));
+  class EndedEventDispatcher final : public nsRunnable
+  {
+  public:
+    explicit EndedEventDispatcher(AudioBufferSourceNode* aNode)
+      : mNode(aNode) {}
+    NS_IMETHODIMP Run() override
+    {
+      // If it's not safe to run scripts right now, schedule this to run later
+      if (!nsContentUtils::IsSafeToRunScript()) {
+        nsContentUtils::AddScriptRunner(this);
         return NS_OK;
       }
-    private:
-      nsRefPtr<AudioBufferSourceNode> mNode;
-    };
-    if (!mStopped) {
-      // Only dispatch the ended event once
-      NS_DispatchToMainThread(new EndedEventDispatcher(this));
-      mStopped = true;
-    }
 
-    // Drop the playing reference
-    // Warning: The below line might delete this.
-    MarkInactive();
-  }
+      mNode->DispatchTrustedEvent(NS_LITERAL_STRING("ended"));
+      // Release stream resources.
+      mNode->DestroyMediaStream();
+      return NS_OK;
+    }
+  private:
+    nsRefPtr<AudioBufferSourceNode> mNode;
+  };
+
+  NS_DispatchToMainThread(new EndedEventDispatcher(this));
+
+  // Drop the playing reference
+  // Warning: The below line might delete this.
+  MarkInactive();
 }
 
 void
 AudioBufferSourceNode::SendPlaybackRateToStream(AudioNode* aNode)
 {
   AudioBufferSourceNode* This = static_cast<AudioBufferSourceNode*>(aNode);
+  if (!This->mStream) {
+    return;
+  }
   SendTimelineParameterToStream(This, PLAYBACKRATE, *This->mPlaybackRate);
 }
 
@@ -755,18 +748,25 @@ void
 AudioBufferSourceNode::SendDetuneToStream(AudioNode* aNode)
 {
   AudioBufferSourceNode* This = static_cast<AudioBufferSourceNode*>(aNode);
+  if (!This->mStream) {
+    return;
+  }
   SendTimelineParameterToStream(This, DETUNE, *This->mDetune);
 }
 
 void
 AudioBufferSourceNode::SendDopplerShiftToStream(double aDopplerShift)
 {
+  MOZ_ASSERT(mStream, "Should have disconnected panner if no stream");
   SendDoubleParameterToStream(DOPPLERSHIFT, aDopplerShift);
 }
 
 void
 AudioBufferSourceNode::SendLoopParametersToStream()
 {
+  if (!mStream) {
+    return;
+  }
   // Don't compute and set the loop parameters unnecessarily
   if (mLoop && mBuffer) {
     float rate = mBuffer->SampleRate();

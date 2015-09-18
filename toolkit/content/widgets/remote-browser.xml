@@ -47,6 +47,8 @@
 
       <field name="_controller">null</field>
 
+      <field name="_selectParentHelper">null</field>
+
       <field name="_remoteWebNavigation">null</field>
 
       <property name="webNavigation"
@@ -198,6 +200,13 @@
         ]]></getter>
       </property>
 
+      <property name="hasContentOpener">
+        <getter><![CDATA[
+          let {frameLoader} = this.QueryInterface(Ci.nsIFrameLoaderOwner);
+          return frameLoader.tabParent.hasContentOpener;
+        ]]></getter>
+      </property>
+
       <field name="_outerWindowID">null</field>
       <property name="outerWindowID"
                 onget="return this._outerWindowID"
@@ -256,8 +265,6 @@
           let RemoteController = Components.utils.import(jsm, {}).RemoteController;
           this._controller = new RemoteController(this);
           this.controllers.appendController(this._controller);
-
-          Services.obs.addObserver(this, "ask-children-to-exit-fullscreen", false);
         ]]>
       </constructor>
 
@@ -276,8 +283,6 @@
           this.mDestroyed = true;
 
           this.controllers.removeController(this._controller);
-
-          Services.obs.removeObserver(this, "ask-children-to-exit-fullscreen");
         ]]></body>
       </method>
 
@@ -304,10 +309,14 @@
               break;
 
             case "Forms:ShowDropDown": {
-              Cu.import("resource://gre/modules/SelectParentHelper.jsm");
+              if (!this._selectParentHelper) {
+                this._selectParentHelper =
+                  Cu.import("resource://gre/modules/SelectParentHelper.jsm", {}).SelectParentHelper;
+              }
+
               let menulist = document.getElementById(this.getAttribute("selectmenulist"));
-              SelectParentHelper.populate(menulist, data.options, data.selectedIndex);
-              SelectParentHelper.open(this, menulist, data.rect);
+              this._selectParentHelper.populate(menulist, data.options, data.selectedIndex, this._fullZoom);
+              this._selectParentHelper.open(this, menulist, data.rect);
               break;
             }
 
@@ -335,9 +344,10 @@
             }
 
             case "Forms:HideDropDown": {
-              Cu.import("resource://gre/modules/SelectParentHelper.jsm");
-              let menulist = document.getElementById(this.getAttribute("selectmenulist"));
-              SelectParentHelper.hide(menulist);
+              if (this._selectParentHelper) {
+                let menulist = document.getElementById(this.getAttribute("selectmenulist"));
+                this._selectParentHelper.hide(menulist);
+              }
               break;
             }
 
@@ -359,19 +369,6 @@
               // Delegate to browser.xml.
               return this._receiveMessage(aMessage);
               break;
-          }
-        ]]></body>
-      </method>
-
-      <method name="observe">
-        <parameter name="aSubject"/>
-        <parameter name="aTopic"/>
-        <parameter name="aData"/>
-        <body><![CDATA[
-          if (aTopic == "ask-children-to-exit-fullscreen") {
-            if (aSubject == window.document) {
-              this.messageManager.sendAsyncMessage("DOMFullscreen:ChildrenMustExit");
-            }
           }
         ]]></body>
       </method>

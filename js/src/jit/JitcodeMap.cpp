@@ -1211,7 +1211,7 @@ struct JitcodeMapBufferWriteSpewer
         startPos = writer->length();
     }
 #else // !DEBUG
-    JitcodeMapBufferWriteSpewer(CompactBufferWriter& w) {}
+    explicit JitcodeMapBufferWriteSpewer(CompactBufferWriter& w) {}
     void spewAndAdvance(const char* name) {}
 #endif // DEBUG
 };
@@ -1295,7 +1295,7 @@ JitcodeRegionEntry::WriteRun(CompactBufferWriter& writer,
             uint32_t curBc = curBytecodeOffset;
             while (curBc < nextBytecodeOffset) {
                 jsbytecode* pc = entry[i].tree->script()->offsetToPC(curBc);
-                JSOp op = JSOp(*pc);
+                mozilla::DebugOnly<JSOp> op = JSOp(*pc);
                 JitSpewCont(JitSpew_Profiling, "%s ", js_CodeName[op]);
                 curBc += GetBytecodeLength(pc);
             }
@@ -1552,7 +1552,7 @@ JitcodeIonTable::WriteIonTable(CompactBufferWriter& writer,
 } // namespace jit
 } // namespace js
 
-JS::ForEachProfiledFrameOp::FrameHandle::FrameHandle(JSRuntime* rt, JitcodeGlobalEntry& entry,
+JS::ForEachProfiledFrameOp::FrameHandle::FrameHandle(JSRuntime* rt, js::jit::JitcodeGlobalEntry& entry,
                                                      void* addr, const char* label, uint32_t depth)
   : rt_(rt),
     entry_(entry),

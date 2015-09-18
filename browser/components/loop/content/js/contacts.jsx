@@ -1,11 +1,6 @@
-/** @jsx React.DOM */
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-/*jshint newcap:false*/
-/*global loop:true, React */
 
 var loop = loop || {};
 loop.contacts = (function(_, mozL10n) {
@@ -134,14 +129,16 @@ loop.contacts = (function(_, mozL10n) {
       });
       return (
         <div className="contacts-gravatar-promo">
-          <Button additionalClass="button-close" onClick={this.handleCloseButtonClick}/>
+          <Button additionalClass="button-close"
+                  caption=""
+                  onClick={this.handleCloseButtonClick} />
           <p dangerouslySetInnerHTML={{__html: message}}
              onClick={this.handleLinkClick}></p>
           <ButtonGroup>
             <Button caption={mozL10n.get("gravatars_promo_button_nothanks")}
                     onClick={this.handleCloseButtonClick}/>
-            <Button caption={mozL10n.get("gravatars_promo_button_use")}
-                    additionalClass="button-accept"
+            <Button additionalClass="button-accept"
+                    caption={mozL10n.get("gravatars_promo_button_use")}
                     onClick={this.handleUseButtonClick}/>
           </ButtonGroup>
         </div>
@@ -151,8 +148,10 @@ loop.contacts = (function(_, mozL10n) {
 
   const ContactDropdown = React.createClass({
     propTypes: {
-      handleAction: React.PropTypes.func.isRequired,
-      canEdit: React.PropTypes.bool
+      // If the contact is blocked or not.
+      blocked: React.PropTypes.bool.isRequired,
+      canEdit: React.PropTypes.bool,
+      handleAction: React.PropTypes.func.isRequired
     },
 
     getInitialState: function () {
@@ -196,31 +195,35 @@ loop.contacts = (function(_, mozL10n) {
                             "dropdown-menu-up": this.state.openDirUp })}>
           <li className={cx({ "dropdown-menu-item": true,
                               "disabled": this.props.blocked })}
-              onClick={this.onItemClick}
-              data-action="video-call">
+              data-action="video-call"
+              onClick={this.onItemClick}>
             <i className="icon icon-video-call" />
             {mozL10n.get("video_call_menu_button")}
           </li>
           <li className={cx({ "dropdown-menu-item": true,
                               "disabled": this.props.blocked })}
-              onClick={this.onItemClick} data-action="audio-call">
+              data-action="audio-call"
+              onClick={this.onItemClick}>
             <i className="icon icon-audio-call" />
             {mozL10n.get("audio_call_menu_button")}
           </li>
           <li className={cx({ "dropdown-menu-item": true,
                               "disabled": !this.props.canEdit })}
-              onClick={this.onItemClick} data-action="edit">
+              data-action="edit"
+              onClick={this.onItemClick}>
             <i className="icon icon-edit" />
             {mozL10n.get("edit_contact_menu_button")}
           </li>
           <li className="dropdown-menu-item"
-              onClick={this.onItemClick} data-action={blockAction}>
+              data-action={blockAction}
+              onClick={this.onItemClick}>
             <i className={"icon icon-" + blockAction} />
             {mozL10n.get(blockLabel)}
           </li>
           <li className={cx({ "dropdown-menu-item": true,
                               "disabled": !this.props.canEdit })}
-              onClick={this.onItemClick} data-action="remove">
+               data-action="remove"
+               onClick={this.onItemClick}>
             <i className="icon icon-remove" />
             {mozL10n.get("remove_contact_menu_button2")}
           </li>
@@ -237,8 +240,8 @@ loop.contacts = (function(_, mozL10n) {
     },
 
     propTypes: {
-      handleContactAction: React.PropTypes.func,
-      contact: React.PropTypes.object.isRequired
+      contact: React.PropTypes.object.isRequired,
+      handleContactAction: React.PropTypes.func
     },
 
     _onBodyClick: function() {
@@ -317,9 +320,9 @@ loop.contacts = (function(_, mozL10n) {
                onClick={this.showDropdownMenu} />
           </div>
           {this.state.showMenu
-            ? <ContactDropdown handleAction={this.handleAction}
+            ? <ContactDropdown blocked={this.props.contact.blocked}
                                canEdit={this.canEdit()}
-                               blocked={this.props.contact.blocked} />
+                               handleAction={this.handleAction} />
             : null
           }
         </li>
@@ -335,7 +338,9 @@ loop.contacts = (function(_, mozL10n) {
 
     propTypes: {
       notifications: React.PropTypes.instanceOf(
-        loop.shared.models.NotificationCollection).isRequired
+        loop.shared.models.NotificationCollection).isRequired,
+        // Callback to handle entry to the add/edit contact form.
+        startForm: React.PropTypes.func.isRequired
     },
 
     /**
@@ -490,9 +495,9 @@ loop.contacts = (function(_, mozL10n) {
             message: mozL10n.get("confirm_delete_contact_alert"),
             okButton: mozL10n.get("confirm_delete_contact_remove_button"),
             cancelButton: mozL10n.get("confirm_delete_contact_cancel_button")
-          }, (err, result) => {
-            if (err) {
-              throw err;
+          }, (error, result) => {
+            if (error) {
+              throw error;
             }
 
             if (!result) {
@@ -554,8 +559,9 @@ loop.contacts = (function(_, mozL10n) {
 
       let viewForItem = item => {
         return (
-          <ContactDetail key={item._guid} contact={item}
-                         handleContactAction={this.handleContactAction} />
+          <ContactDetail contact={item}
+                         handleContactAction={this.handleContactAction}
+                         key={item._guid} />
         );
       };
 
@@ -624,7 +630,9 @@ loop.contacts = (function(_, mozL10n) {
     mixins: [React.addons.LinkedStateMixin],
 
     propTypes: {
-      mode: React.PropTypes.string
+      mode: React.PropTypes.string,
+      // Callback used to change the selected tab - it is passed the tab name.
+      selectTab: React.PropTypes.func.isRequired
     },
 
     getInitialState: function() {
@@ -693,7 +701,7 @@ loop.contacts = (function(_, mozL10n) {
           };
           var tel = this.state.tel.trim();
           if (!!tel) {
-            contact["tel"] = [{
+            contact.tel = [{
               pref: true,
               type: ["fxos"],
               value: tel
@@ -722,16 +730,23 @@ loop.contacts = (function(_, mozL10n) {
                    ? mozL10n.get("add_contact_button")
                    : mozL10n.get("edit_contact_title")}</header>
           <label>{mozL10n.get("edit_contact_name_label")}</label>
-          <input ref="name" required pattern="\s*\S.*" type="text"
-                 className={cx({pristine: this.state.pristine})}
+          <input className={cx({pristine: this.state.pristine})}
+                 pattern="\s*\S.*"
+                 ref="name"
+                 required
+                 type="text"
                  valueLink={this.linkState("name")} />
           <label>{mozL10n.get("edit_contact_email_label")}</label>
-          <input ref="email" type="email" required={phoneOrEmailRequired}
-                 className={cx({pristine: this.state.pristine})}
+          <input className={cx({pristine: this.state.pristine})}
+                 ref="email"
+                 required={phoneOrEmailRequired}
+                 type="email"
                  valueLink={this.linkState("email")} />
           <label>{mozL10n.get("new_contact_fxos_phone_placeholder")}</label>
-          <input ref="tel" type="tel" required={phoneOrEmailRequired}
-                 className={cx({pristine: this.state.pristine})}
+          <input className={cx({pristine: this.state.pristine})}
+                 ref="tel"
+                 required={phoneOrEmailRequired}
+                 type="tel"
                  valueLink={this.linkState("tel")} />
           <ButtonGroup>
             <Button additionalClass="button-cancel"

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "nsSpeechTask.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 
 #include "mozilla/dom/ContentChild.h"
 #include "mozilla/dom/Element.h"
@@ -16,7 +16,6 @@
 #include "nsIDocument.h"
 
 #undef LOG
-#ifdef PR_LOGGING
 PRLogModuleInfo*
 GetSpeechSynthLog()
 {
@@ -28,10 +27,7 @@ GetSpeechSynthLog()
 
   return sLog;
 }
-#define LOG(type, msg) PR_LOG(GetSpeechSynthLog(), type, msg)
-#else
-#define LOG(type, msg)
-#endif
+#define LOG(type, msg) MOZ_LOG(GetSpeechSynthLog(), type, msg)
 
 namespace mozilla {
 namespace dom {
@@ -149,7 +145,7 @@ SpeechSynthesis::Speak(SpeechSynthesisUtterance& aUtterance)
 void
 SpeechSynthesis::AdvanceQueue()
 {
-  LOG(PR_LOG_DEBUG,
+  LOG(LogLevel::Debug,
       ("SpeechSynthesis::AdvanceQueue length=%d", mSpeechQueue.Length()));
 
   if (mSpeechQueue.IsEmpty()) {

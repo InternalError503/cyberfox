@@ -105,7 +105,9 @@ MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
     return;
   }
 
-  MediaKeySystemStatus status = MediaKeySystemAccess::GetKeySystemStatus(keySystem, minCdmVersion);
+  nsAutoCString message;
+  nsAutoCString cdmVersion;
+  MediaKeySystemStatus status = MediaKeySystemAccess::GetKeySystemStatus(keySystem, minCdmVersion, message, cdmVersion);
   if ((status == MediaKeySystemStatus::Cdm_not_installed ||
        status == MediaKeySystemStatus::Cdm_insufficient_version) &&
       keySystem.EqualsLiteral("com.adobe.primetime")) {
@@ -149,7 +151,8 @@ MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
 
   if (aOptions.IsEmpty() ||
       MediaKeySystemAccess::IsSupported(keySystem, aOptions)) {
-    nsRefPtr<MediaKeySystemAccess> access(new MediaKeySystemAccess(mWindow, keySystem));
+    nsRefPtr<MediaKeySystemAccess> access(
+      new MediaKeySystemAccess(mWindow, keySystem, NS_ConvertUTF8toUTF16(cdmVersion)));
 #ifdef XP_WIN
     if (IsVistaOrLater()) {
       // On Windows, ensure we have tried creating a GMPVideoDecoder for this

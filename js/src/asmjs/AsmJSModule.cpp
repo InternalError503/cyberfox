@@ -45,6 +45,7 @@
 #include "jsobjinlines.h"
 
 #include "frontend/ParseNode-inl.h"
+#include "jit/MacroAssembler-inl.h"
 #include "vm/ArrayBufferObject-inl.h"
 #include "vm/Stack-inl.h"
 
@@ -61,11 +62,11 @@ using mozilla::Swap;
 static uint8_t*
 AllocateExecutableMemory(ExclusiveContext* cx, size_t bytes)
 {
-#ifdef XP_WIN
-    unsigned permissions = PAGE_EXECUTE_READWRITE;
-#else
-    unsigned permissions = PROT_READ | PROT_WRITE | PROT_EXEC;
-#endif
+    // On most platforms, this will allocate RWX memory. On iOS, or when
+    // --non-writable-jitcode is used, this will allocate RW memory. In this
+    // case, DynamicallyLinkModule will reprotect the code as RX.
+    unsigned permissions =
+        ExecutableAllocator::initialProtectionFlags(ExecutableAllocator::Writable);
     void* p = AllocateExecutableMemory(nullptr, bytes, permissions, "asm-js-code", AsmJSPageSize);
     if (!p)
         ReportOutOfMemory(cx);
@@ -294,10 +295,9 @@ AsmJSModule::finish(ExclusiveContext* cx, TokenStream& tokenStream, MacroAssembl
     pod.srcLength_ = endBeforeCurly - srcStart_;
     pod.srcLengthWithRightBrace_ = endAfterCurly - srcStart_;
 
-    // The global data section sits immediately after the executable (and
-    // other) data allocated by the MacroAssembler, so ensure it is
-    // SIMD-aligned.
-    pod.codeBytes_ = AlignBytes(masm.bytesNeeded(), SimdMemoryAlignment);
+    // Start global data on a new page so JIT code may be given independent
+    // protection flags.
+    pod.codeBytes_ = AlignBytes(masm.bytesNeeded(), AsmJSPageSize);
 
     // The entire region is allocated via mmap/VirtualAlloc which requires
     // units of pages.
@@ -661,7 +661,7 @@ FuncCast(F* pf)
 static void*
 RedirectCall(void* fun, ABIFunctionType type)
 {
-#if defined(JS_ARM_SIMULATOR) || defined(JS_MIPS_SIMULATOR)
+#ifdef JS_SIMULATOR
     fun = Simulator::RedirectNativeFunction(fun, type);
 #endif
     return fun;
@@ -946,6 +946,24 @@ AsmJSModule::restoreToInitialState(ArrayBufferObjectMaybeShared* maybePrevBuffer
     restoreHeapToInitialState(maybePrevBuffer);
 }
 
+namespace {
+
+class MOZ_STACK_CLASS AutoMutateCode
+{
+    AutoWritableJitCode awjc_;
+    AutoFlushICache afc_;
+
+   public:
+    AutoMutateCode(JSContext* cx, AsmJSModule& module, const char* name)
+      : awjc_(cx->runtime(), module.codeBase(), module.codeBytes()),
+        afc_(name)
+    {
+        module.setAutoFlushICacheRange();
+    }
+};
+
+}; // anonymous namespace
+
 bool
 AsmJSModule::detachHeap(JSContext* cx)
 {
@@ -966,9 +984,7 @@ AsmJSModule::detachHeap(JSContext* cx)
     MOZ_ASSERT_IF(active(), activation()->exitReason() == AsmJSExit::Reason_JitFFI ||
                             activation()->exitReason() == AsmJSExit::Reason_SlowFFI);
 
-    AutoFlushICache afc("AsmJSModule::detachHeap");
-    setAutoFlushICacheRange();
-
+    AutoMutateCode amc(cx, *this, "AsmJSModule::detachHeap");
     restoreHeapToInitialState(maybeHeap_);
 
     MOZ_ASSERT(hasDetachedHeap());
@@ -1019,7 +1035,7 @@ const Class AsmJSModuleObject::class_ = {
 AsmJSModuleObject*
 AsmJSModuleObject::create(ExclusiveContext* cx, ScopedJSDeletePtr<AsmJSModule>* module)
 {
-    JSObject* obj = NewObjectWithGivenProto(cx, &AsmJSModuleObject::class_, NullPtr());
+    JSObject* obj = NewObjectWithGivenProto(cx, &AsmJSModuleObject::class_, nullptr);
     if (!obj)
         return nullptr;
     AsmJSModuleObject* nobj = &obj->as<AsmJSModuleObject>();
@@ -1716,9 +1732,7 @@ AsmJSModule::changeHeap(Handle<ArrayBufferObject*> newHeap, JSContext* cx)
     if (interrupted_)
         return false;
 
-    AutoFlushICache afc("AsmJSModule::changeHeap");
-    setAutoFlushICacheRange();
-
+    AutoMutateCode amc(cx, *this, "AsmJSModule::changeHeap");
     restoreHeapToInitialState(maybeHeap_);
     initHeap(newHeap, cx);
     return true;
@@ -1755,9 +1769,7 @@ AsmJSModule::setProfilingEnabled(bool enabled, JSContext* cx)
         profilingLabels_.clear();
     }
 
-    // Conservatively flush the icache for the entire module.
-    AutoFlushICache afc("AsmJSModule::setProfilingEnabled");
-    setAutoFlushICacheRange();
+    AutoMutateCode amc(cx, *this, "AsmJSModule::setProfilingEnabled");
 
     // Patch all internal (asm.js->asm.js) callsites to call the profiling
     // prologues:

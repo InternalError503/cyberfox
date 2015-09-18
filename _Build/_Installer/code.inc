@@ -44,8 +44,86 @@ var
 				Result := TRUE;
 			end;
 		end;
-end;	
+end;
+
+function DoCleanInstall(const Count : LongInt): boolean;
+var
+	CleanInstallation : Boolean;
+	ii : LongInt;
+	Param : String;	
+	begin
+		CleanInstallation := FALSE;
+		for ii := 0 to Count do
+		begin
+			Param := ParamStr(ii)
+			if CompareText(Param,'--cleaninstall')=0 then
+			begin
+				CleanInstallation := TRUE;
+				Result := TRUE;
+			end;
+		end;
+end;
 	
+//Get the uninstall string;
+function GetUninstallString: string;
+	var
+		sUnInstPath: string;
+		sUnInstallString: String;
+	begin
+		Result := '';
+		sUnInstPath := ExpandConstant('{#UNINSTKEY}');
+		sUnInstallString := '';
+	if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
+		RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
+	log('Getting uninstall string ' + sUnInstPath);
+	Result := sUnInstallString;
+end;	
+
+function cleanUninstall : boolean;
+	var
+		iResultCode: Integer;
+		sUnInstallString: string;
+    begin
+			//Perform clean install and uninstall existing installation.
+			if RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then
+				begin
+					sUnInstallString := GetUninstallString();
+					sUnInstallString :=  RemoveQuotes(sUnInstallString);
+					Wizardform.NextButton.Enabled := False;
+					Wizardform.BackButton.Enabled := False;
+					WizardForm.CancelButton.Enabled := False;
+					log('Current installation found!');
+			if Exec(ExpandConstant(sUnInstallString), '/VERYSILENT', '', SW_SHOW, ewWaitUntilTerminated, iResultCode) then
+			begin
+				//All IO operations have completed.
+				log('Older installation was uninstalled');
+				//Ensure time out between uninstall and install.
+				sleep(2000);
+				Result := True;
+			end
+			else begin
+			    log('Error occurred trying to uninstall older version.');
+				if UninstallSilent() then begin ExitProcess(11); end; // Our Exit code for clean install fail.
+				Result := False;				
+			end
+		end	
+end;
+
+//Check task.
+function TaskSelected(const Tasks: String): Boolean;
+begin
+	if IsTaskSelected(Tasks) then
+		begin
+			log(Tasks + ' was True');
+			Result := True;
+		end
+	else
+		begin
+			log(Tasks + ' was False');
+			Result := False;
+		end
+end;
+
 //Initialize installer run check for running process.	
 #if Arch == "amd64"
 //Check and warn user if installing Cyberfox x64 bit on x86 OS.
@@ -86,6 +164,11 @@ var
 #endif		
 	end
 end;
+//After initializing installer event.
+procedure InitializeWizard();
+begin
+	if (DoCleanInstall(ParamCount())) then begin cleanUninstall(); end;
+end;
 //Make sure to remove start-menu entries during install as not to have many of the same short-cuts in other languages.
 procedure CurStepChanged(CurStep: TSetupStep);
 	begin
@@ -96,20 +179,6 @@ procedure CurStepChanged(CurStep: TSetupStep);
 				DelTree(ExpandConstant('{group}'), True, True, True);
 		end
 
-end;
-//Get the uninstall string;
-function GetUninstallString: string;
-	var
-		sUnInstPath: string;
-		sUnInstallString: String;
-	begin
-		Result := '';
-		sUnInstPath := ExpandConstant('{#UNINSTKEY}');
-		sUnInstallString := '';
-	if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
-		RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
-	log('Getting uninstall string ' + sUnInstPath);
-	Result := sUnInstallString;
 end;
 //Check if install exists of not disable clean install check-box
 procedure CurPageChanged(CurPageID: Integer);
@@ -130,30 +199,12 @@ end;
 
 //Check if cleanInstall has been selected
 function NextButtonClick(CurPageID: Integer): Boolean;
-	var
-		iResultCode: Integer;
-		sUnInstallString: string;
 	begin
 		Result := True;
 	if CurPageID = wpSelectTasks then
 	begin
-		if WizardForm.TasksList.Checked[1] then
-			//Perform clean install and uninstall existing installation.
-			if RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then
-				begin
-					sUnInstallString := GetUninstallString();
-					sUnInstallString :=  RemoveQuotes(sUnInstallString);
-					Wizardform.NextButton.Enabled := False;
-					Wizardform.BackButton.Enabled := False;
-					WizardForm.CancelButton.Enabled := False;
-			if Exec(ExpandConstant(sUnInstallString), '/VERYSILENT', '', SW_SHOW, ewWaitUntilTerminated, iResultCode) then
-			begin
-				//All IO operations have completed.
-			end
-			else begin
-				if UninstallSilent() then begin ExitProcess(11); end; // Our Exit code for clean install fail.			
-			end
-		end
+		if TaskSelected('cleaninstall') then
+			 cleanUninstall();			
 	end;
 end;
 //Initialize uninstaller run check for process

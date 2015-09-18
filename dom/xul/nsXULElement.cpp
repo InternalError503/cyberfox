@@ -40,7 +40,6 @@
 #include "mozilla/EventStates.h"
 #include "nsFocusManager.h"
 #include "nsHTMLStyleSheet.h"
-#include "nsIJSRuntimeService.h"
 #include "nsNameSpaceManager.h"
 #include "nsIObjectInputStream.h"
 #include "nsIObjectOutputStream.h"
@@ -87,7 +86,7 @@
 #include "nsXULContentUtils.h"
 #include "nsNodeUtils.h"
 #include "nsFrameLoader.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "rdf.h"
 #include "nsIControllers.h"
 #include "nsAttrValueOrString.h"
@@ -2306,9 +2305,9 @@ nsXULPrototypeElement::Deserialize(nsIObjectInputStream* aStream,
     NS_PRECONDITION(aNodeInfos, "missing nodeinfo array");
 
     // Read Node Info
-    uint32_t number;
+    uint32_t number = 0;
     nsresult rv = aStream->Read32(&number);
-    mNodeInfo = aNodeInfos->ElementAt(number);
+    mNodeInfo = aNodeInfos->SafeElementAt(number, nullptr);
     if (!mNodeInfo)
         return NS_ERROR_UNEXPECTED;
 
@@ -2321,7 +2320,7 @@ nsXULPrototypeElement::Deserialize(nsIObjectInputStream* aStream,
 
     uint32_t i;
     if (mNumAttributes > 0) {
-        mAttributes = new nsXULPrototypeAttribute[mNumAttributes];
+        mAttributes = new (fallible) nsXULPrototypeAttribute[mNumAttributes];
         if (! mAttributes)
             return NS_ERROR_OUT_OF_MEMORY;
 
@@ -2331,7 +2330,7 @@ nsXULPrototypeElement::Deserialize(nsIObjectInputStream* aStream,
             if (NS_FAILED(tmp)) {
               rv = tmp;
             }
-            mozilla::dom::NodeInfo* ni = aNodeInfos->ElementAt(number);
+            mozilla::dom::NodeInfo* ni = aNodeInfos->SafeElementAt(number, nullptr);
             if (!ni)
                 return NS_ERROR_UNEXPECTED;
 
@@ -2438,10 +2437,11 @@ nsXULPrototypeElement::Deserialize(nsIObjectInputStream* aStream,
                 break;
             }
             default:
-                NS_NOTREACHED("Unexpected child type!");
-                rv = NS_ERROR_UNEXPECTED;
+                MOZ_ASSERT(false, "Unexpected child type!");
+                return NS_ERROR_UNEXPECTED;
             }
 
+            MOZ_ASSERT(child, "Don't append null to mChildren");
             mChildren.AppendElement(child);
 
             // Oh dear. Something failed during the deserialization.
@@ -2767,9 +2767,6 @@ NotifyOffThreadScriptCompletedRunnable::Run()
     // Note: this unroots mScript so that it is available to be collected by the
     // JS GC. The receiver needs to root the script before performing a call that
     // could GC.
-    nsCOMPtr<nsIJSRuntimeService> svc = do_GetService("@mozilla.org/js/xpc/RuntimeService;1");
-    NS_ENSURE_TRUE(svc, NS_ERROR_FAILURE);
-
     JSScript *script;
     {
         AutoSafeJSContext cx;

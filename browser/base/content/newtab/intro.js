@@ -60,7 +60,7 @@ let gIntro = {
     this._paragraphs.push(`${newTabString("intro.paragraph9")} ${newTabString("intro.paragraph7")}`);
     this._paragraphs.push(
         `${newTabString("intro.paragraph2", [this._link(TILES_PRIVACY_LINK, newTabString("privacy.link"))])}
-         ${newTabString("intro.paragraph4", [customizeIcon, this._bold(newTabString("intro.controls"))])}`);
+         ${newTabString("intro.paragraph4.2", [customizeIcon, this._bold(newTabString("intro.controls"))])}`);
   },
 
   showIfNecessary: function() {

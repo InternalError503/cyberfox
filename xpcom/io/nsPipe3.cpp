@@ -16,7 +16,7 @@
 #include "nsStreamUtils.h"
 #include "nsCOMPtr.h"
 #include "nsCRT.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "nsIClassInfoImpl.h"
 #include "nsAlgorithm.h"
 #include "nsMemory.h"
@@ -40,7 +40,7 @@ GetPipeLog()
   }
   return sLog;
 }
-#define LOG(args) PR_LOG(GetPipeLog(), PR_LOG_DEBUG, args)
+#define LOG(args) MOZ_LOG(GetPipeLog(), mozilla::LogLevel::Debug, args)
 
 #define DEFAULT_SEGMENT_SIZE  4096
 #define DEFAULT_SEGMENT_COUNT 16

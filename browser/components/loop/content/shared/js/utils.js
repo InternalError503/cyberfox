@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global loop:true */
+/* global Components */
 
 var loop = loop || {};
 loop.shared = loop.shared || {};
@@ -10,6 +10,32 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
 
 (function() {
   "use strict";
+
+  /**
+   * Root object, by default set to window if we're not in chrome code.
+   * @type {DOMWindow|Object}
+   */
+  var rootObject = inChrome ? {} : window;
+  /**
+   * Root navigator, by default set to navigator if we're not in chrome code.
+   * @type {Navigator|Object}
+   */
+  var rootNavigator = inChrome ? {} : navigator;
+
+  /**
+   * Sets new root objects.  This is useful for testing native DOM events, and also
+   * so we can easily stub items like navigator.mediaDevices.
+   * can fake them. In beforeEach(), loop.shared.utils.setRootObjects is used to
+   * substitute fake objects, and in afterEach(), the real window object is
+   * replaced.
+   *
+   * @param {Object} windowObj The fake window object, undefined to use window.
+   * @param {Object} navigatorObj The fake navigator object, undefined to use navigator.
+   */
+  function setRootObjects(windowObj, navigatorObj) {
+    rootObject = windowObj || window;
+    rootNavigator = navigatorObj || navigator;
+  }
 
   var mozL10n;
   if (inChrome) {
@@ -48,7 +74,9 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
 
   var FAILURE_DETAILS = {
     MEDIA_DENIED: "reason-media-denied",
+    NO_MEDIA: "reason-no-media",
     UNABLE_TO_PUBLISH_MEDIA: "unable-to-publish-media",
+    USER_UNAVAILABLE: "reason-user-unavailable",
     COULD_NOT_CONNECT: "reason-could-not-connect",
     NETWORK_DISCONNECTED: "reason-network-disconnected",
     EXPIRED_OR_INVALID: "reason-expired-or-invalid",
@@ -109,8 +137,8 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
   }
 
   function isChrome(platform) {
-    return platform.toLowerCase().indexOf('chrome') > -1 ||
-           platform.toLowerCase().indexOf('chromium') > -1;
+    return platform.toLowerCase().indexOf("chrome") > -1 ||
+           platform.toLowerCase().indexOf("chromium") > -1;
   }
 
   function isFirefox(platform) {
@@ -127,8 +155,8 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
   }
 
   function isOpera(platform) {
-    return platform.toLowerCase().indexOf('opera') > -1 ||
-           platform.toLowerCase().indexOf('opr') > -1;
+    return platform.toLowerCase().indexOf("opera") > -1 ||
+           platform.toLowerCase().indexOf("opr") > -1;
   }
 
   /**
@@ -280,6 +308,43 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
   };
 
   /**
+   * Determines if the user has any audio devices installed.
+   *
+   * @param  {Function} callback Called with a boolean which is true if there
+   *                             are audio devices present.
+   */
+  function hasAudioOrVideoDevices(callback) {
+    // mediaDevices is the official API for the spec.
+    // Older versions of FF had mediaDevices but not enumerateDevices.
+    if ("mediaDevices" in rootNavigator &&
+        "enumerateDevices" in rootNavigator.mediaDevices) {
+      rootNavigator.mediaDevices.enumerateDevices().then(function(result) {
+        function checkForInput(device) {
+          return device.kind === "audioinput" || device.kind === "videoinput";
+        }
+
+        callback(result.some(checkForInput));
+      }).catch(function() {
+        callback(false);
+      });
+    // MediaStreamTrack is the older version of the API, implemented originally
+    // by Google Chrome.
+    } else if ("MediaStreamTrack" in rootObject &&
+               "getSources" in rootObject.MediaStreamTrack) {
+      rootObject.MediaStreamTrack.getSources(function(result) {
+        function checkForInput(device) {
+          return device.kind === "audio" || device.kind === "video";
+        }
+
+        callback(result.some(checkForInput));
+      });
+    } else {
+      // We don't know, so assume true.
+      callback(true);
+    }
+  }
+
+  /**
    * Helper to allow getting some of the location data in a way that's compatible
    * with stubbing for unit tests.
    */
@@ -324,9 +389,11 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
    * @param {String} callUrl              The call URL.
    * @param {String} [recipient]          The recipient email address (optional).
    * @param {String} [contextDescription] The context description (optional).
+   * @param {String} [from]               The area from which this function is called.
    */
-  function composeCallUrlEmail(callUrl, recipient, contextDescription) {
-    if (typeof navigator.mozLoop === "undefined") {
+  function composeCallUrlEmail(callUrl, recipient, contextDescription, from) {
+    var mozLoop = navigator.mozLoop;
+    if (typeof mozLoop === "undefined") {
       console.warn("composeCallUrlEmail isn't available for Loop standalone.");
       return;
     }
@@ -335,7 +402,7 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
     var brandShortname = mozL10n.get("brandShortname");
     var clientShortname2 = mozL10n.get("clientShortname2");
     var clientSuperShortname = mozL10n.get("clientSuperShortname");
-    var learnMoreUrl = navigator.mozLoop.getLoopPref("learnMoreUrl");
+    var learnMoreUrl = mozLoop.getLoopPref("learnMoreUrl");
 
     if (contextDescription) {
       subject = mozL10n.get("share_email_subject_context", {
@@ -363,11 +430,18 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
       });
     }
 
-    navigator.mozLoop.composeEmail(
+    mozLoop.composeEmail(
       subject,
       body.replace(/\r\n/g, "\n").replace(/\n/g, "\r\n"),
       recipient
     );
+
+    var bucket = mozLoop.SHARING_ROOM_URL["EMAIL_FROM_" + (from || "").toUpperCase()];
+    if (typeof bucket === "undefined") {
+      console.error("No URL sharing type bucket found for '" + from + "'");
+      return;
+    }
+    mozLoop.telemetryAddValue("LOOP_SHARING_ROOM_URL", bucket);
   }
 
   // We can alias `subarray` to `slice` when the latter is not available, because
@@ -671,6 +745,7 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
     STREAM_PROPERTIES: STREAM_PROPERTIES,
     SCREEN_SHARE_STATES: SCREEN_SHARE_STATES,
     ROOM_INFO_FAILURES: ROOM_INFO_FAILURES,
+    setRootObjects: setRootObjects,
     composeCallUrlEmail: composeCallUrlEmail,
     formatDate: formatDate,
     formatURL: formatURL,
@@ -683,6 +758,7 @@ var inChrome = typeof Components != "undefined" && "utils" in Components;
     isFirefoxOS: isFirefoxOS,
     isOpera: isOpera,
     getUnsupportedPlatform: getUnsupportedPlatform,
+    hasAudioOrVideoDevices: hasAudioOrVideoDevices,
     locationData: locationData,
     atob: atob,
     btoa: btoa,

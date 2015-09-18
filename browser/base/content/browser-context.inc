@@ -32,7 +32,7 @@
                   command="Browser:Stop"/>
         <menuitem id="context-bookmarkpage"
                   class="menuitem-iconic"
-                  tooltiptext="&bookmarkPageCmd2.label;"
+                  observes="bookmarkThisPageBroadcaster"
                   aria-label="&bookmarkPageCmd2.label;"
                   oncommand="gContextMenu.bookmarkThisPage();"/>
       </menugroup>
@@ -62,7 +62,7 @@
                   command="Browser:Stop" hidden="true"/>
         <menuitem id="context-bookmarkpage"
                   class="menuitem-iconic"
-                  tooltiptext="&bookmarkPageCmd2.label;"
+                  observes="bookmarkThisPageBroadcaster"
                   label="&bookmarkPageCmd2.label;"
                   oncommand="gContextMenu.bookmarkThisPage();"/>				  
 	  </menugroup>
@@ -424,7 +424,7 @@
       <menuitem id="context-viewsource"
                 label="&viewPageSourceCmd.label;"
                 accesskey="&viewPageSourceCmd.accesskey;"
-                oncommand="BrowserViewSourceOfDocument(gContextMenu.browser.contentDocumentAsCPOW);"
+                oncommand="BrowserViewSource(gContextMenu.browser);"
                 observes="isImage"/>
       <menuitem id="context-viewinfo"
                 label="&viewPageInfoCmd.label;"

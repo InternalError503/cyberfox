@@ -33,7 +33,7 @@
 #include "nsLayoutUtils.h"
 #include "nsPresContext.h"
 #include "nsComponentManagerUtils.h"
-#include "prlog.h"
+#include "mozilla/Logging.h"
 #include "nsAutoPtr.h"
 #include "nsIDocument.h"
 #include "jsapi.h"
@@ -73,15 +73,12 @@ using namespace mozilla::widget;
 using namespace mozilla::ipc;
 using namespace mozilla::layout;
 
-#ifdef PR_LOGGING
 static PRLogModuleInfo *gLog = nullptr;
-#define LOG(...) PR_LOG(gLog, PR_LOG_NOTICE, (__VA_ARGS__))
-#else
-#define LOG(...) do { } while(0)
-#endif
+#define LOG(...) MOZ_LOG(gLog, mozilla::LogLevel::Debug, (__VA_ARGS__))
 
 #define DEFAULT_FRAME_RATE 60
 #define DEFAULT_THROTTLED_FRAME_RATE 1
+#define DEFAULT_RECOMPUTE_VISIBILITY_INTERVAL_MS 1000
 // after 10 minutes, stop firing off inactive timers
 #define DEFAULT_INACTIVE_TIMER_DISABLE_SECONDS 600
 
@@ -140,9 +137,9 @@ public:
   {
     MOZ_ASSERT(NS_IsMainThread());
 
-    for (size_t i = 0; i < mRefreshDrivers.Length(); i++) {
-      aNewTimer->AddRefreshDriver(mRefreshDrivers[i]);
-      mRefreshDrivers[i]->mActiveTimer = aNewTimer;
+    for (nsRefreshDriver* driver : mRefreshDrivers) {
+      aNewTimer->AddRefreshDriver(driver);
+      driver->mActiveTimer = aNewTimer;
     }
     mRefreshDrivers.Clear();
 
@@ -180,13 +177,13 @@ protected:
     nsTArray<nsRefPtr<nsRefreshDriver> > drivers(mRefreshDrivers);
     // RD is short for RefreshDriver
     profiler_tracing("Paint", "RD", TRACING_INTERVAL_START);
-    for (size_t i = 0; i < drivers.Length(); ++i) {
+    for (nsRefreshDriver* driver : drivers) {
       // don't poke this driver if it's in test mode
-      if (drivers[i]->IsTestControllingRefreshesEnabled()) {
+      if (driver->IsTestControllingRefreshesEnabled()) {
         continue;
       }
 
-      TickDriver(drivers[i], jsnow, now);
+      TickDriver(driver, jsnow, now);
     }
     profiler_tracing("Paint", "RD", TRACING_INTERVAL_END);
     LOG("[%p] done.", this);
@@ -366,6 +363,7 @@ private:
         aVsyncTimestamp = mRecentVsync;
         mProcessedVsync = true;
       }
+      MOZ_ASSERT(aVsyncTimestamp <= TimeStamp::Now());
 
       // We might have a problem that we call ~VsyncRefreshDriverTimer() before
       // the scheduled TickRefreshDriver() runs. Check mVsyncRefreshDriverTimer
@@ -902,11 +900,9 @@ GetFirstFrameDelay(imgIRequest* req)
 /* static */ void
 nsRefreshDriver::InitializeStatics()
 {
-#ifdef PR_LOGGING
   if (!gLog) {
     gLog = PR_NewLogModule("nsRefreshDriver");
   }
-#endif
 }
 
 /* static */ void
@@ -976,6 +972,17 @@ nsRefreshDriver::GetThrottledTimerInterval()
   return 1000.0 / rate;
 }
 
+/* static */ mozilla::TimeDuration
+nsRefreshDriver::GetMinRecomputeVisibilityInterval()
+{
+  int32_t interval =
+    Preferences::GetInt("layout.visibility.min-recompute-interval-ms", -1);
+  if (interval <= 0) {
+    interval = DEFAULT_RECOMPUTE_VISIBILITY_INTERVAL_MS;
+  }
+  return TimeDuration::FromMilliseconds(interval);
+}
+
 double
 nsRefreshDriver::GetRefreshTimerInterval() const
 {
@@ -1022,7 +1029,9 @@ nsRefreshDriver::nsRefreshDriver(nsPresContext* aPresContext)
     mFreezeCount(0),
     mThrottledFrameRequestInterval(TimeDuration::FromMilliseconds(
                                      GetThrottledTimerInterval())),
+    mMinRecomputeVisibilityInterval(GetMinRecomputeVisibilityInterval()),
     mThrottled(false),
+    mNeedToRecomputeVisibility(false),
     mTestControllingRefreshes(false),
     mViewManagerFlushIsPending(false),
     mRequestedHighPrecision(false),
@@ -1034,6 +1043,7 @@ nsRefreshDriver::nsRefreshDriver(nsPresContext* aPresContext)
   mMostRecentRefresh = TimeStamp::Now();
   mMostRecentTick = mMostRecentRefresh;
   mNextThrottledFrameRequestTick = mMostRecentTick;
+  mNextRecomputeVisibilityTick = mMostRecentTick;
 }
 
 nsRefreshDriver::~nsRefreshDriver()
@@ -1046,8 +1056,8 @@ nsRefreshDriver::~nsRefreshDriver()
     mRootRefresh->RemoveRefreshObserver(this, Flush_Style);
     mRootRefresh = nullptr;
   }
-  for (uint32_t i = 0; i < mPresShellsToInvalidateIfHidden.Length(); i++) {
-    mPresShellsToInvalidateIfHidden[i]->InvalidatePresShellIfHidden();
+  for (nsIPresShell* shell : mPresShellsToInvalidateIfHidden) {
+    shell->InvalidatePresShellIfHidden();
   }
   mPresShellsToInvalidateIfHidden.Clear();
 
@@ -1528,34 +1538,34 @@ nsRefreshDriver::RunFrameRequestCallbacks(int64_t aNowEpoch, TimeStamp aNowTime)
   // Reset mFrameRequestCallbackDocs so they can be readded as needed.
   mFrameRequestCallbackDocs.Clear();
 
-  profiler_tracing("Paint", "Scripts", TRACING_INTERVAL_START);
-  int64_t eventTime = aNowEpoch / PR_USEC_PER_MSEC;
-  for (uint32_t i = 0; i < frameRequestCallbacks.Length(); ++i) {
-    const DocumentFrameCallbacks& docCallbacks = frameRequestCallbacks[i];
-    // XXXbz Bug 863140: GetInnerWindow can return the outer
-    // window in some cases.
-    nsPIDOMWindow* innerWindow = docCallbacks.mDocument->GetInnerWindow();
-    DOMHighResTimeStamp timeStamp = 0;
-    if (innerWindow && innerWindow->IsInnerWindow()) {
-      nsPerformance* perf = innerWindow->GetPerformance();
-      if (perf) {
-        timeStamp = perf->GetDOMTiming()->TimeStampToDOMHighRes(aNowTime);
+  if (!frameRequestCallbacks.IsEmpty()) {
+    profiler_tracing("Paint", "Scripts", TRACING_INTERVAL_START);
+    int64_t eventTime = aNowEpoch / PR_USEC_PER_MSEC;
+    for (const DocumentFrameCallbacks& docCallbacks : frameRequestCallbacks) {
+      // XXXbz Bug 863140: GetInnerWindow can return the outer
+      // window in some cases.
+      nsPIDOMWindow* innerWindow = docCallbacks.mDocument->GetInnerWindow();
+      DOMHighResTimeStamp timeStamp = 0;
+      if (innerWindow && innerWindow->IsInnerWindow()) {
+        nsPerformance* perf = innerWindow->GetPerformance();
+        if (perf) {
+          timeStamp = perf->GetDOMTiming()->TimeStampToDOMHighRes(aNowTime);
+        }
+        // else window is partially torn down already
       }
-      // else window is partially torn down already
-    }
-    for (uint32_t j = 0; j < docCallbacks.mCallbacks.Length(); ++j) {
-      const nsIDocument::FrameRequestCallbackHolder& holder =
-        docCallbacks.mCallbacks[j];
-      nsAutoMicroTask mt;
-      if (holder.HasWebIDLCallback()) {
-        ErrorResult ignored;
-        holder.GetWebIDLCallback()->Call(timeStamp, ignored);
-      } else {
-        holder.GetXPCOMCallback()->Sample(eventTime);
+      for (const nsIDocument::FrameRequestCallbackHolder& holder :
+           docCallbacks.mCallbacks) {
+        nsAutoMicroTask mt;
+        if (holder.HasWebIDLCallback()) {
+          ErrorResult ignored;
+          holder.GetWebIDLCallback()->Call(timeStamp, ignored);
+        } else {
+          holder.GetXPCOMCallback()->Sample(eventTime);
+        }
       }
     }
+    profiler_tracing("Paint", "Scripts", TRACING_INTERVAL_END);
   }
-  profiler_tracing("Paint", "Scripts", TRACING_INTERVAL_END);
 }
 
 void
@@ -1682,6 +1692,8 @@ nsRefreshDriver::Tick(int64_t aNowEpoch, TimeStamp aNowTime)
           NS_RELEASE(shell);
         }
 
+        mNeedToRecomputeVisibility = true;
+
         if (tracingStyleFlush) {
           profiler_tracing("Paint", "Styles", TRACING_INTERVAL_END);
         }
@@ -1727,11 +1739,24 @@ nsRefreshDriver::Tick(int64_t aNowEpoch, TimeStamp aNowTime)
           NS_RELEASE(shell);
         }
 
+        mNeedToRecomputeVisibility = true;
+
         if (tracingLayoutFlush) {
           profiler_tracing("Paint", "Reflow", TRACING_INTERVAL_END);
         }
       }
     }
+  }
+
+  // Recompute image visibility if it's necessary and enough time has passed
+  // since the last time we did it.
+  if (mNeedToRecomputeVisibility && !mThrottled &&
+      aNowTime >= mNextRecomputeVisibilityTick &&
+      !presShell->IsPaintingSuppressed()) {
+    mNextRecomputeVisibilityTick = aNowTime + mMinRecomputeVisibilityInterval;
+    mNeedToRecomputeVisibility = false;
+
+    presShell->ScheduleImageVisibilityUpdate();
   }
 
   /*
@@ -1757,19 +1782,18 @@ nsRefreshDriver::Tick(int64_t aNowEpoch, TimeStamp aNowTime)
     }
   }
 
-  for (uint32_t i = 0; i < mPresShellsToInvalidateIfHidden.Length(); i++) {
-    mPresShellsToInvalidateIfHidden[i]->InvalidatePresShellIfHidden();
+  for (nsIPresShell* shell : mPresShellsToInvalidateIfHidden) {
+    shell->InvalidatePresShellIfHidden();
   }
   mPresShellsToInvalidateIfHidden.Clear();
 
   if (mViewManagerFlushIsPending) {
     nsTArray<nsDocShell*> profilingDocShells;
     GetProfileTimelineSubDocShells(GetDocShell(mPresContext), profilingDocShells);
-    for (uint32_t i = 0; i < profilingDocShells.Length(); i ++) {
+    for (nsDocShell* docShell : profilingDocShells) {
       // For the sake of the profile timeline's simplicity, this is flagged as
       // paint even if it includes creating display lists
-      profilingDocShells[i]->AddProfileTimelineMarker("Paint",
-                                                      TRACING_INTERVAL_START);
+      docShell->AddProfileTimelineMarker("Paint", TRACING_INTERVAL_START);
     }
 #ifdef MOZ_DUMP_PAINTING
     if (nsLayoutUtils::InvalidationDebuggingIsEnabled()) {
@@ -1785,9 +1809,8 @@ nsRefreshDriver::Tick(int64_t aNowEpoch, TimeStamp aNowTime)
       printf_stderr("Ending ProcessPendingUpdates\n");
     }
 #endif
-    for (uint32_t i = 0; i < profilingDocShells.Length(); i ++) {
-      profilingDocShells[i]->AddProfileTimelineMarker("Paint",
-                                                      TRACING_INTERVAL_END);
+    for (nsDocShell* docShell : profilingDocShells) {
+      docShell->AddProfileTimelineMarker("Paint", TRACING_INTERVAL_END);
     }
 
     if (nsContentUtils::XPConnect()) {
@@ -1800,8 +1823,10 @@ nsRefreshDriver::Tick(int64_t aNowEpoch, TimeStamp aNowTime)
   mozilla::Telemetry::AccumulateTimeDelta(mozilla::Telemetry::REFRESH_DRIVER_TICK, mTickStart);
 #endif
 
-  for (uint32_t i = 0; i < mPostRefreshObservers.Length(); ++i) {
-    mPostRefreshObservers[i]->DidRefresh();
+  nsTObserverArray<nsAPostRefreshObserver*>::ForwardIterator iter(mPostRefreshObservers);
+  while (iter.HasMore()) {
+    nsAPostRefreshObserver* observer = iter.GetNext();
+    observer->DidRefresh();
   }
 
   NS_ASSERTION(mInRefresh, "Still in refresh");

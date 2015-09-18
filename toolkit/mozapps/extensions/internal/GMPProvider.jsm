@@ -526,7 +526,8 @@ let GMPProvider = {
       }
     }
 
-    if (Preferences.get(GMPPrefs.KEY_EME_ENABLED, false)) {
+    var emeEnabled = Preferences.get(GMPPrefs.KEY_EME_ENABLED, false);
+    if (emeEnabled) {
       try {
         let greDir = Services.dirsvc.get(NS_GRE_DIR,
                                          Ci.nsILocalFile);

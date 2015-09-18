@@ -3,6 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
+const { devtools: loader } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+const require = loader.require;
+
 const { Task } = require("resource://gre/modules/Task.jsm");
 const { Heritage, ViewHelpers, WidgetMethods } = require("resource:///modules/devtools/ViewHelpers.jsm");
 
@@ -12,25 +16,31 @@ loader.lazyRequireGetter(this, "EventEmitter",
   "devtools/toolkit/event-emitter");
 loader.lazyRequireGetter(this, "DevToolsUtils",
   "devtools/toolkit/DevToolsUtils");
+loader.lazyRequireGetter(this, "system",
+  "devtools/toolkit/shared/system");
 
 // Logic modules
 
 loader.lazyRequireGetter(this, "L10N",
   "devtools/performance/global", true);
 loader.lazyRequireGetter(this, "TIMELINE_BLUEPRINT",
-  "devtools/performance/global", true);
+  "devtools/performance/markers", true);
 loader.lazyRequireGetter(this, "RecordingUtils",
   "devtools/performance/recording-utils");
 loader.lazyRequireGetter(this, "RecordingModel",
   "devtools/performance/recording-model", true);
 loader.lazyRequireGetter(this, "GraphsController",
   "devtools/performance/graphs", true);
-loader.lazyRequireGetter(this, "Waterfall",
-  "devtools/performance/waterfall", true);
+loader.lazyRequireGetter(this, "WaterfallHeader",
+  "devtools/performance/waterfall-ticks", true);
+loader.lazyRequireGetter(this, "MarkerView",
+  "devtools/performance/marker-view", true);
 loader.lazyRequireGetter(this, "MarkerDetails",
   "devtools/performance/marker-details", true);
 loader.lazyRequireGetter(this, "MarkerUtils",
   "devtools/performance/marker-utils");
+loader.lazyRequireGetter(this, "WaterfallUtils",
+  "devtools/performance/waterfall-utils");
 loader.lazyRequireGetter(this, "CallView",
   "devtools/performance/tree-view", true);
 loader.lazyRequireGetter(this, "ThreadNode",
@@ -123,8 +133,6 @@ const EVENTS = {
 
   // Emitted by the OverviewView when a range has been selected in the graphs
   OVERVIEW_RANGE_SELECTED: "Performance:UI:OverviewRangeSelected",
-  // Emitted by the OverviewView when a selection range has been removed
-  OVERVIEW_RANGE_CLEARED: "Performance:UI:OverviewRangeCleared",
 
   // Emitted by the DetailsView when a subview is selected
   DETAILS_VIEW_SELECTED: "Performance:UI:DetailsViewSelected",
@@ -150,7 +158,7 @@ const EVENTS = {
 };
 
 /**
- * The current target and the profiler connection, set by this tool's host.
+ * The current target, toolbox and PerformanceFront, set by this tool's host.
  */
 let gToolbox, gTarget, gFront;
 
@@ -293,7 +301,8 @@ let PerformanceController = {
       withMarkers: true,
       withMemory: this.getOption("enable-memory"),
       withTicks: this.getOption("enable-framerate"),
-      withAllocations: this.getOption("enable-memory"),
+      withJITOptimizations: this.getOption("enable-jit-optimizations"),
+      withAllocations: this.getOption("enable-allocations"),
       allocationsSampleProbability: this.getPref("memory-sample-probability"),
       allocationsMaxLogLength: this.getPref("memory-max-log-length"),
       bufferSize: this.getPref("profiler-buffer-size"),
@@ -397,16 +406,6 @@ let PerformanceController = {
   },
 
   /**
-   * Gets the current timeline blueprint without the hidden markers.
-   * @return object
-   */
-  getTimelineBlueprint: function() {
-    let blueprint = TIMELINE_BLUEPRINT;
-    let hiddenMarkers = this.getPref("hidden-markers");
-    return RecordingUtils.getFilteredBlueprint({ blueprint, hiddenMarkers });
-  },
-
-  /**
    * Fired from RecordingsView, we listen on the PerformanceController so we can
    * set it here and re-emit on the controller, where all views can listen.
    */
@@ -454,6 +453,7 @@ let PerformanceController = {
     if (state !== "recording-starting" && this.getRecordings().indexOf(model) === -1) {
       return;
     }
+
     switch (state) {
       // Fired when a RecordingModel was just created from the front
       case "recording-starting":
@@ -535,7 +535,7 @@ let PerformanceController = {
     if (gDevTools.testing) {
       return { supported: true, enabled: true };
     }
-    let supported = SYSTEM.MULTIPROCESS_SUPPORTED;
+    let supported = system.constants.E10S_TESTING_ONLY;
     // This is only checked on tool startup -- requires a restart if
     // e10s subsequently enabled.
     let enabled = this._e10s;

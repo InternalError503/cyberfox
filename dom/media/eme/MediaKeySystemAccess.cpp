@@ -40,9 +40,11 @@ NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION(MediaKeySystemAccess)
 NS_INTERFACE_MAP_END
 
 MediaKeySystemAccess::MediaKeySystemAccess(nsPIDOMWindow* aParent,
-                                           const nsAString& aKeySystem)
+                                           const nsAString& aKeySystem,
+                                           const nsAString& aCDMVersion)
   : mParent(aParent)
   , mKeySystem(aKeySystem)
+  , mCDMVersion(aCDMVersion)
 {
 }
 
@@ -63,15 +65,15 @@ MediaKeySystemAccess::GetParentObject() const
 }
 
 void
-MediaKeySystemAccess::GetKeySystem(nsString& aRetVal) const
+MediaKeySystemAccess::GetKeySystem(nsString& aOutKeySystem) const
 {
-  aRetVal = mKeySystem;
+  ConstructKeySystem(mKeySystem, mCDMVersion, aOutKeySystem);
 }
 
 already_AddRefed<Promise>
 MediaKeySystemAccess::CreateMediaKeys(ErrorResult& aRv)
 {
-  nsRefPtr<MediaKeys> keys(new MediaKeys(mParent, mKeySystem));
+  nsRefPtr<MediaKeys> keys(new MediaKeys(mParent, mKeySystem, mCDMVersion));
   return keys->Init(aRv);
 }
 
@@ -142,7 +144,8 @@ static MediaKeySystemStatus
 EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
                     const nsAString& aKeySystem,
                     int32_t aMinCdmVersion,
-                    bool aCheckForV6=false)
+                    nsACString& aOutMessage,
+                    nsACString& aOutCdmVersion)
 {
   nsTArray<nsCString> tags;
   tags.AppendElement(NS_ConvertUTF16toUTF8(aKeySystem));
@@ -151,17 +154,15 @@ EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
   if (NS_FAILED(aGMPService->GetPluginVersionForAPI(NS_LITERAL_CSTRING(GMP_API_DECRYPTOR),
                                                     &tags,
                                                     &hasPlugin,
-                                                    versionStr)) ||
-      // XXX to be removed later in bug 1147692
-      (aCheckForV6 && !hasPlugin &&
-       NS_FAILED(aGMPService->GetPluginVersionForAPI(NS_LITERAL_CSTRING(GMP_API_DECRYPTOR_COMPAT),
-                                                     &tags,
-                                                     &hasPlugin,
-                                                     versionStr)))) {
+                                                    versionStr))) {
+    aOutMessage = NS_LITERAL_CSTRING("GetPluginVersionForAPI failed");
     return MediaKeySystemStatus::Error;
   }
 
+  aOutCdmVersion = versionStr;
+
   if (!hasPlugin) {
+    aOutMessage = NS_LITERAL_CSTRING("CDM is not installed");
     return MediaKeySystemStatus::Cdm_not_installed;
   }
 
@@ -170,8 +171,16 @@ EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
       aKeySystem.EqualsLiteral("com.adobe.primetime")) {
     // Verify that anti-virus hasn't "helpfully" deleted the Adobe GMP DLL,
     // as we suspect may happen (Bug 1160382).
-    if (!AdobePluginDLLExists(versionStr) ||
-        !AdobePluginVoucherExists(versionStr)) {
+    bool somethingMissing = false;
+    if (!AdobePluginDLLExists(versionStr)) {
+      aOutMessage = NS_LITERAL_CSTRING("Adobe DLL was expected to be on disk but was not");
+      somethingMissing = true;
+    }
+    if (!AdobePluginVoucherExists(versionStr)) {
+      aOutMessage = NS_LITERAL_CSTRING("Adobe plugin voucher was expected to be on disk but was not");
+      somethingMissing = true;
+    }
+    if (somethingMissing) {    
       NS_WARNING("Adobe EME plugin or voucher disappeared from disk!");
       // Reset the prefs that Firefox's GMP downloader sets, so that
       // Firefox will try to download the plugin next time the updater runs.
@@ -186,6 +195,7 @@ EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
   int32_t version = versionStr.ToInteger(&rv);
   if (aMinCdmVersion != NO_CDM_VERSION &&
       (NS_FAILED(rv) || version < 0 || aMinCdmVersion > version)) {
+    aOutMessage = NS_LITERAL_CSTRING("Installed CDM version insufficient");
     return MediaKeySystemStatus::Cdm_insufficient_version;
   }
 
@@ -195,20 +205,24 @@ EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
 /* static */
 MediaKeySystemStatus
 MediaKeySystemAccess::GetKeySystemStatus(const nsAString& aKeySystem,
-                                         int32_t aMinCdmVersion)
+                                         int32_t aMinCdmVersion,
+                                         nsACString& aOutMessage,
+                                         nsACString& aOutCdmVersion)
 {
   MOZ_ASSERT(Preferences::GetBool("media.eme.enabled", false));
   nsCOMPtr<mozIGeckoMediaPluginService> mps =
     do_GetService("@mozilla.org/gecko-media-plugin-service;1");
   if (NS_WARN_IF(!mps)) {
+    aOutMessage = NS_LITERAL_CSTRING("Failed to get GMP service");
     return MediaKeySystemStatus::Error;
   }
 
   if (aKeySystem.EqualsLiteral("org.w3.clearkey")) {
     if (!Preferences::GetBool("media.eme.clearkey.enabled", true)) {
+      aOutMessage = NS_LITERAL_CSTRING("ClearKey was disabled");
       return MediaKeySystemStatus::Cdm_disabled;
     }
-    return EnsureMinCDMVersion(mps, aKeySystem, aMinCdmVersion);
+    return EnsureMinCDMVersion(mps, aKeySystem, aMinCdmVersion, aOutMessage, aOutCdmVersion);
   }
 
 #ifdef XP_WIN
@@ -216,20 +230,21 @@ MediaKeySystemAccess::GetKeySystemStatus(const nsAString& aKeySystem,
        aKeySystem.EqualsLiteral("com.adobe.primetime"))) {
     // Win Vista and later only.
     if (!IsVistaOrLater()) {
+      aOutMessage = NS_LITERAL_CSTRING("Minimum Windows version not met for Adobe EME");
       return MediaKeySystemStatus::Cdm_not_supported;
     }
     if (!Preferences::GetBool("media.gmp-eme-adobe.enabled", false)) {
+      aOutMessage = NS_LITERAL_CSTRING("Adobe EME disabled");
       return MediaKeySystemStatus::Cdm_disabled;
     }
-    if (!MP4Decoder::CanCreateH264Decoder() ||
-        !MP4Decoder::CanCreateAACDecoder() ||
-        !EMEVoucherFileExists()) {
+    if (!EMEVoucherFileExists()) {
       // The system doesn't have the codecs that Adobe EME relies
       // on installed, or doesn't have a voucher for the plugin-container.
       // Adobe EME isn't going to work, so don't advertise that it will.
+      aOutMessage = NS_LITERAL_CSTRING("Plugin-container voucher not present");
       return MediaKeySystemStatus::Cdm_not_supported;
     }
-    return EnsureMinCDMVersion(mps, aKeySystem, aMinCdmVersion, true);
+    return EnsureMinCDMVersion(mps, aKeySystem, aMinCdmVersion, aOutMessage, aOutCdmVersion);
   }
 #endif
 
@@ -271,25 +286,15 @@ IsPlayableWithGMP(mozIGeckoMediaPluginService* aGMPS,
     return false;
   }
   return (!hasAAC ||
-          !(HaveGMPFor(aGMPS,
-                       NS_ConvertUTF16toUTF8(aKeySystem),
-                       NS_LITERAL_CSTRING(GMP_API_DECRYPTOR),
-                       NS_LITERAL_CSTRING("aac")) ||
-            // XXX remove later in bug 1147692
-            HaveGMPFor(aGMPS,
-                       NS_ConvertUTF16toUTF8(aKeySystem),
-                       NS_LITERAL_CSTRING(GMP_API_DECRYPTOR_COMPAT),
-                       NS_LITERAL_CSTRING("aac")))) &&
+          !HaveGMPFor(aGMPS,
+                      NS_ConvertUTF16toUTF8(aKeySystem),
+                      NS_LITERAL_CSTRING(GMP_API_DECRYPTOR),
+                      NS_LITERAL_CSTRING("aac"))) &&
          (!hasH264 ||
-          !(HaveGMPFor(aGMPS,
-                       NS_ConvertUTF16toUTF8(aKeySystem),
-                       NS_LITERAL_CSTRING(GMP_API_DECRYPTOR),
-                       NS_LITERAL_CSTRING("h264")) ||
-            // XXX remove later in bug 1147692
-            HaveGMPFor(aGMPS,
-                       NS_ConvertUTF16toUTF8(aKeySystem),
-                       NS_LITERAL_CSTRING(GMP_API_DECRYPTOR_COMPAT),
-                       NS_LITERAL_CSTRING("h264"))));
+          !HaveGMPFor(aGMPS,
+                     NS_ConvertUTF16toUTF8(aKeySystem),
+                     NS_LITERAL_CSTRING(GMP_API_DECRYPTOR),
+                     NS_LITERAL_CSTRING("h264")));
 #else
   return false;
 #endif

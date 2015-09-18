@@ -25,14 +25,9 @@ using namespace mozilla::gfx;
 using namespace android;
 
 #undef LOG
-#ifdef PR_LOGGING
 extern PRLogModuleInfo* GetMediaManagerLog();
-#define LOG(msg) PR_LOG(GetMediaManagerLog(), PR_LOG_DEBUG, msg)
-#define LOGFRAME(msg) PR_LOG(GetMediaManagerLog(), 6, msg)
-#else
-#define LOG(msg)
-#define LOGFRAME(msg)
-#endif
+#define LOG(msg) MOZ_LOG(GetMediaManagerLog(), mozilla::LogLevel::Debug, msg)
+#define LOGFRAME(msg) MOZ_LOG(GetMediaManagerLog(), mozilla::LogLevel::Verbose, msg)
 
 class MediaBufferListener : public GonkCameraSource::DirectBufferListener {
 public:
@@ -342,8 +337,8 @@ MediaEngineGonkVideoSource::Init()
 {
   nsAutoCString deviceName;
   ICameraControl::GetCameraName(mCaptureIndex, deviceName);
-  CopyUTF8toUTF16(deviceName, mDeviceName);
-  CopyUTF8toUTF16(deviceName, mUniqueId);
+  SetName(NS_ConvertUTF8toUTF16(deviceName));
+  SetUUID(deviceName.get());
 
   mInitDone = true;
 }
@@ -614,11 +609,11 @@ MediaEngineGonkVideoSource::OnTakePictureComplete(const uint8_t* aData, uint32_t
 
     NS_IMETHOD Run()
     {
-      nsRefPtr<dom::File> blob =
-        dom::File::CreateMemoryFile(nullptr, mPhotoData, mPhotoDataLength, mMimeType);
+      nsRefPtr<dom::Blob> blob =
+        dom::Blob::CreateMemoryBlob(nullptr, mPhotoData, mPhotoDataLength, mMimeType);
       uint32_t callbackCounts = mCallbacks.Length();
       for (uint8_t i = 0; i < callbackCounts; i++) {
-        nsRefPtr<dom::File> tempBlob = blob;
+        nsRefPtr<dom::Blob> tempBlob = blob;
         mCallbacks[i]->PhotoComplete(tempBlob.forget());
       }
       // PhotoCallback needs to dereference on main thread.

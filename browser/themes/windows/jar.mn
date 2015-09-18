@@ -24,6 +24,14 @@ browser.jar:
         skin/classic/browser/actionicon-tab.png
         skin/classic/browser/actionicon-tab@2x.png
         skin/classic/browser/actionicon-tab-XPVista7.png
+        skin/classic/browser/addons/addon-install-blocked.svg        (../shared/addons/addon-install-blocked.svg)
+        skin/classic/browser/addons/addon-install-confirm.svg        (../shared/addons/addon-install-confirm.svg)
+        skin/classic/browser/addons/addon-install-downloading.svg    (../shared/addons/addon-install-downloading.svg)
+        skin/classic/browser/addons/addon-install-error.svg          (../shared/addons/addon-install-error.svg)
+        skin/classic/browser/addons/addon-install-installed.svg      (../shared/addons/addon-install-installed.svg)
+        skin/classic/browser/addons/addon-install-restart.svg        (../shared/addons/addon-install-restart.svg)
+        skin/classic/browser/addons/addon-install-warning.svg        (../shared/addons/addon-install-warning.svg)
+        skin/classic/browser/addons/addon-install-anchor.svg         (../shared/addons/addon-install-anchor.svg)
 *       skin/classic/browser/browser.css
 *       skin/classic/browser/devedition.css
 *       skin/classic/browser/browser-lightweightTheme.css
@@ -42,8 +50,6 @@ browser.jar:
         skin/classic/browser/heartbeat-star-off.svg                  (../shared/heartbeat-star-off.svg)
         skin/classic/browser/Info.png
         skin/classic/browser/Info-XP.png
-        skin/classic/browser/identity.png
-        skin/classic/browser/identity-XP.png
         skin/classic/browser/identity-icons-generic.png
         skin/classic/browser/identity-icons-generic@2x.png
         skin/classic/browser/identity-icons-https.png
@@ -118,8 +124,6 @@ browser.jar:
         skin/classic/browser/search-indicator-badge-add.png          (../shared/search/search-indicator-badge-add.png)
         skin/classic/browser/search-indicator-badge-add@2x.png       (../shared/search/search-indicator-badge-add@2x.png)
         skin/classic/browser/search-history-icon.svg                 (../shared/search/history-icon.svg)
-        skin/classic/browser/Secure24.png
-        skin/classic/browser/Secure24-XP.png
         skin/classic/browser/setDesktopBackground.css
         skin/classic/browser/slowStartup-16.png
         skin/classic/browser/theme-switcher-icon.png                 (../shared/theme-switcher-icon.png)
@@ -196,6 +200,11 @@ browser.jar:
         skin/classic/browser/loop/toolbar-win8@2x.png                (loop/toolbar-win8@2x.png)
         skin/classic/browser/loop/toolbar-XP.png                     (loop/toolbar-XP.png)
         skin/classic/browser/loop/toolbar-XP@2x.png                  (loop/toolbar-XP@2x.png)
+*       skin/classic/browser/controlcenter/panel.css                 (controlcenter/panel.css)
+        skin/classic/browser/controlcenter/arrow-subview.svg  (../shared/controlcenter/arrow-subview.svg)
+        skin/classic/browser/controlcenter/conn-not-secure.svg  (../shared/controlcenter/conn-not-secure.svg)
+        skin/classic/browser/controlcenter/conn-secure.svg  (../shared/controlcenter/conn-secure.svg)
+        skin/classic/browser/controlcenter/permissions.svg  (../shared/controlcenter/permissions.svg)
         skin/classic/browser/customizableui/background-noise-toolbar.png  (customizableui/background-noise-toolbar.png)
         skin/classic/browser/customizableui/customizeFavicon.ico  (../shared/customizableui/customizeFavicon.ico)
         skin/classic/browser/customizableui/customize-illustration.png  (../shared/customizableui/customize-illustration.png)
@@ -212,6 +221,7 @@ browser.jar:
         skin/classic/browser/customizableui/panelarrow-customizeTip.png  (../shared/customizableui/panelarrow-customizeTip.png)
 *       skin/classic/browser/customizableui/panelUIOverlay.css       (customizableui/panelUIOverlay.css)
         skin/classic/browser/customizableui/subView-arrow-back-inverted.png  (../shared/customizableui/subView-arrow-back-inverted.png)
+        skin/classic/browser/customizableui/subView-arrow-back-inverted@2x.png  (../shared/customizableui/subView-arrow-back-inverted@2x.png)
         skin/classic/browser/customizableui/subView-arrow-back-inverted-rtl.png  (../shared/customizableui/subView-arrow-back-inverted-rtl.png)
         skin/classic/browser/customizableui/8pecx.png  (../shared/customizableui/8pecx.png)
         skin/classic/browser/customizableui/8pecx@2x.png  (../shared/customizableui/8pecx@2x.png)
@@ -295,7 +305,7 @@ browser.jar:
         skin/classic/browser/preferences/in-content/search.css       (../shared/incontentprefs/search.css)
         skin/classic/browser/preferences/in-content/check.png        (../shared/incontentprefs/check.png)
         skin/classic/browser/preferences/in-content/check@2x.png     (../shared/incontentprefs/check@2x.png)
-        skin/classic/browser/preferences/in-content/default-profile-image.svg   (../shared/incontentprefs/default-profile-image.svg)
+        skin/classic/browser/fxa/default-profile-image.svg   (../shared/fxa/default-profile-image.svg)
         skin/classic/browser/preferences/applications.css            (preferences/applications.css)
         skin/classic/browser/preferences/aboutPermissions.css        (preferences/aboutPermissions.css)
         skin/classic/browser/preferences/search.css                  (preferences/search.css)
@@ -354,9 +364,6 @@ browser.jar:
         skin/classic/browser/tabbrowser/tab-stroke-start.png         (tabbrowser/tab-stroke-start.png)
         skin/classic/browser/tabbrowser/tab-stroke-start@2x.png      (tabbrowser/tab-stroke-start@2x.png)
         skin/classic/browser/tabbrowser/tabDragIndicator.png         (tabbrowser/tabDragIndicator.png)
-        skin/classic/browser/tabbrowser/tab-separator.png            (tabbrowser/tab-separator.png)
-        skin/classic/browser/tabbrowser/tab-separator-XP.png         (tabbrowser/tab-separator-XP.png)
-        skin/classic/browser/tabbrowser/tab-separator-luna-blue.png  (tabbrowser/tab-separator-luna-blue.png)
         skin/classic/browser/tabview/close.png                      (tabview/close.png)
         skin/classic/browser/tabview/edit-light.png                 (tabview/edit-light.png)
         skin/classic/browser/tabview/grain.png                      (tabview/grain.png)
@@ -377,8 +384,10 @@ browser.jar:
         skin/classic/browser/devtools/add.svg                       (../shared/devtools/images/add.svg)
         skin/classic/browser/devtools/filters.svg                   (../shared/devtools/filters.svg)
         skin/classic/browser/devtools/filter-swatch.svg             (../shared/devtools/images/filter-swatch.svg)
+        skin/classic/browser/devtools/pseudo-class.svg              (../shared/devtools/images/pseudo-class.svg)
         skin/classic/browser/devtools/controls.png                  (../shared/devtools/images/controls.png)
         skin/classic/browser/devtools/controls@2x.png               (../shared/devtools/images/controls@2x.png)
+        skin/classic/browser/devtools/animation-fast-track.svg      (../shared/devtools/images/animation-fast-track.svg)
         skin/classic/browser/devtools/performance-icons.svg         (../shared/devtools/images/performance-icons.svg)
         skin/classic/browser/devtools/newtab.png                    (../shared/devtools/images/newtab.png)
         skin/classic/browser/devtools/newtab@2x.png                 (../shared/devtools/images/newtab@2x.png)
@@ -424,8 +433,7 @@ browser.jar:
         skin/classic/browser/devtools/editor-debug-location@2x.png     (../shared/devtools/images/editor-debug-location@2x.png)
 *       skin/classic/browser/devtools/webconsole.css                (devtools/webconsole.css)
         skin/classic/browser/devtools/webconsole_networkpanel.css   (devtools/webconsole_networkpanel.css)
-        skin/classic/browser/devtools/webconsole.png                (../shared/devtools/images/webconsole.png)
-        skin/classic/browser/devtools/webconsole@2x.png             (../shared/devtools/images/webconsole@2x.png)
+        skin/classic/browser/devtools/webconsole.svg                (../shared/devtools/images/webconsole.svg)
         skin/classic/browser/devtools/breadcrumbs-divider@2x.png    (../shared/devtools/images/breadcrumbs-divider@2x.png)
         skin/classic/browser/devtools/breadcrumbs-scrollbutton.png  (../shared/devtools/images/breadcrumbs-scrollbutton.png)
         skin/classic/browser/devtools/breadcrumbs-scrollbutton@2x.png (../shared/devtools/images/breadcrumbs-scrollbutton@2x.png)
@@ -434,7 +442,6 @@ browser.jar:
 *       skin/classic/browser/devtools/canvasdebugger.css            (devtools/canvasdebugger.css)
 *       skin/classic/browser/devtools/debugger.css                  (devtools/debugger.css)
 *       skin/classic/browser/devtools/netmonitor.css                (devtools/netmonitor.css)
-*       skin/classic/browser/devtools/profiler.css                  (devtools/profiler.css)
 *       skin/classic/browser/devtools/performance.css               (devtools/performance.css)
         skin/classic/browser/devtools/timeline-filter.svg           (../shared/devtools/images/timeline-filter.svg)
 *       skin/classic/browser/devtools/scratchpad.css                (devtools/scratchpad.css)
@@ -497,6 +504,8 @@ browser.jar:
         skin/classic/browser/devtools/toggle-tools.png              (../shared/devtools/images/toggle-tools.png)
         skin/classic/browser/devtools/toggle-tools@2x.png              (../shared/devtools/images/toggle-tools@2x.png)
         skin/classic/browser/devtools/dock-bottom@2x.png            (../shared/devtools/images/dock-bottom@2x.png)
+        skin/classic/browser/devtools/dock-bottom-minimize@2x.png   (../shared/devtools/images/dock-bottom-minimize@2x.png)
+        skin/classic/browser/devtools/dock-bottom-maximize@2x.png   (../shared/devtools/images/dock-bottom-maximize@2x.png)
         skin/classic/browser/devtools/dock-side@2x.png              (../shared/devtools/images/dock-side@2x.png)
         skin/classic/browser/devtools/floating-scrollbars.css       (devtools/floating-scrollbars.css)
         skin/classic/browser/devtools/floating-scrollbars-light.css (devtools/floating-scrollbars-light.css)
@@ -508,6 +517,7 @@ browser.jar:
         skin/classic/browser/devtools/tool-debugger.svg             (../shared/devtools/images/tool-debugger.svg)
         skin/classic/browser/devtools/tool-debugger-paused.svg      (../shared/devtools/images/tool-debugger-paused.svg)
         skin/classic/browser/devtools/tool-inspector.svg            (../shared/devtools/images/tool-inspector.svg)
+        skin/classic/browser/devtools/tool-shadereditor.svg         (../shared/devtools/images/tool-shadereditor.svg)
         skin/classic/browser/devtools/tool-styleeditor.svg          (../shared/devtools/images/tool-styleeditor.svg)
         skin/classic/browser/devtools/tool-storage.svg              (../shared/devtools/images/tool-storage.svg)
         skin/classic/browser/devtools/tool-profiler.svg             (../shared/devtools/images/tool-profiler.svg)
@@ -566,7 +576,6 @@ browser.jar:
         skin/classic/browser/syncSetup.css
         skin/classic/browser/syncCommon.css
         skin/classic/browser/syncQuota.css
-        skin/classic/browser/syncProgress.css
         skin/classic/browser/syncProgress-horizontalbar.png
         skin/classic/browser/syncProgress-horizontalbar@2x.png
         skin/classic/browser/syncProgress-horizontalbar-XPVista7.png
@@ -615,14 +624,12 @@ browser.jar:
 % override chrome://browser/skin/aboutSessionRestore-window-icon.png  chrome://browser/skin/preferences/application.png                 os=WINNT osversion<6
 
 % override chrome://browser/skin/Info.png                             chrome://browser/skin/Info-XP.png                                 os=WINNT osversion<6
-% override chrome://browser/skin/identity.png                         chrome://browser/skin/identity-XP.png                             os=WINNT osversion<6
 % override chrome://browser/skin/livemark-folder.png                  chrome://browser/skin/livemark-folder-XP.png                      os=WINNT osversion<6
 % override chrome://browser/skin/menu-back.png                        chrome://browser/skin/menu-back-XP.png                            os=WINNT osversion<6
 % override chrome://browser/skin/menu-forward.png                     chrome://browser/skin/menu-forward-XP.png                         os=WINNT osversion<6
 % override chrome://browser/skin/pageInfo.png                         chrome://browser/skin/pageInfo-XP.png                             os=WINNT osversion<6
 % override chrome://browser/skin/Privacy-16.png                       chrome://browser/skin/Privacy-16-XP.png                           os=WINNT osversion<6
 % override chrome://browser/skin/searchbar-dropdown-arrow.png         chrome://browser/skin/searchbar-dropdown-arrow-XP.png             os=WINNT osversion<6
-% override chrome://browser/skin/Secure24.png                         chrome://browser/skin/Secure24-XP.png                             os=WINNT osversion<6
 % override chrome://browser/skin/downloads/buttons.png                chrome://browser/skin/downloads/buttons-XP.png                    os=WINNT osversion<6
 % override chrome://browser/skin/feeds/feedIcon.png                   chrome://browser/skin/feeds/feedIcon-XP.png                       os=WINNT osversion<6
 % override chrome://browser/skin/feeds/feedIcon16.png                 chrome://browser/skin/feeds/feedIcon16-XP.png                     os=WINNT osversion<6
@@ -644,7 +651,6 @@ browser.jar:
 % override chrome://browser/skin/preferences/mail.png                 chrome://browser/skin/preferences/mail-XP.png                     os=WINNT osversion<6
 % override chrome://browser/skin/preferences/Options.png              chrome://browser/skin/preferences/Options-XP.png                  os=WINNT osversion<6
 % override chrome://browser/skin/preferences/saveFile.png             chrome://browser/skin/preferences/saveFile-XP.png                 os=WINNT osversion<6
-% override chrome://browser/skin/tabbrowser/tab-separator.png         chrome://browser/skin/tabbrowser/tab-separator-XP.png             os=WINNT osversion<6
 
 % override chrome://browser/skin/actionicon-tab.png                   chrome://browser/skin/actionicon-tab-XPVista7.png                 os=WINNT osversion<=6.1
 % override chrome://browser/skin/sync-horizontalbar.png               chrome://browser/skin/sync-horizontalbar-XPVista7.png             os=WINNT osversion<=6.1

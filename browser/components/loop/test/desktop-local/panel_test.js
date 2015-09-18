@@ -2,16 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*jshint newcap:false*/
-/*global loop, sinon */
-
-var expect = chai.expect;
-var TestUtils = React.addons.TestUtils;
-var sharedActions = loop.shared.actions;
-var sharedUtils = loop.shared.utils;
-
 describe("loop.panel", function() {
   "use strict";
+
+  var expect = chai.expect;
+  var TestUtils = React.addons.TestUtils;
+  var sharedActions = loop.shared.actions;
+  var sharedUtils = loop.shared.utils;
 
   var sandbox, notifications;
   var fakeXHR, fakeWindow, fakeMozLoop;
@@ -205,7 +202,7 @@ describe("loop.panel", function() {
         .to.have.length.of(0);
     });
 
-    describe('TabView', function() {
+    describe("TabView", function() {
       var view, callTab, roomsTab, contactsTab;
 
       beforeEach(function() {
@@ -390,8 +387,10 @@ describe("loop.panel", function() {
       beforeEach(function() {
         supportUrl = "https://example.com";
         navigator.mozLoop.getLoopPref = function(pref) {
-          if (pref === "support_url")
+          if (pref === "support_url") {
             return supportUrl;
+          }
+
           return "unseen";
         };
       });
@@ -527,8 +526,10 @@ describe("loop.panel", function() {
         TestUtils.Simulate.click(copyButton);
 
         sinon.assert.called(dispatcher.dispatch);
-        sinon.assert.calledWithExactly(dispatcher.dispatch,
-          new sharedActions.CopyRoomUrl({roomUrl: roomData.roomUrl}));
+        sinon.assert.calledWithExactly(dispatcher.dispatch, new sharedActions.CopyRoomUrl({
+          roomUrl: roomData.roomUrl,
+          from: "panel"
+        }));
       });
 
       it("should set state.urlCopied when the click event fires", function() {
@@ -779,7 +780,7 @@ describe("loop.panel", function() {
        "conversation button",
       function() {
         navigator.mozLoop.userProfile = {email: fakeEmail};
-        var view = createTestComponent();
+        var view = createTestComponent(false);
 
         TestUtils.Simulate.click(view.getDOMNode().querySelector(".new-room-button"));
 
@@ -802,7 +803,7 @@ describe("loop.panel", function() {
         });
       };
 
-      var view = createTestComponent();
+      var view = createTestComponent(false);
 
       // Simulate being visible
       view.onDocumentVisible();
@@ -842,13 +843,32 @@ describe("loop.panel", function() {
         });
       };
 
-      var view = createTestComponent();
+      var view = createTestComponent(false);
 
       // Simulate being visible
       view.onDocumentVisible();
 
       var contextContent = view.getDOMNode().querySelector(".context-content");
       expect(contextContent).to.not.equal(null);
+    });
+
+    it("should cancel the checkbox when a new URL is available", function() {
+      fakeMozLoop.getSelectedTabMetadata = function (callback) {
+        callback({
+          url: "https://www.example.com",
+          description: "fake description",
+          previews: [""]
+        });
+      };
+
+      var view = createTestComponent(false);
+
+      view.setState({ checked: true });
+
+      // Simulate being visible
+      view.onDocumentVisible();
+
+      expect(view.state.checked).eql(false);
     });
 
     it("should show a default favicon when none is available", function() {
@@ -860,7 +880,7 @@ describe("loop.panel", function() {
         });
       };
 
-      var view = createTestComponent();
+      var view = createTestComponent(false);
 
       // Simulate being visible
       view.onDocumentVisible();
@@ -878,7 +898,7 @@ describe("loop.panel", function() {
         });
       };
 
-      var view = createTestComponent();
+      var view = createTestComponent(false);
 
       view.onDocumentVisible();
 
@@ -895,7 +915,7 @@ describe("loop.panel", function() {
         });
       };
 
-      var view = createTestComponent();
+      var view = createTestComponent(false);
 
       // Simulate being visible
       view.onDocumentVisible();
@@ -915,7 +935,7 @@ describe("loop.panel", function() {
         });
       };
 
-      var view = createTestComponent();
+      var view = createTestComponent(false);
 
       // Simulate being visible.
       view.onDocumentVisible();
@@ -925,7 +945,7 @@ describe("loop.panel", function() {
     });
   });
 
-  describe('loop.panel.ToSView', function() {
+  describe("loop.panel.ToSView", function() {
 
     it("should render when the value of loop.seenToS is not set", function() {
       navigator.mozLoop.getLoopPref = function(key) {
@@ -941,8 +961,7 @@ describe("loop.panel", function() {
       TestUtils.findRenderedDOMComponentWithClass(view, "terms-service");
     });
 
-    it("should not render when the value of loop.seenToS is set to 'seen'",
-      function(done) {
+    it("should not render when the value of loop.seenToS is set to 'seen'", function() {
         navigator.mozLoop.getLoopPref = function(key) {
           return {
             "gettingStarted.seen": true,
@@ -950,11 +969,12 @@ describe("loop.panel", function() {
           }[key];
         };
 
-        try {
+        var view = TestUtils.renderIntoDocument(
+          React.createElement(loop.panel.ToSView));
+
+        expect(function() {
           TestUtils.findRenderedDOMComponentWithClass(view, "terms-service");
-        } catch (err) {
-          done();
-        }
+        }).to.Throw(/not find/);
     });
 
     it("should render when the value of loop.gettingStarted.seen is false",

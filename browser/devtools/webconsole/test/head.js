@@ -226,6 +226,8 @@ let closeConsole = Task.async(function* (aTab) {
  */
 function waitForContextMenu(aPopup, aButton, aOnShown, aOnHidden)
 {
+  let deferred = promise.defer();
+
   function onPopupShown() {
     info("onPopupShown");
     aPopup.removeEventListener("popupshown", onPopupShown);
@@ -245,15 +247,29 @@ function waitForContextMenu(aPopup, aButton, aOnShown, aOnHidden)
     deferred.resolve(aPopup);
   }
 
-  let deferred = promise.defer();
   aPopup.addEventListener("popupshown", onPopupShown);
 
   info("wait for the context menu to open");
-  let eventDetails = { type: "contextmenu", button: 2};
+  let eventDetails = {type: "contextmenu", button: 2};
   EventUtils.synthesizeMouse(aButton, 2, 2, eventDetails,
                              aButton.ownerDocument.defaultView);
   return deferred.promise;
 }
+
+/**
+ * Listen for a new tab to open and return a promise that resolves when one
+ * does and completes the load event.
+ * @return a promise that resolves to the tab object
+ */
+let waitForTab = Task.async(function*() {
+  info("Waiting for a tab to open");
+  yield once(gBrowser.tabContainer, "TabOpen");
+  let tab = gBrowser.selectedTab;
+  let browser = tab.linkedBrowser;
+  yield once(browser, "load", true);
+  info("The tab load completed");
+  return tab;
+});
 
 /**
  * Dump the output of all open Web Consoles - used only for debugging purposes.
@@ -810,7 +826,7 @@ function openDebugger(aOptions = {})
 
   let target = TargetFactory.forTab(aOptions.tab);
   let toolbox = gDevTools.getToolbox(target);
-  let dbgPanelAlreadyOpen = toolbox.getPanel("jsdebugger");
+  let dbgPanelAlreadyOpen = toolbox && toolbox.getPanel("jsdebugger");
 
   gDevTools.showToolbox(target, "jsdebugger").then(function onSuccess(aToolbox) {
     let panel = aToolbox.getCurrentPanel();
@@ -839,6 +855,24 @@ function openDebugger(aOptions = {})
   });
 
   return deferred.promise;
+}
+
+/**
+ * Returns true if the caret in the debugger editor is placed at the specified
+ * position.
+ * @param  aPanel The debugger panel.
+ * @param {number} aLine The line number.
+ * @param {number} [aCol] The column number.
+ * @returns {boolean}
+ */
+function isDebuggerCaretPos(aPanel, aLine, aCol = 1) {
+  let editor = aPanel.panelWin.DebuggerView.editor;
+  let cursor = editor.getCursor();
+
+  // Source editor starts counting line and column numbers from 0.
+  info("Current editor caret position: " + (cursor.line + 1) + ", " +
+    (cursor.ch + 1));
+  return cursor.line == (aLine - 1) && cursor.ch == (aCol - 1);
 }
 
 /**
@@ -892,6 +926,7 @@ function openDebugger(aOptions = {})
  *            - source: object of the shape { url, line }. This is used to
  *            match the source URL and line number of the error message or
  *            console API call.
+ *            - prefix: prefix text to check for in the prefix element.
  *            - stacktrace: array of objects of the form { file, fn, line } that
  *            can match frames in the stacktrace associated with the message.
  *            - groupDepth: number used to check the depth of the message in
@@ -1275,6 +1310,11 @@ function waitForMessages(aOptions)
         return false;
       }
       aRule.clickableElements = clickables;
+    }
+
+    if ("prefix" in aRule) {
+      let prefixNode = aElement.querySelector(".prefix");
+      is(prefixNode && prefixNode.textContent, aRule.prefix, "Check prefix");
     }
 
     let count = aRule.count || 1;

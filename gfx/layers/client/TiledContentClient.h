@@ -270,6 +270,7 @@ struct TileClient
   RefPtr<gfxSharedReadLock> mBackLock;
   RefPtr<gfxSharedReadLock> mFrontLock;
   RefPtr<ClientLayerManager> mManager;
+  gfx::IntRect mUpdateRect;
   CompositableClient* mCompositableClient;
 #ifdef GFX_TILEDLAYER_DEBUG_OVERLAY
   TimeStamp        mLastUpdate;
@@ -404,6 +405,8 @@ public:
     : mPaintedLayer(nullptr)
     , mCompositableClient(nullptr)
     , mManager(nullptr)
+    , mCallback(nullptr)
+    , mCallbackData(nullptr)
     , mLastPaintContentType(gfxContentType::COLOR)
     , mLastPaintSurfaceMode(SurfaceMode::SURFACE_OPAQUE)
     , mSharedFrameMetricsHelper(nullptr)
@@ -415,8 +418,6 @@ public:
                    const nsIntRegion& aPaintRegion,
                    LayerManager::DrawPaintedLayerCallback aCallback,
                    void* aCallbackData);
-
-  void ReadUnlock();
 
   void ReadLock();
 
@@ -442,6 +443,15 @@ public:
                          void* aCallbackData);
 
   SurfaceDescriptorTiles GetSurfaceDescriptorTiles();
+
+  void SetResolution(float aResolution) {
+    if (mResolution == aResolution) {
+      return;
+    }
+
+    Update(nsIntRegion(), nsIntRegion());
+    mResolution = aResolution;
+  }
 
 protected:
   TileClient ValidateTile(TileClient aTile,
@@ -530,6 +540,7 @@ protected:
   {
     MOZ_COUNT_DTOR(TiledContentClient);
 
+    mDestroyed = true;
     mTiledBuffer.Release();
     mLowPrecisionTiledBuffer.Release();
   }

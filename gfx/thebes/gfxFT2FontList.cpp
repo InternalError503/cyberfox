@@ -60,8 +60,8 @@ GetFontInfoLog()
 }
 
 #undef LOG
-#define LOG(args) PR_LOG(GetFontInfoLog(), PR_LOG_DEBUG, args)
-#define LOG_ENABLED() PR_LOG_TEST(GetFontInfoLog(), PR_LOG_DEBUG)
+#define LOG(args) MOZ_LOG(GetFontInfoLog(), mozilla::LogLevel::Debug, args)
+#define LOG_ENABLED() MOZ_LOG_TEST(GetFontInfoLog(), mozilla::LogLevel::Debug)
 
 static cairo_user_data_key_t sFTUserFontDataKey;
 
@@ -532,7 +532,7 @@ FT2FontEntry::CopyFontTable(uint32_t aTableTag,
         return NS_ERROR_FAILURE;
     }
 
-    if (!aBuffer.SetLength(len)) {
+    if (!aBuffer.SetLength(len, fallible)) {
         return NS_ERROR_OUT_OF_MEMORY;
     }
     uint8_t *buf = aBuffer.Elements();
@@ -617,9 +617,24 @@ FT2FontFamily::AddFacesToFontList(InfallibleTArray<FontListEntry>* aFontList,
 class FontNameCache {
 public:
     FontNameCache()
-        : mMap(&sMapOps, sizeof(FNCMapEntry), 0)
+        : mMap(&mOps, sizeof(FNCMapEntry), 0)
         , mWriteNeeded(false)
     {
+        // HACK ALERT: it's weird to assign |mOps| after we passed a pointer to
+        // it to |mMap|'s constructor. A more normal approach here would be to
+        // have a static |sOps| member. Unfortunately, this mysteriously but
+        // consistently makes Fennec start-up slower, so we take this
+        // unorthodox approach instead. It's safe because PLDHashTable's
+        // constructor doesn't dereference the pointer; it just makes a copy of
+        // it.
+        mOps = (PLDHashTableOps) {
+            StringHash,
+            HashMatchEntry,
+            MoveEntry,
+            PL_DHashClearEntryStub,
+            nullptr
+        };
+
         MOZ_ASSERT(XRE_GetProcessType() == GeckoProcessType_Default,
                    "StartupCacheFontNameCache should only be used in chrome "
                    "process");
@@ -635,13 +650,27 @@ public:
         }
 
         nsAutoCString buf;
-        PL_DHashTableEnumerate(&mMap, WriteOutMap, &buf);
+        for (auto iter = mMap.Iter(); !iter.Done(); iter.Next()) {
+            auto entry = static_cast<FNCMapEntry*>(iter.Get());
+            if (!entry->mFileExists) {
+                // skip writing entries for files that are no longer present
+                continue;
+            }
+            buf.Append(entry->mFilename);
+            buf.Append(';');
+            buf.Append(entry->mFaces);
+            buf.Append(';');
+            buf.AppendInt(entry->mTimestamp);
+            buf.Append(';');
+            buf.AppendInt(entry->mFilesize);
+            buf.Append(';');
+        }
         mCache->PutBuffer(CACHE_KEY, buf.get(), buf.Length() + 1);
     }
 
     void Init()
     {
-        if (!mMap.IsInitialized() || !mCache) {
+        if (!mCache) {
             return;
         }
         uint32_t size;
@@ -696,9 +725,6 @@ public:
     GetInfoForFile(const nsCString& aFileName, nsCString& aFaceList,
                    uint32_t *aTimestamp, uint32_t *aFilesize)
     {
-        if (!mMap.IsInitialized()) {
-            return;
-        }
         FNCMapEntry *entry =
             static_cast<FNCMapEntry*>(PL_DHashTableSearch(&mMap,
                                                           aFileName.get()));
@@ -717,9 +743,6 @@ public:
     CacheFileInfo(const nsCString& aFileName, const nsCString& aFaceList,
                   uint32_t aTimestamp, uint32_t aFilesize)
     {
-        if (!mMap.IsInitialized()) {
-            return;
-        }
         FNCMapEntry* entry = static_cast<FNCMapEntry*>
             (PL_DHashTableAdd(&mMap, aFileName.get(), fallible));
         if (entry) {
@@ -737,29 +760,7 @@ private:
     PLDHashTable mMap;
     bool mWriteNeeded;
 
-    static const PLDHashTableOps sMapOps;
-
-    static PLDHashOperator WriteOutMap(PLDHashTable *aTable,
-                                       PLDHashEntryHdr *aHdr,
-                                       uint32_t aNumber, void *aData)
-    {
-        FNCMapEntry* entry = static_cast<FNCMapEntry*>(aHdr);
-        if (!entry->mFileExists) {
-            // skip writing entries for files that are no longer present
-            return PL_DHASH_NEXT;
-        }
-
-        nsAutoCString* buf = reinterpret_cast<nsAutoCString*>(aData);
-        buf->Append(entry->mFilename);
-        buf->Append(';');
-        buf->Append(entry->mFaces);
-        buf->Append(';');
-        buf->AppendInt(entry->mTimestamp);
-        buf->Append(';');
-        buf->AppendInt(entry->mFilesize);
-        buf->Append(';');
-        return PL_DHASH_NEXT;
-    }
+    PLDHashTableOps mOps;
 
     typedef struct : public PLDHashEntryHdr {
     public:
@@ -794,15 +795,6 @@ private:
         to->mFaces.Assign(from->mFaces);
         to->mFileExists = from->mFileExists;
     }
-};
-
-/* static */ const PLDHashTableOps FontNameCache::sMapOps =
-{
-    FontNameCache::StringHash,
-    FontNameCache::HashMatchEntry,
-    FontNameCache::MoveEntry,
-    PL_DHashClearEntryStub,
-    nullptr
 };
 
 /***************************************************************
@@ -1352,7 +1344,7 @@ AddHiddenFamilyToFontList(nsStringHashKey::KeyType aKey,
 }
 
 void
-gfxFT2FontList::GetFontList(InfallibleTArray<FontListEntry>* retValue)
+gfxFT2FontList::GetSystemFontList(InfallibleTArray<FontListEntry>* retValue)
 {
     mFontFamilies.Enumerate(AddFamilyToFontList, retValue);
     mHiddenFontFamilies.Enumerate(AddHiddenFamilyToFontList, retValue);

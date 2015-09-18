@@ -48,11 +48,10 @@ class Configuration:
                         "%s\n"
                         "%s" %
                         (thing.location, thing.implementor.location))
-            # Some toplevel things are sadly types, and those have an
-            # isInterface that doesn't mean the same thing as IDLObject's
-            # isInterface()...
-            if (not isinstance(thing, IDLInterface) and
-                not isinstance(thing, IDLExternalInterface)):
+
+            assert not thing.isType();
+
+            if not thing.isInterface():
                 continue
             iface = thing
             self.interfaces[iface.identifier.name] = iface
@@ -687,14 +686,18 @@ class Descriptor(DescriptorProvider):
 
     def needsHeaderInclude(self):
         """
-        An interface doesn't need a header file if it is not concrete,
-        not pref-controlled, has no prototype object, and has no
-        static methods or attributes.
+        An interface doesn't need a header file if it is not concrete, not
+        pref-controlled, has no prototype object, has no static methods or
+        attributes and has no parent.  The parent matters because we assert
+        things about refcounting that depend on the actual underlying type if we
+        have a parent.
+
         """
         return (self.interface.isExternal() or self.concrete or
             self.interface.hasInterfacePrototypeObject() or
             any((m.isAttr() or m.isMethod()) and m.isStatic() for m
-                in self.interface.members))
+                in self.interface.members) or
+            self.interface.parent)
 
     def hasThreadChecks(self):
         return ((self.isExposedConditionally() and
@@ -800,9 +803,9 @@ def findCallbacksAndDictionaries(inputTypes):
     def doFindCallbacksAndDictionaries(types, callbacks, dictionaries):
         unhandledTypes = set()
         for type in types:
-            if type.isCallback() and type not in callbacks:
-                unhandledTypes |= getFlatTypes(getTypesFromCallback(type))
-                callbacks.add(type)
+            if type.isCallback() and type.callback not in callbacks:
+                unhandledTypes |= getFlatTypes(getTypesFromCallback(type.callback))
+                callbacks.add(type.callback)
             elif type.isDictionary() and type.inner not in dictionaries:
                 d = type.inner
                 unhandledTypes |= getFlatTypes(getTypesFromDictionary(d))

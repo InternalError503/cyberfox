@@ -255,6 +255,7 @@ function checkSettingsSection(data) {
     blocklistEnabled: "boolean",
     e10sEnabled: "boolean",
     telemetryEnabled: "boolean",
+    isInOptoutSample: "boolean",
     locale: "string",
     update: "object",
     userPrefs: "object",
@@ -265,6 +266,14 @@ function checkSettingsSection(data) {
   for (let f in EXPECTED_FIELDS_TYPES) {
     Assert.equal(typeof data.settings[f], EXPECTED_FIELDS_TYPES[f],
                  f + " must have the correct type.");
+  }
+
+  // Check "addonCompatibilityCheckEnabled" separately, as it is not available
+  // on Gonk.
+  if (gIsGonk) {
+    Assert.ok(!("addonCompatibilityCheckEnabled" in data.settings), "Must not be available on Gonk.");
+  } else {
+    Assert.equal(data.settings.addonCompatibilityCheckEnabled, AddonManager.checkCompatibility);
   }
 
   // Check "isDefaultBrowser" separately, as it is not available on Android an can either be
@@ -416,6 +425,20 @@ function checkSystemSection(data) {
   Assert.equal(typeof gfxData.adapters[0].GPUActive, "boolean");
   Assert.ok(gfxData.adapters[0].GPUActive, "The first GFX adapter must be active.");
 
+  Assert.ok(Array.isArray(gfxData.monitors));
+  if (gIsWindows || gIsMac) {
+    Assert.ok(gfxData.monitors.length >= 1, "There is at least one monitor.");
+    Assert.equal(typeof gfxData.monitors[0].screenWidth, "number");
+    Assert.equal(typeof gfxData.monitors[0].screenHeight, "number");
+    if (gIsWindows) {
+      Assert.equal(typeof gfxData.monitors[0].refreshRate, "number");
+      Assert.equal(typeof gfxData.monitors[0].pseudoDisplay, "boolean");
+    }
+    if (gIsMac) {
+      Assert.equal(typeof gfxData.monitors[0].scale, "number");
+    }
+  }
+
   try {
     // If we've not got nsIGfxInfoDebug, then this will throw and stop us doing
     // this test.
@@ -442,6 +465,7 @@ function checkActiveAddon(data){
     hasBinaryComponents: "boolean",
     installDay: "number",
     updateDay: "number",
+    signedState: mozinfo.addon_signing ? "number" : "undefined",
   };
 
   for (let f in EXPECTED_ADDON_FIELDS_TYPES) {
@@ -858,6 +882,7 @@ add_task(function* test_addonsAndPlugins() {
     hasBinaryComponents: false,
     installDay: ADDON_INSTALL_DATE,
     updateDay: ADDON_INSTALL_DATE,
+    signedState: mozinfo.addon_signing ? AddonManager.SIGNEDSTATE_MISSING : AddonManager.SIGNEDSTATE_NOT_REQUIRED,
   };
 
   const EXPECTED_PLUGIN_DATA = {
@@ -902,6 +927,49 @@ add_task(function* test_addonsAndPlugins() {
 
   let personaId = (gIsGonk) ? null : PERSONA_ID;
   Assert.equal(data.addons.persona, personaId, "The correct Persona Id must be reported.");
+});
+
+add_task(function* test_signedAddon() {
+  const ADDON_INSTALL_URL = gDataRoot + "signed.xpi";
+  const ADDON_ID = "tel-signed-xpi@tests.mozilla.org";
+  const ADDON_INSTALL_DATE = truncateToDays(Date.now());
+  const EXPECTED_ADDON_DATA = {
+    blocklisted: false,
+    description: "A signed addon which gets enabled without a reboot.",
+    name: "XPI Telemetry Signed Test",
+    userDisabled: false,
+    appDisabled: false,
+    version: "1.0",
+    scope: 1,
+    type: "extension",
+    foreignInstall: false,
+    hasBinaryComponents: false,
+    installDay: ADDON_INSTALL_DATE,
+    updateDay: ADDON_INSTALL_DATE,
+    signedState: mozinfo.addon_signing ? AddonManager.SIGNEDSTATE_SIGNED : AddonManager.SIGNEDSTATE_NOT_REQUIRED,
+  };
+
+  // Set the clock in the future so our changes don't get throttled.
+  gNow = fakeNow(futureDate(gNow, 10 * MILLISECONDS_PER_MINUTE));
+  let deferred = PromiseUtils.defer();
+  TelemetryEnvironment.registerChangeListener("test_signedAddon", deferred.resolve);
+
+  // Install the addon.
+  yield AddonTestUtils.installXPIFromURL(ADDON_INSTALL_URL);
+
+  yield deferred.promise;
+  // Unregister the listener.
+  TelemetryEnvironment.unregisterChangeListener("test_signedAddon");
+
+  let data = TelemetryEnvironment.currentEnvironment;
+  checkEnvironmentData(data);
+
+  // Check addon data.
+  Assert.ok(ADDON_ID in data.addons.activeAddons, "Add-on should be in the environment.");
+  let targetAddon = data.addons.activeAddons[ADDON_ID];
+  for (let f in EXPECTED_ADDON_DATA) {
+    Assert.equal(targetAddon[f], EXPECTED_ADDON_DATA[f], f + " must have the correct value.");
+  }
 });
 
 add_task(function* test_changeThrottling() {
@@ -958,9 +1026,7 @@ add_task(function* test_defaultSearchEngine() {
   defaultBranch.setCharPref("browser.search.jarURIs", "chrome://testsearchplugin/locale/searchplugins/");
   defaultBranch.setBoolPref("browser.search.loadFromJars", true);
 
-  // Initialize the search service and disable geoip lookup, so we don't get unwanted
-  // network connections.
-  Preferences.set("browser.search.geoip.url", "");
+  // Initialize the search service.
   yield new Promise(resolve => Services.search.init(resolve));
 
   // Our default engine from the JAR file has an identifier. Check if it is correctly

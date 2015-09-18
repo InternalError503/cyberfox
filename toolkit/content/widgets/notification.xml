@@ -122,7 +122,8 @@
                 var button = aButtons[b];
                 var buttonElem = document.createElementNS(XULNS, "button");
                 buttonElem.setAttribute("label", button.label);
-                buttonElem.setAttribute("accesskey", button.accessKey);
+                if (typeof button.accessKey == "string")
+                  buttonElem.setAttribute("accesskey", button.accessKey);
                 if (typeof button.type == "string") {
                   buttonElem.setAttribute("type", button.type);
                   if ((button.type == "menu-button" || button.type == "menu") &&
@@ -479,8 +480,8 @@
         <xul:hbox align="start">
           <xul:vbox flex="1">
             <xul:label class="popup-notification-origin header"
-                       xbl:inherits="value=origin"
-                       crop="end"/>
+                       xbl:inherits="value=origin,tooltiptext=origin"
+                       crop="center"/>
             <xul:description class="popup-notification-description"
                              xbl:inherits="xbl:text=label,popupid"/>
           </xul:vbox>

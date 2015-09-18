@@ -10,7 +10,7 @@ Components.utils.import("resource://gre/modules/NetUtil.jsm");
 const XPI_MIMETYPE = "application/x-xpinstall";
 
 function newPrincipal(uri) {
-  return Services.scriptSecurityManager.getNoAppCodebasePrincipal(NetUtil.newURI(uri));
+  return Services.scriptSecurityManager.createCodebasePrincipal(NetUtil.newURI(uri), {});
 }
 
 function run_test() {

@@ -34,8 +34,7 @@ ImageHost::ImageHost(const TextureInfo& aTextureInfo)
 {}
 
 ImageHost::~ImageHost()
-{
-}
+{}
 
 void
 ImageHost::UseTextureHost(TextureHost* aTexture)
@@ -106,8 +105,13 @@ ImageHost::Composite(EffectChain& aEffectChain,
   RefPtr<TexturedEffect> effect = CreateTexturedEffect(mFrontBuffer->GetFormat(),
                                                        mTextureSource.get(),
                                                        aFilter,
-                                                       isAlphaPremultiplied);
+                                                       isAlphaPremultiplied,
+                                                       GetRenderState());
   if (!effect) {
+    return;
+  }
+
+  if (!GetCompositor()->SupportsEffect(effect->mType)) {
     return;
   }
 
@@ -298,7 +302,8 @@ ImageHost::GenEffect(const gfx::Filter& aFilter)
   return CreateTexturedEffect(mFrontBuffer->GetFormat(),
                               mTextureSource,
                               aFilter,
-                              isAlphaPremultiplied);
+                              isAlphaPremultiplied,
+                              GetRenderState());
 }
 
 #ifdef MOZ_WIDGET_GONK
@@ -360,6 +365,16 @@ void
 ImageHostOverlay::UseOverlaySource(OverlaySource aOverlay)
 {
   mOverlay = aOverlay;
+}
+
+IntSize
+ImageHostOverlay::GetImageSize() const
+{
+  if (mHasPictureRect) {
+    return IntSize(mPictureRect.width, mPictureRect.height);
+  }
+
+  return IntSize();
 }
 
 void

@@ -187,7 +187,7 @@ struct Zone : public JS::shadow::Zone,
     // tracer.
     bool requireGCTracer() const {
         JSRuntime* rt = runtimeFromAnyThread();
-        return rt->isHeapMajorCollecting() && !rt->isHeapCompacting() && gcState_ != NoGC;
+        return rt->isHeapMajorCollecting() && !rt->gc.isHeapCompacting() && gcState_ != NoGC;
     }
 
     bool isGCMarking() {
@@ -221,6 +221,9 @@ struct Zone : public JS::shadow::Zone,
 
     js::jit::JitZone* getJitZone(JSContext* cx) { return jitZone_ ? jitZone_ : createJitZone(cx); }
     js::jit::JitZone* jitZone() { return jitZone_; }
+
+    bool isAtomsZone() const { return runtimeFromAnyThread()->isAtomsZone(this); }
+    bool isSelfHostingZone() const { return runtimeFromAnyThread()->isSelfHostingZone(this); }
 
 #ifdef DEBUG
     // For testing purposes, return the index of the zone group which this zone
@@ -451,10 +454,6 @@ class CompartmentsIterT
 };
 
 typedef CompartmentsIterT<ZonesIter> CompartmentsIter;
-
-// Return the Zone* of a Value. Asserts if the Value is not a GC thing.
-Zone*
-ZoneOfValue(const JS::Value& value);
 
 } // namespace js
 

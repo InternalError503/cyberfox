@@ -49,11 +49,19 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
 
+#ifndef SPS_STANDALONE
 #include "js/TypeDecls.h"
+#endif
+#include "mozilla/UniquePtr.h"
 
 namespace mozilla {
 class TimeStamp;
-}
+
+namespace dom {
+class Promise;
+} // namespace dom
+
+} // namespace mozilla
 
 enum TracingMetadata {
   TRACING_DEFAULT,
@@ -159,13 +167,21 @@ static inline void profiler_responsiveness(const mozilla::TimeStamp& aTime) {}
 static inline void profiler_set_frame_number(int frameNumber) {}
 
 // Get the profile encoded as a JSON string.
-static inline char* profiler_get_profile(float aSinceTime = 0) { return nullptr; }
+static inline mozilla::UniquePtr<char[]> profiler_get_profile(double aSinceTime = 0) {
+  return nullptr;
+}
 
 // Get the profile encoded as a JSON object.
 static inline JSObject* profiler_get_profile_jsobject(JSContext* aCx,
-                                                      float aSinceTime = 0) {
+                                                      double aSinceTime = 0) {
   return nullptr;
 }
+
+#ifndef SPS_STANDALONE
+// Get the profile encoded as a JSON object.
+static inline void profiler_get_profile_jsobject_async(double aSinceTime = 0,
+                                                       mozilla::dom::Promise* = 0) {}
+#endif
 
 // Get the profile and write it into a file
 static inline void profiler_save_profile_to_file(char* aFilename) { }

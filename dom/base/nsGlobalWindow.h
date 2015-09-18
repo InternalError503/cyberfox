@@ -111,6 +111,7 @@ class MozSelfSupport;
 class Navigator;
 class OwningExternalOrWindowProxy;
 class Promise;
+class PostMessageEvent;
 struct RequestInit;
 class RequestOrUSVString;
 class Selection;
@@ -127,12 +128,6 @@ namespace gfx {
 class VRHMDInfo;
 } // namespace gfx
 } // namespace mozilla
-
-extern nsresult
-NS_CreateJSTimeoutHandler(nsGlobalWindow *aWindow,
-                          bool *aIsInterval,
-                          int32_t *aInterval,
-                          nsIScriptTimeoutHandler **aRet);
 
 extern already_AddRefed<nsIScriptTimeoutHandler>
 NS_CreateJSTimeoutHandler(nsGlobalWindow *aWindow,
@@ -408,13 +403,22 @@ public:
                                 bool aUseCapture,
                                 const mozilla::dom::Nullable<bool>& aWantsUntrusted,
                                 mozilla::ErrorResult& aRv) override;
-  virtual nsIDOMWindow* GetOwnerGlobal() override
+  virtual nsIDOMWindow* GetOwnerGlobalForBindings() override
   {
     if (IsOuterWindow()) {
       return this;
     }
 
     return GetOuterFromCurrentInner(this);
+  }
+
+  virtual nsIGlobalObject* GetOwnerGlobal() const override
+  {
+    if (IsOuterWindow()) {
+      return GetCurrentInnerWindowInternal();
+    }
+
+    return const_cast<nsGlobalWindow*>(this);
   }
 
   // nsPIDOMWindow
@@ -481,8 +485,9 @@ public:
   virtual void RefreshCompartmentPrincipal() override;
 
   // Outer windows only.
-  virtual nsresult SetFullScreenInternal(bool aIsFullScreen, bool aRequireTrust,
-                                         mozilla::gfx::VRHMDInfo *aHMD = nullptr) override;
+  virtual nsresult SetFullScreenInternal(bool aIsFullscreen, bool aFullscreenMode,
+                                         mozilla::gfx::VRHMDInfo *aHMD = nullptr) override final;
+  virtual void FinishFullscreenChange(bool aIsFullscreen) override final;
   bool FullScreen() const;
 
   // Inner windows only.
@@ -899,6 +904,13 @@ public:
                   mozilla::ErrorResult& aRv);
   already_AddRefed<mozilla::dom::External> GetExternal(mozilla::ErrorResult& aRv);
 
+  // Exposed only for testing
+  static bool
+  TokenizeDialogOptions(nsAString& aToken, nsAString::const_iterator& aIter,
+                        nsAString::const_iterator aEnd);
+  static void
+  ConvertDialogOptions(const nsAString& aOptions, nsAString& aResult);
+
 protected:
   bool AlertOrConfirm(bool aAlert, const nsAString& aMessage,
                       mozilla::ErrorResult& aError);
@@ -1049,6 +1061,8 @@ public:
             bool aWrapAround, bool aWholeWord, bool aSearchInFrames,
             bool aShowDialog, mozilla::ErrorResult& aError);
   uint64_t GetMozPaintCount(mozilla::ErrorResult& aError);
+
+  bool ShouldResistFingerprinting();
 
   mozilla::dom::MozSelfSupport* GetMozSelfSupport(mozilla::ErrorResult& aError);
 
@@ -1315,7 +1329,6 @@ public:
   }
 
   // JS specific timeout functions (JS args grabbed from context).
-  nsresult SetTimeoutOrInterval(bool aIsInterval, int32_t* aReturn);
   nsresult ResetTimersForNonBackgroundWindow();
 
   // The timeout implementation functions.
@@ -1338,6 +1351,7 @@ public:
   already_AddRefed<nsIBaseWindow> GetTreeOwnerWindow();
   already_AddRefed<nsIWebBrowserChrome> GetWebBrowserChrome();
   nsresult SecurityCheckURL(const char *aURL);
+  bool IsPrivateBrowsing();
 
   bool PopupWhitelisted();
   PopupControlState RevisePopupAbuseLevel(PopupControlState);
@@ -1740,7 +1754,7 @@ protected:
 
   friend class nsDOMScriptableHelper;
   friend class nsDOMWindowUtils;
-  friend class PostMessageEvent;
+  friend class mozilla::dom::PostMessageEvent;
   friend class DesktopNotification;
 
   static WindowByIdTable* sWindowsById;

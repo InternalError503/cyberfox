@@ -39,8 +39,6 @@ interface nsIDOMStyleSheet;
 interface nsITransferable;
 interface nsIQueryContentEventResult;
 interface nsIDOMWindow;
-interface nsIDOMBlob;
-interface nsIDOMFile;
 interface nsIFile;
 interface nsIDOMClientRect;
 interface nsIURI;
@@ -51,7 +49,7 @@ interface nsIJSRAIIHelper;
 interface nsIContentPermissionRequest;
 interface nsIObserver;
 
-[scriptable, uuid(1a75c351-d115-4d51-94df-731dd1723a1f)]
+[scriptable, uuid(42c529d8-54cf-4158-8b09-13ca89d7a88c)]
 interface nsIDOMWindowUtils : nsISupports {
 
   /**
@@ -1185,17 +1183,24 @@ interface nsIDOMWindowUtils : nsISupports {
    * Called when the remote child frame has changed its fullscreen state,
    * when entering fullscreen, and when the origin which is fullscreen changes.
    * aFrameElement is the iframe element which contains the child-process
-   * fullscreen document, and aNewOrigin is the origin of the new fullscreen
-   * document.
+   * fullscreen document.
    */
-  void remoteFrameFullscreenChanged(in nsIDOMElement aFrameElement,
-                                    in AString aNewOrigin);
+  void remoteFrameFullscreenChanged(in nsIDOMElement aFrameElement);
 
   /**
    * Called when the remote frame has popped all fullscreen elements off its
    * stack, so that the operation can complete on the parent side.
    */
   void remoteFrameFullscreenReverted();
+
+  /**
+   * Calls the document to handle any pending fullscreen requests.
+   * It is called when the parent document has entered fullscreen, and
+   * we want to put the current document into fullscreen as well.
+   * The return value indicates whether there is any fullscreen request
+   * handled by this call.
+   */
+  boolean handleFullscreenRequests();
 
   /**
    * Called when the child frame has fully exit fullscreen, so that the parent
@@ -1433,6 +1438,24 @@ interface nsIDOMWindowUtils : nsISupports {
   void setAsyncScrollOffset(in nsIDOMNode aNode, in int32_t aX, in int32_t aY);
 
   /**
+   * Set async zoom value. aRootElement should be the document element of our
+   * document. The next composite will render with that zoom added to any
+   * existing zoom if async scrolling is enabled, and then the zoom will be
+   * removed. Only call this while test-controlled refreshes is enabled.
+   */
+  void setAsyncZoom(in nsIDOMNode aRootElement, in float aValue);
+
+  /**
+   * Do a round-trip to the compositor to ensure any pending APZ repaint requests
+   * get flushed to the main thread. If the function returns true, the flush was
+   * triggered and an "apz-repaints-flushed" notification will be dispatched via
+   * the observer service once the flush is complete. If the function returns
+   * false, an error occurred or a flush is not needed, and the notification
+   * will not fire. This is intended to be used by test code only!
+   */
+  bool flushApzRepaints();
+
+  /**
    * Method for testing StyleAnimationValue::ComputeDistance.
    *
    * Returns the distance between the two values as reported by
@@ -1445,9 +1468,10 @@ interface nsIDOMWindowUtils : nsISupports {
                                   in AString value2);
 
   /**
-   * Wrap an nsIFile in an nsIDOMFile
+   * Wrap an nsIFile in an DOM File
+   * Returns a File object.
    */
-  nsIDOMFile wrapDOMFile(in nsIFile aFile);
+  nsISupports wrapDOMFile(in nsIFile aFile);
 
   /**
    * Get the type of the currently focused html input, if any.
@@ -1690,9 +1714,11 @@ interface nsIDOMWindowUtils : nsISupports {
    attribute boolean paintFlashing;
 
    /**
-    * Allows running of a "synchronous section", in the form of an nsIRunnable
-    * once the event loop has reached a "stable state". We've reached a stable
-    * state when the currently executing task/event has finished, see:
+    * Add a "synchronous section", in the form of an nsIRunnable run once the
+    * event loop has reached a "stable state". |runnable| must not cause any
+    * queued events to be processed (i.e. must not spin the event loop).
+    * We've reached a stable state when the currently executing task/event has
+    * finished, see:
     * http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#synchronous-section
     * In practice this runs aRunnable once the currently executing event
     * finishes. If called multiple times per task/event, all the runnables will
@@ -1807,6 +1833,27 @@ interface nsIDOMWindowUtils : nsISupports {
    * Enable some service workers testing features.
    */
   attribute boolean serviceWorkersTestingEnabled;
+
+  /**
+   * Returns a JSObject which contains a list of frame uniformities
+   * when the pref gfx.vsync.collect-scroll-data is enabled.
+   * Every result contains a layer address and a frame uniformity for that layer.
+   * A negative frame uniformity value indicates an invalid frame uniformity and an error has occured.
+   */
+  [implicit_jscontext] jsval getFrameUniformityTestData();
+
+  /*
+   * Increase the chaos mode activation level. An equivalent number of
+   * calls to leaveChaosMode must be made in order to restore the original
+   * chaos mode state. If the activation level is nonzero all chaos mode
+   * features are activated.
+   */
+  void enterChaosMode();
+
+  /**
+   * Decrease the chaos mode activation level. See enterChaosMode().
+   */
+  void leaveChaosMode();
 };
 
 [scriptable, uuid(c694e359-7227-4392-a138-33c0cc1f15a6)]

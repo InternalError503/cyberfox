@@ -43,9 +43,9 @@
 
 #include "mozilla/gfx/Logging.h"
 
-#include "prlog.h"
+#include "mozilla/Logging.h"
 PRLogModuleInfo * kWidgetPrintingLogMod = PR_NewLogModule("printing-widget");
-#define PR_PL(_p1)  PR_LOG(kWidgetPrintingLogMod, PR_LOG_DEBUG, _p1)
+#define PR_PL(_p1)  MOZ_LOG(kWidgetPrintingLogMod, mozilla::LogLevel::Debug, _p1)
 
 using namespace mozilla;
 

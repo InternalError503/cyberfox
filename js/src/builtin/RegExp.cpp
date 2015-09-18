@@ -168,14 +168,10 @@ RegExpInitialize(JSContext* cx, RegExpObjectBuilder& builder,
             return false;
     }
 
-    RootedAtom escapedPatternStr(cx, EscapeRegExpPattern(cx, pattern));
-    if (!escapedPatternStr)
-        return false;
-
     /* Steps 9-10. */
     CompileOptions options(cx);
     frontend::TokenStream dummyTokenStream(cx, options, nullptr, 0, nullptr);
-    if (!irregexp::ParsePatternSyntax(dummyTokenStream, cx->tempLifoAlloc(), escapedPatternStr))
+    if (!irregexp::ParsePatternSyntax(dummyTokenStream, cx->tempLifoAlloc(), pattern))
         return false;
 
     if (staticsUse == UseRegExpStatics) {
@@ -186,7 +182,7 @@ RegExpInitialize(JSContext* cx, RegExpObjectBuilder& builder,
     }
 
     /* Steps 11-15. */
-    RootedObject reobj(cx, builder.build(escapedPatternStr, flags));
+    RootedObject reobj(cx, builder.build(pattern, flags));
     if (!reobj)
         return false;
 
@@ -213,7 +209,7 @@ CompileRegExpObject(JSContext* cx, RegExpObjectBuilder& builder, CallArgs args,
         if (!res)
             return false;
 
-        RootedAtom empty(cx, cx->names().emptyRegExp);
+        RootedAtom empty(cx, cx->runtime()->emptyString);
         RegExpObject* reobj = builder.build(empty, res->getFlags());
         if (!reobj)
             return false;
@@ -244,6 +240,7 @@ CompileRegExpObject(JSContext* cx, RegExpObjectBuilder& builder, CallArgs args,
          */
         RootedObject patternObj(cx, &patternValue.toObject());
 
+        RootedAtom sourceAtom(cx);
         RegExpFlag flags;
         {
             /*
@@ -255,6 +252,7 @@ CompileRegExpObject(JSContext* cx, RegExpObjectBuilder& builder, CallArgs args,
             RegExpGuard g(cx);
             if (!RegExpToShared(cx, patternObj, &g))
                 return false;
+            sourceAtom = g->getSource();
 
             if (args.hasDefined(1)) {
                 /* 21.2.3.1 step 5.c. */
@@ -272,18 +270,6 @@ CompileRegExpObject(JSContext* cx, RegExpObjectBuilder& builder, CallArgs args,
                 flags = g->getFlags();
             }
         }
-
-        /*
-         * 'toSource' is a permanent read-only property, so this is equivalent
-         * to executing RegExpObject::getSource on the unwrapped object.
-         */
-        RootedValue v(cx);
-        if (!GetProperty(cx, patternObj, patternObj, cx->names().source, &v))
-            return false;
-
-        // For proxies like CPOWs, we can't assume the result of a property get
-        // for 'source' is atomized.
-        Rooted<JSAtom*> sourceAtom(cx, AtomizeString(cx, v.toString()));
 
         /*
          * 21.2.3.1 steps 8-10.
@@ -509,6 +495,35 @@ regexp_multiline(JSContext* cx, unsigned argc, JS::Value* vp)
     return CallNonGenericMethod<IsRegExpObject, regexp_multiline_impl>(cx, args);
 }
 
+/* ES6 draft rev32 21.2.5.10. */
+MOZ_ALWAYS_INLINE bool
+regexp_source_impl(JSContext* cx, CallArgs args)
+{
+    MOZ_ASSERT(IsRegExpObject(args.thisv()));
+    Rooted<RegExpObject*> reObj(cx, &args.thisv().toObject().as<RegExpObject>());
+
+    /* Step 5. */
+    RootedAtom src(cx, reObj->getSource());
+    if (!src)
+        return false;
+
+    /* Step 7. */
+    RootedString str(cx, EscapeRegExpPattern(cx, src));
+    if (!str)
+        return false;
+
+    args.rval().setString(str);
+    return true;
+}
+
+static bool
+regexp_source(JSContext* cx, unsigned argc, JS::Value* vp)
+{
+    /* Steps 1-4. */
+    CallArgs args = CallArgsFromVp(argc, vp);
+    return CallNonGenericMethod<IsRegExpObject, regexp_source_impl>(cx, args);
+}
+
 /* ES6 draft rev32 21.2.5.12. */
 MOZ_ALWAYS_INLINE bool
 regexp_sticky_impl(JSContext* cx, CallArgs args)
@@ -534,6 +549,7 @@ const JSPropertySpec js::regexp_properties[] = {
     JS_PSG("global", regexp_global, 0),
     JS_PSG("ignoreCase", regexp_ignoreCase, 0),
     JS_PSG("multiline", regexp_multiline, 0),
+    JS_PSG("source", regexp_source, 0),
     JS_PSG("sticky", regexp_sticky, 0),
     JS_PS_END
 };
@@ -677,7 +693,7 @@ js::CreateRegExpPrototype(JSContext* cx, JSProtoKey key)
         return nullptr;
     proto->NativeObject::setPrivate(nullptr);
 
-    HandlePropertyName empty = cx->names().emptyRegExp;
+    HandlePropertyName empty = cx->names().empty;
     RegExpObjectBuilder builder(cx, proto);
     if (!builder.build(empty, RegExpFlag(0)))
         return nullptr;
@@ -685,11 +701,35 @@ js::CreateRegExpPrototype(JSContext* cx, JSProtoKey key)
     return proto;
 }
 
+static bool
+ReportLastIndexNonwritable(JSContext* cx)
+{
+    JS_ReportErrorNumber(cx, GetErrorMessage, nullptr, JSMSG_READ_ONLY, "\"lastIndex\"");
+    return false;
+}
+
+static bool
+SetLastIndex(JSContext* cx, Handle<RegExpObject*> reobj, double lastIndex)
+{
+    if (!reobj->lookup(cx, cx->names().lastIndex)->writable())
+        return ReportLastIndexNonwritable(cx);
+
+    reobj->setLastIndex(lastIndex);
+    return true;
+}
+
+/* ES6 final draft 21.2.5.2.2. */
 RegExpRunStatus
 js::ExecuteRegExp(JSContext* cx, HandleObject regexp, HandleString string,
                   MatchPairs* matches, RegExpStaticsUpdate staticsUpdate)
 {
-    /* Step 1 (b) was performed by CallNonGenericMethod. */
+    /*
+     * WARNING: Despite the presence of spec step comment numbers, this
+     *          algorithm isn't consistent with any ES6 version, draft or
+     *          otherwise.  YOU HAVE BEEN WARNED.
+     */
+
+    /* Steps 1-2 performed by the caller. */
     Rooted<RegExpObject*> reobj(cx, &regexp->as<RegExpObject>());
 
     RegExpGuard re(cx);
@@ -705,16 +745,15 @@ js::ExecuteRegExp(JSContext* cx, HandleObject regexp, HandleString string,
         res = nullptr;
     }
 
-    /* Step 3. */
     RootedLinearString input(cx, string->ensureLinear(cx));
     if (!input)
         return RegExpRunStatus_Error;
 
-    /* Step 4. */
-    RootedValue lastIndex(cx, reobj->getLastIndex());
+    /* Step 3. */
     size_t length = input->length();
 
-    /* Step 5. */
+    /* Steps 4-5. */
+    RootedValue lastIndex(cx, reobj->getLastIndex());
     int searchIndex;
     if (lastIndex.isInt32()) {
         /* Aggressively avoid doubles. */
@@ -724,9 +763,13 @@ js::ExecuteRegExp(JSContext* cx, HandleObject regexp, HandleString string,
         if (!ToInteger(cx, lastIndex, &d))
             return RegExpRunStatus_Error;
 
-        /* Inlined steps 6, 7, 9a with doubles to detect failure case. */
+        /* Inlined steps 6-10, 15.a with doubles to detect failure case. */
         if (reobj->needUpdateLastIndex() && (d < 0 || d > length)) {
-            reobj->zeroLastIndex();
+            /* Steps 15.a.i-ii. */
+            if (!SetLastIndex(cx, reobj, 0))
+                return RegExpRunStatus_Error;
+
+            /* Step 15.a.iii. */
             return RegExpRunStatus_Success_NotFound;
         }
 
@@ -734,7 +777,7 @@ js::ExecuteRegExp(JSContext* cx, HandleObject regexp, HandleString string,
     }
 
     /*
-     * Steps 6-7 (with sticky extension).
+     * Steps 6-10.
      *
      * Also make sure that we have a MatchPairs for regexps which update their
      * last index, as we won't compute the last index otherwise.
@@ -747,22 +790,30 @@ js::ExecuteRegExp(JSContext* cx, HandleObject regexp, HandleString string,
         matches = &alternateMatches.ref();
     }
 
-    /* Step 9a. */
+    /* Step 15.a. */
     if (searchIndex < 0 || size_t(searchIndex) > length) {
-        reobj->zeroLastIndex();
+        /* Steps 15.a.i-ii. */
+        if (!SetLastIndex(cx, reobj, 0))
+            return RegExpRunStatus_Error;
+
+        /* Step 15.a.iii. */
         return RegExpRunStatus_Success_NotFound;
     }
 
-    /* Steps 8-21. */
+    /* Step 14-29. */
     RegExpRunStatus status = ExecuteRegExpImpl(cx, res, *re, input, searchIndex, matches);
     if (status == RegExpRunStatus_Error)
         return RegExpRunStatus_Error;
 
-    /* Steps 9a and 11 (with sticky extension). */
-    if (status == RegExpRunStatus_Success_NotFound)
-        reobj->zeroLastIndex();
-    else if (reobj->needUpdateLastIndex())
-        reobj->setLastIndex((*matches)[0].limit);
+    if (status == RegExpRunStatus_Success_NotFound) {
+        /* Steps 15.a.i-ii. */
+        if (!SetLastIndex(cx, reobj, 0))
+            return RegExpRunStatus_Error;
+    } else if (reobj->needUpdateLastIndex()) {
+        /* Steps 18.a-b. */
+        if (!SetLastIndex(cx, reobj, (*matches)[0].limit))
+            return RegExpRunStatus_Error;
+    }
 
     return status;
 }

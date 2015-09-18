@@ -2684,7 +2684,11 @@ var gCSSProperties = {
     inherited: false,
     type: CSS_TYPE_LONGHAND,
     /* FIXME: test zero, and test calc clamping */
-    initial_values: [ " auto" ],
+    initial_values: [ " auto",
+      // these four keywords compute to the initial value when the
+      // writing mode is horizontal, and that's the context we're testing in
+      "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
+    ],
     /* computed value tests for height test more with display:block */
     prerequisites: { "display": "block" },
     other_values: [ "15px", "3em", "15%",
@@ -2694,7 +2698,7 @@ var gCSSProperties = {
       "calc(25px*3)",
       "calc(3*25px + 50%)",
     ],
-    invalid_values: [ "none", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available" ],
+    invalid_values: [ "none" ],
     quirks_values: { "5": "5px" },
   },
   "ime-mode": {
@@ -2945,7 +2949,11 @@ var gCSSProperties = {
     inherited: false,
     type: CSS_TYPE_LONGHAND,
     prerequisites: { "display": "block" },
-    initial_values: [ "none" ],
+    initial_values: [ "none",
+      // these four keywords compute to the initial value when the
+      // writing mode is horizontal, and that's the context we're testing in
+      "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
+    ],
     other_values: [ "30px", "50%", "0",
       "calc(2px)",
       "calc(-2px)",
@@ -2955,7 +2963,7 @@ var gCSSProperties = {
       "calc(25px*3)",
       "calc(3*25px + 50%)",
     ],
-    invalid_values: [ "auto", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available" ],
+    invalid_values: [ "auto" ],
     quirks_values: { "5": "5px" },
   },
   "max-width": {
@@ -2964,7 +2972,11 @@ var gCSSProperties = {
     type: CSS_TYPE_LONGHAND,
     prerequisites: { "display": "block" },
     initial_values: [ "none" ],
-    other_values: [ "30px", "50%", "0", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
+    other_values: [ "30px", "50%", "0",
+      // these four keywords compute to the initial value only when the
+      // writing mode is vertical, and we're testing with a horizontal
+      // writing mode
+      "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
       "calc(2px)",
       "calc(-2px)",
       "calc(0px)",
@@ -2981,7 +2993,11 @@ var gCSSProperties = {
     inherited: false,
     type: CSS_TYPE_LONGHAND,
     prerequisites: { "display": "block" },
-    initial_values: [ "auto", "0", "calc(0em)", "calc(-2px)", "calc(-1%)" ],
+    initial_values: [ "auto", "0", "calc(0em)", "calc(-2px)", "calc(-1%)",
+      // these four keywords compute to the initial value when the
+      // writing mode is horizontal, and that's the context we're testing in
+      "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
+    ],
     other_values: [ "30px", "50%",
       "calc(2px)",
       "calc(50%)",
@@ -2989,7 +3005,7 @@ var gCSSProperties = {
       "calc(25px*3)",
       "calc(3*25px + 50%)",
     ],
-    invalid_values: ["none", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available" ],
+    invalid_values: ["none"],
     quirks_values: { "5": "5px" },
   },
   "min-width": {
@@ -2998,7 +3014,11 @@ var gCSSProperties = {
     type: CSS_TYPE_LONGHAND,
     prerequisites: { "display": "block" },
     initial_values: [ "auto", "0", "calc(0em)", "calc(-2px)", "calc(-1%)" ],
-    other_values: [ "30px", "50%", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
+    other_values: [ "30px", "50%",
+      // these four keywords compute to the initial value only when the
+      // writing mode is vertical, and we're testing with a horizontal
+      // writing mode
+      "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
       "calc(2px)",
       "calc(50%)",
       "calc(3*25px)",
@@ -3515,7 +3535,15 @@ var gCSSProperties = {
     prerequisites: { "display": "block" },
     initial_values: [ " auto" ],
     /* XXX these have prerequisites */
-    other_values: [ "15px", "3em", "15%", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
+    other_values: [ "15px", "3em", "15%",
+      // these three keywords compute to the initial value only when the
+      // writing mode is vertical, and we're testing with a horizontal
+      // writing mode
+      "-moz-max-content", "-moz-min-content", "-moz-fit-content",
+      // whether -moz-available computes to the initial value depends on
+      // the container size, and for the container size we're testing
+      // with, it does
+      // "-moz-available",
       "3e1px", "3e+1px", "3e0px", "3e+0px", "3e-0px", "3e-1px",
       "3.2e1px", "3.2e+1px", "3.2e0px", "3.2e+0px", "3.2e-0px", "3.2e-1px",
       "3e1%", "3e+1%", "3e0%", "3e+0%", "3e-0%", "3e-1%",
@@ -4687,16 +4715,6 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
       other_values: [ "upright", "sideways-right" ],
       invalid_values: [ "none", "3em", "sideways", "sideways-left" ] /* sideways, sideways-left not yet supported */
     },
-    "text-combine-upright": {
-      domProp: "textCombineUpright",
-      inherited: true,
-      type: CSS_TYPE_LONGHAND,
-      initial_values: [ "none" ],
-      other_values: [ "all", "digits", "digits 2", "digits 3", "digits 4", "digits     3" ],
-      invalid_values: [ "auto", "all 2", "none all", "digits -3", "digits 0",
-                        "digits 12", "none 3", "digits 3.1415", "digits3", "digits 1",
-                        "digits 3 all", "digits foo", "digits all", "digits 3.0" ]
-    },
     "border-block-end": {
       domProp: "borderBlockEnd",
       inherited: false,
@@ -4723,7 +4741,7 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
         "calc(25px*3)",
         "calc(3*25px + 50%)",
       ],
-      invalid_values: [ "none" ],
+      invalid_values: [ "none", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available" ],
     },
     "border-block-end-color": {
       domProp: "borderBlockEndColor",
@@ -4929,6 +4947,14 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
       initial_values: [ "auto" ],
       prerequisites: { "display": "block" },
       other_values: [ "15px", "3em", "15%",
+        // these three keywords compute to the initial value only when the
+        // writing mode is vertical, and we're testing with a horizontal
+        // writing mode
+        "-moz-max-content", "-moz-min-content", "-moz-fit-content",
+        // whether -moz-available computes to the initial value depends on
+        // the container size, and for the container size we're testing
+        // with, it does
+        // "-moz-available",
         "calc(2px)",
         "calc(50%)",
         "calc(3*25px)",
@@ -5025,7 +5051,7 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
         "calc(25px*3)",
         "calc(3*25px + 50%)",
       ],
-      invalid_values: [ "auto", "5" ]
+      invalid_values: [ "auto", "5", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available" ]
     },
     "max-inline-size": {
       domProp: "maxInlineSize",
@@ -5037,6 +5063,10 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
       prerequisites: { "display": "block" },
       initial_values: [ "none" ],
       other_values: [ "30px", "50%",
+        // these four keywords compute to the initial value only when the
+        // writing mode is vertical, and we're testing with a horizontal
+        // writing mode
+        "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
         "calc(2px)",
         "calc(50%)",
         "calc(3*25px)",
@@ -5061,7 +5091,7 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
         "calc(25px*3)",
         "calc(3*25px + 50%)",
       ],
-      invalid_values: [ "none", "5" ]
+      invalid_values: [ "none", "5", "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available" ]
     },
     "min-inline-size": {
       domProp: "minInlineSize",
@@ -5073,6 +5103,10 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
       prerequisites: { "display": "block" },
       initial_values: [ "auto", "0", "calc(0em)", "calc(-2px)", "calc(-1%)" ],
       other_values: [ "30px", "50%",
+        // these four keywords compute to the initial value only when the
+        // writing mode is vertical, and we're testing with a horizontal
+        // writing mode
+        "-moz-max-content", "-moz-min-content", "-moz-fit-content", "-moz-available",
         "calc(2px)",
         "calc(50%)",
         "calc(3*25px)",
@@ -5244,6 +5278,19 @@ if (SpecialPowers.getBoolPref("layout.css.vertical-text.enabled")) {
   });
 }
 
+if (SpecialPowers.getBoolPref("layout.css.text-combine-upright.enabled")) {
+  gCSSProperties["text-combine-upright"] = {
+    domProp: "textCombineUpright",
+    inherited: true,
+    type: CSS_TYPE_LONGHAND,
+    initial_values: [ "none" ],
+    other_values: [ "all", "digits", "digits 2", "digits 3", "digits 4", "digits     3" ],
+    invalid_values: [ "auto", "all 2", "none all", "digits -3", "digits 0",
+                      "digits 12", "none 3", "digits 3.1415", "digits3", "digits 1",
+                      "digits 3 all", "digits foo", "digits all", "digits 3.0" ]
+  };
+}
+
 if (SpecialPowers.getBoolPref("layout.css.masking.enabled")) {
   gCSSProperties["mask-type"] = {
     domProp: "maskType",
@@ -5263,6 +5310,17 @@ if (SpecialPowers.getBoolPref("svg.paint-order.enabled")) {
     initial_values: [ "normal" ],
     other_values: [ "fill", "fill stroke", "fill stroke markers", "stroke markers fill" ],
     invalid_values: [ "fill stroke markers fill", "fill normal" ]
+  };
+}
+
+if (SpecialPowers.getBoolPref("svg.transform-origin.enabled")) {
+  gCSSProperties["transform-box"] = {
+    domProp: "transformBox",
+    inherited: false,
+    type: CSS_TYPE_LONGHAND,
+    initial_values: [ "border-box" ],
+    other_values: [ "fill-box", "view-box" ],
+    invalid_values: []
   };
 }
 
@@ -5790,32 +5848,32 @@ if (SpecialPowers.getBoolPref("layout.css.grid.enabled")) {
       "auto",
       "40px",
       "2.5fr",
-      "(normal) 40px () auto ( ) 12%",
-      "(foo) 40px min-content ( bar ) calc(20px + 10%) max-content",
+      "[normal] 40px [] auto [ ] 12%",
+      "[foo] 40px min-content [ bar ] calc(20px + 10%) max-content",
       "40px min-content calc(20px + 10%) max-content",
       "minmax(min-content, auto)",
       "minmax(auto, max-content)",
       "m\\69nmax(20px, 4Fr)",
       "40px MinMax(min-content, calc(20px + 10%)) max-content",
       "40px 2em",
-      "() 40px (-foo) 2em (bar baz This\ is\ one\ ident)",
-      // TODO bug 978478: "(a) repeat(3, (b) 20px (c) 40px (d)) (e)",
+      "[] 40px [-foo] 2em [bar baz This\ is\ one\ ident]",
+      // TODO bug 978478: "[a] repeat(3, [b] 20px [c] 40px [d]) [e]",
       "repeat(1, 20px)",
-      "repeat(1, (a) 20px)",
-      "(a) Repeat(4, (a) 20px () auto (b c)) (d)",
-      "(a) 2.5fr Repeat(4, (a) 20px () auto (b c)) (d)",
-      "(a) 2.5fr (z) Repeat(4, (a) 20px () auto (b c)) (d)",
-      "(a) 2.5fr (z) Repeat(4, (a) 20px () auto) (d)",
-      "(a) 2.5fr (z) Repeat(4, 20px (b c) auto (b c)) (d)",
-      "(a) 2.5fr (z) Repeat(4, 20px auto) (d)",
+      "repeat(1, [a] 20px)",
+      "[a] Repeat(4, [a] 20px [] auto [b c]) [d]",
+      "[a] 2.5fr Repeat(4, [a] 20px [] auto [b c]) [d]",
+      "[a] 2.5fr [z] Repeat(4, [a] 20px [] auto [b c]) [d]",
+      "[a] 2.5fr [z] Repeat(4, [a] 20px [] auto) [d]",
+      "[a] 2.5fr [z] Repeat(4, 20px [b c] auto [b c]) [d]",
+      "[a] 2.5fr [z] Repeat(4, 20px auto) [d]",
 
       // See https://bugzilla.mozilla.org/show_bug.cgi?id=981300
-      "(none auto subgrid min-content max-content foo) 40px",
+      "[none auto subgrid min-content max-content foo] 40px",
 
       "subgrid",
-      "subgrid () (foo bar)",
-      "subgrid repeat(1, ())",
-      "subgrid Repeat(4, (a) (b c) () (d))",
+      "subgrid [] [foo bar]",
+      "subgrid repeat(1, [])",
+      "subgrid Repeat(4, [a] [b c] [] [d])",
     ],
     invalid_values: [
       "",
@@ -5833,7 +5891,7 @@ if (SpecialPowers.getBoolPref("layout.css.grid.enabled")) {
       "(5th) 40px",
       "(foo() bar) 40px",
       "(foo)) 40px",
-      "[foo] 40px",
+      "(foo) 40px",
       "(foo) (bar) 40px",
       "40px (foo) (bar)",
       "minmax()",
@@ -5888,7 +5946,12 @@ if (SpecialPowers.getBoolPref("layout.css.grid.enabled")) {
       "'' ''",
       "'1a-é_ .' \"b .\"",
       "' Z\t\\aZ' 'Z Z'",
-      " '. . a b'  '..a b' ",
+      " '. . a b'  '. .a b' ",
+      "'a.b' '. . .'",
+      "'.' '..'",
+      "'...' '.'",
+      "'...-blah' '. .'",
+      "'.. ..' '.. ...'",
     ],
     invalid_values: [
       "'a b' 'a/b'",
@@ -5917,32 +5980,32 @@ if (SpecialPowers.getBoolPref("layout.css.grid.enabled")) {
       "subgrid",
       // <'grid-template-columns'> / <'grid-template-rows'>
       "40px / 100px",
-      "(foo) 40px (bar) / (baz) 100px (fizz)",
+      "[foo] 40px [bar] / [baz] 100px [fizz]",
       " none/100px",
       "40px/none",
       "subgrid/40px 20px",
-      "subgrid (foo) () (bar baz) / 40px 20px",
+      "subgrid [foo] [] [bar baz] / 40px 20px",
       "40px 20px/subgrid",
-      "40px 20px/subgrid  (foo) () repeat(3, (a) (b)) (bar baz)",
+      "40px 20px/subgrid  [foo] [] repeat(3, [a] [b]) [bar baz]",
       "subgrid/subgrid",
-      "subgrid (foo) () (bar baz)/subgrid (foo) () (bar baz)",
+      "subgrid [foo] [] [bar baz]/subgrid [foo] [] [bar baz]",
       // [ <track-list> / ]? [ <line-names>? <string> <track-size>? <line-names>? ]+
       "'fizz'",
-      "(bar) 'fizz'",
-      "(foo) 40px / 'fizz'",
-      "(foo) 40px / (bar) 'fizz'",
-      "(foo) 40px / 'fizz' 100px",
-      "(foo) 40px / (bar) 'fizz' 100px",
-      "(foo) 40px / (bar) 'fizz' 100px (buzz)",
-      "(foo) 40px / (bar) 'fizz' 100px (buzz) \n (a) '.' 200px (b)",
+      "[bar] 'fizz'",
+      "[foo] 40px / 'fizz'",
+      "[foo] 40px / [bar] 'fizz'",
+      "[foo] 40px / 'fizz' 100px",
+      "[foo] 40px / [bar] 'fizz' 100px",
+      "[foo] 40px / [bar] 'fizz' 100px [buzz]",
+      "[foo] 40px / [bar] 'fizz' 100px [buzz] \n [a] '.' 200px [b]",
     ],
     invalid_values: [
-      "subgrid ()",
-      "subgrid () / 'fizz'",
+      "subgrid []",
+      "subgrid [] / 'fizz'",
       "subgrid / 'fizz'",
-      "(foo) (bar) 40px / 100px",
-      "40px / (fizz) (buzz) 100px",
-      "40px / (fizz) (buzz) 'foo'",
+      "[foo] [bar] 40px / 100px",
+      "40px / [fizz] [buzz] 100px",
+      "40px / [fizz] [buzz] 'foo'",
       "none / 'foo'"
     ]
   };
@@ -6141,6 +6204,46 @@ if (SpecialPowers.getBoolPref("layout.css.grid.enabled")) {
 
 if (SpecialPowers.getBoolPref("layout.css.display-contents.enabled")) {
   gCSSProperties["display"].other_values.push("contents");
+}
+
+if (SpecialPowers.getBoolPref("layout.css.contain.enabled")) {
+  gCSSProperties["contain"] = {
+    domProp: "contain",
+    inherited: false,
+    type: CSS_TYPE_LONGHAND,
+    initial_values: [ "none" ],
+    other_values: [
+      "strict",
+      "layout",
+      "style",
+      "layout style",
+      "style layout",
+      "paint",
+      "layout paint",
+      "paint layout",
+      "style paint",
+      "paint style",
+      "layout style paint",
+      "layout paint style",
+      "style paint layout",
+      "paint style layout",
+    ],
+    invalid_values: [
+      "none strict",
+      "strict layout",
+      "strict layout style",
+      "layout strict",
+      "layout style strict",
+      "layout style paint strict",
+      "paint strict",
+      "style strict",
+      "paint paint",
+      "strict strict",
+      "auto",
+      "10px",
+      "0",
+    ]
+  };
 }
 
 if (SpecialPowers.getBoolPref("layout.css.image-orientation.enabled")) {

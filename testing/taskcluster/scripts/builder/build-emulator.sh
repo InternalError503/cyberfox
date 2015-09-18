@@ -42,6 +42,8 @@ if [ 0$B2G_DEBUG -ne 0 ]; then
   debug_flag='--debug'
 fi
 
+rm -rf $WORKSPACE/B2G/out/target/product/generic/tests/
+
 ./mozharness/scripts/b2g_build.py \
   --config b2g/taskcluster-emulator.py \
   "$debug_flag" \

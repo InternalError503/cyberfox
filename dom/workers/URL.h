@@ -15,7 +15,7 @@
 
 namespace mozilla {
 namespace dom {
-class File;
+class Blob;
 struct objectURLOptions;
 }
 }
@@ -61,7 +61,7 @@ public:
 
   static void
   CreateObjectURL(const GlobalObject& aGlobal,
-                  File& aArg, const objectURLOptions& aOptions,
+                  Blob& aArg, const objectURLOptions& aOptions,
                   nsAString& aResult, ErrorResult& aRv);
 
   static void
@@ -107,8 +107,6 @@ public:
   void SetSearch(const nsAString& aSearch, ErrorResult& aRv);
 
   URLSearchParams* SearchParams();
-
-  void SetSearchParams(URLSearchParams& aSearchParams);
 
   void GetHash(nsAString& aHost, ErrorResult& aRv) const;
 

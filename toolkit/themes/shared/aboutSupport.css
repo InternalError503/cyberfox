@@ -3,25 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 html {
-  background-color: -moz-Field;
-  color: -moz-FieldText;
-  font: message-box;
-  background-color: rgb(235, 235, 237);
-  background-image: url("chrome://browser/content/abouthome/noise.png"), linear-gradient(rgb(237, 238, 240), rgb(237, 238, 240) 95%, rgb(225, 225, 225));
+  --aboutSupport-table-background: #ebebeb;
+  background-color: var(--in-content-page-background);
 }
 
 body {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-  background-color: rgb(235, 235, 237);
-  background-image: url("chrome://browser/content/abouthome/noise.png"), linear-gradient(rgb(237, 238, 240), rgb(237, 238, 240) 95%, rgb(225, 225, 225));
-}
-a , a:active{
-  color: #333333;
-}
-a:hover {
-  color: #3399FF !important;
+  margin: 40px 48px;
 }
 
 .page-subtitle {
@@ -36,26 +23,24 @@ a:hover {
   font-weight: bold;
 }
 
+button {
+  -moz-margin-start: 0;
+  -moz-margin-end: 8px;
+}
+
 table {
-  background-color: -moz-Dialog;
-  color: -moz-DialogText;
+  background-color: var(--aboutSupport-table-background);
+  color: var(--in-content-text-color);
   font: message-box;
   text-align: start;
   width: 100%;
-  background-color: rgb(235, 235, 237);
-  background-image: linear-gradient(rgb(237, 238, 240), rgb(237, 238, 240) 95%, rgb(225, 225, 225));
-  box-shadow: 1px 1px 1px hsla(0,0%,0%,.100) inset,
-              1px 1px 1px hsla(0,0%,0%,.100) inset;
-  border-top: 6px solid rgb(55, 55, 55); 			  
-  border-bottom: 1px solid rgb(155, 155, 155, .3);
-  border-left: 1px solid rgb(155, 155, 155, .3); 
-  border-right: 1px solid rgb(155, 155, 155, .3);  
+  border: 1px solid var(--in-content-border-color);
   border-spacing: 0px;
 }
 
 th, td {
-  border: 1px solid rgb(235, 235, 237, .3);
-  padding: 3px;
+  border: 1px solid var(--in-content-border-color);
+  padding: 4px;
 }
 
 thead th {
@@ -64,8 +49,8 @@ thead th {
 
 th {
   text-align: start;
-  background-color: rgb(235, 235, 237);
-  background-image: url("chrome://browser/content/abouthome/noise.png"), linear-gradient(rgb(237, 238, 240), rgb(237, 238, 240) 95%, rgb(225, 225, 225));
+  background-color: var(--in-content-table-header-background);
+  color: var(--in-content-selected-text);
 }
 
 th.column {
@@ -75,7 +60,7 @@ th.column {
 
 td {
   text-align: start;
-  border-top: 1px solid rgb(235, 235, 237, .3);
+  border-color: var(--in-content-table-border-dark-color);
 }
 
 .prefs-table {
@@ -96,8 +81,9 @@ td {
 }
 
 #action-box {
-  background-color: -moz-Dialog;
-  color: -moz-DialogText;
+  background-color: var(--aboutSupport-table-background);
+  border: 1px solid var(--in-content-border-color);
+  color: var(--in-content-text-color);
   float: right;
   margin-top: 2em;
   margin-bottom: 20px;
@@ -105,14 +91,6 @@ td {
   -moz-margin-end: 0;
   padding: 16px;
   width: 30%;
-  background-color: rgb(235, 235, 237);
-  background-image: linear-gradient(rgb(237, 238, 240), rgb(237, 238, 240) 95%, rgb(225, 225, 225));
-  box-shadow: 1px 4px 4px hsla(0,0%,0%,.100) inset,
-              1px 4px 4px hsla(0,0%,0%,.100) inset;
-  border-top: 6px solid rgb(55, 55, 55); 			  
-  border-bottom: 1px solid rgb(155, 155, 155, .3);
-  border-left: 1px solid rgb(155, 155, 155, .3); 
-  border-right: 1px solid rgb(155, 155, 155, .3); 
 }
 
 #action-box,
@@ -131,7 +109,6 @@ td {
 
 #action-box button {
   display: block;
-  margin: auto;
 }
 
 .block {

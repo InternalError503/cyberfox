@@ -180,6 +180,8 @@ pref("xpinstall.whitelist.fileRequest", false);
 pref("xpinstall.whitelist.add", "addons.mozilla.org");
 pref("xpinstall.whitelist.add.180", "marketplace.firefox.com");
 
+pref("xpinstall.signatures.required", false);
+
 pref("extensions.enabledScopes", 1);
 pref("extensions.autoupdate.enabled", true);
 pref("extensions.autoupdate.interval", 86400);
@@ -222,6 +224,9 @@ pref("extensions.blocklist.enabled", true);
 pref("extensions.blocklist.interval", 86400);
 pref("extensions.blocklist.url", "https://blocklist.addons.mozilla.org/blocklist/3/%APP_ID%/%APP_VERSION%/%PRODUCT%/%BUILD_ID%/%BUILD_TARGET%/%LOCALE%/%CHANNEL%/%OS_VERSION%/%DISTRIBUTION%/%DISTRIBUTION_VERSION%/%PING_COUNT%/%TOTAL_PING_COUNT%/%DAYS_SINCE_LAST_PING%/");
 pref("extensions.blocklist.detailsURL", "https://www.mozilla.com/%LOCALE%/blocklist/");
+
+/* Don't let XPIProvider install distribution add-ons; we do our own thing on mobile. */
+pref("extensions.installDistroAddons", false);
 
 /* block popups by default, and notify the user about blocked popups */
 pref("dom.disable_open_during_load", true);
@@ -403,7 +408,7 @@ pref("font.size.inflation.minTwips", 0);
 // When true, zooming will be enabled on all sites, even ones that declare user-scalable=no.
 pref("browser.ui.zoom.force-user-scalable", false);
 
-pref("ui.zoomedview.enabled", false);
+pref("ui.zoomedview.disabled", false);
 pref("ui.zoomedview.limitReadableSize", 8);  // value in layer pixels
 
 pref("ui.touch.radius.enabled", false);
@@ -579,6 +584,9 @@ pref("media.fragmented-mp4.enabled", true);
 pref("media.fragmented-mp4.android-media-codec.enabled", true);
 pref("media.fragmented-mp4.android-media-codec.preferred", true);
 
+// Enable MSE
+pref("media.mediasource.enabled", true);
+
 // optimize images memory usage
 pref("image.downscale-during-decode.enabled", true);
 pref("image.decode-only-on-draw.enabled", true);
@@ -598,13 +606,9 @@ pref("browser.safebrowsing.debug", false);
 
 pref("browser.safebrowsing.updateURL", "https://safebrowsing.google.com/safebrowsing/downloads?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2&key=%GOOGLE_API_KEY%");
 pref("browser.safebrowsing.gethashURL", "https://safebrowsing.google.com/safebrowsing/gethash?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2");
-pref("browser.safebrowsing.reportURL", "https://safebrowsing.google.com/safebrowsing/report?");
-pref("browser.safebrowsing.reportGenericURL", "https://%LOCALE%.phish-generic.mozilla.com/?hl=%LOCALE%");
-pref("browser.safebrowsing.reportErrorURL", "https://%LOCALE%.phish-error.mozilla.com/?hl=%LOCALE%");
-pref("browser.safebrowsing.reportPhishURL", "https://%LOCALE%.phish-report.mozilla.com/?hl=%LOCALE%");
-pref("browser.safebrowsing.reportMalwareURL", "https://%LOCALE%.malware-report.mozilla.com/?hl=%LOCALE%");
-pref("browser.safebrowsing.reportMalwareErrorURL", "https://%LOCALE%.malware-error.mozilla.com/?hl=%LOCALE%");
-
+pref("browser.safebrowsing.reportPhishMistakeURL", "https://%LOCALE%.phish-error.mozilla.com/?hl=%LOCALE%&url=");
+pref("browser.safebrowsing.reportPhishURL", "https://%LOCALE%.phish-report.mozilla.com/?hl=%LOCALE%&url=");
+pref("browser.safebrowsing.reportMalwareMistakeURL", "https://%LOCALE%.malware-error.mozilla.com/?hl=%LOCALE%&url=");
 pref("browser.safebrowsing.malware.reportURL", "https://safebrowsing.google.com/safebrowsing/diagnostic?client=%NAME%&hl=%LOCALE%&site=");
 
 pref("browser.safebrowsing.id", @MOZ_APP_UA_NAME@);
@@ -774,7 +778,7 @@ pref("browser.contentHandlers.types.3.type", "application/vnd.mozilla.maybe.feed
 // WebPayment
 pref("dom.mozPay.enabled", true);
 
-#ifndef RELEASE_BUILD
+#ifndef MOZ_PAY
 pref("dom.payment.provider.0.name", "Firefox Marketplace");
 pref("dom.payment.provider.0.description", "marketplace.firefox.com");
 pref("dom.payment.provider.0.uri", "https://marketplace.firefox.com/mozpay/?req=");
@@ -795,7 +799,17 @@ pref("media.useAudioChannelService", false);
 pref("gfx.canvas.azure.backends", "skia");
 pref("gfx.canvas.azure.accelerated", true);
 
-pref("general.useragent.override.youtube.com", "Android; Tablet;#Android; Mobile;");
+// See ua-update.json.in for the packaged UA override list
+// Disabling until we understand the cause of Bug 1178760
+pref("general.useragent.updates.enabled", false);
+pref("general.useragent.updates.url", "https://dynamicua.cdn.mozilla.net/0/%APP_ID%");
+pref("general.useragent.updates.interval", 604800); // 1 week
+pref("general.useragent.updates.retry", 86400); // 1 day
+
+// Youtube is broken with Android version in UA string. Bug 1174784.
+pref("general.useragent.override.youtube.com", "Android\\s\\d.+?;#Android;");
+// Gmail sends a busted site with Android version in UA string. Bug 1184320.
+pref("general.useragent.override.mail.google.com", "Android\\s\\d.+?;#Android;");
 
 // When true, phone number linkification is enabled.
 pref("browser.ui.linkify.phone", false);
@@ -881,17 +895,43 @@ pref("browser.readinglist.enabled", true);
 // Whether to use the unified telemetry behavior, requires a restart.
 pref("toolkit.telemetry.unified", false);
 
+// Turn off selection caret by default
+pref("selectioncaret.enabled", false);
+
 // Selection carets never fall-back to internal LongTap detector.
 pref("selectioncaret.detects.longtap", false);
 
-// Enable Service workers for Android on non-release builds
-#ifdef NIGHTLY_BUILD
-pref("dom.serviceWorkers.enabled", false);
-#endif
+// Selection carets override caret visibility.
+pref("selectioncaret.visibility.affectscaret", true);
+
+// Selection caret visibility observes composition
+// selections generated by soft keyboard managers.
+pref("selectioncaret.observes.compositions", true);
+
+// Turn off touch caret by default.
+pref("touchcaret.enabled", false);
+
+// TouchCaret never auto-hides.
+pref("touchcaret.expiration.time", 0);
+
+// Touch caret stays visible under a wider range of conditions
+// than the default b2g. We can display the caret in empty editables
+// for example, and do not auto-hide until loss of focus.
+pref("touchcaret.extendedvisibility", true);
+
+// The TouchCaret and the SelectionCarets will indicate when the
+// TextSelection actionbar is to be openned or closed.
+pref("caret.manages-android-actionbar", true);
 
 // Disable sending console to logcat on release builds.
 #ifdef RELEASE_BUILD
 pref("consoleservice.logcat", false);
 #else
 pref("consoleservice.logcat", true);
+#endif
+
+// Enable Service Workers for Android on non-release builds
+#ifndef RELEASE_BUILD
+pref("dom.serviceWorkers.enabled", false);
+pref("dom.serviceWorkers.interception.enabled", false);
 #endif

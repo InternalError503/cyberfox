@@ -18,6 +18,7 @@
 #include "nsPIDOMWindow.h"
 
 class nsIConsoleAPIStorage;
+class nsIProfiler;
 class nsIXPConnectJSObjectHolder;
 
 namespace mozilla {
@@ -158,7 +159,7 @@ private:
   // finds based the format string. The index of the styles matches the indexes
   // of elements that need the custom styling from aSequence. For elements with
   // no custom styling the array is padded with null elements.
-  void
+  bool
   ProcessArguments(JSContext* aCx, const nsTArray<JS::Heap<JS::Value>>& aData,
                    Sequence<JS::Value>& aSequence,
                    Sequence<JS::Value>& aStyles);
@@ -182,7 +183,7 @@ private:
             DOMHighResTimeStamp aTimestamp);
 
   // The method populates a Sequence from an array of JS::Value.
-  void
+  bool
   ArgumentsToValueList(const nsTArray<JS::Heap<JS::Value>>& aData,
                        Sequence<JS::Value>& aSequence);
 
@@ -203,6 +204,9 @@ private:
   nsCOMPtr<nsPIDOMWindow> mWindow;
   nsCOMPtr<nsIConsoleAPIStorage> mStorage;
   nsCOMPtr<nsIXPConnectJSObjectHolder> mSandbox;
+#ifdef MOZ_ENABLE_PROFILER_SPS
+  nsCOMPtr<nsIProfiler> mProfiler;
+#endif
 
   nsDataHashtable<nsStringHashKey, DOMHighResTimeStamp> mTimerRegistry;
   nsDataHashtable<nsStringHashKey, uint32_t> mCounterRegistry;

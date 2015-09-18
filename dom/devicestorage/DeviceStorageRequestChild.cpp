@@ -104,12 +104,13 @@ DeviceStorageRequestChild::
     {
       BlobResponse r = aValue;
       BlobChild* actor = static_cast<BlobChild*>(r.blobChild());
-      nsRefPtr<FileImpl> bloblImpl = actor->GetBlobImpl();
-      nsRefPtr<File> blob = new File(mRequest->GetParentObject(), bloblImpl);
+      nsRefPtr<BlobImpl> bloblImpl = actor->GetBlobImpl();
+      nsRefPtr<Blob> blob = Blob::Create(mRequest->GetParentObject(),
+                                         bloblImpl);
 
       AutoJSContext cx;
 
-      JS::Rooted<JSObject*> obj(cx, blob->WrapObject(cx, JS::NullPtr()));
+      JS::Rooted<JSObject*> obj(cx, blob->WrapObject(cx, nullptr));
       MOZ_ASSERT(obj);
 
       JS::Rooted<JS::Value> result(cx, JS::ObjectValue(*obj));
@@ -192,11 +193,12 @@ DeviceStorageRequestChild::
         = static_cast<nsDOMDeviceStorageCursor*>(mRequest.get());
 
       uint32_t count = r.paths().Length();
+      cursor->mFiles.SetCapacity(count);
       for (uint32_t i = 0; i < count; i++) {
         nsRefPtr<DeviceStorageFile> dsf
           = new DeviceStorageFile(r.type(), r.paths()[i].storageName(),
                                   r.rootdir(), r.paths()[i].name());
-        cursor->mFiles.AppendElement(dsf);
+        cursor->mFiles.AppendElement(dsf.forget());
       }
 
       nsRefPtr<ContinueCursorEvent> event = new ContinueCursorEvent(cursor);

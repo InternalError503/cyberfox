@@ -27,14 +27,10 @@
 #include "nsCOMPtr.h"                   // for already_AddRefed
 #include "nsDebug.h"                    // for NS_ASSERTION, NS_WARNING
 #include "nsISupportsImpl.h"            // for MOZ_COUNT_CTOR, etc
-#include "nsSize.h"                     // for nsIntSize
 #include "nsTArray.h"                   // for nsAutoTArray, nsTArray, etc
 #include "nsThreadUtils.h"              // for nsRunnable
 #include "nsXULAppAPI.h"                // for XRE_GetProcessType
 #include "nscore.h"                     // for NS_IMETHOD
-#ifdef MOZ_WIDGET_GONK
-#include <ui/GraphicBuffer.h>
-#endif
 #include "gfxVR.h"
 
 class nsIWidget;
@@ -233,7 +229,8 @@ public:
                         const gfx::Rect& aClipRect,
                         const EffectChain &aEffectChain,
                         gfx::Float aOpacity,
-                        const gfx::Matrix4x4 &aTransform) override;
+                        const gfx::Matrix4x4& aTransform,
+                        const gfx::Rect& aVisibleRect) override;
 
   virtual void EndFrame() override;
   virtual void SetDispAcquireFence(Layer* aLayer) override;
@@ -339,7 +336,7 @@ private:
   gfx::Matrix4x4 mProjMatrix;
 
   /** The size of the surface we are rendering to */
-  nsIntSize mSurfaceSize;
+  gfx::IntSize mSurfaceSize;
 
   ScreenPoint mRenderOffset;
 
@@ -391,7 +388,8 @@ private:
   ShaderConfigOGL GetShaderConfigFor(Effect *aEffect,
                                      MaskType aMask = MaskType::MaskNone,
                                      gfx::CompositionOp aOp = gfx::CompositionOp::OP_OVER,
-                                     bool aColorMatrix = false) const;
+                                     bool aColorMatrix = false,
+                                     bool aDEAAEnabled = false) const;
   ShaderProgramOGL* GetShaderProgramFor(const ShaderConfigOGL &aConfig);
 
   /**
@@ -422,7 +420,8 @@ private:
                                       const gfx::Rect& aRect,
                                       const gfx::Rect& aTexCoordRect,
                                       TextureSource *aTexture);
-
+  gfx::Point3D GetLineCoefficients(const gfx::Point& aPoint1,
+                                   const gfx::Point& aPoint2);
   void ActivateProgram(ShaderProgramOGL *aProg);
   void CleanupResources();
 
@@ -441,7 +440,7 @@ private:
    * y-axis pointing downwards, for good reason as Web pages are typically
    * scrolled downwards. So, some flipping has to take place; FlippedY does it.
    */
-  GLint FlipY(GLint y) const { return mHeight - y; }
+  GLint FlipY(GLint y) const { return mViewportSize.height - y; }
 
   RefPtr<CompositorTexturePoolOGL> mTexturePool;
 
@@ -450,13 +449,15 @@ private:
   bool mDestroyed;
 
   /**
-   * Height of the OpenGL context's primary framebuffer in pixels. Used by
-   * FlipY for the y-flipping calculation.
+   * Size of the OpenGL context's primary framebuffer in pixels. Used by
+   * FlipY for the y-flipping calculation and by the DEAA shader.
    */
-  GLint mHeight;
+  gfx::IntSize mViewportSize;
 
   FenceHandle mReleaseFenceHandle;
   ShaderProgramOGL *mCurrentProgram;
+
+  gfx::Rect mRenderBoundsOut;
 
   CompositorOGLVRObjects mVR;
 };

@@ -287,6 +287,7 @@ private:
    */
   CommandResult configureInterface(NetworkParams& aOptions);
   CommandResult dhcpRequest(NetworkParams& aOptions);
+  CommandResult stopDhcp(NetworkParams& aOptions);
   CommandResult enableInterface(NetworkParams& aOptions);
   CommandResult disableInterface(NetworkParams& aOptions);
   CommandResult resetConnections(NetworkParams& aOptions);
@@ -362,6 +363,8 @@ private:
   static void addRouteToLocalNetwork(PARAMS);
   static void preTetherInterfaceList(PARAMS);
   static void postTetherInterfaceList(PARAMS);
+  static void addUpstreamInterface(PARAMS);
+  static void removeUpstreamInterface(PARAMS);
   static void setIpForwardingEnabled(PARAMS);
   static void tetheringStatus(PARAMS);
   static void stopTethering(PARAMS);

@@ -13,11 +13,17 @@
 #include "pratom.h"
 #include "GeckoProfiler.h"
 #include "mozilla/Atomics.h"
+#include "mozilla/Logging.h"
 #ifdef MOZ_NUWA_PROCESS
 #include "ipc/Nuwa.h"
 #endif
+#ifdef MOZ_TASK_TRACER
+#include "GeckoTaskTracerImpl.h"
+using namespace mozilla::tasktracer;
+#endif
 
 using mozilla::Atomic;
+using mozilla::LogLevel;
 using mozilla::TimeDuration;
 using mozilla::TimeStamp;
 
@@ -313,14 +319,14 @@ nsTimerImpl::Startup()
 void
 nsTimerImpl::Shutdown()
 {
-  if (PR_LOG_TEST(GetTimerLog(), PR_LOG_DEBUG)) {
+  if (MOZ_LOG_TEST(GetTimerLog(), LogLevel::Debug)) {
     double mean = 0, stddev = 0;
     myNS_MeanAndStdDev(sDeltaNum, sDeltaSum, sDeltaSumSquared, &mean, &stddev);
 
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("sDeltaNum = %f, sDeltaSum = %f, sDeltaSumSquared = %f\n",
             sDeltaNum, sDeltaSum, sDeltaSumSquared));
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("mean: %fms, stddev: %fms\n", mean, stddev));
   }
 
@@ -455,12 +461,6 @@ nsTimerImpl::SetDelay(uint32_t aDelay)
     return NS_ERROR_NOT_INITIALIZED;
   }
 
-  // If we're already repeating precisely, update mTimeout now so that the
-  // new delay takes effect in the future.
-  if (!mTimeout.IsNull() && mType == TYPE_REPEATING_PRECISE) {
-    mTimeout = TimeStamp::Now();
-  }
-
   SetDelayInternal(aDelay);
 
   if (!mFiring && gThread) {
@@ -549,27 +549,13 @@ nsTimerImpl::Fire()
     return;
   }
 
-#ifdef MOZ_NUWA_PROCESS
-  if (IsNuwaProcess() && IsNuwaReady()) {
-    // A timer event fired after Nuwa frozen can freeze main thread.
-    return;
-  }
-#endif
-
 #if !defined(MOZILLA_XPCOMRT_API)
   PROFILER_LABEL("Timer", "Fire",
                  js::ProfileEntry::Category::OTHER);
 #endif
 
-#ifdef MOZ_TASK_TRACER
-  // mTracedTask is an instance of FakeTracedTask created by
-  // DispatchTracedTask(). AutoRunFakeTracedTask logs the begin/end time of the
-  // timer/FakeTracedTask instance in ctor/dtor.
-  mozilla::tasktracer::AutoRunFakeTracedTask runTracedTask(mTracedTask);
-#endif
-
   TimeStamp now = TimeStamp::Now();
-  if (PR_LOG_TEST(GetTimerLog(), PR_LOG_DEBUG)) {
+  if (MOZ_LOG_TEST(GetTimerLog(), LogLevel::Debug)) {
     TimeDuration   a = now - mStart; // actual delay in intervals
     TimeDuration   b = TimeDuration::FromMilliseconds(mDelay); // expected delay in intervals
     TimeDuration   delta = (a > b) ? a - b : b - a;
@@ -578,14 +564,14 @@ nsTimerImpl::Fire()
     sDeltaSumSquared += double(d) * double(d);
     sDeltaNum++;
 
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("[this=%p] expected delay time %4ums\n", this, mDelay));
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("[this=%p] actual delay time   %fms\n", this,
             a.ToMilliseconds()));
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("[this=%p] (mType is %d)       -------\n", this, mType));
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("[this=%p]     delta           %4dms\n",
             this, (a > b) ? (int32_t)d : -(int32_t)d));
 
@@ -650,14 +636,13 @@ nsTimerImpl::Fire()
   mFiring = false;
   mTimerCallbackWhileFiring = nullptr;
 
-  PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+  MOZ_LOG(GetTimerLog(), LogLevel::Debug,
          ("[this=%p] Took %fms to fire timer callback\n",
           this, (TimeStamp::Now() - now).ToMilliseconds()));
 
-  // Reschedule repeating timers, except REPEATING_PRECISE which already did
-  // that in PostTimerEvent, but make sure that we aren't armed already (which
-  // can happen if the callback reinitialized the timer).
-  if (IsRepeating() && mType != TYPE_REPEATING_PRECISE && !mArmed) {
+  // Reschedule repeating timers, but make sure that we aren't armed already
+  // (which can happen if the callback reinitialized the timer).
+  if (IsRepeating() && !mArmed) {
     if (mType == TYPE_REPEATING_SLACK) {
       SetDelayInternal(mDelay);  // force mTimeout to be recomputed.  For
     }
@@ -698,9 +683,9 @@ nsTimerEvent::Run()
     return NS_OK;
   }
 
-  if (PR_LOG_TEST(GetTimerLog(), PR_LOG_DEBUG)) {
+  if (MOZ_LOG_TEST(GetTimerLog(), LogLevel::Debug)) {
     TimeStamp now = TimeStamp::Now();
-    PR_LOG(GetTimerLog(), PR_LOG_DEBUG,
+    MOZ_LOG(GetTimerLog(), LogLevel::Debug,
            ("[this=%p] time between PostTimerEvent() and Fire(): %fms\n",
             this, (now - mInitTime).ToMilliseconds()));
   }
@@ -739,23 +724,23 @@ nsTimerImpl::PostTimerEvent(already_AddRefed<nsTimerImpl> aTimerRef)
     return timer.forget();
   }
 
-  if (PR_LOG_TEST(GetTimerLog(), PR_LOG_DEBUG)) {
+  if (MOZ_LOG_TEST(GetTimerLog(), LogLevel::Debug)) {
     event->mInitTime = TimeStamp::Now();
   }
 
   // If this is a repeating precise timer, we need to calculate the time for
-  // the next timer to fire before we make the callback.
+  // the next timer to fire before we make the callback. But don't re-arm.
   if (timer->IsRepeatingPrecisely()) {
     timer->SetDelayInternal(timer->mDelay);
-
-    // But only re-arm REPEATING_PRECISE timers.
-    if (gThread && timer->mType == TYPE_REPEATING_PRECISE) {
-      nsresult rv = gThread->AddTimer(timer);
-      if (NS_FAILED(rv)) {
-        return timer.forget();
-      }
-    }
   }
+
+#ifdef MOZ_TASK_TRACER
+  // During the dispatch of TimerEvent, we overwrite the current TraceInfo
+  // partially with the info saved in timer earlier, and restore it back by
+  // AutoSaveCurTraceInfo.
+  AutoSaveCurTraceInfo saveCurTraceInfo;
+  (timer->GetTracedTask()).SetTLSTraceInfo();
+#endif
 
   nsIEventTarget* target = timer->mEventTarget;
   event->SetTimer(timer.forget());
@@ -780,13 +765,11 @@ nsTimerImpl::SetDelayInternal(uint32_t aDelay)
   mDelay = aDelay;
 
   TimeStamp now = TimeStamp::Now();
-  if (mTimeout.IsNull() || mType != TYPE_REPEATING_PRECISE) {
-    mTimeout = now;
-  }
+  mTimeout = now;
 
   mTimeout += delayInterval;
 
-  if (PR_LOG_TEST(GetTimerLog(), PR_LOG_DEBUG)) {
+  if (MOZ_LOG_TEST(GetTimerLog(), LogLevel::Debug)) {
     if (mStart.IsNull()) {
       mStart = now;
     } else {
@@ -800,3 +783,18 @@ nsTimerImpl::SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
 {
   return aMallocSizeOf(this);
 }
+
+#ifdef MOZ_TASK_TRACER
+void
+nsTimerImpl::GetTLSTraceInfo()
+{
+  mTracedTask.GetTLSTraceInfo();
+}
+
+TracedTaskCommon
+nsTimerImpl::GetTracedTask()
+{
+  return mTracedTask;
+}
+#endif
+

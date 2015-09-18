@@ -109,6 +109,9 @@ public:
   void IgnoreWaitingCall();
   void ToggleCalls();
 
+  // Handle unexpected backend crash
+  void HandleBackendError();
+
   //
   // Bluetooth notifications
   //
@@ -208,8 +211,8 @@ private:
   int mCurrentVgs;
   int mCurrentVgm;
   bool mReceiveVgsFlag;
+  // This flag is for HFP only, not for HSP.
   bool mDialingRequestProcessed;
-  bool mFirstCKPD;
   PhoneType mPhoneType;
   nsString mDeviceAddress;
   nsString mMsisdn;

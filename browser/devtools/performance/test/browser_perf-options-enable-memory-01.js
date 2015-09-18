@@ -5,7 +5,7 @@
  * Tests that `enable-memory` toggles the visibility of the memory graph,
  * as well as enabling memory data on the PerformanceFront.
  */
-function spawnTest () {
+function* spawnTest() {
   let { panel } = yield initPerformance(SIMPLE_URL);
   let { EVENTS, PerformanceController, $ } = panel.panelWin;
 
@@ -30,8 +30,8 @@ function spawnTest () {
   ok(!$("#memory-overview").hidden, "memory graph is not hidden when memory enabled before recording");
   is(PerformanceController.getCurrentRecording().getConfiguration().withMemory, true,
     "PerformanceFront started with memory recording.");
-  is(PerformanceController.getCurrentRecording().getConfiguration().withAllocations, true,
-    "PerformanceFront started with allocations recording.");
+  is(PerformanceController.getCurrentRecording().getConfiguration().withAllocations, false,
+    "PerformanceFront did not record with allocations.");
 
   yield teardown(panel);
   finish();

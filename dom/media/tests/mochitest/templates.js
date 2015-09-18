@@ -405,7 +405,7 @@ var commandsPeerConnectionOfferAnswer = [
   },
 
   function PC_LOCAL_SET_REMOTE_DESCRIPTION(test) {
-    test.setRemoteDescription(test.pcLocal, test._remote_answer, STABLE)
+    return test.setRemoteDescription(test.pcLocal, test._remote_answer, STABLE)
       .then(() => {
         is(test.pcLocal.signalingState, STABLE,
            "signalingState after local setRemoteDescription is 'stable'");
@@ -446,13 +446,14 @@ var commandsPeerConnectionOfferAnswer = [
     return test.pcRemote.checkMediaTracks();
   },
 
-  function PC_LOCAL_CHECK_MEDIA_FLOW_PRESENT(test) {
-    return test.pcLocal.checkMediaFlowPresent();
+  function PC_LOCAL_WAIT_FOR_MEDIA_FLOW(test) {
+    return test.pcLocal.waitForMediaFlow();
   },
 
-  function PC_REMOTE_CHECK_MEDIA_FLOW_PRESENT(test) {
-    return test.pcRemote.checkMediaFlowPresent();
+  function PC_REMOTE_WAIT_FOR_MEDIA_FLOW(test) {
+    return test.pcRemote.waitForMediaFlow();
   },
+
   function PC_LOCAL_CHECK_STATS(test) {
     return test.pcLocal.getStats(null).then(stats => {
       test.pcLocal.checkStats(stats, test.steeplechase);

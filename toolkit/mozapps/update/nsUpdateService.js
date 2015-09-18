@@ -1037,10 +1037,9 @@ function shouldUseService() {
 }
 
 /**
- * Determines if the service is is installed and enabled or not.
+ * Determines if the service is is installed.
  *
- * @return  true if the service should be used for updates,
- *          is installed and enabled.
+ * @return  true if the service is installed.
  */
 function isServiceInstalled() {
   if (AppConstants.MOZ_MAINTENANCE_SERVICE && AppConstants.platform == "win") {
@@ -3498,7 +3497,7 @@ Checker.prototype = {
       let buildType = sysLibs.libcutils.property_get("ro.build.type");
       url = url.replace(/%PRODUCT_MODEL%/g,
                         sysLibs.libcutils.property_get("ro.product.model"));
-      if (buildType == "user") {
+      if (buildType == "user" || buildType == "userdebug") {
         url = url.replace(/%PRODUCT_DEVICE%/g, productDevice);
       } else {
         url = url.replace(/%PRODUCT_DEVICE%/g, productDevice + "-" + buildType);
@@ -3634,7 +3633,7 @@ Checker.prototype = {
 
     var prefs = Services.prefs;
     var certs = null;
-    if (!prefs.prefHasUserValue(PREF_APP_UPDATE_URL_OVERRIDE) &&
+    if (!getPref("getCharPref", PREF_APP_UPDATE_URL_OVERRIDE, null) &&
         getPref("getBoolPref", PREF_APP_UPDATE_CERT_CHECKATTRS, true)) {
       certs = gCertUtils.readCertPrefs(PREF_APP_UPDATE_CERTS_BRANCH);
     }
@@ -4568,13 +4567,16 @@ UpdatePrompt.prototype = {
    * See nsIUpdateService.idl
    */
   showUpdateDownloaded: function UP_showUpdateDownloaded(update, background) {
+    if (background && getPref("getBoolPref", PREF_APP_UPDATE_SILENT, false)) {
+      return;
+    }
+    // Trigger the display of the hamburger menu badge.
+    Services.obs.notifyObservers(null, "update-downloaded", update.state);
+
     if (this._getAltUpdateWindow())
       return;
 
     if (background) {
-      if (getPref("getBoolPref", PREF_APP_UPDATE_SILENT, false))
-        return;
-
       var stringsPrefix = "updateDownloaded_" + update.type + ".";
       var title = gUpdateBundle.formatStringFromName(stringsPrefix + "title",
                                                      [update.name], 1);

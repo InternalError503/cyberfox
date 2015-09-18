@@ -262,13 +262,16 @@ CompositorChild::RecvUpdatePluginConfigurations(const nsIntPoint& aContentOffset
 
   // Tracks visible plugins we update, so we can hide any plugins we don't.
   nsTArray<uintptr_t> visiblePluginIds;
-
+  nsIWidget* parent = nullptr;
   for (uint32_t pluginsIdx = 0; pluginsIdx < aPlugins.Length(); pluginsIdx++) {
     nsIWidget* widget =
       nsIWidget::LookupRegisteredPluginWindow(aPlugins[pluginsIdx].windowId());
     if (!widget) {
       NS_WARNING("Unexpected, plugin id not found!");
       continue;
+    }
+    if (!parent) {
+      parent = widget->GetParent();
     }
     bool isVisible = aPlugins[pluginsIdx].visible();
     if (widget && !widget->Destroyed()) {
@@ -321,13 +324,14 @@ CompositorChild::RecvUpdatePluginConfigurations(const nsIntPoint& aContentOffset
   }
   // Any plugins we didn't update need to be hidden, as they are
   // not associated with visible content.
-  nsIWidget::UpdateRegisteredPluginWindowVisibility(visiblePluginIds);
+  nsIWidget::UpdateRegisteredPluginWindowVisibility((uintptr_t)parent, visiblePluginIds);
   return true;
 #endif // !defined(XP_WIN) && !defined(MOZ_WIDGET_GTK)
 }
 
 bool
-CompositorChild::RecvUpdatePluginVisibility(nsTArray<uintptr_t>&& aVisibleIdList)
+CompositorChild::RecvUpdatePluginVisibility(const uintptr_t& aOwnerWidget,
+                                            nsTArray<uintptr_t>&& aVisibleIdList)
 {
 #if !defined(XP_WIN) && !defined(MOZ_WIDGET_GTK)
   NS_NOTREACHED("CompositorChild::RecvUpdatePluginVisibility calls "
@@ -335,7 +339,7 @@ CompositorChild::RecvUpdatePluginVisibility(nsTArray<uintptr_t>&& aVisibleIdList
   return false;
 #else
   MOZ_ASSERT(NS_IsMainThread());
-  nsIWidget::UpdateRegisteredPluginWindowVisibility(aVisibleIdList);
+  nsIWidget::UpdateRegisteredPluginWindowVisibility(aOwnerWidget, aVisibleIdList);
   return true;
 #endif // !defined(XP_WIN) && !defined(MOZ_WIDGET_GTK)
 }
@@ -370,6 +374,16 @@ CompositorChild::AddOverfillObserver(ClientLayerManager* aLayerManager)
 {
   MOZ_ASSERT(aLayerManager);
   mOverfillObservers.AppendElement(aLayerManager);
+}
+
+bool
+CompositorChild::RecvClearCachedResources(const uint64_t& aId)
+{
+  dom::TabChild* child = dom::TabChild::GetFrom(aId);
+  if (child) {
+    child->ClearCachedResources();
+  }
+  return true;
 }
 
 void
@@ -547,6 +561,26 @@ CompositorChild::SendResume()
     return true;
   }
   return PCompositorChild::SendResume();
+}
+
+bool
+CompositorChild::SendNotifyHidden(const uint64_t& id)
+{
+  MOZ_ASSERT(mCanSend);
+  if (!mCanSend) {
+    return true;
+  }
+  return PCompositorChild::SendNotifyHidden(id);
+}
+
+bool
+CompositorChild::SendNotifyVisible(const uint64_t& id)
+{
+  MOZ_ASSERT(mCanSend);
+  if (!mCanSend) {
+    return true;
+  }
+  return PCompositorChild::SendNotifyVisible(id);
 }
 
 bool

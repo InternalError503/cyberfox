@@ -18,10 +18,10 @@ let tests = [
   function test_untrusted_host(done) {
     loadUITourTestPage(function() {
       let bookmarksMenu = document.getElementById("bookmarks-menu-button");
-      ise(bookmarksMenu.open, false, "Bookmark menu should initially be closed");
+      is(bookmarksMenu.open, false, "Bookmark menu should initially be closed");
 
       gContentAPI.showMenu("bookmarks");
-      ise(bookmarksMenu.open, false, "Bookmark menu should not open on a untrusted host");
+      is(bookmarksMenu.open, false, "Bookmark menu should not open on a untrusted host");
 
       done();
     }, "http://mochi.test:8888/");
@@ -46,10 +46,10 @@ let tests = [
   function test_unsecure_host(done) {
     loadUITourTestPage(function() {
       let bookmarksMenu = document.getElementById("bookmarks-menu-button");
-      ise(bookmarksMenu.open, false, "Bookmark menu should initially be closed");
+      is(bookmarksMenu.open, false, "Bookmark menu should initially be closed");
 
       gContentAPI.showMenu("bookmarks");
-      ise(bookmarksMenu.open, false, "Bookmark menu should not open on a unsecure host");
+      is(bookmarksMenu.open, false, "Bookmark menu should not open on a unsecure host");
 
       done();
     }, "http://example.com/");
@@ -70,10 +70,10 @@ let tests = [
     Services.prefs.setBoolPref("browser.uitour.enabled", false);
 
     let bookmarksMenu = document.getElementById("bookmarks-menu-button");
-    ise(bookmarksMenu.open, false, "Bookmark menu should initially be closed");
+    is(bookmarksMenu.open, false, "Bookmark menu should initially be closed");
 
     gContentAPI.showMenu("bookmarks");
-    ise(bookmarksMenu.open, false, "Bookmark menu should not open when feature is disabled");
+    is(bookmarksMenu.open, false, "Bookmark menu should not open when feature is disabled");
 
     Services.prefs.setBoolPref("browser.uitour.enabled", true);
     done();

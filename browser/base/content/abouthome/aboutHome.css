@@ -15,6 +15,7 @@ html {
   background-color: hsl(0,0%,95%);
   color: #000;
   height: 100%;
+  -moz-user-select: none;
 }
 
 body {

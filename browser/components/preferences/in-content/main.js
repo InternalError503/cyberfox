@@ -174,7 +174,7 @@ var gMainPane = {
         Components.utils.import("resource://gre/modules/UpdateChannel.jsm", tmp);
         if (!e10sCheckbox.checked && tmp.UpdateChannel.get() != "default") {
           Services.prefs.setBoolPref("browser.requestE10sFeedback", true);
-          Services.prompt.alert(window, brandName, "After restart, a tab will open to input.mozilla.org where you can provide us feedback about your e10s experience.");
+          Services.prompt.alert(window, brandName, bundle.getString("e10sFeedbackAfterRestart"));
         }
         Services.startup.quit(Ci.nsIAppStartup.eAttemptQuit |  Ci.nsIAppStartup.eRestart);
       }
@@ -536,7 +536,10 @@ _setNewTabPageToBookmarkClosed: function(rv, aEvent) {
    * downloads are automatically saved, updating preferences and UI in
    * response to the choice, if one is made.
    */
-  chooseFolder() this.chooseFolderTask().catch(Components.utils.reportError),
+  chooseFolder()
+  {
+    return this.chooseFolderTask().catch(Components.utils.reportError);
+  },
   chooseFolderTask: Task.async(function* ()
   {
     let bundlePreferences = document.getElementById("bundlePreferences");

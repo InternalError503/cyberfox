@@ -628,7 +628,11 @@ class Marionette(object):
             self.port = self.emulator.setup_port_forwarding(remote_port=self.port)
             assert(self.emulator.wait_for_port(self.port)), "Timed out waiting for port!"
 
-        self.client = MarionetteTransport(self.host, self.port, self.socket_timeout)
+        self.client = MarionetteTransport(
+            self.host,
+            self.port,
+            self.socket_timeout,
+            instance=self.instance)
 
         if emulator:
             if busybox:
@@ -787,15 +791,43 @@ class Marionette(object):
                     typing.append(val[i])
         return typing
 
-    def push_permission(self, perm_type, allow):
+    def get_permission(self, perm):
+        with self.using_context('content'):
+            value = self.execute_script("""
+                let value = {
+                              'url': document.nodePrincipal.URI.spec,
+                              'appId': document.nodePrincipal.appId,
+                              'isInBrowserElement': document.nodePrincipal.isInBrowserElement,
+                              'type': arguments[0]
+                            };
+                return value;
+                """, script_args=[perm], sandbox='system')
+
+        with self.using_context('chrome'):
+            permission = self.execute_script("""
+                Components.utils.import("resource://gre/modules/Services.jsm");
+                let perm = arguments[0];
+                let secMan = Services.scriptSecurityManager;
+                let principal = secMan.getAppCodebasePrincipal(
+                                Services.io.newURI(perm.url, null, null),
+                                perm.appId, perm.isInBrowserElement);
+                let testPerm = Services.perms.testPermissionFromPrincipal(
+                               principal, perm.type);
+                return testPerm;
+                """, script_args=[value])
+        return permission
+
+    def push_permission(self, perm, allow):
         with self.using_context('content'):
             perm = self.execute_script("""
                 let allow = arguments[0];
-                if (allow) {
-                  allow = Components.interfaces.nsIPermissionManager.ALLOW_ACTION;
-                }
-                else {
-                  allow = Components.interfaces.nsIPermissionManager.DENY_ACTION;
+                if (typeof(allow) == "boolean") {
+                    if (allow) {
+                      allow = Components.interfaces.nsIPermissionManager.ALLOW_ACTION;
+                    }
+                    else {
+                      allow = Components.interfaces.nsIPermissionManager.DENY_ACTION;
+                    }
                 }
                 let perm_type = arguments[1];
 
@@ -821,35 +853,59 @@ class Marionette(object):
                               'action': allow
                             };
                 return value;
-                """, script_args=[allow, perm_type], sandbox='system')
+                """, script_args=[allow, perm], sandbox='system')
+
+        current_perm = self.get_permission(perm['type'])
+        if current_perm == perm['action']:
+            with self.using_context('content'):
+                self.execute_script("""
+                    Components.utils.import("resource://gre/modules/Services.jsm");
+                    Services.obs.removeObserver(window.wrappedJSObject.permObserver, "perm-changed");
+                    """, sandbox='system')
+            return
 
         with self.using_context('chrome'):
-            waiting = self.execute_script("""
+            self.execute_script("""
                 Components.utils.import("resource://gre/modules/Services.jsm");
                 let perm = arguments[0];
                 let secMan = Services.scriptSecurityManager;
                 let principal = secMan.getAppCodebasePrincipal(Services.io.newURI(perm.url, null, null),
                                 perm.appId, perm.isInBrowserElement);
-                let testPerm = Services.perms.testPermissionFromPrincipal(principal, perm.type, perm.action);
-                if (testPerm == perm.action) {
-                  return false;
-                }
                 Services.perms.addFromPrincipal(principal, perm.type, perm.action);
                 return true;
                 """, script_args=[perm])
 
         with self.using_context('content'):
-            if waiting:
-                self.execute_async_script("""
-                    waitFor(marionetteScriptFinished, function() {
-                      return window.wrappedJSObject.permChanged;
-                    });
-                    """, sandbox='system')
-            else:
-                self.execute_script("""
-                    Components.utils.import("resource://gre/modules/Services.jsm");
-                    Services.obs.removeObserver(window.wrappedJSObject.permObserver, "perm-changed");
-                    """, sandbox='system')
+            self.execute_async_script("""
+                waitFor(marionetteScriptFinished, function() {
+                  return window.wrappedJSObject.permChanged;
+                });
+                """, sandbox='system')
+
+    @contextmanager
+    def using_permissions(self, perms):
+        '''
+        Sets permissions for code being executed in a `with` block,
+        and restores them on exit.
+
+        :param perms: A dict containing one or more perms and their
+        values to be set.
+
+        Usage example::
+
+          with marionette.using_permissions({'systemXHR': True}):
+              ... do stuff ...
+        '''
+        original_perms = {}
+        for perm in perms:
+            original_perms[perm] = self.get_permission(perm)
+            self.push_permission(perm, perms[perm])
+
+        try:
+            yield
+        finally:
+            for perm in original_perms:
+                self.push_permission(perm, original_perms[perm])
 
     def enforce_gecko_prefs(self, prefs):
         """
@@ -920,6 +976,9 @@ class Marionette(object):
             ]
             self._send_message('quitApplication', flags=restart_flags)
             self.client.close()
+            # The instance is restarting itself; we will no longer be able to
+            # track it by pid, so mark it as 'detached'.
+            self.instance.detached = True
         else:
             self.delete_session()
             self.instance.restart(clean=clean)
@@ -947,6 +1006,11 @@ class Marionette(object):
             passed in then one will be generated by the marionette server.
 
         :returns: A dict of the capabilities offered."""
+        if self.instance:
+            returncode = self.instance.runner.process_handler.proc.returncode
+            if returncode is not None:
+                # We're managing a binary which has terminated, so restart it.
+                self.instance.restart()
         self.wait_for_port(timeout=timeout)
         self.session = self._send_message('newSession', 'value', capabilities=desired_capabilities, sessionId=session_id)
         self.b2g = 'b2g' in self.session
@@ -1349,9 +1413,9 @@ class Marionette(object):
         return unwrapped
 
     def execute_js_script(self, script, script_args=None, async=True,
-                          new_sandbox=True, special_powers=False,
-                          script_timeout=None, inactivity_timeout=None,
-                          filename=None, sandbox='default'):
+                          new_sandbox=True, script_timeout=None,
+                          inactivity_timeout=None, filename=None,
+                          sandbox='default'):
         if script_args is None:
             script_args = []
         args = self.wrapArguments(script_args)
@@ -1361,7 +1425,6 @@ class Marionette(object):
                                       args=args,
                                       async=async,
                                       newSandbox=new_sandbox,
-                                      specialPowers=special_powers,
                                       scriptTimeout=script_timeout,
                                       inactivityTimeout=inactivity_timeout,
                                       filename=filename,
@@ -1369,7 +1432,7 @@ class Marionette(object):
         return self.unwrapValue(response)
 
     def execute_script(self, script, script_args=None, new_sandbox=True,
-                       special_powers=False, sandbox='default', script_timeout=None):
+                       sandbox='default', script_timeout=None):
         '''
         Executes a synchronous JavaScript script, and returns the result (or None if the script does return a value).
 
@@ -1379,11 +1442,6 @@ class Marionette(object):
 
         :param script: A string containing the JavaScript to execute.
         :param script_args: A list of arguments to pass to the script.
-        :param special_powers: Whether or not you want access to SpecialPowers
-         in your script. Set to False by default because it shouldn't really
-         be used, since you already have access to chrome-level commands if you
-         set context to chrome and do an execute_script. This method was added
-         only to help us run existing Mochitests.
         :param sandbox: A tag referring to the sandbox you wish to use; if
          you specify a new tag, a new sandbox will be created.  If you use the
          special tag 'system', the sandbox will be created using the system
@@ -1446,7 +1504,6 @@ class Marionette(object):
                                       args=args,
                                       newSandbox=new_sandbox,
                                       sandbox=sandbox,
-                                      specialPowers=special_powers,
                                       scriptTimeout=script_timeout,
                                       line=int(frame[1]),
                                       filename=os.path.basename(frame[0]))
@@ -1454,7 +1511,7 @@ class Marionette(object):
 
     def execute_async_script(self, script, script_args=None, new_sandbox=True,
                              sandbox='default', script_timeout=None,
-                             special_powers=False, debug_script=False):
+                             debug_script=False):
         '''
         Executes an asynchronous JavaScript script, and returns the result (or None if the script does return a value).
 
@@ -1464,11 +1521,6 @@ class Marionette(object):
 
         :param script: A string containing the JavaScript to execute.
         :param script_args: A list of arguments to pass to the script.
-        :param special_powers: Whether or not you want access to SpecialPowers
-         in your script. Set to False by default because it shouldn't really
-         be used, since you already have access to chrome-level commands if you
-         set context to chrome and do an execute_script. This method was added
-         only to help us run existing Mochitests.
         :param sandbox: A tag referring to the sandbox you wish to use; if
          you specify a new tag, a new sandbox will be created.  If you use the
          special tag 'system', the sandbox will be created using the system
@@ -1503,7 +1555,6 @@ class Marionette(object):
                                       args=args,
                                       newSandbox=new_sandbox,
                                       sandbox=sandbox,
-                                      specialPowers=special_powers,
                                       scriptTimeout=script_timeout,
                                       line=int(frame[1]),
                                       filename=os.path.basename(frame[0]),

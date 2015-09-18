@@ -30,19 +30,6 @@ void
 UuidToString(const BluetoothUuid& aUuid, nsAString& aString);
 
 /**
- * Convert BluetoothUuid object in a reversed byte order to
- * xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx uuid string.
- * Bluedroid stack reports the BluetoothUuid in a reversed byte order for
- * GATT service, characteristic, descriptor uuids.
- *
- * Note: This utility function is used by gecko internal only to convert
- * BluetoothUuid in a reversed byte order created by bluetooth stack to uuid
- * string representation.
- */
-void
-ReversedUuidToString(const BluetoothUuid& aUuid, nsAString& aString);
-
-/**
  * Convert xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx uuid string to BluetoothUuid object.
  *
  * Note: This utility function is used by gecko internal only to convert uuid
@@ -62,18 +49,6 @@ GenerateUuid(nsAString &aUuidString);
 //
 // Generate bluetooth signal path from GattId
 //
-
-/**
- * Generate bluetooth signal path and UUID string from a GattId.
- *
- * @param aId      [in] GattId value to convert.
- * @param aPath    [out] Bluetooth signal path generated from aId.
- * @param aUuidStr [out] UUID string generated from aId.
- */
-void
-GeneratePathFromGattId(const BluetoothGattId& aId,
-                       nsAString& aPath,
-                       nsAString& aUuidStr);
 
 /**
  * Generate bluetooth signal path from a GattId.
@@ -127,7 +102,6 @@ BroadcastSystemMessage(const nsAString& aType,
 // Dispatch bluetooth reply to main thread
 //
 
-#ifdef MOZ_B2G_BT_API_V2
 /**
  * Dispatch successful bluetooth reply with NO value to reply request.
  *
@@ -177,19 +151,6 @@ DispatchReplyError(BluetoothReplyRunnable* aRunnable,
 void
 DispatchReplyError(BluetoothReplyRunnable* aRunnable,
                    const enum BluetoothStatus aStatus);
-#else
-// TODO: remove with bluetooth1
-void
-DispatchBluetoothReply(BluetoothReplyRunnable* aRunnable,
-                       const BluetoothValue& aValue,
-                       const nsAString& aErrorStr);
-
-// TODO: remove with bluetooth1
-void
-DispatchStatusChangedEvent(const nsAString& aType,
-                           const nsAString& aDeviceAddress,
-                           bool aStatus);
-#endif
 
 void
 DispatchStatusChangedEvent(const nsAString& aType,

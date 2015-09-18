@@ -5,7 +5,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 #include "AndroidMediaReader.h"
 #include "mozilla/TimeStamp.h"
-#include "mozilla/dom/TimeRanges.h"
 #include "mozilla/gfx/Point.h"
 #include "MediaResource.h"
 #include "VideoUtils.h"
@@ -19,6 +18,7 @@
 namespace mozilla {
 
 using namespace mozilla::gfx;
+using namespace mozilla::media;
 
 typedef mozilla::layers::Image Image;
 typedef mozilla::layers::PlanarYCbCrImage PlanarYCbCrImage;
@@ -56,8 +56,7 @@ nsresult AndroidMediaReader::ReadMetadata(MediaInfo* aInfo,
   int64_t durationUs;
   mPlugin->GetDuration(mPlugin, &durationUs);
   if (durationUs) {
-    ReentrantMonitorAutoEnter mon(mDecoder->GetReentrantMonitor());
-    mDecoder->SetMediaDuration(durationUs);
+    mInfo.mMetadataDuration.emplace(TimeUnit::FromMicroseconds(durationUs));
   }
 
   if (mPlugin->HasVideo(mPlugin)) {

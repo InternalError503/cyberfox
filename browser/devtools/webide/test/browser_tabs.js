@@ -8,7 +8,7 @@ function test() {
   waitForExplicitFinish();
   requestCompleteLog();
 
-  Task.spawn(function() {
+  Task.spawn(function*() {
     const { DebuggerServer } =
       Cu.import("resource://gre/modules/devtools/dbg-server.jsm", {});
 
@@ -60,7 +60,7 @@ function connectToLocal(win) {
 }
 
 function selectTabProject(win) {
-  return Task.spawn(function() {
+  return Task.spawn(function*() {
     yield win.Cmds.showProjectPanel();
     yield waitForUpdate(win, "runtime-targets");
     let tabsNode = win.document.querySelector("#project-panel-tabs");

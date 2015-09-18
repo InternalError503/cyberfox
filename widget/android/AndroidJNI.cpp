@@ -876,6 +876,9 @@ Java_org_mozilla_gecko_GeckoAppShell_dispatchMemoryPressure(JNIEnv* jenv, jclass
 NS_EXPORT jdouble JNICALL
 Java_org_mozilla_gecko_GeckoJavaSampler_getProfilerTime(JNIEnv *jenv, jclass jc)
 {
+  if (!profiler_is_active()) {
+    return 0.0;
+  }
   return profiler_time();
 }
 
@@ -1012,9 +1015,8 @@ Java_org_mozilla_gecko_ANRReporter_getNativeStack(JNIEnv* jenv, jclass)
     const PRIntervalTime timeout = PR_SecondsToInterval(5);
     const PRIntervalTime startTime = PR_IntervalNow();
 
-    typedef struct { void operator()(void* p) { free(p); } } ProfilePtrPolicy;
     // Pointer to a profile JSON string
-    typedef mozilla::UniquePtr<char, ProfilePtrPolicy> ProfilePtr;
+    typedef mozilla::UniquePtr<char[]> ProfilePtr;
 
     ProfilePtr profile(profiler_get_profile());
 

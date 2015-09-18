@@ -108,7 +108,7 @@ class TestEmitterBasic(unittest.TestCase):
 
         self.assertEqual(objs[3].affected_tiers, {'misc'})
 
-        dirs = [o.dirs for o in objs]
+        dirs = [[d.full_path for d in o.dirs] for o in objs]
         self.assertEqual(dirs, [
             [
                 mozpath.join(reader.config.topsrcdir, 'foo'),
@@ -132,9 +132,9 @@ class TestEmitterBasic(unittest.TestCase):
             reldir = o.relativedir
 
             if reldir == '':
-                self.assertEqual(o.dirs, [
+                self.assertEqual([d.full_path for d in o.dirs], [
                     mozpath.join(reader.config.topsrcdir, 'regular')])
-                self.assertEqual(o.test_dirs, [
+                self.assertEqual([d.full_path for d in o.test_dirs], [
                     mozpath.join(reader.config.topsrcdir, 'test')])
 
     def test_config_file_substitution(self):
@@ -468,6 +468,24 @@ class TestEmitterBasic(unittest.TestCase):
         paths = sorted([v[0] for v in o.installs.values()])
         self.assertEqual(paths, expected)
 
+    def test_test_manifest_includes(self):
+        """Ensure that manifest objects from the emitter list a correct manifest.
+        """
+        reader = self.reader('test-manifest-emitted-includes')
+        [obj] = self.read_topsrcdir(reader)
+
+        # Expected manifest leafs for our tests.
+        expected_manifests = {
+            'reftest1.html': 'reftest.list',
+            'reftest1-ref.html': 'reftest.list',
+            'reftest2.html': 'included-reftest.list',
+            'reftest2-ref.html': 'included-reftest.list',
+        }
+
+        for t in obj.tests:
+            self.assertTrue(t['manifest'].endswith(expected_manifests[t['name']]))
+
+
     def test_test_manifest_keys_extracted(self):
         """Ensure all metadata from test manifests is extracted."""
         reader = self.reader('test-manifest-keys-extracted')
@@ -733,18 +751,16 @@ class TestEmitterBasic(unittest.TestCase):
         }
         for suffix, files in expected.items():
             sources = suffix_map[suffix]
-            self.assertEqual(sources.files, files)
+            self.assertEqual(
+                sources.files,
+                [mozpath.join(reader.config.topsrcdir, f) for f in files])
 
-    def test_sources(self):
+    def test_generated_sources(self):
         """Test that GENERATED_SOURCES works properly."""
         reader = self.reader('generated-sources')
         objs = self.read_topsrcdir(reader)
 
-        self.assertEqual(len(objs), 7)
-
-        # GENERATED_SOURCES automatically generate GARBAGE definitions.
-        garbage = [o for o in objs if isinstance(o, VariablePassthru)]
-        self.assertEqual(len(garbage), 1)
+        self.assertEqual(len(objs), 6)
 
         generated_sources = [o for o in objs if isinstance(o, GeneratedSources)]
         self.assertEqual(len(generated_sources), 6)
@@ -762,7 +778,9 @@ class TestEmitterBasic(unittest.TestCase):
         }
         for suffix, files in expected.items():
             sources = suffix_map[suffix]
-            self.assertEqual(sources.files, files)
+            self.assertEqual(
+                sources.files,
+                [mozpath.join(reader.config.topobjdir, f) for f in files])
 
     def test_host_sources(self):
         """Test that HOST_SOURCES works properly."""
@@ -783,7 +801,9 @@ class TestEmitterBasic(unittest.TestCase):
         }
         for suffix, files in expected.items():
             sources = suffix_map[suffix]
-            self.assertEqual(sources.files, files)
+            self.assertEqual(
+                sources.files,
+                [mozpath.join(reader.config.topsrcdir, f) for f in files])
 
     def test_unified_sources(self):
         """Test that UNIFIED_SOURCES works properly."""
@@ -804,7 +824,9 @@ class TestEmitterBasic(unittest.TestCase):
         }
         for suffix, files in expected.items():
             sources = suffix_map[suffix]
-            self.assertEqual(sources.files, files)
+            self.assertEqual(
+                sources.files,
+                [mozpath.join(reader.config.topsrcdir, f) for f in files])
             self.assertTrue(sources.have_unified_mapping)
 
     def test_unified_sources_non_unified(self):
@@ -826,7 +848,9 @@ class TestEmitterBasic(unittest.TestCase):
         }
         for suffix, files in expected.items():
             sources = suffix_map[suffix]
-            self.assertEqual(sources.files, files)
+            self.assertEqual(
+                sources.files,
+                [mozpath.join(reader.config.topsrcdir, f) for f in files])
             self.assertFalse(sources.have_unified_mapping)
 
     def test_dist_files(self):

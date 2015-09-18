@@ -9,7 +9,7 @@
 #include "gfxContext.h"                 // for gfxContext, etc
 #include "gfxPlatform.h"                // for gfxPlatform
 #include "gfxPrefs.h"                   // for gfxPrefs
-#include "gfxPoint.h"                   // for gfxIntSize, gfxPoint
+#include "gfxPoint.h"                   // for IntSize, gfxPoint
 #include "gfxTeeSurface.h"              // for gfxTeeSurface
 #include "gfxUtils.h"                   // for gfxUtils
 #include "ipc/ShadowLayers.h"           // for ShadowLayerForwarder
@@ -35,7 +35,6 @@
 #ifdef MOZ_WIDGET_GTK
 #include "gfxPlatformGtk.h"
 #endif
-#include "gfx2DGlue.h"
 #include "ReadbackLayer.h"
 
 #include <vector>
@@ -91,9 +90,9 @@ ContentClient::CreateContentClient(CompositableForwarder* aForwarder)
   }
 
   if (useDoubleBuffering || PR_GetEnv("MOZ_FORCE_DOUBLE_BUFFERING")) {
-    return new ContentClientDoubleBuffered(aForwarder);
+    return MakeAndAddRef<ContentClientDoubleBuffered>(aForwarder);
   }
-  return new ContentClientSingleBuffered(aForwarder);
+  return MakeAndAddRef<ContentClientSingleBuffered>(aForwarder);
 }
 
 void
@@ -142,12 +141,10 @@ ContentClientBasic::CreateBuffer(ContentType aType,
                                  RefPtr<gfx::DrawTarget>* aWhiteDT)
 {
   MOZ_ASSERT(!(aFlags & BUFFER_COMPONENT_ALPHA));
-  gfxImageFormat format =
-    gfxPlatform::GetPlatform()->OptimalFormatForContent(aType);
 
   *aBlackDT = gfxPlatform::GetPlatform()->CreateOffscreenContentDrawTarget(
     IntSize(aRect.width, aRect.height),
-    ImageFormatToSurfaceFormat(format));
+    gfxPlatform::GetPlatform()->Optimal2DFormatForContent(aType));
 }
 
 void
@@ -293,7 +290,7 @@ ContentClientRemoteBuffer::BuildTextureClients(SurfaceFormat aFormat,
   DestroyBuffers();
 
   mSurfaceFormat = aFormat;
-  mSize = gfx::IntSize(aRect.width, aRect.height);
+  mSize = IntSize(aRect.width, aRect.height);
   mTextureFlags = TextureFlagsForRotatedContentBufferFlags(aFlags);
 
   if (aFlags & BUFFER_COMPONENT_ALPHA) {
@@ -309,7 +306,7 @@ ContentClientRemoteBuffer::CreateBackBuffer(const IntRect& aBufferRect)
   // gfx::BackendType::NONE means fallback to the content backend
   mTextureClient = CreateTextureClientForDrawing(
     mSurfaceFormat, mSize, gfx::BackendType::NONE,
-    mTextureFlags,
+    mTextureFlags | ExtraTextureFlags(),
     TextureAllocationFlags::ALLOC_CLEAR_BUFFER
   );
   if (!mTextureClient || !AddTextureClient(mTextureClient)) {
@@ -319,7 +316,7 @@ ContentClientRemoteBuffer::CreateBackBuffer(const IntRect& aBufferRect)
 
   if (mTextureFlags & TextureFlags::COMPONENT_ALPHA) {
     mTextureClientOnWhite = mTextureClient->CreateSimilar(
-      mTextureFlags,
+      mTextureFlags | ExtraTextureFlags(),
       TextureAllocationFlags::ALLOC_CLEAR_BUFFER_WHITE
     );
     if (!mTextureClientOnWhite || !AddTextureClient(mTextureClientOnWhite)) {

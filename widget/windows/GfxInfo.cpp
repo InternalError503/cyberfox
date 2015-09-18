@@ -15,7 +15,9 @@
 #include "prprf.h"
 #include "GfxDriverInfo.h"
 #include "mozilla/Preferences.h"
+#include "mozilla/gfx/Logging.h"
 #include "nsPrintfCString.h"
+#include "jsapi.h"
 
 #if defined(MOZ_CRASHREPORTER)
 #include "nsExceptionHandler.h"
@@ -523,18 +525,25 @@ GfxInfo::Init()
              driverNumericVersion = 0, knownSafeMismatchVersion = 0;
     ParseDriverVersion(dllVersion, &dllNumericVersion);
     ParseDriverVersion(dllVersion2, &dllNumericVersion2);
+
     ParseDriverVersion(mDriverVersion, &driverNumericVersion);
     ParseDriverVersion(NS_LITERAL_STRING("9.17.10.0"), &knownSafeMismatchVersion);
 
     // If there's a driver version mismatch, consider this harmful only when
     // the driver version is less than knownSafeMismatchVersion.  See the
-    // above comment about crashes with old mismatches. If the GetDllVersion
-    // call fails, then they return 0, so that will be considered a mismatch.
-    if (dllNumericVersion != driverNumericVersion &&
-        dllNumericVersion2 != driverNumericVersion &&
-        (driverNumericVersion < knownSafeMismatchVersion ||
-         std::max(dllNumericVersion, dllNumericVersion2) < knownSafeMismatchVersion)) {
-      mHasDriverVersionMismatch = true;
+    // above comment about crashes with old mismatches.  If the GetDllVersion
+    // call fails, we are not calling it a mismatch.
+    if ((dllNumericVersion != 0 && dllNumericVersion != driverNumericVersion) ||
+        (dllNumericVersion2 != 0 && dllNumericVersion2 != driverNumericVersion)) {
+      if (driverNumericVersion < knownSafeMismatchVersion ||
+          std::max(dllNumericVersion, dllNumericVersion2) < knownSafeMismatchVersion) {
+        mHasDriverVersionMismatch = true;
+        gfxWarningOnce() << "Mismatched driver versions between the registry " << mDriverVersion.get() << " and DLL(s) " << NS_ConvertUTF16toUTF8(dllVersion).get() << ", " << NS_ConvertUTF16toUTF8(dllVersion2).get() << " reported.";
+      }
+    } else if (dllNumericVersion == 0 && dllNumericVersion2 == 0) {
+      // Leave it as an asserting error for now, to see if we can find
+      // a system that exhibits this kind of a problem internally.
+      gfxCriticalErrorOnce() << "Potential driver version mismatch ignored due to missing DLLs";
     }
   }
 
@@ -1216,12 +1225,55 @@ GfxInfo::GetFeatureStatusImpl(int32_t aFeature,
       os = DRIVER_OS_WINDOWS_XP;
 
     if (mHasDriverVersionMismatch) {
-      *aStatus = nsIGfxInfo::FEATURE_BLOCKED_DRIVER_VERSION;
+      *aStatus = nsIGfxInfo::FEATURE_BLOCKED_MISMATCHED_VERSION;
       return NS_OK;
     }
   }
 
   return GfxInfoBase::GetFeatureStatusImpl(aFeature, aStatus, aSuggestedDriverVersion, aDriverInfo, &os);
+}
+
+nsresult
+GfxInfo::FindMonitors(JSContext* aCx, JS::HandleObject aOutArray)
+{
+  int deviceCount = 0;
+  for (int deviceIndex = 0;; deviceIndex++) {
+    DISPLAY_DEVICEA device;
+    device.cb = sizeof(device);
+    if (!::EnumDisplayDevicesA(nullptr, deviceIndex, &device, 0)) {
+      break;
+    }
+
+    if (!(device.StateFlags & DISPLAY_DEVICE_ACTIVE)) {
+      continue;
+    }
+
+    DEVMODEA mode;
+    mode.dmSize = sizeof(mode);
+    mode.dmDriverExtra = 0;
+    if (!::EnumDisplaySettingsA(device.DeviceName, ENUM_CURRENT_SETTINGS, &mode)) {
+      continue;
+    }
+
+    JS::Rooted<JSObject*> obj(aCx, JS_NewPlainObject(aCx));
+
+    JS::Rooted<JS::Value> screenWidth(aCx, JS::Int32Value(mode.dmPelsWidth));
+    JS_SetProperty(aCx, obj, "screenWidth", screenWidth);
+
+    JS::Rooted<JS::Value> screenHeight(aCx, JS::Int32Value(mode.dmPelsHeight));
+    JS_SetProperty(aCx, obj, "screenHeight", screenHeight);
+
+    JS::Rooted<JS::Value> refreshRate(aCx, JS::Int32Value(mode.dmDisplayFrequency));
+    JS_SetProperty(aCx, obj, "refreshRate", refreshRate);
+
+    JS::Rooted<JS::Value> pseudoDisplay(aCx,
+      JS::BooleanValue(!!(device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)));
+    JS_SetProperty(aCx, obj, "pseudoDisplay", pseudoDisplay);
+
+    JS::Rooted<JS::Value> element(aCx, JS::ObjectValue(*obj));
+    JS_SetElement(aCx, aOutArray, deviceCount++, element);
+  }
+  return NS_OK;
 }
 
 #ifdef DEBUG

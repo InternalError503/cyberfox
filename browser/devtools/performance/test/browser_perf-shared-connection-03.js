@@ -2,10 +2,10 @@
    http://creativecommons.org/publicdomain/zero/1.0/ */
 
 /**
- * Tests if the shared PerformanceActorsConnection can properly send requests.
+ * Tests if the shared PerformanceFront can properly send requests.
  */
 
-function spawnTest () {
+function* spawnTest() {
   let { panel } = yield initPerformance(SIMPLE_URL);
   let front = panel.panelWin.gFront;
 

@@ -1,11 +1,6 @@
-/** @jsx React.DOM */
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-/*jshint newcap:false*/
-/*global loop:true, React */
 
 var loop = loop || {};
 loop.panel = (function(_, mozL10n) {
@@ -25,9 +20,10 @@ loop.panel = (function(_, mozL10n) {
   var TabView = React.createClass({
     propTypes: {
       buttonsHidden: React.PropTypes.array,
+      children: React.PropTypes.arrayOf(React.PropTypes.element),
+      mozLoop: React.PropTypes.object,
       // The selectedTab prop is used by the UI showcase.
-      selectedTab: React.PropTypes.string,
-      mozLoop: React.PropTypes.object
+      selectedTab: React.PropTypes.string
     },
 
     getDefaultProps: function() {
@@ -87,14 +83,14 @@ loop.panel = (function(_, mozL10n) {
         if (!tab.props.hidden) {
           tabButtons.push(
             <li className={cx({selected: isSelected})}
-                key={i}
                 data-tab-name={tabName}
-                title={mozL10n.get(tabName + "_tab_button_tooltip")}
-                onClick={this.handleSelectTab} />
+                key={i}
+                onClick={this.handleSelectTab}
+                title={mozL10n.get(tabName + "_tab_button_tooltip")} />
           );
         }
         tabs.push(
-          <div key={i} className={cx({tab: true, selected: isSelected})}>
+          <div className={cx({tab: true, selected: isSelected})} key={i}>
             {tab.props.children}
           </div>
         );
@@ -133,11 +129,11 @@ loop.panel = (function(_, mozL10n) {
       return function(event) {
         // Note: side effect!
         switch (newAvailabilty) {
-          case 'available':
+          case "available":
             this.setState({doNotDisturb: false});
             navigator.mozLoop.doNotDisturb = false;
             break;
-          case 'do-not-disturb':
+          case "do-not-disturb":
             this.setState({doNotDisturb: true});
             navigator.mozLoop.doNotDisturb = true;
             break;
@@ -150,13 +146,13 @@ loop.panel = (function(_, mozL10n) {
       // XXX https://github.com/facebook/react/issues/310 for === htmlFor
       var cx = React.addons.classSet;
       var availabilityStatus = cx({
-        'status': true,
-        'status-dnd': this.state.doNotDisturb,
-        'status-available': !this.state.doNotDisturb
+        "status": true,
+        "status-dnd": this.state.doNotDisturb,
+        "status-available": !this.state.doNotDisturb
       });
       var availabilityDropdown = cx({
-        'dropdown-menu': true,
-        'hide': !this.state.showMenu
+        "dropdown-menu": true,
+        "hide": !this.state.showMenu
       });
       var availabilityText = this.state.doNotDisturb ?
                               mozL10n.get("display_name_dnd_status") :
@@ -169,13 +165,13 @@ loop.panel = (function(_, mozL10n) {
             <i className={availabilityStatus}></i>
           </p>
           <ul className={availabilityDropdown}>
-            <li onClick={this.changeAvailability("available")}
-                className="dropdown-menu-item dnd-make-available">
+            <li className="dropdown-menu-item dnd-make-available"
+                onClick={this.changeAvailability("available")}>
               <i className="status status-available"></i>
               <span>{mozL10n.get("display_name_available_status")}</span>
             </li>
-            <li onClick={this.changeAvailability("do-not-disturb")}
-                className="dropdown-menu-item dnd-make-unavailable">
+            <li className="dropdown-menu-item dnd-make-unavailable"
+                onClick={this.changeAvailability("do-not-disturb")}>
               <i className="status status-dnd"></i>
               <span>{mozL10n.get("display_name_dnd_status")}</span>
             </li>
@@ -207,9 +203,9 @@ loop.panel = (function(_, mozL10n) {
               "clientShortname": mozL10n.get("clientShortname2")
             })}
           </header>
-          <Button htmlId="fte-button"
-                  onClick={this.handleButtonClick}
-                  caption={mozL10n.get("first_time_experience_button_label")} />
+          <Button caption={mozL10n.get("first_time_experience_button_label")}
+                  htmlId="fte-button"
+                  onClick={this.handleButtonClick} />
         </div>
       );
     }
@@ -294,11 +290,11 @@ loop.panel = (function(_, mozL10n) {
       }
 
       var locale = mozL10n.getLanguage();
-      navigator.mozLoop.setLoopPref('showPartnerLogo', false);
+      navigator.mozLoop.setLoopPref("showPartnerLogo", false);
       return (
-        <p id="powered-by" className="powered-by">
+        <p className="powered-by" id="powered-by">
           {mozL10n.get("powered_by_beforeLogo")}
-          <img id="powered-by-logo" className={locale} />
+          <img className={locale} id="powered-by-logo" />
           {mozL10n.get("powered_by_afterLogo")}
         </p>
       );
@@ -306,8 +302,8 @@ loop.panel = (function(_, mozL10n) {
 
     render: function() {
       if (!this.state.gettingStartedSeen || this.state.seenToS == "unseen") {
-        var terms_of_use_url = navigator.mozLoop.getLoopPref('legal.ToS_url');
-        var privacy_notice_url = navigator.mozLoop.getLoopPref('legal.privacy_url');
+        var terms_of_use_url = navigator.mozLoop.getLoopPref("legal.ToS_url");
+        var privacy_notice_url = navigator.mozLoop.getLoopPref("legal.privacy_url");
         var tosHTML = mozL10n.get("legal_text_and_links3", {
           "clientShortname": mozL10n.get("clientShortname2"),
           "terms_of_use": React.renderToStaticMarkup(
@@ -340,10 +336,10 @@ loop.panel = (function(_, mozL10n) {
    */
   var SettingsDropdownEntry = React.createClass({
     propTypes: {
-      onClick: React.PropTypes.func.isRequired,
-      label: React.PropTypes.string.isRequired,
+      displayed: React.PropTypes.bool,
       icon: React.PropTypes.string,
-      displayed: React.PropTypes.bool
+      label: React.PropTypes.string.isRequired,
+      onClick: React.PropTypes.func.isRequired
     },
 
     getDefaultProps: function() {
@@ -355,7 +351,7 @@ loop.panel = (function(_, mozL10n) {
         return null;
       }
       return (
-        <li onClick={this.props.onClick} className="dropdown-menu-item">
+        <li className="dropdown-menu-item" onClick={this.props.onClick}>
           {this.props.icon ?
             <i className={"icon icon-" + this.props.icon}></i> :
             null}
@@ -415,29 +411,29 @@ loop.panel = (function(_, mozL10n) {
         <div className="settings-menu dropdown">
           <a className="button-settings"
              onClick={this.toggleDropdownMenu}
-             title={mozL10n.get("settings_menu_button_tooltip")}
-             ref="menu-button" />
+             ref="menu-button"
+             title={mozL10n.get("settings_menu_button_tooltip")} />
           <ul className={cx({"dropdown-menu": true, hide: !this.state.showMenu})}>
-            <SettingsDropdownEntry label={mozL10n.get("settings_menu_item_settings")}
-                                   onClick={this.handleClickSettingsEntry}
-                                   displayed={false}
-                                   icon="settings" />
-            <SettingsDropdownEntry label={mozL10n.get("settings_menu_item_account")}
-                                   onClick={this.handleClickAccountEntry}
+            <SettingsDropdownEntry displayed={false}
+                                   icon="settings"
+                                   label={mozL10n.get("settings_menu_item_settings")}
+                                   onClick={this.handleClickSettingsEntry} />
+            <SettingsDropdownEntry displayed={this._isSignedIn() && this.props.mozLoop.fxAEnabled}
                                    icon="account"
-                                   displayed={this._isSignedIn() && this.props.mozLoop.fxAEnabled} />
+                                   label={mozL10n.get("settings_menu_item_account")}
+                                   onClick={this.handleClickAccountEntry} />
             <SettingsDropdownEntry icon="tour"
                                    label={mozL10n.get("tour_label")}
                                    onClick={this.openGettingStartedTour} />
-            <SettingsDropdownEntry label={this._isSignedIn() ?
+            <SettingsDropdownEntry displayed={this.props.mozLoop.fxAEnabled}
+                                   icon={this._isSignedIn() ? "signout" : "signin"}
+                                   label={this._isSignedIn() ?
                                           mozL10n.get("settings_menu_item_signout") :
                                           mozL10n.get("settings_menu_item_signin")}
-                                   onClick={this.handleClickAuthEntry}
-                                   displayed={this.props.mozLoop.fxAEnabled}
-                                   icon={this._isSignedIn() ? "signout" : "signin"} />
-            <SettingsDropdownEntry label={mozL10n.get("help_label")}
-                                   onClick={this.handleHelpEntry}
-                                   icon="help" />
+                                   onClick={this.handleClickAuthEntry} />
+            <SettingsDropdownEntry icon="help"
+                                   label={mozL10n.get("help_label")}
+                                   onClick={this.handleHelpEntry} />
           </ul>
         </div>
       );
@@ -473,6 +469,10 @@ loop.panel = (function(_, mozL10n) {
    * FxA user identity (guest/authenticated) component.
    */
   var UserIdentity = React.createClass({
+    propTypes: {
+      displayName: React.PropTypes.string.isRequired
+    },
+
     render: function() {
       return (
         <p className="user-identity">
@@ -505,7 +505,7 @@ loop.panel = (function(_, mozL10n) {
 
       return (
         <div className="room-entry-context-item">
-          <a href={roomUrl.location} title={roomUrl.description} onClick={this.handleClick}>
+          <a href={roomUrl.location} onClick={this.handleClick} title={roomUrl.description}>
             <img src={roomUrl.thumbnail || "loop/shared/img/icons-16x16.svg#globe"} />
           </a>
         </div>
@@ -546,7 +546,8 @@ loop.panel = (function(_, mozL10n) {
       event.stopPropagation();
       event.preventDefault();
       this.props.dispatcher.dispatch(new sharedActions.CopyRoomUrl({
-        roomUrl: this.props.room.roomUrl
+        roomUrl: this.props.room.roomUrl,
+        from: "panel"
       }));
       this.setState({urlCopied: true});
     },
@@ -592,17 +593,17 @@ loop.panel = (function(_, mozL10n) {
       });
 
       return (
-        <div className={roomClasses} onMouseLeave={this.handleMouseLeave}
-             onClick={this.handleClickEntry}>
+        <div className={roomClasses} onClick={this.handleClickEntry}
+             onMouseLeave={this.handleMouseLeave}>
           <h2>
             <span className="room-notification" />
             {this.props.room.decryptedContext.roomName}
             <button className={copyButtonClasses}
-              title={mozL10n.get("rooms_list_copy_url_tooltip")}
-              onClick={this.handleCopyButtonClick} />
+              onClick={this.handleCopyButtonClick}
+              title={mozL10n.get("rooms_list_copy_url_tooltip")} />
             <button className="delete-link"
-              title={mozL10n.get("rooms_list_delete_tooltip")}
-              onClick={this.handleDeleteButtonClick} />
+              onClick={this.handleDeleteButtonClick}
+              title={mozL10n.get("rooms_list_delete_tooltip")} />
           </h2>
           <RoomEntryContextItem mozLoop={this.props.mozLoop}
                                 roomUrls={this.props.room.decryptedContext.urls} />
@@ -618,9 +619,9 @@ loop.panel = (function(_, mozL10n) {
     mixins: [Backbone.Events, sharedMixins.WindowCloseMixin],
 
     propTypes: {
+      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       mozLoop: React.PropTypes.object.isRequired,
       store: React.PropTypes.instanceOf(loop.store.RoomStore).isRequired,
-      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       userDisplayName: React.PropTypes.string.isRequired  // for room creation
     },
 
@@ -675,11 +676,10 @@ loop.panel = (function(_, mozL10n) {
             this.state.rooms.map(function(room, i) {
               return (
                 <RoomEntry
-                  key={room.roomToken}
                   dispatcher={this.props.dispatcher}
+                  key={room.roomToken}
                   mozLoop={this.props.mozLoop}
-                  room={room}
-                />
+                  room={room} />
               );
             }, this)
           }</div>
@@ -725,10 +725,17 @@ loop.panel = (function(_, mozL10n) {
       // even if there's a small delay.
 
       this.props.mozLoop.getSelectedTabMetadata(function callback(metadata) {
+        // Bail out when the component is not mounted (anymore).
+        // This occurs during test runs. See bug 1174611 for more info.
+        if (!this.isMounted()) {
+          return;
+        }
+
         var previewImage = metadata.favicon || "";
         var description = metadata.title || metadata.description;
         var url = metadata.url;
         this.setState({
+          checked: false,
           previewImage: previewImage,
           description: description,
           url: url
@@ -770,24 +777,24 @@ loop.panel = (function(_, mozL10n) {
         hide: !hostname ||
           !this.props.mozLoop.getLoopPref("contextInConversations.enabled")
       });
-      var thumbnail = this.state.previewImage || "loop/shared/img/icons-16x16.svg#globe";
 
       return (
         <div className="new-room-view">
           <div className={contextClasses}>
-            <Checkbox label={mozL10n.get("context_inroom_label")}
+            <Checkbox checked={this.state.checked}
+                      label={mozL10n.get("context_inroom_label")}
                       onChange={this.onCheckboxChange} />
-            <div className="context-content">
-              <img className="context-preview" src={thumbnail} />
-              <span className="context-description">
-                {this.state.description}
-                <span className="context-url">{hostname}</span>
-              </span>
-            </div>
+            <sharedViews.ContextUrlView
+              allowClick={false}
+              description={this.state.description}
+              showContextTitle={false}
+              thumbnail={this.state.previewImage}
+              url={this.state.url}
+              useDesktopPaths={true} />
           </div>
           <button className="btn btn-info new-room-button"
-                  onClick={this.handleCreateButtonClick}
-                  disabled={this.props.pendingOperation}>
+                  disabled={this.props.pendingOperation}
+                  onClick={this.handleCreateButtonClick}>
             {mozL10n.get("rooms_new_room_button_label")}
           </button>
         </div>
@@ -800,16 +807,16 @@ loop.panel = (function(_, mozL10n) {
    */
   var PanelView = React.createClass({
     propTypes: {
-      notifications: React.PropTypes.object.isRequired,
-      // Mostly used for UI components showcase and unit tests
-      userProfile: React.PropTypes.object,
-      // Used only for unit tests.
-      showTabButtons: React.PropTypes.bool,
-      selectedTab: React.PropTypes.string,
       dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       mozLoop: React.PropTypes.object.isRequired,
+      notifications: React.PropTypes.object.isRequired,
       roomStore:
-        React.PropTypes.instanceOf(loop.store.RoomStore).isRequired
+        React.PropTypes.instanceOf(loop.store.RoomStore).isRequired,
+      selectedTab: React.PropTypes.string,
+      // Used only for unit tests.
+      showTabButtons: React.PropTypes.bool,
+      // Mostly used for UI components showcase and unit tests
+      userProfile: React.PropTypes.object
     },
 
     getInitialState: function() {
@@ -921,8 +928,9 @@ loop.panel = (function(_, mozL10n) {
       if (!this.state.gettingStartedSeen) {
         return (
           <div>
-            <NotificationListView notifications={this.props.notifications}
-                                  clearOnDocumentHidden={true} />
+            <NotificationListView
+              clearOnDocumentHidden={true}
+              notifications={this.props.notifications} />
             <GettingStartedView />
             <ToSView />
           </div>
@@ -941,33 +949,44 @@ loop.panel = (function(_, mozL10n) {
 
       return (
         <div>
-          <NotificationListView notifications={this.props.notifications}
-                                clearOnDocumentHidden={true} />
-          <TabView ref="tabView" selectedTab={this.props.selectedTab}
-            buttonsHidden={hideButtons} mozLoop={this.props.mozLoop}>
+          <NotificationListView
+            clearOnDocumentHidden={true}
+            notifications={this.props.notifications} />
+          <TabView
+            buttonsHidden={hideButtons}
+            mozLoop={this.props.mozLoop}
+            ref="tabView"
+            selectedTab={this.props.selectedTab}>
             <Tab name="rooms">
               <RoomList dispatcher={this.props.dispatcher}
+                        mozLoop={this.props.mozLoop}
                         store={this.props.roomStore}
-                        userDisplayName={this._getUserDisplayName()}
-                        mozLoop={this.props.mozLoop}/>
+                        userDisplayName={this._getUserDisplayName()} />
               <ToSView />
             </Tab>
             <Tab name="contacts">
-              <ContactsList selectTab={this.selectTab}
-                            startForm={this.startForm}
-                            notifications={this.props.notifications} />
+              <ContactsList
+                notifications={this.props.notifications}
+                selectTab={this.selectTab}
+                startForm={this.startForm} />
             </Tab>
-            <Tab name="contacts_add" hidden={true}>
-              <ContactDetailsForm ref="contacts_add" mode="add"
-                                  selectTab={this.selectTab} />
+            <Tab hidden={true} name="contacts_add">
+              <ContactDetailsForm
+                mode="add"
+                ref="contacts_add"
+                selectTab={this.selectTab} />
             </Tab>
-            <Tab name="contacts_edit" hidden={true}>
-              <ContactDetailsForm ref="contacts_edit" mode="edit"
-                                  selectTab={this.selectTab} />
+            <Tab hidden={true} name="contacts_edit">
+              <ContactDetailsForm
+                mode="edit"
+                ref="contacts_edit"
+                selectTab={this.selectTab} />
             </Tab>
-            <Tab name="contacts_import" hidden={true}>
-              <ContactDetailsForm ref="contacts_import" mode="import"
-                                  selectTab={this.selectTab}/>
+            <Tab hidden={true} name="contacts_import">
+              <ContactDetailsForm
+                mode="import"
+                ref="contacts_import"
+                selectTab={this.selectTab}/>
             </Tab>
           </TabView>
           <div className="footer">
@@ -1002,17 +1021,18 @@ loop.panel = (function(_, mozL10n) {
     });
 
     React.render(<PanelView
-      notifications={notifications}
-      roomStore={roomStore}
+      dispatcher={dispatcher}
       mozLoop={navigator.mozLoop}
-      dispatcher={dispatcher} />, document.querySelector("#main"));
+      notifications={notifications}
+      roomStore={roomStore} />, document.querySelector("#main"));
 
-    document.body.setAttribute("dir", mozL10n.getDirection());
+    document.documentElement.setAttribute("lang", mozL10n.getLanguage());
+    document.documentElement.setAttribute("dir", mozL10n.getDirection());
     document.body.setAttribute("platform", loop.shared.utils.getPlatform());
 
     // Notify the window that we've finished initalization and initial layout
-    var evtObject = document.createEvent('Event');
-    evtObject.initEvent('loopPanelInitialized', true, false);
+    var evtObject = document.createEvent("Event");
+    evtObject.initEvent("loopPanelInitialized", true, false);
     window.dispatchEvent(evtObject);
   }
 
@@ -1032,4 +1052,4 @@ loop.panel = (function(_, mozL10n) {
   };
 })(_, document.mozL10n);
 
-document.addEventListener('DOMContentLoaded', loop.panel.init);
+document.addEventListener("DOMContentLoaded", loop.panel.init);

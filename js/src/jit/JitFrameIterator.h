@@ -34,9 +34,10 @@ enum FrameType
     // JS frame used by the baseline JIT.
     JitFrame_BaselineJS,
 
-    // Frame pushed for baseline JIT stubs that make non-tail calls, so that the
+    // Frame pushed for JIT stubs that make non-tail calls, so that the
     // return address -> ICEntry mapping works.
     JitFrame_BaselineStub,
+    JitFrame_IonStub,
 
     // The entry frame is the initial prologue block transitioning from the VM
     // into the Ion world.
@@ -55,6 +56,7 @@ enum FrameType
     JitFrame_Unwound_BaselineJS,
     JitFrame_Unwound_IonJS,
     JitFrame_Unwound_BaselineStub,
+    JitFrame_Unwound_IonStub,
     JitFrame_Unwound_Rectifier,
     JitFrame_Unwound_IonAccessorIC,
 
@@ -165,6 +167,9 @@ class JitFrameIterator
     }
     bool isIonJS() const {
         return type_ == JitFrame_IonJS;
+    }
+    bool isIonStub() const {
+        return type_ == JitFrame_IonStub;
     }
     bool isBailoutJS() const {
         return type_ == JitFrame_Bailout;
@@ -701,8 +706,8 @@ class InlineFrameIterator
 
     template <class ArgOp, class LocalOp>
     void readFrameArgsAndLocals(JSContext* cx, ArgOp& argOp, LocalOp& localOp,
-                                JSObject** scopeChain, bool* hasCallObj, Value* rval,
-                                ArgumentsObject** argsObj, Value* thisv,
+                                JSObject** scopeChain, bool* hasCallObj,
+                                Value* rval, ArgumentsObject** argsObj, Value* thisv,
                                 ReadFrameArgsBehavior behavior,
                                 MaybeReadFallback& fallback) const
     {
@@ -746,13 +751,14 @@ class InlineFrameIterator
                     InlineFrameIterator it(cx, this);
                     ++it;
                     unsigned argsObjAdj = it.script()->argumentsHasVarBinding() ? 1 : 0;
+                    bool hasNewTarget = isConstructing();
                     SnapshotIterator parent_s(it.snapshotIterator());
 
                     // Skip over all slots until we get to the last slots
                     // (= arguments slots of callee) the +3 is for [this], [returnvalue],
                     // [scopechain], and maybe +1 for [argsObj]
-                    MOZ_ASSERT(parent_s.numAllocations() >= nactual + 3 + argsObjAdj);
-                    unsigned skip = parent_s.numAllocations() - nactual - 3 - argsObjAdj;
+                    MOZ_ASSERT(parent_s.numAllocations() >= nactual + 3 + argsObjAdj + hasNewTarget);
+                    unsigned skip = parent_s.numAllocations() - nactual - 3 - argsObjAdj - hasNewTarget;
                     for (unsigned j = 0; j < skip; j++)
                         parent_s.skip();
 
@@ -761,13 +767,13 @@ class InlineFrameIterator
                     parent_s.skip(); // scope chain
                     parent_s.skip(); // return value
                     parent_s.readFunctionFrameArgs(argOp, nullptr, nullptr,
-                                                   nformal, nactual, it.script(),
+                                                   nformal, nactual + isConstructing(), it.script(),
                                                    fallback);
                 } else {
                     // There is no parent frame to this inlined frame, we can read
                     // from the frame's Value vector directly.
                     Value* argv = frame_->actualArgs();
-                    for (unsigned i = nformal; i < nactual; i++)
+                    for (unsigned i = nformal; i < nactual + isConstructing(); i++)
                         argOp(argv[i]);
                 }
             }

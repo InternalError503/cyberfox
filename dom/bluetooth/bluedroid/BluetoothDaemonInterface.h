@@ -8,26 +8,37 @@
 #define mozilla_dom_bluetooth_bluedroid_bluetoothdaemoninterface_h__
 
 #include "BluetoothInterface.h"
+#include "mozilla/ipc/DaemonSocketConsumer.h"
+#include "mozilla/ipc/ListenSocketConsumer.h"
+
+namespace mozilla {
+namespace ipc {
+
+class DaemonSocket;
+class ListenSocket;
+
+}
+}
 
 BEGIN_BLUETOOTH_NAMESPACE
 
-class BluetoothDaemonListenSocket;
-class BluetoothDaemonChannel;
 class BluetoothDaemonA2dpInterface;
 class BluetoothDaemonAvrcpInterface;
+class BluetoothDaemonGattInterface;
 class BluetoothDaemonHandsfreeInterface;
 class BluetoothDaemonProtocol;
 class BluetoothDaemonSocketInterface;
 
-class BluetoothDaemonInterface final : public BluetoothInterface
+class BluetoothDaemonInterface final
+  : public BluetoothInterface
+  , public mozilla::ipc::DaemonSocketConsumer
+  , public mozilla::ipc::ListenSocketConsumer
 {
 public:
   class CleanupResultHandler;
   class InitResultHandler;
   class StartDaemonTask;
 
-  friend class BluetoothDaemonListenSocket;
-  friend class BluetoothDaemonChannel;
   friend class CleanupResultHandler;
   friend class InitResultHandler;
   friend class StartDaemonTask;
@@ -128,22 +139,25 @@ protected:
   BluetoothDaemonInterface();
   ~BluetoothDaemonInterface();
 
-  void OnConnectSuccess(enum Channel aChannel);
-  void OnConnectError(enum Channel aChannel);
-  void OnDisconnect(enum Channel aChannel);
-
   nsresult CreateRandomAddressString(const nsACString& aPrefix,
                                      unsigned long aPostfixLength,
                                      nsACString& aAddress);
+
+  // Methods for |DaemonSocketConsumer| and |ListenSocketConsumer|
+  //
+
+  void OnConnectSuccess(int aIndex) override;
+  void OnConnectError(int aIndex) override;
+  void OnDisconnect(int aIndex) override;
 
 private:
   void DispatchError(BluetoothResultHandler* aRes, BluetoothStatus aStatus);
   void DispatchError(BluetoothResultHandler* aRes, nsresult aRv);
 
   nsCString mListenSocketName;
-  nsRefPtr<BluetoothDaemonListenSocket> mListenSocket;
-  nsRefPtr<BluetoothDaemonChannel> mCmdChannel;
-  nsRefPtr<BluetoothDaemonChannel> mNtfChannel;
+  nsRefPtr<mozilla::ipc::ListenSocket> mListenSocket;
+  nsRefPtr<mozilla::ipc::DaemonSocket> mCmdChannel;
+  nsRefPtr<mozilla::ipc::DaemonSocket> mNtfChannel;
   nsAutoPtr<BluetoothDaemonProtocol> mProtocol;
 
   nsTArray<nsRefPtr<BluetoothResultHandler> > mResultHandlerQ;
@@ -152,6 +166,7 @@ private:
   nsAutoPtr<BluetoothDaemonHandsfreeInterface> mHandsfreeInterface;
   nsAutoPtr<BluetoothDaemonA2dpInterface> mA2dpInterface;
   nsAutoPtr<BluetoothDaemonAvrcpInterface> mAvrcpInterface;
+  nsAutoPtr<BluetoothDaemonGattInterface> mGattInterface;
 };
 
 END_BLUETOOTH_NAMESPACE

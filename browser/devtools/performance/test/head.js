@@ -12,9 +12,10 @@ let { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 let { gDevTools } = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
 let { DevToolsUtils } = Cu.import("resource://gre/modules/devtools/DevToolsUtils.jsm", {});
 let { DebuggerServer } = Cu.import("resource://gre/modules/devtools/dbg-server.jsm", {});
+let { console } = devtools.require("resource://gre/modules/devtools/Console.jsm");
 let { merge } = devtools.require("sdk/util/object");
 let { generateUUID } = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
-let { getPerformanceActorsConnection, PerformanceFront } = devtools.require("devtools/performance/front");
+let { getPerformanceFront, PerformanceFront } = devtools.require("devtools/performance/front");
 let TargetFactory = devtools.TargetFactory;
 
 let mm = null;
@@ -22,6 +23,7 @@ let mm = null;
 const FRAME_SCRIPT_UTILS_URL = "chrome://browser/content/devtools/frame-script-utils.js"
 const EXAMPLE_URL = "http://example.com/browser/browser/devtools/performance/test/";
 const SIMPLE_URL = EXAMPLE_URL + "doc_simple-test.html";
+const MARKERS_URL = EXAMPLE_URL + "doc_markers.html";
 
 const MEMORY_SAMPLE_PROB_PREF = "devtools.performance.memory.sample-probability";
 const MEMORY_MAX_LOG_LEN_PREF = "devtools.performance.memory.max-log-length";
@@ -30,13 +32,14 @@ const PROFILER_SAMPLE_RATE_PREF = "devtools.performance.profiler.sample-frequenc
 
 const FRAMERATE_PREF = "devtools.performance.ui.enable-framerate";
 const MEMORY_PREF = "devtools.performance.ui.enable-memory";
+const ALLOCATIONS_PREF = "devtools.performance.ui.enable-allocations";
 
 const PLATFORM_DATA_PREF = "devtools.performance.ui.show-platform-data";
 const IDLE_PREF = "devtools.performance.ui.show-idle-blocks";
 const INVERT_PREF = "devtools.performance.ui.invert-call-tree";
 const INVERT_FLAME_PREF = "devtools.performance.ui.invert-flame-graph";
 const FLATTEN_PREF = "devtools.performance.ui.flatten-tree-recursion";
-const JIT_PREF = "devtools.performance.ui.show-jit-optimizations";
+const JIT_PREF = "devtools.performance.ui.enable-jit-optimizations";
 const EXPERIMENTAL_PREF = "devtools.performance.ui.experimental";
 
 // All tests are asynchronous.
@@ -51,13 +54,15 @@ let DEFAULT_PREFS = [
   "devtools.performance.ui.show-platform-data",
   "devtools.performance.ui.show-idle-blocks",
   "devtools.performance.ui.enable-memory",
+  "devtools.performance.ui.enable-allocations",
   "devtools.performance.ui.enable-framerate",
-  "devtools.performance.ui.show-jit-optimizations",
+  "devtools.performance.ui.enable-jit-optimizations",
   "devtools.performance.memory.sample-probability",
   "devtools.performance.memory.max-log-length",
   "devtools.performance.profiler.buffer-size",
   "devtools.performance.profiler.sample-frequency-khz",
   "devtools.performance.ui.experimental",
+  "devtools.performance.timeline.hidden-markers",
 ].reduce((prefs, pref) => {
   prefs[pref] = Preferences.get(pref);
   return prefs;
@@ -191,10 +196,8 @@ function initBackend(aUrl, targetOps={}) {
     // TEST_PROFILER_FILTER_STATUS = array
     merge(target, targetOps);
 
-    let connection = getPerformanceActorsConnection(target);
-    yield connection.open();
-
-    let front = new PerformanceFront(connection);
+    let front = getPerformanceFront(target);
+    yield front.open();
     return { target, front };
   });
 }
@@ -263,9 +266,9 @@ function consoleExecute (console, method, val) {
 
 function waitForProfilerConnection() {
   let { promise, resolve } = Promise.defer();
-  Services.obs.addObserver(resolve, "performance-actors-connection-opened", false);
+  Services.obs.addObserver(resolve, "performance-tools-connection-opened", false);
   return promise.then(() =>
-    Services.obs.removeObserver(resolve, "performance-actors-connection-opened"));
+    Services.obs.removeObserver(resolve, "performance-tools-connection-opened"));
 }
 
 function* teardown(panel) {
@@ -345,12 +348,13 @@ function* startRecording(panel, options = {
   click(win, button);
   yield clicked;
 
+  yield willStart;
+
   ok(button.hasAttribute("checked"),
     "The record button should now be checked.");
   ok(button.hasAttribute("locked"),
     "The record button should be locked.");
 
-  yield willStart;
   let stateChanged = options.waitForStateChanged
     ? once(win.PerformanceView, win.EVENTS.UI_STATE_CHANGED)
     : Promise.resolve();
@@ -392,12 +396,12 @@ function* stopRecording(panel, options = {
   click(win, button);
   yield clicked;
 
+  yield willStop;
   ok(!button.hasAttribute("checked"),
     "The record button should not be checked.");
   ok(button.hasAttribute("locked"),
     "The record button should be locked.");
 
-  yield willStop;
   let stateChanged = options.waitForStateChanged
     ? once(win.PerformanceView, win.EVENTS.UI_STATE_CHANGED)
     : Promise.resolve();
@@ -535,22 +539,6 @@ function getInflatedStackLocations(thread, sample) {
 
   // The profiler tree is inverted, so reverse the array.
   return locations.reverse();
-}
-
-/**
- * Get a path in a FrameNode call tree.
- */
-function getFrameNodePath(root, path) {
-  let calls = root.calls;
-  let node;
-  for (let key of path.split(" > ")) {
-    node = calls.find((node) => node.key == key);
-    if (!node) {
-      break;
-    }
-    calls = node.calls;
-  }
-  return node;
 }
 
 /**

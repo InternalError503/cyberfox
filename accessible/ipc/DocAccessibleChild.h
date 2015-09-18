@@ -32,8 +32,19 @@ public:
   { MOZ_COUNT_CTOR(DocAccessibleChild); }
   ~DocAccessibleChild()
   {
-    mDoc->SetIPCDoc(nullptr);
+    // Shutdown() should have been called, but maybe it isn't if the process is
+    // killed?
+    MOZ_ASSERT(!mDoc);
+    if (mDoc)
+      mDoc->SetIPCDoc(nullptr);
     MOZ_COUNT_DTOR(DocAccessibleChild);
+  }
+
+  void Shutdown()
+  {
+    mDoc->SetIPCDoc(nullptr);
+    mDoc = nullptr;
+    SendShutdown();
   }
 
   void ShowEvent(AccShowEvent* aShowEvent);
@@ -396,6 +407,9 @@ public:
   virtual bool RecvIndexOfEmbeddedChild(const uint64_t& aID,
                                         const uint64_t& aChildID,
                                         uint32_t* aChildIdx) override final;
+
+  virtual bool RecvEmbeddedChildAt(const uint64_t& aID, const uint32_t& aIdx,
+                                   uint64_t* aChildID) override final;
 
   virtual bool RecvChildAtPoint(const uint64_t& aID,
                                 const int32_t& aX,

@@ -455,6 +455,9 @@ void
 EventStateManager::OnStartToObserveContent(
                      IMEContentObserver* aIMEContentObserver)
 {
+  if (mIMEContentObserver == aIMEContentObserver) {
+    return;
+  }
   ReleaseCurrentIMEContentObserver();
   mIMEContentObserver = aIMEContentObserver;
 }
@@ -580,6 +583,15 @@ EventStateManager::PreHandleEvent(nsPresContext* aPresContext,
     }
     break;
   }
+  case NS_MOUSE_ENTER_WIDGET:
+    // In some cases on e10s NS_MOUSE_ENTER_WIDGET
+    // event was sent twice into child process of content.
+    // (From specific widget code (sending is not permanent) and
+    // from ESM::DispatchMouseOrPointerEvent (sending is permanent)).
+    // Flag mNoCrossProcessBoundaryForwarding helps to
+    // suppress sending accidental event from widget code.
+    aEvent->mFlags.mNoCrossProcessBoundaryForwarding = true;
+    break;
   case NS_MOUSE_EXIT_WIDGET:
     // If this is a remote frame, we receive NS_MOUSE_EXIT_WIDGET from the parent
     // the mouse exits our content. Since the parent may update the cursor
@@ -591,6 +603,10 @@ EventStateManager::PreHandleEvent(nsPresContext* aPresContext,
     if (XRE_GetProcessType() == GeckoProcessType_Content) {
       ClearCachedWidgetCursor(mCurrentTarget);
     }
+
+    // Flag helps to suppress double event sending into process of content.
+    // For more information see comment above, at NS_MOUSE_ENTER_WIDGET case.
+    aEvent->mFlags.mNoCrossProcessBoundaryForwarding = true;
 
     // If the event is not a top-level window exit, then it's not
     // really an exit --- we may have traversed widget boundaries but
@@ -1183,7 +1199,6 @@ CrossProcessSafeEvent(const WidgetEvent& aEvent)
     case NS_CONTEXTMENU:
     case NS_MOUSE_ENTER_WIDGET:
     case NS_MOUSE_EXIT_WIDGET:
-    case NS_MOUSE_OVER:
       return true;
     default:
       return false;
@@ -1589,7 +1604,7 @@ EventStateManager::GenerateDragGesture(nsPresContext* aPresContext,
   if (IsTrackingDragGesture()) {
     mCurrentTarget = mGestureDownFrameOwner->GetPrimaryFrame();
 
-    if (!mCurrentTarget) {
+    if (!mCurrentTarget || !mCurrentTarget->GetNearestWidget()) {
       StopTrackingDragGesture();
       return;
     }
@@ -3269,12 +3284,13 @@ EventStateManager::PostHandleEvent(nsPresContext* aPresContext,
       }
       if (dispatchedToContentProcess) {
         dragSession->SetCanDrop(true);
-      }
-
-      // now set the drop effect in the initial dataTransfer. This ensures
-      // that we can get the desired drop effect in the drop event.
-      if (initialDataTransfer)
+      } else if (initialDataTransfer) {
+        // Now set the drop effect in the initial dataTransfer. This ensures
+        // that we can get the desired drop effect in the drop event. For events
+        // dispatched to content, the content process will take care of setting
+        // this.
         initialDataTransfer->SetDropEffectInt(dropEffect);
+      }
     }
     break;
 
@@ -3695,8 +3711,18 @@ EventStateManager::IsHandlingUserInput()
   }
 
   TimeDuration timeout = nsContentUtils::HandlingUserInputTimeout();
-  return timeout <= TimeDuration(0) ||
-         (TimeStamp::Now() - sHandlingInputStart) <= timeout;
+  TimeDuration elapsed = TimeStamp::Now() - sHandlingInputStart;
+  bool inTime = timeout <= TimeDuration(0) || elapsed <= timeout;
+
+  if (!inTime) {
+#ifdef DEBUG
+    printf("EventStateManager::IsHandlingUserInput() has timed out "
+           "(timeout: %f, elapsed: %f)\n",
+           timeout.ToMilliseconds(), elapsed.ToMilliseconds());
+#endif
+    return false;
+  }
+  return true;
 }
 
 static void
@@ -3931,10 +3957,15 @@ EventStateManager::NotifyMouseOut(WidgetMouseEvent* aMouseEvent,
     SetContentState(nullptr, NS_EVENT_STATE_HOVER);
   }
 
+  // In case we go out from capturing element (retargetedByPointerCapture is true)
+  // we should dispatch NS_POINTER_LEAVE event and only for capturing element.
+  nsRefPtr<nsIContent> movingInto = aMouseEvent->retargetedByPointerCapture
+                                    ? wrapper->mLastOverElement->GetParent()
+                                    : aMovingInto;
+
   EnterLeaveDispatcher leaveDispatcher(this, wrapper->mLastOverElement,
-                                       aMovingInto, aMouseEvent,
-                                       isPointer ? NS_POINTER_LEAVE :
-                                                   NS_MOUSELEAVE);
+                                       movingInto, aMouseEvent,
+                                       isPointer ? NS_POINTER_LEAVE : NS_MOUSELEAVE);
 
   // Fire mouseout
   DispatchMouseOrPointerEvent(aMouseEvent, isPointer ? NS_POINTER_OUT : NS_MOUSE_OUT,

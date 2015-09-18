@@ -20,12 +20,8 @@
 #include "vpx/vpx_decoder.h"
 
 #undef LOG
-#ifdef PR_LOGGING
 PRLogModuleInfo* GetDemuxerLog();
-#define LOG(...) PR_LOG(GetDemuxerLog(), PR_LOG_DEBUG, (__VA_ARGS__))
-#else
-#define LOG(...)
-#endif
+#define LOG(...) MOZ_LOG(GetDemuxerLog(), mozilla::LogLevel::Debug, (__VA_ARGS__))
 
 using namespace mp4_demuxer;
 
@@ -174,6 +170,11 @@ IntelWebMVideoDecoder::Demux(nsRefPtr<VP8Sample>& aSample, bool* aEOS)
     return false;
   }
 
+  if (count > 1) {
+    NS_WARNING("Packet contains more than one video frame");
+    return false;
+  }
+
   int64_t tstamp = holder->Timestamp();
 
   // The end time of this frame is the start time of the next frame.  Fetch
@@ -191,34 +192,32 @@ IntelWebMVideoDecoder::Demux(nsRefPtr<VP8Sample>& aSample, bool* aEOS)
   }
   mReader->SetLastVideoFrameTime(tstamp);
 
-  for (uint32_t i = 0; i < count; ++i) {
-    unsigned char* data;
-    size_t length;
-    r = nestegg_packet_data(packet, i, &data, &length);
-    if (r == -1) {
-      return false;
-    }
+  unsigned char* data;
+  size_t length;
+  r = nestegg_packet_data(packet, 0, &data, &length);
+  if (r == -1) {
+    return false;
+  }
 
-    vpx_codec_stream_info_t si;
-    memset(&si, 0, sizeof(si));
-    si.sz = sizeof(si);
-    if (mReader->GetVideoCodec() == NESTEGG_CODEC_VP8) {
-      vpx_codec_peek_stream_info(vpx_codec_vp8_dx(), data, length, &si);
-    } else if (mReader->GetVideoCodec() == NESTEGG_CODEC_VP9) {
-      vpx_codec_peek_stream_info(vpx_codec_vp9_dx(), data, length, &si);
-    }
+  vpx_codec_stream_info_t si;
+  PodZero(&si);
+  si.sz = sizeof(si);
+  if (mReader->GetVideoCodec() == NESTEGG_CODEC_VP8) {
+    vpx_codec_peek_stream_info(vpx_codec_vp8_dx(), data, length, &si);
+  } else if (mReader->GetVideoCodec() == NESTEGG_CODEC_VP9) {
+    vpx_codec_peek_stream_info(vpx_codec_vp9_dx(), data, length, &si);
+  }
 
-    MOZ_ASSERT(mPlatform && mMediaDataDecoder);
+  MOZ_ASSERT(mPlatform && mMediaDataDecoder);
 
-    aSample = new VP8Sample(tstamp,
-                            next_tstamp - tstamp,
-                            0,
-                            data,
-                            length,
-                            si.is_kf);
-    if (!aSample->mData) {
-      return false;
-    }
+  aSample = new VP8Sample(tstamp,
+                          next_tstamp - tstamp,
+                          0,
+                          data,
+                          length,
+                          si.is_kf);
+  if (!aSample->mData) {
+    return false;
   }
 
   return true;

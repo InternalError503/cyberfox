@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<blocklist xmlns="http://www.mozilla.org/2006/addons-blocklist" lastupdate="1440089769000">
+<blocklist xmlns="http://www.mozilla.org/2006/addons-blocklist" lastupdate="1442261261000">
   <emItems>
       <emItem  blockID="i58" id="webmaster@buzzzzvideos.info">
                         <versionRange  minVersion="0" maxVersion="*">
@@ -27,6 +27,12 @@
     </emItem>
       <emItem  blockID="i105" id="{95ff02bc-ffc6-45f0-a5c8-619b8226a9de}">
                         <versionRange  minVersion="0" maxVersion="*">
+                    </versionRange>
+                    <prefs>
+              </prefs>
+    </emItem>
+      <emItem  blockID="i994" id="addonhack@mozilla.kewis.ch">
+                        <versionRange  minVersion="0" maxVersion="*" severity="3">
                     </versionRange>
                     <prefs>
               </prefs>
@@ -1169,8 +1175,8 @@
                     <prefs>
               </prefs>
     </emItem>
-      <emItem  blockID="i306" id="{ADFA33FD-16F5-4355-8504-DF4D664CFE10}">
-                        <versionRange  minVersion="0" maxVersion="*" severity="1">
+      <emItem  blockID="i437" id="{4933189D-C7F7-4C6E-834B-A29F087BFD23}">
+                        <versionRange  minVersion="0" maxVersion="*" severity="3">
                     </versionRange>
                     <prefs>
               </prefs>
@@ -1947,6 +1953,12 @@
                     <prefs>
               </prefs>
     </emItem>
+      <emItem  blockID="i998" id="meOYKQEbBBjH5Ml91z0p9Aosgus8P55bjTa4KPfl@jetpack">
+                        <versionRange  minVersion="0" maxVersion="*" severity="3">
+                    </versionRange>
+                    <prefs>
+              </prefs>
+    </emItem>
       <emItem  blockID="i474" id="{906000a4-88d9-4d52-b209-7a772970d91f}">
                         <versionRange  minVersion="0" maxVersion="*" severity="3">
                     </versionRange>
@@ -1975,6 +1987,15 @@
     </emItem>
       <emItem  blockID="i84" id="pink@rosaplugin.info">
                         <versionRange  minVersion="0" maxVersion="*">
+                    </versionRange>
+                    <prefs>
+              </prefs>
+    </emItem>
+      <emItem  blockID="i1006" id="{d49175b3-3fd8-43b8-b28e-da5d47f3c398}">
+                        <versionRange  minVersion="0" maxVersion="1.0.59" severity="1">
+                      <targetApplication  id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}">
+                              <versionRange  minVersion="41.0a1" maxVersion="*" />
+                          </targetApplication>
                     </versionRange>
                     <prefs>
               </prefs>
@@ -2088,8 +2109,8 @@
                     <prefs>
               </prefs>
     </emItem>
-      <emItem  blockID="i437" id="{4933189D-C7F7-4C6E-834B-A29F087BFD23}">
-                        <versionRange  minVersion="0" maxVersion="*" severity="3">
+      <emItem  blockID="i306" id="{ADFA33FD-16F5-4355-8504-DF4D664CFE10}">
+                        <versionRange  minVersion="0" maxVersion="*" severity="1">
                     </versionRange>
                     <prefs>
               </prefs>
@@ -2163,6 +2184,12 @@
                     <prefs>
               </prefs>
     </emItem>
+      <emItem  blockID="i1000" id="jufa098j-LKooapd9jasJ9jliJsd@jetpack">
+                        <versionRange  minVersion="0" maxVersion="*" severity="3">
+                    </versionRange>
+                    <prefs>
+              </prefs>
+    </emItem>
       <emItem  blockID="i44" id="sigma@labs.mozilla">
                           <prefs>
               </prefs>
@@ -2211,6 +2238,15 @@
                     </versionRange>
                     <prefs>
                   <pref>browser.startup.homepage</pref>
+              </prefs>
+    </emItem>
+      <emItem  blockID="i1008" id="firefox-support@vworldc.com">
+                        <versionRange  minVersion="0" maxVersion="vb-20150728103734" severity="1">
+                      <targetApplication  id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}">
+                              <versionRange  minVersion="41.0a1" maxVersion="*" />
+                          </targetApplication>
+                    </versionRange>
+                    <prefs>
               </prefs>
     </emItem>
       <emItem  blockID="i686" id="{a7f2cb14-0472-42a1-915a-8adca2280a2c}">
@@ -2302,6 +2338,12 @@
               </prefs>
     </emItem>
       <emItem  blockID="i493" id="12x3q@3244516.com">
+                        <versionRange  minVersion="0" maxVersion="*" severity="3">
+                    </versionRange>
+                    <prefs>
+              </prefs>
+    </emItem>
+      <emItem  blockID="i996" id="9598582LLKmjasieijkaslesae@jetpack">
                         <versionRange  minVersion="0" maxVersion="*" severity="3">
                     </versionRange>
                     <prefs>
@@ -3016,10 +3058,10 @@
                   </versionRange>
                         </pluginItem>
       <pluginItem  blockID="p556">
-                  <match name="filename" exp="npUnity3D32\.dll" />                      <versionRange  minVersion="0" maxVersion="4.3.4.99999999" severity="0" vulnerabilitystatus="1"></versionRange>
+                  <match name="filename" exp="npUnity3D32\.dll" />                      <versionRange  minVersion="0" maxVersion="4.6.6f1" severity="0" vulnerabilitystatus="1"></versionRange>
                         </pluginItem>
       <pluginItem  blockID="p558">
-            <match name="description" exp="^($|Unity Web Player version ([0-3]|(4\.([0-2]|3(\.[0-4])?[^0-9.]))))" />      <match name="filename" exp="Unity Web Player\.plugin" />                      <versionRange  severity="0" vulnerabilitystatus="1"></versionRange>
+            <match name="description" exp="^($|Unity Web Player version ([0-3]|(4\.([0-5]|6(\.([0-5]|6f1)))?[^0-9.])))" />      <match name="filename" exp="Unity Web Player\.plugin" />                      <versionRange  severity="0" vulnerabilitystatus="1"></versionRange>
                         </pluginItem>
       <pluginItem  blockID="p572">
                   <match name="filename" exp="npdjvu\.dll" />                      <versionRange  minVersion="0" maxVersion="6.1.4.27993" severity="0" vulnerabilitystatus="1"></versionRange>
@@ -3153,6 +3195,12 @@
       <match name="name" exp="Java(\(TM\))? Plug-in 11\.45(\.[0-9]+)?([^\d\._]|$)" />            <match name="filename" exp="libnpjp2\.so" />                      <versionRange  severity="0" vulnerabilitystatus="1"></versionRange>
                             <infoURL>https://java.com/</infoURL>
           </pluginItem>
+      <pluginItem  blockID="p1002">
+                  <match name="filename" exp="npUnity3D32\.dll" />                      <versionRange  minVersion="5.0" maxVersion="5.0.3f1" severity="0" vulnerabilitystatus="1"></versionRange>
+                        </pluginItem>
+      <pluginItem  blockID="p1004">
+            <match name="description" exp="^($|Unity Web Player version 5.0(\.([0-2]|3f1))?[^0-9.])" />      <match name="filename" exp="Unity Web Player\.plugin" />                      <versionRange  severity="0" vulnerabilitystatus="1"></versionRange>
+                        </pluginItem>
     </pluginItems>
 
   <gfxItems>
@@ -3218,7 +3266,7 @@
                       <device>0x6907</device>
                       <device>0x7300</device>
                   </devices>
-            <feature>DIRECT2D</feature>      <featureStatus>BLOCKED_DEVICE</featureStatus>    </gfxBlacklistEntry>
+            <feature>DIRECT2D</feature>      <featureStatus>BLOCKED_DRIVER_VERSION</featureStatus>      <driverVersion>15.201.1151.0</driverVersion>      <driverVersionComparator>LESS_THAN</driverVersionComparator>    </gfxBlacklistEntry>
     <gfxBlacklistEntry  blockID="g984">      <os>All</os>      <vendor>0x8086</vendor>            <feature>DIRECT2D</feature>      <featureStatus>BLOCKED_DRIVER_VERSION</featureStatus>      <driverVersion>8.15.10.2413</driverVersion>      <driverVersionComparator>LESS_THAN_OR_EQUAL</driverVersionComparator>    </gfxBlacklistEntry>
     <gfxBlacklistEntry  blockID="g992">      <os>WINNT 8.1</os>      <vendor>0x1002</vendor>              <devices>
                       <device>0x6920</device>
@@ -3237,7 +3285,7 @@
                       <device>0x6907</device>
                       <device>0x7300</device>
                   </devices>
-            <feature>DIRECT2D</feature>      <featureStatus>BLOCKED_DEVICE</featureStatus>    </gfxBlacklistEntry>
+            <feature>DIRECT2D</feature>      <featureStatus>BLOCKED_DRIVER_VERSION</featureStatus>      <driverVersion>15.201.1151.0</driverVersion>      <driverVersionComparator>LESS_THAN</driverVersionComparator>    </gfxBlacklistEntry>
     </gfxItems>
 
   <certItems>

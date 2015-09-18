@@ -262,6 +262,9 @@ public:
     PVoicemailChild* SendPVoicemailConstructor(PVoicemailChild* aActor);
     virtual bool DeallocPVoicemailChild(PVoicemailChild*) override;
 
+    virtual PMediaChild* AllocPMediaChild() override;
+    virtual bool DeallocPMediaChild(PMediaChild* aActor) override;
+
     virtual PStorageChild* AllocPStorageChild() override;
     virtual bool DeallocPStorageChild(PStorageChild* aActor) override;
 
@@ -302,10 +305,6 @@ public:
 
     virtual bool RecvUpdateServiceWorkerRegistrations() override;
 
-    virtual bool RecvRemoveServiceWorkerRegistrationsForDomain(const nsString& aDomain) override;
-
-    virtual bool RecvRemoveServiceWorkerRegistrations() override;
-
     virtual bool RecvNotifyVisited(const URIParams& aURI) override;
     // auto remove when alertfinished is received.
     nsresult AddRemoteAlertObserver(const nsString& aData, nsIObserver* aObserver);
@@ -345,6 +344,7 @@ public:
     virtual bool RecvAppInfo(const nsCString& version, const nsCString& buildID,
                              const nsCString& name, const nsCString& UAName,
                              const nsCString& ID, const nsCString& vendor) override;
+    virtual bool RecvAppInit() override;
 
     virtual bool RecvLastPrivateDocShellDestroyed() override;
 
@@ -378,8 +378,6 @@ public:
 
     virtual bool RecvNotifyPhoneStateChange(const nsString& state) override;
 
-    virtual bool RecvNuwaFreeze() override;
-
     void AddIdleObserver(nsIObserver* aObserver, uint32_t aIdleTimeInS);
     void RemoveIdleObserver(nsIObserver* aObserver, uint32_t aIdleTimeInS);
     virtual bool RecvNotifyIdleObserver(const uint64_t& aObserver,
@@ -399,7 +397,7 @@ public:
                                    nsTArray<nsCString>&& aFeatures,
                                    nsTArray<nsCString>&& aThreadNameFilters) override;
     virtual bool RecvStopProfiler() override;
-    virtual bool RecvGetProfile(nsCString* aProfile) override;
+    virtual bool RecvGatherProfile() override;
     virtual bool RecvDomainSetChanged(const uint32_t& aSetType, const uint32_t& aChangeType,
                                       const OptionalURIParams& aDomain) override;
     virtual bool RecvShutdown() override;
@@ -447,8 +445,6 @@ public:
                                          const ContentParentId& aCpID,
                                          const bool& aIsForApp,
                                          const bool& aIsForBrowser) override;
-    virtual PDocAccessibleChild* AllocPDocAccessibleChild(PDocAccessibleChild*, const uint64_t&) override;
-    virtual bool DeallocPDocAccessibleChild(PDocAccessibleChild*) override;
 
     void GetAvailableDictionaries(InfallibleTArray<nsString>& aDictionaries);
 

@@ -402,7 +402,7 @@ nsJSIID::Resolve(nsIXPConnectWrappedNative* wrapper,
         *resolvedp = true;
         *_retval = JS_DefinePropertyById(cx, obj, id, val,
                                          JSPROP_ENUMERATE | JSPROP_READONLY |
-                                         JSPROP_PERMANENT);
+                                         JSPROP_PERMANENT | JSPROP_RESOLVING);
     }
 
     return NS_OK;
@@ -712,7 +712,7 @@ nsJSCID::Construct(nsIXPConnectWrappedNative* wrapper,
 
     // 'push' a call context and call on it
     RootedId name(cx, rt->GetStringID(XPCJSRuntime::IDX_CREATE_INSTANCE));
-    XPCCallContext ccx(JS_CALLER, cx, obj, JS::NullPtr(), name, args.length(), args.array(),
+    XPCCallContext ccx(JS_CALLER, cx, obj, nullptr, name, args.length(), args.array(),
                        args.rval().address());
 
     *_retval = XPCWrappedNative::CallMethod(ccx);
