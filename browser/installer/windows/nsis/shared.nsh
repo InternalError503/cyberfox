@@ -202,6 +202,8 @@ ${EndIf}
   ${ShowShortcuts}
   ${StrFilter} "${FileMainEXE}" "+" "" "" $R9
   WriteRegStr HKLM "Software\Clients\StartMenuInternet" "" "$R9"
+  ; Sloppy hack taskbar duplication.
+  DeleteRegKey HKCU "Software\mozilla\Cyberfox"
 !macroend
 !define SetAsDefaultAppGlobal "!insertmacro SetAsDefaultAppGlobal"
 
@@ -1427,6 +1429,8 @@ FunctionEnd
 !ifdef NO_LOG
 
 Function SetAsDefaultAppUser
+  ; Sloppy hack taskbar duplication.
+  DeleteRegKey HKCU "Software\mozilla\Cyberfox"
   ; On Win8, we want to avoid having a UAC prompt since we'll already have
   ; another action for control panel default browser selection popping up
   ; to the user.  Win8 is the first OS where the start menu keys can be
