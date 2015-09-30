@@ -6,14 +6,14 @@ pref("startup.homepage_override_url","https://cyberfox.8pecxstudios.com/hooray-y
 pref("startup.homepage_welcome_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 
 #ifdef HAVE_64BIT_BUILD
-pref("app.update.url.manual", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64/?downloadID=intel64"); 
-pref("app.update.url.details", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64");
+pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64"); 
+pref("app.update.url.details", "https://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64");
 #else
-pref("app.update.url.manual", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x86?downloadID=intel86"); 
-pref("app.update.url.details", "http://cyberfox.8pecxstudios.com/cyberfox-intel-version-x86");
+pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/cyberfox-intel-version-x86"); 
+pref("app.update.url.details", "https://cyberfox.8pecxstudios.com/cyberfox-intel-version-x86");
 #endif
 
-pref("app.update.check.url", "http://download.8pecxstudios.com/current_version/update.json");
+pref("app.update.check.url", "https://download.8pecxstudios.com/current_version/update.json");
 // app.update.channel.type:
 // release  current release channel version
 // beta current beta channel version (Note: only if applicable meaning only if beta version is release with this setting enabled)

@@ -157,7 +157,7 @@ function init(aEvent) {
                             case true:
                                 ElementState("update-button-checking-throbber", true);
                                 ElementState("update-button-checking", true);
-                                Services.prefs.setCharPref("app.update.url.manual", "http://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=" + Services.appinfo.version);
+                                Services.prefs.setCharPref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=" + Services.appinfo.version);
                                 ElementState("update-button-no-update", false);
                                 //set the browsers core version in-case "app.update.url.manual" is not changed from a browser update or switched versions.
                                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));

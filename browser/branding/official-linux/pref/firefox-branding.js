@@ -9,7 +9,7 @@ pref("app.update.url.details", "");
 pref("app.releaseNotesURL", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 pref("app.vendorURL", "https://8pecxstudios.com/");
 
-pref("app.update.check.url", "http://download.8pecxstudios.com/current_version/update.json");
+pref("app.update.check.url", "https://download.8pecxstudios.com/current_version/update.json");
 // app.update.channel.type:
 // release  current release channel version
 // beta current beta channel version (Note: only if applicable meaning only if beta version is release with this setting enabled)
