@@ -19,6 +19,11 @@ pref("app.update.check.url", "http://download.8pecxstudios.com/current_version/u
 // beta current beta channel version (Note: only if applicable meaning only if beta version is release with this setting enabled)
 // esr current esr channel version (Note: only if applicable meaning only if we release cyberfox esr with this setting enabled)
 pref("app.update.channel.type", "release");
+//Set last update check preference.
+pref("app.update.check.lastcheck", 0);
+//Set if update available
+pref("app.update.available", false);
+
 
 pref("app.releaseNotesURL", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 pref("app.vendorURL", "https://8pecxstudios.com/");

@@ -494,87 +494,95 @@ var gCyberfoxCustom = {
 
             try {
 
+			//Only run start-up once daily to reduce server load.
+			var curTime = new Date();
+			
                 //Set Global to disable update checks entirely 
-                if (Services.prefs.getBoolPref("app.update.check.enabled")) {
+                if (Services.prefs.getBoolPref("app.update.check.enabled") && Services.prefs.getIntPref("app.update.check.lastcheck") != curTime.getDate()) {
+														
+						//Get Latest Browser Version
+						//Unfortunately same origin policy's prevent us using HTTPS here.
+						let url = Services.prefs.getCharPref("app.update.check.url");
+						let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+							.createInstance(Components.interfaces.nsIXMLHttpRequest);
 
-                    //Get Latest Browser Version
-                    //Unfortunately same origin policy's prevent us using HTTPS here.
-                    let url = Services.prefs.getCharPref("app.update.check.url");
-                    let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                        .createInstance(Components.interfaces.nsIXMLHttpRequest);
+						request.onload = function(aEvent) {
 
-                    request.onload = function(aEvent) {
+							let text = aEvent.target.responseText;
 
-                        let text = aEvent.target.responseText;
+							//Need to check if json is valid, If json not valid don't continue and show error.
+							function IsJsonValid(text) {
+								try {
+									JSON.parse(text);
+								} catch (e) {
+									return false;
+								}
+								return true;
+							}
+							let jsObject;
+							let currentVersion;
+							if (!IsJsonValid(text)) { 
+								//Throw error message	
+								console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
+								//Return error
+								return;
+							} else {
+								jsObject = JSON.parse(text);
+							}
 
-                        //Need to check if json is valid, If json not valid don't continue and show error.
-                        function IsJsonValid(text) {
-                            try {
-                                JSON.parse(text);
-                            } catch (e) {
-                                return false;
-                            }
-                            return true;
-                        }
-                        let jsObject;
-                        let currentVersion;
-                        if (!IsJsonValid(text)) { 
-                            //Throw error message	
-                            console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
-                            //Return error
-                            return;
-                        } else {
-                            jsObject = JSON.parse(text);
-                        }
+							switch (Services.prefs.getCharPref("app.update.channel.type")) {
+								case "release": currentVersion = jsObject.release; break;
+								case "beta":currentVersion = jsObject.beta;break;
+								case "esr":currentVersion = jsObject.esr;break;
+							}
 
-                        switch (Services.prefs.getCharPref("app.update.channel.type")) {
-                            case "release": currentVersion = jsObject.release; break;
-                            case "beta":currentVersion = jsObject.beta;break;
-                            case "esr":currentVersion = jsObject.esr;break;
-                        }
+							if (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()) === false && aBoolean === true) {
+								try {
+									Cc['@mozilla.org/alerts-service;1']
+											  .getService(Ci.nsIAlertsService)
+											  .showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
+									//Set last check date.
+									Services.prefs.setIntPref("app.update.check.lastcheck", curTime.getDate());
+									//Set update available
+									Services.prefs.setBoolPref("app.update.available", true);
+								  } catch(e) {
+									// prevents runtime error on platforms that don't implement nsIAlertsService
+								  }								
+							}else{
+								//Set update available
+								Services.prefs.setBoolPref("app.update.available", false);								
+							}	
 
-                        if (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()) === false && aBoolean === true) {
-							var message = "New Cyberfox "+ currentVersion.toString() + " update available!";
-							var nb = gBrowser.getNotificationBox();
-							const priority = nb.PRIORITY_WARNING_HIGH;
-							var updateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
-								if (updateNotification) {
-									return;
-								}else{
-									nb.appendNotification(message, 'cyberfoxupdate', 'chrome://branding/content/icon16.png', priority, null);
-								}	
-                        }
+						};
 
-                    };
+						request.ontimeout = function(aEvent) {
+							//Log return failed check message for request time-out!
+							console.log("Update Check Failed!" + " " + "Were sorry something has gone wrong! The check for update has failed Please check your internet connection or if cyberfox is not being blocked by a firewall!");
+						};
 
-                    request.ontimeout = function(aEvent) {
-                        //Log return failed check message for request time-out!
-                        console.log("Update Check Failed!" + " " + "Were sorry something has gone wrong! The check for update has failed Please check your internet connection or if cyberfox is not being blocked by a firewall!");
-                    };
+						request.onerror = function(aEvent) {
+							//Marked to add better error handling and messages.
+							switch (aEvent.target.status) {
+								case 0:
+									//Log return failed request message for status 0 unsent
+									console.log("Update Check Failed!" + " " + 
+									"Were sorry something has gone wrong! The request for update check was unable to be sent! Please check your internet connection or if cyberfox is not being blocked by a firewall!");break;
+								case 1: console.log("Error Status: " + aEvent.target.status);break;
+								case 2:console.log("Error Status: " + aEvent.target.status);break;
+								case 3:console.log("Error Status: " + aEvent.target.status);break;
+								case 4:console.log("Error Status: " + aEvent.target.status);break;
+								default:console.log("Error Status: " + aEvent.target.status);break;
+							}
+						};
 
-                    request.onerror = function(aEvent) {
-                        //Marked to add better error handling and messages.
-                        switch (aEvent.target.status) {
-                            case 0:
-                                //Log return failed request message for status 0 unsent
-                                console.log("Update Check Failed!" + " " + 
-								"Were sorry something has gone wrong! The request for update check was unable to be sent! Please check your internet connection or if cyberfox is not being blocked by a firewall!");break;
-                            case 1: console.log("Error Status: " + aEvent.target.status);break;
-                            case 2:console.log("Error Status: " + aEvent.target.status);break;
-							case 3:console.log("Error Status: " + aEvent.target.status);break;
-							case 4:console.log("Error Status: " + aEvent.target.status);break;
-							default:console.log("Error Status: " + aEvent.target.status);break;
-                        }
-                    };
-
-                    //Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
-                    request.timeout = 5000;
-                    request.open("GET", url, true);
-                    request.setRequestHeader("Content-Type", "application/json");
-                    request.send(null);
-
+						//Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
+						request.timeout = 5000;
+						request.open("GET", url, true);
+						request.setRequestHeader("Content-Type", "application/json");
+						request.send(null);
+						
                 }
-
+				
             } catch (eve) {
                 //Show error
                 Components.utils.reportError(eve);
@@ -591,7 +599,16 @@ window.addEventListener("load", function() {
 	window.removeEventListener("load",gCyberfoxCustom.startupUpdateCheck(), false);
 	window.setTimeout(function(){
 		gCyberfoxCustom.startupUpdateCheck(true);
-	},6000);
+		if (Services.prefs.getBoolPref("app.update.autocheck") && 
+			Services.prefs.getBoolPref("app.update.available")){		
+				try {
+					Cc['@mozilla.org/alerts-service;1'].getService(Ci.nsIAlertsService)
+						.showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
+				} catch(e) {
+					// prevents runtime error on platforms that don't implement nsIAlertsService
+			}				
+		}
+	},6000);	
 }, false);
 
 
