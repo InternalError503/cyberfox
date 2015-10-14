@@ -9,6 +9,7 @@ Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/LoadContextInfo.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://gre/modules/AppConstants.jsm");
 
 var gAdvancedPane = {
   _inited: false,
@@ -28,14 +29,13 @@ var gAdvancedPane = {
 		document.getElementById("app.update.check.enabled").hidden = true;
 		Services.prefs.setBoolPref("app.update.autocheck", false);
 		Services.prefs.setBoolPref("app.update.check.enabled", false);		
-	}	
-  //If windows vista x64 hide Hardware acceleration.
-  var osWin = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS=="WINNT";
-  if (osWin){
-	  if(/6.0; Win64/.test(window.navigator.oscpu)){
-		  document.getElementById('allowHWAccel').hidden=true;
-	  }	
-  }	
+	}
+	
+    //If windows vista disable & hide Hardware acceleration.
+    if (AppConstants.platform == "win" && !AppConstants.isPlatformAndVersionAtLeast("win", "6.0")) {
+		  document.getElementById('allowHWAccel').hidden=true;	
+	}
+  
     var extraArgs = window.arguments[1];
     if (extraArgs && extraArgs["advancedTab"]){
       advancedPrefs.selectedTab = document.getElementById(extraArgs["advancedTab"]);

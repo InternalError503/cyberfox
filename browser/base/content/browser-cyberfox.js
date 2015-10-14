@@ -376,15 +376,12 @@ var gCyberfoxCustom = {
 
             }, false);
 
-        //If windows vista x64 disable Hardware acceleration.
-        var osWin = Services.appinfo.OS == "WINNT";
-        if (osWin) {
-            if (/6.0; Win64/.test(window.navigator.oscpu)) {
+        //If windows vista disable & hide Hardware acceleration.
+        if (AppConstants.platform == "win" && !AppConstants.isPlatformAndVersionAtLeast("win", "6.0")) {
                 Services.prefs.setBoolPref("gfx.direct2d.disabled", true);
                 Services.prefs.setBoolPref("gfx.direct2d.use1_1", false);
                 Services.prefs.setBoolPref("layers.acceleration.disabled", true);
                 Services.prefs.setBoolPref("gfx.direct2d.force-enabled", false);
-            }
         }
 
         //Restart browser panel UI		
