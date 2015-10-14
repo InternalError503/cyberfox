@@ -482,8 +482,18 @@ var gCyberfoxCustom = {
 			Services.prefs.getBoolPref("app.update.available") && 
 			Services.prefs.getBoolPref("app.update.check.enabled")){
 			try {
-				Cc['@mozilla.org/alerts-service;1'].getService(Ci.nsIAlertsService)
-					.showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
+				if(Services.prefs.getBoolPref("app.update.notification-new")){
+					Cc['@mozilla.org/alerts-service;1'].getService(Ci.nsIAlertsService)
+						.showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
+					}else{
+						var nb = gBrowser.getNotificationBox();
+						var iupdateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
+						if (iupdateNotification) {
+							return;
+						}else{
+							nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
+						}						
+					}
 				} catch(e) {
 					// prevents runtime error on platforms that don't implement nsIAlertsService
 			}

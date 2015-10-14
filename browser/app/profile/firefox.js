@@ -2051,6 +2051,9 @@ pref("app.update.autocheck", true);
 //Update check browser version
 pref("app.update.check.enabled", true);
 
+//Set new notification pop-up
+pref("app.update.notification-new", false);
+
 //Auto check browser version on startup
 pref("app.update.startup.check", true);
 
