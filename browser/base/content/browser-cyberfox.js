@@ -479,6 +479,15 @@ var gCyberfoxCustom = {
 		if (Services.prefs.getBoolPref("app.update.autocheck") && 
 			Services.prefs.getBoolPref("app.update.available") && 
 			Services.prefs.getBoolPref("app.update.check.enabled")){
+			
+			//Set notification bar button.
+			var button = [];
+			button = [{
+				label: "View",
+				accessKey: "v",
+				callback: function() { openUILinkIn(Services.prefs.getCharPref("app.update.url.manual"), 'tab'); }
+			}];				
+				
 			try {
 				if(Services.prefs.getBoolPref("app.update.notification-new")){
 						if(AppConstants.platform == "win"){
@@ -490,7 +499,7 @@ var gCyberfoxCustom = {
 							if (iupdateNotification) {
 								return;
 							}else{
-								nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
+								nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
 							}
 						}
 					}else{
@@ -499,7 +508,7 @@ var gCyberfoxCustom = {
 						if (iupdateNotification) {
 							return;
 						}else{
-							nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
+							nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
 						}						
 					}
 				} catch(e) {
