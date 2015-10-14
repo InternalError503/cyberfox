@@ -10,7 +10,6 @@ pref("app.releaseNotesURL", "");
 pref("app.vendorURL", "");
 pref("app.update.check.url", "");
 pref("app.update.channel.type", "");
-pref("app.update.check.lastcheck", 0);
 pref("app.update.available", false);
 
 // Number of usages of the web console or scratchpad.

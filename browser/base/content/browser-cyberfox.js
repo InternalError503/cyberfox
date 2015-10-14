@@ -493,12 +493,9 @@ var gCyberfoxCustom = {
         if (Services.prefs.getBoolPref("app.update.autocheck")) {
 
             try {
-
-			//Only run start-up once daily to reduce server load.
-			var curTime = new Date();
 			
                 //Set Global to disable update checks entirely 
-                if (Services.prefs.getBoolPref("app.update.check.enabled") && Services.prefs.getIntPref("app.update.check.lastcheck") != curTime.getDate()) {
+                if (Services.prefs.getBoolPref("app.update.check.enabled")) {
 														
 						//Get Latest Browser Version
 						//Unfortunately same origin policy's prevent us using HTTPS here.
@@ -541,8 +538,6 @@ var gCyberfoxCustom = {
 									Cc['@mozilla.org/alerts-service;1']
 											  .getService(Ci.nsIAlertsService)
 											  .showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
-									//Set last check date.
-									Services.prefs.setIntPref("app.update.check.lastcheck", curTime.getDate());
 									//Set update available
 									Services.prefs.setBoolPref("app.update.available", true);
 								  } catch(e) {
