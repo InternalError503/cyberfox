@@ -1,5 +1,6 @@
 (function(global) {
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/AppConstants.jsm");
 
 if (typeof gCyberfoxCustom == "undefined") {
     var gCyberfoxCustom = {};
@@ -483,13 +484,18 @@ var gCyberfoxCustom = {
 			Services.prefs.getBoolPref("app.update.check.enabled")){
 			try {
 				if(Services.prefs.getBoolPref("app.update.notification-new")){
-					Cc['@mozilla.org/alerts-service;1'].getService(Ci.nsIAlertsService)
-						.showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
-					}else{
-						var nb = gBrowser.getNotificationBox();
-						var iupdateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
-						if (iupdateNotification) {
-							return;
+						if(AppConstants.platform == "win"){
+							Cc['@mozilla.org/alerts-service;1'].getService(Ci.nsIAlertsService)
+							.showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
+						}else if(AppConstants.platform == "linux"){
+							var nb = gBrowser.getNotificationBox();
+							var iupdateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
+							if (iupdateNotification) {
+								return;
+							}else{
+								nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
+							}
+						}
 						}else{
 							nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
 						}						
@@ -607,7 +613,9 @@ window.addEventListener("load", function() {
 	window.removeEventListener("load",gCyberfoxCustom.startupUpdateCheck(), false);
 	window.setTimeout(function(){
 		gCyberfoxCustom.startupUpdateCheck(true);
-		gCyberfoxCustom.updateNotification();
+		if (AppConstants.platform == "win" || AppConstants.platform == "linux"){
+			gCyberfoxCustom.updateNotification();
+		}
 	},Services.prefs.getIntPref("app.update.startup-delay"));	
 }, false);
 
