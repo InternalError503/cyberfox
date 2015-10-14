@@ -513,8 +513,7 @@ var gCyberfoxCustom = {
 						//Get Latest Browser Version
 						//Unfortunately same origin policy's prevent us using HTTPS here.
 						let url = Services.prefs.getCharPref("app.update.check.url");
-						let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-							.createInstance(Components.interfaces.nsIXMLHttpRequest);
+						let request = new XMLHttpRequest();
 
 						request.onload = function(aEvent) {
 
@@ -563,17 +562,13 @@ var gCyberfoxCustom = {
 
 						request.ontimeout = function(aEvent) {
 							//Log return failed check message for request time-out!
-							console.log("Update Check Failed!" + " " + "Were sorry something has gone wrong! The check for update has failed Please check your internet connection or if cyberfox is not being blocked by a firewall!");
+							console.log("Startup update check failed! timed out");
 						};
 
 						request.onerror = function(aEvent) {
-							//Marked to add better error handling and messages.
 							switch (aEvent.target.status) {
-								case 0:
-									//Log return failed request message for status 0 unsent
-									console.log("Update Check Failed!" + " " + 
-									"Were sorry something has gone wrong! The request for update check was unable to be sent! Please check your internet connection or if cyberfox is not being blocked by a firewall!");break;
-								case 1: console.log("Error Status: " + aEvent.target.status);break;
+								case 0:console.log("Startup update check failed! no connection or blocked. " + aEvent.target.status);break;
+								case 1:console.log("Error Status: " + aEvent.target.status);break;
 								case 2:console.log("Error Status: " + aEvent.target.status);break;
 								case 3:console.log("Error Status: " + aEvent.target.status);break;
 								case 4:console.log("Error Status: " + aEvent.target.status);break;
@@ -581,8 +576,7 @@ var gCyberfoxCustom = {
 							}
 						};
 
-						//Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
-						request.timeout = 5000;
+						request.timeout = Services.prefs.getIntPref("app.update.startup-timeout");
 						request.open("GET", url, true);
 						request.setRequestHeader("Content-Type", "application/json");
 						request.send(null);

@@ -2057,6 +2057,9 @@ pref("app.update.startup.check", true);
 //Set startup check delay (6 Seconds)
 pref("app.update.startup-delay", 6000);
 
+//Set startup check timeout (5 Seconds)
+pref("app.update.startup-timeout", 5000);
+
 //set bool pref for copy tab url enabled
 pref("browser.tabs.copyurl", true);
 

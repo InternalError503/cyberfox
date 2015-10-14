@@ -3,7 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Services = object with smart getters for common XPCOM services
-Components.utils.import("resource://gre/modules/Services.jsm");
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+const Cu = Components.utils;
+Cu.import("resource://gre/modules/Services.jsm");
 
 //Setup Localised Messages.
 let _locMSG = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
@@ -26,13 +29,13 @@ function init(aEvent) {
                 try {
                     // This is in its own try catch due to bug 895473 and bug 900925.
                     var distroAbout = Services.prefs.getComplexValue("distribution.about",
-                        Components.interfaces.nsISupportsString);
+                        Ci.nsISupportsString);
                     var distroField = document.getElementById("distribution");
                     distroField.value = distroAbout;
                     distroField.style.display = "block";
                 } catch (ex) {
                     // Pref is unset
-                    Components.utils.reportError(ex);
+                    Cu.reportError(ex);
                 }
             }
         } catch (e) {
@@ -45,7 +48,6 @@ function init(aEvent) {
             let buildID = Services.appinfo.appBuildID;
             let buildDate = buildID.slice(0, 4) + "-" + buildID.slice(4, 6) + "-" + buildID.slice(6, 8);
             document.getElementById("version").textContent += " (" + buildDate + ")";
-            document.getElementById("experimental").hidden = false;
             document.getElementById("communityDesc").hidden = true;
         }
 
@@ -85,7 +87,7 @@ function init(aEvent) {
                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));
             } catch (ex) {
                 // Pref is unset
-                Components.utils.reportError(ex);
+                Cu.reportError(ex);
             }
 
             //feature prototype
@@ -101,8 +103,7 @@ function init(aEvent) {
                     //Get Latest Browser Version
                     //Unfortunately same origin policy's prevent us using HTTPS here.
                     let url = Services.prefs.getCharPref("app.update.check.url");
-                    let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                        .createInstance(Components.interfaces.nsIXMLHttpRequest);
+                    let request = new XMLHttpRequest();
 
                     request.onload = function(aEvent) {
 
@@ -189,11 +190,11 @@ function init(aEvent) {
                             case 0:
                                 //Log return failed request message for status 0 unsent
                                 console.log(_locMSG.GetStringFromName("updateCheckErrorTitle") + " " + _locMSG.GetStringFromName("updateRequestError"));break;
-                            case 1: console.log("Error Status: " + this.target.status);break;
-                            case 2:console.log("Error Status: " + this.target.status);break;
-							case 3:console.log("Error Status: " + this.target.status);break;
-							case 4:console.log("Error Status: " + this.target.status);break;
-							default:console.log("Error Status: " + this.target.status);break;
+                            case 1: console.log("Error Status: " + aEvent.target.status);break;
+                            case 2:console.log("Error Status: " + aEvent.target.status);break;
+							case 3:console.log("Error Status: " + aEvent.target.status);break;
+							case 4:console.log("Error Status: " + aEvent.target.status);break;
+							default:console.log("Error Status: " + aEvent.target.status);break;
                         }
                         //hide buttons		  
                         ElementState("update-button-checkNow", true);
@@ -214,7 +215,7 @@ function init(aEvent) {
 
             } catch (eve) {
                 //Show error
-                Components.utils.reportError(eve);
+                Cu.reportError(eve);
             }
 
         } else {
@@ -228,7 +229,7 @@ function init(aEvent) {
                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));
             } catch (ex) {
                 // Pref is unset
-                Components.utils.reportError(ex);
+                Cu.reportError(ex);
             }
             //hide buttons		  
             ElementState("update-button-checkNow", false);
@@ -274,7 +275,7 @@ var versions = {
 
         } catch (rv) {
             //Show error
-            Components.utils.reportError(rv);
+            Cu.reportError(rv);
         }
     }
 }
