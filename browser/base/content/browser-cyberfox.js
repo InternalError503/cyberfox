@@ -112,23 +112,21 @@ var gCyberfoxCustom = {
 
     //Get all the tab urls into a json array.
     getAllUrls: function() {
-
-        var _tabCount = gBrowser.browsers.length;
-
-        for (var i = 0; i < _tabCount; i++) {
-
-            var _browsersI = gBrowser.getBrowserAtIndex(i);
-
+		//We don't want to copy about uri's
+        var blacklist = /^about:(accounts|addons|app-manager|buildconfig|cache|config|customizing|downloads|home|newtab|license|logo|memory|networking|newaddon|permissions|plugins|preferences|privatebrowsing|rights|sessionrestore|support|serviceworkers|welcomeback)/i;
+		
+        var tabCount = gBrowser.browsers.length;
+        for (var i = 0; i < tabCount; i++) {
             try {
-                var urlItems = _browsersI.currentURI.spec;
-
-                this.urlArray.url.push({
-                    "url": urlItems
-                });
-
+                var urlItems = gBrowser.getBrowserAtIndex(i).currentURI.spec;				
+				if (!blacklist.test(urlItems)){
+					this.urlArray.url.push({
+						"url": urlItems
+					});
+				}				
             } catch (e) {
                 //Catch any nasty errors and output to dialogue
-                Components.utils.reportError(e);
+                Cu.reportError(e);
             }
         }
 
