@@ -493,6 +493,11 @@ var gCyberfoxCustom = {
 								nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
 							}
 						}
+					}else{
+						var nb = gBrowser.getNotificationBox();
+						var iupdateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
+						if (iupdateNotification) {
+							return;
 						}else{
 							nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, null);
 						}						
