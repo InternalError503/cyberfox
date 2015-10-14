@@ -175,16 +175,16 @@ var gCyberfoxCustom = {
 
     },
 
-    //When a user triggers the about:config menu item if the page is about:home or about:newtab then utilize that tab else open a new tab.
+    //When a user triggers the about:config menu item if the page is any in the whitelist then utilize that tab else open a new tab.
     openAboutConfig: function() {
         try {
-            if (content.location.href === "about:home" ||
-                content.location.href === "about:newtab") {
+			var whitelist = /^about:(home|newtab|addons|support|customizing|plugins|buildconfig|memory|serviceworkers)/i;
+            if (whitelist.test(content.location.href)) {
                 content.location.href = "about:config";
             } else {
                 gBrowser.selectedTab = openUILinkIn("about:config", 'tab');
             }
-        } catch (type) {
+        } catch (e) {
             //Catch any nasty errors and output to console
             console.log("Were sorry but something has gone wrong with 'openAboutConfig' " + e);
 
