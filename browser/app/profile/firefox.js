@@ -2054,6 +2054,9 @@ pref("app.update.check.enabled", true);
 //Auto check browser version on startup
 pref("app.update.startup.check", true);
 
+//Set startup check delay (6 Seconds)
+pref("app.update.startup-delay", 6000);
+
 //set bool pref for copy tab url enabled
 pref("browser.tabs.copyurl", true);
 

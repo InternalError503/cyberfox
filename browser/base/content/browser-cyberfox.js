@@ -608,7 +608,7 @@ window.addEventListener("load", function() {
 					// prevents runtime error on platforms that don't implement nsIAlertsService
 			}				
 		}
-	},6000);	
+	},Services.prefs.getIntPref("app.update.startup-delay"));	
 }, false);
 
 
