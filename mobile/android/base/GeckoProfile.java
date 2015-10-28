@@ -30,6 +30,7 @@ import org.mozilla.gecko.distribution.Distribution;
 import org.mozilla.gecko.mozglue.ContextUtils;
 import org.mozilla.gecko.mozglue.RobocopTarget;
 import org.mozilla.gecko.firstrun.FirstrunPane;
+import org.mozilla.gecko.RestrictedProfiles;
 import org.mozilla.gecko.util.INIParser;
 import org.mozilla.gecko.util.INISection;
 
@@ -240,7 +241,6 @@ public final class GeckoProfile {
     // If the directory changes, the returned GeckoProfile instance will be mutated.
     // If the factory differs, it will be *ignored*.
     public static GeckoProfile get(Context context, String profileName, File profileDir, BrowserDB.Factory dbFactory) {
-        Log.v(LOGTAG, "Fetching profile: '" + profileName + "', '" + profileDir + "'");
         if (context == null) {
             throw new IllegalArgumentException("context must be non-null");
         }
@@ -254,6 +254,8 @@ public final class GeckoProfile {
                 // We're unable to do anything sane here.
                 throw new RuntimeException(e);
             }
+        } else {
+            Log.v(LOGTAG, "Fetching profile: '" + profileName + "', '" + profileDir + "'");
         }
 
         // Actually try to look up the profile.
@@ -905,6 +907,9 @@ public final class GeckoProfile {
                 synchronized (GeckoProfile.this) {
                     // Skip initialization if the profile directory has been removed.
                     if (!profileDir.exists()) {
+                        return;
+                    }
+                    if (RestrictedProfiles.isUserRestricted(context)) {
                         return;
                     }
 

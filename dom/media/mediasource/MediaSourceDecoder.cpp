@@ -7,6 +7,7 @@
 
 #include "mozilla/Logging.h"
 #include "mozilla/dom/HTMLMediaElement.h"
+#include "mozilla/Preferences.h"
 #include "MediaDecoderStateMachine.h"
 #include "MediaSource.h"
 #include "MediaSourceReader.h"
@@ -16,6 +17,7 @@
 #include "VideoUtils.h"
 #include "MediaFormatReader.h"
 #include "MediaSourceDemuxer.h"
+#include "SourceBufferList.h"
 
 extern PRLogModuleInfo* GetMediaSourceLog();
 
@@ -70,7 +72,7 @@ MediaSourceDecoder::Load(nsIStreamListener**, MediaDecoder*)
   NS_ENSURE_SUCCESS(rv, rv);
 
   SetStateMachineParameters();
-  return ScheduleStateMachine();
+  return NS_OK;
 }
 
 media::TimeIntervals
@@ -146,6 +148,7 @@ MediaSourceDecoder::Shutdown()
   if (mMediaSource) {
     mMediaSource->Detach();
   }
+  mDemuxer = nullptr;
 
   MediaDecoder::Shutdown();
   // Kick WaitForData out of its slumber.
@@ -212,12 +215,6 @@ MediaSourceDecoder::Ended(bool aEnded)
   }
   mEnded = true;
   mon.NotifyAll();
-}
-
-bool
-MediaSourceDecoder::IsExpectingMoreData()
-{
-  return !mEnded;
 }
 
 void
@@ -292,6 +289,7 @@ void
 MediaSourceDecoder::GetMozDebugReaderData(nsAString& aString)
 {
   if (mIsUsingFormatReader) {
+    mDemuxer->GetMozDebugReaderData(aString);
     return;
   }
   GetReader()->GetMozDebugReaderData(aString);

@@ -8,7 +8,8 @@
 #define AbstractMediaDecoder_h_
 
 #include "mozilla/Attributes.h"
-#include "StateMirroring.h"
+#include "mozilla/StateMirroring.h"
+
 #include "MediaInfo.h"
 #include "nsISupports.h"
 #include "nsDataHashtable.h"
@@ -20,7 +21,7 @@ namespace mozilla
 namespace layers
 {
   class ImageContainer;
-}
+} // namespace layers
 class MediaResource;
 class ReentrantMonitor;
 class VideoFrameContainer;
@@ -53,6 +54,10 @@ public:
 
   // Returns true if the decoder is shut down.
   virtual bool IsShutdown() const = 0;
+
+  // A special version of the above for the ogg decoder that is allowed to be
+  // called cross-thread.
+  virtual bool IsOggDecoderShutdown() { return false; }
 
   virtual bool OnStateMachineTaskQueue() const = 0;
 
@@ -255,7 +260,7 @@ private:
   nsRefPtr<AbstractMediaDecoder> mDecoder;
 };
 
-}
+} // namespace mozilla
 
 #endif
 

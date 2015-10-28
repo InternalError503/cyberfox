@@ -17,7 +17,7 @@ namespace dom {
 struct ThreeDPoint;
 class AudioParamTimeline;
 class DelayNodeEngine;
-}
+} // namespace dom
 
 class AudioNodeStream;
 
@@ -96,7 +96,7 @@ public:
   virtual size_t SizeOfExcludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override
   {
     size_t amount = ThreadSharedObject::SizeOfExcludingThis(aMallocSizeOf);
-    amount += mContents.SizeOfExcludingThis(aMallocSizeOf);
+    amount += mContents.ShallowSizeOfExcludingThis(aMallocSizeOf);
     for (size_t i = 0; i < mContents.Length(); i++) {
       amount += mContents[i].SizeOfExcludingThis(aMallocSizeOf);
     }
@@ -114,8 +114,8 @@ private:
 };
 
 /**
- * Allocates an AudioChunk with fresh buffers of WEBAUDIO_BLOCK_SIZE float samples.
- * AudioChunk::mChannelData's entries can be cast to float* for writing.
+ * Allocates, if necessary, aChannelCount buffers of WEBAUDIO_BLOCK_SIZE float
+ * samples for writing to an AudioChunk.
  */
 void AllocateAudioBlock(uint32_t aChannelCount, AudioChunk* aChunk);
 
@@ -244,7 +244,6 @@ public:
 
   explicit AudioNodeEngine(dom::AudioNode* aNode)
     : mNode(aNode)
-    , mNodeMutex("AudioNodeEngine::mNodeMutex")
     , mInputCount(aNode ? aNode->NumberOfInputs() : 1)
     , mOutputCount(aNode ? aNode->NumberOfOutputs() : 0)
   {
@@ -344,17 +343,10 @@ public:
     aOutput[0] = aInput[0];
   }
 
-  Mutex& NodeMutex() { return mNodeMutex;}
-
   bool HasNode() const
   {
+    MOZ_ASSERT(NS_IsMainThread());
     return !!mNode;
-  }
-
-  dom::AudioNode* Node() const
-  {
-    mNodeMutex.AssertCurrentThreadOwns();
-    return mNode;
   }
 
   dom::AudioNode* NodeMainThread() const
@@ -367,7 +359,6 @@ public:
   {
     MOZ_ASSERT(NS_IsMainThread());
     MOZ_ASSERT(mNode != nullptr);
-    mNodeMutex.AssertCurrentThreadOwns();
     mNode = nullptr;
   }
 
@@ -389,7 +380,7 @@ public:
                            AudioNodeSizes& aUsage) const
   {
     aUsage.mEngine = SizeOfIncludingThis(aMallocSizeOf);
-    if (HasNode()) {
+    if (mNode) {
       aUsage.mDomNode = mNode->SizeOfIncludingThis(aMallocSizeOf);
       aUsage.mNodeType = mNode->NodeType();
     }
@@ -397,11 +388,10 @@ public:
 
 private:
   dom::AudioNode* mNode;
-  Mutex mNodeMutex;
   const uint16_t mInputCount;
   const uint16_t mOutputCount;
 };
 
-}
+} // namespace mozilla
 
 #endif /* MOZILLA_AUDIONODEENGINE_H_ */

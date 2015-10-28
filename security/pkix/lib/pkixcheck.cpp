@@ -91,7 +91,7 @@ CheckSignatureAlgorithm(TrustDomain& trustDomain,
   // more generally it short-circuits any path building with them (which, of
   // course, is even slower).
 
-  rv = trustDomain.CheckSignatureDigestAlgorithm(digestAlg);
+  rv = trustDomain.CheckSignatureDigestAlgorithm(digestAlg, endEntityOrCA);
   if (rv != Success) {
     return rv;
   }
@@ -948,7 +948,15 @@ CheckIssuerIndependentProperties(TrustDomain& trustDomain,
 
   // IMPORTANT: This check must come after the other checks in order for error
   // ranking to work correctly.
-  rv = CheckValidity(cert.GetValidity(), time);
+  Time notBefore(Time::uninitialized);
+  Time notAfter(Time::uninitialized);
+  rv = CheckValidity(cert.GetValidity(), time, &notBefore, &notAfter);
+  if (rv != Success) {
+    return rv;
+  }
+
+  rv = trustDomain.CheckValidityIsAcceptable(notBefore, notAfter, endEntityOrCA,
+                                             requiredEKUIfPresent);
   if (rv != Success) {
     return rv;
   }

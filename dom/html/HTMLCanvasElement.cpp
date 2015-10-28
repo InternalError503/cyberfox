@@ -45,13 +45,6 @@ using namespace mozilla::gfx;
 
 NS_IMPL_NS_NEW_HTML_ELEMENT(Canvas)
 
-namespace {
-
-typedef mozilla::dom::HTMLImageElementOrHTMLCanvasElementOrHTMLVideoElement
-HTMLImageOrCanvasOrVideoElement;
-
-} // anonymous namespace
-
 namespace mozilla {
 namespace dom {
 
@@ -283,10 +276,10 @@ HTMLCanvasElement::CopyInnerTo(Element* aDest)
     nsRefPtr<CanvasRenderingContext2D> context2d =
       static_cast<CanvasRenderingContext2D*>(cxt.get());
     if (context2d && !mPrintCallback) {
-      HTMLImageOrCanvasOrVideoElement element;
-      element.SetAsHTMLCanvasElement() = this;
+      CanvasImageSource source;
+      source.SetAsHTMLCanvasElement() = this;
       ErrorResult err;
-      context2d->DrawImage(element,
+      context2d->DrawImage(source,
                            0.0, 0.0, err);
       rv = err.StealNSResult();
     }
@@ -575,18 +568,19 @@ HTMLCanvasElement::ToBlob(JSContext* aCx,
     return;
   }
 
-#ifdef DEBUG
   if (mCurrentContext) {
     // We disallow canvases of width or height zero, and set them to 1, so
     // we will have a discrepancy with the sizes of the canvas and the context.
     // That discrepancy is OK, the rest are not.
     nsIntSize elementSize = GetWidthHeight();
-    MOZ_ASSERT(elementSize.width == mCurrentContext->GetWidth() ||
-               (elementSize.width == 0 && mCurrentContext->GetWidth() == 1));
-    MOZ_ASSERT(elementSize.height == mCurrentContext->GetHeight() ||
-               (elementSize.height == 0 && mCurrentContext->GetHeight() == 1));
+    if ((elementSize.width != mCurrentContext->GetWidth() &&
+         (elementSize.width != 0 || mCurrentContext->GetWidth() != 1)) ||
+        (elementSize.height != mCurrentContext->GetHeight() &&
+         (elementSize.height != 0 || mCurrentContext->GetHeight() != 1))) {
+    aRv.Throw(NS_ERROR_FAILURE);
+    return;
+    }
   }
-#endif
 
   uint8_t* imageBuffer = nullptr;
   int32_t format = 0;
@@ -737,7 +731,7 @@ GetCanvasContextType(const nsAString& str, CanvasContextType* const out_type)
 #endif
 
   if (WebGL2Context::IsSupported()) {
-    if (str.EqualsLiteral("experimental-webgl2")) {
+    if (str.EqualsLiteral("webgl2")) {
       *out_type = CanvasContextType::WebGL2;
       return true;
     }
@@ -749,9 +743,12 @@ GetCanvasContextType(const nsAString& str, CanvasContextType* const out_type)
 static already_AddRefed<nsICanvasRenderingContextInternal>
 CreateContextForCanvas(CanvasContextType contextType, HTMLCanvasElement* canvas)
 {
+  MOZ_ASSERT(contextType != CanvasContextType::NoContext);
   nsRefPtr<nsICanvasRenderingContextInternal> ret;
 
   switch (contextType) {
+  case CanvasContextType::NoContext:
+    break;
   case CanvasContextType::Canvas2D:
     Telemetry::Accumulate(Telemetry::CANVAS_2D_USED, 1);
     ret = new CanvasRenderingContext2D();
@@ -1036,7 +1033,7 @@ HTMLCanvasElement::MarkContextClean()
   mCurrentContext->MarkContextClean();
 }
 
-TemporaryRef<SourceSurface>
+already_AddRefed<SourceSurface>
 HTMLCanvasElement::GetSurfaceSnapshot(bool* aPremultAlpha)
 {
   if (!mCurrentContext)

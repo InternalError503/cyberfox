@@ -30,7 +30,7 @@ namespace mozilla {
 namespace dom{
 class TabParent;
 class PBrowserOrId;
-}
+} // namespace dom
 
 namespace net {
 
@@ -116,9 +116,10 @@ protected:
                    const bool&                allowSpdy,
                    const bool&                allowAltSvc,
                    const OptionalFileDescriptorSet& aFds,
-                   const LoadInfoArgs&        aLoadInfoArgs,
+                   const OptionalLoadInfoArgs& aLoadInfoArgs,
                    const OptionalHttpResponseHead& aSynthesizedResponseHead,
-                   const uint32_t&            aCacheKey);
+                   const uint32_t&            aCacheKey,
+                   const nsCString&           aSchedulingContextID);
 
   virtual bool RecvSetPriority(const uint16_t& priority) override;
   virtual bool RecvSetClassOfService(const uint32_t& cos) override;

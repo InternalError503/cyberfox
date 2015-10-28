@@ -2,9 +2,8 @@ BRANCH = "mozilla-beta"
 MOZ_UPDATE_CHANNEL = "beta"
 MOZILLA_DIR = BRANCH
 OBJDIR = "obj-l10n"
-EN_US_BINARY_URL = "http://ftp.mozilla.org/pub/mozilla.org/mobile/candidates/%(version)s-candidates/build%(buildnum)d/android-api-9/en-US"
-#STAGE_SERVER = "dev-stage01.srv.releng.scl3.mozilla.com"
-STAGE_SERVER = "stage.mozilla.org"
+EN_US_BINARY_URL = "http://archive.mozilla.org/pub/mobile/candidates/%(version)s-candidates/build%(buildnum)d/android-api-9/en-US"
+STAGE_SERVER = "upload.ffxbld.productdelivery.prod.mozaws.net"
 STAGE_USER = "ffxbld"
 STAGE_SSH_KEY = "~/.ssh/ffxbld_rsa"
 HG_SHARE_BASE_DIR = "/builds/hg-shared"
@@ -27,7 +26,6 @@ config = {
     "tooltool_config": {
         "manifest": "mobile/android/config/tooltool-manifests/android/releng.manifest",
         "output_dir": "%(abs_work_dir)s/" + MOZILLA_DIR,
-        "bootstrap_cmd": ["bash", "-xe", "setup.sh"],
     },
     "exes": {
         'tooltool.py': '/tools/tooltool.py',
@@ -113,5 +111,6 @@ config = {
                       ],
     "mock_files": [
         ("/home/cltbld/.ssh", "/home/mock_mozilla/.ssh"),
+        ('/usr/local/lib/hgext', '/usr/local/lib/hgext'),
     ],
 }

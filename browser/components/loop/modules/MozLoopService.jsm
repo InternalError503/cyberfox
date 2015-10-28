@@ -15,7 +15,7 @@ const LOOP_SESSION_TYPE = {
   FXA: 2
 };
 
-/***
+/**
  * Values that we segment 2-way media connection length telemetry probes
  * into.
  *
@@ -173,13 +173,13 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
 });
 
 function setJSONPref(aName, aValue) {
-  let value = !!aValue ? JSON.stringify(aValue) : "";
+  let value = aValue ? JSON.stringify(aValue) : "";
   Services.prefs.setCharPref(aName, value);
 }
 
 function getJSONPref(aName) {
   let value = Services.prefs.getCharPref(aName);
-  return !!value ? JSON.parse(value) : null;
+  return value ? JSON.parse(value) : null;
 }
 
 let gHawkClient = null;
@@ -658,7 +658,8 @@ let MozLoopServiceInternal = {
               return this.hawkRequestInternal(sessionType, path, method, payloadObj, false);
             },
             () => {
-              return handle401Error(error); //Process the original error that triggered the retry.
+              // Process the original error that triggered the retry.
+              return handle401Error(error);
             }
           );
         }
@@ -963,10 +964,10 @@ let MozLoopServiceInternal = {
             // Not ideal but insert our data amidst existing data like this:
             // - 000 (id=00 url=http)
             // + 000 (session=000 call=000 id=00 url=http)
-            var pair = pc.id.split("(");  //)
+            var pair = pc.id.split("(");
             if (pair.length == 2) {
               pc.id = pair[0] + "(session=" + context.sessionId +
-                  (context.callId ? " call=" + context.callId : "") + " " + pair[1]; //)
+                  (context.callId ? " call=" + context.callId : "") + " " + pair[1];
             }
           }
 

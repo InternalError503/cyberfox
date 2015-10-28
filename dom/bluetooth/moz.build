@@ -13,7 +13,6 @@ if CONFIG['MOZ_B2G_BT']:
     SOURCES += [
         'BluetoothHidManager.cpp',
         'BluetoothInterface.cpp',
-        'BluetoothInterfaceHelpers.cpp',
         'BluetoothUtils.cpp',
         'BluetoothUuid.cpp',
         'ObexBase.cpp'
@@ -51,6 +50,7 @@ if CONFIG['MOZ_B2G_BT']:
             'bluetooth2/BluetoothGatt.cpp',
             'bluetooth2/BluetoothGattCharacteristic.cpp',
             'bluetooth2/BluetoothGattDescriptor.cpp',
+            'bluetooth2/BluetoothGattServer.cpp',
             'bluetooth2/BluetoothGattService.cpp',
             'bluetooth2/BluetoothLeDeviceEvent.cpp',
             'bluetooth2/BluetoothManager.cpp',
@@ -87,29 +87,21 @@ if CONFIG['MOZ_B2G_BT']:
                 'bluez',
             ]
             DEFINES['MOZ_B2G_BT_BLUEZ'] = True
-        elif CONFIG['MOZ_B2G_BT_BLUEDROID']:
+        elif CONFIG['MOZ_B2G_BT_DAEMON']:
             SOURCES += [
-                'bluedroid/BluetoothA2dpHALInterface.cpp',
                 'bluedroid/BluetoothA2dpManager.cpp',
-                'bluedroid/BluetoothAvrcpHALInterface.cpp',
                 'bluedroid/BluetoothDaemonA2dpInterface.cpp',
                 'bluedroid/BluetoothDaemonAvrcpInterface.cpp',
-                'bluedroid/BluetoothDaemonConnector.cpp',
                 'bluedroid/BluetoothDaemonGattInterface.cpp',
                 'bluedroid/BluetoothDaemonHandsfreeInterface.cpp',
                 'bluedroid/BluetoothDaemonHelpers.cpp',
                 'bluedroid/BluetoothDaemonInterface.cpp',
                 'bluedroid/BluetoothDaemonSetupInterface.cpp',
                 'bluedroid/BluetoothDaemonSocketInterface.cpp',
-                'bluedroid/BluetoothGattHALInterface.cpp',
-                'bluedroid/BluetoothHALHelpers.cpp',
-                'bluedroid/BluetoothHALInterface.cpp',
-                'bluedroid/BluetoothHandsfreeHALInterface.cpp',
                 'bluedroid/BluetoothOppManager.cpp',
                 'bluedroid/BluetoothPbapManager.cpp',
                 'bluedroid/BluetoothServiceBluedroid.cpp',
                 'bluedroid/BluetoothSocket.cpp',
-                'bluedroid/BluetoothSocketHALInterface.cpp',
                 'bluedroid/BluetoothSocketMessageWatcher.cpp'
             ]
             LOCAL_INCLUDES += [
@@ -135,9 +127,7 @@ if CONFIG['MOZ_B2G_BT']:
                     'bluedroid/BluetoothGattManager.cpp',
                 ]
 
-            DEFINES['MOZ_B2G_BT_BLUEDROID'] = True
-            if CONFIG['MOZ_B2G_BT_DAEMON']:
-                DEFINES['MOZ_B2G_BT_DAEMON'] = True
+            DEFINES['MOZ_B2G_BT_DAEMON'] = True
     elif CONFIG['MOZ_ENABLE_DBUS']:
         CFLAGS += CONFIG['MOZ_DBUS_CFLAGS']
         CFLAGS += CONFIG['MOZ_DBUS_GLIB_CFLAGS']
@@ -189,6 +179,7 @@ else:
         'bluetooth2/BluetoothGatt.h',
         'bluetooth2/BluetoothGattCharacteristic.h',
         'bluetooth2/BluetoothGattDescriptor.h',
+        'bluetooth2/BluetoothGattServer.h',
         'bluetooth2/BluetoothGattService.h',
         'bluetooth2/BluetoothLeDeviceEvent.h',
         'bluetooth2/BluetoothManager.h',

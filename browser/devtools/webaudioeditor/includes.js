@@ -10,8 +10,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource:///modules/devtools/ViewHelpers.jsm");
 Cu.import("resource:///modules/devtools/gDevTools.jsm");
 
-const devtools = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools;
-const { require } = devtools;
+const { devtools: loader, require } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 
 let { console } = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 let { EventTarget } = require("sdk/event/target");
@@ -23,8 +22,9 @@ const STRINGS_URI = "chrome://browser/locale/devtools/webaudioeditor.properties"
 const L10N = new ViewHelpers.L10N(STRINGS_URI);
 const Telemetry = require("devtools/shared/telemetry");
 const telemetry = new Telemetry();
+const DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 
-devtools.lazyRequireGetter(this, "LineGraphWidget",
+loader.lazyRequireGetter(this, "LineGraphWidget",
   "devtools/shared/widgets/LineGraphWidget");
 
 // `AUDIO_NODE_DEFINITION` defined in the controller's initialization,

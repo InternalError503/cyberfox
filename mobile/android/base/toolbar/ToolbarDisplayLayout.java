@@ -65,6 +65,7 @@ public class ToolbarDisplayLayout extends ThemedLinearLayout
                                   implements Animation.AnimationListener {
 
     private static final String LOGTAG = "GeckoToolbarDisplayLayout";
+    private boolean mTrackingProtectionEnabled;
 
     // To be used with updateFromTab() to allow the caller
     // to give enough context for the requested state change.
@@ -125,8 +126,12 @@ public class ToolbarDisplayLayout extends ThemedLinearLayout
     private final SiteIdentityPopup mSiteIdentityPopup;
     private int mSecurityImageLevel;
 
-    private final int LEVEL_SHIELD_ENABLED = 3;
-    private final int LEVEL_SHIELD_DISABLED = 4;
+    // Levels for displaying Mixed Content state icons.
+    private final int LEVEL_WARNING_MINOR = 3;
+    private final int LEVEL_LOCK_DISABLED = 4;
+    // Levels for displaying Tracking Protection state icons.
+    private final int LEVEL_SHIELD_ENABLED = 5;
+    private final int LEVEL_SHIELD_DISABLED = 6;
 
     private PropertyAnimator mForwardAnim;
 
@@ -201,7 +206,7 @@ public class ToolbarDisplayLayout extends ThemedLinearLayout
                     // immediately based on the stopped tab.
                     final Tab tab = mStopListener.onStop();
                     if (tab != null) {
-                        updateUiMode(tab, UIMode.DISPLAY, EnumSet.noneOf(UpdateFlags.class));
+                        updateUiMode(UIMode.DISPLAY, EnumSet.noneOf(UpdateFlags.class));
                     }
                 }
             }
@@ -418,15 +423,18 @@ public class ToolbarDisplayLayout extends ThemedLinearLayout
         mSiteIdentityPopup.setSiteIdentity(siteIdentity);
 
         final SecurityMode securityMode;
-        final MixedMode mixedMode;
+        final MixedMode activeMixedMode;
+        final MixedMode displayMixedMode;
         final TrackingMode trackingMode;
         if (siteIdentity == null) {
             securityMode = SecurityMode.UNKNOWN;
-            mixedMode = MixedMode.UNKNOWN;
+            activeMixedMode = MixedMode.UNKNOWN;
+            displayMixedMode = MixedMode.UNKNOWN;
             trackingMode = TrackingMode.UNKNOWN;
         } else {
             securityMode = siteIdentity.getSecurityMode();
-            mixedMode = siteIdentity.getMixedMode();
+            activeMixedMode = siteIdentity.getMixedModeActive();
+            displayMixedMode = siteIdentity.getMixedModeDisplay();
             trackingMode = siteIdentity.getTrackingMode();
         }
 
@@ -435,12 +443,14 @@ public class ToolbarDisplayLayout extends ThemedLinearLayout
         int imageLevel = securityMode.ordinal();
 
         // Check to see if any protection was overridden first
-        if (trackingMode == TrackingMode.TRACKING_CONTENT_LOADED ||
-            mixedMode == MixedMode.MIXED_CONTENT_LOADED) {
-          imageLevel = LEVEL_SHIELD_DISABLED;
-        } else if (trackingMode == TrackingMode.TRACKING_CONTENT_BLOCKED ||
-                   mixedMode == MixedMode.MIXED_CONTENT_BLOCKED) {
-          imageLevel = LEVEL_SHIELD_ENABLED;
+        if (trackingMode == TrackingMode.TRACKING_CONTENT_LOADED) {
+            imageLevel = LEVEL_SHIELD_DISABLED;
+        } else if (trackingMode == TrackingMode.TRACKING_CONTENT_BLOCKED) {
+            imageLevel = LEVEL_SHIELD_ENABLED;
+        } else if (activeMixedMode == MixedMode.MIXED_CONTENT_LOADED) {
+            imageLevel = LEVEL_LOCK_DISABLED;
+        } else if (displayMixedMode == MixedMode.MIXED_CONTENT_LOADED) {
+            imageLevel = LEVEL_WARNING_MINOR;
         }
 
         if (mSecurityImageLevel != imageLevel) {
@@ -448,16 +458,22 @@ public class ToolbarDisplayLayout extends ThemedLinearLayout
             mSiteSecurity.setImageLevel(mSecurityImageLevel);
             updatePageActions(flags);
         }
+
+        mTrackingProtectionEnabled = trackingMode == TrackingMode.TRACKING_CONTENT_BLOCKED;
     }
 
     private void updateProgress(Tab tab, EnumSet<UpdateFlags> flags) {
         final boolean shouldShowThrobber = (tab != null &&
                                             tab.getState() == Tab.STATE_LOADING);
 
-        updateUiMode(tab, shouldShowThrobber ? UIMode.PROGRESS : UIMode.DISPLAY, flags);
+        updateUiMode(shouldShowThrobber ? UIMode.PROGRESS : UIMode.DISPLAY, flags);
+
+        if (Tab.STATE_SUCCESS == tab.getState() && mTrackingProtectionEnabled) {
+            mActivity.showTrackingProtectionPromptIfApplicable();
+        }
     }
 
-    private void updateUiMode(Tab tab, UIMode uiMode, EnumSet<UpdateFlags> flags) {
+    private void updateUiMode(UIMode uiMode, EnumSet<UpdateFlags> flags) {
         if (mUiMode == uiMode) {
             return;
         }

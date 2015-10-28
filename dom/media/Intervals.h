@@ -16,8 +16,8 @@ namespace mozilla {
 namespace media {
 template<class T>
 class IntervalSet;
-}
-}
+} // namespace media
+} // namespace mozilla
 
 template<class E>
 struct nsTArray_CopyChooser<mozilla::media::IntervalSet<E>>
@@ -155,6 +155,11 @@ public:
   {
     return (mStart - mFuzz < aOther.mEnd + aOther.mFuzz) &&
       (aOther.mStart - aOther.mFuzz < mEnd + mFuzz);
+  }
+
+  bool IntersectsStrict(const SelfType& aOther) const
+  {
+    return mStart < aOther.mEnd && aOther.mStart < mEnd;
   }
 
   // Same as Intersects, but including the boundaries.
@@ -308,14 +313,18 @@ public:
   SelfType& operator= (const ElemType& aInterval)
   {
     mIntervals.Clear();
-    mIntervals.AppendElement(aInterval);
+    if (!aInterval.IsEmpty()) {
+      mIntervals.AppendElement(aInterval);
+    }
     return *this;
   }
 
   SelfType& operator= (ElemType&& aInterval)
   {
     mIntervals.Clear();
-    mIntervals.AppendElement(Move(aInterval));
+    if (!aInterval.IsEmpty()) {
+      mIntervals.AppendElement(Move(aInterval));
+    }
     return *this;
   }
 
@@ -420,11 +429,19 @@ public:
     }
     T firstEnd = std::max(mIntervals[0].mStart, aInterval.mStart);
     T secondStart = std::min(mIntervals.LastElement().mEnd, aInterval.mEnd);
-    ElemType startInterval(mIntervals[0].mStart, firstEnd, aInterval.mFuzz);
-    ElemType endInterval(secondStart, mIntervals.LastElement().mEnd, aInterval.mFuzz);
+    ElemType startInterval(mIntervals[0].mStart, firstEnd);
+    ElemType endInterval(secondStart, mIntervals.LastElement().mEnd);
     SelfType intervals(Move(startInterval));
     intervals += Move(endInterval);
     return Intersection(intervals);
+  }
+
+  SelfType& operator-= (const SelfType& aIntervals)
+  {
+    for (const auto& interval : aIntervals.mIntervals) {
+      *this -= interval;
+    }
+    return *this;
   }
 
   SelfType operator- (const ElemType& aInterval)
@@ -455,7 +472,7 @@ public:
     const ContainerType& other = aOther.mIntervals;
     IndexType i = 0, j = 0;
     for (; i < mIntervals.Length() && j < other.Length();) {
-      if (mIntervals[i].Intersects(other[j])) {
+      if (mIntervals[i].IntersectsStrict(other[j])) {
         intersection.AppendElement(mIntervals[i].Intersection(other[j]));
       }
       if (mIntervals[i].mEnd < other[j].mEnd) {

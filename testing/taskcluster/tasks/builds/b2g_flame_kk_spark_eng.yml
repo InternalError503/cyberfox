@@ -1,0 +1,28 @@
+$inherits:
+  from: 'tasks/builds/b2g_phone_eng_base.yml'
+  variables:
+    build_name: 'flame-kk-spark-eng'
+    build_type: 'opt'
+task:
+  scopes:
+    - 'docker-worker:cache:build-flame-kk-spark-eng'
+  metadata:
+    name: '[TC] B2G Flame KK Eng (spark)'
+
+  payload:
+    cache:
+      build-flame-kk-spark-eng: /home/worker/workspace
+    env:
+      TARGET: 'flame-kk'
+      MOZHARNESS_CONFIG: b2g/taskcluster-spark.py
+  extra:
+    treeherderEnv:
+      - staging
+    treeherder:
+      symbol: Be
+      groupSymbol: Flame-KK-spark
+      groupName: Flame KitKat Device Image
+      machine:
+        platform: b2g-device-image
+    locations:
+      img: 'private/build/flame-kk.zip'

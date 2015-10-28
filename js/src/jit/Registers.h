@@ -14,6 +14,8 @@
 # include "jit/x86-shared/Architecture-x86-shared.h"
 #elif defined(JS_CODEGEN_ARM)
 # include "jit/arm/Architecture-arm.h"
+#elif defined(JS_CODEGEN_ARM64)
+# include "jit/arm64/Architecture-arm64.h"
 #elif defined(JS_CODEGEN_MIPS)
 # include "jit/mips/Architecture-mips.h"
 #elif defined(JS_CODEGEN_NONE)
@@ -42,8 +44,7 @@ struct Register {
         Register r = { Encoding(code) };
         return r;
     }
-    Code code() const {
-        MOZ_ASSERT(Code(reg_) < Registers::Total);
+    MOZ_CONSTEXPR Code code() const {
         return Code(reg_);
     }
     Encoding encoding() const {
@@ -111,7 +112,10 @@ class RegisterDump
     }
 };
 
-// Information needed to recover machine register state.
+// Information needed to recover machine register state. This records the
+// location of spilled register and not the content of the spilled
+// registers. Thus we can safely assume that this structure is unchanged, even
+// if the GC pointers mapped by this structure are relocated.
 class MachineState
 {
     mozilla::Array<Registers::RegisterContent*, Registers::Total> regs_;
@@ -119,10 +123,12 @@ class MachineState
 
   public:
     MachineState() {
+#ifndef JS_CODEGEN_NONE
         for (unsigned i = 0; i < Registers::Total; i++)
             regs_[i] = reinterpret_cast<Registers::RegisterContent*>(i + 0x100);
         for (unsigned i = 0; i < FloatRegisters::Total; i++)
             fpregs_[i] = reinterpret_cast<FloatRegisters::RegisterContent*>(i + 0x200);
+#endif
     }
 
     static MachineState FromBailout(RegisterDump::GPRArray& regs, RegisterDump::FPUArray& fpregs);

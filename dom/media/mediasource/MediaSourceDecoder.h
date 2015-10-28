@@ -43,6 +43,14 @@ public:
   virtual media::TimeIntervals GetSeekable() override;
   media::TimeIntervals GetBuffered() override;
 
+  // We can't do this in the constructor because we don't know what type of
+  // media we're dealing with by that point.
+  void NotifyDormantSupported(bool aSupported)
+  {
+    MOZ_ASSERT(NS_IsMainThread());
+    mDormantSupported = aSupported;
+  }
+
   virtual void Shutdown() override;
 
   static already_AddRefed<MediaResource> CreateResource(nsIPrincipal* aPrincipal = nullptr);
@@ -57,7 +65,6 @@ public:
   void OnTrackBufferConfigured(TrackBuffer* aTrackBuffer, const MediaInfo& aInfo);
 
   void Ended(bool aEnded);
-  bool IsExpectingMoreData() override;
 
   // Return the duration of the video in seconds.
   virtual double GetDuration() override;

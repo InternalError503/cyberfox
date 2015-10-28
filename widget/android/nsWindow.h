@@ -155,7 +155,7 @@ public:
                               mozilla::layers::CompositorParent* aCompositorParent,
                               mozilla::layers::CompositorChild* aCompositorChild);
     static bool IsCompositionPaused();
-    static void ScheduleComposite();
+    static void InvalidateAndScheduleComposite();
     static void SchedulePauseComposition();
     static void ScheduleResumeComposition();
     static void ScheduleResumeComposition(int width, int height);
@@ -183,12 +183,14 @@ protected:
         }
         IMEChange(const IMENotification& aIMENotification)
             : mStart(aIMENotification.mTextChangeData.mStartOffset)
-            , mOldEnd(aIMENotification.mTextChangeData.mOldEndOffset)
-            , mNewEnd(aIMENotification.mTextChangeData.mNewEndOffset)
+            , mOldEnd(aIMENotification.mTextChangeData.mRemovedEndOffset)
+            , mNewEnd(aIMENotification.mTextChangeData.mAddedEndOffset)
         {
             MOZ_ASSERT(aIMENotification.mMessage ==
                            mozilla::widget::NOTIFY_IME_OF_TEXT_CHANGE,
                        "IMEChange initialized with wrong notification");
+            MOZ_ASSERT(aIMENotification.mTextChangeData.IsValid(),
+                       "The text change notification isn't initialized");
             MOZ_ASSERT(aIMENotification.mTextChangeData.IsInInt32Range(),
                        "The text change notification is out of range");
         }

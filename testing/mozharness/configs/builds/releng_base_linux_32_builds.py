@@ -45,6 +45,7 @@ config = {
         ('/builds/mozilla-desktop-geoloc-api.key', '/builds/mozilla-desktop-geoloc-api.key'),
         ('/builds/crash-stats-api.token', '/builds/crash-stats-api.token'),
         ('/builds/adjust-sdk.token', '/builds/adjust-sdk.token'),
+        ('/usr/local/lib/hgext', '/usr/local/lib/hgext'),
     ],
     'enable_ccache': True,
     'vcs_share_base': '/builds/hg-shared',
@@ -62,6 +63,7 @@ config = {
     'base_name': 'Linux_%(branch)s',
     'platform': 'linux',
     'stage_platform': 'linux',
+    'publish_nightly_en_US_routes': True,
     'env': {
         'MOZBUILD_STATE_PATH': os.path.join(os.getcwd(), '.mozbuild'),
         'MOZ_AUTOMATION': '1',

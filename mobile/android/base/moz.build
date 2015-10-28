@@ -14,6 +14,7 @@ thirdparty_source_dir = TOPSRCDIR + '/mobile/android/thirdparty/'
 constants_jar = add_java_jar('constants')
 constants_jar.sources = [
     'adjust/AdjustHelperInterface.java',
+    'annotation/WrapForJNI.java',
     'SysInfo.java',
 ]
 constants_jar.generated_sources = [
@@ -54,9 +55,7 @@ mgjar.sources += [
     'mozglue/ContextUtils.java',
     'mozglue/DirectBufferAllocator.java',
     'mozglue/GeckoLoader.java',
-    'mozglue/generatorannotations/OptionalGeneratedParameter.java',
-    'mozglue/generatorannotations/WrapElementForJNI.java',
-    'mozglue/generatorannotations/WrapEntireClassForJNI.java',
+    'mozglue/JNIObject.java',
     'mozglue/JNITarget.java',
     'mozglue/NativeReference.java',
     'mozglue/NativeZip.java',
@@ -75,6 +74,7 @@ gujar.sources += [
     'util/ActivityResultHandlerMap.java',
     'util/ActivityUtils.java',
     'util/Clipboard.java',
+    'util/DrawableUtil.java',
     'util/EventCallback.java',
     'util/FileUtils.java',
     'util/FloatUtils.java',
@@ -83,6 +83,7 @@ gujar.sources += [
     'util/GeckoEventListener.java',
     'util/GeckoJarReader.java',
     'util/GeckoRequest.java',
+    'util/HardwareCodecCapabilityUtils.java',
     'util/HardwareUtils.java',
     'util/INIParser.java',
     'util/INISection.java',
@@ -132,6 +133,7 @@ if CONFIG['MOZ_WEBRTC']:
         audio_root + 'WebRtcAudioTrack.java',
     ]
     wrjar.extra_jars = [
+        'constants.jar',
         'gecko-R.jar',
         'gecko-browser.jar',
         'gecko-util.jar',
@@ -200,6 +202,7 @@ gbjar.sources += [
     'db/TopSitesCursorWrapper.java',
     'db/URLMetadata.java',
     'db/URLMetadataTable.java',
+    'DevToolsAuthHelper.java',
     'distribution/Distribution.java',
     'distribution/ReferrerDescriptor.java',
     'distribution/ReferrerReceiver.java',
@@ -226,6 +229,7 @@ gbjar.sources += [
     'firstrun/FirstrunPagerConfig.java',
     'firstrun/FirstrunPane.java',
     'firstrun/FirstrunPanel.java',
+    'firstrun/RestrictedWelcomePanel.java',
     'firstrun/WelcomePanel.java',
     'FormAssistPopup.java',
     'GeckoAccessibility.java',
@@ -326,11 +330,13 @@ gbjar.sources += [
     'home/PanelAuthCache.java',
     'home/PanelAuthLayout.java',
     'home/PanelBackItemView.java',
-    'home/PanelGridView.java',
+    'home/PanelHeaderView.java',
     'home/PanelInfoManager.java',
     'home/PanelItemView.java',
     'home/PanelLayout.java',
     'home/PanelListView.java',
+    'home/PanelRecyclerView.java',
+    'home/PanelRecyclerViewAdapter.java',
     'home/PanelRefreshLayout.java',
     'home/PanelViewAdapter.java',
     'home/PanelViewItemHandler.java',
@@ -345,10 +351,12 @@ gbjar.sources += [
     'home/RemoteTabsSplitPlaneFragment.java',
     'home/RemoteTabsStaticFragment.java',
     'home/SearchEngine.java',
+    'home/SearchEngineAdapter.java',
     'home/SearchEngineBar.java',
     'home/SearchEngineRow.java',
     'home/SearchLoader.java',
     'home/SimpleCursorLoader.java',
+    'home/SpacingDecoration.java',
     'home/TabMenuStrip.java',
     'home/TabMenuStripLayout.java',
     'home/TopSitesGridItemView.java',
@@ -366,6 +374,7 @@ gbjar.sources += [
     'Locales.java',
     'lwt/LightweightTheme.java',
     'lwt/LightweightThemeDrawable.java',
+    'mdns/MulticastDNSManager.java',
     'MediaCastingBar.java',
     'MemoryMonitor.java',
     'menu/GeckoMenu.java',
@@ -426,7 +435,12 @@ gbjar.sources += [
     'RemoteTabsExpandableListAdapter.java',
     'Restarter.java',
     'RestrictedProfiles.java',
-    'ScrollAnimator.java',
+    'restrictions/DefaultConfiguration.java',
+    'restrictions/GuestProfileConfiguration.java',
+    'restrictions/RestrictedProfileConfiguration.java',
+    'restrictions/Restriction.java',
+    'restrictions/RestrictionConfiguration.java',
+    'restrictions/RestrictionProvider.java',
     'ServiceNotificationClient.java',
     'SessionParser.java',
     'SharedPreferencesHelper.java',
@@ -485,6 +499,7 @@ gbjar.sources += [
     'toolbar/ToolbarPrefs.java',
     'toolbar/ToolbarProgressView.java',
     'TouchEventInterceptor.java',
+    'trackingprotection/TrackingProtectionPrompt.java',
     'updater/UpdateService.java',
     'updater/UpdateServiceHelper.java',
     'Webapp.java',
@@ -506,6 +521,7 @@ gbjar.sources += [
     'widget/ButtonToast.java',
     'widget/CheckableLinearLayout.java',
     'widget/ClickableWhenDisabledEditText.java',
+    'widget/ContentSecurityDoorHanger.java',
     'widget/DateTimePicker.java',
     'widget/DefaultDoorHanger.java',
     'widget/Divider.java',
@@ -524,7 +540,9 @@ gbjar.sources += [
     'widget/GeckoViewFlipper.java',
     'widget/IconTabWidget.java',
     'widget/LoginDoorHanger.java',
+    'widget/RecyclerViewClickSupport.java',
     'widget/ResizablePathDrawable.java',
+    'widget/RoundedCornerLayout.java',
     'widget/SiteLogins.java',
     'widget/SquaredImageView.java',
     'widget/SquaredRelativeLayout.java',
@@ -560,7 +578,7 @@ gbjar.extra_jars += [
 ]
 if CONFIG['MOZ_CRASHREPORTER']:
     gbjar.sources += [ 'CrashReporter.java' ]
-    ANDROID_RES_DIRS += [ SRCDIR + '/crashreporter/res' ]
+    ANDROID_RES_DIRS += [ 'crashreporter/res' ]
 
 if CONFIG['MOZ_ANDROID_SHARE_OVERLAY']:
     gbjar.sources += [
@@ -569,7 +587,6 @@ if CONFIG['MOZ_ANDROID_SHARE_OVERLAY']:
         'overlays/service/ShareData.java',
         'overlays/service/sharemethods/AddBookmark.java',
         'overlays/service/sharemethods/AddToReadingList.java',
-        'overlays/service/sharemethods/ParcelableClientRecord.java',
         'overlays/service/sharemethods/SendTab.java',
         'overlays/service/sharemethods/ShareMethod.java',
         'overlays/ui/OverlayDialogButton.java',
@@ -736,14 +753,18 @@ if CONFIG['MOZ_INSTALL_TRACKING']:
 
 # Putting branding earlier allows branders to override default resources.
 ANDROID_RES_DIRS += [
-    TOPSRCDIR + '/' + CONFIG['MOZ_BRANDING_DIRECTORY'] + '/res',
-    SRCDIR + '/resources',
-    OBJDIR + '/res',
+    '/' + CONFIG['MOZ_BRANDING_DIRECTORY'] + '/res',
+    'resources',
+    '!res',
 ]
 
 ANDROID_GENERATED_RESFILES += [
     'res/raw/suggestedsites.json',
     'res/values/strings.xml',
+]
+
+ANDROID_ASSETS_DIRS += [
+    '/mobile/android/app/assets',
 ]
 
 # We do not expose MOZ_INSTALL_TRACKING_ADJUST_SDK_APP_TOKEN here because that

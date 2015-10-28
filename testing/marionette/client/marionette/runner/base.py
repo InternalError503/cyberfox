@@ -21,7 +21,7 @@ from manifestparser import TestManifest
 from manifestparser.filters import tags
 from marionette_driver.marionette import Marionette
 from mixins.b2g import B2GTestResultMixin, get_b2g_pid, get_dm
-from mozlog.structured.structuredlog import get_default_logger
+from mozlog import get_default_logger
 from moztest.adapters.unit import StructuredTestRunner, StructuredTestResult
 from moztest.results import TestResultCollection, TestResult, relevant_line
 import mozversion
@@ -333,6 +333,10 @@ class BaseMarionetteOptions(OptionParser):
                         action='store',
                         help='profile to use when launching the gecko process. if not passed, then a profile will be '
                              'constructed and used')
+        self.add_option('--addon',
+                        dest='addons',
+                        action='append',
+                        help="addon to install; repeat for multiple addons.")
         self.add_option('--repeat',
                         dest='repeat',
                         action='store',
@@ -511,7 +515,7 @@ class BaseMarionetteTestRunner(object):
                  server_root=None, gecko_log=None, result_callbacks=None,
                  adb_host=None, adb_port=None, prefs=None, test_tags=None,
                  socket_timeout=BaseMarionetteOptions.socket_timeout_default,
-                 startup_timeout=None, **kwargs):
+                 startup_timeout=None, addons=None, **kwargs):
         self.address = address
         self.emulator = emulator
         self.emulator_binary = emulator_binary
@@ -522,6 +526,7 @@ class BaseMarionetteTestRunner(object):
         self.app_args = app_args or []
         self.bin = binary
         self.profile = profile
+        self.addons = addons
         self.logger = logger
         self.no_window = no_window
         self.httpd = None
@@ -666,6 +671,7 @@ class BaseMarionetteTestRunner(object):
                 'app_args': self.app_args,
                 'bin': self.bin,
                 'profile': self.profile,
+                'addons': self.addons,
                 'gecko_log': self.gecko_log,
             })
 
@@ -784,6 +790,15 @@ setReq.onerror = function() {
         for test in tests:
             self.add_test(test)
 
+        # ensure we have only tests files with names starting with 'test_'
+        invalid_tests = \
+            [t['filepath'] for t in self.tests
+             if not os.path.basename(t['filepath']).startswith('test_')]
+        if invalid_tests:
+            raise Exception("Tests file names must starts with 'test_'."
+                            " Invalid test names:\n  %s"
+                            % '\n  '.join(invalid_tests))
+
         version_info = mozversion.get_version(binary=self.bin,
                                               sources=self.sources,
                                               dm_type=os.environ.get('DM_TRANS', 'adb'),
@@ -808,14 +823,32 @@ setReq.onerror = function() {
                                  message=test['disabled'])
             self.todo += 1
 
-        counter = self.repeat
-        while counter >=0:
-            round = self.repeat - counter
-            if round > 0:
-                self.logger.info('\nREPEAT %d\n-------' % round)
-            self.run_test_sets()
-            counter -= 1
+        interrupted = None
+        try:
+            counter = self.repeat
+            while counter >=0:
+                round = self.repeat - counter
+                if round > 0:
+                    self.logger.info('\nREPEAT %d\n-------' % round)
+                self.run_test_sets()
+                counter -= 1
+        except KeyboardInterrupt:
+            # in case of KeyboardInterrupt during the test execution
+            # we want to display current test results.
+            # so we keep the exception to raise it later.
+            interrupted = sys.exc_info()
+        try:
+            self._print_summary(tests)
+        except:
+            # raise only the exception if we were not interrupted
+            if not interrupted:
+                raise
+        finally:
+            # reraise previous interruption now
+            if interrupted:
+                raise interrupted[0], interrupted[1], interrupted[2]
 
+    def _print_summary(self, tests):
         self.logger.info('\nSUMMARY\n-------')
         self.logger.info('passed: %d' % self.passed)
         if self.unexpected_successes == 0:

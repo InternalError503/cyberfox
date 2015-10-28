@@ -43,13 +43,14 @@ const FALLBACK_CHARSET_LIST = "intl.fallbackCharsetList.ISO-8859-1";
 
 const VARIABLES_VIEW_URL = "chrome://browser/content/devtools/widgets/VariablesView.xul";
 
-const require   = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
+const {require} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 
 const Telemetry = require("devtools/shared/telemetry");
 const Editor    = require("devtools/sourceeditor/editor");
 const TargetFactory = require("devtools/framework/target").TargetFactory;
 const EventEmitter = require("devtools/toolkit/event-emitter");
 const {DevToolsWorker} = require("devtools/toolkit/shared/worker");
+const DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 
 const { Promise: promise } = Cu.import("resource://gre/modules/Promise.jsm", {});
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -61,7 +62,6 @@ Cu.import("resource:///modules/devtools/gDevTools.jsm");
 Cu.import("resource://gre/modules/osfile.jsm");
 Cu.import("resource:///modules/devtools/ViewHelpers.jsm");
 Cu.import("resource://gre/modules/reflect.jsm");
-Cu.import("resource://gre/modules/devtools/DevToolsUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "VariablesView",
   "resource:///modules/devtools/VariablesView.jsm");

@@ -600,7 +600,6 @@ nsEditor::GetWidget()
   return widget.forget();
 }
 
-/* attribute string contentsMIMEType; */
 NS_IMETHODIMP
 nsEditor::GetContentsMIMEType(char * *aContentsMIMEType)
 {
@@ -628,7 +627,9 @@ nsEditor::GetSelectionController(nsISelectionController **aSel)
     nsCOMPtr<nsIPresShell> presShell = GetPresShell();
     selCon = do_QueryInterface(presShell);
   }
-  NS_ENSURE_TRUE(selCon, NS_ERROR_NOT_INITIALIZED);
+  if (!selCon) {
+    return NS_ERROR_NOT_INITIALIZED;
+  }
   NS_ADDREF(*aSel = selCon);
   return NS_OK;
 }
@@ -1832,7 +1833,7 @@ void
 nsEditor::NotifyEditorObservers(NotificationForEditorObservers aNotification)
 {
   // Copy the observers since EditAction()s can modify mEditorObservers.
-  nsTArray<mozilla::dom::OwningNonNull<nsIEditorObserver>> observers(mEditorObservers);
+  nsTArray<mozilla::OwningNonNull<nsIEditorObserver>> observers(mEditorObservers);
   switch (aNotification) {
     case eNotifyEditorObserversOfEnd:
       mIsInEditAction = false;
@@ -3832,6 +3833,33 @@ nsEditor::IsPreformatted(nsIDOMNode *aNode, bool *aResult)
 //                a new element, for instance, if that's why you were splitting
 //                the node.
 //
+int32_t
+nsEditor::SplitNodeDeep(nsIContent& aNode, nsIContent& aSplitPointParent,
+                        int32_t aSplitPointOffset,
+                        EmptyContainers aEmptyContainers,
+                        nsIContent** outLeftNode,
+                        nsIContent** outRightNode)
+{
+  int32_t offset;
+  nsCOMPtr<nsIDOMNode> leftNodeDOM, rightNodeDOM;
+  nsresult res = SplitNodeDeep(aNode.AsDOMNode(),
+      aSplitPointParent.AsDOMNode(), aSplitPointOffset, &offset,
+      aEmptyContainers == EmptyContainers::no, address_of(leftNodeDOM),
+      address_of(rightNodeDOM));
+  NS_ENSURE_SUCCESS(res, -1);
+  if (outLeftNode) {
+    nsCOMPtr<nsIContent> leftNode = do_QueryInterface(leftNodeDOM);
+    MOZ_ASSERT(!leftNodeDOM || leftNode);
+    leftNode.forget(outLeftNode);
+  }
+  if (outRightNode) {
+    nsCOMPtr<nsIContent> rightNode = do_QueryInterface(rightNodeDOM);
+    MOZ_ASSERT(!rightNodeDOM || rightNode);
+    rightNode.forget(outRightNode);
+  }
+  return offset;
+}
+
 nsresult
 nsEditor::SplitNodeDeep(nsIDOMNode *aNode,
                         nsIDOMNode *aSplitPointParent,

@@ -33,6 +33,7 @@
 #include "InterceptedChannel.h"
 #include "nsPerformance.h"
 #include "mozIThirdPartyUtil.h"
+#include "nsContentSecurityManager.h"
 
 #ifdef OS_POSIX
 #include "chrome/common/file_descriptor_set_posix.h"
@@ -57,7 +58,7 @@ static_assert(FileDescriptorSet::MAX_DESCRIPTORS_PER_MESSAGE == 250,
               "MAX_DESCRIPTORS_PER_MESSAGE mismatch!");
 #endif
 
-}
+} // namespace
 
 // A stream listener interposed between the nsInputStreamPump used for intercepted channels
 // and this channel's original listener. This is only used to ensure the original listener
@@ -494,9 +495,6 @@ HttpChannelChild::DoOnStartRequest(nsIRequest* aRequest, nsISupports* aContext)
     Cancel(rv);
     return;
   }
-
-  if (mResponseHead)
-    SetCookie(mResponseHead->PeekHeader(nsHttp::Set_Cookie));
 
   if (mDivertingToParent) {
     mListener = nullptr;
@@ -1106,7 +1104,6 @@ HttpChannelChild::Redirect1Begin(const uint32_t& newChannelId,
 
   // We won't get OnStartRequest, set cookies here.
   mResponseHead = new nsHttpResponseHead(responseHead);
-  SetCookie(mResponseHead->PeekHeader(nsHttp::Set_Cookie));
 
   bool rewriteToGET = HttpBaseChannel::ShouldRewriteRedirectToGET(mResponseHead->Status(),
                                                                   mRequestHead.ParsedMethod());
@@ -1242,8 +1239,14 @@ HttpChannelChild::Redirect3Complete()
   if (mLoadGroup)
     mLoadGroup->RemoveRequest(this, nullptr, NS_BINDING_ABORTED);
 
-  if (NS_FAILED(rv))
+  if (NS_SUCCEEDED(rv)) {
+    if (mLoadInfo) {
+      mLoadInfo->AppendRedirectedPrincipal(GetURIPrincipal());
+    }
+  }
+  else {
     NS_WARNING("CompleteRedirectSetup failed, HttpChannelChild already open?");
+  }
 
   // Release ref to new channel.
   mRedirectChannelChild = nullptr;
@@ -1554,6 +1557,15 @@ HttpChannelChild::AsyncOpen(nsIStreamListener *listener, nsISupports *aContext)
   return ContinueAsyncOpen();
 }
 
+NS_IMETHODIMP
+HttpChannelChild::AsyncOpen2(nsIStreamListener *aListener)
+{
+  nsCOMPtr<nsIStreamListener> listener = aListener;
+  nsresult rv = nsContentSecurityManager::doContentSecurityCheck(this, listener);
+  NS_ENSURE_SUCCESS(rv, rv);
+  return AsyncOpen(listener, nullptr);
+}
+
 nsresult
 HttpChannelChild::ContinueAsyncOpen()
 {
@@ -1680,6 +1692,11 @@ HttpChannelChild::ContinueAsyncOpen()
 
   nsresult rv = mozilla::ipc::LoadInfoToLoadInfoArgs(mLoadInfo, &openArgs.loadInfo());
   NS_ENSURE_SUCCESS(rv, rv);
+
+  EnsureSchedulingContextID();
+  char scid[NSID_LENGTH];
+  mSchedulingContextID.ToProvidedString(scid);
+  openArgs.schedulingContextID().AssignASCII(scid);
 
   // The socket transport in the chrome process now holds a logical ref to us
   // until OnStopRequest, or we do a redirect, or we hit an IPDL error.
@@ -2016,7 +2033,6 @@ HttpChannelChild::GetAssociatedContentSecurity(
   return true;
 }
 
-/* attribute unsigned long countSubRequestsBrokenSecurity; */
 NS_IMETHODIMP
 HttpChannelChild::GetCountSubRequestsBrokenSecurity(
                     int32_t *aSubRequestsBrokenSecurity)
@@ -2038,7 +2054,6 @@ HttpChannelChild::SetCountSubRequestsBrokenSecurity(
   return assoc->SetCountSubRequestsBrokenSecurity(aSubRequestsBrokenSecurity);
 }
 
-/* attribute unsigned long countSubRequestsNoSecurity; */
 NS_IMETHODIMP
 HttpChannelChild::GetCountSubRequestsNoSecurity(int32_t *aSubRequestsNoSecurity)
 {
@@ -2213,4 +2228,5 @@ HttpChannelChild::ForceIntercepted()
   return NS_OK;
 }
 
-}} // mozilla::net
+} // namespace net
+} // namespace mozilla

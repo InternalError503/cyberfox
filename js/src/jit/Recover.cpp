@@ -1344,6 +1344,12 @@ RSimdBox::recover(JSContext* cx, SnapshotIterator& iter) const
       case SimdTypeDescr::Float64x2:
         MOZ_CRASH("NYI, RSimdBox of Float64x2");
         break;
+      case SimdTypeDescr::Int8x16:
+        MOZ_CRASH("NYI, RSimdBox of Int8x16");
+        break;
+      case SimdTypeDescr::Int16x8:
+        MOZ_CRASH("NYI, RSimdBox of Int16x8");
+        break;
     }
 
     if (!resultObject)
@@ -1494,5 +1500,31 @@ bool RStringReplace::recover(JSContext* cx, SnapshotIterator& iter) const
         return false;
 
     iter.storeInstructionResult(result);
+    return true;
+}
+
+bool
+MAtomicIsLockFree::writeRecoverData(CompactBufferWriter& writer) const
+{
+    MOZ_ASSERT(canRecoverOnBailout());
+    writer.writeUnsigned(uint32_t(RInstruction::Recover_AtomicIsLockFree));
+    return true;
+}
+
+RAtomicIsLockFree::RAtomicIsLockFree(CompactBufferReader& reader)
+{ }
+
+bool
+RAtomicIsLockFree::recover(JSContext* cx, SnapshotIterator& iter) const
+{
+    RootedValue operand(cx, iter.read());
+    MOZ_ASSERT(operand.isInt32());
+
+    int32_t result;
+    if (!js::AtomicIsLockFree(cx, operand, &result))
+        return false;
+
+    RootedValue rootedResult(cx, js::Int32Value(result));
+    iter.storeInstructionResult(rootedResult);
     return true;
 }

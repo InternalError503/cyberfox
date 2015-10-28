@@ -109,8 +109,8 @@ using namespace mozilla::layout;
 namespace mozilla {
 namespace gfx {
 class VRHMDInfo;
-}
-}
+} // namespace gfx
+} // namespace mozilla
 
 // Struct containing cached metrics for box-wrapped frames.
 struct nsBoxLayoutMetrics
@@ -1082,7 +1082,7 @@ nsIFrame::IsTransformed() const
           (StyleDisplay()->HasTransform(this) ||
            IsSVGTransformed() ||
            (mContent &&
-            nsLayoutUtils::HasAnimationsForCompositor(mContent,
+            nsLayoutUtils::HasAnimationsForCompositor(this,
                                                       eCSSProperty_transform) &&
             IsFrameOfType(eSupportsCSSTransforms) &&
             mContent->GetPrimaryFrame() == this)));
@@ -1096,7 +1096,7 @@ nsIFrame::HasOpacityInternal(float aThreshold) const
   return StyleDisplay()->mOpacity < aThreshold ||
          (displayStyle->mWillChangeBitField & NS_STYLE_WILL_CHANGE_OPACITY) ||
          (mContent &&
-           nsLayoutUtils::HasAnimationsForCompositor(mContent,
+           nsLayoutUtils::HasAnimationsForCompositor(this,
                                                      eCSSProperty_opacity) &&
            mContent->GetPrimaryFrame() == this);
 }
@@ -1946,7 +1946,8 @@ nsIFrame::BuildDisplayListForStackingContext(nsDisplayListBuilder* aBuilder,
   if (disp->mOpacity == 0.0 && aBuilder->IsForPainting() &&
       !aBuilder->WillComputePluginGeometry() &&
       !(disp->mWillChangeBitField & NS_STYLE_WILL_CHANGE_OPACITY) &&
-      !nsLayoutUtils::HasAnimations(mContent, eCSSProperty_opacity) &&
+      !nsLayoutUtils::HasCurrentAnimationOfProperty(this,
+                                                    eCSSProperty_opacity) &&
       !needEventRegions) {
     return;
   }
@@ -2946,6 +2947,7 @@ nsFrame::HandlePress(nsPresContext* aPresContext,
       if (curDetail->mType != nsISelectionController::SELECTION_SPELLCHECK &&
           curDetail->mType != nsISelectionController::SELECTION_FIND &&
           curDetail->mType != nsISelectionController::SELECTION_URLSECONDARY &&
+          curDetail->mType != nsISelectionController::SELECTION_URLSTRIKEOUT &&
           curDetail->mStart <= offsets.StartOffset() &&
           offsets.EndOffset() <= curDetail->mEnd)
       {
@@ -3554,7 +3556,7 @@ static FrameTarget GetSelectionClosestFrameForLine(
   nsIFrame *closestFromIStart = nullptr, *closestFromIEnd = nullptr;
   nscoord closestIStart = aLine->IStart(), closestIEnd = aLine->IEnd();
   WritingMode wm = aLine->mWritingMode;
-  LogicalPoint pt(wm, aPoint, aLine->mContainerWidth);
+  LogicalPoint pt(wm, aPoint, aLine->mContainerSize);
   bool canSkipBr = false;
   for (int32_t n = aLine->GetChildCount(); n;
        --n, frame = frame->GetNextSibling()) {
@@ -3566,7 +3568,7 @@ static FrameTarget GetSelectionClosestFrameForLine(
     }
     canSkipBr = true;
     LogicalRect frameRect = LogicalRect(wm, frame->GetRect(),
-                                        aLine->mContainerWidth);
+                                        aLine->mContainerSize);
     if (pt.I(wm) >= frameRect.IStart(wm)) {
       if (pt.I(wm) < frameRect.IEnd(wm)) {
         return GetSelectionClosestFrameForChild(frame, aPoint, aFlags);
@@ -3624,7 +3626,7 @@ static FrameTarget GetSelectionClosestFrameForBlock(nsIFrame* aFrame,
   nsBlockFrame::line_iterator closestLine = end;
   // Convert aPoint into a LogicalPoint in the writing-mode of this block
   WritingMode wm = curLine->mWritingMode;
-  LogicalPoint pt(wm, aPoint, curLine->mContainerWidth);
+  LogicalPoint pt(wm, aPoint, curLine->mContainerSize);
   while (curLine != end) {
     // Check to see if our point lies within the line's block-direction bounds
     nscoord BCoord = pt.B(wm) - curLine->BStart();
@@ -4328,20 +4330,20 @@ nsFrame::ComputeSize(nsRenderingContext *aRenderingContext,
       GetMinimumWidgetSize(presContext, this, disp->mAppearance,
                            &widget, &canOverride);
 
-    // Dimensions from themed widgets are applied physically...
-    nsSize size;
-    size.width = presContext->DevPixelsToAppUnits(widget.width);
-    size.height = presContext->DevPixelsToAppUnits(widget.height);
+    // Convert themed widget's physical dimensions to logical coords
+    LogicalSize size(aWM,
+                     nsSize(presContext->DevPixelsToAppUnits(widget.width),
+                            presContext->DevPixelsToAppUnits(widget.height)));
 
     // GMWS() returns border-box; we need content-box
-    size.width -= aBorder.Width(aWM) + aPadding.Width(aWM);
-    size.height -= aBorder.Height(aWM) + aPadding.Height(aWM);
+    size.ISize(aWM) -= aBorder.ISize(aWM) + aPadding.ISize(aWM);
+    size.BSize(aWM) -= aBorder.BSize(aWM) + aPadding.BSize(aWM);
 
-    if (size.height > result.Height(aWM) || !canOverride) {
-      result.Height(aWM) = size.height;
+    if (size.BSize(aWM) > result.BSize(aWM) || !canOverride) {
+      result.BSize(aWM) = size.BSize(aWM);
     }
-    if (size.width > result.Width(aWM) || !canOverride) {
-      result.Width(aWM) = size.width;
+    if (size.ISize(aWM) > result.ISize(aWM) || !canOverride) {
+      result.ISize(aWM) = size.ISize(aWM);
     }
   }
 
@@ -4905,8 +4907,8 @@ nsIFrame::GetTransformMatrix(const nsIFrame* aStopAtAncestor,
                  "Cannot transform the viewport frame!");
     int32_t scaleFactor = PresContext()->AppUnitsPerDevPixel();
 
-    Matrix4x4 result = ToMatrix4x4(
-      nsDisplayTransform::GetResultingTransformMatrix(this, nsPoint(0, 0), scaleFactor, nullptr, aOutAncestor));
+    Matrix4x4 result = nsDisplayTransform::GetResultingTransformMatrix(this,
+                         nsPoint(0, 0), scaleFactor, nullptr, aOutAncestor);
     // XXXjwatt: seems like this will double count offsets in the face of preserve-3d:
     nsPoint delta = GetOffsetToCrossDoc(*aOutAncestor);
     /* Combine the raw transform with a translation to our parent. */
@@ -5666,6 +5668,33 @@ nsIFrame::ListGeneric(nsACString& aTo, const char* aPrefix, uint32_t aFlags) con
     aTo += nsPrintfCString(" IBSplitPrevSibling=%p", IBprevsibling);
   }
   aTo += nsPrintfCString(" {%d,%d,%d,%d}", mRect.x, mRect.y, mRect.width, mRect.height);
+
+  mozilla::WritingMode wm = GetWritingMode();
+  if (wm.IsVertical() || !wm.IsBidiLTR()) {
+    aTo += nsPrintfCString(" wm=%s-%s: logical size={%d,%d}",
+                           wm.IsVertical() ? wm.IsVerticalLR() ? "vlr" : "vrl"
+                                           : "htb",
+                           wm.IsBidiLTR() ? "ltr" : "rtl",
+                           ISize(), BSize());
+  }
+
+  nsIFrame* parent = GetParent();
+  if (parent) {
+    WritingMode pWM = parent->GetWritingMode();
+    if (pWM.IsVertical() || !pWM.IsBidiLTR()) {
+      nsSize containerSize = parent->mRect.Size();
+      LogicalRect lr(pWM, mRect, containerSize);
+      aTo += nsPrintfCString(" parent wm=%s-%s, cs={%d,%d}, "
+                             " logicalRect={%d,%d,%d,%d}",
+                             pWM.IsVertical() ? pWM.IsVerticalLR()
+                                                ? "vlr" : "vrl"
+                                              : "htb",
+                             wm.IsBidiLTR() ? "ltr" : "rtl",
+                             containerSize.width, containerSize.height,
+                             lr.IStart(pWM), lr.BStart(pWM),
+                             lr.ISize(pWM), lr.BSize(pWM));
+    }
+  }
   nsIFrame* f = const_cast<nsIFrame*>(this);
   if (f->HasOverflowAreas()) {
     nsRect vo = f->GetVisualOverflowRect();
@@ -5755,13 +5784,13 @@ nsFrame::MakeFrameName(const nsAString& aType, nsAString& aResult) const
 }
 
 void
-nsIFrame::DumpFrameTree()
+nsIFrame::DumpFrameTree() const
 {
   RootFrameList(PresContext(), stderr);
 }
 
 void
-nsIFrame::DumpFrameTreeLimited()
+nsIFrame::DumpFrameTreeLimited() const
 {
   List(stderr);
 }
@@ -6194,7 +6223,8 @@ nsFrame::GetNextPrevLineFromeBlockFrame(nsPresContext* aPresContext,
                                     ePostOrder,
                                     false, // aVisual
                                     aPos->mScrollViewStop,
-                                    false     // aFollowOOFs
+                                    false, // aFollowOOFs
+                                    false  // aSkipPopupChecks
                                     );
       if (NS_FAILED(result))
         return result;
@@ -6294,7 +6324,8 @@ nsFrame::GetNextPrevLineFromeBlockFrame(nsPresContext* aPresContext,
                                       eLeaf,
                                       false, // aVisual
                                       aPos->mScrollViewStop,
-                                      false     // aFollowOOFs
+                                      false, // aFollowOOFs
+                                      false  // aSkipPopupChecks
                                       );
       }
       while ( !found ){
@@ -7082,7 +7113,8 @@ nsIFrame::GetFrameFromDirection(nsDirection aDirection, bool aVisual,
                                   eLeaf,
                                   aVisual && presContext->BidiEnabled(),
                                   aScrollViewStop,
-                                  true     // aFollowOOFs
+                                  true,  // aFollowOOFs
+                                  false  // aSkipPopupChecks
                                   );
     if (NS_FAILED(result))
       return result;
@@ -7318,6 +7350,7 @@ UnionBorderBoxes(nsIFrame* aFrame, bool aApplyTransform,
   nsIAtom* fType = aFrame->GetType();
   if (nsFrame::ShouldApplyOverflowClipping(aFrame, disp) ||
       fType == nsGkAtoms::scrollFrame ||
+      fType == nsGkAtoms::listControlFrame ||
       fType == nsGkAtoms::svgOuterSVGFrame) {
     return u;
   }
@@ -8143,7 +8176,9 @@ void nsFrame::FillCursorInformationFromStyle(const nsStyleUserInterface* ui,
        item < item_end; ++item) {
     uint32_t status;
     nsresult rv = item->GetImage()->GetImageStatus(&status);
-    if (NS_SUCCEEDED(rv) && (status & imgIRequest::STATUS_LOAD_COMPLETE)) {
+    if (NS_SUCCEEDED(rv) &&
+        (status & imgIRequest::STATUS_LOAD_COMPLETE) &&
+        !(status & imgIRequest::STATUS_ERROR)) {
       // This is the one we want
       item->GetImage()->GetImage(getter_AddRefs(aCursor.mContainer));
       aCursor.mHaveHotspot = item->mHaveHotspot;

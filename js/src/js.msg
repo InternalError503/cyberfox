@@ -370,6 +370,7 @@ MSG_DEF(JSMSG_CANT_SET_NW_NC,          0, JSEXN_TYPEERR, "proxy can't successful
 MSG_DEF(JSMSG_CANT_SET_WO_SETTER,      0, JSEXN_TYPEERR, "proxy can't succesfully set an accessor property without a setter")
 MSG_DEF(JSMSG_CANT_SKIP_NC,            0, JSEXN_TYPEERR, "proxy can't skip a non-configurable property")
 MSG_DEF(JSMSG_INVALID_TRAP_RESULT,     2, JSEXN_TYPEERR, "trap {1} for {0} returned an invalid result")
+MSG_DEF(JSMSG_ONWKEYS_STR_SYM,         0, JSEXN_TYPEERR,  "proxy [[OwnPropertyKeys]] must return an array with only string and symbol elements")
 MSG_DEF(JSMSG_MUST_REPORT_SAME_VALUE,  0, JSEXN_TYPEERR, "proxy must report the same value for a non-writable, non-configurable property")
 MSG_DEF(JSMSG_MUST_REPORT_UNDEFINED,   0, JSEXN_TYPEERR, "proxy must report undefined for a non-configurable accessor property without a getter")
 MSG_DEF(JSMSG_OBJECT_ACCESS_DENIED,    0, JSEXN_ERR, "Permission denied to access object")
@@ -411,11 +412,13 @@ MSG_DEF(JSMSG_DEBUG_VARIABLE_NOT_FOUND,0, JSEXN_TYPEERR, "variable not found in 
 MSG_DEF(JSMSG_DEBUG_WRAPPER_IN_WAY,    3, JSEXN_TYPEERR, "{0} is {1}{2}a global object, but a direct reference is required")
 MSG_DEF(JSMSG_NOT_CALLABLE_OR_UNDEFINED, 0, JSEXN_TYPEERR, "value is not a function or undefined")
 MSG_DEF(JSMSG_NOT_TRACKING_ALLOCATIONS, 1, JSEXN_ERR, "Cannot call {0} without setting trackingAllocationSites to true")
+MSG_DEF(JSMSG_NOT_TRACKING_TENURINGS,  1, JSEXN_ERR, "Cannot call {0} without setting trackingTenurePromotions to true")
 MSG_DEF(JSMSG_OBJECT_METADATA_CALLBACK_ALREADY_SET, 0, JSEXN_ERR, "Cannot track object allocation, because other tools are already doing so")
 MSG_DEF(JSMSG_QUERY_INNERMOST_WITHOUT_LINE_URL, 0, JSEXN_TYPEERR, "findScripts query object with 'innermost' property must have 'line' and either 'displayURL', 'url', or 'source'")
 MSG_DEF(JSMSG_QUERY_LINE_WITHOUT_URL, 0, JSEXN_TYPEERR, "findScripts query object has 'line' property, but no 'displayURL', 'url', or 'source' property")
 MSG_DEF(JSMSG_DEBUG_CANT_SET_OPT_ENV, 1, JSEXN_REFERENCEERR, "can't set `{0}' in an optimized-out environment")
 MSG_DEF(JSMSG_DEBUG_INVISIBLE_COMPARTMENT, 0, JSEXN_TYPEERR, "object in compartment marked as invisible to Debugger")
+MSG_DEF(JSMSG_DEBUG_CENSUS_BREAKDOWN,  1, JSEXN_TYPEERR, "unrecognized 'by' value in takeCensus breakdown: {0}")
 
 // Tracelogger
 MSG_DEF(JSMSG_TRACELOGGER_ENABLE_FAIL, 1, JSEXN_ERR, "enabling tracelogger failed: {0}")

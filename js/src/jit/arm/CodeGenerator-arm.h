@@ -23,8 +23,6 @@ class CodeGeneratorARM : public CodeGeneratorShared
     CodeGeneratorARM* thisFromCtor() {return this;}
 
   protected:
-    // Label for the common return path.
-    NonAssertingLabel returnLabel_;
     NonAssertingLabel deoptLabel_;
 
     MoveOperand toMoveOperand(LAllocation a) const;
@@ -62,8 +60,6 @@ class CodeGeneratorARM : public CodeGeneratorShared
                                   T* mir);
 
   protected:
-    bool generatePrologue();
-    bool generateEpilogue();
     bool generateOutOfLineCode();
 
     void emitRoundDouble(FloatRegister src, Register dest, Label* fail);
@@ -203,6 +199,8 @@ class CodeGeneratorARM : public CodeGeneratorShared
     void visitAsmJSStoreHeap(LAsmJSStoreHeap* ins);
     void visitAsmJSCompareExchangeHeap(LAsmJSCompareExchangeHeap* ins);
     void visitAsmJSCompareExchangeCallout(LAsmJSCompareExchangeCallout* ins);
+    void visitAsmJSAtomicExchangeHeap(LAsmJSAtomicExchangeHeap* ins);
+    void visitAsmJSAtomicExchangeCallout(LAsmJSAtomicExchangeCallout* ins);
     void visitAsmJSAtomicBinopHeap(LAsmJSAtomicBinopHeap* ins);
     void visitAsmJSAtomicBinopHeapForEffect(LAsmJSAtomicBinopHeapForEffect* ins);
     void visitAsmJSAtomicBinopCallout(LAsmJSAtomicBinopCallout* ins);

@@ -74,6 +74,8 @@ let gTests = [
     yield setupPingArchive();
     Preferences.set("datareporting.healthreport.about.reportUrl",
                     HTTPS_BASE + "healthreport_testRemoteCommands.html");
+    Preferences.set("datareporting.healthreport.about.reportUrlUnified",
+                    HTTPS_BASE + "healthreport_testRemoteCommands.html");
   }),
   run: function (iframe)
   {

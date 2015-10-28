@@ -48,7 +48,7 @@ namespace mozilla {
 namespace dom {
 struct MediaStreamConstraints;
 struct MediaTrackConstraintSet;
-}
+} // namespace dom
 
 extern PRLogModuleInfo* GetMediaManagerLog();
 #define MM_LOG(msg) MOZ_LOG(GetMediaManagerLog(), mozilla::LogLevel::Debug, msg)
@@ -103,7 +103,7 @@ public:
     return mStream->AsSourceStream();
   }
 
-  void StopScreenWindowSharing();
+  void StopSharing();
 
   void StopTrack(TrackID aID, bool aIsAudio);
 
@@ -465,13 +465,25 @@ public:
   NS_DECL_NSIMEDIADEVICE
 
   void SetId(const nsAString& aID);
+  virtual uint32_t GetBestFitnessDistance(
+      const nsTArray<const dom::MediaTrackConstraintSet*>& aConstraintSets);
 protected:
   virtual ~MediaDevice() {}
-  explicit MediaDevice(MediaEngineSource* aSource);
+  explicit MediaDevice(MediaEngineSource* aSource, bool aIsVideo);
+  static uint32_t FitnessDistance(nsString aN,
+    const dom::OwningStringOrStringSequenceOrConstrainDOMStringParameters& aConstraint);
+private:
+  static bool StringsContain(const dom::OwningStringOrStringSequence& aStrings,
+                             nsString aN);
+  static uint32_t FitnessDistance(nsString aN,
+      const dom::ConstrainDOMStringParameters& aParams);
+protected:
   nsString mName;
   nsString mID;
   dom::MediaSourceEnum mMediaSource;
   nsRefPtr<MediaEngineSource> mSource;
+public:
+  bool mIsVideo;
 };
 
 class VideoDevice : public MediaDevice
@@ -482,8 +494,8 @@ public:
   explicit VideoDevice(Source* aSource);
   NS_IMETHOD GetType(nsAString& aType);
   Source* GetSource();
-  uint32_t GetBestFitnessDistance(
-    const nsTArray<const dom::MediaTrackConstraintSet*>& aConstraintSets);
+  nsresult Allocate(const dom::MediaTrackConstraints &aConstraints,
+                    const MediaEnginePrefs &aPrefs);
 };
 
 class AudioDevice : public MediaDevice
@@ -494,8 +506,8 @@ public:
   explicit AudioDevice(Source* aSource);
   NS_IMETHOD GetType(nsAString& aType);
   Source* GetSource();
-  uint32_t GetBestFitnessDistance(
-    const nsTArray<const dom::MediaTrackConstraintSet*>& aConstraintSets);
+  nsresult Allocate(const dom::MediaTrackConstraints &aConstraints,
+                    const MediaEnginePrefs &aPrefs);
 };
 
 // we could add MediaManager if needed
@@ -567,14 +579,18 @@ public:
 
   nsresult EnumerateDevices(nsPIDOMWindow* aWindow, dom::Promise& aPromise);
   void OnNavigation(uint64_t aWindowID);
-  bool IsWindowActivelyCapturing(uint64_t aWindowId);
+  bool IsActivelyCapturingOrHasAPermission(uint64_t aWindowId);
 
   MediaEnginePrefs mPrefs;
 
-private:
   typedef nsTArray<nsRefPtr<MediaDevice>> SourceSet;
+  static bool IsPrivateBrowsing(nsPIDOMWindow *window);
+private:
   typedef media::Pledge<SourceSet*, dom::MediaStreamError> PledgeSourceSet;
 
+  static bool IsPrivileged();
+  static bool IsLoop(nsIURI* aDocURI);
+  static nsresult GenerateUUID(nsAString& aResult);
   static nsresult AnonymizeId(nsAString& aId, const nsACString& aOriginKey);
 public: // TODO: make private once we upgrade to GCC 4.8+ on linux.
   static void AnonymizeDevices(SourceSet& aDevices, const nsACString& aOriginKey);
@@ -582,10 +598,14 @@ public: // TODO: make private once we upgrade to GCC 4.8+ on linux.
 private:
   already_AddRefed<PledgeSourceSet>
   EnumerateRawDevices(uint64_t aWindowId,
-                      const dom::MediaStreamConstraints& aConstraints);
+                      dom::MediaSourceEnum aVideoType,
+                      dom::MediaSourceEnum aAudioType,
+                      bool aFake, bool aFakeTracks);
   already_AddRefed<PledgeSourceSet>
   EnumerateDevicesImpl(uint64_t aWindowId,
-                       const dom::MediaStreamConstraints& aConstraints);
+                       dom::MediaSourceEnum aVideoSrcType,
+                       dom::MediaSourceEnum aAudioSrcType,
+                       bool aFake = false, bool aFakeTracks = false);
 
   StreamListeners* AddWindowID(uint64_t aWindowId);
   WindowTable *GetActiveWindows() {

@@ -30,6 +30,8 @@ const SEARCH_AUTOFILL = [SEARCH_GLOBAL_FLAG, SEARCH_FUNCTION_FLAG, SEARCH_TOKEN_
 const EDITOR_VARIABLE_HOVER_DELAY = 750; // ms
 const EDITOR_VARIABLE_POPUP_POSITION = "topcenter bottomleft";
 const TOOLBAR_ORDER_POPUP_POSITION = "topcenter bottomleft";
+const PROMISE_DEBUGGER_URL =
+  "chrome://browser/content/devtools/promisedebugger/promise-debugger.xhtml";
 
 /**
  * Object defining the debugger view components.
@@ -58,7 +60,6 @@ let DebuggerView = {
     this.Workers.initialize();
     this.Sources.initialize();
     this.VariableBubble.initialize();
-    this.Tracer.initialize();
     this.WatchExpressions.initialize();
     this.EventListeners.initialize();
     this.GlobalSearch.initialize();
@@ -91,10 +92,10 @@ let DebuggerView = {
     this.StackFramesClassicList.destroy();
     this.Sources.destroy();
     this.VariableBubble.destroy();
-    this.Tracer.destroy();
     this.WatchExpressions.destroy();
     this.EventListeners.destroy();
     this.GlobalSearch.destroy();
+    this._destroyPromiseDebugger();
     this._destroyPanes();
     this._destroyEditor(deferred.resolve);
 
@@ -112,6 +113,7 @@ let DebuggerView = {
     this._workersAndSourcesPane = document.getElementById("workers-and-sources-pane");
     this._instrumentsPane = document.getElementById("instruments-pane");
     this._instrumentsPaneToggleButton = document.getElementById("instruments-pane-toggle");
+    this._promisePane = document.getElementById("promise-debugger-pane");
 
     this.showEditor = this.showEditor.bind(this);
     this.showBlackBoxMessage = this.showBlackBoxMessage.bind(this);
@@ -148,6 +150,7 @@ let DebuggerView = {
     this._workersAndSourcesPane = null;
     this._instrumentsPane = null;
     this._instrumentsPaneToggleButton = null;
+    this._promisePane = null;
   },
 
   /**
@@ -174,9 +177,7 @@ let DebuggerView = {
     VariablesViewController.attach(this.Variables, {
       getEnvironmentClient: aObject => gThreadClient.environment(aObject),
       getObjectClient: aObject => {
-        return aObject instanceof DebuggerController.Tracer.WrappedObject
-          ? DebuggerController.Tracer.syncGripClient(aObject.object)
-          : gThreadClient.pauseGrip(aObject)
+        return gThreadClient.pauseGrip(aObject)
       }
     });
 
@@ -194,6 +195,28 @@ let DebuggerView = {
           break;
       }
     });
+  },
+
+  /**
+   * Initialie the Promise Debugger instance.
+   */
+  _initializePromiseDebugger: function() {
+    let iframe = this._promiseDebuggerIframe = document.createElement("iframe");
+    iframe.setAttribute("flex", 1);
+    iframe.setAttribute("src", PROMISE_DEBUGGER_URL);
+    this._promisePane.appendChild(iframe);
+  },
+
+  /**
+   * Destroy the Promise Debugger instance.
+   */
+  _destroyPromiseDebugger: function() {
+    if (this._promiseDebuggerIframe) {
+      this._promiseDebuggerIframe.parentNode.removeChild(
+        this._promiseDebuggerIframe);
+
+      this._promiseDebuggerIframe = null;
+    }
   },
 
   /**
@@ -219,9 +242,6 @@ let DebuggerView = {
     }
 
     let gutters = ["breakpoints"];
-    if (Services.prefs.getBoolPref("devtools.debugger.tracer")) {
-      gutters.unshift("hit-counts");
-    }
 
     this.editor = new Editor({
       mode: Editor.modes.text,
@@ -414,7 +434,6 @@ let DebuggerView = {
       // source.
       DebuggerView.Sources.selectedValue = aSource.actor;
       DebuggerController.Breakpoints.updateEditorBreakpoints();
-      DebuggerController.HitCounts.updateEditorHitCounts();
 
       histogram.add(Date.now() - startTime);
 
@@ -609,7 +628,6 @@ let DebuggerView = {
    * Switches the debugger widgets to a horizontal layout.
    */
   _enterVerticalLayout: function() {
-    let normContainer = document.getElementById("debugger-widgets");
     let vertContainer = document.getElementById("vertical-layout-panes-container");
 
     // Move the soruces and instruments panes in a different container.
@@ -628,13 +646,13 @@ let DebuggerView = {
    */
   _enterHorizontalLayout: function() {
     let normContainer = document.getElementById("debugger-widgets");
-    let vertContainer = document.getElementById("vertical-layout-panes-container");
+    let editorPane = document.getElementById("editor-and-instruments-pane");
 
     // The sources and instruments pane need to be inserted at their
     // previous locations in their normal container.
     let splitter = document.getElementById("sources-and-editor-splitter");
     normContainer.insertBefore(this._workersAndSourcesPane, splitter);
-    normContainer.appendChild(this._instrumentsPane);
+    editorPane.appendChild(this._instrumentsPane);
 
     // Revert to the preferred sources and instruments widths, because
     // they flexed in the vertical layout.
@@ -673,7 +691,6 @@ let DebuggerView = {
   GlobalSearch: null,
   StackFrames: null,
   Sources: null,
-  Tracer: null,
   Variables: null,
   VariableBubble: null,
   WatchExpressions: null,

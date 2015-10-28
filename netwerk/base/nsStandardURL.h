@@ -173,7 +173,7 @@ private:
     void     Clear();
     void     InvalidateCache(bool invalidateCachedFile = true);
 
-    bool     ValidIPv6orHostname(const char *host);
+    bool     ValidIPv6orHostname(const char *host, uint32_t aLen);
     bool     NormalizeIDN(const nsCSubstring &host, nsCString &result);
     void     CoalescePath(netCoalesceFlags coalesceFlag, char *path);
 
@@ -236,8 +236,6 @@ private:
 
     void FindHostLimit(nsACString::const_iterator& aStart,
                        nsACString::const_iterator& aEnd);
-    // Checks that the Ref contains only allowed characters
-    nsresult CheckRefCharacters(const nsACString &input);
 
     // mSpec contains the normalized version of the URL spec (UTF-8 encoded).
     nsCString mSpec;

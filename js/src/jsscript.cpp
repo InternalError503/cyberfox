@@ -61,24 +61,25 @@ using mozilla::PodZero;
 using mozilla::RotateLeft;
 
 /* static */ BindingIter
-Bindings::argumentsBinding(ExclusiveContext* cx, InternalBindingsHandle bindings)
+Bindings::argumentsBinding(ExclusiveContext* cx, HandleScript script)
 {
     HandlePropertyName arguments = cx->names().arguments;
-    BindingIter bi(bindings);
+    BindingIter bi(script);
     while (bi->name() != arguments)
         bi++;
     return bi;
 }
 
 bool
-Bindings::initWithTemporaryStorage(ExclusiveContext* cx, InternalBindingsHandle self,
+Bindings::initWithTemporaryStorage(ExclusiveContext* cx, MutableHandle<Bindings> self,
                                    uint32_t numArgs, uint32_t numVars,
                                    uint32_t numBodyLevelLexicals, uint32_t numBlockScoped,
                                    uint32_t numUnaliasedVars, uint32_t numUnaliasedBodyLevelLexicals,
-                                   Binding* bindingArray)
+                                   const Binding* bindingArray)
 {
-    MOZ_ASSERT(!self->callObjShape_);
-    MOZ_ASSERT(self->bindingArrayAndFlag_ == TEMPORARY_STORAGE_BIT);
+    MOZ_ASSERT(!self.callObjShape());
+    MOZ_ASSERT(self.bindingArrayUsingTemporaryStorage());
+    MOZ_ASSERT(!self.bindingArray());
     MOZ_ASSERT(!(uintptr_t(bindingArray) & TEMPORARY_STORAGE_BIT));
     MOZ_ASSERT(numArgs <= ARGC_LIMIT);
     MOZ_ASSERT(numVars <= LOCALNO_LIMIT);
@@ -93,13 +94,13 @@ Bindings::initWithTemporaryStorage(ExclusiveContext* cx, InternalBindingsHandle 
     MOZ_ASSERT(numUnaliasedVars <= numVars);
     MOZ_ASSERT(numUnaliasedBodyLevelLexicals <= numBodyLevelLexicals);
 
-    self->bindingArrayAndFlag_ = uintptr_t(bindingArray) | TEMPORARY_STORAGE_BIT;
-    self->numArgs_ = numArgs;
-    self->numVars_ = numVars;
-    self->numBodyLevelLexicals_ = numBodyLevelLexicals;
-    self->numBlockScoped_ = numBlockScoped;
-    self->numUnaliasedVars_ = numUnaliasedVars;
-    self->numUnaliasedBodyLevelLexicals_ = numUnaliasedBodyLevelLexicals;
+    self.setBindingArray(bindingArray, TEMPORARY_STORAGE_BIT);
+    self.setNumArgs(numArgs);
+    self.setNumVars(numVars);
+    self.setNumBodyLevelLexicals(numBodyLevelLexicals);
+    self.setNumBlockScoped(numBlockScoped);
+    self.setNumUnaliasedVars(numUnaliasedVars);
+    self.setNumUnaliasedBodyLevelLexicals(numUnaliasedBodyLevelLexicals);
 
     // Get the initial shape to use when creating CallObjects for this script.
     // After creation, a CallObject's shape may change completely (via direct eval() or
@@ -134,7 +135,7 @@ Bindings::initWithTemporaryStorage(ExclusiveContext* cx, InternalBindingsHandle 
             nslots++;
         }
     }
-    self->aliasedBodyLevelLexicalBegin_ = aliasedBodyLevelLexicalBegin;
+    self.setAliasedBodyLevelLexicalBegin(aliasedBodyLevelLexicalBegin);
 
     // Put as many of nslots inline into the object header as possible.
     uint32_t nfixed = gc::GetGCKindSlots(gc::GetGCObjectKind(nslots));
@@ -190,7 +191,7 @@ Bindings::initWithTemporaryStorage(ExclusiveContext* cx, InternalBindingsHandle 
     MOZ_ASSERT(slot == nslots);
 
     MOZ_ASSERT(!shape->inDictionary());
-    self->callObjShape_.init(shape);
+    self.setCallObjShape(shape);
     return true;
 }
 
@@ -218,12 +219,12 @@ Bindings::switchToScriptStorage(Binding* newBindingArray)
     return reinterpret_cast<uint8_t*>(newBindingArray + count());
 }
 
-bool
-Bindings::clone(JSContext* cx, InternalBindingsHandle self,
+/* static */ bool
+Bindings::clone(JSContext* cx, MutableHandle<Bindings> self,
                 uint8_t* dstScriptData, HandleScript srcScript)
 {
     /* The clone has the same bindingArray_ offset as 'src'. */
-    Bindings& src = srcScript->bindings;
+    Handle<Bindings> src = Handle<Bindings>::fromMarkedLocation(&srcScript->bindings);
     ptrdiff_t off = (uint8_t*)src.bindingArray() - srcScript->data;
     MOZ_ASSERT(off >= 0);
     MOZ_ASSERT(size_t(off) <= srcScript->dataSize());
@@ -243,14 +244,8 @@ Bindings::clone(JSContext* cx, InternalBindingsHandle self,
         return false;
     }
 
-    self->switchToScriptStorage(dstPackedBindings);
+    self.switchToScriptStorage(dstPackedBindings);
     return true;
-}
-
-/* static */ Bindings
-GCMethods<Bindings>::initial()
-{
-    return Bindings();
 }
 
 template<XDRMode mode>
@@ -302,14 +297,15 @@ XDRScriptBindings(XDRState<mode>* xdr, LifoAllocScope& las, uint16_t numArgs, ui
             bindingArray[i] = Binding(name, kind, aliased);
         }
 
-        InternalBindingsHandle bindings(script, &script->bindings);
-        if (!Bindings::initWithTemporaryStorage(cx, bindings, numArgs, numVars,
+        Rooted<Bindings> bindings(cx, script->bindings);
+        if (!Bindings::initWithTemporaryStorage(cx, &bindings, numArgs, numVars,
                                                 numBodyLevelLexicals, numBlockScoped,
                                                 numUnaliasedVars, numUnaliasedBodyLevelLexicals,
                                                 bindingArray))
         {
             return false;
         }
+        script->bindings = bindings;
     }
 
     return true;
@@ -1279,17 +1275,16 @@ JSScript::initScriptCounts(JSContext* cx)
 {
     MOZ_ASSERT(!hasScriptCounts());
 
-    size_t n = 0;
+    // We allocate one PCCounts for each offset, instead of for each bytecode,
+    // because the pcCountsVector maps an offset to a PCCounts structure.
+    size_t nbytes = length() * sizeof(PCCounts);
 
-    for (jsbytecode* pc = code(); pc < codeEnd(); pc += GetBytecodeLength(pc))
-        n += PCCounts::numCounts(JSOp(*pc));
-
-    size_t nbytes = (length() * sizeof(PCCounts)) + (n * sizeof(double));
+    // Initialize all PCCounts counters to 0.
     uint8_t* base = zone()->pod_calloc<uint8_t>(nbytes);
     if (!base)
         return false;
 
-    /* Create compartment's scriptCountsMap if necessary. */
+    // Create compartment's scriptCountsMap if necessary.
     ScriptCountsMap* map = compartment()->scriptCountsMap;
     if (!map) {
         map = cx->new_<ScriptCountsMap>();
@@ -1301,29 +1296,15 @@ JSScript::initScriptCounts(JSContext* cx)
         compartment()->scriptCountsMap = map;
     }
 
-    uint8_t* cursor = base;
-
     ScriptCounts scriptCounts;
-    scriptCounts.pcCountsVector = (PCCounts*) cursor;
-    cursor += length() * sizeof(PCCounts);
+    scriptCounts.pcCountsVector = (PCCounts*) base;
 
-    for (jsbytecode* pc = code(); pc < codeEnd(); pc += GetBytecodeLength(pc)) {
-        MOZ_ASSERT(uintptr_t(cursor) % sizeof(double) == 0);
-        scriptCounts.pcCountsVector[pcToOffset(pc)].counts = (double*) cursor;
-        size_t capacity = PCCounts::numCounts(JSOp(*pc));
-#ifdef DEBUG
-        scriptCounts.pcCountsVector[pcToOffset(pc)].capacity = capacity;
-#endif
-        cursor += capacity * sizeof(double);
-    }
-
+    // Register the current ScriptCount in the compartment's map.
     if (!map->putNew(this, scriptCounts)) {
         js_free(base);
         return false;
     }
     hasScriptCounts_ = true; // safe to set this;  we can't fail after this point
-
-    MOZ_ASSERT(size_t(cursor - base) == nbytes);
 
     /* Enable interrupts in any interpreter frames running on this script. */
     for (ActivationIterator iter(cx->runtime()); !iter.done(); ++iter) {
@@ -1343,7 +1324,7 @@ static inline ScriptCountsMap::Ptr GetScriptCountsMapEntry(JSScript* script)
     return p;
 }
 
-js::PCCounts
+js::PCCounts&
 JSScript::getPCCounts(jsbytecode* pc) {
     MOZ_ASSERT(containsPC(pc));
     ScriptCountsMap::Ptr p = GetScriptCountsMapEntry(this);
@@ -1761,8 +1742,10 @@ ScriptSource::ensureOwnsSource(ExclusiveContext* cx)
         return true;
 
     char16_t* uncompressed = cx->zone()->pod_malloc<char16_t>(Max<size_t>(length_, 1));
-    if (!uncompressed)
+    if (!uncompressed) {
+        ReportOutOfMemory(cx);
         return false;
+    }
     PodCopy(uncompressed, uncompressedChars(), length_);
 
     data.uncompressed.chars = uncompressed;
@@ -2083,8 +2066,10 @@ FormatIntroducedFilename(ExclusiveContext* cx, const char* filename, unsigned li
                  introducerLen                  +
                  1 /* \0 */;
     char* formatted = cx->zone()->pod_malloc<char>(len);
-    if (!formatted)
+    if (!formatted) {
+        ReportOutOfMemory(cx);
         return nullptr;
+    }
     mozilla::DebugOnly<size_t> checkLen = JS_snprintf(formatted, len, "%s line %s > %s",
                                                       filename, linenoBuf, introducer);
     MOZ_ASSERT(checkLen == len - 1);
@@ -2199,8 +2184,10 @@ js::SharedScriptData::new_(ExclusiveContext* cx, uint32_t codeLength,
 
     SharedScriptData* entry = reinterpret_cast<SharedScriptData*>(
             cx->zone()->pod_malloc<uint8_t>(length + dataOffset));
-    if (!entry)
+    if (!entry) {
+        ReportOutOfMemory(cx);
         return nullptr;
+    }
 
     entry->length = length;
     entry->natoms = natoms;
@@ -2358,7 +2345,7 @@ js::FreeScriptData(JSRuntime* rt)
  *
  * IMPORTANT: This layout has two key properties.
  * - It ensures that everything has sufficient alignment; in particular, the
- *   consts() elements need jsval alignment.
+ *   consts() elements need Value alignment.
  * - It ensures there are no gaps between elements, which saves space and makes
  *   manual layout easy. In particular, in the second part, arrays with larger
  *   elements precede arrays with smaller elements.
@@ -2381,12 +2368,12 @@ js::FreeScriptData(JSRuntime* rt)
  */
 
 #define KEEPS_JSVAL_ALIGNMENT(T) \
-    (JS_ALIGNMENT_OF(jsval) % JS_ALIGNMENT_OF(T) == 0 && \
-     sizeof(T) % sizeof(jsval) == 0)
+    (JS_ALIGNMENT_OF(JS::Value) % JS_ALIGNMENT_OF(T) == 0 && \
+     sizeof(T) % sizeof(JS::Value) == 0)
 
 #define HAS_JSVAL_ALIGNMENT(T) \
-    (JS_ALIGNMENT_OF(jsval) == JS_ALIGNMENT_OF(T) && \
-     sizeof(T) == sizeof(jsval))
+    (JS_ALIGNMENT_OF(JS::Value) == JS_ALIGNMENT_OF(T) && \
+     sizeof(T) == sizeof(JS::Value))
 
 #define NO_PADDING_BETWEEN_ENTRIES(T1, T2) \
     (JS_ALIGNMENT_OF(T1) % JS_ALIGNMENT_OF(T2) == 0)
@@ -2394,7 +2381,7 @@ js::FreeScriptData(JSRuntime* rt)
 /*
  * These assertions ensure that there is no padding between the array headers,
  * and also that the consts() elements (which follow immediately afterward) are
- * jsval-aligned.  (There is an assumption that |data| itself is jsval-aligned;
+ * Value-aligned.  (There is an assumption that |data| itself is Value-aligned;
  * we check this below).
  */
 JS_STATIC_ASSERT(KEEPS_JSVAL_ALIGNMENT(ConstArray));
@@ -2521,8 +2508,10 @@ JSScript::partiallyInit(ExclusiveContext* cx, HandleScript script, uint32_t ncon
     size_t size = ScriptDataSize(script->bindings.count(), nconsts, nobjects, nregexps, ntrynotes,
                                  nblockscopes, nyieldoffsets);
     script->data = AllocScriptData(script->zone(), size);
-    if (size && !script->data)
+    if (size && !script->data) {
+        ReportOutOfMemory(cx);
         return false;
+    }
     script->dataSize_ = size;
 
     MOZ_ASSERT(nTypeSets <= UINT16_MAX);
@@ -2557,7 +2546,7 @@ JSScript::partiallyInit(ExclusiveContext* cx, HandleScript script, uint32_t ncon
     }
 
     if (nconsts != 0) {
-        MOZ_ASSERT(reinterpret_cast<uintptr_t>(cursor) % sizeof(jsval) == 0);
+        MOZ_ASSERT(reinterpret_cast<uintptr_t>(cursor) % sizeof(JS::Value) == 0);
         script->consts()->length = nconsts;
         script->consts()->vector = (HeapValue*)cursor;
         cursor += nconsts * sizeof(script->consts()->vector[0]);
@@ -3117,9 +3106,7 @@ js::detail::CopyScript(JSContext* cx, HandleObject scriptStaticScope, HandleScri
     /* Bindings */
 
     Rooted<Bindings> bindings(cx);
-    InternalHandle<Bindings*> bindingsHandle =
-        InternalHandle<Bindings*>::fromMarkedLocation(bindings.address());
-    if (!Bindings::clone(cx, bindingsHandle, data, src))
+    if (!Bindings::clone(cx, &bindings, data, src))
         return false;
 
     /* Objects */
@@ -3609,6 +3596,33 @@ LazyScript::finalize(FreeOp* fop)
         fop->free_(table_);
 }
 
+size_t
+JSScript::calculateLiveFixed(jsbytecode* pc)
+{
+    size_t nlivefixed = nbodyfixed();
+
+    if (nfixed() != nlivefixed) {
+        NestedScopeObject* staticScope = getStaticBlockScope(pc);
+        if (staticScope)
+            staticScope = MaybeForwarded(staticScope);
+        while (staticScope && !staticScope->is<StaticBlockObject>()) {
+            staticScope = staticScope->enclosingNestedScope();
+            if (staticScope)
+                staticScope = MaybeForwarded(staticScope);
+        }
+
+        if (staticScope) {
+            StaticBlockObject& blockObj = staticScope->as<StaticBlockObject>();
+            nlivefixed = blockObj.localOffset() + blockObj.numVariables();
+        }
+    }
+
+    MOZ_ASSERT(nlivefixed <= nfixed());
+    MOZ_ASSERT(nlivefixed >= nbodyfixed());
+
+    return nlivefixed;
+}
+
 NestedScopeObject*
 JSScript::getStaticBlockScope(jsbytecode* pc)
 {
@@ -3704,8 +3718,7 @@ js::SetFrameArgumentsObject(JSContext* cx, AbstractFramePtr frame,
      * object. Note that 'arguments' may have already been overwritten.
      */
 
-    InternalBindingsHandle bindings(script, &script->bindings);
-    BindingIter bi = Bindings::argumentsBinding(cx, bindings);
+    BindingIter bi = Bindings::argumentsBinding(cx, script);
 
     if (script->bindingIsAliased(bi)) {
         /*
@@ -3899,8 +3912,10 @@ LazyScript::CreateRaw(ExclusiveContext* cx, HandleFunction fun,
                  + (p.numInnerFunctions * sizeof(HeapPtrFunction));
 
     ScopedJSFreePtr<uint8_t> table(bytes ? fun->zone()->pod_malloc<uint8_t>(bytes) : nullptr);
-    if (bytes && !table)
+    if (bytes && !table) {
+        ReportOutOfMemory(cx);
         return nullptr;
+    }
 
     LazyScript* res = Allocate<LazyScript>(cx);
     if (!res)

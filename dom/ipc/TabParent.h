@@ -22,6 +22,7 @@
 #include "nsIDOMEventListener.h"
 #include "nsISecureBrowserUI.h"
 #include "nsITabParent.h"
+#include "nsIWebBrowserPersistable.h"
 #include "nsIXULBrowserWindow.h"
 #include "nsRefreshDriver.h"
 #include "nsWeakReference.h"
@@ -40,25 +41,25 @@ namespace mozilla {
 
 namespace jsipc {
 class CpowHolder;
-}
+} // namespace jsipc
 
 namespace layers {
 struct FrameMetrics;
 struct TextureFactoryIdentifier;
-}
+} // namespace layers
 
 namespace layout {
 class RenderFrameParent;
-}
+} // namespace layout
 
 namespace widget {
 struct IMENotification;
-}
+} // namespace widget
 
 namespace gfx {
 class SourceSurface;
 class DataSourceSurface;
-}
+} // namespace gfx
 
 namespace dom {
 
@@ -76,6 +77,7 @@ class TabParent final : public PBrowserParent
                       , public nsSupportsWeakReference
                       , public TabContext
                       , public nsAPostRefreshObserver
+                      , public nsIWebBrowserPersistable
 {
     typedef mozilla::dom::ClonedMessageData ClonedMessageData;
     typedef mozilla::OwningSerializedStructuredCloneBuffer OwningSerializedStructuredCloneBuffer;
@@ -116,7 +118,7 @@ public:
     }
 
     already_AddRefed<nsILoadContext> GetLoadContext();
-
+    already_AddRefed<nsIWidget> GetTopLevelWidget();
     nsIXULBrowserWindow* GetXULBrowserWindow();
 
     void Destroy();
@@ -125,7 +127,8 @@ public:
     void AddWindowListeners();
     void DidRefresh() override;
 
-    virtual bool RecvMoveFocus(const bool& aForward) override;
+    virtual bool RecvMoveFocus(const bool& aForward,
+                               const bool& aForDocumentNavigation) override;
     virtual bool RecvEvent(const RemoteDOMEvent& aEvent) override;
     virtual bool RecvReplyKeyEvent(const WidgetKeyboardEvent& aEvent) override;
     virtual bool RecvDispatchAfterKeyboardEvent(const WidgetKeyboardEvent& aEvent) override;
@@ -141,7 +144,7 @@ public:
                                   const bool& aSizeSpecified,
                                   const nsString& aURI,
                                   const nsString& aName,
-                                  const nsString& aFeatures,
+                                  const nsCString& aFeatures,
                                   const nsString& aBaseURI,
                                   nsresult* aResult,
                                   bool* aWindowIsNew,
@@ -161,22 +164,22 @@ public:
                                   const ClonedMessageData& aData,
                                   InfallibleTArray<CpowEntry>&& aCpows,
                                   const IPC::Principal& aPrincipal) override;
-    virtual bool RecvNotifyIMEFocus(const bool& aFocus,
-                                    const ContentCache& aContentCache,
+    virtual bool RecvNotifyIMEFocus(const ContentCache& aContentCache,
+                                    const widget::IMENotification& aEventMessage,
                                     nsIMEUpdatePreference* aPreference)
                                       override;
     virtual bool RecvNotifyIMETextChange(const ContentCache& aContentCache,
-                                         const uint32_t& aStart,
-                                         const uint32_t& aEnd,
-                                         const uint32_t& aNewEnd,
-                                         const bool& aCausedByComposition) override;
-    virtual bool RecvNotifyIMESelectedCompositionRect(const ContentCache& aContentCache) override;
+                                         const widget::IMENotification& aEventMessage) override;
+    virtual bool RecvNotifyIMECompositionUpdate(const ContentCache& aContentCache,
+                                                const widget::IMENotification& aEventMessage) override;
     virtual bool RecvNotifyIMESelection(const ContentCache& aContentCache,
-                                        const bool& aCausedByComposition) override;
+                                        const widget::IMENotification& aEventMessage) override;
     virtual bool RecvUpdateContentCache(const ContentCache& aContentCache) override;
     virtual bool RecvNotifyIMEMouseButtonEvent(const widget::IMENotification& aEventMessage,
                                                bool* aConsumedByIME) override;
-    virtual bool RecvNotifyIMEPositionChange(const ContentCache& aContentCache) override;
+    virtual bool RecvNotifyIMEPositionChange(const ContentCache& aContentCache,
+                                             const widget::IMENotification& aEventMessage) override;
+    virtual bool RecvOnEventNeedingAckHandled(const uint32_t& aMessage) override;
     virtual bool RecvEndIMEComposition(const bool& aCancel,
                                        bool* aNoCompositionEvent,
                                        nsString* aComposition) override;
@@ -219,6 +222,7 @@ public:
     virtual bool RecvGetMaxTouchPoints(uint32_t* aTouchPoints) override;
     virtual bool RecvGetWidgetNativeData(WindowsHandle* aValue) override;
     virtual bool RecvSetNativeChildOfShareableWindow(const uintptr_t& childWindow) override;
+    virtual bool RecvDispatchFocusToTopLevelWindow() override;
     virtual bool RecvZoomToRect(const uint32_t& aPresShellId,
                                 const ViewID& aViewId,
                                 const CSSRect& aRect) override;
@@ -367,8 +371,8 @@ public:
     NS_DECL_ISUPPORTS
     NS_DECL_NSIAUTHPROMPTPROVIDER
     NS_DECL_NSISECUREBROWSERUI
+    NS_DECL_NSIWEBBROWSERPERSISTABLE
 
-    static TabParent *GetIMETabParent() { return mIMETabParent; }
     bool HandleQueryContentEvent(mozilla::WidgetQueryContentEvent& aEvent);
     bool SendCompositionEvent(mozilla::WidgetCompositionEvent& event);
     bool SendSelectionEvent(mozilla::WidgetSelectionEvent& event);
@@ -430,6 +434,10 @@ public:
     void TakeDragVisualization(RefPtr<mozilla::gfx::SourceSurface>& aSurface,
                                int32_t& aDragAreaX, int32_t& aDragAreaY);
     layout::RenderFrameParent* GetRenderFrame();
+
+    virtual PWebBrowserPersistDocumentParent* AllocPWebBrowserPersistDocumentParent() override;
+    virtual bool DeallocPWebBrowserPersistDocumentParent(PWebBrowserPersistDocumentParent* aActor) override;
+
 protected:
     bool ReceiveMessage(const nsString& aMessage,
                         bool aSync,
@@ -449,8 +457,6 @@ protected:
     Element* mFrameElement;
     nsCOMPtr<nsIBrowserDOMWindow> mBrowserDOMWindow;
 
-    bool AllowContentIME();
-
     virtual PRenderFrameParent* AllocPRenderFrameParent() override;
     virtual bool DeallocPRenderFrameParent(PRenderFrameParent* aFrame) override;
 
@@ -464,13 +470,14 @@ protected:
                                    const int32_t& aX, const int32_t& aY,
                                    const int32_t& aCx, const int32_t& aCy) override;
 
+    virtual bool RecvAudioChannelActivityNotification(const uint32_t& aAudioChannel,
+                                                      const bool& aActive) override;
+
     bool InitBrowserConfiguration(const nsCString& aURI,
                                   BrowserConfiguration& aConfiguration);
 
     void SetHasContentOpener(bool aHasContentOpener);
 
-    // IME
-    static TabParent *mIMETabParent;
     ContentCacheInParent mContentCache;
 
     nsIntRect mRect;

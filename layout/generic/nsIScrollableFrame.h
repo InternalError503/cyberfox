@@ -32,10 +32,18 @@ class nsDisplayListBuilder;
 
 namespace mozilla {
 struct ContainerLayerParameters;
+class DisplayItemClip;
 namespace layers {
 class Layer;
-}
-}
+} // namespace layers
+
+struct FrameMetricsAndClip
+{
+  layers::FrameMetrics metrics;
+  const DisplayItemClip* clip;
+};
+
+} // namespace mozilla
 
 /**
  * Interface for frames that are scrollable. This interface exposes
@@ -99,8 +107,10 @@ public:
   /**
    * Return the width for non-disappearing scrollbars.
    */
-  virtual nscoord GetNondisappearingScrollbarWidth(nsPresContext* aPresContext,
-                                                   nsRenderingContext* aRC) = 0;
+  virtual nscoord
+  GetNondisappearingScrollbarWidth(nsPresContext* aPresContext,
+                                   nsRenderingContext* aRC,
+                                   mozilla::WritingMode aWM) = 0;
   /**
    * GetScrolledRect is designed to encapsulate deciding which
    * directions of overflow should be reachable by scrolling and which
@@ -415,10 +425,11 @@ public:
    * aLayer's animated geometry root is this frame. If there needs to be a
    * FrameMetrics contributed by this frame, append it to aOutput.
    */
-  virtual void ComputeFrameMetrics(mozilla::layers::Layer* aLayer,
-                                   nsIFrame* aContainerReferenceFrame,
-                                   const ContainerLayerParameters& aParameters,
-                                   nsTArray<FrameMetrics>* aOutput) const = 0;
+  virtual mozilla::Maybe<mozilla::FrameMetricsAndClip> ComputeFrameMetrics(
+    mozilla::layers::Layer* aLayer,
+    nsIFrame* aContainerReferenceFrame,
+    const ContainerLayerParameters& aParameters,
+    bool aIsForCaret) const = 0;
 
   /**
    * If this scroll frame is ignoring viewporting clipping
@@ -437,6 +448,8 @@ public:
    * Whether or not this frame uses containerful scrolling.
    */
   virtual bool UsesContainerScrolling() const = 0;
+
+  virtual const mozilla::DisplayItemClip* ComputeScrollClip(bool aIsForCaret) const = 0;
 };
 
 #endif

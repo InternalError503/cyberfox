@@ -182,7 +182,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "mozilla/AutoTimelineMarker.h"
+#include "mozilla/AutoGlobalTimelineMarker.h"
 #include "mozilla/Likely.h"
 #include "mozilla/PoisonIOInterposer.h"
 #include "mozilla/Telemetry.h"
@@ -886,7 +886,7 @@ public:
 
     // We don't measure what the WeakMappings point to, because the
     // pointers are non-owning.
-    *aWeakMapsSize = mWeakMaps.SizeOfExcludingThis(aMallocSizeOf);
+    *aWeakMapsSize = mWeakMaps.ShallowSizeOfExcludingThis(aMallocSizeOf);
   }
 };
 

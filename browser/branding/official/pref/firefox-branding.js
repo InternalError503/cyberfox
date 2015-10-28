@@ -4,6 +4,7 @@
 
 pref("startup.homepage_override_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%&oldversion=%OLD_VERSION%");
 pref("startup.homepage_welcome_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
+pref("startup.homepage_welcome_url.additional", "");
 
 #ifdef HAVE_64BIT_BUILD
 pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/cyberfox-intel-version-x64"); 

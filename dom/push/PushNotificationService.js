@@ -39,7 +39,11 @@ PushNotificationService.prototype = {
                                          Ci.nsIPushNotificationService]),
 
   register: function register(scope, originAttributes) {
-    return PushService._register({scope, originAttributes});
+    return PushService._register({
+      scope: scope,
+      originAttributes: originAttributes,
+      maxQuota: Infinity,
+    });
   },
 
   unregister: function unregister(scope, originAttributes) {
@@ -52,6 +56,10 @@ PushNotificationService.prototype = {
 
   clearAll: function clearAll() {
     return PushService._clearAll();
+  },
+
+  clearForDomain: function(domain) {
+    return PushService._clearForDomain(domain);
   },
 
   observe: function observe(subject, topic, data) {

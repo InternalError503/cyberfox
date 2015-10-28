@@ -23,11 +23,6 @@ describe("loop.webapp", function() {
     sandbox = sinon.sandbox.create();
     dispatcher = new loop.Dispatcher();
     notifications = new sharedModels.NotificationCollection();
-    loop.store.StoreMixin.register({
-      feedbackStore: new loop.store.FeedbackStore(dispatcher, {
-        feedbackClient: {}
-      })
-    });
 
     stubGetPermsAndCacheMedia = sandbox.stub(
       loop.standaloneMedia._MultiplexGum.prototype, "getPermsAndCacheMedia");
@@ -52,10 +47,20 @@ describe("loop.webapp", function() {
   });
 
   describe("#init", function() {
+    var loopConfigRestore;
+
     beforeEach(function() {
       sandbox.stub(React, "render");
-      loop.config.feedbackApiUrl = "http://fake.invalid";
+      loopConfigRestore = loop.config;
+      loop.config = {
+        feedbackApiUrl: "http://fake.invalid",
+        serverUrl: "http://fake.invalid"
+      };
       sandbox.stub(loop.Dispatcher.prototype, "dispatch");
+    });
+
+    afterEach(function() {
+      loop.config = loopConfigRestore;
     });
 
     it("should create the WebappRootView", function() {
@@ -1068,6 +1073,7 @@ describe("loop.webapp", function() {
         React.createElement(
           loop.webapp.EndedConversationView, {
             conversation: conversation,
+            dispatcher: dispatcher,
             sdk: {},
             onAfterFeedbackReceived: function(){}
           }));
@@ -1075,10 +1081,6 @@ describe("loop.webapp", function() {
 
     it("should render a ConversationView", function() {
       TestUtils.findRenderedComponentWithType(view, sharedViews.ConversationView);
-    });
-
-    it("should render a FeedbackView", function() {
-      TestUtils.findRenderedComponentWithType(view, sharedViews.FeedbackView);
     });
   });
 

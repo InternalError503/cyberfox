@@ -284,7 +284,11 @@ MoofParser::ParseMvex(Box& aBox)
     if (box.IsType("trex")) {
       Trex trex = Trex(box);
       if (!mTrex.mTrackId || trex.mTrackId == mTrex.mTrackId) {
+        auto trackId = mTrex.mTrackId;
         mTrex = trex;
+        // Keep the original trackId, as should it be 0 we want to continue
+        // parsing all tracks.
+        mTrex.mTrackId = trackId;
       }
     }
   }
@@ -492,11 +496,6 @@ Moof::ParseTrun(Box& aBox, Tfhd& aTfhd, Mvhd& aMvhd, Mdhd& aMdhd, Edts& aEdts, u
     return false;
   }
   uint32_t flags = reader->ReadU32();
-  if ((flags & 0x404) == 0x404) {
-    // Can't use these flags together
-    reader->DiscardRemaining();
-    return true;
-  }
   uint8_t version = flags >> 24;
 
   if (!reader->CanReadType<uint32_t>()) {
@@ -524,8 +523,8 @@ Moof::ParseTrun(Box& aBox, Tfhd& aTfhd, Mvhd& aMvhd, Mdhd& aMdhd, Edts& aEdts, u
   }
 
   uint64_t offset = aTfhd.mBaseDataOffset + (flags & 1 ? reader->ReadU32() : 0);
-  bool hasFirstSampleFlags = flags & 4;
-  uint32_t firstSampleFlags = hasFirstSampleFlags ? reader->ReadU32() : 0;
+  uint32_t firstSampleFlags =
+    flags & 4 ? reader->ReadU32() : aTfhd.mDefaultSampleFlags;
   uint64_t decodeTime = *aDecodeTime;
   nsTArray<Interval<Microseconds>> timeRanges;
 
@@ -540,9 +539,8 @@ Moof::ParseTrun(Box& aBox, Tfhd& aTfhd, Mvhd& aMvhd, Mdhd& aMdhd, Edts& aEdts, u
     uint32_t sampleSize =
       flags & 0x200 ? reader->ReadU32() : aTfhd.mDefaultSampleSize;
     uint32_t sampleFlags =
-      flags & 0x400 ? reader->ReadU32() : hasFirstSampleFlags && i == 0
-                                            ? firstSampleFlags
-                                            : aTfhd.mDefaultSampleFlags;
+      flags & 0x400 ? reader->ReadU32()
+                    : i ? aTfhd.mDefaultSampleFlags : firstSampleFlags;
     int32_t ctsOffset = 0;
     if (flags & 0x800) {
       ctsOffset = reader->Read32();
@@ -656,7 +654,9 @@ Mvhd::Mvhd(Box& aBox)
   }
   // More stuff that we don't care about
   reader->DiscardRemaining();
-  mValid = true;
+  if (mTimescale) {
+    mValid = true;
+  }
 }
 
 Mdhd::Mdhd(Box& aBox)

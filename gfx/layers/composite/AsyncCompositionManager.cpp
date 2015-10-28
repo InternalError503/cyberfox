@@ -11,6 +11,7 @@
 #include "LayerManagerComposite.h"      // for LayerManagerComposite, etc
 #include "Layers.h"                     // for Layer, ContainerLayer, etc
 #include "gfxPoint.h"                   // for gfxPoint, gfxSize
+#include "gfxPrefs.h"                   // for gfxPrefs
 #include "mozilla/StyleAnimationValue.h" // for StyleAnimationValue, etc
 #include "mozilla/WidgetUtils.h"        // for ComputeTransformForRotation
 #include "mozilla/dom/KeyframeEffect.h" // for KeyframeEffectReadOnly
@@ -32,6 +33,7 @@
 #include "nsTArray.h"                   // for nsTArray, nsTArray_Impl, etc
 #include "nsTArrayForwardDeclare.h"     // for InfallibleTArray
 #include "UnitTransforms.h"             // for TransformTo
+#include "gfxPrefs.h"
 #if defined(MOZ_WIDGET_ANDROID)
 # include <android/log.h>
 # include "AndroidBridge.h"
@@ -408,7 +410,7 @@ SampleValue(float aPortion, Animation& aAnimation, StyleAnimationValue& aStart,
                                                      transformOrigin,
                                                      perspectiveOrigin,
                                                      data.perspective());
-  gfx3DMatrix transform =
+  Matrix4x4 transform =
     nsDisplayTransform::GetResultingTransformMatrix(props, origin,
                                                     data.appUnitsPerDevPixel(),
                                                     &data.bounds());
@@ -417,10 +419,10 @@ SampleValue(float aPortion, Animation& aAnimation, StyleAnimationValue& aStart,
             NS_round(NSAppUnitsToFloatPixels(origin.y, data.appUnitsPerDevPixel())),
             0.0f);
 
-  transform.Translate(scaledOrigin);
+  transform.PreTranslate(scaledOrigin);
 
   InfallibleTArray<TransformFunction> functions;
-  functions.AppendElement(TransformMatrix(ToMatrix4x4(transform)));
+  functions.AppendElement(TransformMatrix(transform));
   *aValue = functions;
 }
 
@@ -441,7 +443,8 @@ SampleAnimations(Layer* aLayer, TimeStamp aPoint)
 
     MOZ_ASSERT(!animation.startTime().IsNull(),
                "Failed to resolve start time of pending animations");
-    TimeDuration elapsedDuration = aPoint - animation.startTime();
+    TimeDuration elapsedDuration =
+      (aPoint - animation.startTime()).MultDouble(animation.playbackRate());
     // Skip animations that are yet to start.
     //
     // Currently, this should only happen when the refresh driver is under test
@@ -614,6 +617,18 @@ AsyncCompositionManager::ApplyAsyncContentTransformToTree(Layer *aLayer)
   // The final clip for the layer is the intersection of these clips.
   Maybe<ParentLayerIntRect> asyncClip = aLayer->GetClipRect();
 
+  // The transform of a mask layer is relative to the masked layer's parent
+  // layer. So whenever we apply an async transform to a layer, we need to
+  // apply that same transform to the layer's own mask layer.
+  // A layer can also have "ancestor" mask layers for any rounded clips from
+  // its ancestor scroll frames. A scroll frame mask layer only needs to be
+  // async transformed for async scrolls of this scroll frame's ancestor
+  // scroll frames, not for async scrolls of this scroll frame itself.
+  // In the loop below, we iterate over scroll frames from inside to outside.
+  // At each iteration, this array contains the layer's ancestor mask layers 
+  // of all scroll frames inside the current one.
+  nsTArray<Layer*> ancestorMaskLayers;
+
   for (uint32_t i = 0; i < aLayer->GetFrameMetricsCount(); i++) {
     AsyncPanZoomController* controller = aLayer->GetAsyncPanZoomController(i);
     if (!controller) {
@@ -676,6 +691,21 @@ AsyncCompositionManager::ApplyAsyncContentTransformToTree(Layer *aLayer)
       }
     }
 
+    // Do the same for the ancestor mask layers: ancestorMaskLayers contains
+    // the ancestor mask layers for scroll frames *inside* the current scroll
+    // frame, so these are the ones we need to shift by our async transform.
+    for (Layer* ancestorMaskLayer : ancestorMaskLayers) {
+      SetShadowTransform(ancestorMaskLayer,
+          ancestorMaskLayer->GetLocalTransform() * asyncTransform);
+    }
+
+    // Append the ancestor mask layer for this scroll frame to ancestorMaskLayers.
+    if (metrics.GetMaskLayerIndex()) {
+      size_t maskLayerIndex = metrics.GetMaskLayerIndex().value();
+      Layer* ancestorMaskLayer = aLayer->GetAncestorMaskLayerAt(maskLayerIndex);
+      ancestorMaskLayers.AppendElement(ancestorMaskLayer);
+    }
+
     combinedAsyncTransformWithoutOverscroll *= asyncTransformWithoutOverscroll;
     combinedAsyncTransform *= asyncTransform;
   }
@@ -691,6 +721,12 @@ AsyncCompositionManager::ApplyAsyncContentTransformToTree(Layer *aLayer)
     // rather than clobber it.
     SetShadowTransform(aLayer,
         aLayer->GetLocalTransform() * AdjustForClip(combinedAsyncTransform, aLayer));
+
+    // Do the same for the layer's own mask layer, if it has one.
+    if (Layer* maskLayer = aLayer->GetMaskLayer()) {
+      SetShadowTransform(maskLayer,
+          maskLayer->GetLocalTransform() * combinedAsyncTransform);
+    }
 
     const FrameMetrics& bottom = LayerMetricsWrapper::BottommostScrollableMetrics(aLayer);
     MOZ_ASSERT(bottom.IsScrollable());  // must be true because hasAsyncTransform is true

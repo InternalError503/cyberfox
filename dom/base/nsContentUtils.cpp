@@ -26,6 +26,7 @@
 #include "MediaDecoder.h"
 // nsNPAPIPluginInstance must be included before nsIDocument.h, which is included in mozAutoDocUpdate.h.
 #include "nsNPAPIPluginInstance.h"
+#include "gfxPrefs.h"
 #include "mozAutoDocUpdate.h"
 #include "mozilla/ArrayUtils.h"
 #include "mozilla/Attributes.h"
@@ -50,6 +51,7 @@
 #include "mozilla/dom/TextDecoder.h"
 #include "mozilla/dom/TouchEvent.h"
 #include "mozilla/dom/ShadowRoot.h"
+#include "mozilla/dom/WorkerPrivate.h"
 #include "mozilla/EventDispatcher.h"
 #include "mozilla/EventListenerManager.h"
 #include "mozilla/EventStateManager.h"
@@ -134,6 +136,7 @@
 #include "nsILoadContext.h"
 #include "nsILoadGroup.h"
 #include "nsIMemoryReporter.h"
+#include "nsIMIMEHeaderParam.h"
 #include "nsIMIMEService.h"
 #include "nsINode.h"
 #include "mozilla/dom/NodeInfo.h"
@@ -155,6 +158,7 @@
 #include "nsIStreamConverterService.h"
 #include "nsIStringBundle.h"
 #include "nsIURI.h"
+#include "nsIURIWithPrincipal.h"
 #include "nsIURL.h"
 #include "nsIWebNavigation.h"
 #include "nsIWordBreaker.h"
@@ -258,6 +262,7 @@ bool nsContentUtils::sIsExperimentalAutocompleteEnabled = false;
 bool nsContentUtils::sEncodeDecodeURLHash = false;
 bool nsContentUtils::sGettersDecodeURLHash = false;
 bool nsContentUtils::sPrivacyResistFingerprinting = false;
+bool nsContentUtils::sSendPerformanceTimingNotifications = false;
 
 uint32_t nsContentUtils::sHandlingInputTimeout = 1000;
 
@@ -360,8 +365,8 @@ public:
     // We don't measure the |EventListenerManager| objects pointed to by the
     // entries because those references are non-owning.
     int64_t amount = sEventListenerManagersHash
-                   ? PL_DHashTableSizeOfExcludingThis(
-                       sEventListenerManagersHash, nullptr, MallocSizeOf)
+                   ? sEventListenerManagersHash->ShallowSizeOfIncludingThis(
+                       MallocSizeOf)
                    : 0;
 
     return MOZ_COLLECT_REPORT(
@@ -440,7 +445,7 @@ private:
   nsCString mCharset;
 };
 
-} // anonymous namespace
+} // namespace
 
 /* static */
 TimeDuration
@@ -548,6 +553,9 @@ nsContentUtils::Init()
   Preferences::AddUintVarCache(&sHandlingInputTimeout,
                                "dom.event.handling-user-input-time-limit",
                                1000);
+
+  Preferences::AddBoolVarCache(&sSendPerformanceTimingNotifications,
+                               "dom.performance.enable_notify_performance_timing", false);
 
 #if !(defined(DEBUG) || defined(MOZ_ENABLE_JS_DUMP))
   Preferences::AddBoolVarCache(&sDOMWindowDumpEnabled,
@@ -2024,9 +2032,9 @@ namespace dom {
 namespace workers {
 extern bool IsCurrentThreadRunningChromeWorker();
 extern JSContext* GetCurrentThreadJSContext();
-}
-}
-}
+} // namespace workers
+} // namespace dom
+} // namespace mozilla
 
 bool
 nsContentUtils::ThreadsafeIsCallerChrome()
@@ -3412,6 +3420,36 @@ nsContentUtils::ReportToConsole(uint32_t aErrorFlags,
   return ReportToConsoleNonLocalized(errorText, aErrorFlags, aCategory,
                                      aDocument, aURI, aSourceLine,
                                      aLineNumber, aColumnNumber);
+}
+
+/* static */ nsresult
+nsContentUtils::MaybeReportInterceptionErrorToConsole(nsIDocument* aDocument,
+                                                      nsresult aError)
+{
+  const char* messageName = nullptr;
+  if (aError == NS_ERROR_INTERCEPTION_FAILED) {
+    messageName = "InterceptionFailed";
+  } else if (aError == NS_ERROR_OPAQUE_INTERCEPTION_DISABLED) {
+    messageName = "OpaqueInterceptionDisabled";
+  } else if (aError == NS_ERROR_BAD_OPAQUE_INTERCEPTION_REQUEST_MODE) {
+    messageName = "BadOpaqueInterceptionRequestMode";
+  } else if (aError == NS_ERROR_INTERCEPTED_ERROR_RESPONSE) {
+    messageName = "InterceptedErrorResponse";
+  } else if (aError == NS_ERROR_INTERCEPTED_USED_RESPONSE) {
+    messageName = "InterceptedUsedResponse";
+  } else if (aError == NS_ERROR_CLIENT_REQUEST_OPAQUE_INTERCEPTION) {
+    messageName = "ClientRequestOpaqueInterception";
+  }
+
+  if (messageName) {
+    return ReportToConsole(nsIScriptError::warningFlag,
+                           NS_LITERAL_CSTRING("Service Worker Interception"),
+                           aDocument,
+                           nsContentUtils::eDOM_PROPERTIES,
+                           messageName);
+  }
+
+  return NS_OK;
 }
 
 
@@ -7103,7 +7141,7 @@ nsContentUtils::IsAllowedNonCorsContentType(const nsACString& aHeaderValue)
   nsAutoCString contentType;
   nsAutoCString unused;
 
-  nsresult rv = NS_ParseContentType(aHeaderValue, contentType, unused);
+  nsresult rv = NS_ParseRequestContentType(aHeaderValue, contentType, unused);
   if (NS_FAILED(rv)) {
     return false;
   }
@@ -7431,8 +7469,11 @@ nsContentUtils::TransferableToIPCTransferable(nsITransferable* aTransferable,
           if (file) {
             blobImpl = new BlobImplFile(file, false);
             ErrorResult rv;
+            // Ensure that file data is cached no that the content process
+            // has this data available to it when passed over:
             blobImpl->GetSize(rv);
             blobImpl->GetLastModified(rv);
+            blobImpl->LookupAndCacheIsDirectory();
           } else {
             blobImpl = do_QueryInterface(data);
           }
@@ -7867,6 +7908,7 @@ nsContentUtils::InternalContentPolicyTypeToExternal(nsContentPolicyType aType)
   case nsIContentPolicy::TYPE_INTERNAL_SCRIPT:
   case nsIContentPolicy::TYPE_INTERNAL_WORKER:
   case nsIContentPolicy::TYPE_INTERNAL_SHARED_WORKER:
+  case nsIContentPolicy::TYPE_INTERNAL_SERVICE_WORKER:
     return nsIContentPolicy::TYPE_SCRIPT;
 
   case nsIContentPolicy::TYPE_INTERNAL_EMBED:
@@ -7882,8 +7924,28 @@ nsContentUtils::InternalContentPolicyTypeToExternal(nsContentPolicyType aType)
   case nsIContentPolicy::TYPE_INTERNAL_TRACK:
     return nsIContentPolicy::TYPE_MEDIA;
 
+  case nsIContentPolicy::TYPE_INTERNAL_XMLHTTPREQUEST:
+  case nsIContentPolicy::TYPE_INTERNAL_EVENTSOURCE:
+    return nsIContentPolicy::TYPE_XMLHTTPREQUEST;
+
   default:
     return aType;
+  }
+}
+
+/* static */
+nsContentPolicyType
+nsContentUtils::InternalContentPolicyTypeToExternalOrScript(nsContentPolicyType aType)
+{
+  switch (aType) {
+  case nsIContentPolicy::TYPE_INTERNAL_SCRIPT:
+  case nsIContentPolicy::TYPE_INTERNAL_WORKER:
+  case nsIContentPolicy::TYPE_INTERNAL_SHARED_WORKER:
+  case nsIContentPolicy::TYPE_INTERNAL_SERVICE_WORKER:
+    return aType;
+
+  default:
+    return InternalContentPolicyTypeToExternal(aType);
   }
 }
 
@@ -7936,4 +7998,23 @@ nsContentUtils::SetFetchReferrerURIWithPolicy(nsIPrincipal* aPrincipal,
 
   net::ReferrerPolicy referrerPolicy = aDoc->GetReferrerPolicy();
   return aChannel->SetReferrerWithPolicy(referrerURI, referrerPolicy);
+}
+
+// static
+bool
+nsContentUtils::PushEnabled(JSContext* aCx, JSObject* aObj)
+{
+  if (NS_IsMainThread()) {
+    return Preferences::GetBool("dom.push.enabled", false);
+  }
+
+  using namespace workers;
+
+  // Otherwise, check the pref via the WorkerPrivate
+  WorkerPrivate* workerPrivate = GetWorkerPrivateFromContext(aCx);
+  if (!workerPrivate) {
+    return false;
+  }
+
+  return workerPrivate->PushEnabled();
 }

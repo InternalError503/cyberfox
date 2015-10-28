@@ -217,7 +217,7 @@ public:
 
   size_t SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const
   {
-    return mChanges.SizeOfExcludingThis(aMallocSizeOf);
+    return mChanges.ShallowSizeOfExcludingThis(aMallocSizeOf);
   }
 
 private:
@@ -232,6 +232,6 @@ private:
   T mCurrent;
 };
 
-}
+} // namespace mozilla
 
 #endif /* MOZILLA_TIMEVARYING_H_ */

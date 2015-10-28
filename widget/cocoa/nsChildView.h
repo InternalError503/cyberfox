@@ -39,15 +39,15 @@ class nsCocoaWindow;
 namespace {
 class GLPresenter;
 class RectTextureImage;
-}
+} // namespace
 
 namespace mozilla {
 class VibrancyManager;
 namespace layers {
 class GLManager;
 class APZCTreeManager;
-}
-}
+} // namespace layers
+} // namespace mozilla
 
 @interface NSEvent (Undocumented)
 
@@ -412,7 +412,7 @@ public:
   NS_IMETHOD              DispatchEvent(mozilla::WidgetGUIEvent* aEvent,
                                         nsEventStatus& aStatus) override;
 
-  virtual bool            ComputeShouldAccelerate(bool aDefault) override;
+  virtual bool            ComputeShouldAccelerate() override;
   virtual bool            ShouldUseOffMainThreadCompositing() override;
 
   NS_IMETHOD        SetCursor(nsCursor aCursor) override;
@@ -536,7 +536,7 @@ public:
     return nsCocoaUtils::DevPixelsToCocoaPoints(aRect, BackingScaleFactor());
   }
 
-  mozilla::TemporaryRef<mozilla::gfx::DrawTarget> StartRemoteDrawing() override;
+  already_AddRefed<mozilla::gfx::DrawTarget> StartRemoteDrawing() override;
   void EndRemoteDrawing() override;
   void CleanupRemoteDrawing() override;
   bool InitCompositor(mozilla::layers::Compositor* aCompositor) override;

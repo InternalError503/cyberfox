@@ -18,49 +18,6 @@
 namespace mozilla {
 namespace css {
 
-/* static */ PLDHashOperator
-ImageLoader::SetAnimationModeEnumerator(nsISupports* aKey, FrameSet* aValue,
-                                        void* aClosure)
-{
-  imgIRequest* request = static_cast<imgIRequest*>(aKey);
-
-  uint16_t* mode = static_cast<uint16_t*>(aClosure);
-
-#ifdef DEBUG
-  {
-    nsCOMPtr<imgIRequest> debugRequest = do_QueryInterface(aKey);
-    NS_ASSERTION(debugRequest == request, "This is bad");
-  }
-#endif
-
-  nsCOMPtr<imgIContainer> container;
-  request->GetImage(getter_AddRefs(container));
-  if (!container) {
-    return PL_DHASH_NEXT;
-  }
-
-  // This can fail if the image is in error, and we don't care.
-  container->SetAnimationMode(*mode);
-
-  return PL_DHASH_NEXT;
-}
-
-static PLDHashOperator
-ClearImageHashSet(nsPtrHashKey<ImageLoader::Image>* aKey, void* aClosure)
-{
-  nsIDocument* doc = static_cast<nsIDocument*>(aClosure);
-  ImageLoader::Image* image = aKey->GetKey();
-
-  imgIRequest* request = image->mRequests.GetWeak(doc);
-  if (request) {
-    request->CancelAndForgetObserver(NS_BINDING_ABORTED);
-  }
-
-  image->mRequests.Remove(doc);
-
-  return PL_DHASH_REMOVE;
-}
-
 void
 ImageLoader::DropDocumentReference()
 {
@@ -68,7 +25,17 @@ ImageLoader::DropDocumentReference()
   // on the document being null) as that means the presshell has already
   // been destroyed, and it also calls ClearFrames when it is destroyed.
   ClearFrames(GetPresContext());
-  mImages.EnumerateEntries(&ClearImageHashSet, mDocument);
+
+  for (auto it = mImages.Iter(); !it.Done(); it.Next()) {
+    ImageLoader::Image* image = it.Get()->GetKey();
+    imgIRequest* request = image->mRequests.GetWeak(mDocument);
+    if (request) {
+      request->CancelAndForgetObserver(NS_BINDING_ABORTED);
+    }
+    image->mRequests.Remove(mDocument);
+  }
+  mImages.Clear();
+
   mDocument = nullptr;
 }
 
@@ -232,36 +199,47 @@ ImageLoader::SetAnimationMode(uint16_t aMode)
                aMode == imgIContainer::kLoopOnceAnimMode,
                "Wrong Animation Mode is being set!");
 
-  mRequestToFrameMap.EnumerateRead(SetAnimationModeEnumerator, &aMode);
-}
-
-/* static */ PLDHashOperator
-ImageLoader::DeregisterRequestEnumerator(nsISupports* aKey, FrameSet* aValue,
-                                         void* aClosure)
-{
-  imgIRequest* request = static_cast<imgIRequest*>(aKey);
+  for (auto iter = mRequestToFrameMap.ConstIter(); !iter.Done(); iter.Next()) {
+    auto request = static_cast<imgIRequest*>(iter.Key());
 
 #ifdef DEBUG
-  {
-    nsCOMPtr<imgIRequest> debugRequest = do_QueryInterface(aKey);
-    NS_ASSERTION(debugRequest == request, "This is bad");
-  }
+    {
+      nsCOMPtr<imgIRequest> debugRequest = do_QueryInterface(request);
+      NS_ASSERTION(debugRequest == request, "This is bad");
+    }
 #endif
 
-  nsPresContext* presContext = static_cast<nsPresContext*>(aClosure);
-  if (presContext) {
-    nsLayoutUtils::DeregisterImageRequest(presContext,
-                                          request,
-                                          nullptr);
-  }
+    nsCOMPtr<imgIContainer> container;
+    request->GetImage(getter_AddRefs(container));
+    if (!container) {
+      continue;
+    }
 
-  return PL_DHASH_NEXT;
+    // This can fail if the image is in error, and we don't care.
+    container->SetAnimationMode(aMode);
+  }
 }
 
 void
 ImageLoader::ClearFrames(nsPresContext* aPresContext)
 {
-  mRequestToFrameMap.EnumerateRead(DeregisterRequestEnumerator, aPresContext);
+  for (auto iter = mRequestToFrameMap.ConstIter(); !iter.Done(); iter.Next()) {
+    auto request = static_cast<imgIRequest*>(iter.Key());
+
+#ifdef DEBUG
+    {
+      nsCOMPtr<imgIRequest> debugRequest = do_QueryInterface(request);
+      NS_ASSERTION(debugRequest == request, "This is bad");
+    }
+#endif
+
+    if (aPresContext) {
+      nsLayoutUtils::DeregisterImageRequest(aPresContext,
+					    request,
+					    nullptr);
+    }
+  }
+
   mRequestToFrameMap.Clear();
   mFrameToRequestMap.Clear();
 }
@@ -354,13 +332,6 @@ void InvalidateImagesCallback(nsIFrame* aFrame,
   }
   aItem->Invalidate();
   aFrame->SchedulePaint();
-
-  // Update ancestor rendering observers (-moz-element etc)
-  nsIFrame *f = aFrame;
-  while (f && !f->HasAnyStateBits(NS_FRAME_DESCENDANT_NEEDS_PAINT)) {
-    nsSVGEffects::InvalidateDirectRenderingObservers(f);
-    f = nsLayoutUtils::GetCrossDocParentFrame(f);
-  }
 }
 
 void
@@ -381,6 +352,14 @@ ImageLoader::DoRedraw(FrameSet* aFrameSet, bool aForcePaint)
         frame->InvalidateFrame();
       } else {
         FrameLayerBuilder::IterateRetainedDataFor(frame, InvalidateImagesCallback);
+
+        // Update ancestor rendering observers (-moz-element etc)
+        nsIFrame *f = frame;
+        while (f && !f->HasAnyStateBits(NS_FRAME_DESCENDANT_NEEDS_PAINT)) {
+          nsSVGEffects::InvalidateDirectRenderingObservers(f);
+          f = nsLayoutUtils::GetCrossDocParentFrame(f);
+        }
+
         if (aForcePaint) {
           frame->SchedulePaint();
         }

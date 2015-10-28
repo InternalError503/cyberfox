@@ -70,6 +70,7 @@ enum AsmJSMathBuiltinFunction
 enum AsmJSAtomicsBuiltinFunction
 {
     AsmJSAtomicsBuiltin_compareExchange,
+    AsmJSAtomicsBuiltin_exchange,
     AsmJSAtomicsBuiltin_load,
     AsmJSAtomicsBuiltin_store,
     AsmJSAtomicsBuiltin_fence,
@@ -77,7 +78,8 @@ enum AsmJSAtomicsBuiltinFunction
     AsmJSAtomicsBuiltin_sub,
     AsmJSAtomicsBuiltin_and,
     AsmJSAtomicsBuiltin_or,
-    AsmJSAtomicsBuiltin_xor
+    AsmJSAtomicsBuiltin_xor,
+    AsmJSAtomicsBuiltin_isLockFree
 };
 
 // Set of known global object SIMD's attributes, i.e. types
@@ -1569,10 +1571,7 @@ class AsmJSModule
         MOZ_ASSERT(isDynamicallyLinked());
         return maybeHeap_;
     }
-    size_t heapLength() const {
-        MOZ_ASSERT(isDynamicallyLinked());
-        return maybeHeap_ ? maybeHeap_->byteLength() : 0;
-    }
+    size_t heapLength() const;
     bool profilingEnabled() const {
         MOZ_ASSERT(isDynamicallyLinked());
         return profilingEnabled_;
@@ -1629,6 +1628,6 @@ class AsmJSModuleObject : public NativeObject
     static const Class class_;
 };
 
-}  // namespace js
+} // namespace js
 
 #endif /* asmjs_AsmJSModule_h */

@@ -38,6 +38,7 @@
 #include "nsExceptionHandler.h"
 #include "nsPrintfCString.h"
 #endif
+#include "nsIXULRuntime.h"
 #include <limits>
 
 namespace mozilla {
@@ -61,7 +62,7 @@ static const uint32_t NodeIdSaltLength = 32;
 already_AddRefed<GeckoMediaPluginServiceParent>
 GeckoMediaPluginServiceParent::GetSingleton()
 {
-  MOZ_ASSERT(XRE_GetProcessType() == GeckoProcessType_Default);
+  MOZ_ASSERT(XRE_IsParentProcess());
   nsRefPtr<GeckoMediaPluginService> service(
     GeckoMediaPluginServiceParent::GetGeckoMediaPluginService());
 #ifdef DEBUG
@@ -141,6 +142,96 @@ GeckoMediaPluginServiceParent::Init()
   return GetThread(getter_AddRefs(thread));
 }
 
+already_AddRefed<nsIFile>
+CloneAndAppend(nsIFile* aFile, const nsAString& aDir)
+{
+  nsCOMPtr<nsIFile> f;
+  nsresult rv = aFile->Clone(getter_AddRefs(f));
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return nullptr;
+  }
+
+  rv = f->Append(aDir);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return nullptr;
+  }
+  return f.forget();
+}
+
+static void
+MoveAndOverwrite(nsIFile* aOldStorageDir,
+                 nsIFile* aNewStorageDir,
+                 const nsAString& aSubDir)
+{
+  nsresult rv;
+
+  nsCOMPtr<nsIFile> srcDir(CloneAndAppend(aOldStorageDir, aSubDir));
+  if (NS_WARN_IF(!srcDir)) {
+    return;
+  }
+
+  if (!FileExists(srcDir)) {
+    // No sub-directory to be migrated.
+    return;
+  }
+
+  nsCOMPtr<nsIFile> dstDir(CloneAndAppend(aNewStorageDir, aSubDir));
+  if (FileExists(dstDir)) {
+    // We must have migrated before already, and then ran an old version
+    // of Gecko again which created storage at the old location. Overwrite
+    // the previously migrated storage.
+    rv = dstDir->Remove(true);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      // MoveTo will fail.
+      return;
+    }
+  }
+
+  rv = srcDir->MoveTo(aNewStorageDir, EmptyString());
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return;
+  }
+}
+
+static void
+MigratePreGecko42StorageDir(nsIFile* aOldStorageDir,
+                            nsIFile* aNewStorageDir)
+{
+  MoveAndOverwrite(aOldStorageDir, aNewStorageDir, NS_LITERAL_STRING("id"));
+  MoveAndOverwrite(aOldStorageDir, aNewStorageDir, NS_LITERAL_STRING("storage"));
+}
+
+static nsresult
+GMPPlatformString(nsAString& aOutPlatform)
+{
+  // Append the OS and arch so that we don't reuse the storage if the profile is
+  // copied or used under a different bit-ness, or copied to another platform.
+  nsCOMPtr<nsIXULRuntime> runtime = do_GetService("@mozilla.org/xre/runtime;1");
+  if (!runtime) {
+    return NS_ERROR_FAILURE;
+  }
+
+  nsAutoCString OS;
+  nsresult rv = runtime->GetOS(OS);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  nsAutoCString arch;
+  rv = runtime->GetXPCOMABI(arch);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  nsCString platform;
+  platform.Append(OS);
+  platform.AppendLiteral("_");
+  platform.Append(arch);
+
+  aOutPlatform = NS_ConvertUTF8toUTF16(platform);
+
+  return NS_OK;
+}
 
 nsresult
 GeckoMediaPluginServiceParent::InitStorage()
@@ -148,7 +239,7 @@ GeckoMediaPluginServiceParent::InitStorage()
   MOZ_ASSERT(NS_IsMainThread());
 
   // GMP storage should be used in the chrome process only.
-  if (XRE_GetProcessType() != GeckoProcessType_Default) {
+  if (!XRE_IsParentProcess()) {
     return NS_OK;
   }
 
@@ -173,6 +264,33 @@ GeckoMediaPluginServiceParent::InitStorage()
   if (NS_WARN_IF(NS_FAILED(rv) && rv != NS_ERROR_FILE_ALREADY_EXISTS)) {
     return rv;
   }
+
+  nsCOMPtr<nsIFile> gmpDirWithoutPlatform;
+  rv = mStorageBaseDir->Clone(getter_AddRefs(gmpDirWithoutPlatform));
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  nsAutoString platform;
+  rv = GMPPlatformString(platform);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  rv = mStorageBaseDir->Append(platform);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  rv = mStorageBaseDir->Create(nsIFile::DIRECTORY_TYPE, 0700);
+  if (NS_WARN_IF(NS_FAILED(rv) && rv != NS_ERROR_FILE_ALREADY_EXISTS)) {
+    return rv;
+  }
+
+  // Prior to 42, GMP storage was stored in $profile/gmp/. After 42, it's
+  // stored in $profile/gmp/$platform/. So we must migrate any old records
+  // from the old location to the new location, for forwards compatibility.
+  MigratePreGecko42StorageDir(gmpDirWithoutPlatform, mStorageBaseDir);
 
   return GeckoMediaPluginService::Init();
 }
@@ -426,47 +544,29 @@ GeckoMediaPluginServiceParent::AsyncShutdownPluginStates::Update(const nsCString
   state->mStateSequence += aId;
   state->mLastStateDescription = aState;
   note += '{';
-  mStates.EnumerateRead(EnumReadPlugins, &note);
+  bool firstPlugin = true;
+  for (auto pluginIt = mStates.ConstIter(); !pluginIt.Done(); pluginIt.Next()) {
+    if (!firstPlugin) { note += ','; } else { firstPlugin = false; }
+    note += pluginIt.Key();
+    note += ":{";
+    bool firstInstance = true;
+    for (auto instanceIt = pluginIt.UserData()->ConstIter(); !instanceIt.Done(); instanceIt.Next()) {
+      if (!firstInstance) { note += ','; } else { firstInstance = false; }
+      note += instanceIt.Key();
+      note += ":\"";
+      note += instanceIt.UserData()->mStateSequence;
+      note += '=';
+      note += instanceIt.UserData()->mLastStateDescription;
+      note += '"';
+    }
+    note += '}';
+  }
   note += '}';
   LOGD(("%s::%s states[%s][%s]='%c'/'%s' -> %s", __CLASS__, __FUNCTION__,
         aPlugin.get(), aInstance.get(), aId, aState.get(), note.get()));
   CrashReporter::AnnotateCrashReport(
     NS_LITERAL_CSTRING("AsyncPluginShutdownStates"),
     note);
-}
-
-// static
-PLDHashOperator
-GeckoMediaPluginServiceParent::AsyncShutdownPluginStates::EnumReadPlugins(
-  StateInstancesByPlugin::KeyType aKey,
-  StateInstancesByPlugin::UserDataType aData,
-  void* aUserArg)
-{
-  nsCString& note = *static_cast<nsCString*>(aUserArg);
-  if (note.Last() != '{') { note += ','; }
-  note += aKey;
-  note += ":{";
-  aData->EnumerateRead(EnumReadInstances, &note);
-  note += '}';
-  return PL_DHASH_NEXT;
-}
-
-// static
-PLDHashOperator
-GeckoMediaPluginServiceParent::AsyncShutdownPluginStates::EnumReadInstances(
-  StatesByInstance::KeyType aKey,
-  StatesByInstance::UserDataType aData,
-  void* aUserArg)
-{
-  nsCString& note = *static_cast<nsCString*>(aUserArg);
-  if (note.Last() != '{') { note += ','; }
-  note += aKey;
-  note += ":\"";
-  note += aData->mStateSequence;
-  note += '=';
-  note += aData->mLastStateDescription;
-  note += '"';
-  return PL_DHASH_NEXT;
 }
 #endif // MOZ_CRASHREPORTER
 

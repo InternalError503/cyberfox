@@ -10,7 +10,11 @@
 #include "mozilla/AsyncEventDispatcher.h"
 #include "mozilla/DebugOnly.h"
 #include "mozilla/dom/Date.h"
+#include "mozilla/dom/Directory.h"
+#include "mozilla/dom/FileSystemUtils.h"
+#include "mozilla/dom/OSFileSystem.h"
 #include "nsAttrValueInlines.h"
+#include "nsCRTGlue.h"
 
 #include "nsIDOMHTMLInputElement.h"
 #include "nsITextControlElement.h"
@@ -76,7 +80,9 @@
 
 // input type=file
 #include "mozilla/dom/File.h"
+#include "mozilla/dom/FileList.h"
 #include "nsIFile.h"
+#include "nsNetCID.h"
 #include "nsNetUtil.h"
 #include "nsDirectoryServiceDefs.h"
 #include "nsIContentPrefService.h"
@@ -355,7 +361,7 @@ DOMFileToLocalFile(File* aDomFile)
   return localFile.forget();
 }
 
-} // anonymous namespace
+} // namespace
 
 
 NS_IMETHODIMP
@@ -372,7 +378,8 @@ HTMLInputElement::nsFilePickerShownCallback::Done(int16_t aResult)
 
   // Collect new selected filenames
   nsTArray<nsRefPtr<File>> newFiles;
-  if (mode == static_cast<int16_t>(nsIFilePicker::modeOpenMultiple)) {
+  if (mode == static_cast<int16_t>(nsIFilePicker::modeOpenMultiple) ||
+      mode == static_cast<int16_t>(nsIFilePicker::modeGetFolder)) {
     nsCOMPtr<nsISimpleEnumerator> iter;
     nsresult rv = mFilePicker->GetDomfiles(getter_AddRefs(iter));
     NS_ENSURE_SUCCESS(rv, rv);
@@ -387,8 +394,8 @@ HTMLInputElement::nsFilePickerShownCallback::Done(int16_t aResult)
     while (NS_SUCCEEDED(iter->HasMoreElements(&hasMore)) && hasMore) {
       iter->GetNext(getter_AddRefs(tmp));
       nsCOMPtr<nsIDOMBlob> domBlob = do_QueryInterface(tmp);
-      NS_WARN_IF_FALSE(domBlob,
-                       "Null file object from FilePicker's file enumerator?");
+      MOZ_ASSERT(domBlob,
+                 "Null file object from FilePicker's file enumerator?");
       if (domBlob) {
         newFiles.AppendElement(static_cast<File*>(domBlob.get()));
       }
@@ -746,7 +753,7 @@ UploadLastDir::FetchDirectoryAndDisplayPicker(nsIDocument* aDoc,
     new UploadLastDir::ContentPrefCallback(aFilePicker, aFpCallback);
 
 #ifdef MOZ_B2G
-  if (XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (XRE_IsContentProcess()) {
     prefCallback->HandleCompletion(nsIContentPrefCallback2::COMPLETE_ERROR);
     return NS_OK;
   }
@@ -777,7 +784,7 @@ UploadLastDir::StoreLastUsedDirectory(nsIDocument* aDoc, nsIFile* aDir)
   }
 
 #ifdef MOZ_B2G
-  if (XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (XRE_IsContentProcess()) {
     return NS_OK;
   }
 #endif
@@ -878,9 +885,6 @@ HTMLInputElement::HTMLInputElement(already_AddRefed<mozilla::dom::NodeInfo>& aNo
 
 HTMLInputElement::~HTMLInputElement()
 {
-  if (mFileList) {
-    mFileList->Disconnect();
-  }
   if (mNumberControlSpinnerIsSpinning) {
     StopNumberControlSpinnerSpin();
   }
@@ -935,10 +939,7 @@ NS_IMPL_CYCLE_COLLECTION_UNLINK_BEGIN_INHERITED(HTMLInputElement,
   NS_IMPL_CYCLE_COLLECTION_UNLINK(mValidity)
   NS_IMPL_CYCLE_COLLECTION_UNLINK(mControllers)
   NS_IMPL_CYCLE_COLLECTION_UNLINK(mFiles)
-  if (tmp->mFileList) {
-    tmp->mFileList->Disconnect();
-    tmp->mFileList = nullptr;
-  }
+  NS_IMPL_CYCLE_COLLECTION_UNLINK(mFileList)
   if (tmp->IsSingleLineTextControl(false)) {
     tmp->mInputData.mState->Unlink();
   }
@@ -1019,7 +1020,7 @@ HTMLInputElement::Clone(mozilla::dom::NodeInfo* aNodeInfo, nsINode** aResult) co
 
 nsresult
 HTMLInputElement::BeforeSetAttr(int32_t aNameSpaceID, nsIAtom* aName,
-                                const nsAttrValueOrString* aValue,
+                                nsAttrValueOrString* aValue,
                                 bool aNotify)
 {
   if (aNameSpaceID == kNameSpaceID_None) {
@@ -2105,7 +2106,7 @@ HTMLInputElement::MozSetFileArray(const Sequence<OwningNonNull<File>>& aFiles)
 void
 HTMLInputElement::MozSetFileNameArray(const Sequence< nsString >& aFileNames, ErrorResult& aRv)
 {
-  if (XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (XRE_IsContentProcess()) {
     aRv.Throw(NS_ERROR_DOM_NOT_SUPPORTED_ERR);
     return;
   }
@@ -2881,7 +2882,9 @@ HTMLInputElement::Focus(ErrorResult& aError)
     return;
   }
 
-  // For file inputs, focus the button instead.
+  // For file inputs, focus the first button instead. In the case of there
+  // being two buttons (when the picker is a directory picker) the user can
+  // tab to the next one.
   nsIFrame* frame = GetPrimaryFrame();
   if (frame) {
     for (nsIFrame* childFrame = frame->GetFirstPrincipalChild();
@@ -3549,7 +3552,21 @@ HTMLInputElement::MaybeInitPickers(EventChainPostVisitor& aVisitor)
     return NS_OK;
   }
   if (mType == NS_FORM_INPUT_FILE) {
-    return InitFilePicker(FILE_PICKER_FILE);
+    // If the user clicked on the "Choose folder..." button we open the
+    // directory picker, else we open the file picker.
+    FilePickerType type = FILE_PICKER_FILE;
+    nsCOMPtr<nsIContent> target =
+      do_QueryInterface(aVisitor.mEvent->originalTarget);
+    if (target &&
+        target->GetParent() == this &&
+        target->IsRootOfNativeAnonymousSubtree() &&
+        target->HasAttr(kNameSpaceID_None, nsGkAtoms::directory)) {
+      MOZ_ASSERT(Preferences::GetBool("dom.input.dirpicker", false),
+                 "No API or UI should have been exposed to allow this code to "
+                 "be reached");
+      type = FILE_PICKER_DIRECTORY;
+    }
+    return InitFilePicker(type);
   }
   if (mType == NS_FORM_INPUT_COLOR) {
     return InitColorPicker();
@@ -4757,7 +4774,10 @@ HTMLInputElement::GetAttributeChangeHint(const nsIAtom* aAttribute,
 {
   nsChangeHint retval =
     nsGenericHTMLFormElementWithState::GetAttributeChangeHint(aAttribute, aModType);
-  if (aAttribute == nsGkAtoms::type) {
+  if (aAttribute == nsGkAtoms::type ||
+      // The presence or absence of the 'directory' attribute determines what
+      // buttons we show for type=file.
+      aAttribute == nsGkAtoms::directory) {
     NS_UpdateHint(retval, NS_STYLE_HINT_FRAMECHANGE);
   } else if (mType == NS_FORM_INPUT_IMAGE &&
              (aAttribute == nsGkAtoms::alt ||
@@ -4799,6 +4819,110 @@ nsMapRuleToAttributesFunc
 HTMLInputElement::GetAttributeMappingFunction() const
 {
   return &MapAttributesIntoRule;
+}
+
+
+// Directory picking methods:
+
+bool
+HTMLInputElement::IsFilesAndDirectoriesSupported() const
+{
+  // This method is supposed to return true if a file and directory picker
+  // supports the selection of both files and directories *at the same time*.
+  // Only Mac currently supports that. We could implement it for Mac, but
+  // currently we do not.
+  return false;
+}
+
+void
+HTMLInputElement::ChooseDirectory(ErrorResult& aRv)
+{
+  if (mType != NS_FORM_INPUT_FILE) {
+    aRv.Throw(NS_ERROR_DOM_INVALID_STATE_ERR);
+    return;
+  }
+  InitFilePicker(
+#if defined(ANDROID) || defined(MOZ_B2G)
+                 // No native directory picker - redirect to plain file picker
+                 FILE_PICKER_FILE
+#else
+                 FILE_PICKER_DIRECTORY
+#endif
+                 );
+}
+
+static already_AddRefed<OSFileSystem>
+MakeOrReuseFileSystem(const nsAString& aNewLocalRootPath,
+                      OSFileSystem* aFS,
+                      nsPIDOMWindow* aWindow)
+{
+  MOZ_ASSERT(aWindow);
+
+  nsRefPtr<OSFileSystem> fs;
+  if (aFS) {
+    const nsAString& prevLocalRootPath = aFS->GetLocalRootPath();
+    if (aNewLocalRootPath == prevLocalRootPath) {
+      fs = aFS;
+    }
+  }
+  if (!fs) {
+    fs = new OSFileSystem(aNewLocalRootPath);
+    fs->Init(aWindow);
+  }
+  return fs.forget();
+}
+
+already_AddRefed<Promise>
+HTMLInputElement::GetFilesAndDirectories(ErrorResult& aRv)
+{
+  nsCOMPtr<nsIGlobalObject> global = OwnerDoc()->GetScopeObject();
+  MOZ_ASSERT(global);
+  if (!global) {
+    return nullptr;
+  }
+
+  nsRefPtr<Promise> p = Promise::Create(global, aRv);
+  if (aRv.Failed()) {
+    return nullptr;
+  }
+
+  const nsTArray<nsRefPtr<File>>& filesAndDirs = GetFilesInternal();
+
+  Sequence<OwningFileOrDirectory> filesAndDirsSeq;
+
+  if (!filesAndDirsSeq.SetLength(filesAndDirs.Length(), mozilla::fallible_t())) {
+    p->MaybeReject(NS_ERROR_OUT_OF_MEMORY);
+    return p.forget();
+  }
+
+  nsPIDOMWindow* window = OwnerDoc()->GetInnerWindow();
+  nsRefPtr<OSFileSystem> fs;
+  for (uint32_t i = 0; i < filesAndDirs.Length(); ++i) {
+    if (filesAndDirs[i]->IsDirectory()) {
+#if defined(ANDROID) || defined(MOZ_B2G)
+      MOZ_ASSERT(false,
+                 "Directory picking should have been redirected to normal "
+                 "file picking for platforms that don't have a directory "
+                 "picker");
+#endif
+      nsAutoString path;
+      filesAndDirs[i]->GetMozFullPathInternal(path, aRv);
+      if (aRv.Failed()) {
+        return nullptr;
+      }
+      int32_t leafSeparatorIndex = path.RFind(FILE_PATH_SEPARATOR);
+      nsDependentSubstring dirname = Substring(path, 0, leafSeparatorIndex);
+      nsDependentSubstring basename = Substring(path, leafSeparatorIndex);
+      fs = MakeOrReuseFileSystem(dirname, fs, window);
+      filesAndDirsSeq[i].SetAsDirectory() = new Directory(fs, basename);
+    } else {
+      filesAndDirsSeq[i].SetAsFile() = filesAndDirs[i];
+    }
+  }
+
+  p->MaybeResolve(filesAndDirsSeq);
+
+  return p.forget();
 }
 
 
@@ -7089,8 +7213,12 @@ HTMLInputElement::SetFilePickerFiltersFromAccept(nsIFilePicker* filePicker)
       filterBundle->GetStringFromName(MOZ_UTF16("videoFilter"),
                                       getter_Copies(extensionListStr));
     } else if (token.First() == '.') {
+      if (token.Contains(';') || token.Contains('*')) {
+        // Ignore this filter as it contains reserved characters
+        continue;
+      }
       extensionListStr = NS_LITERAL_STRING("*") + token;
-      filterName = extensionListStr + NS_LITERAL_STRING("; ");
+      filterName = extensionListStr;
       atLeastOneFileExtensionFilter = true;
     } else {
       //... if no image/audio/video filter is found, check mime types filters
@@ -7168,7 +7296,14 @@ HTMLInputElement::SetFilePickerFiltersFromAccept(nsIFilePicker* filePicker)
       if (i == j) {
         continue;
       }
-      if (FindInReadable(filterToCheck.mFilter, filtersCopy[j].mFilter)) {
+      // Check if this filter's extension list is a substring of the other one.
+      // e.g. if filters are "*.jpeg" and "*.jpeg; *.jpg" the first one should
+      // be removed.
+      // Add an extra "; " to be sure the check will work and avoid cases like
+      // "*.xls" being a subtring of "*.xslx" while those are two differents
+      // filters and none should be removed.
+      if (FindInReadable(filterToCheck.mFilter + NS_LITERAL_STRING(";"),
+                         filtersCopy[j].mFilter + NS_LITERAL_STRING(";"))) {
         // We already have a similar, less restrictive filter (i.e.
         // filterToCheck extensionList is just a subset of another filter
         // extension list): remove this one

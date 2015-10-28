@@ -132,10 +132,13 @@ public abstract class GeckoApp
     private static final String LOGTAG = "GeckoApp";
     private static final int ONE_DAY_MS = 1000*60*60*24;
 
-    private static enum StartupAction {
+    public static enum StartupAction {
         NORMAL,     /* normal application start */
         URL,        /* launched with a passed URL */
-        PREFETCH    /* launched with a passed URL that we prefetch */
+        PREFETCH,   /* launched with a passed URL that we prefetch */
+        WEBAPP,     /* launched as a webapp runtime */
+        GUEST,      /* launched in guest browsing */
+        RESTRICTED  /* launched with restricted profile */
     }
 
     public static final String ACTION_ALERT_CALLBACK       = "org.mozilla.gecko.ACTION_ALERT_CALLBACK";
@@ -589,6 +592,9 @@ public abstract class GeckoApp
                 // something went wrong.
                 Log.e(LOGTAG, "Received Contact:Add message with no email nor phone number");
             }
+
+        } else if ("DevToolsAuth:Scan".equals(event)) {
+            DevToolsAuthHelper.scan(this, callback);
 
         } else if ("DOMFullScreen:Start".equals(event)) {
             // Local ref to layerView for thread safety
@@ -1232,6 +1238,7 @@ public abstract class GeckoApp
             "Accessibility:Ready",
             "Bookmark:Insert",
             "Contact:Add",
+            "DevToolsAuth:Scan",
             "DOMFullScreen:Start",
             "DOMFullScreen:Stop",
             "Image:SetAs",
@@ -1469,14 +1476,7 @@ public abstract class GeckoApp
             passedUri = null;
         }
 
-        final boolean isExternalURL = passedUri != null &&
-                                      !AboutPages.isAboutHome(passedUri);
-        final StartupAction startupAction;
-        if (isExternalURL) {
-            startupAction = StartupAction.URL;
-        } else {
-            startupAction = StartupAction.NORMAL;
-        }
+        final boolean isExternalURL = passedUri != null && !AboutPages.isAboutHome(passedUri);
 
         // Start migrating as early as possible, can do this in
         // parallel with Gecko load.
@@ -1540,7 +1540,8 @@ public abstract class GeckoApp
             getProfile().moveSessionFile();
         }
 
-        Telemetry.addToHistogram("FENNEC_STARTUP_GECKOAPP_ACTION", startupAction.ordinal());
+        final StartupAction startupAction = getStartupAction(passedUri);
+        Telemetry.addToHistogram("FENNEC_GECKOAPP_STARTUP_ACTION", startupAction.ordinal());
 
         // Check if launched from data reporting notification.
         if (ACTION_LAUNCH_SETTINGS.equals(action)) {
@@ -1636,8 +1637,7 @@ public abstract class GeckoApp
         ThreadUtils.postToBackgroundThread(new Runnable() {
             @Override
             public void run() {
-                if (AppConstants.NIGHTLY_BUILD && AppConstants.MOZ_ANDROID_TAB_QUEUE
-                                               && TabQueueHelper.shouldOpenTabQueueUrls(GeckoApp.this)) {
+                if (TabQueueHelper.TAB_QUEUE_ENABLED && TabQueueHelper.shouldOpenTabQueueUrls(GeckoApp.this)) {
 
                     EventDispatcher.getInstance().registerGeckoThreadListener(new NativeEventListener() {
                         @Override
@@ -2683,5 +2683,10 @@ public abstract class GeckoApp
                                                   final SessionInformation previousSession) {
         // GeckoApp does not need to record any health information - return a stub.
         return new StubbedHealthRecorder();
+    }
+
+    protected StartupAction getStartupAction(final String passedURL) {
+        // Default to NORMAL here. Subclasses can handle the other types.
+        return StartupAction.NORMAL;
     }
 }

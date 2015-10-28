@@ -271,7 +271,7 @@ NeckoParent::AllocPFTPChannelParent(const PBrowserOrId& aBrowser,
     return nullptr;
   }
   PBOverrideStatus overrideStatus = PBOverrideStatusFromLoadContext(aSerialized);
-  FTPChannelParent *p = new FTPChannelParent(loadContext, overrideStatus);
+  FTPChannelParent *p = new FTPChannelParent(aBrowser, loadContext, overrideStatus);
   p->AddRef();
   return p;
 }
@@ -782,7 +782,7 @@ CallbackMap()
   static std::map<uint64_t, nsCOMPtr<nsIAuthPromptCallback> > sCallbackMap;
   return sCallbackMap;
 }
-} // anonymous namespace
+} // namespace
 
 NS_IMPL_ISUPPORTS(NeckoParent::NestedFrameAuthPrompt, nsIAuthPrompt2)
 
@@ -799,7 +799,7 @@ NeckoParent::NestedFrameAuthPrompt::AsyncPromptAuth(
   nsIAuthInformation* aInfo, nsICancelable**)
 {
   static uint64_t callbackId = 0;
-  MOZ_ASSERT(XRE_GetProcessType() == GeckoProcessType_Default);
+  MOZ_ASSERT(XRE_IsParentProcess());
   nsCOMPtr<nsIURI> uri;
   nsresult rv = aChannel->GetURI(getter_AddRefs(uri));
   NS_ENSURE_SUCCESS(rv, rv);
@@ -970,4 +970,21 @@ NeckoParent::OfflineNotification(nsISupports *aSubject)
   return NS_OK;
 }
 
-}} // mozilla::net
+bool
+NeckoParent::RecvRemoveSchedulingContext(const nsCString& scid)
+{
+  nsCOMPtr<nsISchedulingContextService> scsvc =
+    do_GetService("@mozilla.org/network/scheduling-context-service;1");
+  if (!scsvc) {
+    return true;
+  }
+
+  nsID id;
+  id.Parse(scid.BeginReading());
+  scsvc->RemoveSchedulingContext(id);
+
+  return true;
+}
+
+} // namespace net
+} // namespace mozilla

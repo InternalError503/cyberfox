@@ -5,17 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
-
-XPCOMUtils.defineLazyModuleGetter(this, "DevToolsUtils",
-  "resource://gre/modules/devtools/DevToolsUtils.jsm");
-
 XPCOMUtils.defineLazyGetter(this, "HarExporter", function() {
-  return devtools.require("devtools/netmonitor/har/har-exporter.js").HarExporter;
+  return require("devtools/netmonitor/har/har-exporter.js").HarExporter;
 });
 
 XPCOMUtils.defineLazyGetter(this, "NetworkHelper", function() {
-  return devtools.require("devtools/toolkit/webconsole/network-helper");
+  return require("devtools/toolkit/webconsole/network-helper");
 });
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
@@ -1670,7 +1665,7 @@ RequestsMenuView.prototype = Heritage.extend(WidgetMethods, {
           text = L10N.getStr("networkMenu.sizeUnavailable");
         }
         else if(aValue === "cached") {
-          text = aValue;
+          text = L10N.getStr("networkMenu.sizeCached");
           node.classList.add('theme-comment');
         }
         else {
@@ -2478,14 +2473,14 @@ NetworkDetailsView.prototype = {
     let isHtml = RequestsMenuView.prototype.isHtml({ attachment: aData });
 
     // Show the "Preview" tabpanel only for plain HTML responses.
-    this.sidebar.toggleTab(isHtml, "preview-tab", "preview-tabpanel");
+    this.sidebar.toggleTab(isHtml, "preview-tab");
 
     // Show the "Security" tab only for requests that
     //   1) are https (state != insecure)
     //   2) come from a target that provides security information.
     let hasSecurityInfo = aData.securityState &&
                           aData.securityState !== "insecure";
-    this.sidebar.toggleTab(hasSecurityInfo, "security-tab", "security-tabpanel");
+    this.sidebar.toggleTab(hasSecurityInfo, "security-tab");
 
     // Switch to the "Headers" tabpanel if the "Preview" previously selected
     // and this is not an HTML response or "Security" was selected but this

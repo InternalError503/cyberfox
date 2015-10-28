@@ -30,7 +30,7 @@ namespace jit {
     struct IonScript;
     class JitAllocPolicy;
     class TempAllocator;
-}
+} // namespace jit
 
 class TaggedProto;
 struct TypeZone;
@@ -272,7 +272,7 @@ class TypeSet
     // Information about a single concrete type. We pack this into one word,
     // where small values are particular primitive or other singleton types and
     // larger values are either specific JS objects or object groups.
-    class Type
+    class Type : public JS::Traceable
     {
         friend class TypeSet;
 
@@ -350,10 +350,12 @@ class TypeSet
         inline ObjectGroup* group() const;
         inline ObjectGroup* groupNoBarrier() const;
 
+        static void trace(Type* v, JSTracer* trc) {
+            MarkTypeUnbarriered(trc, v, "TypeSet::Type");
+        }
+
         bool operator == (Type o) const { return data == o.data; }
         bool operator != (Type o) const { return data != o.data; }
-
-        static ThingRootKind rootKind() { return THING_ROOT_TYPE; }
     };
 
     static inline Type UndefinedType() { return Type(JSVAL_TYPE_UNDEFINED); }
@@ -799,6 +801,7 @@ class PreliminaryObjectArray
     }
 
     bool full() const;
+    bool empty() const;
     void sweep();
 };
 
@@ -1292,7 +1295,7 @@ PrintTypes(JSContext* cx, JSCompartment* comp, bool force);
 namespace JS {
 namespace ubi {
 template<> struct Concrete<js::ObjectGroup> : TracerConcrete<js::ObjectGroup> { };
-}
-}
+} // namespace ubi
+} // namespace JS
 
 #endif /* vm_TypeInference_h */

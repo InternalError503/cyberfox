@@ -8,7 +8,7 @@
  */
 
 function test() {
-  let RecordingUtils = devtools.require("devtools/performance/recording-utils");
+  let RecordingUtils = require("devtools/performance/recording-utils");
 
   let output = RecordingUtils.getProfileThreadFromAllocations(TEST_DATA);
   is(output.toSource(), EXPECTED_OUTPUT.toSource(), "The output is correct.");
@@ -39,8 +39,7 @@ let TEST_DATA = {
       functionDisplayName: null,
       parent: 2
     }
-  ],
-  counts: [11, 22, 33, 44]
+  ]
 };
 
 let EXPECTED_OUTPUT = {
@@ -49,11 +48,6 @@ let EXPECTED_OUTPUT = {
     "schema": {
       "stack": 0,
       "time": 1,
-      "responsiveness": 2,
-      "rss": 3,
-      "uss": 4,
-      "frameNumber": 5,
-      "power": 6
     },
     data: [
       [ 1, 150 ],
@@ -93,10 +87,4 @@ let EXPECTED_OUTPUT = {
     "y (B:3:4)",
     "C:5:6"
   ],
-  "allocationsTable": [
-    11,
-    22,
-    33,
-    44
-  ]
 };

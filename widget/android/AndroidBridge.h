@@ -207,6 +207,9 @@ public:
                                 nsIHandlerApp **aDefaultApp = nullptr,
                                 const nsAString& aAction = EmptyString());
 
+    bool GetHWEncoderCapability();
+    bool GetHWDecoderCapability();
+
     void GetMimeTypeFromExtensions(const nsACString& aFileExt, nsCString& aMimeType);
     void GetExtensionFromMimeType(const nsACString& aMimeType, nsACString& aFileExt);
 
@@ -308,7 +311,7 @@ public:
     int GetAPIVersion() { return mAPIVersion; }
     bool IsHoneycomb() { return mAPIVersion >= 11 && mAPIVersion <= 13; }
 
-    void ScheduleComposite();
+    void InvalidateAndScheduleComposite();
 
     nsresult GetProxyForURI(const nsACString & aSpec,
                             const nsACString & aScheme,

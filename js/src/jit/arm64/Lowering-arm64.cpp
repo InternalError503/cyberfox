@@ -18,13 +18,6 @@ using namespace js::jit;
 using mozilla::FloorLog2;
 
 void
-LIRGeneratorARM64::useBox(LInstruction* lir, size_t n, MDefinition* mir,
-                          LUse::Policy policy, bool useAtStart)
-{
-    MOZ_CRASH("useBox");
-}
-
-void
 LIRGeneratorARM64::useBoxFixed(LInstruction* lir, size_t n, MDefinition* mir, Register reg1, Register)
 {
     MOZ_CRASH("useBoxFixed");
@@ -40,24 +33,6 @@ LAllocation
 LIRGeneratorARM64::useByteOpRegisterOrNonDoubleConstant(MDefinition* mir)
 {
     MOZ_CRASH("useByteOpRegisterOrNonDoubleConstant");
-}
-
-void
-LIRGeneratorARM64::lowerConstantDouble(double d, MInstruction* mir)
-{
-    MOZ_CRASH("lowerConstantDouble");
-}
-
-void
-LIRGeneratorARM64::lowerConstantFloat32(float d, MInstruction* mir)
-{
-    MOZ_CRASH("lowerConstantFloat32");
-}
-
-void
-LIRGeneratorARM64::visitConstant(MConstant* ins)
-{
-    MOZ_CRASH("visitConstant");
 }
 
 void
@@ -249,6 +224,12 @@ LIRGeneratorARM64::visitAsmJSCompareExchangeHeap(MAsmJSCompareExchangeHeap* ins)
 }
 
 void
+LIRGeneratorARM64::visitAsmJSAtomicExchangeHeap(MAsmJSAtomicExchangeHeap* ins)
+{
+    MOZ_CRASH("visitAsmJSAtomicExchangeHeap");
+}
+
+void
 LIRGeneratorARM64::visitAsmJSAtomicBinopHeap(MAsmJSAtomicBinopHeap* ins)
 {
     MOZ_CRASH("visitAsmJSAtomicBinopHeap");
@@ -304,6 +285,12 @@ LIRGeneratorARM64::visitAtomicTypedArrayElementBinop(MAtomicTypedArrayElementBin
 
 void
 LIRGeneratorARM64::visitCompareExchangeTypedArrayElement(MCompareExchangeTypedArrayElement* ins)
+{
+    MOZ_CRASH("NYI");
+}
+
+void
+LIRGeneratorARM64::visitAtomicExchangeTypedArrayElement(MAtomicExchangeTypedArrayElement* ins)
 {
     MOZ_CRASH("NYI");
 }

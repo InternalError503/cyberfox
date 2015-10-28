@@ -66,8 +66,6 @@ class LIRGeneratorMIPS : public LIRGeneratorShared
 
     void lowerForBitAndAndBranch(LBitAndAndBranch* baab, MInstruction* mir,
                                  MDefinition* lhs, MDefinition* rhs);
-    void lowerConstantDouble(double d, MInstruction* ins);
-    void lowerConstantFloat32(float d, MInstruction* ins);
     void lowerTruncateDToInt32(MTruncateToInt32* ins);
     void lowerTruncateFToInt32(MTruncateToInt32* ins);
     void lowerDivI(MDiv* div);
@@ -83,7 +81,6 @@ class LIRGeneratorMIPS : public LIRGeneratorShared
     LTableSwitchV* newLTableSwitchV(MTableSwitch* ins);
 
   public:
-    void visitConstant(MConstant* ins);
     void visitBox(MBox* box);
     void visitUnbox(MUnbox* unbox);
     void visitReturn(MReturn* ret);
@@ -95,6 +92,7 @@ class LIRGeneratorMIPS : public LIRGeneratorShared
     void visitAsmJSLoadHeap(MAsmJSLoadHeap* ins);
     void visitAsmJSStoreHeap(MAsmJSStoreHeap* ins);
     void visitAsmJSCompareExchangeHeap(MAsmJSCompareExchangeHeap* ins);
+    void visitAsmJSAtomicExchangeHeap(MAsmJSAtomicExchangeHeap* ins);
     void visitAsmJSAtomicBinopHeap(MAsmJSAtomicBinopHeap* ins);
     void visitAsmJSLoadFuncPtr(MAsmJSLoadFuncPtr* ins);
     void visitStoreTypedArrayElementStatic(MStoreTypedArrayElementStatic* ins);
@@ -103,6 +101,7 @@ class LIRGeneratorMIPS : public LIRGeneratorShared
     void visitSimdSplatX4(MSimdSplatX4* ins);
     void visitSimdValueX4(MSimdValueX4* ins);
     void visitCompareExchangeTypedArrayElement(MCompareExchangeTypedArrayElement* ins);
+    void visitAtomicExchangeTypedArrayElement(MAtomicExchangeTypedArrayElement* ins);
     void visitAtomicTypedArrayElementBinop(MAtomicTypedArrayElementBinop* ins);
     void visitSubstr(MSubstr* ins);
     void visitRandom(MRandom* ins);

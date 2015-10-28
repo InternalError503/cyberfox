@@ -49,11 +49,11 @@ namespace layers {
 class Layer;
 class ImageLayer;
 class ImageContainer;
-} //namespace
+} // namespace layers
 namespace gfx {
 class VRHMDInfo;
-} //namespace
-} //namespace
+} // namespace gfx
+} // namespace mozilla
 
 // A set of blend modes, that never includes OP_OVER (since it's
 // considered the default, rather than a specific blend mode).
@@ -345,16 +345,7 @@ public:
   {
     mLayerEventRegions = aItem;
   }
-  bool IsBuildingLayerEventRegions()
-  {
-    if (mMode == PAINTING) {
-      // Note: this is the only place that gets to query LayoutEventRegionsEnabled
-      // 'directly' - other code should call this function.
-      return gfxPrefs::LayoutEventRegionsEnabledDoNotUseDirectly() ||
-             mAsyncPanZoomEnabled;
-    }
-    return false;
-  }
+  bool IsBuildingLayerEventRegions();
   bool IsInsidePointerEventsNoneDoc()
   {
     return CurrentPresShellState()->mInsidePointerEventsNoneDoc;
@@ -827,15 +818,19 @@ public:
   DisplayListClipState& ClipState() { return mClipState; }
 
   /**
-   * The will-change budget is calculated during the display list building
-   * phase for all the frames that want will change on a per-document basis.
-   * The cost should be fully calculated during the layer building phase
-   * and a decission to allow or disallow will-change for all frames of
-   * that document will be made by IsInWillChangeBudget.
+   * Add the current frame to the will-change budget if possible and
+   * remeber the outcome. Subsequent calls to IsInWillChangeBudget
+   * will return the same value as return here.
    */
-  void AddToWillChangeBudget(nsIFrame* aFrame, const nsSize& aSize);
+  bool AddToWillChangeBudget(nsIFrame* aFrame, const nsSize& aSize);
 
-  bool IsInWillChangeBudget(nsIFrame* aFrame) const;
+  /**
+   * This will add the current frame to the will-change budget the first
+   * time it is seen. On subsequent calls this will return the same
+   * answer. This effectively implements a first-come, first-served
+   * allocation of the will-change budget.
+   */
+  bool IsInWillChangeBudget(nsIFrame* aFrame, const nsSize& aSize);
 
   /**
    * Look up the cached animated geometry root for aFrame subject to
@@ -944,8 +939,10 @@ private:
   // will-change budget tracker
   nsDataHashtable<nsPtrHashKey<nsPresContext>, DocumentWillChangeBudget>
                                  mWillChangeBudget;
-  // Assert that we never check the budget before its fully calculated.
-  mutable mozilla::DebugOnly<bool> mWillChangeBudgetCalculated;
+
+  // Any frame listed in this set is already counted in the budget
+  // and thus is in-budget.
+  nsTHashtable<nsPtrHashKey<nsIFrame> > mBudgetSet;
 
   // rects are relative to the frame's reference frame
   nsDataHashtable<nsPtrHashKey<nsIFrame>, nsRect> mDirtyRectForScrolledContents;
@@ -1021,7 +1018,7 @@ protected:
  * class represents an entity that can be drawn on the screen, e.g., a
  * frame's CSS background, or a frame's text string.
  * 
- * nsDisplayListItems can be containers --- i.e., they can perform hit testing
+ * nsDisplayItems can be containers --- i.e., they can perform hit testing
  * and painting by recursively traversing a list of child items.
  * 
  * These are arena-allocated during display list construction. A typical
@@ -1618,8 +1615,8 @@ public:
   }
   
   /**
-   * Append a new item to the top of the list. If the item is null we return
-   * NS_ERROR_OUT_OF_MEMORY. The intended usage is AppendNewToTop(new ...);
+   * Append a new item to the top of the list. The intended usage is
+   * AppendNewToTop(new ...);
    */
   void AppendNewToTop(nsDisplayItem* aItem) {
     if (aItem) {
@@ -1628,8 +1625,8 @@ public:
   }
   
   /**
-   * Append a new item to the bottom of the list. If the item is null we return
-   * NS_ERROR_OUT_OF_MEMORY. The intended usage is AppendNewToBottom(new ...);
+   * Append a new item to the bottom of the list. The intended usage is
+   * AppendNewToBottom(new ...);
    */
   void AppendNewToBottom(nsDisplayItem* aItem) {
     if (aItem) {
@@ -2185,9 +2182,14 @@ public:
   virtual nsRect GetBounds(nsDisplayListBuilder* aBuilder, bool* aSnap) override;
   virtual void Paint(nsDisplayListBuilder* aBuilder, nsRenderingContext* aCtx) override;
   NS_DISPLAY_DECL_NAME("Caret", TYPE_CARET)
+
+  bool NeedsCustomScrollClip() { return mNeedsCustomScrollClip; }
+  void SetNeedsCustomScrollClip() { mNeedsCustomScrollClip = true; }
+
 protected:
   nsRefPtr<nsCaret> mCaret;
   nsRect mBounds;
+  bool mNeedsCustomScrollClip;
 };
 
 /**
@@ -3580,17 +3582,17 @@ public:
    * @param aOffsetByOrigin If true, the resulting matrix will be translated
    *        by aOrigin. This translation is applied *before* the CSS transform.
    */
-  static gfx3DMatrix GetResultingTransformMatrix(const nsIFrame* aFrame,
-                                                 const nsPoint& aOrigin,
-                                                 float aAppUnitsPerPixel,
-                                                 const nsRect* aBoundsOverride = nullptr,
-                                                 nsIFrame** aOutAncestor = nullptr,
-                                                 bool aOffsetByOrigin = false);
-  static gfx3DMatrix GetResultingTransformMatrix(const FrameTransformProperties& aProperties,
-                                                 const nsPoint& aOrigin,
-                                                 float aAppUnitsPerPixel,
-                                                 const nsRect* aBoundsOverride = nullptr,
-                                                 nsIFrame** aOutAncestor = nullptr);
+  static Matrix4x4 GetResultingTransformMatrix(const nsIFrame* aFrame,
+                                               const nsPoint& aOrigin,
+                                               float aAppUnitsPerPixel,
+                                               const nsRect* aBoundsOverride = nullptr,
+                                               nsIFrame** aOutAncestor = nullptr,
+                                               bool aOffsetByOrigin = false);
+  static Matrix4x4 GetResultingTransformMatrix(const FrameTransformProperties& aProperties,
+                                               const nsPoint& aOrigin,
+                                               float aAppUnitsPerPixel,
+                                               const nsRect* aBoundsOverride = nullptr,
+                                               nsIFrame** aOutAncestor = nullptr);
   /**
    * Return true when we should try to prerender the entire contents of the
    * transformed frame even when it's not completely visible (yet).
@@ -3617,12 +3619,12 @@ private:
   void SetReferenceFrameToAncestor(nsDisplayListBuilder* aBuilder);
   void Init(nsDisplayListBuilder* aBuilder);
 
-  static gfx3DMatrix GetResultingTransformMatrixInternal(const FrameTransformProperties& aProperties,
-                                                         const nsPoint& aOrigin,
-                                                         float aAppUnitsPerPixel,
-                                                         const nsRect* aBoundsOverride,
-                                                         nsIFrame** aOutAncestor,
-                                                         bool aOffsetByOrigin);
+  static Matrix4x4 GetResultingTransformMatrixInternal(const FrameTransformProperties& aProperties,
+                                                       const nsPoint& aOrigin,
+                                                       float aAppUnitsPerPixel,
+                                                       const nsRect* aBoundsOverride,
+                                                       nsIFrame** aOutAncestor,
+                                                       bool aOffsetByOrigin);
 
   nsDisplayWrapList mStoredList;
   Matrix4x4 mTransform;

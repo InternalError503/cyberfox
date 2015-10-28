@@ -28,6 +28,7 @@
 
 #include "nsDebug.h" // for |NS_ASSERTION|
 #include "nsISupportsUtils.h" // for |nsresult|, |NS_ADDREF|, |NS_GET_TEMPLATE_IID| et al
+#include "mozilla/nsRefPtr.h"
 
 #include "nsCycleCollectionNoteChild.h"
 
@@ -109,9 +110,7 @@
 #endif
 
 namespace mozilla {
-namespace dom {
 template<class T> class OwningNonNull;
-} // namespace dom
 } // namespace mozilla
 
 template<class T>
@@ -534,7 +533,7 @@ public:
 
   // Defined in OwningNonNull.h
   template<class U>
-  MOZ_IMPLICIT nsCOMPtr(const mozilla::dom::OwningNonNull<U>& aOther);
+  MOZ_IMPLICIT nsCOMPtr(const mozilla::OwningNonNull<U>& aOther);
 
 
   // Assignment operators
@@ -629,7 +628,7 @@ public:
 
   // Defined in OwningNonNull.h
   template<class U>
-  nsCOMPtr<T>& operator=(const mozilla::dom::OwningNonNull<U>& aOther);
+  nsCOMPtr<T>& operator=(const mozilla::OwningNonNull<U>& aOther);
 
   // Exchange ownership with |aRhs|; can save a pair of refcount operations.
   void swap(nsCOMPtr<T>& aRhs)
@@ -1376,5 +1375,28 @@ CallQueryInterface(nsCOMPtr<SourceType>& aSourcePtr, DestinationType** aDestPtr)
 {
   return CallQueryInterface(aSourcePtr.get(), aDestPtr);
 }
+
+template <class T>
+nsRefPtr<T>::nsRefPtr(const nsCOMPtr_helper& aHelper)
+{
+  void* newRawPtr;
+  if (NS_FAILED(aHelper(NS_GET_TEMPLATE_IID(T), &newRawPtr))) {
+    newRawPtr = 0;
+  }
+  mRawPtr = static_cast<T*>(newRawPtr);
+}
+
+template <class T>
+nsRefPtr<T>&
+nsRefPtr<T>::operator=(const nsCOMPtr_helper& aHelper)
+{
+  void* newRawPtr;
+  if (NS_FAILED(aHelper(NS_GET_TEMPLATE_IID(T), &newRawPtr))) {
+    newRawPtr = 0;
+  }
+  assign_assuming_AddRef(static_cast<T*>(newRawPtr));
+  return *this;
+}
+
 
 #endif // !defined(nsCOMPtr_h___)

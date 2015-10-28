@@ -4,8 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef mozilla_dom_bluetooth_bluetoothreplyrunnable_h__
-#define mozilla_dom_bluetooth_bluetoothreplyrunnable_h__
+#ifndef mozilla_dom_bluetooth_BluetoothReplyRunnable_h
+#define mozilla_dom_bluetooth_BluetoothReplyRunnable_h
 
 #include "mozilla/Attributes.h"
 #include "BluetoothCommon.h"
@@ -30,8 +30,7 @@ public:
   NS_DECL_NSIRUNNABLE
 
   BluetoothReplyRunnable(nsIDOMDOMRequest* aReq,
-                         Promise* aPromise = nullptr,
-                         const nsAString& aName = EmptyString());
+                         Promise* aPromise = nullptr);
 
   void SetReply(BluetoothReply* aReply);
 
@@ -71,15 +70,13 @@ private:
 
   BluetoothStatus mErrorStatus;
   nsString mErrorString;
-  nsString mName; // for debugging
 };
 
 class BluetoothVoidReplyRunnable : public BluetoothReplyRunnable
 {
 public:
   BluetoothVoidReplyRunnable(nsIDOMDOMRequest* aReq,
-                             Promise* aPromise = nullptr,
-                             const nsAString& aName = EmptyString());
+                             Promise* aPromise = nullptr);
  ~BluetoothVoidReplyRunnable();
 
 protected:
@@ -93,4 +90,4 @@ protected:
 
 END_BLUETOOTH_NAMESPACE
 
-#endif
+#endif // mozilla_dom_bluetooth_BluetoothReplyRunnable_h

@@ -11,6 +11,7 @@
 #include "mozilla/layers/ISurfaceAllocator.h"     // for GfxMemoryImageReporter
 
 #include "mozilla/Logging.h"
+#include "mozilla/Services.h"
 #include "prprf.h"
 
 #include "gfxPlatform.h"
@@ -31,7 +32,6 @@
 
 #if defined(XP_WIN)
 #include "gfxWindowsPlatform.h"
-#include "gfxD2DSurface.h"
 #elif defined(XP_MACOSX)
 #include "gfxPlatformMac.h"
 #include "gfxQuartzSurface.h"
@@ -58,6 +58,7 @@
 #include "nsTArray.h"
 #include "nsILocaleService.h"
 #include "nsIObserverService.h"
+#include "nsIScreenManager.h"
 #include "MainThreadUtils.h"
 #ifdef MOZ_CRASHREPORTER
 #include "nsExceptionHandler.h"
@@ -90,7 +91,7 @@
 
 #include "mozilla/Hal.h"
 #ifdef USE_SKIA
-#include "skia/SkGraphics.h"
+#include "skia/include/core/SkGraphics.h"
 # ifdef USE_SKIA_GPU
 #  include "SkiaGLGlue.h"
 # endif
@@ -110,6 +111,8 @@ class mozilla::gl::SkiaGLGlue : public GenericAtomicRefCounted {
 #include "nsIXULRuntime.h"
 #include "VsyncSource.h"
 #include "SoftwareVsyncSource.h"
+#include "nscore.h" // for NS_FREE_PERMANENT_DATA
+#include "mozilla/dom/ContentChild.h"
 
 namespace mozilla {
 namespace layers {
@@ -117,11 +120,12 @@ namespace layers {
 void InitGralloc();
 #endif
 void ShutdownTileCache();
-}
-}
+} // namespace layers
+} // namespace mozilla
 
 using namespace mozilla;
 using namespace mozilla::layers;
+using namespace mozilla::gl;
 
 gfxPlatform *gPlatform = nullptr;
 static bool gEverInitialized = false;
@@ -257,7 +261,7 @@ void CrashStatsLogForwarder::UpdateCrashReport()
            mCrashCriticalKey.get(), message.str().c_str());
   }
 }
-  
+
 void CrashStatsLogForwarder::Log(const std::string& aString)
 {
   MutexAutoLock lock(mMutex);
@@ -353,76 +357,22 @@ MemoryPressureObserver::Observe(nsISupports *aSubject,
     return NS_OK;
 }
 
-// this needs to match the list of pref font.default.xx entries listed in all.js!
-// the order *must* match the order in eFontPrefLang
+// xxx - this can probably be eliminated by reworking pref font handling code
 static const char *gPrefLangNames[] = {
-    "x-western",
-    "ja",
-    "zh-TW",
-    "zh-CN",
-    "zh-HK",
-    "ko",
-    "x-cyrillic",
-    "el",
-    "th",
-    "he",
-    "ar",
-    "x-devanagari",
-    "x-tamil",
-    "x-armn",
-    "x-beng",
-    "x-cans",
-    "x-ethi",
-    "x-geor",
-    "x-gujr",
-    "x-guru",
-    "x-khmr",
-    "x-mlym",
-    "x-orya",
-    "x-telu",
-    "x-knda",
-    "x-sinh",
-    "x-tibt",
-    "x-unicode",
+    #define FONT_PREF_LANG(enum_id_, str_, atom_id_) str_
+    #include "gfxFontPrefLangList.h"
+    #undef FONT_PREF_LANG
 };
 
 static nsIAtom* PrefLangToLangGroups(uint32_t aIndex)
 {
-    // This needs to match the list of pref font.default.xx entries listed in
-    // all.js! The order *must* match the order in eFontPrefLang.
-    //
-    // Having this array within a static function rather than at the top-level
-    // avoids a static constructor.
+    // static array here avoids static constructor
     static nsIAtom* gPrefLangToLangGroups[] = {
-        nsGkAtoms::x_western,
-        nsGkAtoms::Japanese,
-        nsGkAtoms::Taiwanese,
-        nsGkAtoms::Chinese,
-        nsGkAtoms::HongKongChinese,
-        nsGkAtoms::ko,
-        nsGkAtoms::x_cyrillic,
-        nsGkAtoms::el,
-        nsGkAtoms::th,
-        nsGkAtoms::he,
-        nsGkAtoms::ar,
-        nsGkAtoms::x_devanagari,
-        nsGkAtoms::x_tamil,
-        nsGkAtoms::x_armn,
-        nsGkAtoms::x_beng,
-        nsGkAtoms::x_cans,
-        nsGkAtoms::x_ethi,
-        nsGkAtoms::x_geor,
-        nsGkAtoms::x_gujr,
-        nsGkAtoms::x_guru,
-        nsGkAtoms::x_khmr,
-        nsGkAtoms::x_mlym,
-        nsGkAtoms::x_orya,
-        nsGkAtoms::x_telu,
-        nsGkAtoms::x_knda,
-        nsGkAtoms::x_sinh,
-        nsGkAtoms::x_tibt,
-        nsGkAtoms::Unicode
+        #define FONT_PREF_LANG(enum_id_, str_, atom_id_) nsGkAtoms::atom_id_
+        #include "gfxFontPrefLangList.h"
+        #undef FONT_PREF_LANG
     };
+
     return aIndex < ArrayLength(gPrefLangToLangGroups)
          ? gPrefLangToLangGroups[aIndex]
          : nsGkAtoms::Unicode;
@@ -433,6 +383,7 @@ gfxPlatform::gfxPlatform()
   , mTileHeight(-1)
   , mAzureCanvasBackendCollector(this, &gfxPlatform::GetAzureBackendInfo)
   , mApzSupportCollector(this, &gfxPlatform::GetApzSupportInfo)
+  , mCompositorBackend(layers::LayersBackend::LAYERS_NONE)
 {
     mAllowDownloadableFonts = UNINITIALIZED_VALUE;
     mFallbackUsesCmaps = UNINITIALIZED_VALUE;
@@ -462,6 +413,12 @@ gfxPlatform::GetPlatform()
         Init();
     }
     return gPlatform;
+}
+
+bool
+gfxPlatform::Initialized()
+{
+  return !!gPlatform;
 }
 
 void RecordingPrefChanged(const char *aPrefName, void *aClosure)
@@ -524,7 +481,7 @@ gfxPlatform::Init()
      * incase that code crashes. See bug #591561. */
     nsCOMPtr<nsIGfxInfo> gfxInfo;
     /* this currently will only succeed on Windows */
-    gfxInfo = do_GetService("@mozilla.org/gfx/info;1");
+    gfxInfo = services::GetGfxInfo();
 
 #if defined(XP_WIN)
     gPlatform = new gfxWindowsPlatform;
@@ -541,11 +498,13 @@ gfxPlatform::Init()
 #endif
 
 #ifdef MOZ_GL_DEBUG
-    mozilla::gl::GLContext::StaticInit();
+    GLContext::StaticInit();
 #endif
 
     InitLayersAccelerationPrefs();
     InitLayersIPC();
+
+    gPlatform->ComputeTileSize();
 
     nsresult rv;
 
@@ -589,11 +548,11 @@ gfxPlatform::Init()
     gPlatform->mFontPrefsObserver = new FontPrefsObserver();
     Preferences::AddStrongObservers(gPlatform->mFontPrefsObserver, kObservedPrefs);
 
-    mozilla::gl::GLContext::PlatformStartup();
+    GLContext::PlatformStartup();
 
 #ifdef MOZ_WIDGET_ANDROID
     // Texture pool init
-    mozilla::gl::TexturePoolOGL::Init();
+    TexturePoolOGL::Init();
 #endif
 
 #ifdef MOZ_WIDGET_GONK
@@ -673,11 +632,11 @@ gfxPlatform::Shutdown()
 
 #ifdef MOZ_WIDGET_ANDROID
     // Shut down the texture pool
-    mozilla::gl::TexturePoolOGL::Shutdown();
+    TexturePoolOGL::Shutdown();
 #endif
 
     // Shut down the default GL context provider.
-    mozilla::gl::GLContextProvider::Shutdown();
+    GLContextProvider::Shutdown();
 
 #if defined(XP_WIN)
     // The above shutdown calls operate on the available context providers on
@@ -686,11 +645,11 @@ gfxPlatform::Shutdown()
     // We should only support the default GL provider on Windows; then, this
     // could go away. Unfortunately, we currently support WGL (the default) for
     // WebGL on Optimus.
-    mozilla::gl::GLContextProviderEGL::Shutdown();
+    GLContextProviderEGL::Shutdown();
 #endif
 
     // This is a bit iffy - we're assuming that we were the ones that set the
-    // log forwarder in the Factory, so that it's our responsibility to 
+    // log forwarder in the Factory, so that it's our responsibility to
     // delete it.
     delete mozilla::gfx::Factory::GetLogForwarder();
     mozilla::gfx::Factory::SetLogForwarder(nullptr);
@@ -714,17 +673,13 @@ gfxPlatform::InitLayersIPC()
 
     AsyncTransactionTrackersHolder::Initialize();
 
-    if (XRE_GetProcessType() == GeckoProcessType_Default)
+    if (XRE_IsParentProcess())
     {
         mozilla::layers::CompositorParent::StartUp();
-#ifndef MOZ_WIDGET_GONK
-        if (gfxPrefs::AsyncVideoEnabled()) {
-            mozilla::layers::ImageBridgeChild::StartUp();
-        }
-#else
-        mozilla::layers::ImageBridgeChild::StartUp();
+#ifdef MOZ_WIDGET_GONK
         SharedBufferManagerChild::StartUp();
 #endif
+        mozilla::layers::ImageBridgeChild::StartUp();
     }
 }
 
@@ -736,7 +691,7 @@ gfxPlatform::ShutdownLayersIPC()
     }
     sLayersIPCIsUp = false;
 
-    if (XRE_GetProcessType() == GeckoProcessType_Default)
+    if (XRE_IsParentProcess())
     {
         // This must happen after the shutdown of media and widgets, which
         // are triggered by the NS_XPCOM_SHUTDOWN_OBSERVER_ID notification.
@@ -763,7 +718,7 @@ gfxPlatform::~gfxPlatform()
     // cairo_debug_* function unconditionally.
     //
     // because cairo can assert and thus crash on shutdown, don't do this in release builds
-#if defined(DEBUG) || defined(NS_BUILD_REFCNT_LOGGING) || defined(MOZ_VALGRIND)
+#ifdef NS_FREE_PERMANENT_DATA
 #ifdef USE_SKIA
     // must do Skia cleanup before Cairo cleanup, because Skia may be referencing
     // Cairo objects e.g. through SkCairoFTTypeface
@@ -778,7 +733,7 @@ gfxPlatform::~gfxPlatform()
 
 cairo_user_data_key_t kDrawTarget;
 
-TemporaryRef<DrawTarget>
+already_AddRefed<DrawTarget>
 gfxPlatform::CreateDrawTargetForSurface(gfxASurface *aSurface, const IntSize& aSize)
 {
   SurfaceFormat format = aSurface->GetSurfaceFormat();
@@ -794,7 +749,7 @@ gfxPlatform::CreateDrawTargetForSurface(gfxASurface *aSurface, const IntSize& aS
 // This is a temporary function used by ContentClient to build a DrawTarget
 // around the gfxASurface. This should eventually be replaced by plumbing
 // the DrawTarget through directly
-TemporaryRef<DrawTarget>
+already_AddRefed<DrawTarget>
 gfxPlatform::CreateDrawTargetForUpdateSurface(gfxASurface *aSurface, const IntSize& aSize)
 {
 #ifdef XP_MACOSX
@@ -847,7 +802,7 @@ gfxPlatform::ClearSourceSurfaceForSurface(gfxASurface *aSurface)
   aSurface->SetData(&kSourceSurface, nullptr, nullptr);
 }
 
-/* static */ TemporaryRef<SourceSurface>
+/* static */ already_AddRefed<SourceSurface>
 gfxPlatform::GetSourceSurfaceForSurface(DrawTarget *aTarget, gfxASurface *aSurface)
 {
   if (!aSurface->CairoSurface() || aSurface->CairoStatus()) {
@@ -905,21 +860,6 @@ gfxPlatform::GetSourceSurfaceForSurface(DrawTarget *aTarget, gfxASurface *aSurfa
 
   RefPtr<SourceSurface> srcBuffer;
 
-#ifdef XP_WIN
-  if (aSurface->GetType() == gfxSurfaceType::D2D &&
-      format != SurfaceFormat::A8) {
-    NativeSurface surf;
-    surf.mFormat = format;
-    surf.mType = NativeSurfaceType::D3D10_TEXTURE;
-    surf.mSurface = static_cast<gfxD2DSurface*>(aSurface)->GetTexture();
-    surf.mSize = aSurface->GetSize();
-    mozilla::gfx::DrawTarget *dt = static_cast<mozilla::gfx::DrawTarget*>(aSurface->GetData(&kDrawTarget));
-    if (dt) {
-      dt->Flush();
-    }
-    srcBuffer = aTarget->CreateSourceSurfaceFromNativeSurface(surf);
-  }
-#endif
   // Currently no other DrawTarget types implement CreateSourceSurfaceFromNativeSurface
 
   if (!srcBuffer) {
@@ -996,7 +936,7 @@ gfxPlatform::GetSourceSurfaceForSurface(DrawTarget *aTarget, gfxASurface *aSurfa
   return srcBuffer.forget();
 }
 
-TemporaryRef<DataSourceSurface>
+already_AddRefed<DataSourceSurface>
 gfxPlatform::GetWrappedDataSourceSurface(gfxASurface* aSurface)
 {
   nsRefPtr<gfxImageSurface> image = aSurface->GetAsImageSurface();
@@ -1022,7 +962,7 @@ gfxPlatform::GetWrappedDataSourceSurface(gfxASurface* aSurface)
   return result.forget();
 }
 
-TemporaryRef<ScaledFont>
+already_AddRefed<ScaledFont>
 gfxPlatform::GetScaledFontForFont(DrawTarget* aTarget, gfxFont *aFont)
 {
   NativeFont nativeFont;
@@ -1063,8 +1003,8 @@ gfxPlatform::ComputeTileSize()
 {
   // The tile size should be picked in the parent processes
   // and sent to the child processes over IPDL GetTileSize.
-  if (XRE_GetProcessType() != GeckoProcessType_Default) {
-    NS_RUNTIMEABORT("wrong process.");
+  if (!XRE_IsParentProcess()) {
+    return;
   }
 
   int32_t w = gfxPrefs::LayersTileWidth();
@@ -1087,6 +1027,24 @@ gfxPlatform::ComputeTileSize()
     }
 #endif
   }
+
+#ifdef XP_MACOSX
+  // Use double sized tiles for HiDPI screens.
+  nsCOMPtr<nsIScreenManager> screenManager =
+    do_GetService("@mozilla.org/gfx/screenmanager;1");
+  if (screenManager) {
+    nsCOMPtr<nsIScreen> primaryScreen;
+    screenManager->GetPrimaryScreen(getter_AddRefs(primaryScreen));
+    double scaleFactor = 1.0;
+    if (primaryScreen) {
+      primaryScreen->GetContentsScaleFactor(&scaleFactor);
+    }
+    if (scaleFactor > 1.0) {
+      w *= 2;
+      h *= 2;
+    }
+  }
+#endif
 
   SetTileSize(w, h);
 }
@@ -1144,7 +1102,7 @@ gfxPlatform::InitializeSkiaCacheLimits()
   }
 }
 
-mozilla::gl::SkiaGLGlue*
+SkiaGLGlue*
 gfxPlatform::GetSkiaGLGlue()
 {
 #ifdef USE_SKIA_GPU
@@ -1154,14 +1112,14 @@ gfxPlatform::GetSkiaGLGlue()
      * FIXME: This should be stored in TLS or something, since there needs to be one for each thread using it. As it
      * stands, this only works on the main thread.
      */
-    bool requireCompatProfile = true;
-    nsRefPtr<mozilla::gl::GLContext> glContext;
-    glContext = mozilla::gl::GLContextProvider::CreateHeadless(requireCompatProfile);
+    nsRefPtr<GLContext> glContext;
+    glContext = GLContextProvider::CreateHeadless(CreateContextFlags::REQUIRE_COMPAT_PROFILE |
+                                                  CreateContextFlags::ALLOW_OFFLINE_RENDERER);
     if (!glContext) {
       printf_stderr("Failed to create GLContext for SkiaGL!\n");
       return nullptr;
     }
-    mSkiaGlue = new mozilla::gl::SkiaGLGlue(glContext);
+    mSkiaGlue = new SkiaGLGlue(glContext);
     MOZ_ASSERT(mSkiaGlue->GetGrContext(), "No GrContext");
     InitializeSkiaCacheLimits();
   }
@@ -1195,7 +1153,7 @@ gfxPlatform::HasEnoughTotalSystemMemoryForSkiaGL()
   return true;
 }
 
-TemporaryRef<DrawTarget>
+already_AddRefed<DrawTarget>
 gfxPlatform::CreateDrawTargetForBackend(BackendType aBackend, const IntSize& aSize, SurfaceFormat aFormat)
 {
   // There is a bunch of knowledge in the gfxPlatform heirarchy about how to
@@ -1218,7 +1176,7 @@ gfxPlatform::CreateDrawTargetForBackend(BackendType aBackend, const IntSize& aSi
   }
 }
 
-TemporaryRef<DrawTarget>
+already_AddRefed<DrawTarget>
 gfxPlatform::CreateOffscreenCanvasDrawTarget(const IntSize& aSize, SurfaceFormat aFormat)
 {
   NS_ASSERTION(mPreferredCanvasBackend != BackendType::NONE, "No backend.");
@@ -1236,20 +1194,20 @@ gfxPlatform::CreateOffscreenCanvasDrawTarget(const IntSize& aSize, SurfaceFormat
 #endif
 }
 
-TemporaryRef<DrawTarget>
+already_AddRefed<DrawTarget>
 gfxPlatform::CreateOffscreenContentDrawTarget(const IntSize& aSize, SurfaceFormat aFormat)
 {
   NS_ASSERTION(mPreferredCanvasBackend != BackendType::NONE, "No backend.");
   return CreateDrawTargetForBackend(mContentBackend, aSize, aFormat);
 }
 
-TemporaryRef<DrawTarget>
+already_AddRefed<DrawTarget>
 gfxPlatform::CreateDrawTargetForData(unsigned char* aData, const IntSize& aSize, int32_t aStride, SurfaceFormat aFormat)
 {
   NS_ASSERTION(mContentBackend != BackendType::NONE, "No backend.");
 
   BackendType backendType = mContentBackend;
-  
+
   if (!Factory::DoesBackendSupportDataDrawtarget(mContentBackend)) {
     backendType = BackendType::CAIRO;
   }
@@ -1380,58 +1338,6 @@ gfxPlatform::MakePlatformFont(const nsAString& aFontName,
         free((void*)aFontData);
     }
     return nullptr;
-}
-
-static void
-AppendGenericFontFromPref(nsString& aFonts, nsIAtom *aLangGroup, const char *aGenericName)
-{
-    NS_ENSURE_TRUE_VOID(Preferences::GetRootBranch());
-
-    nsAutoCString prefName, langGroupString;
-
-    aLangGroup->ToUTF8String(langGroupString);
-
-    nsAutoCString genericDotLang;
-    if (aGenericName) {
-        genericDotLang.Assign(aGenericName);
-    } else {
-        prefName.AssignLiteral("font.default.");
-        prefName.Append(langGroupString);
-        genericDotLang = Preferences::GetCString(prefName.get());
-    }
-
-    genericDotLang.Append('.');
-    genericDotLang.Append(langGroupString);
-
-    // fetch font.name.xxx value
-    prefName.AssignLiteral("font.name.");
-    prefName.Append(genericDotLang);
-    nsAdoptingString nameValue = Preferences::GetString(prefName.get());
-    if (nameValue) {
-        if (!aFonts.IsEmpty())
-            aFonts.AppendLiteral(", ");
-        aFonts += nameValue;
-    }
-
-    // fetch font.name-list.xxx value
-    prefName.AssignLiteral("font.name-list.");
-    prefName.Append(genericDotLang);
-    nsAdoptingString nameListValue = Preferences::GetString(prefName.get());
-    if (nameListValue && !nameListValue.Equals(nameValue)) {
-        if (!aFonts.IsEmpty())
-            aFonts.AppendLiteral(", ");
-        aFonts += nameListValue;
-    }
-}
-
-void
-gfxPlatform::GetPrefFonts(nsIAtom *aLanguage, nsString& aFonts, bool aAppendUnicode)
-{
-    aFonts.Truncate();
-
-    AppendGenericFontFromPref(aFonts, aLanguage, nullptr);
-    if (aAppendUnicode)
-        AppendGenericFontFromPref(aFonts, nsGkAtoms::Unicode, nullptr);
 }
 
 bool gfxPlatform::ForEachPrefFont(eFontPrefLang aLangArray[], uint32_t aLangArrayLen, PrefFontCallback aCallback,
@@ -2260,7 +2166,7 @@ InitLayersAccelerationPrefs()
     gfxPrefs::GetSingleton();
     sPrefBrowserTabsRemoteAutostart = BrowserTabsRemoteAutostart();
 
-    nsCOMPtr<nsIGfxInfo> gfxInfo = do_GetService("@mozilla.org/gfx/info;1");
+    nsCOMPtr<nsIGfxInfo> gfxInfo = services::GetGfxInfo();
     int32_t status;
 #ifdef XP_WIN
     if (gfxPrefs::LayersAccelerationForceEnabled()) {
@@ -2342,6 +2248,37 @@ gfxPlatform::CanUseDirect3D11ANGLE()
   return gANGLESupportsD3D11;
 }
 
+bool
+gfxPlatform::ShouldUseLayersAcceleration()
+{
+  const char *acceleratedEnv = PR_GetEnv("MOZ_ACCELERATED");
+  if (gfxPrefs::LayersAccelerationDisabled() ||
+      InSafeMode() ||
+      (acceleratedEnv && *acceleratedEnv == '0'))
+  {
+    return false;
+  }
+  if (gfxPrefs::LayersAccelerationForceEnabled()) {
+    return true;
+  }
+  if (AccelerateLayersByDefault()) {
+    return true;
+  }
+  if (acceleratedEnv && *acceleratedEnv != '0') {
+    return true;
+  }
+  return false;
+}
+
+bool
+gfxPlatform::AccelerateLayersByDefault()
+{
+#if defined(MOZ_GL_PROVIDER) || defined(MOZ_WIDGET_UIKIT)
+  return true;
+#else
+  return false;
+#endif
+}
 
 bool
 gfxPlatform::BufferRotationEnabled()
@@ -2359,7 +2296,7 @@ gfxPlatform::DisableBufferRotation()
   sBufferRotationCheckPref = false;
 }
 
-TemporaryRef<ScaledFont>
+already_AddRefed<ScaledFont>
 gfxPlatform::GetScaledFontForFontWithCairoSkia(DrawTarget* aTarget, gfxFont* aFont)
 {
     NativeFont nativeFont;
@@ -2467,7 +2404,7 @@ gfxPlatform::GetApzSupportInfo(mozilla::widget::InfoObject& aObj)
 /*static*/ bool
 gfxPlatform::AsyncPanZoomEnabled()
 {
-#if !defined(MOZ_B2G) && !defined(MOZ_WIDGET_ANDROID)
+#if !defined(MOZ_B2G) && !defined(MOZ_WIDGET_ANDROID) && !defined(MOZ_WIDGET_UIKIT)
   // For XUL applications (everything but B2G on mobile and desktop, and
   // Firefox on Android) we only want to use APZ when E10S is enabled. If
   // we ever get input events off the main thread we can consider relaxing
@@ -2477,4 +2414,103 @@ gfxPlatform::AsyncPanZoomEnabled()
   }
 #endif
   return gfxPrefs::AsyncPanZoomEnabledDoNotUseDirectly();
+}
+
+/*virtual*/ bool
+gfxPlatform::UseProgressivePaint()
+{
+  return gfxPrefs::ProgressivePaintDoNotUseDirectly();
+}
+
+/*static*/ bool
+gfxPlatform::PerfWarnings()
+{
+  return gfxPrefs::PerfWarnings();
+}
+
+void
+gfxPlatform::GetAcceleratedCompositorBackends(nsTArray<LayersBackend>& aBackends)
+{
+  // Being whitelisted is not enough to accelerate, but not being whitelisted is
+  // enough not to:
+  bool whitelisted = false;
+
+  nsCOMPtr<nsIGfxInfo> gfxInfo = do_GetService("@mozilla.org/gfx/info;1");
+  if (gfxInfo) {
+    // bug 655578: on X11 at least, we must always call GetData (even if we don't need that information)
+    // as that's what causes GfxInfo initialization which kills the zombie 'glxtest' process.
+    // initially we relied on the fact that GetFeatureStatus calls GetData for us, but bug 681026 showed
+    // that assumption to be unsafe.
+    gfxInfo->GetData();
+
+    int32_t status;
+    if (NS_SUCCEEDED(gfxInfo->GetFeatureStatus(nsIGfxInfo::FEATURE_OPENGL_LAYERS, &status))) {
+      if (status == nsIGfxInfo::FEATURE_STATUS_OK) {
+        aBackends.AppendElement(LayersBackend::LAYERS_OPENGL);
+        whitelisted = true;
+      }
+    }
+  }
+
+  if (!whitelisted) {
+    static int tell_me_once = 0;
+    if (!tell_me_once) {
+      NS_WARNING("OpenGL-accelerated layers are not supported on this system");
+      tell_me_once = 1;
+    }
+#ifdef MOZ_WIDGET_ANDROID
+    NS_RUNTIMEABORT("OpenGL-accelerated layers are a hard requirement on this platform. "
+                    "Cannot continue without support for them");
+#endif
+  }
+}
+
+void
+gfxPlatform::GetCompositorBackends(bool useAcceleration, nsTArray<mozilla::layers::LayersBackend>& aBackends)
+{
+  if (useAcceleration) {
+    GetAcceleratedCompositorBackends(aBackends);
+  }
+  if (SupportsBasicCompositor()) {
+    aBackends.AppendElement(LayersBackend::LAYERS_BASIC);
+  }
+}
+
+void
+gfxPlatform::NotifyCompositorCreated(LayersBackend aBackend)
+{
+  if (mCompositorBackend == aBackend) {
+    return;
+  }
+
+  NS_ASSERTION(mCompositorBackend == LayersBackend::LAYERS_NONE, "Compositor backend changed.");
+
+  // Set the backend before we notify so it's available immediately.
+  mCompositorBackend = aBackend;
+
+  // Notify that we created a compositor, so telemetry can update.
+  if (nsCOMPtr<nsIObserverService> obsvc = services::GetObserverService()) {
+    obsvc->NotifyObservers(nullptr, "compositor:created", nullptr);
+  }
+}
+
+void
+gfxPlatform::GetDeviceInitData(mozilla::gfx::DeviceInitData* aOut)
+{
+  MOZ_ASSERT(XRE_IsParentProcess());
+  aOut->useAcceleration() = ShouldUseLayersAcceleration();
+}
+
+void
+gfxPlatform::UpdateDeviceInitData()
+{
+  if (XRE_IsParentProcess()) {
+    // The parent process figures out device initialization on its own.
+    return;
+  }
+
+  mozilla::gfx::DeviceInitData data;
+  mozilla::dom::ContentChild::GetSingleton()->SendGetGraphicsDeviceInitData(&data);
+
+  SetDeviceInitData(data);
 }

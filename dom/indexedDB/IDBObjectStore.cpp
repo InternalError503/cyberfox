@@ -439,7 +439,8 @@ ResolveMysteryFile(BlobImpl* aImpl,
   BlobChild* actor = ActorFromRemoteBlobImpl(aImpl);
   if (actor) {
     return actor->SetMysteryBlobInfo(aName, aContentType,
-                                     aSize, aLastModifiedDate);
+                                     aSize, aLastModifiedDate,
+                                     BlobDirState::eUnknownIfDir);
   }
   return true;
 }
@@ -851,7 +852,7 @@ ClearStructuredCloneBuffer(JSAutoStructuredCloneBuffer& aBuffer)
   }
 }
 
-} // anonymous namespace
+} // namespace
 
 const JSClass IDBObjectStore::sDummyPropJSClass = {
   "IDBObjectStore Dummy",

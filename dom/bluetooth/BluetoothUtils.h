@@ -4,8 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef mozilla_dom_bluetooth_bluetoothutils_h
-#define mozilla_dom_bluetooth_bluetoothutils_h
+#ifndef mozilla_dom_bluetooth_BluetoothUtils_h
+#define mozilla_dom_bluetooth_BluetoothUtils_h
 
 #include "BluetoothCommon.h"
 #include "js/TypeDecls.h"
@@ -157,14 +157,6 @@ DispatchStatusChangedEvent(const nsAString& aType,
                            const nsAString& aDeviceAddress,
                            bool aStatus);
 
-/**
- * Check whether the caller runs at B2G process.
- *
- * @return true if the caller runs at B2G process, false otherwise.
- */
-bool
-IsMainProcess();
-
 END_BLUETOOTH_NAMESPACE
 
-#endif
+#endif // mozilla_dom_bluetooth_BluetoothUtils_h

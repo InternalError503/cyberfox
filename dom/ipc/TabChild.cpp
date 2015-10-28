@@ -8,6 +8,7 @@
 
 #include "TabChild.h"
 
+#include "gfxPrefs.h"
 #ifdef ACCESSIBILITY
 #include "mozilla/a11y/DocAccessibleChild.h"
 #endif
@@ -20,16 +21,20 @@
 #include "mozilla/dom/workers/ServiceWorkerManager.h"
 #include "mozilla/dom/indexedDB/PIndexedDBPermissionRequestChild.h"
 #include "mozilla/plugins/PluginWidgetChild.h"
+#include "mozilla/IMEStateManager.h"
 #include "mozilla/ipc/DocumentRendererChild.h"
 #include "mozilla/ipc/FileDescriptorUtils.h"
 #include "mozilla/layers/APZCCallbackHelper.h"
 #include "mozilla/layers/APZCTreeManager.h"
 #include "mozilla/layers/APZEventState.h"
 #include "mozilla/layers/CompositorChild.h"
+#include "mozilla/layers/DoubleTapToZoom.h"
 #include "mozilla/layers/ImageBridgeChild.h"
 #include "mozilla/layers/ShadowLayers.h"
 #include "mozilla/layout/RenderFrameChild.h"
+#include "mozilla/LookAndFeel.h"
 #include "mozilla/MouseEvents.h"
+#include "mozilla/PWebBrowserPersistDocumentChild.h"
 #include "mozilla/Services.h"
 #include "mozilla/StaticPtr.h"
 #include "mozilla/TextEvents.h"
@@ -93,6 +98,7 @@
 #include "nsIScriptError.h"
 #include "mozilla/EventForwards.h"
 #include "nsDeviceContext.h"
+#include "mozilla/WebBrowserPersistDocumentChild.h"
 
 #define BROWSER_ELEMENT_CHILD_SCRIPT \
     NS_LITERAL_STRING("chrome://global/content/BrowserElementChild.js")
@@ -115,7 +121,6 @@ NS_IMPL_ISUPPORTS(ContentListener, nsIDOMEventListener)
 
 static const CSSSize kDefaultViewportSize(980, 480);
 
-static const char BROWSER_ZOOM_TO_RECT[] = "browser-zoom-to-rect";
 static const char BEFORE_FIRST_PAINT[] = "before-first-paint";
 
 typedef nsDataHashtable<nsUint64HashKey, TabChild*> TabChildMap;
@@ -164,8 +169,7 @@ NS_IMPL_ISUPPORTS(TabChild::DelayedFireContextMenuEvent,
                   nsITimerCallback)
 
 TabChildBase::TabChildBase()
-  : mContentDocumentIsDisplayed(false)
-  , mTabChildGlobal(nullptr)
+  : mTabChildGlobal(nullptr)
 {
   mozilla::HoldJSObjects(this);
 }
@@ -205,280 +209,6 @@ NS_INTERFACE_MAP_END
 NS_IMPL_CYCLE_COLLECTING_ADDREF(TabChildBase)
 NS_IMPL_CYCLE_COLLECTING_RELEASE(TabChildBase)
 
-// For the root frame, Screen and ParentLayer pixels are interchangeable.
-// nsViewportInfo stores zoom values as CSSToScreenScale (because it's a
-// data structure specific to the root frame), while FrameMetrics and
-// ZoomConstraints store zoom values as CSSToParentLayerScale (because they
-// are not specific to the root frame). We define convenience functions for
-// converting between the two. As the name suggests, they should only be used
-// when dealing with the root frame!
-CSSToScreenScale ConvertScaleForRoot(CSSToParentLayerScale aScale)
-{
-  return ViewTargetAs<ScreenPixel>(aScale, PixelCastJustification::ScreenIsParentLayerForRoot);
-}
-CSSToParentLayerScale ConvertScaleForRoot(CSSToScreenScale aScale)
-{
-  return ViewTargetAs<ParentLayerPixel>(aScale, PixelCastJustification::ScreenIsParentLayerForRoot);
-}
-
-// Calculate the scale needed to fit the given viewport into the given display.
-CSSToScreenScale CalculateIntrinsicScale(const ScreenIntSize& aDisplaySize, const CSSSize& aViewportSize)
-{
-  return MaxScaleRatio(ScreenSize(aDisplaySize), aViewportSize);
-}
-
-void
-TabChildBase::InitializeRootMetrics()
-{
-  // Calculate a really simple resolution that we probably won't
-  // be keeping, as well as putting the scroll offset back to
-  // the top-left of the page.
-  mLastRootMetrics.SetViewport(CSSRect(CSSPoint(), kDefaultViewportSize));
-  mLastRootMetrics.SetCompositionBounds(ParentLayerRect(
-      ParentLayerPoint(),
-      ParentLayerSize(
-        ViewAs<ParentLayerPixel>(GetInnerSize(),
-                                 PixelCastJustification::ScreenIsParentLayerForRoot))));
-  mLastRootMetrics.SetZoom(CSSToParentLayerScale2D(
-      ConvertScaleForRoot(CalculateIntrinsicScale(GetInnerSize(), kDefaultViewportSize))));
-  mLastRootMetrics.SetDevPixelsPerCSSPixel(WebWidget()->GetDefaultScale());
-  // We use ParentLayerToLayerScale(1) below in order to turn the
-  // async zoom amount into the gecko zoom amount.
-  mLastRootMetrics.SetCumulativeResolution(mLastRootMetrics.GetZoom() / mLastRootMetrics.GetDevPixelsPerCSSPixel() * ParentLayerToLayerScale(1));
-  // This is the root layer, so the cumulative resolution is the same
-  // as the resolution.
-  mLastRootMetrics.SetPresShellResolution(mLastRootMetrics.GetCumulativeResolution().ToScaleFactor().scale);
-
-  nsCOMPtr<nsIPresShell> shell = GetPresShell();
-  if (shell && shell->GetRootScrollFrameAsScrollable()) {
-    // The session history code might restore a scroll position when navigating
-    // back or forward, and we don't want to clobber that.
-    nsPoint pos = shell->GetRootScrollFrameAsScrollable()->GetScrollPosition();
-    mLastRootMetrics.SetScrollOffset(CSSPoint::FromAppUnits(pos));
-  } else {
-    mLastRootMetrics.SetScrollOffset(CSSPoint(0, 0));
-  }
-
-  TABC_LOG("After InitializeRootMetrics, mLastRootMetrics is %s\n",
-    Stringify(mLastRootMetrics).c_str());
-}
-
-void
-TabChildBase::SetCSSViewport(const CSSSize& aSize)
-{
-  mOldViewportSize = aSize;
-  TABC_LOG("Setting CSS viewport to %s\n", Stringify(aSize).c_str());
-
-  if (mContentDocumentIsDisplayed) {
-    if (nsCOMPtr<nsIPresShell> shell = GetPresShell()) {
-      nsLayoutUtils::SetCSSViewport(shell, aSize);
-    }
-  }
-}
-
-CSSSize
-TabChildBase::GetPageSize(nsCOMPtr<nsIDocument> aDocument, const CSSSize& aViewport)
-{
-  nsCOMPtr<Element> htmlDOMElement = aDocument->GetHtmlElement();
-  HTMLBodyElement* bodyDOMElement = aDocument->GetBodyElement();
-
-  if (!htmlDOMElement && !bodyDOMElement) {
-    // For non-HTML content (e.g. SVG), just assume page size == viewport size.
-    return aViewport;
-  }
-
-  int32_t htmlWidth = 0, htmlHeight = 0;
-  if (htmlDOMElement) {
-    htmlWidth = htmlDOMElement->ScrollWidth();
-    htmlHeight = htmlDOMElement->ScrollHeight();
-  }
-  int32_t bodyWidth = 0, bodyHeight = 0;
-  if (bodyDOMElement) {
-    bodyWidth = bodyDOMElement->ScrollWidth();
-    bodyHeight = bodyDOMElement->ScrollHeight();
-  }
-  return CSSSize(std::max(htmlWidth, bodyWidth),
-                 std::max(htmlHeight, bodyHeight));
-}
-
-bool
-TabChildBase::HandlePossibleViewportChange(const ScreenIntSize& aOldScreenSize)
-{
-  PuppetWidget* widget = WebWidget();
-  if (!widget || !widget->AsyncPanZoomEnabled()) {
-    return false;
-  }
-
-  TABC_LOG("HandlePossibleViewportChange aOldScreenSize=%s mInnerSize=%s\n",
-    Stringify(aOldScreenSize).c_str(), Stringify(GetInnerSize()).c_str());
-
-  nsCOMPtr<nsIDocument> document(GetDocument());
-  if (!document) {
-    return false;
-  }
-
-  nsViewportInfo viewportInfo = nsContentUtils::GetViewportInfo(document, GetInnerSize());
-  uint32_t presShellId = 0;
-  mozilla::layers::FrameMetrics::ViewID viewId = FrameMetrics::NULL_SCROLL_ID;
-  APZCCallbackHelper::GetOrCreateScrollIdentifiers(
-        document->GetDocumentElement(), &presShellId, &viewId);
-
-  float screenW = GetInnerSize().width;
-  float screenH = GetInnerSize().height;
-  CSSSize viewport(viewportInfo.GetSize());
-
-  // We're not being displayed in any way; don't bother doing anything because
-  // that will just confuse future adjustments.
-  if (!screenW || !screenH) {
-    return false;
-  }
-
-  TABC_LOG("HandlePossibleViewportChange mOldViewportSize=%s viewport=%s\n",
-    Stringify(mOldViewportSize).c_str(), Stringify(viewport).c_str());
-  CSSSize oldBrowserSize = mOldViewportSize;
-  mLastRootMetrics.SetViewport(CSSRect(
-    mLastRootMetrics.GetViewport().TopLeft(), viewport));
-  if (oldBrowserSize == CSSSize()) {
-    oldBrowserSize = kDefaultViewportSize;
-  }
-  SetCSSViewport(viewport);
-
-  // If this page has not been painted yet, then this must be getting run
-  // because a meta-viewport element was added (via the DOMMetaAdded handler).
-  // in this case, we should not do anything that forces a reflow (see bug
-  // 759678) such as requesting the page size or sending a viewport update. this
-  // code will get run again in the before-first-paint handler and that point we
-  // will run though all of it. the reason we even bother executing up to this
-  // point on the DOMMetaAdded handler is so that scripts that use
-  // window.innerWidth before they are painted have a correct value (bug
-  // 771575).
-  if (!mContentDocumentIsDisplayed) {
-    return false;
-  }
-
-  ScreenIntSize oldScreenSize = aOldScreenSize;
-  if (oldScreenSize == ScreenIntSize()) {
-    oldScreenSize = GetInnerSize();
-  }
-
-  FrameMetrics metrics(mLastRootMetrics);
-  metrics.SetViewport(CSSRect(CSSPoint(), viewport));
-
-  // Calculate the composition bounds based on the inner size, excluding the sizes
-  // of the scrollbars if they are not overlay scrollbars.
-  ScreenSize compositionSize(GetInnerSize());
-  nsCOMPtr<nsIPresShell> shell = GetPresShell();
-  if (shell) {
-    nsMargin scrollbarsAppUnits =
-        nsLayoutUtils::ScrollbarAreaToExcludeFromCompositionBoundsFor(shell->GetRootScrollFrame());
-    // Scrollbars are not subject to scaling, so CSS pixels = screen pixels for them.
-    ScreenMargin scrollbars = CSSMargin::FromAppUnits(scrollbarsAppUnits)
-                            * CSSToScreenScale(1.0f);
-    compositionSize.width -= scrollbars.LeftRight();
-    compositionSize.height -= scrollbars.TopBottom();
-  }
-
-  metrics.SetCompositionBounds(ParentLayerRect(
-      ParentLayerPoint(),
-      ParentLayerSize(
-        ViewAs<ParentLayerPixel>(GetInnerSize(),
-                                 PixelCastJustification::ScreenIsParentLayerForRoot))));
-  metrics.SetRootCompositionSize(
-      ScreenSize(compositionSize) * ScreenToLayoutDeviceScale(1.0f) / metrics.GetDevPixelsPerCSSPixel());
-
-  // This change to the zoom accounts for all types of changes I can conceive:
-  // 1. screen size changes, CSS viewport does not (pages with no meta viewport
-  //    or a fixed size viewport)
-  // 2. screen size changes, CSS viewport also does (pages with a device-width
-  //    viewport)
-  // 3. screen size remains constant, but CSS viewport changes (meta viewport
-  //    tag is added or removed)
-  // 4. neither screen size nor CSS viewport changes
-  //
-  // In all of these cases, we maintain how much actual content is visible
-  // within the screen width. Note that "actual content" may be different with
-  // respect to CSS pixels because of the CSS viewport size changing.
-  CSSToScreenScale oldIntrinsicScale = CalculateIntrinsicScale(oldScreenSize, oldBrowserSize);
-  CSSToScreenScale newIntrinsicScale = CalculateIntrinsicScale(GetInnerSize(), viewport);
-  metrics.ZoomBy(newIntrinsicScale.scale / oldIntrinsicScale.scale);
-
-  // Changing the zoom when we're not doing a first paint will get ignored
-  // by AsyncPanZoomController and causes a blurry flash.
-  bool isFirstPaint = true;
-  if (shell) {
-    isFirstPaint = shell->GetIsFirstPaint();
-  }
-  if (isFirstPaint) {
-    // FIXME/bug 799585(?): GetViewportInfo() returns a defaultZoom of
-    // 0.0 to mean "did not calculate a zoom".  In that case, we default
-    // it to the intrinsic scale.
-    if (viewportInfo.GetDefaultZoom().scale < 0.01f) {
-      viewportInfo.SetDefaultZoom(newIntrinsicScale);
-    }
-
-    CSSToScreenScale defaultZoom = viewportInfo.GetDefaultZoom();
-    MOZ_ASSERT(viewportInfo.GetMinZoom() <= defaultZoom &&
-               defaultZoom <= viewportInfo.GetMaxZoom());
-    metrics.SetZoom(CSSToParentLayerScale2D(ConvertScaleForRoot(defaultZoom)));
-
-    metrics.SetPresShellId(presShellId);
-    metrics.SetScrollId(viewId);
-  }
-
-  if (shell) {
-    if (nsPresContext* context = shell->GetPresContext()) {
-      metrics.SetDevPixelsPerCSSPixel(CSSToLayoutDeviceScale(
-        (float)nsPresContext::AppUnitsPerCSSPixel() / context->AppUnitsPerDevPixel()));
-    }
-  }
-
-  metrics.SetCumulativeResolution(metrics.GetZoom()
-                                / metrics.GetDevPixelsPerCSSPixel()
-                                * ParentLayerToLayerScale(1));
-  // This is the root layer, so the cumulative resolution is the same
-  // as the resolution.
-  metrics.SetPresShellResolution(metrics.GetCumulativeResolution().ToScaleFactor().scale);
-  if (shell) {
-    nsLayoutUtils::SetResolutionAndScaleTo(shell, metrics.GetPresShellResolution());
-    nsLayoutUtils::SetScrollPositionClampingScrollPortSize(shell,
-        metrics.CalculateCompositedSizeInCssPixels());
-  }
-
-  // The call to GetPageSize forces a resize event to content, so we need to
-  // make sure that we have the right CSS viewport and
-  // scrollPositionClampingScrollPortSize set up before that happens.
-
-  CSSSize pageSize = GetPageSize(document, viewport);
-  if (!pageSize.width) {
-    // Return early rather than divide by 0.
-    return false;
-  }
-  metrics.SetScrollableRect(CSSRect(CSSPoint(), pageSize));
-
-  // Calculate a display port _after_ having a scrollable rect because the
-  // display port is clamped to the scrollable rect.
-  metrics.SetDisplayPortMargins(APZCTreeManager::CalculatePendingDisplayPort(
-    // The page must have been refreshed in some way such as a new document or
-    // new CSS viewport, so we know that there's no velocity, acceleration, and
-    // we have no idea how long painting will take.
-    metrics, ParentLayerPoint(0.0f, 0.0f), 0.0));
-  metrics.SetUseDisplayPortMargins();
-
-  // Force a repaint with these metrics. This, among other things, sets the
-  // displayport, so we start with async painting.
-  mLastRootMetrics = ProcessUpdateFrame(metrics);
-
-  return true;
-}
-
-already_AddRefed<nsIDOMWindowUtils>
-TabChildBase::GetDOMWindowUtils()
-{
-  nsCOMPtr<nsPIDOMWindow> window = do_GetInterface(WebNavigation());
-  nsCOMPtr<nsIDOMWindowUtils> utils = do_GetInterface(window);
-  return utils.forget();
-}
-
 already_AddRefed<nsIDocument>
 TabChildBase::GetDocument() const
 {
@@ -503,7 +233,7 @@ TabChildBase::DispatchMessageManagerMessage(const nsAString& aMessageName,
                                             const nsAString& aJSONData)
 {
     AutoSafeJSContext cx;
-    JS::Rooted<JS::Value> json(cx, JSVAL_NULL);
+    JS::Rooted<JS::Value> json(cx, JS::NullValue());
     StructuredCloneData cloneData;
     JSAutoStructuredCloneBuffer buffer;
     if (JS_ParseJSON(cx,
@@ -534,7 +264,7 @@ TabChildBase::UpdateFrameHandler(const FrameMetrics& aFrameMetrics)
       // Guard against stale updates (updates meant for a pres shell which
       // has since been torn down and destroyed).
       if (aFrameMetrics.GetPresShellId() == shell->GetPresShellId()) {
-        mLastRootMetrics = ProcessUpdateFrame(aFrameMetrics);
+        ProcessUpdateFrame(aFrameMetrics);
         return true;
       }
     }
@@ -548,49 +278,15 @@ TabChildBase::UpdateFrameHandler(const FrameMetrics& aFrameMetrics)
   return true;
 }
 
-FrameMetrics
+void
 TabChildBase::ProcessUpdateFrame(const FrameMetrics& aFrameMetrics)
 {
     if (!mGlobal || !mTabChildGlobal) {
-        return aFrameMetrics;
+        return;
     }
 
     FrameMetrics newMetrics = aFrameMetrics;
     APZCCallbackHelper::UpdateRootFrame(newMetrics);
-
-    CSSSize cssCompositedSize = newMetrics.CalculateCompositedSizeInCssPixels();
-    // The BrowserElementScrolling helper must know about these updated metrics
-    // for other functions it performs, such as double tap handling.
-    // Note, %f must not be used because it is locale specific!
-    nsString data;
-    data.AppendPrintf("{ \"x\" : %d", NS_lround(newMetrics.GetScrollOffset().x));
-    data.AppendPrintf(", \"y\" : %d", NS_lround(newMetrics.GetScrollOffset().y));
-    data.AppendLiteral(", \"viewport\" : ");
-        data.AppendLiteral("{ \"width\" : ");
-        data.AppendFloat(newMetrics.GetViewport().width);
-        data.AppendLiteral(", \"height\" : ");
-        data.AppendFloat(newMetrics.GetViewport().height);
-        data.AppendLiteral(" }");
-    data.AppendLiteral(", \"cssPageRect\" : ");
-        data.AppendLiteral("{ \"x\" : ");
-        data.AppendFloat(newMetrics.GetScrollableRect().x);
-        data.AppendLiteral(", \"y\" : ");
-        data.AppendFloat(newMetrics.GetScrollableRect().y);
-        data.AppendLiteral(", \"width\" : ");
-        data.AppendFloat(newMetrics.GetScrollableRect().width);
-        data.AppendLiteral(", \"height\" : ");
-        data.AppendFloat(newMetrics.GetScrollableRect().height);
-        data.AppendLiteral(" }");
-    data.AppendLiteral(", \"cssCompositedRect\" : ");
-        data.AppendLiteral("{ \"width\" : ");
-        data.AppendFloat(cssCompositedSize.width);
-        data.AppendLiteral(", \"height\" : ");
-        data.AppendFloat(cssCompositedSize.height);
-        data.AppendLiteral(" }");
-    data.AppendLiteral(" }");
-
-    DispatchMessageManagerMessage(NS_LITERAL_STRING("Viewport:Change"), data);
-    return newMetrics;
 }
 
 NS_IMETHODIMP
@@ -741,7 +437,7 @@ NestedTabChildMap()
   static std::map<TabId, nsRefPtr<TabChild>> sNestedTabChildMap;
   return sNestedTabChildMap;
 }
-} // anonymous namespace
+} // namespace
 
 already_AddRefed<TabChild>
 TabChild::FindTabChild(const TabId& aTabId)
@@ -889,22 +585,26 @@ TabChild::TabChild(nsIContentChild* aManager,
     MOZ_ASSERT(NestedTabChildMap().find(mUniqueId) == NestedTabChildMap().end());
     NestedTabChildMap()[mUniqueId] = this;
   }
-}
 
-NS_IMETHODIMP
-TabChild::HandleEvent(nsIDOMEvent* aEvent)
-{
-  nsAutoString eventType;
-  aEvent->GetType(eventType);
-  if (eventType.EqualsLiteral("DOMMetaAdded")) {
-    // This meta data may or may not have been a meta viewport tag. If it was,
-    // we should handle it immediately.
-    HandlePossibleViewportChange(GetInnerSize());
-  } else if (eventType.EqualsLiteral("FullZoomChange")) {
-    HandlePossibleViewportChange(GetInnerSize());
+  nsCOMPtr<nsIObserverService> observerService =
+    mozilla::services::GetObserverService();
+
+  if (observerService) {
+    const nsAttrValue::EnumTable* table =
+      AudioChannelService::GetAudioChannelTable();
+
+    nsAutoCString topic;
+    for (uint32_t i = 0; table[i].tag; ++i) {
+      topic.Assign("audiochannel-activity-");
+      topic.Append(table[i].tag);
+
+      observerService->AddObserver(this, topic.get(), false);
+    }
   }
 
-  return NS_OK;
+  for (uint32_t idx = 0; idx < NUMBER_OF_AUDIO_CHANNELS; idx++) {
+    mAudioChannelsActive.AppendElement(false);
+  }
 }
 
 NS_IMETHODIMP
@@ -912,23 +612,7 @@ TabChild::Observe(nsISupports *aSubject,
                   const char *aTopic,
                   const char16_t *aData)
 {
-  if (!strcmp(aTopic, BROWSER_ZOOM_TO_RECT)) {
-    nsCOMPtr<nsIDocShell> docShell(do_QueryInterface(aSubject));
-    nsCOMPtr<nsITabChild> tabChild(TabChild::GetFrom(docShell));
-    if (tabChild == this) {
-      nsCOMPtr<nsIDocument> doc(GetDocument());
-      uint32_t presShellId;
-      ViewID viewId;
-      if (APZCCallbackHelper::GetOrCreateScrollIdentifiers(doc->GetDocumentElement(),
-                                                           &presShellId, &viewId)) {
-        CSSRect rect;
-        sscanf(NS_ConvertUTF16toUTF8(aData).get(),
-               "{\"x\":%f,\"y\":%f,\"w\":%f,\"h\":%f}",
-               &rect.x, &rect.y, &rect.width, &rect.height);
-        SendZoomToRect(presShellId, viewId, rect);
-      }
-    }
-  } else if (!strcmp(aTopic, BEFORE_FIRST_PAINT)) {
+  if (!strcmp(aTopic, BEFORE_FIRST_PAINT)) {
     if (AsyncPanZoomEnabled()) {
       nsCOMPtr<nsIDocument> subject(do_QueryInterface(aSubject));
       nsCOMPtr<nsIDocument> doc(GetDocument());
@@ -939,117 +623,61 @@ TabChild::Observe(nsISupports *aSubject,
           shell->SetIsFirstPaint(true);
         }
 
-        mContentDocumentIsDisplayed = true;
-
-        // In some cases before-first-paint gets called before
-        // RecvUpdateDimensions is called and therefore before we have an
-        // inner size value set. In such cases defer initializing the viewport
-        // until we we get an inner size.
-        if (HasValidInnerSize()) {
-          InitializeRootMetrics();
-          if (shell) {
-            nsLayoutUtils::SetResolutionAndScaleTo(shell, mLastRootMetrics.GetPresShellResolution());
-          }
-          HandlePossibleViewportChange(GetInnerSize());
-        }
+        APZCCallbackHelper::InitializeRootDisplayport(shell);
       }
     }
   }
 
-  return NS_OK;
-}
+  const nsAttrValue::EnumTable* table =
+    AudioChannelService::GetAudioChannelTable();
 
-NS_IMETHODIMP
-TabChild::OnStateChange(nsIWebProgress* aWebProgress,
-                        nsIRequest* aRequest,
-                        uint32_t aStateFlags,
-                        nsresult aStatus)
-{
-  NS_NOTREACHED("not implemented in TabChild");
-  return NS_OK;
-}
+  nsAutoCString topic;
+  int16_t audioChannel = -1;
+  for (uint32_t i = 0; table[i].tag; ++i) {
+    topic.Assign("audiochannel-activity-");
+    topic.Append(table[i].tag);
 
-NS_IMETHODIMP
-TabChild::OnProgressChange(nsIWebProgress* aWebProgress,
-                           nsIRequest* aRequest,
-                           int32_t aCurSelfProgress,
-                           int32_t aMaxSelfProgress,
-                           int32_t aCurTotalProgress,
-                           int32_t aMaxTotalProgress)
-{
-  NS_NOTREACHED("not implemented in TabChild");
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-TabChild::OnLocationChange(nsIWebProgress* aWebProgress,
-                           nsIRequest* aRequest,
-                           nsIURI *aLocation,
-                           uint32_t aFlags)
-{
-  if (!AsyncPanZoomEnabled()) {
-    return NS_OK;
-  }
-
-  nsCOMPtr<nsIDOMWindow> window;
-  aWebProgress->GetDOMWindow(getter_AddRefs(window));
-  if (!window) {
-    return NS_OK;
-  }
-
-  nsCOMPtr<nsIDOMDocument> progressDoc;
-  window->GetDocument(getter_AddRefs(progressDoc));
-  if (!progressDoc) {
-    return NS_OK;
-  }
-
-  nsCOMPtr<nsIDOMDocument> domDoc;
-  WebNavigation()->GetDocument(getter_AddRefs(domDoc));
-  if (!domDoc || !SameCOMIdentity(domDoc, progressDoc)) {
-    return NS_OK;
-  }
-
-  nsCOMPtr<nsIURIFixup> urifixup(do_GetService(NS_URIFIXUP_CONTRACTID));
-  if (!urifixup) {
-    return NS_OK;
-  }
-
-  nsCOMPtr<nsIURI> exposableURI;
-  urifixup->CreateExposableURI(aLocation, getter_AddRefs(exposableURI));
-  if (!exposableURI) {
-    return NS_OK;
-  }
-
-  if (!(aFlags & nsIWebProgressListener::LOCATION_CHANGE_SAME_DOCUMENT)) {
-    mContentDocumentIsDisplayed = false;
-  } else if (mLastURI != nullptr) {
-    bool exposableEqualsLast, exposableEqualsNew;
-    exposableURI->Equals(mLastURI.get(), &exposableEqualsLast);
-    exposableURI->Equals(aLocation, &exposableEqualsNew);
-    if (exposableEqualsLast && !exposableEqualsNew) {
-      mContentDocumentIsDisplayed = false;
+    if (topic.Equals(aTopic)) {
+      audioChannel = table[i].value;
+      break;
     }
   }
 
-  return NS_OK;
-}
+  if (audioChannel != -1 && mIPCOpen) {
+    // If the subject is not a wrapper, it is sent by the TabParent and we
+    // should ignore it.
+    nsCOMPtr<nsISupportsPRUint64> wrapper = do_QueryInterface(aSubject);
+    if (!wrapper) {
+      return NS_OK;
+    }
 
-NS_IMETHODIMP
-TabChild::OnStatusChange(nsIWebProgress* aWebProgress,
-                         nsIRequest* aRequest,
-                         nsresult aStatus,
-                         const char16_t* aMessage)
-{
-  NS_NOTREACHED("not implemented in TabChild");
-  return NS_OK;
-}
+    // We must have a window in order to compare the windowID contained into the
+    // wrapper.
+    nsCOMPtr<nsPIDOMWindow> window = do_GetInterface(WebNavigation());
+    if (!window) {
+      return NS_OK;
+    }
 
-NS_IMETHODIMP
-TabChild::OnSecurityChange(nsIWebProgress* aWebProgress,
-                           nsIRequest* aRequest,
-                           uint32_t aState)
-{
-  NS_NOTREACHED("not implemented in TabChild");
+    uint64_t windowID = 0;
+    nsresult rv = wrapper->GetData(&windowID);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
+    // In theory a tabChild should contain just 1 top window, but let's double
+    // check it comparing the windowID.
+    if (window->WindowID() != windowID) {
+      return NS_OK;
+    }
+
+    nsAutoString activeStr(aData);
+    bool active = activeStr.EqualsLiteral("active");
+    if (active != mAudioChannelsActive[audioChannel]) {
+      mAudioChannelsActive[audioChannel] = active;
+      unused << SendAudioChannelActivityNotification(audioChannel, active);
+    }
+  }
+
   return NS_OK;
 }
 
@@ -1085,7 +713,7 @@ TabChild::Init()
 
   nsCOMPtr<nsIDocShellTreeItem> docShellItem(do_QueryInterface(WebNavigation()));
   docShellItem->SetItemType(nsIDocShellTreeItem::typeContentWrapper);
-  
+
   nsCOMPtr<nsIBaseWindow> baseWindow = do_QueryInterface(WebNavigation());
   if (!baseWindow) {
     NS_ERROR("mWebNav doesn't QI to nsIBaseWindow");
@@ -1133,10 +761,6 @@ TabChild::Init()
   loadContext->SetRemoteTabs(
       mChromeFlags & nsIWebBrowserChrome::CHROME_REMOTE_WINDOW);
 
-  nsCOMPtr<nsIWebProgress> webProgress = do_GetInterface(docShell);
-  NS_ENSURE_TRUE(webProgress, NS_ERROR_FAILURE);
-  webProgress->AddProgressListener(this, nsIWebProgress::NOTIFY_LOCATION);
-
   // Few lines before, baseWindow->Create() will end up creating a new
   // window root in nsGlobalWindow::SetDocShell.
   // Then this chrome event handler, will be inherited to inner windows.
@@ -1181,8 +805,6 @@ NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION_INHERITED(TabChild)
   NS_INTERFACE_MAP_ENTRY(nsIWebBrowserChromeFocus)
   NS_INTERFACE_MAP_ENTRY(nsIInterfaceRequestor)
   NS_INTERFACE_MAP_ENTRY(nsIWindowProvider)
-  NS_INTERFACE_MAP_ENTRY(nsIDOMEventListener)
-  NS_INTERFACE_MAP_ENTRY(nsIWebProgressListener)
   NS_INTERFACE_MAP_ENTRY(nsITabChild)
   NS_INTERFACE_MAP_ENTRY(nsIObserver)
   NS_INTERFACE_MAP_ENTRY(nsISupportsWeakReference)
@@ -1368,16 +990,16 @@ TabChild::Blur()
 }
 
 NS_IMETHODIMP
-TabChild::FocusNextElement()
+TabChild::FocusNextElement(bool aForDocumentNavigation)
 {
-  SendMoveFocus(true);
+  SendMoveFocus(true, aForDocumentNavigation);
   return NS_OK;
 }
 
 NS_IMETHODIMP
-TabChild::FocusPrevElement()
+TabChild::FocusPrevElement(bool aForDocumentNavigation)
 {
-  SendMoveFocus(false);
+  SendMoveFocus(false, aForDocumentNavigation);
   return NS_OK;
 }
 
@@ -1529,16 +1151,12 @@ TabChild::ProvideWindowCommon(nsIDOMWindow* aOpener,
     nsAutoCString baseURIString;
     baseURI->GetSpec(baseURIString);
 
-    // We can assume that if content is requesting to open a window from a remote
-    // tab, then we want to enforce that the new window is also a remote tab.
-    features.AppendLiteral(",remote");
-
     nsresult rv;
 
     if (!SendCreateWindow(newChild,
                           aChromeFlags, aCalledFromJS, aPositionSpecified,
                           aSizeSpecified, url,
-                          name, NS_ConvertUTF8toUTF16(features),
+                          name, features,
                           NS_ConvertUTF8toUTF16(baseURIString),
                           &rv,
                           aWindowIsNew,
@@ -1585,12 +1203,6 @@ TabChild::ProvideWindowCommon(nsIDOMWindow* aOpener,
   nsCOMPtr<nsIDOMWindow> win = do_GetInterface(newChild->WebNavigation());
   win.forget(aReturn);
   return NS_OK;
-}
-
-bool
-TabChild::HasValidInnerSize()
-{
-  return mHasValidInnerSize;
 }
 
 void
@@ -2052,40 +1664,25 @@ TabChild::RecvUpdateDimensions(const CSSRect& rect, const CSSSize& size,
     mUnscaledOuterRect = rect;
     mChromeDisp = chromeDisp;
 
-    bool initialSizing = !HasValidInnerSize()
-                      && (size.width != 0 && size.height != 0);
-
     mOrientation = orientation;
-    ScreenIntSize oldScreenSize = GetInnerSize();
     SetUnscaledInnerSize(size);
-    ScreenIntSize screenSize = GetInnerSize();
-    bool sizeChanged = true;
-    if (initialSizing) {
+    if (!mHasValidInnerSize && size.width != 0 && size.height != 0) {
       mHasValidInnerSize = true;
-    } else if (screenSize == oldScreenSize) {
-      sizeChanged = false;
     }
 
+    ScreenIntSize screenSize = GetInnerSize();
     ScreenIntRect screenRect = GetOuterRect();
-    mPuppetWidget->Resize(screenRect.x + chromeDisp.x,
-                          screenRect.y + chromeDisp.y,
-                          screenSize.width, screenSize.height, true);
 
+    // Set the size on the document viewer before we update the widget and
+    // trigger a reflow. Otherwise the MobileViewportManager reads the stale
+    // size from the content viewer when it computes a new CSS viewport.
     nsCOMPtr<nsIBaseWindow> baseWin = do_QueryInterface(WebNavigation());
     baseWin->SetPositionAndSize(0, 0, screenSize.width, screenSize.height,
                                 true);
 
-    if (initialSizing && mContentDocumentIsDisplayed) {
-      // If this is the first time we're getting a valid inner size, and the
-      // before-first-paint event has already been handled, then we need to set
-      // up our default viewport here. See the corresponding call to
-      // InitializeRootMetrics in the before-first-paint handler.
-      InitializeRootMetrics();
-    }
-
-    if (sizeChanged) {
-      HandlePossibleViewportChange(oldScreenSize);
-    }
+    mPuppetWidget->Resize(screenRect.x + chromeDisp.x,
+                          screenRect.y + chromeDisp.y,
+                          screenSize.width, screenSize.height, true);
 
     return true;
 }
@@ -2125,14 +1722,18 @@ TabChild::RecvHandleDoubleTap(const CSSPoint& aPoint, const Modifiers& aModifier
     // Note: there is nothing to do with the modifiers here, as we are not
     // synthesizing any sort of mouse event.
     CSSPoint point = APZCCallbackHelper::ApplyCallbackTransform(aPoint, aGuid);
-    nsString data;
-    data.AppendLiteral("{ \"x\" : ");
-    data.AppendFloat(point.x);
-    data.AppendLiteral(", \"y\" : ");
-    data.AppendFloat(point.y);
-    data.AppendLiteral(" }");
-
-    DispatchMessageManagerMessage(NS_LITERAL_STRING("Gesture:DoubleTap"), data);
+    nsCOMPtr<nsIDocument> document = GetDocument();
+    CSSRect zoomToRect = CalculateRectToZoomTo(document, point);
+    // The double-tap can be dispatched by any scroll frame (so |aGuid| could be
+    // the guid of any scroll frame), but the zoom-to-rect operation must be
+    // performed by the root content scroll frame, so query its identifiers
+    // for the SendZoomToRect() call rather than using the ones from |aGuid|.
+    uint32_t presShellId;
+    ViewID viewId;
+    if (APZCCallbackHelper::GetOrCreateScrollIdentifiers(
+        document->GetDocumentElement(), &presShellId, &viewId)) {
+      SendZoomToRect(presShellId, viewId, zoomToRect);
+    }
 
     return true;
 }
@@ -2203,6 +1804,20 @@ bool TabChild::RecvParentActivated(const bool& aActivated)
 
   nsCOMPtr<nsIDOMWindow> window = do_GetInterface(WebNavigation());
   fm->ParentActivated(window, aActivated);
+  return true;
+}
+
+bool
+TabChild::RecvStopIMEStateManagement()
+{
+  IMEStateManager::StopIMEStateManagement();
+  return true;
+}
+
+bool
+TabChild::RecvMenuKeyboardListenerInstalled(const bool& aInstalled)
+{
+  IMEStateManager::OnInstalledMenuKeyboardListener(aInstalled);
   return true;
 }
 
@@ -2580,6 +2195,7 @@ TabChild::RecvCompositionEvent(const WidgetCompositionEvent& event)
   WidgetCompositionEvent localEvent(event);
   localEvent.widget = mPuppetWidget;
   APZCCallbackHelper::DispatchWidgetEvent(localEvent);
+  unused << SendOnEventNeedingAckHandled(event.message);
   return true;
 }
 
@@ -2589,6 +2205,7 @@ TabChild::RecvSelectionEvent(const WidgetSelectionEvent& event)
   WidgetSelectionEvent localEvent(event);
   localEvent.widget = mPuppetWidget;
   APZCCallbackHelper::DispatchWidgetEvent(localEvent);
+  unused << SendOnEventNeedingAckHandled(event.message);
   return true;
 }
 
@@ -2775,11 +2392,18 @@ TabChild::RecvSwappedWithOtherRemoteLoader()
     return true;
   }
 
+  nsRefPtr<nsDocShell> docShell = static_cast<nsDocShell*>(ourDocShell.get());
+
   nsCOMPtr<EventTarget> ourEventTarget = ourWindow->GetParentTarget();
+
+  docShell->SetInFrameSwap(true);
 
   nsContentUtils::FirePageShowEvent(ourDocShell, ourEventTarget, false);
   nsContentUtils::FirePageHideEvent(ourDocShell, ourEventTarget);
   nsContentUtils::FirePageShowEvent(ourDocShell, ourEventTarget, true);
+
+  docShell->SetInFrameSwap(false);
+
   return true;
 }
 
@@ -2799,8 +2423,18 @@ TabChild::RecvDestroy()
   nsCOMPtr<nsIObserverService> observerService =
     mozilla::services::GetObserverService();
 
-  observerService->RemoveObserver(this, BROWSER_ZOOM_TO_RECT);
   observerService->RemoveObserver(this, BEFORE_FIRST_PAINT);
+
+  const nsAttrValue::EnumTable* table =
+    AudioChannelService::GetAudioChannelTable();
+
+  nsAutoCString topic;
+  for (uint32_t i = 0; table[i].tag; ++i) {
+    topic.Assign("audiochannel-activity-");
+    topic.Append(table[i].tag);
+
+    observerService->RemoveObserver(this, topic.get());
+  }
 
   // XXX what other code in ~TabChild() should we be running here?
   DestroyWindow();
@@ -2845,6 +2479,35 @@ TabChild::RecvSetIsDocShellActive(const bool& aIsActive)
     return true;
 }
 
+bool
+TabChild::RecvNavigateByKey(const bool& aForward, const bool& aForDocumentNavigation)
+{
+  nsIFocusManager* fm = nsFocusManager::GetFocusManager();
+  if (fm) {
+    nsCOMPtr<nsIDOMElement> result;
+    nsCOMPtr<nsPIDOMWindow> window = do_GetInterface(WebNavigation());
+
+    // Move to the first or last document.
+    uint32_t type = aForward ?
+      (aForDocumentNavigation ? static_cast<uint32_t>(nsIFocusManager::MOVEFOCUS_FIRSTDOC) :
+                                static_cast<uint32_t>(nsIFocusManager::MOVEFOCUS_ROOT)) :
+      (aForDocumentNavigation ? static_cast<uint32_t>(nsIFocusManager::MOVEFOCUS_LASTDOC) :
+                                static_cast<uint32_t>(nsIFocusManager::MOVEFOCUS_LAST));
+    fm->MoveFocus(window, nullptr, type,
+                  nsIFocusManager::FLAG_BYKEY, getter_AddRefs(result));
+
+    // No valid root element was found, so move to the first focusable element.
+    if (!result && aForward && !aForDocumentNavigation) {
+      fm->MoveFocus(window, nullptr, nsIFocusManager::MOVEFOCUS_FIRST,
+                  nsIFocusManager::FLAG_BYKEY, getter_AddRefs(result));
+    }
+
+    SendRequestFocus(false);
+  }
+
+  return true;
+}
+
 PRenderFrameChild*
 TabChild::AllocPRenderFrameChild()
 {
@@ -2881,9 +2544,6 @@ TabChild::InitTabChildGlobal(FrameScriptLoading aScriptLoading)
     nsCOMPtr<nsPIWindowRoot> root = do_QueryInterface(chromeHandler);
     NS_ENSURE_TRUE(root, false);
     root->SetParentTarget(scope);
-
-    chromeHandler->AddEventListener(NS_LITERAL_STRING("DOMMetaAdded"), this, false);
-    chromeHandler->AddEventListener(NS_LITERAL_STRING("FullZoomChange"), this, false);
   }
 
   if (aScriptLoading != DONT_LOAD_SCRIPTS && !mTriedBrowserInit) {
@@ -2964,9 +2624,6 @@ TabChild::InitRenderingState(const TextureFactoryIdentifier& aTextureFactoryIden
         mozilla::services::GetObserverService();
 
     if (observerService) {
-        observerService->AddObserver(this,
-                                     BROWSER_ZOOM_TO_RECT,
-                                     false);
         observerService->AddObserver(this,
                                      BEFORE_FIRST_PAINT,
                                      false);
@@ -3400,7 +3057,6 @@ NS_INTERFACE_MAP_END_INHERITING(DOMEventTargetHelper)
 NS_IMPL_ADDREF_INHERITED(TabChildGlobal, DOMEventTargetHelper)
 NS_IMPL_RELEASE_INHERITED(TabChildGlobal, DOMEventTargetHelper)
 
-/* [notxpcom] boolean markForCC (); */
 // This method isn't automatically forwarded safely because it's notxpcom, so
 // the IDL binding doesn't know what value to return.
 NS_IMETHODIMP_(bool)
@@ -3408,6 +3064,10 @@ TabChildGlobal::MarkForCC()
 {
   if (mTabChild) {
     mTabChild->MarkScopesForCC();
+  }
+  EventListenerManager* elm = GetExistingListenerManager();
+  if (elm) {
+    elm->MarkForCC();
   }
   return mMessageManager ? mMessageManager->MarkForCC() : false;
 }
@@ -3457,3 +3117,23 @@ TabChildGlobal::GetGlobalJSObject()
   return ref->GetJSObject();
 }
 
+PWebBrowserPersistDocumentChild*
+TabChild::AllocPWebBrowserPersistDocumentChild()
+{
+  return new WebBrowserPersistDocumentChild();
+}
+
+bool
+TabChild::RecvPWebBrowserPersistDocumentConstructor(PWebBrowserPersistDocumentChild *aActor)
+{
+  nsCOMPtr<nsIDocument> doc = GetDocument();
+  static_cast<WebBrowserPersistDocumentChild*>(aActor)->Start(doc);
+  return true;
+}
+
+bool
+TabChild::DeallocPWebBrowserPersistDocumentChild(PWebBrowserPersistDocumentChild* aActor)
+{
+  delete aActor;
+  return true;
+}

@@ -275,7 +275,7 @@ public:
 
   virtual ~RectTextureImage();
 
-  TemporaryRef<gfx::DrawTarget>
+  already_AddRefed<gfx::DrawTarget>
     BeginUpdate(const nsIntSize& aNewSize,
                 const nsIntRegion& aDirtyRegion = nsIntRegion());
   void EndUpdate(bool aKeepSurface = false);
@@ -1351,14 +1351,14 @@ NS_IMETHODIMP nsChildView::Invalidate(const nsIntRect &aRect)
 }
 
 bool
-nsChildView::ComputeShouldAccelerate(bool aDefault)
+nsChildView::ComputeShouldAccelerate()
 {
   // Don't use OpenGL for transparent windows or for popup windows.
   if (!mView || ![[mView window] isOpaque] ||
       [[mView window] isKindOfClass:[PopupWindow class]])
     return false;
 
-  return nsBaseWidget::ComputeShouldAccelerate(aDefault);
+  return nsBaseWidget::ComputeShouldAccelerate();
 }
 
 bool
@@ -1620,10 +1620,12 @@ nsChildView::NotifyIMEInternal(const IMENotification& aIMENotification)
       mTextInputHandler->CancelIMEComposition();
       return NS_OK;
     case NOTIFY_IME_OF_FOCUS:
-      if (mInputContext.IsPasswordEditor()) {
-        TextInputHandler::EnableSecureEventInput();
-      } else {
-        TextInputHandler::EnsureSecureEventInputDisabled();
+      if (mTextInputHandler->IsFocused()) {
+        if (mInputContext.IsPasswordEditor()) {
+          TextInputHandler::EnableSecureEventInput();
+        } else {
+          TextInputHandler::EnsureSecureEventInputDisabled();
+        }
       }
 
       NS_ENSURE_TRUE(mTextInputHandler, NS_ERROR_NOT_AVAILABLE);
@@ -1635,7 +1637,7 @@ nsChildView::NotifyIMEInternal(const IMENotification& aIMENotification)
       return NS_OK;
     case NOTIFY_IME_OF_SELECTION_CHANGE:
       NS_ENSURE_TRUE(mTextInputHandler, NS_ERROR_NOT_AVAILABLE);
-      mTextInputHandler->OnSelectionChange();
+      mTextInputHandler->OnSelectionChange(aIMENotification);
     default:
       return NS_ERROR_NOT_IMPLEMENTED;
   }
@@ -1661,7 +1663,7 @@ nsChildView::StartPluginIME(const mozilla::WidgetKeyboardEvent& aKeyboardEvent,
   // currently exists.  So nested IME should never reach here, and so it should
   // be fine to use the last key-down event received by -[ChildView keyDown:]
   // (as we currently do).
-  ctiPanel->InterpretKeyEvent([mView lastKeyDownEvent], aCommitted);
+  ctiPanel->InterpretKeyEvent([(ChildView*)mView lastKeyDownEvent], aCommitted);
 
   return NS_OK;
 }
@@ -1689,7 +1691,7 @@ nsChildView::SetInputContext(const InputContext& aContext,
 {
   NS_ENSURE_TRUE_VOID(mTextInputHandler);
 
-  if (mTextInputHandler->IsOrWouldBeFocused()) {
+  if (mTextInputHandler->IsFocused()) {
     if (aContext.IsPasswordEditor()) {
       TextInputHandler::EnableSecureEventInput();
     } else {
@@ -2559,7 +2561,7 @@ nsChildView::EnsureVibrancyManager()
   return *mVibrancyManager;
 }
 
-TemporaryRef<gfx::DrawTarget>
+already_AddRefed<gfx::DrawTarget>
 nsChildView::StartRemoteDrawing()
 {
   // should have created the GLPresenter in InitCompositor.
@@ -2691,7 +2693,7 @@ RectTextureImage::TextureSizeForSize(const nsIntSize& aSize)
                    gfx::NextPowerOfTwo(aSize.height));
 }
 
-TemporaryRef<gfx::DrawTarget>
+already_AddRefed<gfx::DrawTarget>
 RectTextureImage::BeginUpdate(const nsIntSize& aNewSize,
                               const nsIntRegion& aDirtyRegion)
 {
@@ -5135,12 +5137,38 @@ static int32_t RoundUp(double aDouble)
   NS_OBJC_END_TRY_ABORT_BLOCK;
 }
 
+- (BOOL)shouldZoomOnDoubleClick
+{
+  if ([NSWindow respondsToSelector:@selector(_shouldZoomOnDoubleClick)]) {
+    return [NSWindow _shouldZoomOnDoubleClick];
+  }
+  return nsCocoaFeatures::OnYosemiteOrLater();
+}
+
+- (BOOL)shouldMinimizeOnTitlebarDoubleClick
+{
+  NSString *MDAppleMiniaturizeOnDoubleClickKey =
+                                      @"AppleMiniaturizeOnDoubleClick";
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  bool shouldMinimize = [[userDefaults
+          objectForKey:MDAppleMiniaturizeOnDoubleClickKey] boolValue];
+
+  return shouldMinimize;
+}
+
 #pragma mark -
 // NSTextInput implementation
 
 - (void)insertText:(id)insertString
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK;
+
+  // We're considering not implementing NSTextInput. Start by just
+  // preffing its methods off.
+  if (!Preferences::GetBool("intl.ime.nstextinput.enable", false)) {
+    NSLog(@"Set intl.ime.nstextinput.enable to true in about:config to fix input.");
+    return;
+  }
 
   NS_ENSURE_TRUE_VOID(mGeckoChild);
 
@@ -5161,28 +5189,66 @@ static int32_t RoundUp(double aDouble)
 
 - (void)insertNewline:(id)sender
 {
-  [self insertText:@"\n"];
-}
-
-- (void) doCommandBySelector:(SEL)aSelector
-{
-  NS_OBJC_BEGIN_TRY_ABORT_BLOCK;
-
-  if (!mGeckoChild || !mTextInputHandler) {
+  // We're considering not implementing NSTextInput. Start by just
+  // preffing its methods off.
+  if (!Preferences::GetBool("intl.ime.nstextinput.enable", false)) {
+    NSLog(@"Set intl.ime.nstextinput.enable to true in about:config to fix input.");
     return;
   }
 
-  const char* sel = reinterpret_cast<const char*>(aSelector);
-  if (!mTextInputHandler->DoCommandBySelector(sel)) {
-    [super doCommandBySelector:aSelector];
-  }
-
-  NS_OBJC_END_TRY_ABORT_BLOCK;
+  [self insertText:@"\n"];
 }
 
-- (void) setMarkedText:(id)aString selectedRange:(NSRange)selRange
+- (NSInteger)conversationIdentifier
+{
+  // We're considering not implementing NSTextInput. Start by just
+  // preffing its methods off.
+  if (!Preferences::GetBool("intl.ime.nstextinput.enable", false)) {
+    NSLog(@"Set intl.ime.nstextinput.enable to true in about:config to fix input.");
+    return 0;
+  }
+
+  NS_ENSURE_TRUE(mTextInputHandler, reinterpret_cast<NSInteger>(self));
+  return mTextInputHandler->ConversationIdentifier();
+}
+
+- (NSRect)firstRectForCharacterRange:(NSRange)theRange
+{
+  // We're considering not implementing NSTextInput. Start by just
+  // preffing its methods off.
+  if (!Preferences::GetBool("intl.ime.nstextinput.enable", false)) {
+    NSLog(@"Set intl.ime.nstextinput.enable to true in about:config to fix input.");
+    return NSMakeRect(0.0, 0.0, 0.0, 0.0);
+  }
+
+  NSRect rect;
+  NS_ENSURE_TRUE(mTextInputHandler, rect);
+  return mTextInputHandler->FirstRectForCharacterRange(theRange);
+}
+
+- (NSAttributedString *)attributedSubstringFromRange:(NSRange)theRange
+{
+  // We're considering not implementing NSTextInput. Start by just
+  // preffing its methods off.
+  if (!Preferences::GetBool("intl.ime.nstextinput.enable", false)) {
+    NSLog(@"Set intl.ime.nstextinput.enable to true in about:config to fix input.");
+    return nil;
+  }
+
+  NS_ENSURE_TRUE(mTextInputHandler, nil);
+  return mTextInputHandler->GetAttributedSubstringFromRange(theRange);
+}
+
+- (void)setMarkedText:(id)aString selectedRange:(NSRange)selRange
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK;
+
+  // We're considering not implementing NSTextInput. Start by just
+  // preffing its methods off.
+  if (!Preferences::GetBool("intl.ime.nstextinput.enable", false)) {
+    NSLog(@"Set intl.ime.nstextinput.enable to true in about:config to fix input.");
+    return;
+  }
 
   NS_ENSURE_TRUE_VOID(mTextInputHandler);
 
@@ -5200,50 +5266,10 @@ static int32_t RoundUp(double aDouble)
   NS_OBJC_END_TRY_ABORT_BLOCK;
 }
 
-- (void) unmarkText
-{
-  NS_ENSURE_TRUE(mTextInputHandler, );
-  mTextInputHandler->CommitIMEComposition();
-}
+#pragma mark -
+// NSTextInputClient implementation
 
-- (BOOL) hasMarkedText
-{
-  NS_ENSURE_TRUE(mTextInputHandler, NO);
-  return mTextInputHandler->HasMarkedText();
-}
-
-- (BOOL)shouldZoomOnDoubleClick
-{
-  if ([NSWindow respondsToSelector:@selector(_shouldZoomOnDoubleClick)]) {
-    return [NSWindow _shouldZoomOnDoubleClick];
-  }
-  return nsCocoaFeatures::OnYosemiteOrLater();
-}
-
-- (BOOL)shouldMinimizeOnTitlebarDoubleClick
-{
-  NSString *MDAppleMiniaturizeOnDoubleClickKey =
-                                      @"AppleMiniaturizeOnDoubleClick";
-  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  bool shouldMinimize = [[userDefaults
-          objectForKey:MDAppleMiniaturizeOnDoubleClickKey] boolValue];
-
-  return shouldMinimize;
-}
-
-- (NSInteger) conversationIdentifier
-{
-  NS_ENSURE_TRUE(mTextInputHandler, reinterpret_cast<NSInteger>(self));
-  return mTextInputHandler->ConversationIdentifier();
-}
-
-- (NSAttributedString *) attributedSubstringFromRange:(NSRange)theRange
-{
-  NS_ENSURE_TRUE(mTextInputHandler, nil);
-  return mTextInputHandler->GetAttributedSubstringFromRange(theRange);
-}
-
-- (NSRange) markedRange
+- (NSRange)markedRange
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_RETURN;
 
@@ -5253,7 +5279,7 @@ static int32_t RoundUp(double aDouble)
   NS_OBJC_END_TRY_ABORT_BLOCK_RETURN(NSMakeRange(0, 0));
 }
 
-- (NSRange) selectedRange
+- (NSRange)selectedRange
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_RETURN;
 
@@ -5272,20 +5298,13 @@ static int32_t RoundUp(double aDouble)
   return mTextInputHandler->DrawsVerticallyForCharacterAtIndex(charIndex);
 }
 
-- (NSRect) firstRectForCharacterRange:(NSRange)theRange
-{
-  NSRect rect;
-  NS_ENSURE_TRUE(mTextInputHandler, rect);
-  return mTextInputHandler->FirstRectForCharacterRange(theRange);
-}
-
 - (NSUInteger)characterIndexForPoint:(NSPoint)thePoint
 {
   NS_ENSURE_TRUE(mTextInputHandler, 0);
   return mTextInputHandler->CharacterIndexForPoint(thePoint);
 }
 
-- (NSArray*) validAttributesForMarkedText
+- (NSArray*)validAttributesForMarkedText
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_NIL;
 
@@ -5294,9 +5313,6 @@ static int32_t RoundUp(double aDouble)
 
   NS_OBJC_END_TRY_ABORT_BLOCK_NIL;
 }
-
-#pragma mark -
-// NSTextInputClient implementation
 
 - (void)insertText:(id)aString replacementRange:(NSRange)replacementRange
 {
@@ -5316,6 +5332,34 @@ static int32_t RoundUp(double aDouble)
   mTextInputHandler->InsertText(attrStr, &replacementRange);
 
   NS_OBJC_END_TRY_ABORT_BLOCK;
+}
+
+- (void)doCommandBySelector:(SEL)aSelector
+{
+  NS_OBJC_BEGIN_TRY_ABORT_BLOCK;
+
+  if (!mGeckoChild || !mTextInputHandler) {
+    return;
+  }
+
+  const char* sel = reinterpret_cast<const char*>(aSelector);
+  if (!mTextInputHandler->DoCommandBySelector(sel)) {
+    [super doCommandBySelector:aSelector];
+  }
+
+  NS_OBJC_END_TRY_ABORT_BLOCK;
+}
+
+- (void)unmarkText
+{
+  NS_ENSURE_TRUE_VOID(mTextInputHandler);
+  mTextInputHandler->CommitIMEComposition();
+}
+
+- (BOOL) hasMarkedText
+{
+  NS_ENSURE_TRUE(mTextInputHandler, NO);
+  return mTextInputHandler->HasMarkedText();
 }
 
 - (void)setMarkedText:(id)aString selectedRange:(NSRange)selectedRange
@@ -5539,6 +5583,12 @@ static int32_t RoundUp(double aDouble)
 
   if (isMozWindow)
     [[self window] setSuppressMakeKeyFront:NO];
+
+  if (mGeckoChild->GetInputContext().IsPasswordEditor()) {
+    TextInputHandler::EnableSecureEventInput();
+  } else {
+    TextInputHandler::EnsureSecureEventInputDisabled();
+  }
 
   NS_OBJC_END_TRY_ABORT_BLOCK;
 }

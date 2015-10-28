@@ -158,12 +158,12 @@ CompositableClient::GetIPDLActor() const
 }
 
 bool
-CompositableClient::Connect()
+CompositableClient::Connect(ImageContainer* aImageContainer)
 {
   if (!GetForwarder() || GetIPDLActor()) {
     return false;
   }
-  GetForwarder()->Connect(this);
+  GetForwarder()->Connect(this, aImageContainer);
   return true;
 }
 
@@ -193,7 +193,7 @@ CompositableClient::GetAsyncID() const
   return 0; // zero is always an invalid async ID
 }
 
-TemporaryRef<BufferTextureClient>
+already_AddRefed<BufferTextureClient>
 CompositableClient::CreateBufferTextureClient(gfx::SurfaceFormat aFormat,
                                               gfx::IntSize aSize,
                                               gfx::BackendType aMoz2DBackend,
@@ -204,15 +204,15 @@ CompositableClient::CreateBufferTextureClient(gfx::SurfaceFormat aFormat,
                                                  aTextureFlags | mTextureFlags);
 }
 
-TemporaryRef<TextureClient>
+already_AddRefed<TextureClient>
 CompositableClient::CreateTextureClientForDrawing(gfx::SurfaceFormat aFormat,
                                                   gfx::IntSize aSize,
-                                                  gfx::BackendType aMoz2DBackend,
+                                                  BackendSelector aSelector,
                                                   TextureFlags aTextureFlags,
                                                   TextureAllocationFlags aAllocFlags)
 {
   return TextureClient::CreateForDrawing(GetForwarder(),
-                                         aFormat, aSize, aMoz2DBackend,
+                                         aFormat, aSize, aSelector,
                                          aTextureFlags | mTextureFlags,
                                          aAllocFlags);
 }
@@ -225,11 +225,6 @@ CompositableClient::AddTextureClient(TextureClient* aClient)
   }
   aClient->SetAddedToCompositableClient();
   return aClient->InitIPDLActor(mForwarder);
-}
-
-void
-CompositableClient::OnTransaction()
-{
 }
 
 void

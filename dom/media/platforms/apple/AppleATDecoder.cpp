@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "AppleUtils.h"
-#include "MP4Reader.h"
 #include "MP4Decoder.h"
 #include "mp4_demuxer/Adts.h"
 #include "MediaInfo.h"
@@ -19,7 +18,7 @@ PRLogModuleInfo* GetAppleMediaLog();
 namespace mozilla {
 
 AppleATDecoder::AppleATDecoder(const AudioInfo& aConfig,
-                               FlushableMediaTaskQueue* aAudioTaskQueue,
+                               FlushableTaskQueue* aAudioTaskQueue,
                                MediaDataDecoderCallback* aCallback)
   : mConfig(aConfig)
   , mFileStreamError(false)
@@ -69,7 +68,7 @@ AppleATDecoder::Input(MediaRawData* aSample)
       aSample->mDuration,
       aSample->mTime,
       aSample->mKeyframe ? " keyframe" : "",
-      (unsigned long long)aSample->mSize);
+      (unsigned long long)aSample->Size());
 
   // Queue a task to perform the actual decoding on a separate thread.
   nsCOMPtr<nsIRunnable> runnable =
@@ -217,7 +216,7 @@ AppleATDecoder::DecodeSample(MediaRawData* aSample)
   // This API insists on having packets spoon-fed to it from a callback.
   // This structure exists only to pass our state.
   PassthroughUserData userData =
-    { channels, (UInt32)aSample->mSize, aSample->mData };
+    { channels, (UInt32)aSample->Size(), aSample->Data() };
 
   // Decompressed audio buffer
   nsAutoArrayPtr<AudioDataValue> decoded(new AudioDataValue[maxDecodedSamples]);
@@ -261,8 +260,8 @@ AppleATDecoder::DecodeSample(MediaRawData* aSample)
 
   size_t numFrames = outputData.Length() / channels;
   int rate = mOutputFormat.mSampleRate;
-  CheckedInt<Microseconds> duration = FramesToUsecs(numFrames, rate);
-  if (!duration.isValid()) {
+  media::TimeUnit duration = FramesToTimeUnit(numFrames, rate);
+  if (!duration.IsValid()) {
     NS_WARNING("Invalid count of accumulated audio samples");
     return NS_ERROR_FAILURE;
   }
@@ -270,14 +269,14 @@ AppleATDecoder::DecodeSample(MediaRawData* aSample)
 #ifdef LOG_SAMPLE_DECODE
   LOG("pushed audio at time %lfs; duration %lfs\n",
       (double)aSample->mTime / USECS_PER_S,
-      (double)duration.value() / USECS_PER_S);
+      duration.ToSeconds());
 #endif
 
   nsAutoArrayPtr<AudioDataValue> data(new AudioDataValue[outputData.Length()]);
   PodCopy(data.get(), &outputData[0], outputData.Length());
   nsRefPtr<AudioData> audio = new AudioData(aSample->mOffset,
                                             aSample->mTime,
-                                            duration.value(),
+                                            duration.ToMicroseconds(),
                                             numFrames,
                                             data.forget(),
                                             channels,
@@ -489,8 +488,8 @@ AppleATDecoder::GetImplicitAACMagicCookie(const MediaRawData* aSample)
   }
 
   OSStatus status = AudioFileStreamParseBytes(mStream,
-                                              adtssample->mSize,
-                                              adtssample->mData,
+                                              adtssample->Size(),
+                                              adtssample->Data(),
                                               0 /* discontinuity */);
   if (status) {
     NS_WARNING("Couldn't parse sample");
@@ -505,4 +504,5 @@ AppleATDecoder::GetImplicitAACMagicCookie(const MediaRawData* aSample)
 
   return (mFileStreamError || status) ? NS_ERROR_FAILURE : NS_OK;
 }
+
 } // namespace mozilla

@@ -44,6 +44,7 @@ using mozilla::DefaultXDisplay;
 #include "nsIFocusManager.h"
 #include "nsFocusManager.h"
 #include "nsIDOMDragEvent.h"
+#include "nsIScriptSecurityManager.h"
 #include "nsIScrollableFrame.h"
 #include "nsIDocShell.h"
 #include "ImageContainer.h"
@@ -480,7 +481,8 @@ NS_IMETHODIMP nsPluginInstanceOwner::GetURL(const char *aURL,
                                             const char *aTarget,
                                             nsIInputStream *aPostStream,
                                             void *aHeadersData,
-                                            uint32_t aHeadersDataLen)
+                                            uint32_t aHeadersDataLen,
+                                            bool aDoCheckLoadURIChecks)
 {
   nsCOMPtr<nsIContent> content = do_QueryReferent(mContent);
   if (!content) {
@@ -512,16 +514,34 @@ NS_IMETHODIMP nsPluginInstanceOwner::GetURL(const char *aURL,
   nsCOMPtr<nsILinkHandler> lh = do_QueryInterface(container);
   NS_ENSURE_TRUE(lh, NS_ERROR_FAILURE);
 
-  nsAutoString  unitarget;
-  unitarget.AssignASCII(aTarget); // XXX could this be nonascii?
+  nsAutoString unitarget;
+  if ((0 == PL_strcmp(aTarget, "newwindow")) ||
+      (0 == PL_strcmp(aTarget, "_new"))) {
+    unitarget.AssignASCII("_blank");
+  }
+  else if (0 == PL_strcmp(aTarget, "_current")) {
+    unitarget.AssignASCII("_self");
+  }
+  else {
+    unitarget.AssignASCII(aTarget); // XXX could this be nonascii?
+  }
 
   nsCOMPtr<nsIURI> baseURI = GetBaseURI();
 
   // Create an absolute URL
   nsCOMPtr<nsIURI> uri;
   nsresult rv = NS_NewURI(getter_AddRefs(uri), aURL, baseURI);
-
   NS_ENSURE_SUCCESS(rv, NS_ERROR_FAILURE);
+
+  if (aDoCheckLoadURIChecks) {
+    nsCOMPtr<nsIScriptSecurityManager> secMan(
+      do_GetService(NS_SCRIPTSECURITYMANAGER_CONTRACTID, &rv));
+    NS_ENSURE_TRUE(secMan, NS_ERROR_FAILURE);
+
+    rv = secMan->CheckLoadURIWithPrincipal(content->NodePrincipal(), uri,
+                                           nsIScriptSecurityManager::STANDARD);
+    NS_ENSURE_SUCCESS(rv, rv);
+  }
 
   nsCOMPtr<nsIInputStream> headersDataStream;
   if (aPostStream && aHeadersData) {
@@ -646,7 +666,7 @@ nsPluginInstanceOwner::GetContainingWidgetIfOffset()
   // we only attempt to get the nearest window if this really is a "windowless" plugin so as not
   // to change any behaviour for the much more common windowed plugins,
   // though why this method would even be being called for a windowed plugin escapes me.
-  if (XRE_GetProcessType() != GeckoProcessType_Content &&
+  if (!XRE_IsContentProcess() &&
       mPluginWindow && mPluginWindow->type == NPWindowTypeDrawable) {
     // it turns out that flash also uses this window for determining focus, and is currently
     // unable to show a caret correctly if we return the enclosing window. Therefore for
@@ -2912,7 +2932,7 @@ NS_IMETHODIMP nsPluginInstanceOwner::CreateWidget(void)
       parentWidget = nsContentUtils::WidgetForDocument(doc);
 #ifndef XP_MACOSX
       // If we're running in the content process, we need a remote widget created in chrome.
-      if (XRE_GetProcessType() == GeckoProcessType_Content) {
+      if (XRE_IsContentProcess()) {
         nsCOMPtr<nsIDOMWindow> window = doc->GetWindow();
         if (window) {
           nsCOMPtr<nsIDOMWindow> topWindow;
@@ -2935,7 +2955,7 @@ NS_IMETHODIMP nsPluginInstanceOwner::CreateWidget(void)
 #ifndef XP_MACOSX
     // A failure here is terminal since we can't fall back on the non-e10s code
     // path below.
-    if (!mWidget && XRE_GetProcessType() == GeckoProcessType_Content) {
+    if (!mWidget && XRE_IsContentProcess()) {
       return NS_ERROR_UNEXPECTED;
     }
 #endif // XP_MACOSX
@@ -3043,7 +3063,7 @@ void nsPluginInstanceOwner::FixUpPluginWindow(int32_t inPaintState)
     mPluginWindow->clipRect.bottom = mPluginWindow->clipRect.top;
     mPluginWindow->clipRect.right  = mPluginWindow->clipRect.left;
   }
-  else if (XRE_GetProcessType() != GeckoProcessType_Default)
+  else if (!XRE_IsParentProcess())
   {
     // For e10s we only support async windowless plugin. This means that
     // we're always going to allocate a full window for the plugin to draw
@@ -3237,7 +3257,7 @@ nsPluginInstanceOwner::UpdateDocumentActiveState(bool aIsActive)
   // to be forwarded over after the active state is updated. If we
   // don't hide plugin widgets in hidden tabs, the native child window
   // in chrome will remain visible after a tab switch.
-  if (mWidget && XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (mWidget && XRE_IsContentProcess()) {
     mWidget->Show(aIsActive);
     mWidget->Enable(aIsActive);
   }

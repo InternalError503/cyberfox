@@ -1262,7 +1262,7 @@ var gViewController = {
                                  getService(Ci.amIWebInstallListener);
               webInstaller.onWebInstallRequested(getBrowserElement(),
                                                  document.documentURIObject,
-                                                 installs, installs.length);
+                                                 installs);
             }
             return;
           }
@@ -3185,7 +3185,7 @@ var gDetailView = {
         );
         var errorLink = document.getElementById("detail-error-link");
         errorLink.value = gStrings.ext.GetStringFromName("details.notification.unsigned.link");
-        errorLink.href = Services.urlFormatter.formatURLPref("app.helpdoc.baseURL") + "unsigned-addons";
+        errorLink.href = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
         errorLink.hidden = false;
       } else if (!this._addon.isCompatible && (AddonManager.checkCompatibility ||
         (this._addon.blocklistState != Ci.nsIBlocklistService.STATE_SOFTBLOCKED))) {
@@ -3202,7 +3202,7 @@ var gDetailView = {
         );
         var warningLink = document.getElementById("detail-warning-link");
         warningLink.value = gStrings.ext.GetStringFromName("details.notification.unsigned.link");
-        warningLink.href = Services.urlFormatter.formatURLPref("app.helpdoc.baseURL") + "unsigned-addons";
+        warningLink.href = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
         warningLink.hidden = false;
       } else if (this._addon.blocklistState == Ci.nsIBlocklistService.STATE_SOFTBLOCKED) {
         this.node.setAttribute("notification", "warning");
@@ -3760,7 +3760,7 @@ var gDragDrop = {
                              getService(Ci.amIWebInstallListener);
           webInstaller.onWebInstallRequested(getBrowserElement(),
                                              document.documentURIObject,
-                                             installs, installs.length);
+                                             installs);
         }
         return;
       }

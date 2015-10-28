@@ -22,6 +22,8 @@
 #include "nsWeakReference.h"
 #include "TimingStruct.h"
 #include "AutoClose.h"
+#include "nsIStreamListener.h"
+#include "nsISupportsPrimitives.h"
 
 class nsDNSPrefetch;
 class nsICancelable;
@@ -124,9 +126,9 @@ public:
     // nsIChannel
     NS_IMETHOD GetSecurityInfo(nsISupports **aSecurityInfo) override;
     NS_IMETHOD AsyncOpen(nsIStreamListener *listener, nsISupports *aContext) override;
+    NS_IMETHOD AsyncOpen2(nsIStreamListener *aListener) override;
     // nsIHttpChannelInternal
     NS_IMETHOD SetupFallbackChannel(const char *aFallbackKey) override;
-    NS_IMETHOD ContinueBeginConnect() override;
     // nsISupportsPriority
     NS_IMETHOD SetPriority(int32_t value) override;
     // nsIClassOfService
@@ -241,10 +243,12 @@ private:
 
     bool     RequestIsConditional();
     nsresult BeginConnect();
+    nsresult ContinueBeginConnectWithResult();
+    void     ContinueBeginConnect();
     nsresult Connect();
     void     SpeculativeConnect();
     nsresult SetupTransaction();
-    void     SetupTransactionLoadGroupInfo();
+    void     SetupTransactionSchedulingContext();
     nsresult CallOnStartRequest();
     nsresult ProcessResponse();
     nsresult ContinueProcessResponse(nsresult);
@@ -508,6 +512,7 @@ private: // cache telemetry
 };
 
 NS_DEFINE_STATIC_IID_ACCESSOR(nsHttpChannel, NS_HTTPCHANNEL_IID)
-} } // namespace mozilla::net
+} // namespace net
+} // namespace mozilla
 
 #endif // nsHttpChannel_h__

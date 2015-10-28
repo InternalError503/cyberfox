@@ -39,6 +39,8 @@ class Matrix;
 } // namespace gfx
 } // namespace mozilla
 
+#define SVG_ZERO_LENGTH_PATH_FIX_FACTOR 512
+
 inline bool
 IsSVGWhitespace(char aChar)
 {
@@ -321,8 +323,14 @@ public:
    * Returns a path
    * string formatted as an SVG path
    */
-  static mozilla::TemporaryRef<mozilla::gfx::Path>
+  static already_AddRefed<mozilla::gfx::Path>
   GetPath(const nsAString& aPathString);
+
+  /**
+   *  Returns true if aContent is one of the elements whose stroke is guaranteed
+   *  to have no corners: circle or ellipse
+   */
+  static bool ShapeTypeHasNoCorners(const nsIContent* aContent);
 };
 
 #endif

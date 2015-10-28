@@ -21,6 +21,7 @@
 #include "nsIEventTarget.h"
 #include "nsISeekableStream.h"
 #include "nsNetUtil.h"
+#include "nsIAsyncStreamCopier.h"
 #include "nsString.h"
 #include "nsStringStream.h"
 #include "nsThreadUtils.h"
@@ -189,7 +190,7 @@ private:
   nsCOMPtr<nsIInputStream> mStream;
 };
 
-} // anonymous namespace
+} // namespace
 
 FileHandleBase::FileHandleBase(FileMode aMode,
                                RequestMode aRequestMode)

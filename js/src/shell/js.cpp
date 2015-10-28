@@ -55,7 +55,6 @@
 # include "jswin.h"
 #endif
 #include "jswrapper.h"
-#include "prmjtime.h"
 
 #include "builtin/TestingFunctions.h"
 #include "frontend/Parser.h"
@@ -77,6 +76,7 @@
 #include "vm/Monitor.h"
 #include "vm/Shape.h"
 #include "vm/SharedArrayObject.h"
+#include "vm/Time.h"
 #include "vm/TypedArrayObject.h"
 #include "vm/WrapperObject.h"
 
@@ -259,8 +259,6 @@ extern JS_EXPORT_API(void)   add_history(char* line);
 static char*
 GetLine(FILE* file, const char * prompt)
 {
-    size_t size;
-    char* buffer;
 #ifdef EDITLINE
     /*
      * Use readline only if file is stdin, because there's no way to specify
@@ -283,17 +281,29 @@ GetLine(FILE* file, const char * prompt)
         return linep;
     }
 #endif
+
     size_t len = 0;
     if (*prompt != '\0') {
         fprintf(gOutFile, "%s", prompt);
         fflush(gOutFile);
     }
-    size = 80;
-    buffer = (char*) malloc(size);
+
+    size_t size = 80;
+    char* buffer = static_cast<char*>(malloc(size));
     if (!buffer)
         return nullptr;
+
     char* current = buffer;
-    while (fgets(current, size - len, file)) {
+    while (true) {
+        while (true) {
+            if (fgets(current, size - len, file))
+                break;
+            if (errno != EINTR) {
+                free(buffer);
+                return nullptr;
+            }
+        }
+
         len += strlen(current);
         char* t = buffer + len - 1;
         if (*t == '\n') {
@@ -301,9 +311,10 @@ GetLine(FILE* file, const char * prompt)
             *t = '\0';
             return buffer;
         }
+
         if (len + 1 == size) {
             size = size * 2;
-            char* tmp = (char*) js_realloc(buffer, size);
+            char* tmp = static_cast<char*>(realloc(buffer, size));
             if (!tmp) {
                 free(buffer);
                 return nullptr;
@@ -312,6 +323,7 @@ GetLine(FILE* file, const char * prompt)
         }
         current = buffer + len;
     }
+
     if (len && !ferror(file))
         return buffer;
     free(buffer);
@@ -569,7 +581,7 @@ Process(JSContext* cx, const char* filename, bool forceTTY)
 }
 
 static bool
-Version(JSContext* cx, unsigned argc, jsval* vp)
+Version(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     JSVersion origVersion = JS_GetVersion(cx);
@@ -679,7 +691,7 @@ CreateMappedArrayBuffer(JSContext* cx, unsigned argc, Value* vp)
 }
 
 static bool
-Options(JSContext* cx, unsigned argc, jsval* vp)
+Options(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -738,7 +750,7 @@ Options(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-LoadScript(JSContext* cx, unsigned argc, jsval* vp, bool scriptRelative)
+LoadScript(JSContext* cx, unsigned argc, Value* vp, bool scriptRelative)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -777,13 +789,13 @@ LoadScript(JSContext* cx, unsigned argc, jsval* vp, bool scriptRelative)
 }
 
 static bool
-Load(JSContext* cx, unsigned argc, jsval* vp)
+Load(JSContext* cx, unsigned argc, Value* vp)
 {
     return LoadScript(cx, argc, vp, false);
 }
 
 static bool
-LoadScriptRelativeToScript(JSContext* cx, unsigned argc, jsval* vp)
+LoadScriptRelativeToScript(JSContext* cx, unsigned argc, Value* vp)
 {
     return LoadScript(cx, argc, vp, true);
 }
@@ -990,7 +1002,7 @@ CacheEntry_setBytecode(JSContext* cx, HandleObject cache, uint8_t* buffer, uint3
     if (!arrayBuffer)
         return false;
 
-    SetReservedSlot(cache, CacheEntry_BYTECODE, OBJECT_TO_JSVAL(arrayBuffer));
+    SetReservedSlot(cache, CacheEntry_BYTECODE, ObjectValue(*arrayBuffer));
     return true;
 }
 
@@ -1019,7 +1031,7 @@ class AutoSaveFrameChain
 };
 
 static bool
-Evaluate(JSContext* cx, unsigned argc, jsval* vp)
+Evaluate(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -1317,7 +1329,7 @@ js::shell::FileAsString(JSContext* cx, const char* pathname)
  * to produce benchmark timings by SunSpider.
  */
 static bool
-Run(JSContext* cx, unsigned argc, jsval* vp)
+Run(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (args.length() != 1) {
@@ -1370,7 +1382,7 @@ Run(JSContext* cx, unsigned argc, jsval* vp)
  * Provides a hook for scripts to read a line from stdin.
  */
 static bool
-ReadLine(JSContext* cx, unsigned argc, jsval* vp)
+ReadLine(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -1444,7 +1456,7 @@ ReadLine(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-PutStr(JSContext* cx, unsigned argc, jsval* vp)
+PutStr(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -1465,7 +1477,7 @@ PutStr(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-Now(JSContext* cx, unsigned argc, jsval* vp)
+Now(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     double now = PRMJ_Now() / double(PRMJ_USEC_PER_MSEC);
@@ -1495,24 +1507,24 @@ PrintInternal(JSContext* cx, const CallArgs& args, FILE* file)
 }
 
 static bool
-Print(JSContext* cx, unsigned argc, jsval* vp)
+Print(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     return PrintInternal(cx, args, gOutFile);
 }
 
 static bool
-PrintErr(JSContext* cx, unsigned argc, jsval* vp)
+PrintErr(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     return PrintInternal(cx, args, gErrFile);
 }
 
 static bool
-Help(JSContext* cx, unsigned argc, jsval* vp);
+Help(JSContext* cx, unsigned argc, Value* vp);
 
 static bool
-Quit(JSContext* cx, unsigned argc, jsval* vp)
+Quit(JSContext* cx, unsigned argc, Value* vp)
 {
 #ifdef JS_MORE_DETERMINISTIC
     // Print a message to stderr in more-deterministic builds to help jsfunfuzz
@@ -1540,151 +1552,8 @@ Quit(JSContext* cx, unsigned argc, jsval* vp)
     return false;
 }
 
-namespace gcCallback {
-
-struct MajorGC {
-    int32_t depth;
-    int32_t phases;
-};
-
-static void
-majorGC(JSRuntime* rt, JSGCStatus status, void* data)
-{
-    auto info = static_cast<MajorGC*>(data);
-    if (!(info->phases & (1 << status)))
-        return;
-
-    if (info->depth > 0) {
-        info->depth--;
-        JS::PrepareForFullGC(rt);
-        JS::GCForReason(rt, GC_NORMAL, JS::gcreason::API);
-        info->depth++;
-    }
-}
-
-struct MinorGC {
-    int32_t phases;
-    bool active;
-};
-
-static void
-minorGC(JSRuntime* rt, JSGCStatus status, void* data)
-{
-    auto info = static_cast<MinorGC*>(data);
-    if (!(info->phases & (1 << status)))
-        return;
-
-    if (info->active) {
-        info->active = false;
-        rt->gc.evictNursery(JS::gcreason::DEBUG_GC);
-        info->active = true;
-    }
-}
-
-// Process global, should really be runtime-local. Also, the final one of these
-// is currently leaked, since they are only deleted when changing.
-MajorGC* prevMajorGC = nullptr;
-MinorGC* prevMinorGC = nullptr;
-
-} /* namespace gcCallback */
-
 static bool
-SetGCCallback(JSContext* cx, unsigned argc, jsval* vp)
-{
-    CallArgs args = CallArgsFromVp(argc, vp);
-
-    if (args.length() != 1) {
-        JS_ReportError(cx, "Wrong number of arguments");
-        return false;
-    }
-
-    RootedObject opts(cx, ToObject(cx, args[0]));
-    if (!opts)
-        return false;
-
-    RootedValue v(cx);
-    if (!JS_GetProperty(cx, opts, "action", &v))
-        return false;
-
-    JSString* str = JS::ToString(cx, v);
-    if (!str)
-        return false;
-    JSAutoByteString action(cx, str);
-    if (!action)
-        return false;
-
-    int32_t phases = 0;
-    if ((strcmp(action.ptr(), "minorGC") == 0) || (strcmp(action.ptr(), "majorGC") == 0)) {
-        if (!JS_GetProperty(cx, opts, "phases", &v))
-            return false;
-        if (v.isUndefined()) {
-            phases = (1 << JSGC_END);
-        } else {
-            JSString* str = JS::ToString(cx, v);
-            if (!str)
-                return false;
-            JSAutoByteString phasesStr(cx, str);
-            if (!phasesStr)
-                return false;
-
-            if (strcmp(phasesStr.ptr(), "begin") == 0)
-                phases = (1 << JSGC_BEGIN);
-            else if (strcmp(phasesStr.ptr(), "end") == 0)
-                phases = (1 << JSGC_END);
-            else if (strcmp(phasesStr.ptr(), "both") == 0)
-                phases = (1 << JSGC_BEGIN) | (1 << JSGC_END);
-            else {
-                JS_ReportError(cx, "Invalid callback phase");
-                return false;
-            }
-        }
-    }
-
-    if (gcCallback::prevMajorGC) {
-        JS_SetGCCallback(cx->runtime(), nullptr, nullptr);
-        js_delete<gcCallback::MajorGC>(gcCallback::prevMajorGC);
-        gcCallback::prevMajorGC = nullptr;
-    }
-
-    if (gcCallback::prevMinorGC) {
-        JS_SetGCCallback(cx->runtime(), nullptr, nullptr);
-        js_delete<gcCallback::MinorGC>(gcCallback::prevMinorGC);
-        gcCallback::prevMinorGC = nullptr;
-    }
-
-    if (strcmp(action.ptr(), "minorGC") == 0) {
-        auto info = js_new<gcCallback::MinorGC>();
-        info->phases = phases;
-        info->active = true;
-        JS_SetGCCallback(cx->runtime(), gcCallback::minorGC, info);
-    } else if (strcmp(action.ptr(), "majorGC") == 0) {
-        if (!JS_GetProperty(cx, opts, "depth", &v))
-            return false;
-        int32_t depth = 1;
-        if (!v.isUndefined()) {
-            if (!ToInt32(cx, v, &depth))
-                return false;
-        }
-        if (depth > int32_t(gcstats::Statistics::MAX_NESTING - 4)) {
-            JS_ReportError(cx, "Nesting depth too large, would overflow");
-            return false;
-        }
-
-        auto info = js_new<gcCallback::MajorGC>();
-        info->phases = phases;
-        info->depth = depth;
-        JS_SetGCCallback(cx->runtime(), gcCallback::majorGC, info);
-    } else {
-        JS_ReportError(cx, "Unknown GC callback action");
-        return false;
-    }
-
-    args.rval().setUndefined();
-    return true;
-}
-
-static bool
-StartTimingMutator(JSContext* cx, unsigned argc, jsval* vp)
+StartTimingMutator(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (args.length() > 0) {
@@ -1699,7 +1568,7 @@ StartTimingMutator(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-StopTimingMutator(JSContext* cx, unsigned argc, jsval* vp)
+StopTimingMutator(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (args.length() > 0) {
@@ -1737,7 +1606,7 @@ ToSource(JSContext* cx, MutableHandleValue vp, JSAutoByteString* bytes)
 }
 
 static bool
-AssertEq(JSContext* cx, unsigned argc, jsval* vp)
+AssertEq(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (!(args.length() == 2 || (args.length() == 3 && args[2].isString()))) {
@@ -1775,7 +1644,7 @@ AssertEq(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static JSScript*
-ValueToScript(JSContext* cx, jsval vArg, JSFunction** funp = nullptr)
+ValueToScript(JSContext* cx, Value vArg, JSFunction** funp = nullptr)
 {
     RootedValue v(cx, vArg);
     RootedFunction fun(cx, JS_ValueToFunction(cx, v));
@@ -1814,13 +1683,13 @@ GetTopScript(JSContext* cx)
 }
 
 static bool
-GetScriptAndPCArgs(JSContext* cx, unsigned argc, jsval* argv, MutableHandleScript scriptp,
+GetScriptAndPCArgs(JSContext* cx, unsigned argc, Value* argv, MutableHandleScript scriptp,
                    int32_t* ip)
 {
     RootedScript script(cx, GetTopScript(cx));
     *ip = 0;
     if (argc != 0) {
-        jsval v = argv[0];
+        Value v = argv[0];
         unsigned intarg = 0;
         if (v.isObject() &&
             JS_GetClass(&v.toObject()) == Jsvalify(&JSFunction::class_)) {
@@ -1845,7 +1714,7 @@ GetScriptAndPCArgs(JSContext* cx, unsigned argc, jsval* argv, MutableHandleScrip
 }
 
 static bool
-LineToPC(JSContext* cx, unsigned argc, jsval* vp)
+LineToPC(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -1875,7 +1744,7 @@ LineToPC(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-PCToLine(JSContext* cx, unsigned argc, jsval* vp)
+PCToLine(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     RootedScript script(cx);
@@ -2024,7 +1893,7 @@ SrcNotes(JSContext* cx, HandleScript script, Sprinter* sp)
 }
 
 static bool
-Notes(JSContext* cx, unsigned argc, jsval* vp)
+Notes(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     Sprinter sprinter(cx);
@@ -2147,11 +2016,11 @@ namespace {
 
 struct DisassembleOptionParser {
     unsigned   argc;
-    jsval*  argv;
+    Value*  argv;
     bool    lines;
     bool    recursive;
 
-    DisassembleOptionParser(unsigned argc, jsval* argv)
+    DisassembleOptionParser(unsigned argc, Value* argv)
       : argc(argc), argv(argv), lines(false), recursive(false) {}
 
     bool parse(JSContext* cx) {
@@ -2176,7 +2045,7 @@ struct DisassembleOptionParser {
 } /* anonymous namespace */
 
 static bool
-DisassembleToSprinter(JSContext* cx, unsigned argc, jsval* vp, Sprinter* sprinter)
+DisassembleToSprinter(JSContext* cx, unsigned argc, Value* vp, Sprinter* sprinter)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     DisassembleOptionParser p(args.length(), args.array());
@@ -2208,7 +2077,7 @@ DisassembleToSprinter(JSContext* cx, unsigned argc, jsval* vp, Sprinter* sprinte
 }
 
 static bool
-DisassembleToString(JSContext* cx, unsigned argc, jsval* vp)
+DisassembleToString(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     Sprinter sprinter(cx);
@@ -2225,7 +2094,7 @@ DisassembleToString(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-Disassemble(JSContext* cx, unsigned argc, jsval* vp)
+Disassemble(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     Sprinter sprinter(cx);
@@ -2240,7 +2109,7 @@ Disassemble(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-DisassFile(JSContext* cx, unsigned argc, jsval* vp)
+DisassFile(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -2289,7 +2158,7 @@ DisassFile(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-DisassWithSrc(JSContext* cx, unsigned argc, jsval* vp)
+DisassWithSrc(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -2387,7 +2256,7 @@ DisassWithSrc(JSContext* cx, unsigned argc, jsval* vp)
 #endif /* DEBUG */
 
 static bool
-Intern(JSContext* cx, unsigned argc, jsval* vp)
+Intern(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     JSString* str = JS::ToString(cx, args.get(0));
@@ -2400,7 +2269,7 @@ Intern(JSContext* cx, unsigned argc, jsval* vp)
 
     mozilla::Range<const char16_t> chars = strChars.twoByteRange();
 
-    if (!JS_InternUCStringN(cx, chars.start().get(), chars.length()))
+    if (!JS_AtomizeAndPinUCStringN(cx, chars.start().get(), chars.length()))
         return false;
 
     args.rval().setUndefined();
@@ -2408,7 +2277,7 @@ Intern(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-Clone(JSContext* cx, unsigned argc, jsval* vp)
+Clone(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     RootedObject parent(cx);
@@ -2458,7 +2327,7 @@ Clone(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-GetSLX(JSContext* cx, unsigned argc, jsval* vp)
+GetSLX(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     RootedScript script(cx);
@@ -2471,7 +2340,7 @@ GetSLX(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-ThrowError(JSContext* cx, unsigned argc, jsval* vp)
+ThrowError(JSContext* cx, unsigned argc, Value* vp)
 {
     JS_ReportError(cx, "This is an error");
     return false;
@@ -2549,7 +2418,7 @@ NewSandbox(JSContext* cx, bool lazy)
 }
 
 static bool
-EvalInContext(JSContext* cx, unsigned argc, jsval* vp)
+EvalInContext(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (!args.requireAtLeast(cx, "evalcx", 1))
@@ -2698,7 +2567,7 @@ WorkerMain(void* arg)
 Vector<PRThread*, 0, SystemAllocPolicy> workerThreads;
 
 static bool
-EvalInWorker(JSContext* cx, unsigned argc, jsval* vp)
+EvalInWorker(JSContext* cx, unsigned argc, Value* vp)
 {
     if (!CanUseExtraThreads()) {
         JS_ReportError(cx, "Can't create worker threads with --no-threads");
@@ -2994,7 +2863,7 @@ InterruptIf(JSContext* cx, unsigned argc, Value* vp)
 }
 
 static bool
-InvokeInterruptCallbackWrapper(JSContext* cx, unsigned argc, jsval* vp)
+InvokeInterruptCallbackWrapper(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (args.length() != 1) {
@@ -3137,7 +3006,7 @@ StackPointerInfo(JSContext* cx, unsigned argc, Value* vp)
 
 
 static bool
-Elapsed(JSContext* cx, unsigned argc, jsval* vp)
+Elapsed(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (args.length() == 0) {
@@ -3153,7 +3022,7 @@ Elapsed(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-Compile(JSContext* cx, unsigned argc, jsval* vp)
+Compile(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     if (args.length() < 1) {
@@ -3189,7 +3058,7 @@ Compile(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-Parse(JSContext* cx, unsigned argc, jsval* vp)
+Parse(JSContext* cx, unsigned argc, Value* vp)
 {
     using namespace js::frontend;
 
@@ -3225,7 +3094,7 @@ Parse(JSContext* cx, unsigned argc, jsval* vp)
     if (!parser.checkOptions())
         return false;
 
-    ParseNode* pn = parser.parse(nullptr);
+    ParseNode* pn = parser.parse();
     if (!pn)
         return false;
 #ifdef DEBUG
@@ -3237,7 +3106,7 @@ Parse(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-SyntaxParse(JSContext* cx, unsigned argc, jsval* vp)
+SyntaxParse(JSContext* cx, unsigned argc, Value* vp)
 {
     using namespace js::frontend;
 
@@ -3272,7 +3141,7 @@ SyntaxParse(JSContext* cx, unsigned argc, jsval* vp)
     if (!parser.checkOptions())
         return false;
 
-    bool succeeded = parser.parse(nullptr);
+    bool succeeded = parser.parse();
     if (cx->isExceptionPending())
         return false;
 
@@ -3372,7 +3241,7 @@ OffThreadCompileScriptCallback(void* token, void* callbackData)
 }
 
 static bool
-OffThreadCompileScript(JSContext* cx, unsigned argc, jsval* vp)
+OffThreadCompileScript(JSContext* cx, unsigned argc, Value* vp)
 {
     if (!CanUseExtraThreads()) {
         JS_ReportError(cx, "Can't use offThreadCompileScript with --no-threads");
@@ -3462,7 +3331,7 @@ OffThreadCompileScript(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-runOffThreadScript(JSContext* cx, unsigned argc, jsval* vp)
+runOffThreadScript(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -3597,7 +3466,7 @@ PropagateFlagToNestedShells(const char* flag)
 }
 
 static bool
-NestedShell(JSContext* cx, unsigned argc, jsval* vp)
+NestedShell(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -3745,7 +3614,7 @@ ThisFilename(JSContext* cx, unsigned argc, Value* vp)
 }
 
 static bool
-WrapWithProto(JSContext* cx, unsigned argc, jsval* vp)
+WrapWithProto(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     Value obj = UndefinedValue(), proto = UndefinedValue();
@@ -3771,7 +3640,7 @@ WrapWithProto(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-NewGlobal(JSContext* cx, unsigned argc, jsval* vp)
+NewGlobal(JSContext* cx, unsigned argc, Value* vp)
 {
     JSPrincipals* principals = nullptr;
     JS::CompartmentOptions options;
@@ -3819,7 +3688,7 @@ NewGlobal(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-GetMaxArgs(JSContext* cx, unsigned argc, jsval* vp)
+GetMaxArgs(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     args.rval().setInt32(ARGS_LENGTH_MAX);
@@ -3827,7 +3696,7 @@ GetMaxArgs(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-ObjectEmulatingUndefined(JSContext* cx, unsigned argc, jsval* vp)
+ObjectEmulatingUndefined(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -3844,7 +3713,7 @@ ObjectEmulatingUndefined(JSContext* cx, unsigned argc, jsval* vp)
 }
 
 static bool
-GetSelfHostedValue(JSContext* cx, unsigned argc, jsval* vp)
+GetSelfHostedValue(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
 
@@ -3896,7 +3765,7 @@ class ShellSourceHook: public SourceHook {
 };
 
 static bool
-WithSourceHook(JSContext* cx, unsigned argc, jsval* vp)
+WithSourceHook(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     RootedObject callee(cx, &args.callee());
@@ -4548,7 +4417,6 @@ EntryPoints(JSContext* cx, unsigned argc, Value* vp)
     return false;
 }
 
-
 static const JSFunctionSpecWithHelp shell_functions[] = {
     JS_FN_HELP("version", Version, 0, 0,
 "version([number])",
@@ -4646,12 +4514,6 @@ static const JSFunctionSpecWithHelp shell_functions[] = {
 "assertEq(actual, expected[, msg])",
 "  Throw if the first two arguments are not the same (both +0 or both -0,\n"
 "  both NaN, or non-zero and ===)."),
-
-    JS_FN_HELP("setGCCallback", SetGCCallback, 1, 0,
-"setGCCallback({action:\"...\", options...})",
-"  Set the GC callback. action may be:\n"
-"    'minorGC' - run a nursery collection\n"
-"    'majorGC' - run a major collection, nesting up to a given 'depth'\n"),
 
     JS_FN_HELP("startTimingMutator", StartTimingMutator, 0, 0,
 "startTimingMutator()",
@@ -5045,7 +4907,7 @@ DefineConsole(JSContext* cx, HandleObject global)
 #undef EXTERNAL_FUNCTION_COUNT
 
 static bool
-PrintHelpString(JSContext* cx, jsval v)
+PrintHelpString(JSContext* cx, Value v)
 {
     JSString* str = v.toString();
 
@@ -5083,7 +4945,7 @@ PrintHelp(JSContext* cx, HandleObject obj)
 }
 
 static bool
-Help(JSContext* cx, unsigned argc, jsval* vp)
+Help(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
     fprintf(gOutFile, "%s\n", JS_GetImplementationVersion());
@@ -5436,7 +5298,7 @@ static void
 InitDOMObject(HandleObject obj)
 {
     /* Fow now just initialize to a constant we can check. */
-    SetReservedSlot(obj, DOM_OBJECT_SLOT, PRIVATE_TO_JSVAL((void*)0x1234));
+    SetReservedSlot(obj, DOM_OBJECT_SLOT, PrivateValue((void*)0x1234));
 }
 
 static bool
@@ -5755,7 +5617,7 @@ NewGlobalObject(JSContext* cx, JS::CompartmentOptions& options,
         if (!JS_InitCTypesClass(cx, glob))
             return nullptr;
 #endif
-        if (!JS_InitReflect(cx, glob))
+        if (!JS_InitReflectParse(cx, glob))
             return nullptr;
         if (!JS_DefineDebuggerObject(cx, glob))
             return nullptr;

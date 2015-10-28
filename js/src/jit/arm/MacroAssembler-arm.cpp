@@ -2402,8 +2402,8 @@ MacroAssemblerARMCompat::store32(Imm32 src, const Address& address)
 void
 MacroAssemblerARMCompat::store32(Imm32 imm, const BaseIndex& dest)
 {
-    ma_mov(imm, secondScratchReg_);
-    store32(secondScratchReg_, dest);
+    ma_mov(imm, ScratchRegister);
+    store32(ScratchRegister, dest);
 }
 
 void
@@ -2413,8 +2413,8 @@ MacroAssemblerARMCompat::store32(Register src, const BaseIndex& dest)
     uint32_t scale = Imm32::ShiftOf(dest.scale).value;
 
     if (dest.offset != 0) {
-        ma_add(base, Imm32(dest.offset), ScratchRegister);
-        base = ScratchRegister;
+        ma_add(base, Imm32(dest.offset), secondScratchReg_);
+        base = secondScratchReg_;
     }
     ma_str(src, DTRAddr(base, DtrRegImmShift(dest.index, LSL, scale)));
 }
@@ -4122,7 +4122,7 @@ MacroAssemblerARMCompat::callWithABI(AsmJSImmPtr imm, MoveOp::Type result)
 {
     uint32_t stackAdjust;
     callWithABIPre(&stackAdjust, /* callFromAsmJS = */ true);
-    call(imm);
+    asMasm().call(imm);
     callWithABIPost(stackAdjust, result);
 }
 
@@ -4135,7 +4135,7 @@ MacroAssemblerARMCompat::callWithABI(const Address& fun, MoveOp::Type result)
     ma_ldr(fun, r12);
     uint32_t stackAdjust;
     callWithABIPre(&stackAdjust);
-    call(r12);
+    asMasm().call(r12);
     callWithABIPost(stackAdjust, result);
 }
 
@@ -4146,7 +4146,7 @@ MacroAssemblerARMCompat::callWithABI(Register fun, MoveOp::Type result)
     ma_mov(fun, r12);
     uint32_t stackAdjust;
     callWithABIPre(&stackAdjust);
-    call(r12);
+    asMasm().call(r12);
     callWithABIPost(stackAdjust, result);
 }
 
@@ -4756,11 +4756,11 @@ void
 MacroAssemblerARMCompat::compareExchangeARMv7(int nbytes, bool signExtend, const T& mem,
                                               Register oldval, Register newval, Register output)
 {
-    Label Lagain;
-    Label Ldone;
+    Label again;
+    Label done;
     ma_dmb(BarrierST);
     Register ptr = computePointer(mem, secondScratchReg_);
-    bind(&Lagain);
+    bind(&again);
     switch (nbytes) {
       case 1:
         as_ldrexb(output, ptr);
@@ -4789,7 +4789,7 @@ MacroAssemblerARMCompat::compareExchangeARMv7(int nbytes, bool signExtend, const
         as_cmp(output, O2Reg(ScratchRegister));
     else
         as_cmp(output, O2Reg(oldval));
-    as_b(&Ldone, NotEqual);
+    as_b(&done, NotEqual);
     switch (nbytes) {
       case 1:
         as_strexb(ScratchRegister, newval, ptr);
@@ -4802,8 +4802,8 @@ MacroAssemblerARMCompat::compareExchangeARMv7(int nbytes, bool signExtend, const
         break;
     }
     as_cmp(ScratchRegister, Imm8(1));
-    as_b(&Lagain, Equal);
-    bind(&Ldone);
+    as_b(&again, Equal);
+    bind(&done);
     ma_dmb();
 }
 
@@ -4825,6 +4825,78 @@ template void
 js::jit::MacroAssemblerARMCompat::compareExchange(int nbytes, bool signExtend,
                                                   const BaseIndex& address, Register oldval,
                                                   Register newval, Register output);
+
+template<typename T>
+void
+MacroAssemblerARMCompat::atomicExchange(int nbytes, bool signExtend, const T& mem,
+                                        Register value, Register output)
+{
+    // If LDREXB/H and STREXB/H are not available we use the
+    // word-width operations with read-modify-add.  That does not
+    // abstract well, so fork.
+    //
+    // Bug 1077321: We may further optimize for ARMv8 (AArch32) here.
+    if (nbytes < 4 && !HasLDSTREXBHD())
+        atomicExchangeARMv6(nbytes, signExtend, mem, value, output);
+    else
+        atomicExchangeARMv7(nbytes, signExtend, mem, value, output);
+}
+
+template<typename T>
+void
+MacroAssemblerARMCompat::atomicExchangeARMv7(int nbytes, bool signExtend, const T& mem,
+                                             Register value, Register output)
+{
+    Label again;
+    Label done;
+    ma_dmb(BarrierST);
+    Register ptr = computePointer(mem, secondScratchReg_);
+    bind(&again);
+    switch (nbytes) {
+      case 1:
+        as_ldrexb(output, ptr);
+        if (signExtend)
+            as_sxtb(output, output, 0);
+        as_strexb(ScratchRegister, value, ptr);
+        break;
+      case 2:
+        as_ldrexh(output, ptr);
+        if (signExtend)
+            as_sxth(output, output, 0);
+        as_strexh(ScratchRegister, value, ptr);
+        break;
+      case 4:
+        MOZ_ASSERT(!signExtend);
+        as_ldrex(output, ptr);
+        as_strex(ScratchRegister, value, ptr);
+        break;
+      default:
+        MOZ_CRASH();
+    }
+    as_cmp(ScratchRegister, Imm8(1));
+    as_b(&again, Equal);
+    bind(&done);
+    ma_dmb();
+}
+
+template<typename T>
+void
+MacroAssemblerARMCompat::atomicExchangeARMv6(int nbytes, bool signExtend, const T& mem,
+                                             Register value, Register output)
+{
+    // Bug 1077318: Must use read-modify-write with LDREX / STREX.
+    MOZ_ASSERT(nbytes == 1 || nbytes == 2);
+    MOZ_CRASH("NYI");
+}
+
+template void
+js::jit::MacroAssemblerARMCompat::atomicExchange(int nbytes, bool signExtend,
+                                                 const Address& address, Register value,
+                                                 Register output);
+template void
+js::jit::MacroAssemblerARMCompat::atomicExchange(int nbytes, bool signExtend,
+                                                 const BaseIndex& address, Register value,
+                                                 Register output);
 
 template<typename T>
 void
@@ -4880,10 +4952,10 @@ void
 MacroAssemblerARMCompat::atomicFetchOpARMv7(int nbytes, bool signExtend, AtomicOp op,
                                             const Register& value, const T& mem, Register output)
 {
-    Label Lagain;
+    Label again;
     Register ptr = computePointer(mem, secondScratchReg_);
     ma_dmb();
-    bind(&Lagain);
+    bind(&again);
     switch (nbytes) {
       case 1:
         as_ldrexb(output, ptr);
@@ -4929,7 +5001,7 @@ MacroAssemblerARMCompat::atomicFetchOpARMv7(int nbytes, bool signExtend, AtomicO
         break;
     }
     as_cmp(ScratchRegister, Imm8(1));
-    as_b(&Lagain, Equal);
+    as_b(&again, Equal);
     ma_dmb();
 }
 
@@ -4987,10 +5059,10 @@ void
 MacroAssemblerARMCompat::atomicEffectOpARMv7(int nbytes, AtomicOp op, const Register& value,
                                              const T& mem)
 {
-    Label Lagain;
+    Label again;
     Register ptr = computePointer(mem, secondScratchReg_);
     ma_dmb();
-    bind(&Lagain);
+    bind(&again);
     switch (nbytes) {
       case 1:
         as_ldrexb(ScratchRegister, ptr);
@@ -5031,7 +5103,7 @@ MacroAssemblerARMCompat::atomicEffectOpARMv7(int nbytes, AtomicOp op, const Regi
         break;
     }
     as_cmp(ScratchRegister, Imm8(1));
-    as_b(&Lagain, Equal);
+    as_b(&again, Equal);
     ma_dmb();
 }
 
@@ -5090,6 +5162,14 @@ MacroAssemblerARMCompat::profilerExitFrame()
     branch(GetJitContext()->runtime->jitRuntime()->getProfilerExitFrameTail());
 }
 
+void
+MacroAssemblerARMCompat::callAndPushReturnAddress(Label* label)
+{
+    AutoForbidPools afp(this, 2);
+    ma_push(pc);
+    asMasm().call(label);
+}
+
 MacroAssembler&
 MacroAssemblerARMCompat::asMasm()
 {
@@ -5102,6 +5182,7 @@ MacroAssemblerARMCompat::asMasm() const
     return *static_cast<const MacroAssembler*>(this);
 }
 
+//{{{ check_macroassembler_style
 // ===============================================================
 // Stack manipulation functions.
 
@@ -5240,3 +5321,57 @@ MacroAssembler::reserveStack(uint32_t amount)
         ma_sub(Imm32(amount), sp);
     adjustFrame(amount);
 }
+
+// ===============================================================
+// Simple call functions.
+
+void
+MacroAssembler::call(Register reg)
+{
+    as_blx(reg);
+}
+
+void
+MacroAssembler::call(Label* label)
+{
+    // For now, assume that it'll be nearby?
+    as_bl(label, Always);
+}
+
+void
+MacroAssembler::call(ImmWord imm)
+{
+    call(ImmPtr((void*)imm.value));
+}
+
+void
+MacroAssembler::call(ImmPtr imm)
+{
+    BufferOffset bo = m_buffer.nextOffset();
+    addPendingJump(bo, imm, Relocation::HARDCODED);
+    ma_call(imm);
+}
+
+void
+MacroAssembler::call(AsmJSImmPtr imm)
+{
+    movePtr(imm, CallReg);
+    call(CallReg);
+}
+
+void
+MacroAssembler::call(JitCode* c)
+{
+    BufferOffset bo = m_buffer.nextOffset();
+    addPendingJump(bo, ImmPtr(c->raw()), Relocation::JITCODE);
+    RelocStyle rs;
+    if (HasMOVWT())
+        rs = L_MOVWT;
+    else
+        rs = L_LDR;
+
+    ma_movPatchable(ImmPtr(c->raw()), ScratchRegister, Always, rs);
+    ma_callJitHalfPush(ScratchRegister);
+}
+
+//}}} check_macroassembler_style

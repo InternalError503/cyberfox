@@ -34,7 +34,6 @@
 #include "mozilla/EventDispatcher.h"
 #include "nsIContent.h"
 #include "nsCycleCollector.h"
-#include "nsNetUtil.h"
 #include "nsXPCOMCIDInternal.h"
 #include "nsIXULRuntime.h"
 #include "nsTextFormatter.h"
@@ -61,6 +60,10 @@
 #ifdef MOZ_NFC
 #include "mozilla/dom/MozNDEFRecord.h"
 #endif // MOZ_NFC
+#ifdef MOZ_WEBRTC
+#include "mozilla/dom/RTCCertificate.h"
+#include "mozilla/dom/RTCCertificateBinding.h"
+#endif
 #include "mozilla/dom/StructuredClone.h"
 #include "mozilla/dom/SubtleCryptoBinding.h"
 #include "mozilla/ipc/BackgroundUtils.h"
@@ -422,7 +425,20 @@ public:
     }
 
     if (status != nsEventStatus_eConsumeNoDefault) {
-      mReport->LogToConsole();
+      if (mError.isObject()) {
+        AutoJSAPI jsapi;
+        if (NS_WARN_IF(!jsapi.Init(mError.toObjectOrNull()))) {
+          mReport->LogToConsole();
+          return NS_OK;
+        }
+        JSContext* cx = jsapi.cx();
+        JS::Rooted<JSObject*> exObj(cx, mError.toObjectOrNull());
+        JS::RootedObject stack(cx, ExceptionStackOrNull(cx, exObj));
+        mReport->LogToConsoleWithStack(stack);
+      } else {
+        mReport->LogToConsole();
+      }
+
     }
 
     return NS_OK;
@@ -500,7 +516,14 @@ SystemErrorReporter(JSContext *cx, const char *message, JSErrorReport *report)
     if (!win || JSREPORT_IS_WARNING(xpcReport->mFlags) ||
         report->errorNumber == JSMSG_OUT_OF_MEMORY)
     {
-      xpcReport->LogToConsole();
+      if (exception.isObject()) {
+        JS::RootedObject exObj(cx, exception.toObjectOrNull());
+        JSAutoCompartment ac(cx, exObj);
+        JS::RootedObject stackVal(cx, ExceptionStackOrNull(cx, exObj));
+        xpcReport->LogToConsoleWithStack(stackVal);
+      } else {
+        xpcReport->LogToConsole();
+      }
       return;
     }
 
@@ -932,7 +955,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
       JSString *str = ::JS_NewStringCopyN(cx, data.get(), data.Length());
       NS_ENSURE_TRUE(str, NS_ERROR_OUT_OF_MEMORY);
 
-      *aArgv = STRING_TO_JSVAL(str);
+      aArgv->setString(str);
 
       break;
     }
@@ -950,7 +973,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
         ::JS_NewUCStringCopyN(cx, data.get(), data.Length());
       NS_ENSURE_TRUE(str, NS_ERROR_OUT_OF_MEMORY);
 
-      *aArgv = STRING_TO_JSVAL(str);
+      aArgv->setString(str);
       break;
     }
     case nsISupportsPrimitive::TYPE_PRBOOL : {
@@ -961,7 +984,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
 
       p->GetData(&data);
 
-      *aArgv = BOOLEAN_TO_JSVAL(data);
+      aArgv->setBoolean(data);
 
       break;
     }
@@ -973,7 +996,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
 
       p->GetData(&data);
 
-      *aArgv = INT_TO_JSVAL(data);
+      aArgv->setInt32(data);
 
       break;
     }
@@ -985,7 +1008,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
 
       p->GetData(&data);
 
-      *aArgv = INT_TO_JSVAL(data);
+      aArgv->setInt32(data);
 
       break;
     }
@@ -997,7 +1020,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
 
       p->GetData(&data);
 
-      *aArgv = INT_TO_JSVAL(data);
+      aArgv->setInt32(data);
 
       break;
     }
@@ -1012,7 +1035,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
       JSString *str = ::JS_NewStringCopyN(cx, &data, 1);
       NS_ENSURE_TRUE(str, NS_ERROR_OUT_OF_MEMORY);
 
-      *aArgv = STRING_TO_JSVAL(str);
+      aArgv->setString(str);
 
       break;
     }
@@ -1024,7 +1047,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
 
       p->GetData(&data);
 
-      *aArgv = INT_TO_JSVAL(data);
+      aArgv->setInt32(data);
 
       break;
     }
@@ -1036,7 +1059,7 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
 
       p->GetData(&data);
 
-      *aArgv = INT_TO_JSVAL(data);
+      aArgv->setInt32(data);
 
       break;
     }
@@ -1093,12 +1116,12 @@ nsJSContext::AddSupportsPrimitiveTojsvals(nsISupports *aArg, JS::Value *aArgv)
     case nsISupportsPrimitive::TYPE_PRTIME :
     case nsISupportsPrimitive::TYPE_VOID : {
       NS_WARNING("Unsupported primitive type used");
-      *aArgv = JSVAL_NULL;
+      aArgv->setNull();
       break;
     }
     default : {
       NS_WARNING("Unknown primitive type used");
-      *aArgv = JSVAL_NULL;
+      aArgv->setNull();
       break;
     }
   }
@@ -2471,7 +2494,13 @@ NS_DOMReadStructuredClone(JSContext* cx,
 {
   if (tag == SCTAG_DOM_IMAGEDATA) {
     return ReadStructuredCloneImageData(cx, reader);
-  } else if (tag == SCTAG_DOM_WEBCRYPTO_KEY) {
+  }
+
+  if (tag == SCTAG_DOM_WEBCRYPTO_KEY) {
+    if (!NS_IsMainThread()) {
+      return nullptr;
+    }
+
     nsIGlobalObject *global = xpc::NativeGlobal(JS::CurrentGlobalOrNull(cx));
     if (!global) {
       return nullptr;
@@ -2488,9 +2517,15 @@ NS_DOMReadStructuredClone(JSContext* cx,
       }
     }
     return result;
-  } else if (tag == SCTAG_DOM_NULL_PRINCIPAL ||
-             tag == SCTAG_DOM_SYSTEM_PRINCIPAL ||
-             tag == SCTAG_DOM_CONTENT_PRINCIPAL) {
+  }
+
+  if (tag == SCTAG_DOM_NULL_PRINCIPAL ||
+      tag == SCTAG_DOM_SYSTEM_PRINCIPAL ||
+      tag == SCTAG_DOM_CONTENT_PRINCIPAL) {
+    if (!NS_IsMainThread()) {
+      return nullptr;
+    }
+
     mozilla::ipc::PrincipalInfo info;
     if (tag == SCTAG_DOM_SYSTEM_PRINCIPAL) {
       info = mozilla::ipc::SystemPrincipalInfo();
@@ -2528,8 +2563,14 @@ NS_DOMReadStructuredClone(JSContext* cx,
     }
 
     return result.toObjectOrNull();
-  } else if (tag == SCTAG_DOM_NFC_NDEF) {
+  }
+
 #ifdef MOZ_NFC
+  if (tag == SCTAG_DOM_NFC_NDEF) {
+    if (!NS_IsMainThread()) {
+      return nullptr;
+    }
+
     nsIGlobalObject *global = xpc::NativeGlobal(JS::CurrentGlobalOrNull(cx));
     if (!global) {
       return nullptr;
@@ -2543,10 +2584,33 @@ NS_DOMReadStructuredClone(JSContext* cx,
                ndefRecord->WrapObject(cx, nullptr) : nullptr;
     }
     return result;
-#else
-    return nullptr;
-#endif
   }
+#endif
+
+#ifdef MOZ_WEBRTC
+  if (tag == SCTAG_DOM_RTC_CERTIFICATE) {
+    if (!NS_IsMainThread()) {
+      return nullptr;
+    }
+
+    nsIGlobalObject *global = xpc::NativeGlobal(JS::CurrentGlobalOrNull(cx));
+    if (!global) {
+      return nullptr;
+    }
+
+    // Prevent the return value from being trashed by a GC during ~nsRefPtr.
+    JS::Rooted<JSObject*> result(cx);
+    {
+      nsRefPtr<RTCCertificate> cert = new RTCCertificate(global);
+      if (!cert->ReadStructuredClone(reader)) {
+        result = nullptr;
+      } else {
+        result = cert->WrapObject(cx, nullptr);
+      }
+    }
+    return result;
+  }
+#endif
 
   // Don't know what this is. Bail.
   xpc::Throw(cx, NS_ERROR_DOM_DATA_CLONE_ERR);
@@ -2568,11 +2632,22 @@ NS_DOMWriteStructuredClone(JSContext* cx,
   // Handle Key cloning
   CryptoKey* key;
   if (NS_SUCCEEDED(UNWRAP_OBJECT(CryptoKey, obj, key))) {
+    MOZ_ASSERT(NS_IsMainThread(), "This object should not be exposed outside the main-thread.");
     return JS_WriteUint32Pair(writer, SCTAG_DOM_WEBCRYPTO_KEY, 0) &&
            key->WriteStructuredClone(writer);
   }
 
-  if (xpc::IsReflector(obj)) {
+#ifdef MOZ_WEBRTC
+  // Handle WebRTC Certificate cloning
+  RTCCertificate* cert;
+  if (NS_SUCCEEDED(UNWRAP_OBJECT(RTCCertificate, obj, cert))) {
+    MOZ_ASSERT(NS_IsMainThread(), "This object should not be exposed outside the main-thread.");
+    return JS_WriteUint32Pair(writer, SCTAG_DOM_RTC_CERTIFICATE, 0) &&
+           cert->WriteStructuredClone(writer);
+  }
+#endif
+
+  if (NS_IsMainThread() && xpc::IsReflector(obj)) {
     nsCOMPtr<nsISupports> base = xpc::UnwrapReflectorToISupports(obj);
     nsCOMPtr<nsIPrincipal> principal = do_QueryInterface(base);
     if (principal) {
@@ -2600,6 +2675,7 @@ NS_DOMWriteStructuredClone(JSContext* cx,
 #ifdef MOZ_NFC
   MozNDEFRecord* ndefRecord;
   if (NS_SUCCEEDED(UNWRAP_OBJECT(MozNDEFRecord, obj, ndefRecord))) {
+    MOZ_ASSERT(NS_IsMainThread(), "This object should not be exposed outside the main-thread.");
     return JS_WriteUint32Pair(writer, SCTAG_DOM_NFC_NDEF, 0) &&
            ndefRecord->WriteStructuredClone(cx, writer);
   }
@@ -2969,7 +3045,6 @@ NS_IMETHODIMP nsJSArgArray::GetLength(uint32_t *aLength)
   return NS_OK;
 }
 
-/* void queryElementAt (in unsigned long index, in nsIIDRef uuid, [iid_is (uuid), retval] out nsQIResult result); */
 NS_IMETHODIMP nsJSArgArray::QueryElementAt(uint32_t index, const nsIID & uuid, void * *result)
 {
   *result = nullptr;
@@ -2986,13 +3061,11 @@ NS_IMETHODIMP nsJSArgArray::QueryElementAt(uint32_t index, const nsIID & uuid, v
   return NS_ERROR_NO_INTERFACE;
 }
 
-/* unsigned long indexOf (in unsigned long startIndex, in nsISupports element); */
 NS_IMETHODIMP nsJSArgArray::IndexOf(uint32_t startIndex, nsISupports *element, uint32_t *_retval)
 {
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
-/* nsISimpleEnumerator enumerate (); */
 NS_IMETHODIMP nsJSArgArray::Enumerate(nsISimpleEnumerator **_retval)
 {
   return NS_ERROR_NOT_IMPLEMENTED;

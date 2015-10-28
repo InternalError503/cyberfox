@@ -10,6 +10,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.mozilla.gecko.AndroidGamepadManager;
+import org.mozilla.gecko.annotation.WrapForJNI;
 import org.mozilla.gecko.AppConstants.Versions;
 import org.mozilla.gecko.EventDispatcher;
 import org.mozilla.gecko.GeckoAccessibility;
@@ -20,7 +21,6 @@ import org.mozilla.gecko.Tab;
 import org.mozilla.gecko.Tabs;
 import org.mozilla.gecko.ZoomConstraints;
 import org.mozilla.gecko.mozglue.RobocopTarget;
-import org.mozilla.gecko.mozglue.generatorannotations.WrapElementForJNI;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -459,18 +459,6 @@ public class LayerView extends FrameLayout implements Tabs.OnTabsChangedListener
         return mGLController;
     }
 
-    private Bitmap getDrawable(String name) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
-        Context context = getContext();
-        int resId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
-        return BitmapUtils.decodeResource(context, resId, options);
-    }
-
-    Bitmap getScrollbarImage() {
-        return getDrawable("scrollbar");
-    }
-
     /* When using a SurfaceView (mSurfaceView != null), resizing happens in two
      * phases. First, the LayerView changes size, then, often some frames later,
      * the SurfaceView changes size. Because of this, we need to split the
@@ -527,7 +515,7 @@ public class LayerView extends FrameLayout implements Tabs.OnTabsChangedListener
         return mTextureView.getSurfaceTexture();
     }
 
-    @WrapElementForJNI(allowMultithread = true, stubName = "RegisterCompositorWrapper")
+    @WrapForJNI(allowMultithread = true, stubName = "RegisterCompositorWrapper")
     public static GLController registerCxxCompositor() {
         try {
             LayerView layerView = GeckoAppShell.getLayerView();
@@ -541,7 +529,7 @@ public class LayerView extends FrameLayout implements Tabs.OnTabsChangedListener
     }
 
     //This method is called on the Gecko main thread.
-    @WrapElementForJNI(allowMultithread = true, stubName = "updateZoomedView")
+    @WrapForJNI(allowMultithread = true, stubName = "updateZoomedView")
     public static void updateZoomedView(ByteBuffer data) {
         LayerView layerView = GeckoAppShell.getLayerView();
         if (layerView != null) {

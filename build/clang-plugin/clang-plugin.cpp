@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
@@ -29,6 +30,14 @@ typedef ASTConsumer *ASTConsumerPtr;
 
 namespace {
 
+QualType GetCallReturnType(const CallExpr *expr) {
+#if CLANG_VERSION_FULL >= 307
+  return expr->getCallReturnType(expr->getCalleeDecl()->getASTContext());
+#else
+  return expr->getCallReturnType();
+#endif
+}
+
 using namespace clang::ast_matchers;
 class DiagnosticsMatcher {
 public:
@@ -41,22 +50,7 @@ public:
 private:
   class ScopeChecker : public MatchFinder::MatchCallback {
   public:
-    enum Scope {
-      eLocal,
-      eGlobal
-    };
-    ScopeChecker(Scope scope_) :
-      scope(scope_) {}
     virtual void run(const MatchFinder::MatchResult &Result);
-    void noteInferred(QualType T, DiagnosticsEngine &Diag);
-  private:
-    Scope scope;
-  };
-
-  class NonHeapClassChecker : public MatchFinder::MatchCallback {
-  public:
-    virtual void run(const MatchFinder::MatchResult &Result);
-    void noteInferred(QualType T, DiagnosticsEngine &Diag);
   };
 
   class ArithmeticArgChecker : public MatchFinder::MatchCallback {
@@ -89,15 +83,37 @@ private:
     virtual void run(const MatchFinder::MatchResult &Result);
   };
 
-  ScopeChecker stackClassChecker;
-  ScopeChecker globalClassChecker;
-  NonHeapClassChecker nonheapClassChecker;
+  class NoDuplicateRefCntMemberChecker : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result);
+  };
+
+  class NeedsNoVTableTypeChecker : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result);
+  };
+
+  class NonMemMovableChecker : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result);
+  };
+
+  class ExplicitImplicitChecker : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result);
+  };
+
+  ScopeChecker scopeChecker;
   ArithmeticArgChecker arithmeticArgChecker;
   TrivialCtorDtorChecker trivialCtorDtorChecker;
   NaNExprChecker nanExprChecker;
   NoAddRefReleaseOnReturnChecker noAddRefReleaseOnReturnChecker;
   RefCountedInsideLambdaChecker refCountedInsideLambdaChecker;
   ExplicitOperatorBoolChecker explicitOperatorBoolChecker;
+  NoDuplicateRefCntMemberChecker noDuplicateRefCntMemberChecker;
+  NeedsNoVTableTypeChecker needsNoVTableTypeChecker;
+  NonMemMovableChecker nonMemMovableChecker;
+  ExplicitImplicitChecker explicitImplicitChecker;
   MatchFinder astMatcher;
 };
 
@@ -156,7 +172,6 @@ bool isInIgnoredNamespaceForImplicitConversion(const Decl *decl) {
 }
 
 bool isIgnoredPathForImplicitCtor(const Decl *decl) {
-  decl = decl->getCanonicalDecl();
   SourceLocation Loc = decl->getLocation();
   const SourceManager &SM = decl->getASTContext().getSourceManager();
   SmallString<1024> FileName = SM.getFilename(Loc);
@@ -171,6 +186,11 @@ bool isIgnoredPathForImplicitCtor(const Decl *decl) {
         begin->compare_lower(StringRef("scoped_ptr.h")) == 0 ||
         begin->compare_lower(StringRef("graphite2")) == 0) {
       return true;
+    }
+    if (begin->compare_lower(StringRef("chromium")) == 0) {
+      // Ignore security/sandbox/chromium but not ipc/chromium.
+      ++begin;
+      return begin != end && begin->compare_lower(StringRef("sandbox")) == 0;
     }
   }
   return false;
@@ -192,17 +212,60 @@ bool isIgnoredPathForImplicitConversion(const Decl *decl) {
   return false;
 }
 
-bool isInterestingDeclForImplicitCtor(const Decl *decl) {
-  return !isInIgnoredNamespaceForImplicitCtor(decl) &&
-         !isIgnoredPathForImplicitCtor(decl);
-}
-
 bool isInterestingDeclForImplicitConversion(const Decl *decl) {
   return !isInIgnoredNamespaceForImplicitConversion(decl) &&
          !isIgnoredPathForImplicitConversion(decl);
 }
 
 }
+
+class CustomTypeAnnotation {
+  enum ReasonKind {
+    RK_None,
+    RK_Direct,
+    RK_ArrayElement,
+    RK_BaseClass,
+    RK_Field,
+    RK_TemplateInherited,
+  };
+  struct AnnotationReason {
+    QualType Type;
+    ReasonKind Kind;
+    const FieldDecl *Field;
+
+    bool valid() const { return Kind != RK_None; }
+  };
+  typedef DenseMap<void *, AnnotationReason> ReasonCache;
+
+  const char *Spelling;
+  const char *Pretty;
+  ReasonCache Cache;
+
+public:
+  CustomTypeAnnotation(const char *Spelling, const char *Pretty)
+    : Spelling(Spelling), Pretty(Pretty) {};
+
+  // Checks if this custom annotation "effectively affects" the given type.
+  bool hasEffectiveAnnotation(QualType T) {
+    return directAnnotationReason(T).valid();
+  }
+  void dumpAnnotationReason(DiagnosticsEngine &Diag, QualType T, SourceLocation Loc);
+
+private:
+  bool hasLiteralAnnotation(QualType T) const;
+  AnnotationReason directAnnotationReason(QualType T);
+};
+
+static CustomTypeAnnotation StackClass =
+  CustomTypeAnnotation("moz_stack_class", "stack");
+static CustomTypeAnnotation GlobalClass =
+  CustomTypeAnnotation("moz_global_class", "global");
+static CustomTypeAnnotation NonHeapClass =
+  CustomTypeAnnotation("moz_nonheap_class", "non-heap");
+static CustomTypeAnnotation HeapClass =
+  CustomTypeAnnotation("moz_heap_class", "heap");
+static CustomTypeAnnotation MustUse =
+  CustomTypeAnnotation("moz_must_use", "must-use");
 
 class MozChecker : public ASTConsumer, public RecursiveASTVisitor<MozChecker> {
   DiagnosticsEngine &Diag;
@@ -219,12 +282,31 @@ public:
     TraverseDecl(ctx.getTranslationUnitDecl());
   }
 
-  static bool hasCustomAnnotation(const Decl *d, const char *spelling) {
-    AnnotateAttr *attr = d->getAttr<AnnotateAttr>();
-    if (!attr)
-      return false;
+  static bool hasCustomAnnotation(const Decl *D, const char *Spelling) {
+    iterator_range<specific_attr_iterator<AnnotateAttr> > Attrs =
+      D->specific_attrs<AnnotateAttr>();
 
-    return attr->getAnnotation() == spelling;
+    for (AnnotateAttr *Attr : Attrs) {
+      if (Attr->getAnnotation() == Spelling) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  void HandleUnusedExprResult(const Stmt *stmt) {
+    const Expr* E = dyn_cast_or_null<Expr>(stmt);
+    if (E) {
+      QualType T = E->getType();
+      if (MustUse.hasEffectiveAnnotation(T)) {
+        unsigned errorID = Diag.getDiagnosticIDs()->getCustomDiagID(
+          DiagnosticIDs::Error, "Unused value of must-use type %0");
+
+        Diag.Report(E->getLocStart(), errorID) << T;
+        MustUse.dumpAnnotationReason(Diag, T, E->getLocStart());
+      }
+    }
   }
 
   bool VisitCXXRecordDecl(CXXRecordDecl *d) {
@@ -279,133 +361,44 @@ public:
       }
     }
 
-    if (!d->isAbstract() && isInterestingDeclForImplicitCtor(d)) {
-      for (CXXRecordDecl::ctor_iterator ctor = d->ctor_begin(),
-           e = d->ctor_end(); ctor != e; ++ctor) {
-        // Ignore non-converting ctors
-        if (!ctor->isConvertingConstructor(false)) {
-          continue;
-        }
-        // Ignore copy or move constructors
-        if (ctor->isCopyOrMoveConstructor()) {
-          continue;
-        }
-        // Ignore deleted constructors
-        if (ctor->isDeleted()) {
-          continue;
-        }
-        // Ignore whitelisted constructors
-        if (MozChecker::hasCustomAnnotation(*ctor, "moz_implicit")) {
-          continue;
-        }
-        unsigned ctorID = Diag.getDiagnosticIDs()->getCustomDiagID(
-          DiagnosticIDs::Error, "bad implicit conversion constructor for %0");
-        unsigned noteID = Diag.getDiagnosticIDs()->getCustomDiagID(
-          DiagnosticIDs::Note, "consider adding the explicit keyword to the constructor");
-        Diag.Report(ctor->getLocation(), ctorID) << d->getDeclName();
-        Diag.Report(ctor->getLocation(), noteID);
-      }
-    }
+    return true;
+  }
 
+  bool VisitSwitchCase(SwitchCase* stmt) {
+    HandleUnusedExprResult(stmt->getSubStmt());
+    return true;
+  }
+  bool VisitCompoundStmt(CompoundStmt* stmt) {
+    for (CompoundStmt::body_iterator it = stmt->body_begin(), e = stmt->body_end();
+         it != e; ++it) {
+      HandleUnusedExprResult(*it);
+    }
+    return true;
+  }
+  bool VisitIfStmt(IfStmt* Stmt) {
+    HandleUnusedExprResult(Stmt->getThen());
+    HandleUnusedExprResult(Stmt->getElse());
+    return true;
+  }
+  bool VisitWhileStmt(WhileStmt* Stmt) {
+    HandleUnusedExprResult(Stmt->getBody());
+    return true;
+  }
+  bool VisitDoStmt(DoStmt* Stmt) {
+    HandleUnusedExprResult(Stmt->getBody());
+    return true;
+  }
+  bool VisitForStmt(ForStmt* Stmt) {
+    HandleUnusedExprResult(Stmt->getBody());
+    HandleUnusedExprResult(Stmt->getInit());
+    HandleUnusedExprResult(Stmt->getInc());
+    return true;
+  }
+  bool VisitBinComma(BinaryOperator* Op) {
+    HandleUnusedExprResult(Op->getLHS());
     return true;
   }
 };
-
-/**
- * Where classes may be allocated. Regular classes can be allocated anywhere,
- * non-heap classes on the stack or as static variables, and stack classes only
- * on the stack. Note that stack classes subsumes non-heap classes.
- */
-enum ClassAllocationNature {
-  RegularClass = 0,
-  NonHeapClass = 1,
-  StackClass = 2,
-  GlobalClass = 3
-};
-
-/// A cached data of whether classes are stack classes, non-heap classes, or
-/// neither.
-DenseMap<const CXXRecordDecl *,
-  std::pair<const Decl *, ClassAllocationNature> > inferredAllocCauses;
-
-ClassAllocationNature getClassAttrs(QualType T);
-
-ClassAllocationNature getClassAttrs(CXXRecordDecl *D) {
-  // Normalize so that D points to the definition if it exists. If it doesn't,
-  // then we can't allocate it anyways.
-  if (!D->hasDefinition())
-    return RegularClass;
-  D = D->getDefinition();
-  // Base class: anyone with this annotation is obviously a stack class
-  if (MozChecker::hasCustomAnnotation(D, "moz_stack_class"))
-    return StackClass;
-  // Base class: anyone with this annotation is obviously a global class
-  if (MozChecker::hasCustomAnnotation(D, "moz_global_class"))
-    return GlobalClass;
-
-  // See if we cached the result.
-  DenseMap<const CXXRecordDecl *,
-    std::pair<const Decl *, ClassAllocationNature> >::iterator it =
-    inferredAllocCauses.find(D);
-  if (it != inferredAllocCauses.end()) {
-    return it->second.second;
-  }
-
-  // Continue looking, we might be a stack class yet. Even if we're a nonheap
-  // class, it might be possible that we've inferred to be a stack class.
-  ClassAllocationNature type = RegularClass;
-  if (MozChecker::hasCustomAnnotation(D, "moz_nonheap_class")) {
-    type = NonHeapClass;
-  }
-  inferredAllocCauses.insert(std::make_pair(D,
-    std::make_pair((const Decl *)0, type)));
-
-  // Look through all base cases to figure out if the parent is a stack class or
-  // a non-heap class. Since we might later infer to also be a stack class, keep
-  // going.
-  for (CXXRecordDecl::base_class_iterator base = D->bases_begin(),
-       e = D->bases_end(); base != e; ++base) {
-    ClassAllocationNature super = getClassAttrs(base->getType());
-    if (super == StackClass) {
-      inferredAllocCauses[D] = std::make_pair(
-        base->getType()->getAsCXXRecordDecl(), StackClass);
-      return StackClass;
-    } else if (super == GlobalClass) {
-      inferredAllocCauses[D] = std::make_pair(
-        base->getType()->getAsCXXRecordDecl(), GlobalClass);
-      return GlobalClass;
-    } else if (super == NonHeapClass) {
-      inferredAllocCauses[D] = std::make_pair(
-        base->getType()->getAsCXXRecordDecl(), NonHeapClass);
-      type = NonHeapClass;
-    }
-  }
-
-  // Maybe it has a member which is a stack class.
-  for (RecordDecl::field_iterator field = D->field_begin(), e = D->field_end();
-       field != e; ++field) {
-    ClassAllocationNature fieldType = getClassAttrs(field->getType());
-    if (fieldType == StackClass) {
-      inferredAllocCauses[D] = std::make_pair(*field, StackClass);
-      return StackClass;
-    } else if (fieldType == GlobalClass) {
-      inferredAllocCauses[D] = std::make_pair(*field, GlobalClass);
-      return GlobalClass;
-    } else if (fieldType == NonHeapClass) {
-      inferredAllocCauses[D] = std::make_pair(*field, NonHeapClass);
-      type = NonHeapClass;
-    }
-  }
-
-  return type;
-}
-
-ClassAllocationNature getClassAttrs(QualType T) {
-  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
-    T = arrTy->getElementType();
-  CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
-  return clazz ? getClassAttrs(clazz) : RegularClass;
-}
 
 /// A cached data of whether classes are refcounted or not.
 typedef DenseMap<const CXXRecordDecl *,
@@ -460,7 +453,88 @@ bool isClassRefCounted(QualType T) {
   while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
     T = arrTy->getElementType();
   CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
-  return clazz ? isClassRefCounted(clazz) : RegularClass;
+  return clazz ? isClassRefCounted(clazz) : false;
+}
+
+/// A cached data of whether classes are memmovable, and if not, what declaration
+/// makes them non-movable
+typedef DenseMap<const CXXRecordDecl *, const CXXRecordDecl *> InferredMovability;
+InferredMovability inferredMovability;
+
+bool isClassNonMemMovable(QualType T);
+const CXXRecordDecl* isClassNonMemMovableWorker(QualType T);
+
+const CXXRecordDecl* isClassNonMemMovableWorker(const CXXRecordDecl *D) {
+  // If we have a definition, then we want to standardize our reference to point
+  // to the definition node. If we don't have a definition, that means that either
+  // we only have a forward declaration of the type in our file, or we are being
+  // passed a template argument which is not used, and thus never instantiated by
+  // clang.
+  // As the argument isn't used, we can't memmove it (as we don't know it's size),
+  // which means not reporting an error is OK.
+  if (!D->hasDefinition()) {
+    return 0;
+  }
+  D = D->getDefinition();
+
+  // Are we explicitly marked as non-memmovable class?
+  if (MozChecker::hasCustomAnnotation(D, "moz_non_memmovable")) {
+    return D;
+  }
+
+  // Look through all base cases to figure out if the parent is a non-memmovable class.
+  for (CXXRecordDecl::base_class_const_iterator base = D->bases_begin();
+       base != D->bases_end(); ++base) {
+    const CXXRecordDecl *result = isClassNonMemMovableWorker(base->getType());
+    if (result) {
+      return result;
+    }
+  }
+
+  // Look through all members to figure out if a member is a non-memmovable class.
+  for (RecordDecl::field_iterator field = D->field_begin(), e = D->field_end();
+       field != e; ++field) {
+    const CXXRecordDecl *result = isClassNonMemMovableWorker(field->getType());
+    if (result) {
+      return result;
+    }
+  }
+
+  return 0;
+}
+
+const CXXRecordDecl* isClassNonMemMovableWorker(QualType T) {
+  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
+    T = arrTy->getElementType();
+  const CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
+  return clazz ? isClassNonMemMovableWorker(clazz) : 0;
+}
+
+bool isClassNonMemMovable(const CXXRecordDecl *D) {
+  InferredMovability::iterator it =
+    inferredMovability.find(D);
+  if (it != inferredMovability.end())
+    return !!it->second;
+  const CXXRecordDecl *result = isClassNonMemMovableWorker(D);
+  inferredMovability.insert(std::make_pair(D, result));
+  return !!result;
+}
+
+bool isClassNonMemMovable(QualType T) {
+  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
+    T = arrTy->getElementType();
+  const CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
+  return clazz ? isClassNonMemMovable(clazz) : false;
+}
+
+const CXXRecordDecl* findWhyClassIsNonMemMovable(QualType T) {
+  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
+    T = arrTy->getElementType();
+  CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
+  InferredMovability::iterator it =
+    inferredMovability.find(clazz);
+  assert(it != inferredMovability.end());
+  return it->second;
 }
 
 template<class T>
@@ -473,28 +547,59 @@ bool IsInSystemHeader(const ASTContext &AC, const T &D) {
   return SourceManager.isInSystemHeader(ExpansionLoc);
 }
 
+const FieldDecl *getClassRefCntMember(const CXXRecordDecl *D) {
+  for (RecordDecl::field_iterator field = D->field_begin(), e = D->field_end();
+       field != e; ++field) {
+    if (field->getName() == "mRefCnt") {
+      return *field;
+    }
+  }
+  return 0;
+}
+
+const FieldDecl *getClassRefCntMember(QualType T) {
+  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
+    T = arrTy->getElementType();
+  CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
+  return clazz ? getClassRefCntMember(clazz) : 0;
+}
+
+const FieldDecl *getBaseRefCntMember(QualType T);
+
+const FieldDecl *getBaseRefCntMember(const CXXRecordDecl *D) {
+  const FieldDecl *refCntMember = getClassRefCntMember(D);
+  if (refCntMember && isClassRefCounted(D)) {
+    return refCntMember;
+  }
+
+  for (CXXRecordDecl::base_class_const_iterator base = D->bases_begin(), e = D->bases_end();
+       base != e; ++base) {
+    refCntMember = getBaseRefCntMember(base->getType());
+    if (refCntMember) {
+      return refCntMember;
+    }
+  }
+  return 0;
+}
+
+const FieldDecl *getBaseRefCntMember(QualType T) {
+  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
+    T = arrTy->getElementType();
+  CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
+  return clazz ? getBaseRefCntMember(clazz) : 0;
+}
+
+bool typeHasVTable(QualType T) {
+  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
+    T = arrTy->getElementType();
+  CXXRecordDecl* offender = T->getAsCXXRecordDecl();
+  return offender && offender->hasDefinition() && offender->isDynamicClass();
+}
+
 }
 
 namespace clang {
 namespace ast_matchers {
-
-/// This matcher will match any class with the stack class assertion or an
-/// array of such classes.
-AST_MATCHER(QualType, stackClassAggregate) {
-  return getClassAttrs(Node) == StackClass;
-}
-
-/// This matcher will match any class with the global class assertion or an
-/// array of such classes.
-AST_MATCHER(QualType, globalClassAggregate) {
-  return getClassAttrs(Node) == GlobalClass;
-}
-
-/// This matcher will match any class with the stack class assertion or an
-/// array of such classes.
-AST_MATCHER(QualType, nonheapClassAggregate) {
-  return getClassAttrs(Node) == NonHeapClass;
-}
 
 /// This matcher will match any function declaration that is declared as a heap
 /// allocator.
@@ -627,59 +732,206 @@ AST_POLYMORPHIC_MATCHER_P(equalsBoundNode,
 
 #endif
 
+AST_MATCHER(CXXRecordDecl, hasRefCntMember) {
+  return isClassRefCounted(&Node) && getClassRefCntMember(&Node);
+}
+
+AST_MATCHER(QualType, hasVTable) {
+  return typeHasVTable(Node);
+}
+
+AST_MATCHER(CXXRecordDecl, hasNeedsNoVTableTypeAttr) {
+  return MozChecker::hasCustomAnnotation(&Node, "moz_needs_no_vtable_type");
+}
+
+/// This matcher will select classes which are non-memmovable
+AST_MATCHER(QualType, isNonMemMovable) {
+  return isClassNonMemMovable(Node);
+}
+
+/// This matcher will select classes which require a memmovable template arg
+AST_MATCHER(CXXRecordDecl, needsMemMovable) {
+  return MozChecker::hasCustomAnnotation(&Node, "moz_needs_memmovable_type");
+}
+
+AST_MATCHER(CXXConstructorDecl, isInterestingImplicitCtor) {
+  const CXXConstructorDecl *decl = Node.getCanonicalDecl();
+  return
+    // Skip ignored namespaces and paths
+    !isInIgnoredNamespaceForImplicitCtor(decl) &&
+    !isIgnoredPathForImplicitCtor(decl) &&
+    // We only want Converting constructors
+    decl->isConvertingConstructor(false) &&
+    // We don't want copy of move constructors, as those are allowed to be implicit
+    !decl->isCopyOrMoveConstructor() &&
+    // We don't want deleted constructors.
+    !decl->isDeleted();
+}
+
+// We can't call this "isImplicit" since it clashes with an existing matcher in clang.
+AST_MATCHER(CXXConstructorDecl, isMarkedImplicit) {
+  return MozChecker::hasCustomAnnotation(&Node, "moz_implicit");
+}
+
+AST_MATCHER(CXXRecordDecl, isConcreteClass) {
+  return !Node.isAbstract();
+}
+
 }
 }
 
 namespace {
 
-bool isPlacementNew(const CXXNewExpr *expr) {
+void CustomTypeAnnotation::dumpAnnotationReason(DiagnosticsEngine &Diag, QualType T, SourceLocation Loc) {
+  unsigned InheritsID = Diag.getDiagnosticIDs()->getCustomDiagID(
+    DiagnosticIDs::Note, "%1 is a %0 type because it inherits from a %0 type %2");
+  unsigned MemberID = Diag.getDiagnosticIDs()->getCustomDiagID(
+    DiagnosticIDs::Note, "%1 is a %0 type because member %2 is a %0 type %3");
+  unsigned ArrayID = Diag.getDiagnosticIDs()->getCustomDiagID(
+    DiagnosticIDs::Note, "%1 is a %0 type because it is an array of %0 type %2");
+  unsigned TemplID = Diag.getDiagnosticIDs()->getCustomDiagID(
+    DiagnosticIDs::Note, "%1 is a %0 type because it has a template argument %0 type %2");
+
+  AnnotationReason Reason = directAnnotationReason(T);
+  for (;;) {
+    switch (Reason.Kind) {
+    case RK_ArrayElement:
+      Diag.Report(Loc, ArrayID)
+        << Pretty << T << Reason.Type;
+      break;
+    case RK_BaseClass:
+      {
+        const CXXRecordDecl *Decl = T->getAsCXXRecordDecl();
+        assert(Decl && "This type should be a C++ class");
+
+        Diag.Report(Decl->getLocation(), InheritsID)
+          << Pretty << T << Reason.Type;
+        break;
+      }
+    case RK_Field:
+      Diag.Report(Reason.Field->getLocation(), MemberID)
+        << Pretty << T << Reason.Field << Reason.Type;
+      break;
+    case RK_TemplateInherited:
+      {
+        const CXXRecordDecl *Decl = T->getAsCXXRecordDecl();
+        assert(Decl && "This type should be a C++ class");
+
+        Diag.Report(Decl->getLocation(), TemplID)
+          << Pretty << T << Reason.Type;
+        break;
+      }
+    default:
+      return;
+    }
+
+    T = Reason.Type;
+    Reason = directAnnotationReason(T);
+  }
+}
+
+bool CustomTypeAnnotation::hasLiteralAnnotation(QualType T) const {
+#if CLANG_VERSION_FULL >= 306
+  if (const TagDecl *D = T->getAsTagDecl()) {
+#else
+  if (const CXXRecordDecl *D = T->getAsCXXRecordDecl()) {
+#endif
+    return MozChecker::hasCustomAnnotation(D, Spelling);
+  }
+  return false;
+}
+
+CustomTypeAnnotation::AnnotationReason CustomTypeAnnotation::directAnnotationReason(QualType T) {
+  if (hasLiteralAnnotation(T)) {
+    AnnotationReason Reason = { T, RK_Direct, nullptr };
+    return Reason;
+  }
+
+  // Check if we have a cached answer
+  void *Key = T.getAsOpaquePtr();
+  ReasonCache::iterator Cached = Cache.find(T.getAsOpaquePtr());
+  if (Cached != Cache.end()) {
+    return Cached->second;
+  }
+
+  // Check if we have a type which we can recurse into
+  if (const ArrayType *Array = T->getAsArrayTypeUnsafe()) {
+    if (hasEffectiveAnnotation(Array->getElementType())) {
+      AnnotationReason Reason = { Array->getElementType(), RK_ArrayElement, nullptr };
+      Cache[Key] = Reason;
+      return Reason;
+    }
+  }
+
+  // Recurse into base classes
+  if (const CXXRecordDecl *Decl = T->getAsCXXRecordDecl()) {
+    if (Decl->hasDefinition()) {
+      Decl = Decl->getDefinition();
+
+      for (const CXXBaseSpecifier &Base : Decl->bases()) {
+        if (hasEffectiveAnnotation(Base.getType())) {
+          AnnotationReason Reason = { Base.getType(), RK_BaseClass, nullptr };
+          Cache[Key] = Reason;
+          return Reason;
+        }
+      }
+
+      // Recurse into members
+      for (const FieldDecl *Field : Decl->fields()) {
+        if (hasEffectiveAnnotation(Field->getType())) {
+          AnnotationReason Reason = { Field->getType(), RK_Field, Field };
+          Cache[Key] = Reason;
+          return Reason;
+        }
+      }
+
+      // Recurse into template arguments if the annotation
+      // MOZ_INHERIT_TYPE_ANNOTATIONS_FROM_TEMPLATE_ARGS is present
+      if (MozChecker::hasCustomAnnotation(
+            Decl, "moz_inherit_type_annotations_from_template_args")) {
+        const ClassTemplateSpecializationDecl *Spec =
+          dyn_cast<ClassTemplateSpecializationDecl>(Decl);
+        if (Spec) {
+          const TemplateArgumentList &Args = Spec->getTemplateArgs();
+
+          for (const TemplateArgument &Arg : Args.asArray()) {
+            if (Arg.getKind() == TemplateArgument::Type) {
+              QualType Type = Arg.getAsType();
+
+              if (hasEffectiveAnnotation(Type)) {
+                AnnotationReason Reason = { Type, RK_TemplateInherited, nullptr };
+                Cache[Key] = Reason;
+                return Reason;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  AnnotationReason Reason = { QualType(), RK_None, nullptr };
+  Cache[Key] = Reason;
+  return Reason;
+}
+
+bool isPlacementNew(const CXXNewExpr *Expr) {
   // Regular new expressions aren't placement new
-  if (expr->getNumPlacementArgs() == 0)
+  if (Expr->getNumPlacementArgs() == 0)
     return false;
-  if (MozChecker::hasCustomAnnotation(expr->getOperatorNew(),
-      "moz_heap_allocator"))
+  const FunctionDecl *Decl = Expr->getOperatorNew();
+  if (Decl && MozChecker::hasCustomAnnotation(Decl, "moz_heap_allocator")) {
     return false;
+  }
   return true;
 }
 
-DiagnosticsMatcher::DiagnosticsMatcher()
-  : stackClassChecker(ScopeChecker::eLocal),
-    globalClassChecker(ScopeChecker::eGlobal)
-{
-  // Stack class assertion: non-local variables of a stack class are forbidden
-  // (non-localness checked in the callback)
-  astMatcher.addMatcher(varDecl(hasType(stackClassAggregate())).bind("node"),
-    &stackClassChecker);
-  // Stack class assertion: new stack class is forbidden (unless placement new)
-  astMatcher.addMatcher(newExpr(hasType(pointerType(
-      pointee(stackClassAggregate())
-    ))).bind("node"), &stackClassChecker);
-  // Global class assertion: non-global variables of a global class are forbidden
-  // (globalness checked in the callback)
-  astMatcher.addMatcher(varDecl(hasType(globalClassAggregate())).bind("node"),
-    &globalClassChecker);
-  // Global class assertion: new global class is forbidden
-  astMatcher.addMatcher(newExpr(hasType(pointerType(
-      pointee(globalClassAggregate())
-    ))).bind("node"), &globalClassChecker);
-  // Non-heap class assertion: new non-heap class is forbidden (unless placement
-  // new)
-  astMatcher.addMatcher(newExpr(hasType(pointerType(
-      pointee(nonheapClassAggregate())
-    ))).bind("node"), &nonheapClassChecker);
-
-  // Any heap allocation function that returns a non-heap or a stack class or
-  // a global class is definitely doing something wrong
-  astMatcher.addMatcher(callExpr(callee(functionDecl(allOf(heapAllocator(),
-      returns(pointerType(pointee(nonheapClassAggregate()))))))).bind("node"),
-    &nonheapClassChecker);
-  astMatcher.addMatcher(callExpr(callee(functionDecl(allOf(heapAllocator(),
-      returns(pointerType(pointee(stackClassAggregate()))))))).bind("node"),
-    &stackClassChecker);
-
-  astMatcher.addMatcher(callExpr(callee(functionDecl(allOf(heapAllocator(),
-      returns(pointerType(pointee(globalClassAggregate()))))))).bind("node"),
-    &globalClassChecker);
+DiagnosticsMatcher::DiagnosticsMatcher() {
+  astMatcher.addMatcher(varDecl().bind("node"), &scopeChecker);
+  astMatcher.addMatcher(newExpr().bind("node"), &scopeChecker);
+  astMatcher.addMatcher(materializeTemporaryExpr().bind("node"), &scopeChecker);
+  astMatcher.addMatcher(callExpr(callee(functionDecl(heapAllocator()))).bind("node"),
+                        &scopeChecker);
 
   astMatcher.addMatcher(callExpr(allOf(hasDeclaration(noArithmeticExprInArgs()),
           anyOf(
@@ -749,127 +1001,161 @@ DiagnosticsMatcher::DiagnosticsMatcher()
   astMatcher.addMatcher(methodDecl(anyOf(hasName("operator bool"),
                                          hasName("operator _Bool"))).bind("node"),
     &explicitOperatorBoolChecker);
+
+  astMatcher.addMatcher(recordDecl(allOf(decl().bind("decl"),
+                                         hasRefCntMember())),
+                        &noDuplicateRefCntMemberChecker);
+
+  astMatcher.addMatcher(classTemplateSpecializationDecl(
+             allOf(hasAnyTemplateArgument(refersToType(hasVTable())),
+                   hasNeedsNoVTableTypeAttr())).bind("node"),
+     &needsNoVTableTypeChecker);
+
+  // Handle non-mem-movable template specializations
+  astMatcher.addMatcher(classTemplateSpecializationDecl(
+      allOf(needsMemMovable(),
+            hasAnyTemplateArgument(refersToType(isNonMemMovable())))
+      ).bind("specialization"),
+      &nonMemMovableChecker);
+
+  astMatcher.addMatcher(
+      constructorDecl(isInterestingImplicitCtor(),
+                      ofClass(allOf(isConcreteClass(), decl().bind("class"))),
+                      unless(isMarkedImplicit())).bind("ctor"),
+      &explicitImplicitChecker);
 }
+
+// These enum variants determine whether an allocation has occured in the code.
+enum AllocationVariety {
+  AV_None,
+  AV_Global,
+  AV_Automatic,
+  AV_Temporary,
+  AV_Heap,
+};
 
 void DiagnosticsMatcher::ScopeChecker::run(
     const MatchFinder::MatchResult &Result) {
   DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
-  unsigned stackID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Error, "variable of type %0 only valid on the stack");
-  unsigned globalID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Error, "variable of type %0 only valid as global");
-  unsigned errorID = (scope == eGlobal) ? globalID : stackID;
-  if (const VarDecl *d = Result.Nodes.getNodeAs<VarDecl>("node")) {
-    if (scope == eLocal) {
-      // Ignore the match if it's a local variable.
-      if (d->hasLocalStorage())
-        return;
-    } else if (scope == eGlobal) {
-      // Ignore the match if it's a global variable or a static member of a
-      // class.  The latter is technically not in the global scope, but for the
-      // use case of classes that intend to avoid introducing static
-      // initializers that is fine.
-      if (d->hasGlobalStorage() && !d->isStaticLocal())
-        return;
+
+  // There are a variety of different reasons why something could be allocated
+  AllocationVariety Variety = AV_None;
+  SourceLocation Loc;
+  QualType T;
+
+  // Determine the type of allocation which we detected
+  if (const VarDecl *D = Result.Nodes.getNodeAs<VarDecl>("node")) {
+    if (D->hasGlobalStorage()) {
+      Variety = AV_Global;
+    } else {
+      Variety = AV_Automatic;
     }
-
-    Diag.Report(d->getLocation(), errorID) << d->getType();
-    noteInferred(d->getType(), Diag);
-  } else if (const CXXNewExpr *expr =
-      Result.Nodes.getNodeAs<CXXNewExpr>("node")) {
-    // If it's placement new, then this match doesn't count.
-    if (scope == eLocal && isPlacementNew(expr))
-      return;
-    Diag.Report(expr->getStartLoc(), errorID) << expr->getAllocatedType();
-    noteInferred(expr->getAllocatedType(), Diag);
-  } else if (const CallExpr *expr =
-      Result.Nodes.getNodeAs<CallExpr>("node")) {
-    QualType badType = expr->getCallReturnType()->getPointeeType();
-    Diag.Report(expr->getLocStart(), errorID) << badType;
-    noteInferred(badType, Diag);
+    T = D->getType();
+    Loc = D->getLocStart();
+  } else if (const CXXNewExpr *E = Result.Nodes.getNodeAs<CXXNewExpr>("node")) {
+    // New allocates things on the heap.
+    // We don't consider placement new to do anything, as it doesn't actually
+    // allocate the storage, and thus gives us no useful information.
+    if (!isPlacementNew(E)) {
+      Variety = AV_Heap;
+      T = E->getAllocatedType();
+      Loc = E->getLocStart();
+    }
+  } else if (const Expr *E = Result.Nodes.getNodeAs<MaterializeTemporaryExpr>("node")) {
+    Variety = AV_Temporary;
+    T = E->getType().getUnqualifiedType();
+    Loc = E->getLocStart();
+  } else if (const CallExpr *E = Result.Nodes.getNodeAs<CallExpr>("node")) {
+    T = E->getType()->getPointeeType();
+    if (!T.isNull()) {
+      // This will always allocate on the heap, as the heapAllocator() check
+      // was made in the matcher
+      Variety = AV_Heap;
+      Loc = E->getLocStart();
+    }
   }
-}
 
-void DiagnosticsMatcher::ScopeChecker::noteInferred(QualType T,
-    DiagnosticsEngine &Diag) {
-  unsigned inheritsID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Note,
-    "%0 is a %2 class because it inherits from a %2 class %1");
-  unsigned memberID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Note,
-    "%0 is a %3 class because member %1 is a %3 class %2");
-  const char* attribute = (scope == eGlobal) ?
-    "moz_global_class" : "moz_stack_class";
-  const char* type = (scope == eGlobal) ?
-    "global" : "stack";
+  // Error messages for incorrect allocations.
+  unsigned StackID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "variable of type %0 only valid on the stack");
+  unsigned GlobalID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "variable of type %0 only valid as global");
+  unsigned HeapID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "variable of type %0 only valid on the heap");
+  unsigned NonHeapID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "variable of type %0 is not valid on the heap");
 
-  // Find the CXXRecordDecl that is the local/global class of interest
-  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
-    T = arrTy->getElementType();
-  CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
+  unsigned StackNoteID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "value incorrectly allocated in an automatic variable");
+  unsigned GlobalNoteID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "value incorrectly allocated in a global variable");
+  unsigned HeapNoteID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "value incorrectly allocated on the heap");
+  unsigned TemporaryNoteID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "value incorrectly allocated in a temporary");
 
-  // Direct result, we're done.
-  if (MozChecker::hasCustomAnnotation(clazz, attribute))
+  // Report errors depending on the annotations on the input types.
+  switch (Variety) {
+  case AV_None:
     return;
 
-  const Decl *cause = inferredAllocCauses[clazz].first;
-  if (const CXXRecordDecl *CRD = dyn_cast<CXXRecordDecl>(cause)) {
-    Diag.Report(clazz->getLocation(), inheritsID) <<
-      T << CRD->getDeclName() << type;
-  } else if (const FieldDecl *FD = dyn_cast<FieldDecl>(cause)) {
-    Diag.Report(FD->getLocation(), memberID) <<
-      T << FD << FD->getType() << type;
+  case AV_Global:
+    if (StackClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, StackID) << T;
+      Diag.Report(Loc, GlobalNoteID);
+      StackClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    if (HeapClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, HeapID) << T;
+      Diag.Report(Loc, GlobalNoteID);
+      HeapClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    break;
+
+  case AV_Automatic:
+    if (GlobalClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, GlobalID) << T;
+      Diag.Report(Loc, StackNoteID);
+      GlobalClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    if (HeapClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, HeapID) << T;
+      Diag.Report(Loc, StackNoteID);
+      HeapClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    break;
+
+  case AV_Temporary:
+    if (GlobalClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, GlobalID) << T;
+      Diag.Report(Loc, TemporaryNoteID);
+      GlobalClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    if (HeapClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, HeapID) << T;
+      Diag.Report(Loc, TemporaryNoteID);
+      HeapClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    break;
+
+  case AV_Heap:
+    if (GlobalClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, GlobalID) << T;
+      Diag.Report(Loc, HeapNoteID);
+      GlobalClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    if (StackClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, StackID) << T;
+      Diag.Report(Loc, HeapNoteID);
+      StackClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    if (NonHeapClass.hasEffectiveAnnotation(T)) {
+      Diag.Report(Loc, NonHeapID) << T;
+      Diag.Report(Loc, HeapNoteID);
+      NonHeapClass.dumpAnnotationReason(Diag, T, Loc);
+    }
+    break;
   }
-
-  // Recursively follow this back.
-  noteInferred(cast<ValueDecl>(cause)->getType(), Diag);
-}
-
-void DiagnosticsMatcher::NonHeapClassChecker::run(
-    const MatchFinder::MatchResult &Result) {
-  DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
-  unsigned stackID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Error, "variable of type %0 is not valid on the heap");
-  if (const CXXNewExpr *expr = Result.Nodes.getNodeAs<CXXNewExpr>("node")) {
-    // If it's placement new, then this match doesn't count.
-    if (isPlacementNew(expr))
-      return;
-    Diag.Report(expr->getStartLoc(), stackID) << expr->getAllocatedType();
-    noteInferred(expr->getAllocatedType(), Diag);
-  } else if (const CallExpr *expr = Result.Nodes.getNodeAs<CallExpr>("node")) {
-    QualType badType = expr->getCallReturnType()->getPointeeType();
-    Diag.Report(expr->getLocStart(), stackID) << badType;
-    noteInferred(badType, Diag);
-  }
-}
-
-void DiagnosticsMatcher::NonHeapClassChecker::noteInferred(QualType T,
-    DiagnosticsEngine &Diag) {
-  unsigned inheritsID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Note,
-    "%0 is a non-heap class because it inherits from a non-heap class %1");
-  unsigned memberID = Diag.getDiagnosticIDs()->getCustomDiagID(
-    DiagnosticIDs::Note,
-    "%0 is a non-heap class because member %1 is a non-heap class %2");
-
-  // Find the CXXRecordDecl that is the stack class of interest
-  while (const ArrayType *arrTy = T->getAsArrayTypeUnsafe())
-    T = arrTy->getElementType();
-  CXXRecordDecl *clazz = T->getAsCXXRecordDecl();
-
-  // Direct result, we're done.
-  if (MozChecker::hasCustomAnnotation(clazz, "moz_nonheap_class"))
-    return;
-
-  const Decl *cause = inferredAllocCauses[clazz].first;
-  if (const CXXRecordDecl *CRD = dyn_cast<CXXRecordDecl>(cause)) {
-    Diag.Report(clazz->getLocation(), inheritsID) << T << CRD->getDeclName();
-  } else if (const FieldDecl *FD = dyn_cast<FieldDecl>(cause)) {
-    Diag.Report(FD->getLocation(), memberID) << T << FD << FD->getType();
-  }
-  
-  // Recursively follow this back.
-  noteInferred(cast<ValueDecl>(cause)->getType(), Diag);
 }
 
 void DiagnosticsMatcher::ArithmeticArgChecker::run(
@@ -980,16 +1266,126 @@ void DiagnosticsMatcher::ExplicitOperatorBoolChecker::run(
   }
 }
 
+void DiagnosticsMatcher::NoDuplicateRefCntMemberChecker::run(
+    const MatchFinder::MatchResult &Result) {
+  DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
+  unsigned warningID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "Refcounted record %0 has multiple mRefCnt members");
+  unsigned note1ID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "Superclass %0 also has an mRefCnt member");
+  unsigned note2ID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "Consider using the _INHERITED macros for AddRef and Release here");
+
+  const CXXRecordDecl *decl = Result.Nodes.getNodeAs<CXXRecordDecl>("decl");
+  const FieldDecl *refCntMember = getClassRefCntMember(decl);
+  assert(refCntMember && "The matcher checked to make sure we have a refCntMember");
+
+  // Check every superclass for whether it has a base with a refcnt member, and warn for those which do
+  for (CXXRecordDecl::base_class_const_iterator base = decl->bases_begin(), e = decl->bases_end();
+       base != e; ++base) {
+    const FieldDecl *baseRefCntMember = getBaseRefCntMember(base->getType());
+    if (baseRefCntMember) {
+      Diag.Report(decl->getLocStart(), warningID) << decl;
+      Diag.Report(baseRefCntMember->getLocStart(), note1ID) << baseRefCntMember->getParent();
+      Diag.Report(refCntMember->getLocStart(), note2ID);
+    }
+  }
+}
+
+void DiagnosticsMatcher::NeedsNoVTableTypeChecker::run(
+    const MatchFinder::MatchResult &Result) {
+  DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
+  unsigned errorID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "%0 cannot be instantiated because %1 has a VTable");
+  unsigned noteID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "bad instantiation of %0 requested here");
+
+  const ClassTemplateSpecializationDecl *specialization =
+    Result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("node");
+
+  // Get the offending template argument
+  QualType offender;
+  const TemplateArgumentList &args =
+    specialization->getTemplateInstantiationArgs();
+  for (unsigned i = 0; i < args.size(); ++i) {
+    offender = args[i].getAsType();
+    if (typeHasVTable(offender)) {
+      break;
+    }
+  }
+
+  Diag.Report(specialization->getLocStart(), errorID) << specialization << offender;
+  Diag.Report(specialization->getPointOfInstantiation(), noteID) << specialization;
+}
+
+void DiagnosticsMatcher::NonMemMovableChecker::run(
+    const MatchFinder::MatchResult &Result) {
+  DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
+  unsigned errorID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "Cannot instantiate %0 with non-memmovable template argument %1");
+  unsigned note1ID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "instantiation of %0 requested here");
+  unsigned note2ID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "%0 is non-memmovable because of the MOZ_NON_MEMMOVABLE annotation on %1");
+  unsigned note3ID = Diag.getDiagnosticIDs()->getCustomDiagID(DiagnosticIDs::Note, "%0");
+
+  // Get the specialization
+  const ClassTemplateSpecializationDecl *specialization =
+    Result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>("specialization");
+  SourceLocation requestLoc = specialization->getPointOfInstantiation();
+  const CXXRecordDecl *templ =
+    specialization->getSpecializedTemplate()->getTemplatedDecl();
+
+  // Report an error for every template argument which is non-memmovable
+  const TemplateArgumentList &args =
+    specialization->getTemplateInstantiationArgs();
+  for (unsigned i = 0; i < args.size(); ++i) {
+    QualType argType = args[i].getAsType();
+    if (isClassNonMemMovable(args[i].getAsType())) {
+      const CXXRecordDecl *reason = findWhyClassIsNonMemMovable(argType);
+      Diag.Report(specialization->getLocation(), errorID)
+        << specialization << argType;
+      // XXX It would be really nice if we could get the instantiation stack information
+      // from Sema such that we could print a full template instantiation stack, however,
+      // it seems as though that information is thrown out by the time we get here so we
+      // can only report one level of template specialization (which in many cases won't
+      // be useful)
+      Diag.Report(requestLoc, note1ID)
+        << specialization;
+      Diag.Report(reason->getLocation(), note2ID)
+        << argType << reason;
+    }
+  }
+}
+
+void DiagnosticsMatcher::ExplicitImplicitChecker::run(
+    const MatchFinder::MatchResult &Result) {
+  DiagnosticsEngine &Diag = Result.Context->getDiagnostics();
+  unsigned ErrorID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Error, "bad implicit conversion constructor for %0");
+  unsigned NoteID = Diag.getDiagnosticIDs()->getCustomDiagID(
+      DiagnosticIDs::Note, "consider adding the explicit keyword to the constructor");
+
+  // We've already checked everything in the matcher, so we just have to report the error.
+
+  const CXXConstructorDecl *Ctor = Result.Nodes.getNodeAs<CXXConstructorDecl>("ctor");
+  const CXXRecordDecl *Decl = Result.Nodes.getNodeAs<CXXRecordDecl>("class");
+
+  Diag.Report(Ctor->getLocation(), ErrorID) << Decl->getDeclName();
+  Diag.Report(Ctor->getLocation(), NoteID);
+}
+
 class MozCheckAction : public PluginASTAction {
 public:
   ASTConsumerPtr CreateASTConsumer(CompilerInstance &CI, StringRef fileName) override {
 #if CLANG_VERSION_FULL >= 306
-    std::unique_ptr<MozChecker> checker(make_unique<MozChecker>(CI));
+    std::unique_ptr<MozChecker> checker(llvm::make_unique<MozChecker>(CI));
+    ASTConsumerPtr other(checker->getOtherConsumer());
 
-    std::vector<std::unique_ptr<ASTConsumer>> consumers;
+    std::vector<ASTConsumerPtr> consumers;
     consumers.push_back(std::move(checker));
-    consumers.push_back(checker->getOtherConsumer());
-    return make_unique<MultiplexConsumer>(std::move(consumers));
+    consumers.push_back(std::move(other));
+    return llvm::make_unique<MultiplexConsumer>(std::move(consumers));
 #else
     MozChecker *checker = new MozChecker(CI);
 

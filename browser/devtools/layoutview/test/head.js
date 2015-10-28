@@ -6,10 +6,11 @@
 
 const Cu = Components.utils;
 let {gDevTools} = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
-let {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
-let TargetFactory = devtools.TargetFactory;
+let {require} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+let {TargetFactory} = require("devtools/framework/target");
 let {Promise: promise} = Cu.import("resource://gre/modules/Promise.jsm", {});
 let {console} = Components.utils.import("resource://gre/modules/devtools/Console.jsm", {});
+let DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 
 // All test are asynchronous
 waitForExplicitFinish();
@@ -21,9 +22,9 @@ const TEST_URL_ROOT = "http://example.com/browser/browser/devtools/layoutview/te
 
 // Services.prefs.setBoolPref("devtools.debugger.log", true);
 
-// Set the testing flag on gDevTools and reset it when the test ends
-gDevTools.testing = true;
-registerCleanupFunction(() => gDevTools.testing = false);
+// Set the testing flag on DevToolsUtils and reset it when the test ends
+DevToolsUtils.testing = true;
+registerCleanupFunction(() => DevToolsUtils.testing = false);
 
 // Clean-up all prefs that might have been changed during a test run
 // (safer here because if the test fails, then the pref is never reverted)

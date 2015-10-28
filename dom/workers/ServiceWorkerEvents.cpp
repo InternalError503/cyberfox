@@ -79,16 +79,19 @@ namespace {
 class CancelChannelRunnable final : public nsRunnable
 {
   nsMainThreadPtrHandle<nsIInterceptedChannel> mChannel;
+  const nsresult mStatus;
 public:
-  explicit CancelChannelRunnable(nsMainThreadPtrHandle<nsIInterceptedChannel>& aChannel)
+  CancelChannelRunnable(nsMainThreadPtrHandle<nsIInterceptedChannel>& aChannel,
+                        nsresult aStatus)
     : mChannel(aChannel)
+    , mStatus(aStatus)
   {
   }
 
   NS_IMETHOD Run()
   {
     MOZ_ASSERT(NS_IsMainThread());
-    nsresult rv = mChannel->Cancel();
+    nsresult rv = mChannel->Cancel(mStatus);
     NS_ENSURE_SUCCESS(rv, rv);
     return NS_OK;
   }
@@ -146,13 +149,17 @@ class RespondWithHandler final : public PromiseNativeHandler
   nsMainThreadPtrHandle<nsIInterceptedChannel> mInterceptedChannel;
   nsMainThreadPtrHandle<ServiceWorker> mServiceWorker;
   RequestMode mRequestMode;
+  bool mIsClientRequest;
 public:
+  NS_DECL_ISUPPORTS
+
   RespondWithHandler(nsMainThreadPtrHandle<nsIInterceptedChannel>& aChannel,
                      nsMainThreadPtrHandle<ServiceWorker>& aServiceWorker,
-                     RequestMode aRequestMode)
+                     RequestMode aRequestMode, bool aIsClientRequest)
     : mInterceptedChannel(aChannel)
     , mServiceWorker(aServiceWorker)
     , mRequestMode(aRequestMode)
+    , mIsClientRequest(aIsClientRequest)
   {
   }
 
@@ -160,7 +167,9 @@ public:
 
   void RejectedCallback(JSContext* aCx, JS::Handle<JS::Value> aValue) override;
 
-  void CancelRequest();
+  void CancelRequest(nsresult aStatus);
+private:
+  ~RespondWithHandler() {}
 };
 
 struct RespondWithClosure
@@ -188,7 +197,8 @@ void RespondWithCopyComplete(void* aClosure, nsresult aStatus)
                                data->mInternalResponse,
                                data->mWorkerChannelInfo);
   } else {
-    event = new CancelChannelRunnable(data->mInterceptedChannel);
+    event = new CancelChannelRunnable(data->mInterceptedChannel,
+                                      NS_ERROR_INTERCEPTION_FAILED);
   }
   MOZ_ALWAYS_TRUE(NS_SUCCEEDED(NS_DispatchToMainThread(event)));
 }
@@ -196,18 +206,26 @@ void RespondWithCopyComplete(void* aClosure, nsresult aStatus)
 class MOZ_STACK_CLASS AutoCancel
 {
   nsRefPtr<RespondWithHandler> mOwner;
+  nsresult mStatus;
 
 public:
   explicit AutoCancel(RespondWithHandler* aOwner)
     : mOwner(aOwner)
+    , mStatus(NS_ERROR_INTERCEPTION_FAILED)
   {
   }
 
   ~AutoCancel()
   {
     if (mOwner) {
-      mOwner->CancelRequest();
+      mOwner->CancelRequest(mStatus);
     }
+  }
+
+  void SetCancelStatus(nsresult aStatus)
+  {
+    MOZ_ASSERT(NS_FAILED(aStatus));
+    mStatus = aStatus;
   }
 
   void Reset()
@@ -215,6 +233,8 @@ public:
     mOwner = nullptr;
   }
 };
+
+NS_IMPL_ISUPPORTS0(RespondWithHandler)
 
 void
 RespondWithHandler::ResolvedCallback(JSContext* aCx, JS::Handle<JS::Value> aValue)
@@ -232,14 +252,43 @@ RespondWithHandler::ResolvedCallback(JSContext* aCx, JS::Handle<JS::Value> aValu
     return;
   }
 
-  // Section 4.2, step 2.2 "If either response's type is "opaque" and request's
-  // mode is not "no-cors" or response's type is error, return a network error."
-  if (((response->Type() == ResponseType::Opaque) && (mRequestMode != RequestMode::No_cors)) ||
-      response->Type() == ResponseType::Error) {
+  WorkerPrivate* worker = GetCurrentThreadWorkerPrivate();
+  MOZ_ASSERT(worker);
+  worker->AssertIsOnWorkerThread();
+
+  // Allow opaque response interception to be disabled until we can ensure the
+  // security implications are not a complete disaster.
+  if (response->Type() == ResponseType::Opaque &&
+      !worker->OpaqueInterceptionEnabled()) {
+    autoCancel.SetCancelStatus(NS_ERROR_OPAQUE_INTERCEPTION_DISABLED);
+    return;
+  }
+
+  // Section 4.2, step 2.2:
+  //  If one of the following conditions is true, return a network error:
+  //    * response's type is "error".
+  //    * request's mode is not "no-cors" and response's type is "opaque".
+  //    * request is a client request and response's type is neither "basic"
+  //      nor "default".
+
+  if (response->Type() == ResponseType::Error) {
+    autoCancel.SetCancelStatus(NS_ERROR_INTERCEPTED_ERROR_RESPONSE);
+    return;
+  }
+
+  if (response->Type() == ResponseType::Opaque && mRequestMode != RequestMode::No_cors) {
+    autoCancel.SetCancelStatus(NS_ERROR_BAD_OPAQUE_INTERCEPTION_REQUEST_MODE);
+    return;
+  }
+
+  if (mIsClientRequest && response->Type() != ResponseType::Basic &&
+      response->Type() != ResponseType::Default) {
+    autoCancel.SetCancelStatus(NS_ERROR_CLIENT_REQUEST_OPAQUE_INTERCEPTION);
     return;
   }
 
   if (NS_WARN_IF(response->BodyUsed())) {
+    autoCancel.SetCancelStatus(NS_ERROR_INTERCEPTED_USED_RESPONSE);
     return;
   }
 
@@ -248,14 +297,10 @@ RespondWithHandler::ResolvedCallback(JSContext* aCx, JS::Handle<JS::Value> aValu
     return;
   }
 
-  WorkerPrivate* worker = GetCurrentThreadWorkerPrivate();
-  MOZ_ASSERT(worker);
-  worker->AssertIsOnWorkerThread();
-
   nsAutoPtr<RespondWithClosure> closure(
       new RespondWithClosure(mInterceptedChannel, ir, worker->GetChannelInfo()));
   nsCOMPtr<nsIInputStream> body;
-  response->GetBody(getter_AddRefs(body));
+  ir->GetInternalBody(getter_AddRefs(body));
   // Errors and redirects may not have a body.
   if (body) {
     response->SetBodyUsed();
@@ -289,45 +334,33 @@ RespondWithHandler::ResolvedCallback(JSContext* aCx, JS::Handle<JS::Value> aValu
 void
 RespondWithHandler::RejectedCallback(JSContext* aCx, JS::Handle<JS::Value> aValue)
 {
-  CancelRequest();
+  CancelRequest(NS_ERROR_INTERCEPTION_FAILED);
 }
 
 void
-RespondWithHandler::CancelRequest()
+RespondWithHandler::CancelRequest(nsresult aStatus)
 {
-  nsCOMPtr<nsIRunnable> runnable = new CancelChannelRunnable(mInterceptedChannel);
+  nsCOMPtr<nsIRunnable> runnable =
+    new CancelChannelRunnable(mInterceptedChannel, aStatus);
   NS_DispatchToMainThread(runnable);
 }
 
-} // anonymous namespace
+} // namespace
 
 void
-FetchEvent::RespondWith(const ResponseOrPromise& aArg, ErrorResult& aRv)
+FetchEvent::RespondWith(Promise& aArg, ErrorResult& aRv)
 {
   if (mWaitToRespond) {
     aRv.Throw(NS_ERROR_DOM_INVALID_STATE_ERR);
     return;
   }
 
-  nsRefPtr<Promise> promise;
-
-  if (aArg.IsResponse()) {
-    nsRefPtr<Response> res = &aArg.GetAsResponse();
-    WorkerPrivate* worker = GetCurrentThreadWorkerPrivate();
-    MOZ_ASSERT(worker);
-    worker->AssertIsOnWorkerThread();
-    promise = Promise::Create(worker->GlobalScope(), aRv);
-    if (NS_WARN_IF(aRv.Failed())) {
-      return;
-    }
-    promise->MaybeResolve(res);
-  } else if (aArg.IsPromise()) {
-    promise = &aArg.GetAsPromise();
-  }
+  nsRefPtr<InternalRequest> ir = mRequest->GetInternalRequest();
   mWaitToRespond = true;
   nsRefPtr<RespondWithHandler> handler =
-    new RespondWithHandler(mChannel, mServiceWorker, mRequest->Mode());
-  promise->AppendNativeHandler(handler);
+    new RespondWithHandler(mChannel, mServiceWorker, mRequest->Mode(),
+                           ir->IsClientRequest());
+  aArg.AppendNativeHandler(handler);
 }
 
 already_AddRefed<ServiceWorkerClient>
@@ -338,7 +371,11 @@ FetchEvent::GetClient()
       return nullptr;
     }
 
-    mClient = new ServiceWorkerClient(GetParentObject(), *mClientInfo);
+    WorkerPrivate* worker = GetCurrentThreadWorkerPrivate();
+    MOZ_ASSERT(worker);
+    nsRefPtr<nsIGlobalObject> global = worker->GlobalScope();
+
+    mClient = new ServiceWorkerClient(global, *mClientInfo);
   }
   nsRefPtr<ServiceWorkerClient> client = mClient;
   return client.forget();
@@ -429,12 +466,6 @@ PushEvent::PushEvent(EventTarget* aOwner)
   : ExtendableEvent(aOwner)
 {
 }
-
-NS_INTERFACE_MAP_BEGIN(PushEvent)
-NS_INTERFACE_MAP_END_INHERITING(ExtendableEvent)
-
-NS_IMPL_ADDREF_INHERITED(PushEvent, ExtendableEvent)
-NS_IMPL_RELEASE_INHERITED(PushEvent, ExtendableEvent)
 
 #endif /* ! MOZ_SIMPLEPUSH */
 

@@ -2800,7 +2800,7 @@ nsChangeHint nsStyleDisplay::CalcDifference(const nsStyleDisplay& aOther) const
     // We do not need to apply nsChangeHint_UpdateTransformLayer since
     // nsChangeHint_RepaintFrame will forcibly invalidate the frame area and
     // ensure layers are rebuilt (or removed).
-    NS_UpdateHint(hint, NS_CombineHint(nsChangeHint_AddOrRemoveTransform,
+    NS_UpdateHint(hint, NS_CombineHint(nsChangeHint_UpdateContainingBlock,
                           NS_CombineHint(nsChangeHint_UpdateOverflow,
                                          nsChangeHint_RepaintFrame)));
   } else {
@@ -2833,7 +2833,8 @@ nsChangeHint nsStyleDisplay::CalcDifference(const nsStyleDisplay& aOther) const
       NS_CombineHint(nsChangeHint_UpdateOverflow, nsChangeHint_RepaintFrame);
     for (uint8_t index = 0; index < 3; ++index)
       if (mTransformOrigin[index] != aOther.mTransformOrigin[index]) {
-        NS_UpdateHint(transformHint, kUpdateOverflowAndRepaintHint);
+        NS_UpdateHint(transformHint, NS_CombineHint(nsChangeHint_UpdateTransformLayer,
+                                                    nsChangeHint_UpdatePostTransformOverflow));
         break;
       }
     
@@ -2842,6 +2843,11 @@ nsChangeHint nsStyleDisplay::CalcDifference(const nsStyleDisplay& aOther) const
         NS_UpdateHint(transformHint, kUpdateOverflowAndRepaintHint);
         break;
       }
+
+    if (HasPerspectiveStyle() != aOther.HasPerspectiveStyle()) {
+      // A change from/to being a containing block for position:fixed.
+      NS_UpdateHint(hint, nsChangeHint_UpdateContainingBlock);
+    }
 
     if (mChildPerspective != aOther.mChildPerspective ||
         mTransformStyle != aOther.mTransformStyle ||

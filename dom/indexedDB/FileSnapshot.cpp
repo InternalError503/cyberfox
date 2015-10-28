@@ -9,6 +9,7 @@
 #include "IDBFileHandle.h"
 #include "MainThreadUtils.h"
 #include "mozilla/Assertions.h"
+#include "mozilla/dom/File.h"
 #include "mozilla/dom/MetadataHelper.h"
 
 #ifdef DEBUG
@@ -82,7 +83,7 @@ BlobImplSnapshot::~BlobImplSnapshot()
 void
 BlobImplSnapshot::AssertSanity()
 {
-  MOZ_ASSERT(XRE_GetProcessType() == GeckoProcessType_Default);
+  MOZ_ASSERT(XRE_IsParentProcess());
   MOZ_ASSERT(NS_IsMainThread());
 }
 

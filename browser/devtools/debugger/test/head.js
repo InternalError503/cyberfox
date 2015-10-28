@@ -15,9 +15,8 @@ Services.prefs.setBoolPref("devtools.debugger.log", false);
 let { Task } = Cu.import("resource://gre/modules/Task.jsm", {});
 let { Promise: promise } = Cu.import("resource://gre/modules/devtools/deprecated-sync-thenables.js", {});
 let { gDevTools } = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
-let { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
-let { require } = devtools;
-let { DevToolsUtils } = Cu.import("resource://gre/modules/devtools/DevToolsUtils.jsm", {});
+let { require } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+let DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 let { BrowserToolboxProcess } = Cu.import("resource:///modules/devtools/ToolboxProcess.jsm", {});
 let { DebuggerServer } = Cu.import("resource://gre/modules/devtools/dbg-server.jsm", {});
 let { DebuggerClient, ObjectClient } =
@@ -25,15 +24,15 @@ let { DebuggerClient, ObjectClient } =
 let { AddonManager } = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 let EventEmitter = require("devtools/toolkit/event-emitter");
 const { promiseInvoke } = require("devtools/async-utils");
-let TargetFactory = devtools.TargetFactory;
-let Toolbox = devtools.Toolbox;
+let { TargetFactory } = require("devtools/framework/target");
+let { Toolbox } = require("devtools/framework/toolbox")
 
 const EXAMPLE_URL = "http://example.com/browser/browser/devtools/debugger/test/";
 const FRAME_SCRIPT_URL = getRootDirectory(gTestPath) + "code_frame-script.js";
 
-gDevTools.testing = true;
+DevToolsUtils.testing = true;
 SimpleTest.registerCleanupFunction(() => {
-  gDevTools.testing = false;
+  DevToolsUtils.testing = false;
 });
 
 // All tests are asynchronous.
@@ -601,8 +600,8 @@ AddonDebugger.prototype = {
       customIframe: this.frame
     };
 
-    this.target = devtools.TargetFactory.forTab(targetOptions);
-    let toolbox = yield gDevTools.showToolbox(this.target, "jsdebugger", devtools.Toolbox.HostType.CUSTOM, toolboxOptions);
+    this.target = TargetFactory.forTab(targetOptions);
+    let toolbox = yield gDevTools.showToolbox(this.target, "jsdebugger", Toolbox.HostType.CUSTOM, toolboxOptions);
 
     info("Addon debugger panel shown successfully.");
 
@@ -888,39 +887,6 @@ function reopenVarPopup(...aArgs) {
   return hideVarPopup.apply(this, aArgs).then(() => openVarPopup.apply(this, aArgs));
 }
 
-// Tracing helpers
-
-function startTracing(aPanel) {
-  const deferred = promise.defer();
-  aPanel.panelWin.DebuggerController.Tracer.startTracing(aResponse => {
-    if (aResponse.error) {
-      deferred.reject(aResponse);
-    } else {
-      deferred.resolve(aResponse);
-    }
-  });
-  return deferred.promise;
-}
-
-function stopTracing(aPanel) {
-  const deferred = promise.defer();
-  aPanel.panelWin.DebuggerController.Tracer.stopTracing(aResponse => {
-    if (aResponse.error) {
-      deferred.reject(aResponse);
-    } else {
-      deferred.resolve(aResponse);
-    }
-  });
-  return deferred.promise;
-}
-
-function filterTraces(aPanel, f) {
-  const traces = aPanel.panelWin.document
-    .getElementById("tracer-traces")
-    .querySelector("scrollbox")
-    .children;
-  return Array.filter(traces, f);
-}
 function attachAddonActorForUrl(aClient, aUrl) {
   let deferred = promise.defer();
 

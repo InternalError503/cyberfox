@@ -35,23 +35,6 @@
 
 using namespace mozilla;
 
-// Our extended PLDHashEntryHdr
-class GlobalNameMapEntry : public PLDHashEntryHdr
-{
-public:
-  // Our hash table ops don't care about the order of these members
-  nsString mKey;
-  nsGlobalNameStruct mGlobalName;
-
-  size_t SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) {
-    // Measurement of the following members may be added later if DMD finds it
-    // is worthwhile:
-    // - mGlobalName
-    return mKey.SizeOfExcludingThisMustBeUnshared(aMallocSizeOf);
-  }
-};
-
-
 static PLDHashNumber
 GlobalNameHashHashKey(PLDHashTable *table, const void *key)
 {
@@ -742,44 +725,6 @@ nsScriptNameSpaceManager::RegisterNavigatorDOMConstructor(
   }
 }
 
-struct NameClosure
-{
-  nsScriptNameSpaceManager::NameEnumerator enumerator;
-  void* closure;
-};
-
-static PLDHashOperator
-EnumerateName(PLDHashTable*, PLDHashEntryHdr *hdr, uint32_t, void* aClosure)
-{
-  GlobalNameMapEntry *entry = static_cast<GlobalNameMapEntry *>(hdr);
-  NameClosure* closure = static_cast<NameClosure*>(aClosure);
-  return closure->enumerator(entry->mKey, entry->mGlobalName, closure->closure);
-}
-
-void
-nsScriptNameSpaceManager::EnumerateGlobalNames(NameEnumerator aEnumerator,
-                                               void* aClosure)
-{
-  NameClosure closure = { aEnumerator, aClosure };
-  PL_DHashTableEnumerate(&mGlobalNames, EnumerateName, &closure);
-}
-
-void
-nsScriptNameSpaceManager::EnumerateNavigatorNames(NameEnumerator aEnumerator,
-                                                  void* aClosure)
-{
-  NameClosure closure = { aEnumerator, aClosure };
-  PL_DHashTableEnumerate(&mNavigatorNames, EnumerateName, &closure);
-}
-
-static size_t
-SizeOfEntryExcludingThis(PLDHashEntryHdr *aHdr, MallocSizeOf aMallocSizeOf,
-                         void *aArg)
-{
-  GlobalNameMapEntry* entry = static_cast<GlobalNameMapEntry*>(aHdr);
-  return entry->SizeOfExcludingThis(aMallocSizeOf);
-}
-
 MOZ_DEFINE_MALLOC_SIZE_OF(ScriptNameSpaceManagerMallocSizeOf)
 
 NS_IMETHODIMP
@@ -793,12 +738,22 @@ nsScriptNameSpaceManager::CollectReports(
 }
 
 size_t
-nsScriptNameSpaceManager::SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf)
+nsScriptNameSpaceManager::SizeOfIncludingThis(
+    mozilla::MallocSizeOf aMallocSizeOf) const
 {
   size_t n = 0;
-  n += PL_DHashTableSizeOfExcludingThis(&mGlobalNames,
-         SizeOfEntryExcludingThis, aMallocSizeOf);
-  n += PL_DHashTableSizeOfExcludingThis(&mNavigatorNames,
-         SizeOfEntryExcludingThis, aMallocSizeOf);
+
+  n += mGlobalNames.ShallowSizeOfExcludingThis(aMallocSizeOf);
+  for (auto iter = mGlobalNames.ConstIter(); !iter.Done(); iter.Next()) {
+    auto entry = static_cast<GlobalNameMapEntry*>(iter.Get());
+    n += entry->SizeOfExcludingThis(aMallocSizeOf);
+  }
+
+  n += mNavigatorNames.ShallowSizeOfExcludingThis(aMallocSizeOf);
+  for (auto iter = mNavigatorNames.ConstIter(); !iter.Done(); iter.Next()) {
+    auto entry = static_cast<GlobalNameMapEntry*>(iter.Get());
+    n += entry->SizeOfExcludingThis(aMallocSizeOf);
+  }
+
   return n;
 }

@@ -44,18 +44,27 @@ add_task(function*() {
   yield addTab(TEST_URL);
   let {toolbox, inspector, view} = yield openRuleView();
 
+  info("Test autocompletion after 1st page load");
+  yield runAutocompletionTest(toolbox, inspector, view);
+
+  info("Test autocompletion after page navigation");
+  yield reloadPage(inspector);
+  yield runAutocompletionTest(toolbox, inspector, view);
+});
+
+function* runAutocompletionTest(toolbox, inspector, view) {
   info("Selecting the test node");
   yield selectNode("h1", inspector);
 
   info("Focusing the css property editable field");
-  let brace = view.doc.querySelector(".ruleview-ruleclose");
-  let editor = yield focusEditableField(brace);
+  let brace = view.styleDocument.querySelector(".ruleview-ruleclose");
+  let editor = yield focusEditableField(view, brace);
 
   info("Starting to test for css property completion");
-  for (let i = 0; i < testData.length; i ++) {
+  for (let i = 0; i < testData.length; i++) {
     yield testCompletion(testData[i], editor, view);
   }
-});
+}
 
 function* testCompletion([key, completion, index, total], editor, view) {
   info("Pressing key " + key);
@@ -72,7 +81,7 @@ function* testCompletion([key, completion, index, total], editor, view) {
   }
 
   info("Synthesizing key " + key);
-  EventUtils.synthesizeKey(key, {}, view.doc.defaultView);
+  EventUtils.synthesizeKey(key, {}, view.styleWindow);
 
   yield onSuggest;
   yield wait(1); // Equivalent of executeSoon

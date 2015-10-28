@@ -35,10 +35,10 @@ public:
   void SetMaxPoolSize(uint32_t aMax);
 
   // Creates and allocates a TextureClient.
-  TemporaryRef<TextureClient>
+  already_AddRefed<TextureClient>
   CreateOrRecycleForDrawing(gfx::SurfaceFormat aFormat,
                             gfx::IntSize aSize,
-                            gfx::BackendType aMoz2dBackend,
+                            BackendSelector aSelector,
                             TextureFlags aTextureFlags,
                             TextureAllocationFlags flags = ALLOC_DEFAULT);
 
@@ -46,6 +46,7 @@ private:
   RefPtr<TextureClientRecycleAllocatorImp> mAllocator;
 };
 
-}
-}
+} // namespace layers
+} // namespace mozilla
+
 #endif /* MOZILLA_GFX_TEXTURECLIENT_RECYCLE_ALLOCATOR_H */

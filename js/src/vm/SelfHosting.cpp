@@ -20,8 +20,11 @@
 #include "selfhosted.out.h"
 
 #include "builtin/Intl.h"
+#include "builtin/MapObject.h"
 #include "builtin/Object.h"
+#include "builtin/Reflect.h"
 #include "builtin/SelfHostingDefines.h"
+#include "builtin/SIMD.h"
 #include "builtin/TypedObject.h"
 #include "builtin/WeakSetObject.h"
 #include "gc/Marking.h"
@@ -474,6 +477,32 @@ js::intrinsic_IsArrayIterator(JSContext* cx, unsigned argc, Value* vp)
     MOZ_ASSERT(args[0].isObject());
 
     args.rval().setBoolean(args[0].toObject().is<ArrayIteratorObject>());
+    return true;
+}
+
+bool
+js::intrinsic_IsMapIterator(JSContext* cx, unsigned argc, Value* vp)
+{
+    CallArgs args = CallArgsFromVp(argc, vp);
+    MOZ_ASSERT(args.length() == 1);
+    MOZ_ASSERT(args[0].isObject());
+
+    args.rval().setBoolean(args[0].toObject().is<MapIteratorObject>());
+    return true;
+}
+
+bool
+intrinsic_GetNextMapEntryForIterator(JSContext* cx, unsigned argc, Value* vp)
+{
+    CallArgs args = CallArgsFromVp(argc, vp);
+    MOZ_ASSERT(args.length() == 2);
+    MOZ_ASSERT(args[0].toObject().is<MapIteratorObject>());
+    MOZ_ASSERT(args[1].isObject());
+
+    Rooted<MapIteratorObject*> mapIterator(cx, &args[0].toObject().as<MapIteratorObject>());
+    RootedArrayObject result(cx, &args[1].toObject().as<ArrayObject>());
+
+    args.rval().setBoolean(MapIteratorObject::next(cx, mapIterator, result));
     return true;
 }
 
@@ -1269,10 +1298,12 @@ static const JSFunctionSpec intrinsic_functions[] = {
     JS_FN("std_Object_create",                   obj_create,                   2,0),
     JS_FN("std_Object_propertyIsEnumerable",     obj_propertyIsEnumerable,     1,0),
     JS_FN("std_Object_defineProperty",           obj_defineProperty,           3,0),
-    JS_FN("std_Object_getPrototypeOf",           obj_getPrototypeOf,           1,0),
     JS_FN("std_Object_getOwnPropertyNames",      obj_getOwnPropertyNames,      1,0),
     JS_FN("std_Object_getOwnPropertyDescriptor", obj_getOwnPropertyDescriptor, 2,0),
     JS_FN("std_Object_hasOwnProperty",           obj_hasOwnProperty,           1,0),
+
+    JS_FN("std_Reflect_getPrototypeOf",          Reflect_getPrototypeOf,       1,0),
+    JS_FN("std_Reflect_isExtensible",            Reflect_isExtensible,         1,0),
 
     JS_FN("std_Set_has",                         SetObject::has,               1,0),
     JS_FN("std_Set_iterator",                    SetObject::values,            0,0),
@@ -1293,6 +1324,10 @@ static const JSFunctionSpec intrinsic_functions[] = {
     JS_FN("std_WeakMap_set",                     WeakMap_set,                  2,0),
     JS_FN("std_WeakMap_delete",                  WeakMap_delete,               1,0),
     JS_FN("std_WeakMap_clear",                   WeakMap_clear,                0,0),
+
+    JS_FN("std_SIMD_Int32x4_extractLane",        simd_int32x4_extractLane,     2,0),
+    JS_FN("std_SIMD_Float32x4_extractLane",      simd_float32x4_extractLane,   2,0),
+    JS_FN("std_SIMD_Float64x2_extractLane",      simd_float64x2_extractLane,   2,0),
 
     // Helper funtions after this point.
     JS_FN("ToObject",                intrinsic_ToObject,                1,0),
@@ -1332,6 +1367,11 @@ static const JSFunctionSpec intrinsic_functions[] = {
     JS_FN("IsArrayIterator",         intrinsic_IsArrayIterator,         1,0),
     JS_FN("CallArrayIteratorMethodIfWrapped",
           CallNonGenericSelfhostedMethod<Is<ArrayIteratorObject>>,      2,0),
+
+    JS_FN("IsMapIterator",           intrinsic_IsMapIterator,           1,0),
+    JS_FN("_GetNextMapEntryForIterator", intrinsic_GetNextMapEntryForIterator, 3,0),
+    JS_FN("CallMapIteratorMethodIfWrapped",
+          CallNonGenericSelfhostedMethod<Is<MapIteratorObject>>,        2,0),
 
 
     JS_FN("NewStringIterator",       intrinsic_NewStringIterator,       0,0),
@@ -1396,6 +1436,8 @@ static const JSFunctionSpec intrinsic_functions[] = {
     JS_FN("GetTypedObjectModule",           js::GetTypedObjectModule, 0, 0),
     JS_FN("GetFloat32x4TypeDescr",          js::GetFloat32x4TypeDescr, 0, 0),
     JS_FN("GetFloat64x2TypeDescr",          js::GetFloat64x2TypeDescr, 0, 0),
+    JS_FN("GetInt8x16TypeDescr",            js::GetInt8x16TypeDescr, 0, 0),
+    JS_FN("GetInt16x8TypeDescr",            js::GetInt16x8TypeDescr, 0, 0),
     JS_FN("GetInt32x4TypeDescr",            js::GetInt32x4TypeDescr, 0, 0),
 
 #define LOAD_AND_STORE_SCALAR_FN_DECLS(_constant, _type, _name)         \
@@ -1641,7 +1683,7 @@ CloneProperties(JSContext* cx, HandleNativeObject selfHostedObject, HandleObject
         }
     }
 
-    AutoShapeVector shapes(cx);
+    Rooted<ShapeVector> shapes(cx, ShapeVector(cx));
     for (Shape::Range<NoGC> range(selfHostedObject->lastProperty()); !range.empty(); range.popFront()) {
         Shape& shape = range.front();
         if (shape.enumerable() && !shapes.append(&shape))

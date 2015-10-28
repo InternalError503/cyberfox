@@ -21,7 +21,7 @@ builds:
       opt:
         task: tasks/builds/mulet_linux.yml
   emulator-kk:
-    platfoms:
+    platforms:
       - b2g
     types:
       opt:
@@ -29,7 +29,7 @@ builds:
       debug:
         task: tasks/builds/b2g_emulator_kk_debug.yml
   emulator-l:
-    platfoms:
+    platforms:
       - b2g
     types:
       opt:
@@ -37,7 +37,7 @@ builds:
       debug:
         task: tasks/builds/b2g_emulator_l_debug.yml
   emulator-jb:
-    platfoms:
+    platforms:
       - b2g
     types:
       opt:
@@ -45,7 +45,7 @@ builds:
       debug:
         task: tasks/builds/b2g_emulator_jb_debug.yml
   emulator:
-    platfoms:
+    platforms:
       - b2g
     types:
       opt:
@@ -80,6 +80,12 @@ builds:
     types:
       opt:
         task: tasks/builds/b2g_flame_kk_eng.yml
+  flame-kk-spark-eng:
+    platforms:
+      - b2g
+    types:
+      opt:
+        task: tasks/builds/b2g_flame_kk_spark_eng.yml
 
 tests:
   cppunit:
@@ -96,18 +102,26 @@ tests:
     allowed_build_tasks:
       tasks/builds/b2g_desktop_opt.yml:
         task: tasks/tests/b2g_build_test.yml
+      tasks/builds/mulet_linux.yml:
+        task: tasks/tests/mulet_build_test.yml
   gaia-build-unit:
     allowed_build_tasks:
       tasks/builds/b2g_desktop_opt.yml:
         task: tasks/tests/b2g_build_unit.yml
+      tasks/builds/mulet_linux.yml:
+        task: tasks/tests/mulet_build_unit.yml
   gaia-js-integration:
     allowed_build_tasks:
       tasks/builds/b2g_desktop_opt.yml:
         task: tasks/tests/b2g_gaia_js_integration_tests.yml
+      tasks/builds/mulet_linux.yml:
+        task: tasks/tests/mulet_gaia_js_integration_tests.yml
   gaia-linter:
     allowed_build_tasks:
       tasks/builds/b2g_desktop_opt.yml:
         task: tasks/tests/b2g_linter.yml
+      tasks/builds/mulet_linux.yml:
+        task: tasks/tests/mulet_linter.yml
   gaia-ui-test-accessibility:
     allowed_build_tasks:
       tasks/builds/b2g_desktop_opt.yml:

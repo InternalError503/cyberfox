@@ -206,7 +206,7 @@ public:
       SetParamsOnBiquad(mBiquads[i], aStream->SampleRate(), mType, freq, q, gain, detune);
 
       mBiquads[i].process(input,
-                          static_cast<float*>(const_cast<void*>(aOutput->mChannelData[i])),
+                          aOutput->ChannelFloatsForWrite(i),
                           aInput.GetDuration());
     }
   }
@@ -218,7 +218,7 @@ public:
     // - mDestination - probably not owned
     // - AudioParamTimelines - counted in the AudioNode
     size_t amount = AudioNodeEngine::SizeOfExcludingThis(aMallocSizeOf);
-    amount += mBiquads.SizeOfExcludingThis(aMallocSizeOf);
+    amount += mBiquads.ShallowSizeOfExcludingThis(aMallocSizeOf);
     return amount;
   }
 
@@ -366,5 +366,5 @@ BiquadFilterNode::SendGainToStream(AudioNode* aNode)
   SendTimelineParameterToStream(This, BiquadFilterNodeEngine::GAIN, *This->mGain);
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla

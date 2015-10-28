@@ -49,7 +49,7 @@ let gSyncPane = {
   needsUpdate: function () {
     this.page = PAGE_NEEDS_UPDATE;
     let label = document.getElementById("loginError");
-    label.value = Weave.Utils.getErrorString(Weave.Status.login);
+    label.textContent = Weave.Utils.getErrorString(Weave.Status.login);
     label.className = "error";
   },
 
@@ -113,7 +113,10 @@ let gSyncPane = {
                   "weave:service:start-over:finish",
                   "weave:service:setup-complete",
                   "weave:service:logout:finish",
-                  FxAccountsCommon.ONVERIFIED_NOTIFICATION];
+                  FxAccountsCommon.ONVERIFIED_NOTIFICATION,
+                  FxAccountsCommon.ONLOGIN_NOTIFICATION,
+                  FxAccountsCommon.ON_PROFILE_CHANGE_NOTIFICATION,
+                  ];
     let migrateTopic = "fxa-migration:state-changed";
 
     // Add the observers now and remove them on unload
@@ -156,27 +159,23 @@ let gSyncPane = {
     // service.fxAccountsEnabled is false iff sync is already configured for
     // the legacy provider.
     if (service.fxAccountsEnabled) {
-      // unhide the reading-list engine if readinglist is enabled (note we do
-      // it here as it must remain disabled for legacy sync users)
-      if (Services.prefs.getBoolPref("browser.readinglist.enabled")) {
-        document.getElementById("readinglist-engine").removeAttribute("hidden");
-      }
+
       // determine the fxa status...
       this.page = PAGE_PLEASE_WAIT;
       fxAccounts.getSignedInUser().then(data => {
         if (!data) {
           this.page = FXA_PAGE_LOGGED_OUT;
-          return;
+          return false;
         }
         this.page = FXA_PAGE_LOGGED_IN;
         // We are logged in locally, but maybe we are in a state where the
         // server rejected our credentials (eg, password changed on the server)
         let fxaLoginStatus = document.getElementById("fxaLoginStatus");
-        let enginesListDisabled;
+        let syncReady;
         // Not Verfied implies login error state, so check that first.
         if (!data.verified) {
           fxaLoginStatus.selectedIndex = FXA_LOGIN_UNVERIFIED;
-          enginesListDisabled = true;
+          syncReady = true;
         // So we think we are logged in, so login problems are next.
         // (Although if the Sync identity manager is still initializing, we
         // ignore login errors and assume all will eventually be good.)
@@ -185,12 +184,12 @@ let gSyncPane = {
         // away by themselves, so aren't reflected here.
         } else if (Weave.Status.login == Weave.LOGIN_FAILED_LOGIN_REJECTED) {
           fxaLoginStatus.selectedIndex = FXA_LOGIN_FAILED;
-          enginesListDisabled = true;
+          syncReady = true;
         // Else we must be golden (or in an error state we expect to magically
         // resolve itself)
         } else {
           fxaLoginStatus.selectedIndex = FXA_LOGIN_VERIFIED;
-          enginesListDisabled = false;
+          syncReady = false;
         }
         document.getElementById("fxaEmailAddress1").textContent = data.email;
         document.getElementById("fxaEmailAddress2").textContent = data.email;
@@ -198,7 +197,7 @@ let gSyncPane = {
         document.getElementById("fxaSyncComputerName").value = Weave.Service.clientsEngine.localName;
         let engines = document.getElementById("fxaSyncEngines")
         for (let checkbox of engines.querySelectorAll("checkbox")) {
-          checkbox.disabled = enginesListDisabled;
+          checkbox.disabled = syncReady;
         }
       });
     // If fxAccountEnabled is false and we are in a "not configured" state,
@@ -215,7 +214,7 @@ let gSyncPane = {
       this.needsUpdate();
     } else {
       this.page = PAGE_HAS_ACCOUNT;
-      document.getElementById("accountName").value = Weave.Service.identity.account;
+      document.getElementById("accountName").textContent = Weave.Service.identity.account;
       document.getElementById("syncComputerName").value = Weave.Service.clientsEngine.localName;
       document.getElementById("tosPP-normal").hidden = this._usingCustomServer;
     }
@@ -300,6 +299,18 @@ let gSyncPane = {
     if (container.hidden) {
       container.hidden = false;
       window.innerHeight += container.clientHeight;
+    }
+  },
+
+  // Called whenever one of the sync engine preferences is changed.
+  onPreferenceChanged: function() {
+    let prefElts = document.querySelectorAll("#syncEnginePrefs > preference");
+    let syncEnabled = false;
+    for (let elt of prefElts) {
+      if (elt.name.startsWith("services.sync.") && elt.value) {
+        syncEnabled = true;
+        break;
+      }
     }
   },
 
@@ -418,7 +429,7 @@ let gSyncPane = {
       });
     });
   },
- //Set Help Link For Old Sync
+  //Set Help Link For Old Sync
   openOldSyncSupportPage: function() {
     let url = Services.urlFormatter.formatURLPref('app.helpdoc.baseURI') + "old-sync";
     this.openContentInBrowser(url);

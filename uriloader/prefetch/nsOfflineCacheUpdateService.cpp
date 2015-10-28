@@ -31,7 +31,6 @@
 #include "nsIPrincipal.h"
 #include "nsIScriptSecurityManager.h"
 #include "nsNetCID.h"
-#include "nsNetUtil.h"
 #include "nsServiceManagerUtils.h"
 #include "nsStreamUtils.h"
 #include "nsThreadUtils.h"
@@ -87,7 +86,7 @@ PRLogModuleInfo *gOfflineCacheUpdateLog;
 #undef LOG_ENABLED
 #define LOG_ENABLED() MOZ_LOG_TEST(gOfflineCacheUpdateLog, mozilla::LogLevel::Debug)
 
-namespace { // anon
+namespace {
 
 nsresult
 GetAppIDAndInBrowserFromWindow(nsIDOMWindow *aWindow,
@@ -117,7 +116,7 @@ GetAppIDAndInBrowserFromWindow(nsIDOMWindow *aWindow,
     return NS_OK;
 }
 
-} // anon
+} // namespace
 
 //-----------------------------------------------------------------------------
 // nsOfflineCachePendingUpdate

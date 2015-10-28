@@ -48,31 +48,6 @@ LIRGeneratorARM::tempByteOpRegister()
 }
 
 void
-LIRGeneratorARM::lowerConstantDouble(double d, MInstruction* mir)
-{
-    define(new(alloc()) LDouble(d), mir);
-}
-
-void
-LIRGeneratorARM::lowerConstantFloat32(float d, MInstruction* mir)
-{
-    define(new(alloc()) LFloat32(d), mir);
-}
-
-void
-LIRGeneratorARM::visitConstant(MConstant* ins)
-{
-    if (ins->type() == MIRType_Double)
-        lowerConstantDouble(ins->value().toDouble(), ins);
-    else if (ins->type() == MIRType_Float32)
-        lowerConstantFloat32(ins->value().toDouble(), ins);
-    else if (ins->canEmitAtUses())
-        emitAtUses(ins);
-    else
-        LIRGeneratorShared::visitConstant(ins);
-}
-
-void
 LIRGeneratorARM::visitBox(MBox* box)
 {
     MDefinition* inner = box->getOperand(0);
@@ -574,6 +549,34 @@ LIRGeneratorARM::visitSimdValueX4(MSimdValueX4* ins)
 }
 
 void
+LIRGeneratorARM::visitAtomicExchangeTypedArrayElement(MAtomicExchangeTypedArrayElement* ins)
+{
+    MOZ_ASSERT(HasLDSTREXBHD());
+    MOZ_ASSERT(ins->arrayType() <= Scalar::Uint32);
+
+    MOZ_ASSERT(ins->elements()->type() == MIRType_Elements);
+    MOZ_ASSERT(ins->index()->type() == MIRType_Int32);
+
+    const LUse elements = useRegister(ins->elements());
+    const LAllocation index = useRegisterOrConstant(ins->index());
+
+    // If the target is a floating register then we need a temp at the
+    // CodeGenerator level for creating the result.
+
+    const LAllocation value = useRegister(ins->value());
+    LDefinition tempDef = LDefinition::BogusTemp();
+    if (ins->arrayType() == Scalar::Uint32) {
+        MOZ_ASSERT(ins->type() == MIRType_Double);
+        tempDef = temp();
+    }
+
+    LAtomicExchangeTypedArrayElement* lir =
+        new(alloc()) LAtomicExchangeTypedArrayElement(elements, index, value, tempDef);
+
+    define(lir, ins);
+}
+
+void
 LIRGeneratorARM::visitAtomicTypedArrayElementBinop(MAtomicTypedArrayElementBinop* ins)
 {
     MOZ_ASSERT(ins->arrayType() != Scalar::Uint8Clamped);
@@ -657,10 +660,10 @@ LIRGeneratorARM::visitAsmJSCompareExchangeHeap(MAsmJSCompareExchangeHeap* ins)
 
     if (byteSize(ins->accessType()) != 4 && !HasLDSTREXBHD()) {
         LAsmJSCompareExchangeCallout* lir =
-            new(alloc()) LAsmJSCompareExchangeCallout(useRegister(ptr),
-                                                      useRegister(ins->oldValue()),
-                                                      useRegister(ins->newValue()));
-        defineFixed(lir, ins, LAllocation(AnyRegister(ReturnReg)));
+            new(alloc()) LAsmJSCompareExchangeCallout(useRegisterAtStart(ptr),
+                                                      useRegisterAtStart(ins->oldValue()),
+                                                      useRegisterAtStart(ins->newValue()));
+        defineReturn(lir, ins);
         return;
     }
 
@@ -673,6 +676,24 @@ LIRGeneratorARM::visitAsmJSCompareExchangeHeap(MAsmJSCompareExchangeHeap* ins)
 }
 
 void
+LIRGeneratorARM::visitAsmJSAtomicExchangeHeap(MAsmJSAtomicExchangeHeap* ins)
+{
+    MOZ_ASSERT(ins->ptr()->type() == MIRType_Int32);
+    MOZ_ASSERT(ins->accessType() < Scalar::Float32);
+
+    const LAllocation ptr = useRegisterAtStart(ins->ptr());
+    const LAllocation value = useRegisterAtStart(ins->value());
+
+    if (byteSize(ins->accessType()) < 4 && !HasLDSTREXBHD()) {
+        // Call out on ARMv6.
+        defineReturn(new(alloc()) LAsmJSAtomicExchangeCallout(ptr, value), ins);
+        return;
+    }
+
+    define(new(alloc()) LAsmJSAtomicExchangeHeap(ptr, value), ins);
+}
+
+void
 LIRGeneratorARM::visitAsmJSAtomicBinopHeap(MAsmJSAtomicBinopHeap* ins)
 {
     MOZ_ASSERT(ins->accessType() < Scalar::Float32);
@@ -682,8 +703,9 @@ LIRGeneratorARM::visitAsmJSAtomicBinopHeap(MAsmJSAtomicBinopHeap* ins)
 
     if (byteSize(ins->accessType()) != 4 && !HasLDSTREXBHD()) {
         LAsmJSAtomicBinopCallout* lir =
-            new(alloc()) LAsmJSAtomicBinopCallout(useRegister(ptr), useRegister(ins->value()));
-        defineFixed(lir, ins, LAllocation(AnyRegister(ReturnReg)));
+            new(alloc()) LAsmJSAtomicBinopCallout(useRegisterAtStart(ptr),
+                                                  useRegisterAtStart(ins->value()));
+        defineReturn(lir, ins);
         return;
     }
 

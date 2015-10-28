@@ -124,6 +124,13 @@ pref("dom.indexedDB.logging.details", true);
 // Enable profiler marks for indexedDB events.
 pref("dom.indexedDB.logging.profiler-marks", false);
 
+// Whether or not the Permissions API is enabled.
+#ifdef NIGHTLY_BUILD
+pref("dom.permissions.enabled", true);
+#else
+pref("dom.permissions.enabled", false);
+#endif
+
 // Whether or not Web Workers are enabled.
 pref("dom.workers.enabled", true);
 // The number of workers per domain allowed to run concurrently.
@@ -132,8 +139,13 @@ pref("dom.workers.maxPerDomain", 20);
 // Whether or not Shared Web Workers are enabled.
 pref("dom.workers.sharedWorkers.enabled", true);
 
-// Service workers
 pref("dom.serviceWorkers.enabled", false);
+
+// Allow service workers to intercept network requests using the fetch event
+pref("dom.serviceWorkers.interception.enabled", false);
+
+// Allow service workers to intercept opaque (cross origin) responses
+pref("dom.serviceWorkers.interception.opaque.enabled", false);
 
 // Whether nonzero values can be returned from performance.timing.*
 pref("dom.enable_performance", true);
@@ -146,6 +158,9 @@ pref("dom.enable_user_timing", true);
 
 // Enable printing performance marks/measures to log
 pref("dom.performance.enable_user_timing_logging", false);
+
+// Enable notification of performance timing
+pref("dom.performance.enable_notify_performance_timing", false);
 
 // Whether the Gamepad API is enabled
 pref("dom.gamepad.enabled", true);
@@ -202,7 +217,10 @@ pref("browser.display.force_inline_alttext", false); // true = force ALT text fo
 // 1 = use external leading only when font provides,
 // 2 = add extra leading both internal leading and external leading are zero
 pref("browser.display.normal_lineheight_calc_control", 2);
-pref("browser.display.show_image_placeholders", true); // true = show image placeholders while image is loaded and when image is broken
+// enable showing image placeholders while image is loading or when image is broken
+pref("browser.display.show_image_placeholders", true);
+// if browser.display.show_image_placeholders is true then this controls whether the loading image placeholder and border is shown or not
+pref("browser.display.show_loading_image_placeholder", false);
 // min font device pixel size at which to turn on high quality
 pref("browser.display.auto_quality_min_font_size", 20);
 pref("browser.anchor_color",                "#0000EE");
@@ -270,13 +288,17 @@ pref("media.wakelock_timeout", 2000);
 // opened as top-level documents, as opposed to inside a media element.
 pref("media.play-stand-alone", true);
 
+// Whether we should delay actioning a "play()" JS function call and autoplay
+// attribute until the media element's owner document is visible.
+pref("media.block-play-until-visible", false);
+
 pref("media.hardware-video-decoding.enabled", true);
 
 pref("media.decoder.heuristic.dormant.enabled", true);
 pref("media.decoder.heuristic.dormant.timeout", 60000);
 
 #ifdef MOZ_WMF
-pref("media.windows-media-foundation.enabled", true);
+pref("media.wmf.decoder.thread-count", -1);
 #endif
 #ifdef MOZ_DIRECTSHOW
 pref("media.directshow.enabled", true);
@@ -375,12 +397,16 @@ pref("media.navigator.permission.disabled", false);
 pref("media.peerconnection.default_iceservers", "[]");
 pref("media.peerconnection.ice.loopback", false); // Set only for testing in offline environments.
 pref("media.peerconnection.ice.tcp", false);
+pref("media.peerconnection.ice.link_local", false); // Set only for testing IPV6 in networks that don't assign IPV6 addresses
 pref("media.peerconnection.ice.force_interface", ""); // Limit to only a single interface
+pref("media.peerconnection.ice.relay_only", false); // Limit candidates to TURN
 pref("media.peerconnection.use_document_iceservers", true);
 pref("media.peerconnection.identity.enabled", true);
 pref("media.peerconnection.identity.timeout", 10000);
 pref("media.peerconnection.ice.stun_client_maximum_transmits", 7);
 pref("media.peerconnection.ice.trickle_grace_period", 5000);
+pref("media.peerconnection.ice.default_address_only", false);
+
 // These values (aec, agc, and noice) are from media/webrtc/trunk/webrtc/common_types.h
 // kXxxUnchanged = 0, kXxxDefault = 1, and higher values are specific to each
 // setting (for Xxx = Ec, Agc, or Ns).  Defaults are all set to kXxxDefault here.
@@ -424,13 +450,15 @@ pref("media.getusermedia.screensharing.enabled", true);
 #endif
 
 #ifdef RELEASE_BUILD
-pref("media.getusermedia.screensharing.allowed_domains", "webex.com,*.webex.com,ciscospark.com,*.ciscospark.com,projectsquared.com,*.projectsquared.com,*.room.co,room.co,beta.talky.io,talky.io,*.clearslide.com,appear.in,*.appear.in,tokbox.com,*.tokbox.com,*.sso.francetelecom.fr,*.si.francetelecom.fr,*.sso.infra.ftgroup,*.multimedia-conference.orange-business.com,*.espacecollaboration.orange-business.com,free.gotomeeting.com,g2m.me,*.g2m.me,example.com,*.mypurecloud.com,*.mypurecloud.com.au,spreed.me,*.spreed.me,*.spreed.com");
+pref("media.getusermedia.screensharing.allowed_domains", "webex.com,*.webex.com,ciscospark.com,*.ciscospark.com,projectsquared.com,*.projectsquared.com,*.room.co,room.co,beta.talky.io,talky.io,*.clearslide.com,appear.in,*.appear.in,tokbox.com,*.tokbox.com,*.sso.francetelecom.fr,*.si.francetelecom.fr,*.sso.infra.ftgroup,*.multimedia-conference.orange-business.com,*.espacecollaboration.orange-business.com,free.gotomeeting.com,g2m.me,*.g2m.me,example.com,*.mypurecloud.com,*.mypurecloud.com.au,spreed.me,*.spreed.me,*.spreed.com,air.mozilla.org");
 #else
  // temporary value, not intended for release - bug 1049087
-pref("media.getusermedia.screensharing.allowed_domains", "mozilla.github.io,webex.com,*.webex.com,ciscospark.com,*.ciscospark.com,projectsquared.com,*.projectsquared.com,*.room.co,room.co,beta.talky.io,talky.io,*.clearslide.com,appear.in,*.appear.in,tokbox.com,*.tokbox.com,*.sso.francetelecom.fr,*.si.francetelecom.fr,*.sso.infra.ftgroup,*.multimedia-conference.orange-business.com,*.espacecollaboration.orange-business.com,free.gotomeeting.com,g2m.me,*.g2m.me,example.com,*.mypurecloud.com,*.mypurecloud.com.au,spreed.me,*.spreed.me,*.spreed.com");
+pref("media.getusermedia.screensharing.allowed_domains", "mozilla.github.io,webex.com,*.webex.com,ciscospark.com,*.ciscospark.com,projectsquared.com,*.projectsquared.com,*.room.co,room.co,beta.talky.io,talky.io,*.clearslide.com,appear.in,*.appear.in,tokbox.com,*.tokbox.com,*.sso.francetelecom.fr,*.si.francetelecom.fr,*.sso.infra.ftgroup,*.multimedia-conference.orange-business.com,*.espacecollaboration.orange-business.com,free.gotomeeting.com,g2m.me,*.g2m.me,example.com,*.mypurecloud.com,*.mypurecloud.com.au,spreed.me,*.spreed.me,*.spreed.com,air.mozilla.org");
 #endif
 // OS/X 10.6 and XP have screen/window sharing off by default due to various issues - Caveat emptor
 pref("media.getusermedia.screensharing.allow_on_old_platforms", false);
+
+pref("media.getusermedia.audiocapture.enabled", false);
 
 // TextTrack support
 pref("media.webvtt.enabled", true);
@@ -440,31 +468,22 @@ pref("media.webvtt.regions.enabled", false);
 pref("media.track.enabled", false);
 
 // Whether to enable MediaSource support.
-// We want to enable on non-release  builds and on release windows and mac
-// but on release builds restrict to YouTube. We don't enable for other
-// configurations because code for those platforms isn't ready yet.
-#if defined(XP_WIN) || defined(XP_MACOSX) || defined(MOZ_WIDGET_GONK)
+#if defined(XP_WIN) || defined(XP_MACOSX) || defined(MOZ_WIDGET_GONK) || defined(MOZ_WIDGET_ANDROID)
 pref("media.mediasource.enabled", true);
 #else
 pref("media.mediasource.enabled", false);
 #endif
 
-#ifdef RELEASE_BUILD
-pref("media.mediasource.whitelist", true);
-#else
-pref("media.mediasource.whitelist", false);
-#endif // RELEASE_BUILD
-
 pref("media.mediasource.mp4.enabled", true);
 pref("media.mediasource.webm.enabled", false);
 
 // Enable new MediaSource architecture.
-pref("media.mediasource.format-reader", false);
+pref("media.mediasource.format-reader", true);
 
-// Enable new MediaFormatReader architecture for mp4 in MSE
-pref("media.mediasource.format-reader.mp4", true);
-// Enable new MediaFormatReader architecture for plain mp4.
-pref("media.format-reader.mp4", true);
+// Enable new MediaFormatReader architecture for webm in MSE
+pref("media.mediasource.format-reader.webm", false);
+// Enable new MediaFormatReader architecture for plain webm.
+pref("media.format-reader.webm", true);
 
 #ifdef MOZ_WEBSPEECH
 pref("media.webspeech.recognition.enable", false);
@@ -484,6 +503,10 @@ pref("media.autoplay.enabled", true);
 // MediaDecoderReader's mVideoQueue.
 pref("media.video-queue.default-size", 10);
 
+// The maximum number of queued frames to send to the compositor.
+// By default, send all of them.
+pref("media.video-queue.send-to-compositor-size", 9999);
+
 // Whether to disable the video stats to prevent fingerprinting
 pref("media.video_stats.enabled", true);
 
@@ -499,6 +522,7 @@ pref("layout.event-regions.enabled", false);
 // APZ preferences. For documentation/details on what these prefs do, check
 // gfx/layers/apz/src/AsyncPanZoomController.cpp.
 pref("apz.allow_checkerboarding", true);
+pref("apz.allow_zooming", false);
 pref("apz.asyncscroll.throttle", 100);
 pref("apz.asyncscroll.timeout", 300);
 
@@ -530,6 +554,7 @@ pref("apz.fling_stopped_threshold", "0.01");
 pref("apz.max_velocity_inches_per_ms", "-1.0");
 pref("apz.max_velocity_queue_size", 5);
 pref("apz.min_skate_speed", "1.0");
+pref("apz.minimap.enabled", false);
 pref("apz.num_paint_duration_samples", 3);
 pref("apz.overscroll.enabled", false);
 pref("apz.overscroll.min_pan_distance_ratio", "1.0");
@@ -578,8 +603,8 @@ pref("apz.test.logging_enabled", false);
 pref("gfx.hidpi.enabled", 2);
 #endif
 
-#if !defined(MOZ_WIDGET_ANDROID)
-// Containerless scrolling for root frames does not yet pass tests on Android.
+#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
+// Use containerless scrolling for now on desktop.
 pref("layout.scroll.root-frame-containers", false);
 #endif
 
@@ -805,21 +830,15 @@ pref("toolkit.asyncshutdown.log", false);
 pref("devtools.errorconsole.deprecation_warnings", true);
 
 // Disable debugging chrome
-#ifdef MOZ_DEV_EDITION
-sticky_pref("devtools.chrome.enabled", true);
-#else
-sticky_pref("devtools.chrome.enabled", false);
-#endif
+pref("devtools.chrome.enabled", false);
 
 // Disable remote debugging protocol logging
 pref("devtools.debugger.log", false);
 pref("devtools.debugger.log.verbose", false);
+
 // Disable remote debugging connections
-#ifdef MOZ_DEV_EDITION
-sticky_pref("devtools.debugger.remote-enabled", true);
-#else
-sticky_pref("devtools.debugger.remote-enabled", false);
-#endif
+pref("devtools.debugger.remote-enabled", false);
+
 pref("devtools.debugger.remote-port", 6000);
 // Force debugger server binding on the loopback interface
 pref("devtools.debugger.force-local", true);
@@ -892,6 +911,9 @@ pref("nglayout.debug.paint_flashing_chrome", false);
 // enable/disable widget update area flashing --- only supported with
 // BasicLayers (other layer managers always update the entire widget area)
 pref("nglayout.debug.widget_update_flashing", false);
+
+// Enable/disable display list invalidation logging --- useful for debugging.
+pref("nglayout.debug.invalidation", false);
 
 // Whether image visibility is enabled globally (ie we will try to unlock images
 // that are not visible).
@@ -1008,7 +1030,7 @@ pref("dom.allow_scripts_to_close_windows",          false);
 
 pref("dom.disable_open_during_load",                false);
 pref("dom.popup_maximum",                           20);
-pref("dom.popup_allowed_events", "change click dblclick mouseup reset submit touchend");
+pref("dom.popup_allowed_events", "change click dblclick mouseup notificationclick reset submit touchend");
 pref("dom.disable_open_click_delay", 1000);
 
 pref("dom.storage.enabled", true);
@@ -1037,6 +1059,10 @@ pref("dom.forms.autocomplete.experimental", false);
 // Enables requestAutocomplete DOM API on forms.
 pref("dom.forms.requestAutocomplete", false);
 
+#ifdef NIGHTLY_BUILD
+pref("dom.input.dirpicker", true);
+#endif
+
 // Enables system messages and activities
 pref("dom.sysmsg.enabled", false);
 
@@ -1061,7 +1087,7 @@ pref("privacy.donottrackheader.enabled",    false);
 // Enforce tracking protection in all modes
 pref("privacy.trackingprotection.enabled",  false);
 // Enforce tracking protection in Private Browsing mode
-pref("privacy.trackingprotection.pbmode.enabled",  false);
+pref("privacy.trackingprotection.pbmode.enabled",  true);
 
 pref("dom.event.contextmenu.enabled",       true);
 pref("dom.event.clipboardevents.enabled",   true);
@@ -1279,6 +1305,9 @@ pref("network.http.referer.XOriginPolicy", 0);
 // By default this is enabled for compatibility (see bug 141641)
 pref("network.http.sendSecureXSiteReferrer", true);
 
+// Controls whether referrer attributes in <a>, <img>, <area>, and <iframe> are honoured
+pref("network.http.enablePerElementReferrer", false);
+
 // Maximum number of consecutive redirects before aborting.
 pref("network.http.redirection-limit", 20);
 
@@ -1473,6 +1502,8 @@ pref("dom.server-events.default-reconnection-time", 5000); // in milliseconds
 // application/java-archive or application/x-jar will not be opened
 // by the jar channel.
 pref("network.jar.open-unsafe-types", false);
+// If true, loading remote JAR files using the jar: protocol will be prevented.
+pref("network.jar.block-remote-files", false);
 
 // This preference, if true, causes all UTF-8 domain names to be normalized to
 // punycode.  The intention is to allow UTF-8 domain names as input, but never
@@ -1680,6 +1711,7 @@ pref("network.predictor.preconnect-min-confidence", 90);
 pref("network.predictor.preresolve-min-confidence", 60);
 pref("network.predictor.redirect-likely-confidence", 75);
 pref("network.predictor.max-resources-per-entry", 100);
+pref("network.predictor.max-uri-length", 500);
 pref("network.predictor.cleaned-up", false);
 
 // The following prefs pertain to the negotiate-auth extension (see bug 17578),
@@ -1733,6 +1765,16 @@ pref("network.auth.force-generic-ntlm", false);
 pref("network.automatic-ntlm-auth.allow-proxies", true);
 pref("network.automatic-ntlm-auth.allow-non-fqdn", false);
 pref("network.automatic-ntlm-auth.trusted-uris", "");
+
+// The string to return to the server as the 'workstation' that the
+// user is using.  Bug 1046421 notes that the previous default, of the
+// system hostname, could be used for user fingerprinting.
+//
+// However, in some network environments where allowedWorkstations is in use
+// to provide a level of host-based access control, it must be set to a string
+// that is listed in allowedWorkstations for the user's account in their
+// AD Domain.
+pref("network.generic-ntlm-auth.workstation", "WORKSTATION");
 
 // Sub-resources HTTP-authentication:
 //   0 - don't allow sub-resources to open HTTP authentication credentials
@@ -2141,9 +2183,6 @@ pref("layout.word_select.stop_at_punctuation", true);
 // Windows default is 1 for word delete behavior, the rest as for 2.
 pref("layout.selection.caret_style", 0);
 
-// pref to force frames to be resizable
-pref("layout.frames.force_resizability", false);
-
 // pref to report CSS errors to the error console
 pref("layout.css.report_errors", true);
 
@@ -2240,10 +2279,17 @@ pref("layout.css.prefixes.transitions", true);
 pref("layout.css.prefixes.animations", true);
 pref("layout.css.prefixes.box-sizing", true);
 pref("layout.css.prefixes.font-features", true);
+pref("layout.css.prefixes.gradients", true);
 
 // Is the CSS Unprefixing Service enabled? (This service emulates support
 // for certain vendor-prefixed properties & values, for sites on a "fixlist".)
 pref("layout.css.unprefixing-service.enabled", true);
+#ifdef NIGHTLY_BUILD
+// Is the CSS Unprefixing Service whitelisted for all domains?
+// (This pref is only honored in Nightly builds and can be removed when
+// Bug 1177263 is fixed.)
+pref("layout.css.unprefixing-service.globally-whitelisted", false);
+#endif
 
 // Is support for the :scope selector enabled?
 pref("layout.css.scope-pseudo.enabled", true);
@@ -2435,7 +2481,9 @@ pref("plugin.sessionPermissionNow.intervalInMinutes", 60);
 // to allow it persistently.
 pref("plugin.persistentPermissionAlways.intervalInDays", 90);
 
-#ifndef DEBUG
+// Set IPC timeouts for plugins and tabs, except in leak-checking builds.
+// (NS_FREE_PERMANENT_DATA is C++ only, so approximate its definition here.)
+#if !defined(DEBUG) && !defined(MOZ_ASAN) && !defined(MOZ_VALGRIND)
 // How long a plugin is allowed to process a synchronous IPC message
 // before we consider it "hung".
 pref("dom.ipc.plugins.timeoutSecs", 45);
@@ -2461,7 +2509,7 @@ pref("dom.ipc.plugins.hangUIMinDisplaySecs", 10);
 // we fear the worst and kill it.
 pref("dom.ipc.tabs.shutdownTimeoutSecs", 5);
 #else
-// No timeout in DEBUG builds
+// No timeout in leak-checking builds
 pref("dom.ipc.plugins.timeoutSecs", 0);
 pref("dom.ipc.plugins.contentTimeoutSecs", 0);
 pref("dom.ipc.plugins.processLaunchTimeoutSecs", 0);
@@ -2473,12 +2521,6 @@ pref("dom.ipc.plugins.hangUIMinDisplaySecs", 0);
 pref("dom.ipc.tabs.shutdownTimeoutSecs", 0);
 #endif
 
-#ifdef XP_WIN
-// Disable oopp for java on windows. They run their own
-// process isolation which conflicts with our implementation.
-pref("dom.ipc.plugins.java.enabled", false);
-#endif
-
 pref("dom.ipc.plugins.flash.disable-protected-mode", false);
 
 pref("dom.ipc.plugins.flash.subprocess.crashreporter.enabled", true);
@@ -2488,13 +2530,7 @@ pref("dom.ipc.plugins.reportCrashURL", true);
 // Defaults to 30 seconds.
 pref("dom.ipc.plugins.unloadTimeoutSecs", 30);
 
-// Asynchronous plugin initialization should only be enabled on non-e10s
-// channels until some remaining bugs are resolved.
-#ifdef E10S_TESTING_ONLY
 pref("dom.ipc.plugins.asyncInit.enabled", false);
-#else
-pref("dom.ipc.plugins.asyncInit.enabled", false);
-#endif
 
 pref("dom.ipc.processCount", 1);
 
@@ -3105,6 +3141,10 @@ pref("intl.tsf.hack.atok.create_native_caret", true);
 // composition start offset.
 // For Free ChangJie 2010
 pref("intl.tsf.hack.free_chang_jie.do_not_return_no_layout_error", true);
+// For Microsoft Pinyin and Microsoft Wubi
+pref("intl.tsf.hack.ms_simplified_chinese.do_not_return_no_layout_error", true);
+// For Microsoft ChangJie and Microsoft Quick
+pref("intl.tsf.hack.ms_traditional_chinese.do_not_return_no_layout_error", true);
 // For Easy Changjei
 pref("intl.tsf.hack.easy_changjei.do_not_return_no_layout_error", true);
 // Whether use previous character rect for the result of
@@ -3179,6 +3219,21 @@ pref("ui.window_class_override", "");
 // and 1 is on.  Set this to 1 if three-finger swipe gestures do not cause
 // page back/forward actions, or if pinch-to-zoom does not work.
 pref("ui.elantech_gesture_hacks.enabled", -1);
+
+// Show the Windows on-screen keyboard (osk.exe) when a text field is focused.
+#ifdef RELEASE_BUILD
+pref("ui.osk.enabled", false);
+#else
+pref("ui.osk.enabled", true);
+#endif
+// Only show the on-screen keyboard if there are no physical keyboards attached
+// to the device.
+pref("ui.osk.detect_physical_keyboard", true);
+// Path to TabTip.exe on local machine. Cached for performance reasons.
+pref("ui.osk.on_screen_keyboard_path", "");
+// Only show the on-screen keyboard when Windows is in Tablet mode. Setting
+// this pref to false will allow the OSK to show in regular non-tablet mode.
+pref("ui.osk.require_tablet_mode", true);
 
 # XP_WIN
 #endif
@@ -3405,22 +3460,22 @@ pref("font.name.serif.zh-CN", "Times");
 pref("font.name.sans-serif.zh-CN", "Helvetica");
 pref("font.name.monospace.zh-CN", "Courier");
 pref("font.name-list.serif.zh-CN", "Times,STSong,Heiti SC");
-pref("font.name-list.sans-serif.zh-CN", "Helvetica,STHeiti,Heiti SC");
-pref("font.name-list.monospace.zh-CN", "Courier,STHeiti,Heiti SC");
+pref("font.name-list.sans-serif.zh-CN", "Helvetica,PingFang SC,STHeiti,Heiti SC");
+pref("font.name-list.monospace.zh-CN", "Courier,PingFang SC,STHeiti,Heiti SC");
 
 pref("font.name.serif.zh-TW", "Times");
 pref("font.name.sans-serif.zh-TW", "Helvetica");
 pref("font.name.monospace.zh-TW", "Courier");
 pref("font.name-list.serif.zh-TW", "Times,LiSong Pro,Heiti TC");
-pref("font.name-list.sans-serif.zh-TW", "Helvetica,Heiti TC,LiHei Pro");
-pref("font.name-list.monospace.zh-TW", "Courier,Heiti TC,LiHei Pro");
+pref("font.name-list.sans-serif.zh-TW", "Helvetica,PingFang TC,Heiti TC,LiHei Pro");
+pref("font.name-list.monospace.zh-TW", "Courier,PingFang TC,Heiti TC,LiHei Pro");
 
 pref("font.name.serif.zh-HK", "Times");
 pref("font.name.sans-serif.zh-HK", "Helvetica");
 pref("font.name.monospace.zh-HK", "Courier");
 pref("font.name-list.serif.zh-HK", "Times,LiSong Pro,Heiti TC");
-pref("font.name-list.sans-serif.zh-HK", "Helvetica,Heiti TC,LiHei Pro");
-pref("font.name-list.monospace.zh-HK", "Courier,Heiti TC,LiHei Pro");
+pref("font.name-list.sans-serif.zh-HK", "Helvetica,PingFang TC,Heiti TC,LiHei Pro");
+pref("font.name-list.monospace.zh-HK", "Courier,PingFang TC,Heiti TC,LiHei Pro");
 
 // XP_MACOSX changes to default font sizes
 pref("font.minimum-size.th", 10);
@@ -3960,6 +4015,7 @@ pref("signon.autologin.proxy",              false);
 pref("signon.storeWhenAutocompleteOff",     true);
 pref("signon.ui.experimental",              false);
 pref("signon.debug",                        false);
+pref("signon.recipes.path",                 "chrome://passwordmgr/content/recipes.json");
 
 // Satchel (Form Manager) prefs
 pref("browser.formfill.debug",            false);
@@ -4021,12 +4077,7 @@ pref("image.cache.size", 5242880);
 // Size is given a weight of 1000 - timeweight.
 pref("image.cache.timeweight", 500);
 
-// Prevents images from automatically being decoded on load, instead allowing
-// them to be decoded on demand when they are drawn.
-pref("image.decode-only-on-draw.enabled", true);
-
 // Decode all images automatically on load, ignoring our normal heuristics.
-// Overrides image.decode-only-on-draw.enabled.
 pref("image.decode-immediately.enabled", false);
 
 // Whether we attempt to downscale images during decoding.
@@ -4044,6 +4095,13 @@ pref("image.high_quality_downscaling.min_factor", 1000);
 // The maximum memory size which we'll use high-quality uspcaling on,
 // interpreted as number of decoded bytes.
 pref("image.high_quality_upscaling.max_size", 20971520);
+
+// The threshold for inferring that changes to an <img> element's |src|
+// attribute by JavaScript represent an animation, in milliseconds. If the |src|
+// attribute is changing more frequently than this value, then we enter a
+// special "animation mode" which is designed to eliminate flicker. Set to 0 to
+// disable.
+pref("image.infer-src-animation.threshold-ms", 2000);
 
 // Should we optimize away the surfaces of single-color images?
 pref("image.single-color-optimization.enabled", true);
@@ -4121,13 +4179,21 @@ pref("webgl.enable-privileged-extensions", false);
 pref("webgl.bypass-shader-validation", false);
 pref("webgl.enable-prototype-webgl2", false);
 pref("webgl.disable-fail-if-major-performance-caveat", false);
-pref("webgl.disable-debug-renderer-info", false);
+
+#ifdef RELEASE_BUILD
+// Keep this disabled on Release and Beta for now. (see bug 1171228)
+pref("webgl.enable-debug-renderer-info", false);
+#else
+pref("webgl.enable-debug-renderer-info", true);
+#endif
+
 pref("webgl.renderer-string-override", "");
 pref("webgl.vendor-string-override", "");
 
 #ifdef XP_WIN
 pref("webgl.angle.try-d3d11", true);
 pref("webgl.angle.force-d3d11", false);
+pref("webgl.angle.force-warp", false);
 #endif
 
 #ifdef MOZ_WIDGET_GONK
@@ -4223,11 +4289,6 @@ pref("layers.offmainthreadcomposition.enabled", true);
 // 0  -> full-tilt mode: Recomposite even if not transaction occured.
 pref("layers.offmainthreadcomposition.frame-rate", -1);
 
-// Asynchonous video compositing using the ImageBridge IPDL protocol.
-// requires off-main-thread compositing.
-pref("layers.async-video.enabled", true);
-pref("layers.async-video-oop.enabled",true);
-
 #ifdef MOZ_WIDGET_UIKIT
 pref("layers.async-pan-zoom.enabled", true);
 #endif
@@ -4238,9 +4299,15 @@ pref("layers.async-pan-zoom.enabled", true);
 
 #ifdef XP_MACOSX
 pref("layers.enable-tiles", true);
+pref("layers.tile-width", 512);
+pref("layers.tile-height", 512);
 pref("layers.tiled-drawtarget.enabled", true);
+pref("layers.tiles.edge-padding", false);
 #endif
 
+#ifdef MOZ_WIDGET_GONK
+pref("layers.tiled-drawtarget.enabled", true);
+#endif
 
 // same effect as layers.offmainthreadcomposition.enabled, but specifically for
 // use with tests.
@@ -4297,6 +4364,9 @@ pref("layers.compositor-lru-size", 0);
 // Enable/Disable the geolocation API for content
 pref("geo.enabled", true);
 
+// Timeout for outbound network geolocation provider XHR
+pref("geo.wifi.xhr.timeout", 60000);
+
 // Enable/Disable the orientation API for content
 pref("device.sensors.enabled", true);
 
@@ -4334,6 +4404,9 @@ pref("notification.feature.enabled", false);
 
 // Web Notification
 pref("dom.webnotifications.enabled", true);
+#if !defined(RELEASE_BUILD)
+pref("dom.webnotifications.serviceworker.enabled", true);
+#endif
 
 // Alert animation effect, name is disableSlidingEffect for backwards-compat.
 pref("alerts.disableSlidingEffect", false);
@@ -4342,6 +4415,9 @@ pref("alerts.disableSlidingEffect", false);
 pref("full-screen-api.enabled", false);
 pref("full-screen-api.allow-trusted-requests-only", true);
 pref("full-screen-api.pointer-lock.enabled", true);
+// transition duration of fade-to-black and fade-from-black, unit: ms
+pref("full-screen-api.transition-duration.enter", "200 200");
+pref("full-screen-api.transition-duration.leave", "200 200");
 
 // DOM idle observers API
 pref("dom.idle-observers-api.enabled", true);
@@ -4390,21 +4466,16 @@ pref("dom.mozAlarms.enabled", false);
 
 // Push
 
-#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
-// Desktop prefs
-#ifdef RELEASE_BUILD
 pref("dom.push.enabled", false);
-#else
-pref("dom.push.enabled", true);
-#endif
-#else
-// Mobile prefs
-pref("dom.push.enabled", false);
-#endif
 
 pref("dom.push.debug", false);
+
 pref("dom.push.serverURL", "wss://push.services.mozilla.com/");
 pref("dom.push.userAgentID", "");
+
+// The maximum number of notifications that a service worker can receive
+// without user interaction.
+pref("dom.push.maxQuotaPerSubscription", 16);
 
 // Is the network connection allowed to be up?
 // This preference should be used in UX to enable/disable push.
@@ -4576,9 +4647,19 @@ pref("dom.browserElement.maxScreenshotDelayMS", 2000);
 // Whether we should show the placeholder when the element is focused but empty.
 pref("dom.placeholder.show_on_focus", true);
 
+// VR is disabled by default
 pref("dom.vr.enabled", false);
+// Oculus > 0.5
+pref("dom.vr.oculus.enabled", true);
+// Oculus <= 0.5; will only trigger if > 0.5 is not used or found
+pref("dom.vr.oculus050.enabled", true);
+// Cardboard VR device is disabled by default
+pref("dom.vr.cardboard.enabled", false);
 // 0 = never; 1 = only if real devices aren't there; 2 = always
 pref("dom.vr.add-test-devices", 1);
+// true = show the VR textures in our compositing output; false = don't.
+// true might have performance impact
+pref("gfx.vr.mirror-textures", false);
 
 // MMS UA Profile settings
 pref("wap.UAProf.url", "");
@@ -4630,11 +4711,19 @@ pref("ui.touch_activation.duration_ms", 10);
 // actions when the fifo is written to.  Disable this in general.
 pref("memory_info_dumper.watch_fifo.enabled", false);
 
-#ifdef MOZ_CAPTIVEDETECT
+// If minInterval is 0, the check will only happen
+// when the service has a strong suspicion we are in a captive portal
+pref("network.captive-portal-service.minInterval", 60000); // 60 seconds
+pref("network.captive-portal-service.maxInterval", 1500000); // 25 minutes
+// Every 10 checks, the delay is increased by a factor of 5
+pref("network.captive-portal-service.backoffFactor", "5.0");
+pref("network.captive-portal-service.enabled", false);
+
+pref("captivedetect.canonicalURL", "http://detectportal.firefox.com/success.txt");
+pref("captivedetect.canonicalContent", "success\n");
 pref("captivedetect.maxWaitingTime", 5000);
 pref("captivedetect.pollingTime", 3000);
 pref("captivedetect.maxRetryCount", 5);
-#endif
 
 #ifdef RELEASE_BUILD
 pref("dom.forms.inputmode", false);
@@ -4689,9 +4778,6 @@ pref("dom.voicemail.enabled", false);
 // parameter omitted.
 pref("dom.voicemail.defaultServiceId", 0);
 
-// DOM BroadcastChannel API.
-pref("dom.broadcastChannel.enabled", true);
-
 // DOM Inter-App Communication API.
 pref("dom.inter-app-communication-api.enabled", false);
 
@@ -4703,18 +4789,19 @@ pref("urlclassifier.malwareTable", "goog-malware-shavar,goog-unwanted-shavar,tes
 pref("urlclassifier.phishTable", "goog-phish-shavar,test-phish-simple");
 pref("urlclassifier.downloadBlockTable", "");
 pref("urlclassifier.downloadAllowTable", "");
-pref("urlclassifier.disallow_completions", "test-malware-simple,test-phish-simple,test-unwanted-simple,goog-downloadwhite-digest256,mozpub-track-digest256");
+pref("urlclassifier.disallow_completions", "test-malware-simple,test-phish-simple,test-unwanted-simple,test-track-simple,test-trackwhite-simple,goog-downloadwhite-digest256,mozstd-track-digest256,mozstd-trackwhite-digest256");
 
 // The table and update/gethash URLs for Safebrowsing phishing and malware
 // checks.
-pref("urlclassifier.trackingTable", "mozpub-track-digest256");
-pref("browser.trackingprotection.updateURL", "https://tracking.services.mozilla.com/downloads?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2");
-pref("browser.trackingprotection.gethashURL", "https://tracking.services.mozilla.com/gethash?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2");
+pref("urlclassifier.trackingTable", "test-track-simple,mozstd-track-digest256");
+pref("urlclassifier.trackingWhitelistTable", "test-trackwhite-simple,mozstd-trackwhite-digest256");
+pref("browser.trackingprotection.updateURL", "https://shavar.services.mozilla.com/downloads?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2");
+pref("browser.trackingprotection.gethashURL", "https://shavar.services.mozilla.com/gethash?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2");
 
 // Turn off Spatial navigation by default.
 pref("snav.enabled", false);
 
-// Turn off touch caret by default.
+// Original caret implementation on collapsed selection.
 pref("touchcaret.enabled", false);
 
 // This will inflate the size of the touch caret frame when checking if user
@@ -4726,7 +4813,7 @@ pref("touchcaret.inflatesize.threshold", 40);
 // In milliseconds. (0 means disable this feature)
 pref("touchcaret.expiration.time", 3000);
 
-// Turn off selection caret by default
+// Original caret implementation on non-collapsed selection.
 pref("selectioncaret.enabled", false);
 
 // This will inflate size of selection caret frame when we checking if
@@ -4796,6 +4883,10 @@ pref("dom.caches.enabled", true);
 pref("camera.control.low_memory_thresholdMB", 404);
 #endif
 
+// SystemUpdate API
+pref("dom.system_update.enabled", false);
+pref("dom.system_update.debug", false);
+
 // UDPSocket API
 pref("dom.udpsocket.enabled", false);
 
@@ -4808,10 +4899,16 @@ pref("dom.beforeAfterKeyboardEvent.enabled", false);
 // Presentation API
 pref("dom.presentation.enabled", false);
 pref("dom.presentation.tcp_server.debug", false);
+pref("dom.presentation.discovery.enabled", true);
+pref("dom.presentation.discoverable", false);
 
 #ifdef XP_MACOSX
 // Use raw ICU instead of CoreServices API in Unicode collation
 pref("intl.collation.mac.use_icu", true);
+
+// Enable NSTextInput protocol for use with IMEs that have not
+// been updated to use the NSTextInputClient protocol.
+pref("intl.ime.nstextinput.enable", false);
 
 #if !defined(RELEASE_BUILD) || defined(DEBUG)
 // In non-release builds we crash by default on insecure text input (when a
@@ -4878,7 +4975,7 @@ pref("browser.search.official", true);
 //pref("media.gmp-manager.url.override", "");
 
 // Update service URL for GMP install/updates:
-pref("media.gmp-manager.url", "https://aus4.mozilla.org/update/3/GMP/%VERSION%/%BUILD_ID%/%BUILD_TARGET%/%LOCALE%/%CHANNEL%/%OS_VERSION%/%DISTRIBUTION%/%DISTRIBUTION_VERSION%/update.xml");
+pref("media.gmp-manager.url", "https://aus5.mozilla.org/update/3/GMP/%VERSION%/%BUILD_ID%/%BUILD_TARGET%/%LOCALE%/%CHANNEL%/%OS_VERSION%/%DISTRIBUTION%/%DISTRIBUTION_VERSION%/update.xml");
 
 // When |media.gmp-manager.cert.requireBuiltIn| is true or not specified the
 // final certificate and all certificates the connection is redirected to before
@@ -4903,10 +5000,10 @@ pref("media.gmp-manager.cert.requireBuiltIn", true);
 // IMPORTANT! app.update.certs.* prefs should also be updated if these
 // are updated.
 pref("media.gmp-manager.cert.checkAttributes", true);
-pref("media.gmp-manager.certs.1.issuerName", "CN=DigiCert Secure Server CA,O=DigiCert Inc,C=US");
-pref("media.gmp-manager.certs.1.commonName", "aus4.mozilla.org");
-pref("media.gmp-manager.certs.2.issuerName", "CN=Thawte SSL CA,O=\"Thawte, Inc.\",C=US");
-pref("media.gmp-manager.certs.2.commonName", "aus4.mozilla.org");
+pref("media.gmp-manager.certs.1.issuerName", "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US");
+pref("media.gmp-manager.certs.1.commonName", "aus5.mozilla.org");
+pref("media.gmp-manager.certs.2.issuerName", "CN=thawte SSL CA - G2,O=\"thawte, Inc.\",C=US");
+pref("media.gmp-manager.certs.2.commonName", "aus5.mozilla.org");
 #endif
 
 // Whether or not to perform reader mode article parsing on page load.
@@ -4920,6 +5017,10 @@ pref("reader.parse-node-limit", 3000);
 // Force-enables reader mode parsing, even on low-memory platforms, where it
 // is disabled by default.
 pref("reader.parse-on-load.force-enabled", false);
+
+// Whether we include full URLs in browser console errors. This is disabled
+// by default because some platforms will persist these, leading to privacy issues.
+pref("reader.errors.includeURLs", false);
 
 // The default relative font size in reader mode (1-9)
 pref("reader.font_size", 5);
@@ -4949,6 +5050,8 @@ pref("reader.toolbar.vertical", true);
 pref("media.gmp.insecure.allow", false);
 #endif
 
+pref("dom.audiochannel.mutedByDefault", false);
+
 // Use vsync aligned rendering. b2g prefs are in b2g.js.
 // Hardware vsync supported on windows, os x, and b2g.
 // Linux and fennec will use software vsync.
@@ -4977,3 +5080,14 @@ pref("memory.report_concurrency", 1);
 // Desktop probably doesn't have swapped-out children like that.
 pref("memory.report_concurrency", 10);
 #endif
+
+// Make <audio>, <video>, NPAPI plugins and webAudio talk to the AudioChannelService.
+pref("media.useAudioChannelService", true);
+// Add Mozilla AudioChannel APIs.
+pref("media.useAudioChannelAPI", false);
+
+// Expose Request.cache. Currently disabled since the implementation is incomplete.
+pref("dom.requestcache.enabled", false);
+
+// Expose Request.context. Currently disabled since the spec is in flux.
+pref("dom.requestcontext.enabled", false);

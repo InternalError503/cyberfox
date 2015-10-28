@@ -46,6 +46,8 @@ function getConfigFile(req, res) {
     "loop.config.fxosApp.rooms = true;",
     "loop.config.fxosApp.manifestUrl = 'http://fake-market.herokuapp.com/apps/packagedApp/manifest.webapp';",
     "loop.config.roomsSupportUrl = 'https://support.mozilla.org/kb/group-conversations-firefox-hello-webrtc';",
+    "loop.config.tilesIframeUrl = 'https://tiles.cdn.mozilla.net/iframe.html';",
+    "loop.config.tilesSupportUrl = 'https://support.mozilla.org/tiles-firefox-hello';",
     "loop.config.guestSupportUrl = 'https://support.mozilla.org/kb/respond-firefox-hello-invitation-guest-mode';",
     "loop.config.generalSupportUrl = 'https://support.mozilla.org/kb/respond-firefox-hello-invitation-guest-mode';",
     "loop.config.unsupportedPlatformUrl = 'https://support.mozilla.org/en-US/kb/which-browsers-will-work-firefox-hello-video-chat'"
@@ -83,6 +85,8 @@ app.use("/test", express.static(__dirname + "/../test"));
 // As we don't have hashes on the urls, the best way to serve the index files
 // appears to be to be to closely filter the url and match appropriately.
 function serveIndex(req, res) {
+  "use strict";
+
   return res.sendfile(__dirname + "/content/index.html");
 }
 

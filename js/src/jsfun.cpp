@@ -374,7 +374,7 @@ ResolveInterpretedFunctionPrototype(JSContext* cx, HandleFunction fun, HandleId 
     // Assert that fun is not a compiler-created function object, which
     // must never leak to script or embedding code and then be mutated.
     // Also assert that fun is not bound, per the ES5 15.3.4.5 ref above.
-    MOZ_ASSERT(!IsInternalFunctionObject(fun));
+    MOZ_ASSERT(!IsInternalFunctionObject(*fun));
     MOZ_ASSERT(!fun->isBoundFunction());
 
     // Make the prototype object an instance of Object with the same parent as
@@ -461,7 +461,7 @@ fun_resolve(JSContext* cx, HandleObject obj, HandleId id, bool* resolvedp)
 
     bool isLength = JSID_IS_ATOM(id, cx->names().length);
     if (isLength || JSID_IS_ATOM(id, cx->names().name)) {
-        MOZ_ASSERT(!IsInternalFunctionObject(obj));
+        MOZ_ASSERT(!IsInternalFunctionObject(*obj));
 
         RootedValue v(cx);
 
@@ -1505,9 +1505,10 @@ js::CallOrConstructBoundFunction(JSContext* cx, unsigned argc, Value* vp)
     MOZ_ASSERT(fun->isBoundFunction());
 
     /* 15.3.4.5.1 step 1, 15.3.4.5.2 step 3. */
-    unsigned argslen = fun->getBoundFunctionArgumentCount();
+    unsigned boundArgsLen = fun->getBoundFunctionArgumentCount();
 
-    if (args.length() + argslen > ARGS_LENGTH_MAX) {
+    uint32_t argsLen = args.length();
+    if (argsLen + boundArgsLen > ARGS_LENGTH_MAX) {
         ReportAllocationOverflow(cx);
         return false;
     }
@@ -1518,31 +1519,44 @@ js::CallOrConstructBoundFunction(JSContext* cx, unsigned argc, Value* vp)
     /* 15.3.4.5.1 step 2. */
     const Value& boundThis = fun->getBoundFunctionThis();
 
+    if (args.isConstructing()) {
+        ConstructArgs cargs(cx);
+        if (!cargs.init(argsLen + boundArgsLen))
+            return false;
+
+        /* 15.3.4.5.1, 15.3.4.5.2 step 4. */
+        for (uint32_t i = 0; i < boundArgsLen; i++)
+            cargs[i].set(fun->getBoundFunctionArgument(i));
+        for (uint32_t i = 0; i < argsLen; i++)
+            cargs[boundArgsLen + i].set(args[i]);
+
+        RootedValue targetv(cx, ObjectValue(*target));
+
+        /* ES6 9.4.1.2 step 5 */
+        RootedValue newTarget(cx);
+        if (&args.newTarget().toObject() == fun)
+            newTarget.set(targetv);
+        else
+            newTarget.set(args.newTarget());
+
+        return Construct(cx, targetv, cargs, newTarget, args.rval());
+    }
+
     InvokeArgs invokeArgs(cx);
-    if (!invokeArgs.init(args.length() + argslen, args.isConstructing()))
+    if (!invokeArgs.init(argsLen + boundArgsLen))
         return false;
 
     /* 15.3.4.5.1, 15.3.4.5.2 step 4. */
-    for (unsigned i = 0; i < argslen; i++)
+    for (uint32_t i = 0; i < boundArgsLen; i++)
         invokeArgs[i].set(fun->getBoundFunctionArgument(i));
-    PodCopy(invokeArgs.array() + argslen, vp + 2, args.length());
+    for (uint32_t i = 0; i < argsLen; i++)
+        invokeArgs[boundArgsLen + i].set(args[i]);
 
     /* 15.3.4.5.1, 15.3.4.5.2 step 5. */
     invokeArgs.setCallee(ObjectValue(*target));
+    invokeArgs.setThis(boundThis);
 
-    bool constructing = args.isConstructing();
-    if (!constructing)
-        invokeArgs.setThis(boundThis);
-
-    /* ES6 9.4.1.2 step 5 */
-    if (constructing) {
-        if (&args.newTarget().toObject() == fun)
-            invokeArgs.newTarget().setObject(*target);
-        else
-            invokeArgs.newTarget().set(args.newTarget());
-    }
-
-    if (constructing ? !InvokeConstructor(cx, invokeArgs) : !Invoke(cx, invokeArgs))
+    if (!Invoke(cx, invokeArgs))
         return false;
 
     args.rval().set(invokeArgs.rval());
@@ -1586,42 +1600,29 @@ js::fun_bind(JSContext* cx, unsigned argc, Value* vp)
         argslen = args.length() - 1;
     }
 
-    // Steps 4-14.
     RootedValue thisArg(cx, args.length() >= 1 ? args[0] : UndefinedValue());
     RootedObject target(cx, &thisv.toObject());
-    JSObject* boundFunction = fun_bind(cx, target, thisArg, boundArgs, argslen);
-    if (!boundFunction)
-        return false;
 
-    // Step 15.
-    args.rval().setObject(*boundFunction);
-    return true;
-}
-
-JSObject*
-js::fun_bind(JSContext* cx, HandleObject target, HandleValue thisArg,
-             Value* boundArgs, unsigned argslen)
-{
     double length = 0.0;
     // Try to avoid invoking the resolve hook.
     if (target->is<JSFunction>() && !target->as<JSFunction>().hasResolvedLength()) {
         uint16_t len;
         if (!target->as<JSFunction>().getLength(cx, &len))
-            return nullptr;
+            return false;
         length = Max(0.0, double(len) - argslen);
     } else {
         // Steps 5-6.
         RootedId id(cx, NameToId(cx->names().length));
         bool hasLength;
         if (!HasOwnProperty(cx, target, id, &hasLength))
-            return nullptr;
+            return false;
 
         // Step 7-8.
         if (hasLength) {
             // a-b.
             RootedValue targetLen(cx);
             if (!GetProperty(cx, target, target, id, &targetLen))
-                return nullptr;
+                return false;
             // d.
             if (targetLen.isNumber())
                 length = Max(0.0, JS::ToInteger(targetLen.toNumber()) - argslen);
@@ -1636,7 +1637,7 @@ js::fun_bind(JSContext* cx, HandleObject target, HandleValue thisArg,
         // Steps 11-12.
         RootedValue targetName(cx);
         if (!GetProperty(cx, target, target, cx->names().name, &targetName))
-            return nullptr;
+            return false;
 
         // Step 13.
         if (targetName.isString())
@@ -1647,23 +1648,23 @@ js::fun_bind(JSContext* cx, HandleObject target, HandleValue thisArg,
     StringBuffer sb(cx);
     // Disabled for B2G failures.
     // if (!sb.append("bound ") || !sb.append(name))
-    //   return nullptr;
+    //   return false;
     if (!sb.append(name))
-        return nullptr;
+        return false;
 
     RootedAtom nameAtom(cx, sb.finishAtom());
     if (!nameAtom)
-        return nullptr;
+        return false;
 
-    //  Step 4.
+    // Step 4.
     RootedFunction fun(cx, target->isConstructor() ?
       NewNativeConstructor(cx, CallOrConstructBoundFunction, length, nameAtom) :
       NewNativeFunction(cx, CallOrConstructBoundFunction, length, nameAtom));
     if (!fun)
-        return nullptr;
+        return false;
 
     if (!fun->initBoundFunction(cx, target, thisArg, boundArgs, argslen))
-        return nullptr;
+        return false;
 
     // Steps 9-10. Set length again, because NewNativeFunction/NewNativeConstructor
     // sometimes truncates.
@@ -1672,11 +1673,13 @@ js::fun_bind(JSContext* cx, HandleObject target, HandleValue thisArg,
         if (!DefineProperty(cx, fun, cx->names().length, lengthVal, nullptr, nullptr,
                             JSPROP_READONLY))
         {
-            return nullptr;
+            return false;
         }
     }
 
-    return fun;
+    // Step 15.
+    args.rval().setObject(*fun);
+    return true;
 }
 
 /*

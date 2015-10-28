@@ -7,18 +7,22 @@
 
 #include "ContentHelper.h"
 #include "gfxPlatform.h" // For gfxPlatform::UseTiling
+#include "gfxPrefs.h"
+#include "mozilla/dom/Element.h"
 #include "mozilla/dom/TabParent.h"
 #include "mozilla/layers/LayerTransactionChild.h"
 #include "mozilla/layers/ShadowLayers.h"
+#include "mozilla/TouchEvents.h"
 #include "nsIScrollableFrame.h"
 #include "nsLayoutUtils.h"
-#include "nsIDOMElement.h"
 #include "nsIInterfaceRequestorUtils.h"
 #include "nsIContent.h"
 #include "nsIDocument.h"
 #include "nsIDOMWindow.h"
 #include "nsRefreshDriver.h"
+#include "nsString.h"
 #include "nsView.h"
+#include "Layers.h"
 
 #define APZCCH_LOG(...)
 // #define APZCCH_LOG(...) printf_stderr("APZCCH: " __VA_ARGS__)
@@ -191,33 +195,40 @@ APZCCallbackHelper::UpdateRootFrame(FrameMetrics& aMetrics)
 
   MOZ_ASSERT(aMetrics.GetUseDisplayPortMargins());
 
-  float presShellResolution = nsLayoutUtils::GetResolution(shell);
+  if (gfxPrefs::APZAllowZooming()) {
+    // If zooming is disabled then we don't really want to let APZ fiddle
+    // with these things. In theory setting the resolution here should be a
+    // no-op, but setting the SPCSPS is bad because it can cause a stale value
+    // to be returned by window.innerWidth/innerHeight (see bug 1187792).
 
-  // If the pres shell resolution has changed on the content side side
-  // the time this repaint request was fired, consider this request out of date
-  // and drop it; setting a zoom based on the out-of-date resolution can have
-  // the effect of getting us stuck with the stale resolution.
-  if (presShellResolution != aMetrics.GetPresShellResolution()) {
-    return;
+    float presShellResolution = nsLayoutUtils::GetResolution(shell);
+
+    // If the pres shell resolution has changed on the content side side
+    // the time this repaint request was fired, consider this request out of date
+    // and drop it; setting a zoom based on the out-of-date resolution can have
+    // the effect of getting us stuck with the stale resolution.
+    if (presShellResolution != aMetrics.GetPresShellResolution()) {
+      return;
+    }
+
+    // Set the scroll port size, which determines the scroll range. For example if
+    // a 500-pixel document is shown in a 100-pixel frame, the scroll port length would
+    // be 100, and gecko would limit the maximum scroll offset to 400 (so as to prevent
+    // overscroll). Note that if the content here was zoomed to 2x, the document would
+    // be 1000 pixels long but the frame would still be 100 pixels, and so the maximum
+    // scroll range would be 900. Therefore this calculation depends on the zoom applied
+    // to the content relative to the container.
+    // Note that this needs to happen before scrolling the frame (in UpdateFrameCommon),
+    // otherwise the scroll position may get clamped incorrectly.
+    CSSSize scrollPort = aMetrics.CalculateCompositedSizeInCssPixels();
+    nsLayoutUtils::SetScrollPositionClampingScrollPortSize(shell, scrollPort);
+
+    // The pres shell resolution is updated by the the async zoom since the
+    // last paint.
+    presShellResolution = aMetrics.GetPresShellResolution()
+                        * aMetrics.GetAsyncZoom().scale;
+    nsLayoutUtils::SetResolutionAndScaleTo(shell, presShellResolution);
   }
-
-  // Set the scroll port size, which determines the scroll range. For example if
-  // a 500-pixel document is shown in a 100-pixel frame, the scroll port length would
-  // be 100, and gecko would limit the maximum scroll offset to 400 (so as to prevent
-  // overscroll). Note that if the content here was zoomed to 2x, the document would
-  // be 1000 pixels long but the frame would still be 100 pixels, and so the maximum
-  // scroll range would be 900. Therefore this calculation depends on the zoom applied
-  // to the content relative to the container.
-  // Note that this needs to happen before scrolling the frame (in UpdateFrameCommon),
-  // otherwise the scroll position may get clamped incorrectly.
-  CSSSize scrollPort = aMetrics.CalculateCompositedSizeInCssPixels();
-  nsLayoutUtils::SetScrollPositionClampingScrollPortSize(shell, scrollPort);
-
-  // The pres shell resolution is updated by the the async zoom since the
-  // last paint.
-  presShellResolution = aMetrics.GetPresShellResolution()
-                      * aMetrics.GetAsyncZoom().scale;
-  nsLayoutUtils::SetResolutionAndScaleTo(shell, presShellResolution);
 
   // Do this as late as possible since scrolling can flush layout. It also
   // adjusts the display port margins, so do it before we set those.
@@ -253,7 +264,7 @@ APZCCallbackHelper::GetOrCreateScrollIdentifiers(nsIContent* aContent,
                                                  FrameMetrics::ViewID* aViewIdOut)
 {
     if (!aContent) {
-        return false;
+      return false;
     }
     *aViewIdOut = nsLayoutUtils::FindOrCreateIDFor(aContent);
     if (nsCOMPtr<nsIPresShell> shell = GetPresShell(aContent)) {
@@ -261,6 +272,36 @@ APZCCallbackHelper::GetOrCreateScrollIdentifiers(nsIContent* aContent,
       return true;
     }
     return false;
+}
+
+void
+APZCCallbackHelper::InitializeRootDisplayport(nsIPresShell* aPresShell)
+{
+  // Create a view-id and set a zero-margin displayport for the root element
+  // of the root document in the chrome process. This ensures that the scroll
+  // frame for this element gets an APZC, which in turn ensures that all content
+  // in the chrome processes is covered by an APZC.
+  // The displayport is zero-margin because this element is generally not
+  // actually scrollable (if it is, APZC will set proper margins when it's
+  // scrolled).
+  if (!aPresShell) {
+    return;
+  }
+
+  MOZ_ASSERT(aPresShell->GetDocument());
+  nsIContent* content = aPresShell->GetDocument()->GetDocumentElement();
+  if (!content) {
+    return;
+  }
+
+  uint32_t presShellId;
+  FrameMetrics::ViewID viewId;
+  if (APZCCallbackHelper::GetOrCreateScrollIdentifiers(content, &presShellId, &viewId)) {
+    // Note that the base rect that goes with these margins is set in
+    // nsRootBoxFrame::BuildDisplayList.
+    nsLayoutUtils::SetDisplayPortMargins(content, aPresShell, ScreenMargin(), 0,
+        nsLayoutUtils::RepaintMode::DoNotRepaint);
+  }
 }
 
 class FlingSnapEvent : public nsRunnable
@@ -589,8 +630,23 @@ PrepareForSetTargetAPZCNotification(nsIWidget* aWidget,
     return false;
   }
 
+  if (!scrollAncestor) {
+    MOZ_ASSERT(false);  // If you hit this, please file a bug with STR.
+
+    // Attempt some sort of graceful handling based on a theory as to why we
+    // reach this point...
+    // If we get here, the document element is non-null, valid, but doesn't have
+    // a displayport. It's possible that the init code in ChromeProcessController
+    // failed for some reason, or the document element got swapped out at some
+    // later time. In this case let's try to set a displayport on the document
+    // element again and bail out on this operation.
+    APZCCH_LOG("Widget %p's document element %p didn't have a displayport\n",
+        aWidget, dpElement.get());
+    APZCCallbackHelper::InitializeRootDisplayport(aRootFrame->PresContext()->PresShell());
+    return false;
+  }
+
   APZCCH_LOG("%p didn't have a displayport, so setting one...\n", dpElement.get());
-  MOZ_ASSERT(scrollAncestor);
   return nsLayoutUtils::CalculateAndSetDisplayPortMargins(
       scrollAncestor, nsLayoutUtils::RepaintMode::Repaint);
 }
@@ -754,6 +810,6 @@ APZCCallbackHelper::NotifyFlushComplete()
   observerService->NotifyObservers(nullptr, "apz-repaints-flushed", nullptr);
 }
 
-}
-}
+} // namespace layers
+} // namespace mozilla
 

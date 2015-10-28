@@ -33,6 +33,9 @@
 #include "mozilla/layers/MacIOSurfaceTextureHostOGL.h"
 #endif
 
+#ifdef GL_PROVIDER_GLX
+#include "mozilla/layers/X11TextureHost.h"
+#endif
 
 using namespace mozilla::gl;
 using namespace mozilla::gfx;
@@ -42,7 +45,7 @@ namespace layers {
 
 class Compositor;
 
-TemporaryRef<TextureHost>
+already_AddRefed<TextureHost>
 CreateTextureHostOGL(const SurfaceDescriptor& aDesc,
                      ISurfaceAllocator* aDeallocator,
                      TextureFlags aFlags)
@@ -90,6 +93,14 @@ CreateTextureHostOGL(const SurfaceDescriptor& aDesc,
       const NewSurfaceDescriptorGralloc& desc =
         aDesc.get_NewSurfaceDescriptorGralloc();
       result = new GrallocTextureHostOGL(aFlags, desc);
+      break;
+    }
+#endif
+
+#ifdef GL_PROVIDER_GLX
+    case SurfaceDescriptor::TSurfaceDescriptorX11: {
+      const auto& desc = aDesc.get_SurfaceDescriptorX11();
+      result = new X11TextureHost(aFlags, desc);
       break;
     }
 #endif
@@ -631,5 +642,5 @@ EGLImageTextureHost::GetFormat() const
   return mTextureSource->GetFormat();
 }
 
-} // namespace
-} // namespace
+} // namespace layers
+} // namespace mozilla

@@ -24,7 +24,11 @@
 // For HTTP seeking, if number of bytes needing to be
 // seeked forward is less than this value then a read is
 // done rather than a byte range request.
-static const int64_t SEEK_VS_READ_THRESHOLD = 32*1024;
+//
+// If we assume a 100Mbit connection, and assume reissuing an HTTP seek causes
+// a delay of 200ms, then in that 200ms we could have simply read ahead 2MB. So
+// setting SEEK_VS_READ_THRESHOLD to 1MB sounds reasonable.
+static const int64_t SEEK_VS_READ_THRESHOLD = 1 * 1024 * 1024;
 
 static const uint32_t HTTP_REQUESTED_RANGE_NOT_SATISFIABLE_CODE = 416;
 
@@ -346,6 +350,15 @@ public:
   // Returns true if all the data from aOffset to the end of the stream
   // is in cache. If the end of the stream is not known, we return false.
   virtual bool IsDataCachedToEndOfResource(int64_t aOffset) = 0;
+  // Returns true if we are expecting any more data to arrive
+  // sometime in the not-too-distant future, either from the network or from
+  // an appendBuffer call on a MediaSource element.
+  virtual bool IsExpectingMoreData()
+  {
+    // MediaDecoder::mDecoderPosition is roughly the same as Tell() which
+    // returns a position updated by latest Read() or ReadAt().
+    return !IsDataCachedToEndOfResource(Tell()) && !IsSuspended();
+  }
   // Returns true if this stream is suspended by the cache because the
   // cache is full. If true then the decoder should try to start consuming
   // data, otherwise we may not be able to make progress.

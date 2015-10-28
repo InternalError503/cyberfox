@@ -113,6 +113,8 @@ loop.store.createStore = (function() {
  *     });
  */
 loop.store.StoreMixin = (function() {
+  "use strict";
+
   var _stores = {};
   function StoreMixin(id) {
     function _getStore() {
@@ -140,6 +142,12 @@ loop.store.StoreMixin = (function() {
   }
   StoreMixin.register = function(stores) {
     _.extend(_stores, stores);
+  };
+  /**
+   * Used for test purposes, to clear the list of registered stores.
+   */
+  StoreMixin.clearRegisteredStores = function() {
+    _stores = {};
   };
   return StoreMixin;
 })();

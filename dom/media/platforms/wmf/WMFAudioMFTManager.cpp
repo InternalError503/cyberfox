@@ -9,6 +9,7 @@
 #include "VideoUtils.h"
 #include "WMFUtils.h"
 #include "nsTArray.h"
+#include "TimeUnits.h"
 
 #include "mozilla/Logging.h"
 
@@ -67,7 +68,6 @@ WMFAudioMFTManager::WMFAudioMFTManager(
   const AudioInfo& aConfig)
   : mAudioChannels(aConfig.mChannels)
   , mAudioRate(aConfig.mRate)
-  , mAudioFrameOffset(0)
   , mAudioFrameSum(0)
   , mMustRecaptureAudioPosition(true)
 {
@@ -113,7 +113,7 @@ WMFAudioMFTManager::GetMediaSubtypeGUID()
   };
 }
 
-TemporaryRef<MFTDecoder>
+already_AddRefed<MFTDecoder>
 WMFAudioMFTManager::Init()
 {
   NS_ENSURE_TRUE(mStreamType != Unknown, nullptr);
@@ -175,8 +175,8 @@ WMFAudioMFTManager::Init()
 HRESULT
 WMFAudioMFTManager::Input(MediaRawData* aSample)
 {
-  return mDecoder->Input(aSample->mData,
-                         uint32_t(aSample->mSize),
+  return mDecoder->Input(aSample->Data(),
+                         uint32_t(aSample->Size()),
                          aSample->mTime);
 }
 
@@ -266,8 +266,7 @@ WMFAudioMFTManager::Output(int64_t aStreamOffset,
     LONGLONG timestampHns = 0;
     hr = sample->GetSampleTime(&timestampHns);
     NS_ENSURE_TRUE(SUCCEEDED(hr), hr);
-    hr = HNsToFrames(timestampHns, mAudioRate, &mAudioFrameOffset);
-    NS_ENSURE_TRUE(SUCCEEDED(hr), hr);
+    mAudioTimeOffset = media::TimeUnit::FromMicroseconds(timestampHns / 10);
     mMustRecaptureAudioPosition = false;
   }
   // We can assume PCM 16 output.
@@ -290,17 +289,18 @@ WMFAudioMFTManager::Output(int64_t aStreamOffset,
 
   buffer->Unlock();
 
-  CheckedInt64 timestamp = FramesToUsecs(mAudioFrameOffset + mAudioFrameSum, mAudioRate);
-  NS_ENSURE_TRUE(timestamp.isValid(), E_FAIL);
+  media::TimeUnit timestamp =
+    mAudioTimeOffset + FramesToTimeUnit(mAudioFrameSum, mAudioRate);
+  NS_ENSURE_TRUE(timestamp.IsValid(), E_FAIL);
 
   mAudioFrameSum += numFrames;
 
-  CheckedInt64 duration = FramesToUsecs(numFrames, mAudioRate);
-  NS_ENSURE_TRUE(duration.isValid(), E_FAIL);
+  media::TimeUnit duration = FramesToTimeUnit(numFrames, mAudioRate);
+  NS_ENSURE_TRUE(duration.IsValid(), E_FAIL);
 
   aOutData = new AudioData(aStreamOffset,
-                           timestamp.value(),
-                           duration.value(),
+                           timestamp.ToMicroseconds(),
+                           duration.ToMicroseconds(),
                            numFrames,
                            audioData.forget(),
                            mAudioChannels,
@@ -308,7 +308,7 @@ WMFAudioMFTManager::Output(int64_t aStreamOffset,
 
   #ifdef LOG_SAMPLE_DECODE
   LOG("Decoded audio sample! timestamp=%lld duration=%lld currentLength=%u",
-      timestamp, duration, currentLength);
+      timestamp.ToMicroseconds(), duration.ToMicroseconds(), currentLength);
   #endif
 
   return S_OK;

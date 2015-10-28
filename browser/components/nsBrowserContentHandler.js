@@ -45,9 +45,6 @@ const NS_BINDING_ABORTED = Components.results.NS_BINDING_ABORTED;
 const NS_ERROR_WONT_HANDLE_CONTENT = 0x805d0001;
 const NS_ERROR_ABORT = Components.results.NS_ERROR_ABORT;
 
-const URI_INHERITS_SECURITY_CONTEXT = Components.interfaces.nsIHttpProtocolHandler
-                                        .URI_INHERITS_SECURITY_CONTEXT;
-
 function shouldLoadURI(aURI) {
   if (aURI && !aURI.schemeIs("chrome"))
     return true;
@@ -395,14 +392,22 @@ nsBrowserContentHandler.prototype = {
         openPreferences();
         cmdLine.preventDefault = true;
       } else try {
-        // only load URIs which do not inherit chrome privs
-        var features = "chrome,dialog=no,all" + this.getFeatures(cmdLine);
         var uri = resolveURIInternal(cmdLine, chromeParam);
-        var netutil = Components.classes["@mozilla.org/network/util;1"]
-                                .getService(nsINetUtil);
-        if (!netutil.URIChainHasFlags(uri, URI_INHERITS_SECURITY_CONTEXT)) {
+        let isLocal = (uri) => {
+          let localSchemes = new Set(["chrome", "file", "resource"]);
+          if (uri instanceof Components.interfaces.nsINestedURI) {
+            uri = uri.QueryInterface(Components.interfaces.nsINestedURI).innerMostURI;
+          }
+          return localSchemes.has(uri.scheme);
+        };
+        if (isLocal(uri)) {
+          // If the URI is local, we are sure it won't wrongly inherit chrome privs
+          var features = "chrome,dialog=no,all" + this.getFeatures(cmdLine);
           openWindow(null, uri.spec, "_blank", features);
           cmdLine.preventDefault = true;
+        } else {
+          dump("*** Preventing load of web URI as chrome\n");
+          dump("    If you're trying to load a webpage, do not pass --chrome.\n");
         }
       }
       catch (e) {
@@ -500,7 +505,9 @@ nsBrowserContentHandler.prototype = {
       }
     }
 
+    var override;
     var overridePage = "";
+    var additionalPage = "";
     var willRestoreSession = false;
     try {
       // Read the old value of homepage_override.mstone before
@@ -512,12 +519,13 @@ nsBrowserContentHandler.prototype = {
       try {
         old_mstone = Services.prefs.getCharPref("browser.startup.homepage_override.mstone");
       } catch (ex) {}
-      let override = needHomepageOverride(prefb);
+      override = needHomepageOverride(prefb);
       if (override != OVERRIDE_NONE) {
         switch (override) {
           case OVERRIDE_NEW_PROFILE:
             // New profile.
             overridePage = Services.urlFormatter.formatURLPref("startup.homepage_welcome_url");
+            additionalPage = Services.urlFormatter.formatURLPref("startup.homepage_welcome_url.additional");
             break;
           case OVERRIDE_NEW_MSTONE:
             // Check whether we will restore a session. If we will, we assume
@@ -552,11 +560,18 @@ nsBrowserContentHandler.prototype = {
       let firstUseOnWindows10URL = Services.urlFormatter.formatURLPref("browser.usedOnWindows10.introURL");
 
       if (firstUseOnWindows10URL && firstUseOnWindows10URL.length) {
-        if (overridePage) {
-          overridePage += "|" + firstUseOnWindows10URL;
-        } else {
-          overridePage = firstUseOnWindows10URL;
+        additionalPage = firstUseOnWindows10URL;
+        if (override == OVERRIDE_NEW_PROFILE) {
+          additionalPage += "&utm_content=firstrun";
         }
+      }
+    }
+
+    if (additionalPage && additionalPage != "about:blank") {
+      if (overridePage) {
+        overridePage += "|" + additionalPage;
+      } else {
+        overridePage = additionalPage;
       }
     }
 
@@ -650,7 +665,7 @@ nsBrowserContentHandler.prototype = {
         throw NS_ERROR_ABORT;
       var isDefault = false;
       try {
-        var url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURL") +
+        var url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") +
                   "win10-default-browser";
         if (urlParam == url) {
           var shellSvc = Components.classes["@mozilla.org/browser/shell-service;1"]

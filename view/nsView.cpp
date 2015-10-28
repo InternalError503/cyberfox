@@ -90,6 +90,10 @@ nsView::~nsView()
     mParent->RemoveChild(this);
   }
 
+  if (mPreviousWindow) {
+    mPreviousWindow->SetPreviouslyAttachedWidgetListener(nullptr);
+  }
+
   // Destroy and release the widget
   DestroyWidget();
 
@@ -229,10 +233,10 @@ nsIntRect nsView::CalcWidgetBounds(nsWindowType aType)
   // Compute widget bounds in device pixels
   nsIntRect newBounds = viewBounds.ToNearestPixels(p2a);
 
-#ifdef XP_MACOSX
-  // cocoa rounds widget coordinates to the nearest global "display pixel"
-  // integer value. So we avoid fractional display pixel values by rounding
-  // to the nearest value that won't yield a fractional display pixel.
+#if defined(XP_MACOSX) || (MOZ_WIDGET_GTK == 3)
+  // cocoa and GTK round widget coordinates to the nearest global "display
+  // pixel" integer value. So we avoid fractional display pixel values by
+  // rounding to the nearest value that won't yield a fractional display pixel.
   nsIWidget* widget = parentWidget ? parentWidget : mWindow.get();
   uint32_t round;
   if (aType == eWindowType_popup && widget &&
@@ -722,6 +726,18 @@ nsresult nsView::DetachFromTopLevelWidget()
   NS_PRECONDITION(mWindow, "null mWindow for DetachFromTopLevelWidget!");
 
   mWindow->SetAttachedWidgetListener(nullptr);
+  nsIWidgetListener* listener = mWindow->GetPreviouslyAttachedWidgetListener();
+
+  if (listener && listener->GetView()) {
+    // Ensure the listener doesn't think it's being used anymore
+    listener->GetView()->SetPreviousWidget(nullptr);
+  }
+
+  // If the new view's frame is paint suppressed then the window
+  // will want to use us instead until that's done
+  mWindow->SetPreviouslyAttachedWidgetListener(this);
+
+  mPreviousWindow = mWindow;
   mWindow = nullptr;
 
   mWidgetIsTopLevel = false;
@@ -1095,4 +1111,10 @@ nsView::HandleEvent(WidgetGUIEvent* aEvent,
   }
 
   return result;
+}
+
+bool
+nsView::IsPrimaryFramePaintSuppressed()
+{
+  return mFrame ? mFrame->PresContext()->PresShell()->IsPaintingSuppressed() : false;
 }

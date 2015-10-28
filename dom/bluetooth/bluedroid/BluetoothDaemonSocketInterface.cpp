@@ -11,6 +11,8 @@
 
 BEGIN_BLUETOOTH_NAMESPACE
 
+using namespace mozilla::ipc;
+
 //
 // Socket module
 //
@@ -366,8 +368,8 @@ void
 BluetoothDaemonSocketInterface::DispatchError(
   BluetoothSocketResultHandler* aRes, BluetoothStatus aStatus)
 {
-  BluetoothResultRunnable1<BluetoothSocketResultHandler, void,
-                           BluetoothStatus, BluetoothStatus>::Dispatch(
+  DaemonResultRunnable1<BluetoothSocketResultHandler, void,
+                        BluetoothStatus, BluetoothStatus>::Dispatch(
     aRes, &BluetoothSocketResultHandler::OnError,
     ConstantInitOp1<BluetoothStatus>(aStatus));
 }

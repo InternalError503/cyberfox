@@ -6,13 +6,14 @@
 
 const Cu = Components.utils;
 let {gDevTools} = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
-let {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
-let TargetFactory = devtools.TargetFactory;
-let {CssHtmlTree} = devtools.require("devtools/styleinspector/computed-view");
-let {CssRuleView, _ElementStyle} = devtools.require("devtools/styleinspector/rule-view");
-let {CssLogic, CssSelector} = devtools.require("devtools/styleinspector/css-logic");
+let {require} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+let {TargetFactory} = require("devtools/framework/target");
+let {CssComputedView} = require("devtools/styleinspector/computed-view");
+let {CssRuleView, _ElementStyle} = require("devtools/styleinspector/rule-view");
+let {CssLogic, CssSelector} = require("devtools/styleinspector/css-logic");
+let DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 let {Promise: promise} = Cu.import("resource://gre/modules/Promise.jsm", {});
-let {editableField, getInplaceEditorForSpan: inplaceEditor} = devtools.require("devtools/shared/inplace-editor");
+let {editableField, getInplaceEditorForSpan: inplaceEditor} = require("devtools/shared/inplace-editor");
 let {console} = Components.utils.import("resource://gre/modules/devtools/Console.jsm", {});
 
 // All tests are asynchronous
@@ -37,8 +38,8 @@ registerCleanupFunction(function*() {
 // Services.prefs.setBoolPref("devtools.dump.emit", true);
 
 // Set the testing flag on gDevTools and reset it when the test ends
-gDevTools.testing = true;
-registerCleanupFunction(() => gDevTools.testing = false);
+DevToolsUtils.testing = true;
+registerCleanupFunction(() => DevToolsUtils.testing = false);
 
 // Clean-up all prefs that might have been changed during a test run
 // (safer here because if the test fails, then the pref is never reverted)
@@ -412,16 +413,17 @@ function* waitForComputedStyleProperty(selector, pseudo, name, expected) {
  * focus
  * @return a promise that resolves to the inplace-editor element when ready
  */
-let focusEditableField = Task.async(function*(editable, xOffset=1, yOffset=1, options={}) {
+let focusEditableField = Task.async(function*(ruleView, editable, xOffset=1, yOffset=1, options={}) {
   let onFocus = once(editable.parentNode, "focus", true);
-
   info("Clicking on editable field to turn to edit mode");
   EventUtils.synthesizeMouse(editable, xOffset, yOffset, options,
     editable.ownerDocument.defaultView);
-  let event = yield onFocus;
+  yield onFocus;
 
   info("Editable field gained focus, returning the input field now");
-  return inplaceEditor(editable.ownerDocument.activeElement);
+  let onEdit = inplaceEditor(editable.ownerDocument.activeElement);
+
+  return onEdit;
 });
 
 /**
@@ -628,8 +630,9 @@ function synthesizeKeys(input, win) {
  */
 function getRuleViewRule(view, selectorText) {
   let rule;
-  for (let r of view.doc.querySelectorAll(".ruleview-rule")) {
-    let selector = r.querySelector(".ruleview-selector, .ruleview-selector-matched");
+  for (let r of view.styleDocument.querySelectorAll(".ruleview-rule")) {
+    let selector = r.querySelector(".ruleview-selectorcontainer, " +
+                                   ".ruleview-selector-matched");
     if (selector && selector.textContent === selectorText) {
       rule = r;
       break;
@@ -708,6 +711,7 @@ function getRuleViewSelectorHighlighterIcon(view, selectorText) {
 /**
  * Simulate a color change in a given color picker tooltip, and optionally wait
  * for a given element in the page to have its style changed as a result
+ * @param {RuleView} ruleView The related rule view instance
  * @param {SwatchColorPickerTooltip} colorPicker
  * @param {Array} newRgba The new color to be set [r, g, b, a]
  * @param {Object} expectedChange Optional object that needs the following props:
@@ -717,7 +721,8 @@ function getRuleViewSelectorHighlighterIcon(view, selectorText) {
  *                 - {String} value The expected style value
  * The style will be checked like so: getComputedStyle(element)[name] === value
  */
-let simulateColorPickerChange = Task.async(function*(colorPicker, newRgba, expectedChange) {
+let simulateColorPickerChange = Task.async(function*(ruleView, colorPicker, newRgba, expectedChange) {
+  let onRuleViewChanged = ruleView.once("ruleview-changed");
   info("Getting the spectrum colorpicker object");
   let spectrum = yield colorPicker.spectrum;
   info("Setting the new color");
@@ -725,6 +730,8 @@ let simulateColorPickerChange = Task.async(function*(colorPicker, newRgba, expec
   info("Applying the change");
   spectrum.updateUI();
   spectrum.onChange();
+  info("Waiting for rule-view to update");
+  yield onRuleViewChanged;
 
   if (expectedChange) {
     info("Waiting for the style to be applied on the page");
@@ -742,7 +749,7 @@ let simulateColorPickerChange = Task.async(function*(colorPicker, newRgba, expec
  * @return {DOMNode} The link if any at this index
  */
 function getRuleViewLinkByIndex(view, index) {
-  let links = view.doc.querySelectorAll(".ruleview-rule-source");
+  let links = view.styleDocument.querySelectorAll(".ruleview-rule-source");
   return links[index];
 }
 
@@ -754,7 +761,7 @@ function getRuleViewLinkByIndex(view, index) {
  */
 function getRuleViewLinkTextByIndex(view, index) {
   let link = getRuleViewLinkByIndex(view, index);
-  return link.querySelector(".source-link-label").value;
+  return link.querySelector(".ruleview-rule-source-label").value;
 }
 
 /**
@@ -780,11 +787,11 @@ function getRuleViewRuleEditor(view, childrenIndex, nodeIndex) {
 let focusNewRuleViewProperty = Task.async(function*(ruleEditor) {
   info("Clicking on a close ruleEditor brace to start editing a new property");
   ruleEditor.closeBrace.scrollIntoView();
-  let editor = yield focusEditableField(ruleEditor.closeBrace);
+  let editor = yield focusEditableField(ruleEditor.ruleView,
+    ruleEditor.closeBrace);
 
-  is(inplaceEditor(ruleEditor.newPropSpan), editor, "Focused editor is the new property editor.");
-  is(ruleEditor.rule.textProps.length,  0, "Starting with one new text property.");
-  is(ruleEditor.propertyList.children.length, 1, "Starting with two property editors.");
+  is(inplaceEditor(ruleEditor.newPropSpan), editor,
+    "Focused editor is the new property editor.");
 
   return editor;
 });
@@ -825,7 +832,7 @@ let createNewRuleViewProperty = Task.async(function*(ruleEditor, inputValue) {
 /**
  * Get references to the name and value span nodes corresponding to a given
  * property name in the computed-view
- * @param {CssHtmlTree} view The instance of the computed view panel
+ * @param {CssComputedView} view The instance of the computed view panel
  * @param {String} name The name of the property to retrieve
  * @return an object {nameSpan, valueSpan}
  */
@@ -845,7 +852,7 @@ function getComputedViewProperty(view, name) {
 
 /**
  * Get an instance of PropertyView from the computed-view.
- * @param {CssHtmlTree} view The instance of the computed view panel
+ * @param {CssComputedView} view The instance of the computed view panel
  * @param {String} name The name of the property to retrieve
  * @return {PropertyView}
  */
@@ -867,7 +874,7 @@ function getComputedViewPropertyView(view, name) {
  * and is only shown when the twisty icon is expanded on the property.
  * A property-content element contains matched rules, with selectors, properties,
  * values and stylesheet links
- * @param {CssHtmlTree} view The instance of the computed view panel
+ * @param {CssComputedView} view The instance of the computed view panel
  * @param {String} name The name of the property to retrieve
  * @return {Promise} A promise that resolves to the property matched rules
  * container
@@ -897,7 +904,7 @@ let getComputedViewMatchedRules = Task.async(function*(view, name) {
 /**
  * Get the text value of the property corresponding to a given name in the
  * computed-view
- * @param {CssHtmlTree} view The instance of the computed view panel
+ * @param {CssComputedView} view The instance of the computed view panel
  * @param {String} name The name of the property to retrieve
  * @return {String} The property value
  */
@@ -909,7 +916,7 @@ function getComputedViewPropertyValue(view, name, propertyName) {
 /**
  * Expand a given property, given its index in the current property list of
  * the computed view
- * @param {CssHtmlTree} view The instance of the computed view panel
+ * @param {CssComputedView} view The instance of the computed view panel
  * @param {Number} index The index of the property to be expanded
  * @return a promise that resolves when the property has been expanded, or
  * rejects if the property was not found
@@ -928,7 +935,7 @@ function expandComputedViewPropertyByIndex(view, index) {
 
 /**
  * Get a rule-link from the computed-view given its index
- * @param {CssHtmlTree} view The instance of the computed view panel
+ * @param {CssComputedView} view The instance of the computed view panel
  * @param {Number} index The index of the link to be retrieved
  * @return {DOMNode} The link at the given index, if one exists, null otherwise
  */
@@ -991,4 +998,17 @@ function waitForStyleEditor(toolbox, href) {
   });
 
   return def.promise;
+}
+
+/**
+ * Reload the current page and wait for the inspector to be initialized after
+ * the navigation
+ * @param {InspectorPanel} inspector
+ *        The instance of InspectorPanel currently loaded in the toolbox
+ * @return a promise that resolves after page reload and inspector initialization
+ */
+function reloadPage(inspector) {
+  let onNewRoot = inspector.once("new-root");
+  content.location.reload();
+  return onNewRoot.then(inspector.markup._waitForChildren);
 }

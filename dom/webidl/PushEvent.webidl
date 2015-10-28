@@ -7,13 +7,17 @@
  * https://w3c.github.io/push-api/
  */
 
-[Constructor(DOMString type, optional PushEventInit eventInitDict), Exposed=ServiceWorker]
+[Constructor(DOMString type, optional PushEventInit eventInitDict),
+ Func="nsContentUtils::PushEnabled",
+ Exposed=ServiceWorker]
 interface PushEvent : ExtendableEvent {
-  readonly attribute PushMessageData data;
+  // FIXME(nsm): Bug 1149195.
+  // readonly attribute PushMessageData data;
 };
 
 typedef USVString PushMessageDataInit;
 
 dictionary PushEventInit : ExtendableEventInit {
-  PushMessageDataInit data;
+  // FIXME(nsm): Bug 1149195.
+  // PushMessageDataInit data;
 };

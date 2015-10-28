@@ -65,6 +65,12 @@ extern mozilla::ThreadLocal<PerThreadData*> TlsPerThreadData;
 
 struct DtoaState;
 
+#ifdef JS_SIMULATOR_ARM64
+namespace vixl {
+class Simulator;
+}
+#endif
+
 namespace js {
 
 extern MOZ_COLD void
@@ -86,10 +92,15 @@ namespace jit {
 class JitRuntime;
 class JitActivation;
 struct PcScriptCache;
-class Simulator;
 struct AutoFlushICache;
 class CompileRuntime;
-}
+
+#ifdef JS_SIMULATOR_ARM64
+typedef vixl::Simulator Simulator;
+#elif defined(JS_SIMULATOR)
+class Simulator;
+#endif
+} // namespace jit
 
 /*
  * GetSrcNote cache to avoid O(n^2) growth in finding a source note for a
@@ -347,8 +358,8 @@ class NewObjectCache
 
     static void copyCachedToObject(NativeObject* dst, NativeObject* src, gc::AllocKind kind) {
         js_memcpy(dst, src, gc::Arena::thingSize(kind));
-        Shape::writeBarrierPost(dst->shape_, &dst->shape_);
-        ObjectGroup::writeBarrierPost(dst->group_, &dst->group_);
+        Shape::writeBarrierPost(&dst->shape_, nullptr, dst->shape_);
+        ObjectGroup::writeBarrierPost(&dst->group_, nullptr, dst->group_);
     }
 };
 
@@ -398,7 +409,7 @@ class FreeOp : public JSFreeOp
 
 namespace JS {
 struct RuntimeSizes;
-}
+} // namespace JS
 
 /* Various built-in or commonly-used names pinned on first context. */
 struct JSAtomState
@@ -685,6 +696,12 @@ struct JSRuntime : public JS::shadow::Runtime,
      * Value of asyncCause to be attached to asyncStackForNewActivations.
      */
     JSString* asyncCauseForNewActivations;
+
+    /*
+     * True if the async call was explicitly requested, e.g. via
+     * callFunctionWithAsyncStack.
+     */
+    bool asyncCallIsExplicit;
 
     /* If non-null, report JavaScript entry points to this monitor. */
     JS::dbg::AutoEntryMonitor* entryMonitor;
@@ -1438,11 +1455,12 @@ struct JSRuntime : public JS::shadow::Runtime,
         T* p = pod_calloc<T>(numElems);
         if (MOZ_LIKELY(!!p))
             return p;
-        if (numElems & mozilla::tl::MulOverflowMask<sizeof(T)>::value) {
+        size_t bytes;
+        if (MOZ_UNLIKELY(!js::CalculateAllocSize<T>(numElems, &bytes))) {
             reportAllocationOverflow();
             return nullptr;
         }
-        return (T*)onOutOfMemoryCanGC(js::AllocFunction::Calloc, numElems * sizeof(T));
+        return static_cast<T*>(onOutOfMemoryCanGC(js::AllocFunction::Calloc, bytes));
     }
 
     template <typename T>
@@ -1450,11 +1468,12 @@ struct JSRuntime : public JS::shadow::Runtime,
         T* p2 = pod_realloc<T>(p, oldSize, newSize);
         if (MOZ_LIKELY(!!p2))
             return p2;
-        if (newSize & mozilla::tl::MulOverflowMask<sizeof(T)>::value) {
+        size_t bytes;
+        if (MOZ_UNLIKELY(!js::CalculateAllocSize<T>(newSize, &bytes))) {
             reportAllocationOverflow();
             return nullptr;
         }
-        return (T*)onOutOfMemoryCanGC(js::AllocFunction::Realloc, newSize * sizeof(T), p);
+        return static_cast<T*>(onOutOfMemoryCanGC(js::AllocFunction::Realloc, bytes, p));
     }
 
     /*
@@ -1473,6 +1492,34 @@ struct JSRuntime : public JS::shadow::Runtime,
        ------------------------------------------ */
     struct Stopwatch {
         /**
+         * A map used to collapse compartments belonging to the same
+         * add-on (respectively to the same webpage, to the platform)
+         * into a single group.
+         *
+         * Keys: for system compartments, a `JSAddonId*` (which may be
+         * `nullptr`), and for webpages, a `JSPrincipals*` (which may
+         * not). Note that compartments may start as non-system
+         * compartments and become compartments later during their
+         * lifetime, which requires an invalidation.
+         *
+         * This map is meant to be accessed only by instances of
+         * PerformanceGroupHolder, which handle both reference-counting
+         * of the values and invalidation of the key/value pairs.
+         */
+        typedef js::HashMap<void*, js::PerformanceGroup*,
+                            js::DefaultHasher<void*>,
+                            js::SystemAllocPolicy> Groups;
+
+        Groups& groups() {
+            return groups_;
+        }
+
+        /**
+         * Performance data on the entire runtime.
+         */
+        js::PerformanceGroupHolder performance;
+
+        /**
          * The number of times we have entered the event loop.
          * Used to reset counters whenever we enter the loop,
          * which may be caused either by having completed the
@@ -1482,17 +1529,6 @@ struct JSRuntime : public JS::shadow::Runtime,
          * Always incremented by 1, may safely overflow.
          */
         uint64_t iteration;
-
-        /**
-         * `true` if no stopwatch has been registered for the
-         * current run of the event loop, `false` until then.
-         */
-        bool isEmpty;
-
-        /**
-         * Performance data on the entire runtime.
-         */
-        js::PerformanceData performance;
 
         /**
          * Callback used to ask the embedding to determine in which
@@ -1506,12 +1542,13 @@ struct JSRuntime : public JS::shadow::Runtime,
          */
         JSCurrentPerfGroupCallback currentPerfGroupCallback;
 
-        Stopwatch()
-          : iteration(0)
-          , isEmpty(true)
+        explicit Stopwatch(JSRuntime* runtime)
+          : performance(runtime)
+          , iteration(0)
           , currentPerfGroupCallback(nullptr)
           , isMonitoringJank_(false)
           , isMonitoringCPOW_(false)
+          , isMonitoringPerCompartment_(false)
           , idCounter_(0)
         { }
 
@@ -1524,7 +1561,6 @@ struct JSRuntime : public JS::shadow::Runtime,
          */
         void reset() {
             ++iteration;
-            isEmpty = true;
         }
         /**
          * Activate/deactivate stopwatch measurement of jank.
@@ -1553,6 +1589,21 @@ struct JSRuntime : public JS::shadow::Runtime,
             return isMonitoringJank_;
         }
 
+        bool setIsMonitoringPerCompartment(bool value) {
+            if (isMonitoringPerCompartment_ != value)
+                reset();
+
+            if (value && !groups_.initialized()) {
+                if (!groups_.init(128))
+                    return false;
+            }
+
+            isMonitoringPerCompartment_ = value;
+            return true;
+        }
+        bool isMonitoringPerCompartment() const {
+            return isMonitoringPerCompartment_;
+        }
 
         /**
          * Activate/deactivate stopwatch measurement of CPOW.
@@ -1596,24 +1647,8 @@ struct JSRuntime : public JS::shadow::Runtime,
         MonotonicTimeStamp userTimeFix;
 
     private:
-        /**
-         * A map used to collapse compartments belonging to the same
-         * add-on (respectively to the same webpage, to the platform)
-         * into a single group.
-         *
-         * Keys: for system compartments, a `JSAddonId*` (which may be
-         * `nullptr`), and for webpages, a `JSPrincipals*` (which may
-         * not). Note that compartments may start as non-system
-         * compartments and become compartments later during their
-         * lifetime, which requires an invalidation.
-         *
-         * This map is meant to be accessed only by instances of
-         * PerformanceGroupHolder, which handle both reference-counting
-         * of the values and invalidation of the key/value pairs.
-         */
-        typedef js::HashMap<void*, js::PerformanceGroup*,
-                            js::DefaultHasher<void*>,
-                            js::SystemAllocPolicy> Groups;
+        Stopwatch(const Stopwatch&) = delete;
+        Stopwatch& operator=(const Stopwatch&) = delete;
 
         Groups groups_;
         friend struct js::PerformanceGroupHolder;
@@ -1623,6 +1658,7 @@ struct JSRuntime : public JS::shadow::Runtime,
          */
         bool isMonitoringJank_;
         bool isMonitoringCPOW_;
+        bool isMonitoringPerCompartment_;
 
         /**
          * A counter used to generate unique identifiers for groups.

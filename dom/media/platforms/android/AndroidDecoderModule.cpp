@@ -105,7 +105,8 @@ public:
     return eglImage;
   }
 
-  virtual nsresult PostOutput(BufferInfo::Param aInfo, MediaFormat::Param aFormat, Microseconds aDuration) override {
+  virtual nsresult PostOutput(BufferInfo::Param aInfo, MediaFormat::Param aFormat,
+                              const media::TimeUnit& aDuration) override {
     if (!EnsureGLContext()) {
       return NS_ERROR_FAILURE;
     }
@@ -168,7 +169,7 @@ public:
                                  mImageContainer,
                                  offset,
                                  presentationTimeUs,
-                                 aDuration,
+                                 aDuration.ToMicroseconds(),
                                  img,
                                  isSync,
                                  presentationTimeUs,
@@ -185,7 +186,7 @@ protected:
       return true;
     }
 
-    mGLContext = GLContextProvider::CreateHeadless(false);
+    mGLContext = GLContextProvider::CreateHeadless(CreateContextFlags::NONE);
     return mGLContext;
   }
 
@@ -196,8 +197,6 @@ protected:
 };
 
 class AudioDataDecoder : public MediaCodecDataDecoder {
-private:
-  uint8_t csd0[2];
 
 public:
   AudioDataDecoder(const AudioInfo& aConfig, MediaFormat::Param aFormat, MediaDataDecoderCallback* aCallback)
@@ -209,15 +208,15 @@ public:
     NS_ENSURE_SUCCESS_VOID(aFormat->GetByteBuffer(NS_LITERAL_STRING("csd-0"), &buffer));
 
     if (!buffer && aConfig.mCodecSpecificConfig->Length() >= 2) {
-      csd0[0] = (*aConfig.mCodecSpecificConfig)[0];
-      csd0[1] = (*aConfig.mCodecSpecificConfig)[1];
-
-      buffer = jni::Object::LocalRef::Adopt(env, env->NewDirectByteBuffer(csd0, 2));
+      buffer = jni::Object::LocalRef::Adopt(env, env->NewDirectByteBuffer(aConfig.mCodecSpecificConfig->Elements(),
+                                                                          aConfig.mCodecSpecificConfig->Length()));
       NS_ENSURE_SUCCESS_VOID(aFormat->SetByteBuffer(NS_LITERAL_STRING("csd-0"), buffer));
     }
   }
 
-  nsresult Output(BufferInfo::Param aInfo, void* aBuffer, MediaFormat::Param aFormat, Microseconds aDuration) {
+  nsresult Output(BufferInfo::Param aInfo, void* aBuffer,
+                  MediaFormat::Param aFormat,
+                  const media::TimeUnit& aDuration) {
     // The output on Android is always 16-bit signed
 
     nsresult rv;
@@ -243,7 +242,7 @@ public:
     NS_ENSURE_SUCCESS(rv = aInfo->PresentationTimeUs(&presentationTimeUs), rv);
 
     nsRefPtr<AudioData> data = new AudioData(offset, presentationTimeUs,
-                                             aDuration,
+                                             aDuration.ToMicroseconds(),
                                              numFrames,
                                              audio,
                                              numChannels,
@@ -256,11 +255,21 @@ public:
 
 bool AndroidDecoderModule::SupportsMimeType(const nsACString& aMimeType)
 {
+  if (!AndroidBridge::Bridge() || (AndroidBridge::Bridge()->GetAPIVersion() < 16)) {
+    return false;
+  }
+
   if (aMimeType.EqualsLiteral("video/mp4") ||
       aMimeType.EqualsLiteral("video/avc")) {
     return true;
   }
-  return static_cast<bool>(mozilla::CreateDecoder(aMimeType));
+
+  MediaCodec::LocalRef ref = mozilla::CreateDecoder(aMimeType);
+  if (!ref) {
+    return false;
+  }
+  ref->Release();
+  return true;
 }
 
 already_AddRefed<MediaDataDecoder>
@@ -268,7 +277,7 @@ AndroidDecoderModule::CreateVideoDecoder(
                                 const VideoInfo& aConfig,
                                 layers::LayersBackend aLayersBackend,
                                 layers::ImageContainer* aImageContainer,
-                                FlushableMediaTaskQueue* aVideoTaskQueue,
+                                FlushableTaskQueue* aVideoTaskQueue,
                                 MediaDataDecoderCallback* aCallback)
 {
   MediaFormat::LocalRef format;
@@ -287,7 +296,7 @@ AndroidDecoderModule::CreateVideoDecoder(
 
 already_AddRefed<MediaDataDecoder>
 AndroidDecoderModule::CreateAudioDecoder(const AudioInfo& aConfig,
-                                         FlushableMediaTaskQueue* aAudioTaskQueue,
+                                         FlushableTaskQueue* aAudioTaskQueue,
                                          MediaDataDecoderCallback* aCallback)
 {
   MOZ_ASSERT(aConfig.mBitDepth == 16, "We only handle 16-bit audio!");
@@ -372,6 +381,10 @@ nsresult MediaCodecDataDecoder::InitDecoder(Surface::Param aSurface)
 #define HANDLE_DECODER_ERROR() \
   if (NS_FAILED(res)) { \
     NS_WARNING("exiting decoder loop due to exception"); \
+    if (mDraining) { \
+      ENVOKE_CALLBACK(DrainComplete); \
+      mDraining = false; \
+    } \
     ENVOKE_CALLBACK(Error); \
     break; \
   }
@@ -474,7 +487,7 @@ void MediaCodecDataDecoder::DecoderLoop()
 
         void* directBuffer = frame.GetEnv()->GetDirectBufferAddress(buffer.Get());
 
-        MOZ_ASSERT(frame.GetEnv()->GetDirectBufferCapacity(buffer.Get()) >= sample->mSize,
+        MOZ_ASSERT(frame.GetEnv()->GetDirectBufferCapacity(buffer.Get()) >= sample->Size(),
           "Decoder buffer is not large enough for sample");
 
         {
@@ -483,13 +496,13 @@ void MediaCodecDataDecoder::DecoderLoop()
           mQueue.pop();
         }
 
-        PodCopy((uint8_t*)directBuffer, sample->mData, sample->mSize);
+        PodCopy((uint8_t*)directBuffer, sample->Data(), sample->Size());
 
-        res = mDecoder->QueueInputBuffer(inputIndex, 0, sample->mSize,
+        res = mDecoder->QueueInputBuffer(inputIndex, 0, sample->Size(),
                                          sample->mTime, 0);
         HANDLE_DECODER_ERROR();
 
-        mDurations.push(sample->mDuration);
+        mDurations.push(media::TimeUnit::FromMicroseconds(sample->mDuration));
         sample = nullptr;
         outputDone = false;
       }
@@ -547,7 +560,7 @@ void MediaCodecDataDecoder::DecoderLoop()
 
         MOZ_ASSERT(!mDurations.empty(), "Should have had a duration queued");
 
-        Microseconds duration = 0;
+        media::TimeUnit duration;
         if (!mDurations.empty()) {
           duration = mDurations.front();
           mDurations.pop();

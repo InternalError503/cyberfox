@@ -65,7 +65,6 @@ if CONFIG['MOZ_WEBRTC']:
 
 if CONFIG['MOZ_OMX_DECODER']:
     DIRS += ['omx']
-    DIRS += ['omx/mediaresourcemanager']
 
 if CONFIG['MOZ_EME']:
     DIRS += ['eme']
@@ -86,6 +85,7 @@ MOCHITEST_MANIFESTS += [
 if CONFIG['MOZ_WEBRTC']:
     MOCHITEST_MANIFESTS += ['tests/mochitest/mochitest.ini']
     WEBRTC_SIGNALLING_TEST_MANIFESTS += ['tests/mochitest/steeplechase.ini']
+    WEBRTC_SIGNALLING_TEST_MANIFESTS += ['tests/mochitest/steeplechase_long/steeplechase_long.ini']
 
 XPIDL_SOURCES += [
     'nsIDOMNavigatorUserMedia.idl',
@@ -96,7 +96,6 @@ XPIDL_MODULE = 'dom_media'
 
 EXPORTS += [
     'AbstractMediaDecoder.h',
-    'AbstractThread.h',
     'AudioBufferUtils.h',
     'AudioChannelFormat.h',
     'AudioCompactor.h',
@@ -111,7 +110,6 @@ EXPORTS += [
     'DOMMediaStream.h',
     'EncodedBufferCache.h',
     'FileBlockCache.h',
-    'GraphDriver.h',
     'Intervals.h',
     'Latency.h',
     'MediaCache.h',
@@ -121,16 +119,15 @@ EXPORTS += [
     'MediaDecoderOwner.h',
     'MediaDecoderReader.h',
     'MediaDecoderStateMachine.h',
+    'MediaEventSource.h',
     'MediaFormatReader.h',
     'MediaInfo.h',
     'MediaMetadataManager.h',
-    'MediaPromise.h',
     'MediaQueue.h',
     'MediaRecorder.h',
     'MediaResource.h',
     'MediaSegment.h',
     'MediaStreamGraph.h',
-    'MediaTaskQueue.h',
     'MediaTimer.h',
     'MediaTrack.h',
     'MediaTrackList.h',
@@ -141,11 +138,7 @@ EXPORTS += [
     'RtspMediaResource.h',
     'SelfRef.h',
     'SharedBuffer.h',
-    'SharedThreadPool.h',
-    'StateMirroring.h',
-    'StateWatching.h',
     'StreamBuffer.h',
-    'TaskDispatcher.h',
     'ThreadPoolCOMListener.h',
     'TimeUnits.h',
     'TimeVarying.h',
@@ -154,10 +147,15 @@ EXPORTS += [
     'VideoSegment.h',
     'VideoUtils.h',
     'VorbisUtils.h',
+    'XiphExtradata.h',
 ]
 
 EXPORTS.mozilla += [
     'MediaManager.h',
+    'MozPromise.h',
+    'StateMirroring.h',
+    'StateWatching.h',
+    'TaskQueue.h',
 ]
 
 EXPORTS.mozilla.media.webrtc += [
@@ -183,7 +181,6 @@ EXPORTS.mozilla.dom += [
     'MediaDevices.h',
     'MediaStreamError.h',
     'MediaStreamTrack.h',
-    'RTCIdentityProviderRegistrar.h',
     'TextTrack.h',
     'TextTrackCue.h',
     'TextTrackCueList.h',
@@ -196,7 +193,7 @@ EXPORTS.mozilla.dom += [
 ]
 
 UNIFIED_SOURCES += [
-    'AbstractThread.cpp',
+    'AudioCaptureStream.cpp',
     'AudioChannelFormat.cpp',
     'AudioCompactor.cpp',
     'AudioSegment.cpp',
@@ -229,17 +226,15 @@ UNIFIED_SOURCES += [
     'MediaStreamError.cpp',
     'MediaStreamGraph.cpp',
     'MediaStreamTrack.cpp',
-    'MediaTaskQueue.cpp',
     'MediaTimer.cpp',
     'MediaTrack.cpp',
     'MediaTrackList.cpp',
     'MP3Decoder.cpp',
     'MP3Demuxer.cpp',
     'MP3FrameParser.cpp',
-    'RTCIdentityProviderRegistrar.cpp',
     'RtspMediaResource.cpp',
-    'SharedThreadPool.cpp',
     'StreamBuffer.cpp',
+    'TaskQueue.cpp',
     'TextTrack.cpp',
     'TextTrackCue.cpp',
     'TextTrackCueList.cpp',
@@ -254,6 +249,7 @@ UNIFIED_SOURCES += [
     'VideoTrackList.cpp',
     'VideoUtils.cpp',
     'WebVTTListener.cpp',
+    'XiphExtradata.cpp',
 ]
 
 if CONFIG['OS_TARGET'] == 'WINNT':

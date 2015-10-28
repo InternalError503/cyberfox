@@ -85,6 +85,8 @@ gfxFontEntry::gfxFontEntry() :
     mHasSpaceFeaturesKerning(false),
     mHasSpaceFeaturesNonKerning(false),
     mSkipDefaultFeatureSpaceCheck(false),
+    mGraphiteSpaceContextualsInitialized(false),
+    mHasGraphiteSpaceContextuals(false),
     mSpaceGlyphIsInvisible(false),
     mSpaceGlyphIsInvisibleInitialized(false),
     mCheckedForGraphiteTables(false),
@@ -122,6 +124,8 @@ gfxFontEntry::gfxFontEntry(const nsAString& aName, bool aIsStandardFace) :
     mHasSpaceFeaturesKerning(false),
     mHasSpaceFeaturesNonKerning(false),
     mSkipDefaultFeatureSpaceCheck(false),
+    mGraphiteSpaceContextualsInitialized(false),
+    mHasGraphiteSpaceContextuals(false),
     mSpaceGlyphIsInvisible(false),
     mSpaceGlyphIsInvisibleInitialized(false),
     mCheckedForGraphiteTables(false),
@@ -562,7 +566,7 @@ public:
     }
 
     size_t SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const {
-        return mTableData.SizeOfExcludingThis(aMallocSizeOf);
+        return mTableData.ShallowSizeOfExcludingThis(aMallocSizeOf);
     }
     size_t SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const {
         return aMallocSizeOf(this) + SizeOfExcludingThis(aMallocSizeOf);
@@ -862,6 +866,21 @@ gfxFontEntry::CheckForGraphiteTables()
     mHasGraphiteTables = HasFontTable(TRUETYPE_TAG('S','i','l','f'));
 }
 
+bool
+gfxFontEntry::HasGraphiteSpaceContextuals()
+{
+    if (!mGraphiteSpaceContextualsInitialized) {
+        gr_face* face = GetGrFace();
+        if (face) {
+            const gr_faceinfo* faceInfo = gr_face_info(face, 0);
+            mHasGraphiteSpaceContextuals =
+                faceInfo->space_contextuals != gr_faceinfo::gr_space_none;
+            ReleaseGrFace(face);
+        }
+        mGraphiteSpaceContextualsInitialized = true;
+    }
+    return mHasGraphiteSpaceContextuals;
+}
 
 #define FEATURE_SCRIPT_MASK 0x000000ff // script index replaces low byte of tag
 
@@ -1319,9 +1338,9 @@ gfxFontFamily::FindAllFontsForStyle(const gfxFontStyle& aFontStyle,
 
     uint32_t minDistance = 0xffffffff;
     gfxFontEntry* matched = nullptr;
-    // iterate in reverse order so that the last-defined font is the first one
-    // in the fontlist used for matching, as per CSS Fonts spec
-    for (int32_t i = count - 1; i >= 0; i--) {
+    // iterate in forward order so that faces like 'Bold' are matched before
+    // matching style distance faces such as 'Bold Outline' (see bug 1185812)
+    for (uint32_t i = 0; i < count; i++) {
         fe = mAvailableFonts[i];
         uint32_t distance =
             WeightDistance(aFontStyle.weight, fe->Weight()) +
@@ -1819,7 +1838,7 @@ gfxFontFamily::AddSizeOfExcludingThis(MallocSizeOf aMallocSizeOf,
         mFamilyCharacterMap.SizeOfExcludingThis(aMallocSizeOf);
 
     aSizes->mFontListSize +=
-        mAvailableFonts.SizeOfExcludingThis(aMallocSizeOf);
+        mAvailableFonts.ShallowSizeOfExcludingThis(aMallocSizeOf);
     for (uint32_t i = 0; i < mAvailableFonts.Length(); ++i) {
         gfxFontEntry *fe = mAvailableFonts[i];
         if (fe) {

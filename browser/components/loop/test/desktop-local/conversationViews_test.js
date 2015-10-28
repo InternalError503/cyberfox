@@ -10,7 +10,7 @@ describe("loop.conversationViews", function () {
   var sharedUtils = loop.shared.utils;
   var sharedViews = loop.shared.views;
   var sandbox, view, dispatcher, contact, fakeAudioXHR, conversationStore;
-  var fakeMozLoop, fakeWindow;
+  var fakeMozLoop, fakeWindow, fakeClock;
 
   var CALL_STATES = loop.store.CALL_STATES;
   var CALL_TYPES = loop.shared.utils.CALL_TYPES;
@@ -18,22 +18,9 @@ describe("loop.conversationViews", function () {
   var REST_ERRNOS = loop.shared.utils.REST_ERRNOS;
   var WEBSOCKET_REASONS = loop.shared.utils.WEBSOCKET_REASONS;
 
-  // XXX refactor to Just Work with "sandbox.stubComponent" or else
-  // just pass in the sandbox and put somewhere generally usable
-
-  function stubComponent(obj, component, mockTagName){
-    var reactClass = React.createClass({
-      render: function() {
-        var tagName = mockTagName || "div";
-        return React.DOM[tagName](null, this.props.children);
-      }
-    });
-    return sandbox.stub(obj, component, reactClass);
-  }
-
   beforeEach(function() {
     sandbox = sinon.sandbox.create();
-    sandbox.useFakeTimers();
+    fakeClock = sandbox.useFakeTimers();
 
     sandbox.stub(document.mozL10n, "get", function(x) {
       return x;
@@ -71,6 +58,7 @@ describe("loop.conversationViews", function () {
       },
       // Dummy function, stubbed below.
       getLoopPref: function() {},
+      setLoopPref: sandbox.stub(),
       calls: {
         clearCallInProgress: sinon.stub()
       },
@@ -108,18 +96,19 @@ describe("loop.conversationViews", function () {
     };
     loop.shared.mixins.setRootObject(fakeWindow);
 
-    var feedbackStore = new loop.store.FeedbackStore(dispatcher, {
-      feedbackClient: {}
-    });
     conversationStore = new loop.store.ConversationStore(dispatcher, {
       client: {},
       mozLoop: fakeMozLoop,
       sdkDriver: {}
     });
 
+    var textChatStore = new loop.store.TextChatStore(dispatcher, {
+      sdkDriver: {}
+    });
+
     loop.store.StoreMixin.register({
       conversationStore: conversationStore,
-      feedbackStore: feedbackStore
+      textChatStore: textChatStore
     });
   });
 
@@ -490,7 +479,9 @@ describe("loop.conversationViews", function () {
   describe("OngoingConversationView", function() {
     function mountTestComponent(extraProps) {
       var props = _.extend({
-        dispatcher: dispatcher
+        conversationStore: conversationStore,
+        dispatcher: dispatcher,
+        matchMedia: window.matchMedia
       }, extraProps);
       return TestUtils.renderIntoDocument(
         React.createElement(loop.conversationViews.OngoingConversationView, props));
@@ -505,15 +496,6 @@ describe("loop.conversationViews", function () {
           sinon.match.hasOwn("name", "setupStreamElements"));
       });
 
-    it("should display an avatar for remote video when the stream is not enabled", function() {
-      view = mountTestComponent({
-        mediaConnected: true,
-        remoteVideoEnabled: false
-      });
-
-      TestUtils.findRenderedComponentWithType(view, sharedViews.AvatarView);
-    });
-
     it("should display the remote video when the stream is enabled", function() {
       conversationStore.setStoreState({
         remoteSrcVideoObject: { fake: 1 }
@@ -525,16 +507,6 @@ describe("loop.conversationViews", function () {
       });
 
       expect(view.getDOMNode().querySelector(".remote video")).not.eql(null);
-    });
-
-    it("should display an avatar for local video when the stream is not enabled", function() {
-      view = mountTestComponent({
-        video: {
-          enabled: false
-        }
-      });
-
-      TestUtils.findRenderedComponentWithType(view, sharedViews.AvatarView);
     });
 
     it("should display the local video when the stream is enabled", function() {
@@ -621,20 +593,23 @@ describe("loop.conversationViews", function () {
   });
 
   describe("CallControllerView", function() {
-    var feedbackStore;
+    var onCallTerminatedStub;
 
     function mountTestComponent() {
       return TestUtils.renderIntoDocument(
         React.createElement(loop.conversationViews.CallControllerView, {
           dispatcher: dispatcher,
-          mozLoop: fakeMozLoop
+          mozLoop: fakeMozLoop,
+          onCallTerminated: onCallTerminatedStub
         }));
     }
 
     beforeEach(function() {
-      feedbackStore = new loop.store.FeedbackStore(dispatcher, {
-        feedbackClient: {}
-      });
+      onCallTerminatedStub = sandbox.stub();
+    });
+
+    afterEach(function() {
+      sandbox.restore();
     });
 
     it("should set the document title to the callerId", function() {
@@ -717,24 +692,6 @@ describe("loop.conversationViews", function () {
           loop.conversationViews.OngoingConversationView);
     });
 
-    it("should render the FeedbackView when the call state is 'finished'",
-      function() {
-        conversationStore.setStoreState({callState: CALL_STATES.FINISHED});
-
-        view = mountTestComponent();
-
-        TestUtils.findRenderedComponentWithType(view,
-          loop.shared.views.FeedbackView);
-    });
-
-    it("should set the document title to conversation_has_ended when displaying the feedback view", function() {
-      conversationStore.setStoreState({callState: CALL_STATES.FINISHED});
-
-      mountTestComponent();
-
-      expect(fakeWindow.document.title).eql("conversation_has_ended");
-    });
-
     it("should play the terminated sound when the call state is 'finished'",
       function() {
         var fakeAudio = {
@@ -768,6 +725,21 @@ describe("loop.conversationViews", function () {
 
         TestUtils.findRenderedComponentWithType(view,
           loop.conversationViews.CallFailedView);
+    });
+
+    it("should call onCallTerminated when the call is finished", function() {
+      conversationStore.setStoreState({
+        callState: CALL_STATES.ONGOING
+      });
+
+      view = mountTestComponent({
+        callState: CALL_STATES.FINISHED
+      });
+      // Force a state change so that it triggers componentDidUpdate.
+      view.setState({ callState: CALL_STATES.FINISHED });
+
+      sinon.assert.calledOnce(onCallTerminatedStub);
+      sinon.assert.calledWithExactly(onCallTerminatedStub);
     });
   });
 

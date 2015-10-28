@@ -21,6 +21,7 @@
 #include "mozilla/AutoRestore.h"
 #include <algorithm>
 #include "mozilla/Telemetry.h"
+#include "mozilla/unused.h"
 
 
 #define kMinUnwrittenChanges   300
@@ -1487,62 +1488,56 @@ CacheIndex::ProcessPendingOperations()
 
   AssertOwnsLock();
 
-  mPendingUpdates.EnumerateEntries(&CacheIndex::UpdateEntryInIndex, this);
+  for (auto iter = mPendingUpdates.Iter(); !iter.Done(); iter.Next()) {
+    CacheIndexEntryUpdate* update = iter.Get();
+
+    LOG(("CacheIndex::ProcessPendingOperations() [hash=%08x%08x%08x%08x%08x]",
+         LOGSHA1(update->Hash())));
+
+    MOZ_ASSERT(update->IsFresh());
+
+    CacheIndexEntry* entry = mIndex.GetEntry(*update->Hash());
+
+    {
+      CacheIndexEntryAutoManage emng(update->Hash(), this);
+      emng.DoNotSearchInUpdates();
+
+      if (update->IsRemoved()) {
+        if (entry) {
+          if (entry->IsRemoved()) {
+            MOZ_ASSERT(entry->IsFresh());
+            MOZ_ASSERT(entry->IsDirty());
+          } else if (!entry->IsDirty() && entry->IsFileEmpty()) {
+            // Entries with empty file are not stored in index on disk. Just
+            // remove the entry, but only in case the entry is not dirty, i.e.
+            // the entry file was empty when we wrote the index.
+            mIndex.RemoveEntry(*update->Hash());
+            entry = nullptr;
+          } else {
+            entry->MarkRemoved();
+            entry->MarkDirty();
+            entry->MarkFresh();
+          }
+        }
+      } else if (entry) {
+        // Some information in mIndex can be newer than in mPendingUpdates (see
+        // bug 1074832). This will copy just those values that were really
+        // updated.
+        update->ApplyUpdate(entry);
+      } else {
+        // There is no entry in mIndex, copy all information from
+        // mPendingUpdates to mIndex.
+        entry = mIndex.PutEntry(*update->Hash());
+        *entry = *update;
+      }
+    }
+
+    iter.Remove();
+  }
 
   MOZ_ASSERT(mPendingUpdates.Count() == 0);
 
   EnsureCorrectStats();
-}
-
-// static
-PLDHashOperator
-CacheIndex::UpdateEntryInIndex(CacheIndexEntryUpdate *aEntry, void* aClosure)
-{
-  CacheIndex *index = static_cast<CacheIndex *>(aClosure);
-
-  LOG(("CacheFile::UpdateEntryInIndex() [hash=%08x%08x%08x%08x%08x]",
-       LOGSHA1(aEntry->Hash())));
-
-  MOZ_ASSERT(aEntry->IsFresh());
-
-  CacheIndexEntry *entry = index->mIndex.GetEntry(*aEntry->Hash());
-
-  CacheIndexEntryAutoManage emng(aEntry->Hash(), index);
-  emng.DoNotSearchInUpdates();
-
-  if (aEntry->IsRemoved()) {
-    if (entry) {
-      if (entry->IsRemoved()) {
-        MOZ_ASSERT(entry->IsFresh());
-        MOZ_ASSERT(entry->IsDirty());
-      } else if (!entry->IsDirty() && entry->IsFileEmpty()) {
-        // Entries with empty file are not stored in index on disk. Just remove
-        // the entry, but only in case the entry is not dirty, i.e. the entry
-        // file was empty when we wrote the index.
-        index->mIndex.RemoveEntry(*aEntry->Hash());
-        entry = nullptr;
-      } else {
-        entry->MarkRemoved();
-        entry->MarkDirty();
-        entry->MarkFresh();
-      }
-    }
-
-    return PL_DHASH_REMOVE;
-  }
-
-  if (entry) {
-    // Some information in mIndex can be newer than in mPendingUpdates (see bug
-    // 1074832). This will copy just those values that were really updated.
-    aEntry->ApplyUpdate(entry);
-  } else {
-    // There is no entry in mIndex, copy all information from mPendingUpdates
-    // to mIndex.
-    entry = index->mIndex.PutEntry(*aEntry->Hash());
-    *entry = *aEntry;
-  }
-
-  return PL_DHASH_REMOVE;
 }
 
 bool
@@ -1609,7 +1604,7 @@ CacheIndex::WriteIndexToDisk()
   mSkipEntries = 0;
 }
 
-namespace { // anon
+namespace {
 
 struct WriteRecordsHelper
 {
@@ -1622,7 +1617,7 @@ struct WriteRecordsHelper
 #endif
 };
 
-} // anon
+} // namespace
 
 void
 CacheIndex::WriteRecords()
@@ -1709,7 +1704,25 @@ CacheIndex::FinishWrite(bool aSucceeded)
     // Opening of the file must not be in progress if writing succeeded.
     MOZ_ASSERT(!mIndexFileOpener);
 
-    mIndex.EnumerateEntries(&CacheIndex::ApplyIndexChanges, this);
+    for (auto iter = mIndex.Iter(); !iter.Done(); iter.Next()) {
+      CacheIndexEntry* entry = iter.Get();
+
+      bool remove = false;
+      {
+        CacheIndexEntryAutoManage emng(entry->Hash(), this);
+
+        if (entry->IsRemoved()) {
+          emng.DoNotSearchInIndex();
+          remove = true;
+        } else if (entry->IsDirty()) {
+          entry->ClearDirty();
+        }
+      }
+      if (remove) {
+        iter.Remove();
+      }
+    }
+
     mIndexOnDiskIsValid = true;
   } else {
     if (mIndexFileOpener) {
@@ -1762,26 +1775,6 @@ CacheIndex::CopyRecordsToRWBuf(CacheIndexEntry *aEntry, void* aClosure)
   aEntry->WriteToBuf(data->mBuf);
   data->mBuf += sizeof(CacheIndexRecord);
   data->mProcessed++;
-
-  return PL_DHASH_NEXT;
-}
-
-// static
-PLDHashOperator
-CacheIndex::ApplyIndexChanges(CacheIndexEntry *aEntry, void* aClosure)
-{
-  CacheIndex *index = static_cast<CacheIndex *>(aClosure);
-
-  CacheIndexEntryAutoManage emng(aEntry->Hash(), index);
-
-  if (aEntry->IsRemoved()) {
-    emng.DoNotSearchInIndex();
-    return PL_DHASH_REMOVE;
-  }
-
-  if (aEntry->IsDirty()) {
-    aEntry->ClearDirty();
-  }
 
   return PL_DHASH_NEXT;
 }
@@ -1970,7 +1963,13 @@ CacheIndex::WriteLogToDisk()
   NS_ENSURE_SUCCESS(rv, rv);
 
   WriteLogHelper wlh(fd);
-  mIndex.EnumerateEntries(&CacheIndex::WriteEntryToLog, &wlh);
+  for (auto iter = mIndex.Iter(); !iter.Done(); iter.Next()) {
+    CacheIndexEntry* entry = iter.Get();
+    if (entry->IsRemoved() || entry->IsDirty()) {
+      wlh.AddEntry(entry);
+    }
+    iter.Remove();
+  }
 
   rv = wlh.Finish();
   PR_Close(fd);
@@ -2001,19 +2000,6 @@ CacheIndex::WriteLogToDisk()
   }
 
   return NS_OK;
-}
-
-// static
-PLDHashOperator
-CacheIndex::WriteEntryToLog(CacheIndexEntry *aEntry, void* aClosure)
-{
-  WriteLogHelper *wlh = static_cast<WriteLogHelper *>(aClosure);
-
-  if (aEntry->IsRemoved() || aEntry->IsDirty()) {
-    wlh->AddEntry(aEntry);
-  }
-
-  return PL_DHASH_REMOVE;
 }
 
 void
@@ -2393,7 +2379,10 @@ CacheIndex::EnsureNoFreshEntry()
 #ifdef DEBUG_STATS
   CacheIndexStats debugStats;
   debugStats.DisableLogging();
-  mIndex.EnumerateEntries(&CacheIndex::SumIndexStats, &debugStats);
+  for (auto iter = mIndex.Iter(); !iter.Done(); iter.Next()) {
+    debugStats.BeforeChange(nullptr);
+    debugStats.AfterChange(iter.Get());
+  }
   MOZ_ASSERT(debugStats.Fresh() == 0);
 #endif
 }
@@ -2405,19 +2394,12 @@ CacheIndex::EnsureCorrectStats()
   MOZ_ASSERT(mPendingUpdates.Count() == 0);
   CacheIndexStats debugStats;
   debugStats.DisableLogging();
-  mIndex.EnumerateEntries(&CacheIndex::SumIndexStats, &debugStats);
+  for (auto iter = mIndex.Iter(); !iter.Done(); iter.Next()) {
+    debugStats.BeforeChange(nullptr);
+    debugStats.AfterChange(iter.Get());
+  }
   MOZ_ASSERT(debugStats == mIndexStats);
 #endif
-}
-
-// static
-PLDHashOperator
-CacheIndex::SumIndexStats(CacheIndexEntry *aEntry, void* aClosure)
-{
-  CacheIndexStats *stats = static_cast<CacheIndexStats *>(aClosure);
-  stats->BeforeChange(nullptr);
-  stats->AfterChange(aEntry);
-  return PL_DHASH_NEXT;
 }
 
 void
@@ -2476,7 +2458,7 @@ CacheIndex::FinishRead(bool aSucceeded)
     EnsureNoFreshEntry();
     ProcessPendingOperations();
     // Remove all entries that we haven't seen during this session
-    mIndex.EnumerateEntries(&CacheIndex::RemoveNonFreshEntries, this);
+    RemoveNonFreshEntries();
     StartUpdatingIndex(true);
     return;
   }
@@ -3045,7 +3027,7 @@ CacheIndex::FinishUpdate(bool aSucceeded)
       NS_WARNING(("CacheIndex::FinishUpdate() - Leaking mDirEnumerator!"));
       // This can happen only in case dispatching event to IO thread failed in
       // CacheIndex::PreShutdown().
-      mDirEnumerator.forget(); // Leak it since dir enumerator is not threadsafe
+      unused << mDirEnumerator.forget(); // Leak it since dir enumerator is not threadsafe
     } else {
       mDirEnumerator->Close();
       mDirEnumerator = nullptr;
@@ -3064,7 +3046,7 @@ CacheIndex::FinishUpdate(bool aSucceeded)
     // If we've iterated over all entries successfully then all entries that
     // really exist on the disk are now marked as fresh. All non-fresh entries
     // don't exist anymore and must be removed from the index.
-    mIndex.EnumerateEntries(&CacheIndex::RemoveNonFreshEntries, this);
+    RemoveNonFreshEntries();
   }
 
   // Make sure we won't start update. If the build or update failed, there is no
@@ -3075,23 +3057,25 @@ CacheIndex::FinishUpdate(bool aSucceeded)
   mLastDumpTime = TimeStamp::NowLoRes(); // Do not dump new index immediately
 }
 
-// static
-PLDHashOperator
-CacheIndex::RemoveNonFreshEntries(CacheIndexEntry *aEntry, void* aClosure)
+void
+CacheIndex::RemoveNonFreshEntries()
 {
-  if (aEntry->IsFresh()) {
-    return PL_DHASH_NEXT;
+  for (auto iter = mIndex.Iter(); !iter.Done(); iter.Next()) {
+    CacheIndexEntry* entry = iter.Get();
+    if (entry->IsFresh()) {
+      continue;
+    }
+
+    LOG(("CacheIndex::RemoveNonFreshEntries() - Removing entry. "
+         "[hash=%08x%08x%08x%08x%08x]", LOGSHA1(entry->Hash())));
+
+    {
+      CacheIndexEntryAutoManage emng(entry->Hash(), this);
+      emng.DoNotSearchInIndex();
+    }
+
+    iter.Remove();
   }
-
-  LOG(("CacheFile::RemoveNonFreshEntries() - Removing entry. "
-       "[hash=%08x%08x%08x%08x%08x]", LOGSHA1(aEntry->Hash())));
-
-  CacheIndex *index = static_cast<CacheIndex *>(aClosure);
-
-  CacheIndexEntryAutoManage emng(aEntry->Hash(), index);
-  emng.DoNotSearchInIndex();
-
-  return PL_DHASH_REMOVE;
 }
 
 // static
@@ -3195,7 +3179,7 @@ CacheIndex::ReleaseBuffer()
   mRWBufPos = 0;
 }
 
-namespace { // anon
+namespace {
 
 class FrecencyComparator
 {
@@ -3215,7 +3199,7 @@ public:
   }
 };
 
-} // anon
+} // namespace
 
 void
 CacheIndex::InsertRecordToFrecencyArray(CacheIndexRecord *aRecord)
@@ -3610,8 +3594,8 @@ CacheIndex::SizeOfExcludingThisInternal(mozilla::MallocSizeOf mallocSizeOf) cons
   n += mTmpJournal.SizeOfExcludingThis(mallocSizeOf);
 
   // mFrecencyArray items are reported by mIndex/mPendingUpdates
-  n += mFrecencyArray.SizeOfExcludingThis(mallocSizeOf);
-  n += mDiskConsumptionObservers.SizeOfExcludingThis(mallocSizeOf);
+  n += mFrecencyArray.ShallowSizeOfExcludingThis(mallocSizeOf);
+  n += mDiskConsumptionObservers.ShallowSizeOfExcludingThis(mallocSizeOf);
 
   return n;
 }
@@ -3633,7 +3617,7 @@ CacheIndex::SizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf)
   return mallocSizeOf(gInstance) + SizeOfExcludingThis(mallocSizeOf);
 }
 
-namespace { // anon
+namespace {
 
 class HashComparator
 {
@@ -3679,7 +3663,7 @@ ReportHashSizeMatch(const SHA1Sum::Hash *aHash1, const SHA1Sum::Hash *aHash2)
   MOZ_ASSERT(false, "Found a collision in the index!");
 }
 
-} // anon
+} // namespace
 
 void
 CacheIndex::ReportHashStats()
@@ -3701,5 +3685,5 @@ CacheIndex::ReportHashStats()
   CacheObserver::SetHashStatsReported();
 }
 
-} // net
-} // mozilla
+} // namespace net
+} // namespace mozilla

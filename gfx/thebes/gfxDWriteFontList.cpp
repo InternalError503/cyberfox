@@ -1269,11 +1269,10 @@ gfxDWriteFontList::AddSizeOfExcludingThis(MallocSizeOf aMallocSizeOf,
     gfxPlatformFontList::AddSizeOfExcludingThis(aMallocSizeOf, aSizes);
 
     aSizes->mFontListSize +=
-        mFontSubstitutes.SizeOfExcludingThis(SizeOfFamilyNameEntryExcludingThis,
-                                             aMallocSizeOf);
+        SizeOfFontFamilyTableExcludingThis(mFontSubstitutes, aMallocSizeOf);
 
     aSizes->mFontListSize +=
-        mNonExistingFonts.SizeOfExcludingThis(aMallocSizeOf);
+        mNonExistingFonts.ShallowSizeOfExcludingThis(aMallocSizeOf);
     for (uint32_t i = 0; i < mNonExistingFonts.Length(); ++i) {
         aSizes->mFontListSize +=
             mNonExistingFonts[i].SizeOfExcludingThisIfUnshared(aMallocSizeOf);
@@ -1725,6 +1724,7 @@ private:
     BundledFontFileEnumerator() = delete;
     BundledFontFileEnumerator(const BundledFontFileEnumerator&) = delete;
     BundledFontFileEnumerator& operator=(const BundledFontFileEnumerator&) = delete;
+    virtual ~BundledFontFileEnumerator() {}
 
     nsRefPtr<IDWriteFactory>      mFactory;
 
@@ -1792,6 +1792,7 @@ public:
 private:
     BundledFontLoader(const BundledFontLoader&) = delete;
     BundledFontLoader& operator=(const BundledFontLoader&) = delete;
+    virtual ~BundledFontLoader() { }
 };
 
 IFACEMETHODIMP

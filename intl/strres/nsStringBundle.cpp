@@ -15,6 +15,10 @@
 #include "nscore.h"
 #include "nsMemory.h"
 #include "nsNetUtil.h"
+#include "nsComponentManagerUtils.h"
+#include "nsServiceManagerUtils.h"
+#include "nsIInputStream.h"
+#include "nsIURI.h"
 #include "nsIObserverService.h"
 #include "nsCOMArray.h"
 #include "nsTextFormatter.h"
@@ -187,7 +191,6 @@ nsStringBundle::FormatStringFromName(const char16_t *aName,
 
 NS_IMPL_ISUPPORTS(nsStringBundle, nsIStringBundle)
 
-/* void GetStringFromID (in long aID, out wstring aResult); */
 NS_IMETHODIMP
 nsStringBundle::GetStringFromID(int32_t aID, char16_t **aResult)
 {
@@ -207,7 +210,6 @@ nsStringBundle::GetStringFromID(int32_t aID, char16_t **aResult)
   return NS_OK;
 }
 
-/* void GetStringFromName (in wstring aName, out wstring aResult); */
 NS_IMETHODIMP
 nsStringBundle::GetStringFromName(const char16_t *aName, char16_t **aResult)
 {

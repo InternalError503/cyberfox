@@ -7,71 +7,33 @@
 #ifndef DecodedStream_h_
 #define DecodedStream_h_
 
-#include "nsRefPtr.h"
 #include "nsTArray.h"
+#include "MediaInfo.h"
+
+#include "mozilla/CheckedInt.h"
+#include "mozilla/Maybe.h"
+#include "mozilla/nsRefPtr.h"
+#include "mozilla/ReentrantMonitor.h"
 #include "mozilla/UniquePtr.h"
 #include "mozilla/gfx/Point.h"
 
 namespace mozilla {
 
-class MediaInputPort;
-class SourceMediaStream;
-class ProcessedMediaStream;
 class DecodedStream;
-class DecodedStreamGraphListener;
-class OutputStreamListener;
-class ReentrantMonitor;
+class DecodedStreamData;
+class MediaData;
+class MediaInputPort;
+class MediaStream;
 class MediaStreamGraph;
+class OutputStreamListener;
+class ProcessedMediaStream;
+class ReentrantMonitor;
+
+template <class T> class MediaQueue;
 
 namespace layers {
 class Image;
-}
-
-/*
- * All MediaStream-related data is protected by the decoder's monitor.
- * We have at most one DecodedStreamDaata per MediaDecoder. Its stream
- * is used as the input for each ProcessedMediaStream created by calls to
- * captureStream(UntilEnded). Seeking creates a new source stream, as does
- * replaying after the input as ended. In the latter case, the new source is
- * not connected to streams created by captureStreamUntilEnded.
- */
-class DecodedStreamData {
-public:
-  explicit DecodedStreamData(SourceMediaStream* aStream);
-  ~DecodedStreamData();
-  bool IsFinished() const;
-  int64_t GetPosition() const;
-  void SetPlaying(bool aPlaying);
-
-  /* The following group of fields are protected by the decoder's monitor
-   * and can be read or written on any thread.
-   */
-  // Count of audio frames written to the stream
-  int64_t mAudioFramesWritten;
-  // mNextVideoTime is the end timestamp for the last packet sent to the stream.
-  // Therefore video packets starting at or after this time need to be copied
-  // to the output stream.
-  int64_t mNextVideoTime; // microseconds
-  int64_t mNextAudioTime; // microseconds
-  // The last video image sent to the stream. Useful if we need to replicate
-  // the image.
-  nsRefPtr<layers::Image> mLastVideoImage;
-  gfx::IntSize mLastVideoImageDisplaySize;
-  // This is set to true when the stream is initialized (audio and
-  // video tracks added).
-  bool mStreamInitialized;
-  bool mHaveSentFinish;
-  bool mHaveSentFinishAudio;
-  bool mHaveSentFinishVideo;
-
-  // The decoder is responsible for calling Destroy() on this stream.
-  const nsRefPtr<SourceMediaStream> mStream;
-  nsRefPtr<DecodedStreamGraphListener> mListener;
-  bool mPlaying;
-  // True if we need to send a compensation video frame to ensure the
-  // StreamTime going forward.
-  bool mEOSVideoCompensation;
-};
+} // namespace layers
 
 class OutputStreamData {
 public:
@@ -84,23 +46,67 @@ public:
 };
 
 class DecodedStream {
+  NS_INLINE_DECL_THREADSAFE_REFCOUNTING(DecodedStream);
 public:
-  explicit DecodedStream(ReentrantMonitor& aMonitor);
-  DecodedStreamData* GetData() const;
+  DecodedStream(MediaQueue<MediaData>& aAudioQueue,
+                MediaQueue<MediaData>& aVideoQueue);
+
+  // Mimic MDSM::StartAudioThread.
+  // Must be called before any calls to SendData().
+  void StartPlayback(int64_t aStartTime, const MediaInfo& aInfo);
+  // Mimic MDSM::StopAudioThread.
+  void StopPlayback();
+
   void DestroyData();
-  void RecreateData(MediaStreamGraph* aGraph);
-  nsTArray<OutputStreamData>& OutputStreams();
-  ReentrantMonitor& GetReentrantMonitor() const;
+  void RecreateData();
   void Connect(ProcessedMediaStream* aStream, bool aFinishWhenEnded);
+  void Remove(MediaStream* aStream);
+
   void SetPlaying(bool aPlaying);
+  void SetVolume(double aVolume);
+
+  int64_t AudioEndTime() const;
+  int64_t GetPosition() const;
+  bool IsFinished() const;
+  bool HasConsumers() const;
+
+  // Return true if stream is finished.
+  bool SendData(bool aIsSameOrigin);
+
+protected:
+  virtual ~DecodedStream();
 
 private:
+  ReentrantMonitor& GetReentrantMonitor() const;
+  void RecreateData(MediaStreamGraph* aGraph);
   void Connect(OutputStreamData* aStream);
+  nsTArray<OutputStreamData>& OutputStreams();
+  void InitTracks();
+  void AdvanceTracks();
+  void SendAudio(double aVolume, bool aIsSameOrigin);
+  void SendVideo(bool aIsSameOrigin);
 
   UniquePtr<DecodedStreamData> mData;
   // Data about MediaStreams that are being fed by the decoder.
   nsTArray<OutputStreamData> mOutputStreams;
-  ReentrantMonitor& mMonitor;
+
+  // TODO: This is a temp solution to get rid of decoder monitor on the main
+  // thread in MDSM::AddOutputStream and MDSM::RecreateDecodedStream as
+  // required by bug 1146482. DecodedStream needs to release monitor before
+  // calling back into MDSM functions in order to prevent deadlocks.
+  //
+  // Please move all capture-stream related code from MDSM into DecodedStream
+  // and apply "dispatch + mirroring" to get rid of this monitor in the future.
+  mutable ReentrantMonitor mMonitor;
+
+  bool mPlaying;
+  double mVolume;
+
+  Maybe<int64_t> mStartTime;
+  MediaInfo mInfo;
+
+  MediaQueue<MediaData>& mAudioQueue;
+  MediaQueue<MediaData>& mVideoQueue;
 };
 
 } // namespace mozilla

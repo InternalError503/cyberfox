@@ -24,6 +24,22 @@
 .tabbrowser-tabs[closebuttons="alltabs"] > * > * > * > .tab-close-button:not([pinned]) {
   display: -moz-box;
 }
+
+.tab-close-button[pinned],
+.tab-icon-image:not([src]):not([pinned]):not([crashed]),
+.tab-icon-image[busy],
+.tab-throbber:not([busy]),
+.tab-icon-sound:not([soundplaying]):not([muted]),
+.tab-icon-sound[pinned],
+.tab-icon-overlay {
+  display: none;
+}
+
+.tab-icon-overlay[soundplaying][pinned],
+.tab-icon-overlay[muted][pinned],
+.tab-icon-overlay[crashed] {
+  display: -moz-box;
+}
 /* End Tab Close Button Don't remove */
 
 .tab-label[pinned] {
@@ -54,13 +70,6 @@ tabpanels {
   }
 }
 
-.tab-icon-image:not([src]):not([pinned]):not([crashed]),
-.tab-throbber:not([busy]),
-.tab-icon-image[busy],
-.tab-icon-overlay[busy] {
-  display: none;
-}
-
 .closing-tabs-spacer {
   pointer-events: none;
 }
@@ -87,4 +96,6 @@ tabbrowser[pendingpaint] {
   background-image: url(chrome://browser/skin/tabbrowser/pendingpaint.png);
   background-repeat: no-repeat;
   background-position: center center;
+  background-color: #fff;
+  opacity: 0.3;
 }

@@ -7,8 +7,6 @@ let gTestTab;
 let gContentAPI;
 let gContentWindow;
 
-Components.utils.import("resource:///modules/UITour.jsm");
-
 let hasWebIDE = Services.prefs.getBoolPref("devtools.webide.widget.enabled");
 
 let hasPocket = false;
@@ -63,6 +61,7 @@ let tests = [
         "readerMode-urlBar",
         "search",
         "searchIcon",
+        "trackingProtection",
         "urlbar",
         ...searchEngineTargets(),
         ...(hasWebIDE ? ["webide"] : [])
@@ -95,6 +94,7 @@ let tests = [
         "readerMode-urlBar",
         "search",
         "searchIcon",
+        "trackingProtection",
         "urlbar",
         ...searchEngineTargets(),
         ...(hasWebIDE ? ["webide"] : [])
@@ -130,6 +130,7 @@ let tests = [
         "privateWindow",
         "quit",
         "readerMode-urlBar",
+        "trackingProtection",
         "urlbar",
         ...(hasWebIDE ? ["webide"] : [])
       ]);

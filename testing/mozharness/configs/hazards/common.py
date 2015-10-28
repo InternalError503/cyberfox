@@ -4,6 +4,8 @@ PYTHON_DIR = "/tools/python27"
 SRCDIR = "source"
 
 config = {
+    "platform": "linux64",
+    "build_type": "br-haz",
     "log_name": "hazards",
     "shell-objdir": "obj-opt-js",
     "analysis-dir": "analysis",
@@ -38,9 +40,7 @@ config = {
     'tools_dir': "/tools",
     'compiler_manifest': "build/gcc.manifest",
     'b2g_compiler_manifest': "build/gcc-b2g.manifest",
-    'compiler_setup': "setup.sh.gcc",
     'sixgill_manifest': "build/sixgill.manifest",
-    'sixgill_setup': "setup.sh.sixgill",
 
     # Mock.
     "mock_packages": [
@@ -76,6 +76,7 @@ config = {
     "mock_files": [
         ("/home/cltbld/.ssh", "/home/mock_mozilla/.ssh"),
         ("/tools/tooltool.py", "/tools/tooltool.py"),
+        ('/usr/local/lib/hgext', '/usr/local/lib/hgext'),
     ],
     "env_replacements": {
         "pythondir": PYTHON_DIR,

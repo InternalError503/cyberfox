@@ -47,7 +47,6 @@
 #include "nsWidgetsCID.h"
 #include "nsBoxFrame.h"
 #include "nsIURL.h"
-#include "nsNetUtil.h"
 #include "nsBoxLayoutState.h"
 #include "nsTreeContentView.h"
 #include "nsTreeUtils.h"
@@ -3255,7 +3254,8 @@ nsTreeBodyFrame::PaintCell(int32_t              aRowIndex,
                  pc->AppUnitsToGfxUnits(lineY + mRowHeight / 2));
         Point p2(pc->AppUnitsToGfxUnits(destX),
                  pc->AppUnitsToGfxUnits(lineY + mRowHeight / 2));
-        SnapLineToDevicePixelsForStroking(p1, p2, *drawTarget);
+        SnapLineToDevicePixelsForStroking(p1, p2, *drawTarget,
+                                          strokeOptions.mLineWidth);
         drawTarget->StrokeLine(p1, p2, colorPatt, strokeOptions);
       }
 
@@ -3276,7 +3276,8 @@ nsTreeBodyFrame::PaintCell(int32_t              aRowIndex,
             else if (i == level)
               p2.y = pc->AppUnitsToGfxUnits(lineY + mRowHeight / 2);
 
-            SnapLineToDevicePixelsForStroking(p1, p2, *drawTarget);
+            SnapLineToDevicePixelsForStroking(p1, p2, *drawTarget,
+                                              strokeOptions.mLineWidth);
             drawTarget->StrokeLine(p1, p2, colorPatt, strokeOptions);
           }          
         }

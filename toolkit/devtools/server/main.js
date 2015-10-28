@@ -488,11 +488,6 @@ var DebuggerServer = {
       constructor: "GcliActor",
       type: { tab: true }
     });
-    this.registerModule("devtools/server/actors/tracer", {
-      prefix: "trace",
-      constructor: "TracerActor",
-      type: { tab: true }
-    });
     this.registerModule("devtools/server/actors/memory", {
       prefix: "memory",
       constructor: "MemoryActor",
@@ -549,6 +544,11 @@ var DebuggerServer = {
       prefix: "promises",
       constructor: "PromisesActor",
       type: { global: true, tab: true }
+    });
+    this.registerModule("devtools/server/actors/performance-entries", {
+      prefix: "performanceEntries",
+      constructor: "PerformanceEntriesActor",
+      type: { tab: true }
     });
   },
 

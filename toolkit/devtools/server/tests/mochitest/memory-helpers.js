@@ -14,8 +14,7 @@ Cu.import("resource://gre/modules/devtools/dbg-client.jsm");
 Cu.import("resource://gre/modules/devtools/dbg-server.jsm");
 
 Cu.import("resource://gre/modules/Task.jsm");
-Cu.import("resource://gre/modules/devtools/Loader.jsm");
-let { require } = devtools;
+let { require } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 
 let { MemoryFront } = require("devtools/server/actors/memory");
 
@@ -57,4 +56,11 @@ function waitForTime(ms) {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, ms);
   });
+}
+
+function waitUntil(predicate) {
+  if (predicate()) {
+    return Promise.resolve(true);
+  }
+  return new Promise(resolve => setTimeout(() => waitUntil(predicate).then(() => resolve(true)), 10));
 }

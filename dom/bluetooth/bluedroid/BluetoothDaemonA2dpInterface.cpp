@@ -10,6 +10,8 @@
 
 BEGIN_BLUETOOTH_NAMESPACE
 
+using namespace mozilla::ipc;
+
 //
 // A2DP module
 //
@@ -481,8 +483,8 @@ void
 BluetoothDaemonA2dpInterface::DispatchError(
   BluetoothA2dpResultHandler* aRes, BluetoothStatus aStatus)
 {
-  BluetoothResultRunnable1<BluetoothA2dpResultHandler, void,
-                           BluetoothStatus, BluetoothStatus>::Dispatch(
+  DaemonResultRunnable1<BluetoothA2dpResultHandler, void,
+                        BluetoothStatus, BluetoothStatus>::Dispatch(
     aRes, &BluetoothA2dpResultHandler::OnError,
     ConstantInitOp1<BluetoothStatus>(aStatus));
 }

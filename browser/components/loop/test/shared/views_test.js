@@ -50,7 +50,7 @@ describe("loop.shared.views", function() {
   });
 
   afterEach(function() {
-    $("#fixtures").empty();
+    loop.store.StoreMixin.clearRegisteredStores();
     sandbox.restore();
   });
 
@@ -466,10 +466,6 @@ describe("loop.shared.views", function() {
       });
 
       describe("#startPublishing", function() {
-        beforeEach(function() {
-          sandbox.stub(fakePublisher, "on");
-        });
-
         it("should publish local stream", function() {
           comp.startPublishing();
 
@@ -477,15 +473,10 @@ describe("loop.shared.views", function() {
           sinon.assert.calledOnce(fakeSession.publish);
         });
 
+        // XXX This test would need reworking, but the code should be going
+        // away after the obsolences of call urls (currently bug 1170150).
         it("should start listening to OT publisher accessDialogOpened and " +
-          " accessDenied events",
-          function() {
-            comp.startPublishing();
-
-            sinon.assert.called(fakePublisher.on);
-            sinon.assert.calledWith(fakePublisher.on,
-                                    "accessDialogOpened accessDenied");
-          });
+          " accessDenied events");
       });
 
       describe("#stopPublishing", function() {
@@ -761,7 +752,7 @@ describe("loop.shared.views", function() {
         view = mountTestComponent({ label: "Some label" });
 
         var node = view.getDOMNode();
-        expect(node.lastChild.localName).to.eql("label");
+        expect(node.lastChild.localName).to.eql("div");
         expect(node.lastChild.textContent).to.eql("Some label");
       });
 
@@ -793,6 +784,26 @@ describe("loop.shared.views", function() {
 
         var checkbox = view.getDOMNode().querySelector(".checkbox");
         expect(checkbox.classList.contains("checked")).eql(false);
+      });
+
+      it("should add an ellipsis class when the prop is set", function() {
+        view = mountTestComponent({
+          label: "Some label",
+          useEllipsis: true
+        });
+
+        var label = view.getDOMNode().querySelector(".checkbox-label");
+        expect(label.classList.contains("ellipsis")).eql(true);
+      });
+
+      it("should not add an ellipsis class when the prop is not set", function() {
+        view = mountTestComponent({
+          label: "Some label",
+          useEllipsis: false
+        });
+
+        var label = view.getDOMNode().querySelector(".checkbox-label");
+        expect(label.classList.contains("ellipsis")).eql(false);
       });
     });
 
@@ -1052,6 +1063,137 @@ describe("loop.shared.views", function() {
 
         expect(fakeViewElement.src).eql({fake: 2});
       });
+    });
+  });
+
+  describe("MediaLayoutView", function() {
+    var textChatStore, view;
+
+    function mountTestComponent(extraProps) {
+      var defaultProps = {
+        dispatcher: dispatcher,
+        displayScreenShare: false,
+        isLocalLoading: false,
+        isRemoteLoading: false,
+        isScreenShareLoading: false,
+        localVideoMuted: false,
+        matchMedia: window.matchMedia,
+        renderRemoteVideo: false,
+        showContextRoomName: false,
+        useDesktopPaths: false
+      };
+
+      return TestUtils.renderIntoDocument(
+        React.createElement(sharedViews.MediaLayoutView,
+          _.extend(defaultProps, extraProps)));
+    }
+
+    beforeEach(function() {
+      textChatStore = new loop.store.TextChatStore(dispatcher, {
+        sdkDriver: {}
+      });
+
+      loop.store.StoreMixin.register({textChatStore: textChatStore});
+    });
+
+    it("should mark the remote stream as the focus stream when not displaying screen share", function() {
+      view = mountTestComponent({
+        displayScreenShare: false
+      });
+
+      var node = view.getDOMNode();
+
+      expect(node.querySelector(".remote").classList.contains("focus-stream")).eql(true);
+      expect(node.querySelector(".screen").classList.contains("focus-stream")).eql(false);
+    });
+
+    it("should mark the screen share stream as the focus stream when displaying screen share", function() {
+      view = mountTestComponent({
+        displayScreenShare: true
+      });
+
+      var node = view.getDOMNode();
+
+      expect(node.querySelector(".remote").classList.contains("focus-stream")).eql(false);
+      expect(node.querySelector(".screen").classList.contains("focus-stream")).eql(true);
+    });
+
+    it("should not mark the wrapper as receiving screen share when not displaying a screen share", function() {
+      view = mountTestComponent({
+        displayScreenShare: false
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("receiving-screen-share")).eql(false);
+    });
+
+    it("should mark the wrapper as receiving screen share when displaying a screen share", function() {
+      view = mountTestComponent({
+        displayScreenShare: true
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("receiving-screen-share")).eql(true);
+    });
+
+    it("should not mark the wrapper as showing local streams when not displaying a stream", function() {
+      view = mountTestComponent({
+        localSrcVideoObject: null,
+        localPosterUrl: null
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("showing-local-streams")).eql(false);
+    });
+
+    it("should mark the wrapper as showing local streams when displaying a stream", function() {
+      view = mountTestComponent({
+        localSrcVideoObject: {},
+        localPosterUrl: null
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("showing-local-streams")).eql(true);
+    });
+
+    it("should mark the wrapper as showing local streams when displaying a poster url", function() {
+      view = mountTestComponent({
+        localSrcVideoObject: {},
+        localPosterUrl: "fake/url"
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("showing-local-streams")).eql(true);
+    });
+
+    it("should not mark the wrapper as showing remote streams when not displaying a stream", function() {
+      view = mountTestComponent({
+        remoteSrcVideoObject: null,
+        remotePosterUrl: null
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("showing-remote-streams")).eql(false);
+    });
+
+    it("should mark the wrapper as showing remote streams when displaying a stream", function() {
+      view = mountTestComponent({
+        remoteSrcVideoObject: {},
+        remotePosterUrl: null
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("showing-remote-streams")).eql(true);
+    });
+
+    it("should mark the wrapper as showing remote streams when displaying a poster url", function() {
+      view = mountTestComponent({
+        remoteSrcVideoObject: {},
+        remotePosterUrl: "fake/url"
+      });
+
+      expect(view.getDOMNode().querySelector(".media-wrapper")
+        .classList.contains("showing-remote-streams")).eql(true);
     });
   });
 });

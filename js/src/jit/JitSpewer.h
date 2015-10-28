@@ -116,13 +116,7 @@ class GraphSpewer
     JSONSpewer jsonSpewer_;
 
   public:
-    explicit GraphSpewer(TempAllocator *alloc)
-      : graph_(nullptr),
-        c1Printer_(alloc->lifoAlloc()),
-        jsonPrinter_(alloc->lifoAlloc()),
-        c1Spewer_(c1Printer_),
-        jsonSpewer_(jsonPrinter_)
-    { }
+    explicit GraphSpewer(TempAllocator *alloc);
 
     bool isSpewing() const {
         return graph_;
@@ -274,7 +268,7 @@ class AutoDisableSpew
     }
 };
 
-} /* ion */
-} /* js */
+} // namespace jit
+} // namespace js
 
 #endif /* jit_JitSpewer_h */

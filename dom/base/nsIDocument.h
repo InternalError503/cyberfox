@@ -94,6 +94,7 @@ class ErrorResult;
 class EventStates;
 class PendingAnimationTracker;
 class SVGAttrAnimationRuleProcessor;
+template<typename> class OwningNonNull;
 
 namespace css {
 class Loader;
@@ -142,7 +143,6 @@ class XPathEvaluator;
 class XPathExpression;
 class XPathNSResolver;
 class XPathResult;
-template<typename> class OwningNonNull;
 template<typename> class Sequence;
 
 template<typename, typename> class CallbackObjectHolder;
@@ -152,8 +152,8 @@ typedef CallbackObjectHolder<NodeFilter, nsIDOMNodeFilter> NodeFilterHolder;
 } // namespace mozilla
 
 #define NS_IDOCUMENT_IID \
-{ 0x21bbd52a, 0xc2d2, 0x4b2f, \
-  { 0xbc, 0x6c, 0xc9, 0x52, 0xbe, 0x23, 0x6b, 0x19 } }
+{ 0xbbce44c8, 0x22fe, 0x404f, \
+  { 0x9e, 0x71, 0x23, 0x1d, 0xf4, 0xcc, 0x8e, 0x34 } }
 
 // Enum for requesting a particular type of document when creating a doc
 enum DocumentFlavor {
@@ -230,7 +230,7 @@ public:
    * MayStartLayout() until SetMayStartLayout(true) is called on it.  Making
    * sure this happens is the responsibility of the caller of
    * StartDocumentLoad().
-   */  
+   */
   virtual nsresult StartDocumentLoad(const char* aCommand,
                                      nsIChannel* aChannel,
                                      nsILoadGroup* aLoadGroup,
@@ -309,6 +309,18 @@ public:
   }
 
   /**
+   * If true, this flag indicates that all subresource loads for this
+   * document need to be upgraded from http to https.
+   * This flag becomes true if the CSP of the document itself, or any
+   * of the document's ancestors up to the toplevel document makes use
+   * of the CSP directive 'upgrade-insecure-requests'.
+   */
+  bool GetUpgradeInsecureRequests() const
+  {
+    return mUpgradeInsecureRequests;
+  }
+
+  /**
    * Set the principal responsible for this document.
    */
   virtual void SetPrincipal(nsIPrincipal *aPrincipal) = 0;
@@ -356,8 +368,8 @@ public:
   }
 
   /**
-   * Set the document's character encoding. |aCharSetID| should be canonical. 
-   * That is, callers are responsible for the charset alias resolution. 
+   * Set the document's character encoding. |aCharSetID| should be canonical.
+   * That is, callers are responsible for the charset alias resolution.
    */
   virtual void SetDocumentCharacterSet(const nsACString& aCharSetID) = 0;
 
@@ -456,7 +468,7 @@ public:
   {
     mBidiEnabled = true;
   }
-  
+
   /**
    * Check if the document contains (or has contained) any MathML elements.
    */
@@ -464,7 +476,7 @@ public:
   {
     return mMathMLEnabled;
   }
-  
+
   void SetMathMLEnabled()
   {
     mMathMLEnabled = true;
@@ -477,7 +489,7 @@ public:
   {
     return mIsInitialDocumentInWindow;
   }
-  
+
   /**
    * Tell this document that it's the initial document in its window.  See
    * comments on mIsInitialDocumentInWindow for when this should be called.
@@ -486,7 +498,7 @@ public:
   {
     mIsInitialDocumentInWindow = aIsInitialDocument;
   }
-  
+
 
   /**
    * Get the bidi options for this document.
@@ -687,7 +699,7 @@ public:
   {
     mParentDocument = aParent;
   }
-  
+
   /**
    * Are plugins allowed in this document ?
    */
@@ -838,7 +850,7 @@ public:
   Element* GetHeadElement() {
     return GetHtmlChildElement(nsGkAtoms::head);
   }
-  
+
   /**
    * Accessors to the collection of stylesheets owned by this document.
    * Style sheets are ordered, most significant last.
@@ -873,7 +885,7 @@ public:
    * @throws no exceptions
    */
   virtual int32_t GetNumberOfStyleSheets() const = 0;
-  
+
   /**
    * Get a particular stylesheet
    * @param aIndex the index the stylesheet lives at.  This is zero-based
@@ -881,7 +893,7 @@ public:
    * @throws no exceptions
    */
   virtual nsIStyleSheet* GetStyleSheetAt(int32_t aIndex) const = 0;
-  
+
   /**
    * Insert a sheet at a particular spot in the stylesheet list (zero-based)
    * @param aSheet the sheet to insert
@@ -925,7 +937,7 @@ public:
    * and that observers should be notified and style sets updated
    */
   virtual void SetStyleSheetApplicableState(nsIStyleSheet* aSheet,
-                                            bool aApplicable) = 0;  
+                                            bool aApplicable) = 0;
 
   enum additionalSheetType {
     eAgentSheet,
@@ -1029,7 +1041,7 @@ public:
     nsPIDOMWindow* outer = mWindow ? mWindow->GetOuterWindow() : nullptr;
     return outer && outer->IsBackground();
   }
-  
+
   /**
    * Return the inner window used as the script compilation scope for
    * this document. If you're not absolutely sure you need this, use
@@ -1060,7 +1072,7 @@ public:
 
   /**
    * Get the script loader for this document
-   */ 
+   */
   virtual nsScriptLoader* ScriptLoader() = 0;
 
   /**
@@ -1145,32 +1157,29 @@ public:
   virtual void SetFullscreenRoot(nsIDocument* aRoot) = 0;
 
   /**
-   * Sets whether this document is approved for fullscreen mode.
-   * Documents aren't approved for fullscreen until chrome has sent a
-   * "fullscreen-approved" notification with a subject which is a pointer
-   * to the approved document.
+   * Synchronously cleans up the fullscreen state on the given document.
+   *
+   * Calling this without performing fullscreen transition could lead
+   * to undesired effect (the transition happens after document state
+   * flips), hence it should only be called either by nsGlobalWindow
+   * when we have performed the transition, or when it is necessary to
+   * clean up the state immediately. Otherwise, AsyncExitFullscreen()
+   * should be called instead.
+   *
+   * aDocument must not be null.
    */
-  virtual void SetApprovedForFullscreen(bool aIsApproved) = 0;
+  static void ExitFullscreenInDocTree(nsIDocument* aDocument);
 
   /**
-   * Exits documents out of DOM fullscreen mode.
+   * Ask the document to exit fullscreen state asynchronously.
    *
-   * If aDocument is null, all fullscreen documents in all browser windows
-   * exit fullscreen.
+   * Different from ExitFullscreenInDocTree(), this allows the window
+   * to perform fullscreen transition first if any.
    *
-   * If aDocument is non null, all documents from aDocument's fullscreen root
-   * to the fullscreen leaf exit fullscreen. 
-   *
-   * Note that the fullscreen leaf is the bottom-most document which is
-   * fullscreen, it may have non-fullscreen child documents. The fullscreen
-   * root is normally the chrome document.
-   *
-   * If aRunAsync is true, fullscreen is executed asynchronously.
-   *
-   * Note if aDocument is not fullscreen this function has no effect, even if
-   * aDocument has fullscreen ancestors.
+   * If aDocument is null, it will exit fullscreen from all documents
+   * in all windows.
    */
-  static void ExitFullscreen(nsIDocument* aDocument, bool aRunAsync);
+  static void AsyncExitFullscreen(nsIDocument* aDocument);
 
   /**
    * Handles one single fullscreen request, updates `aHandled` if the request
@@ -1474,7 +1483,7 @@ public:
    * The document should save form control state.
    */
   virtual void RemovedFromDocShell() = 0;
-  
+
   /**
    * Get the layout history state that should be used to save and restore state
    * for nodes in this document.  This may return null; if that happens state
@@ -1583,7 +1592,7 @@ public:
   nsCompatibility GetCompatibilityMode() const {
     return mCompatMode;
   }
-  
+
   /**
    * Check whether we've ever fired a DOMTitleChanged event for this
    * document.
@@ -1717,7 +1726,7 @@ public:
   {
     return mDisplayDocument;
   }
-  
+
   /**
    * Set the display document for this document.  aDisplayDocument must not be
    * null.
@@ -1759,7 +1768,7 @@ public:
       return mObservers;
     }
   protected:
-    nsAutoTArray< nsCOMPtr<nsIObserver>, 8 > mObservers;    
+    nsAutoTArray< nsCOMPtr<nsIObserver>, 8 > mObservers;
   };
 
   /**
@@ -2105,14 +2114,11 @@ public:
 
   virtual mozilla::dom::DocumentTimeline* Timeline() = 0;
 
-  typedef mozilla::dom::CallbackObjectHolder<
-    mozilla::dom::FrameRequestCallback,
-    nsIFrameRequestCallback> FrameRequestCallbackHolder;
-  nsresult ScheduleFrameRequestCallback(const FrameRequestCallbackHolder& aCallback,
+  nsresult ScheduleFrameRequestCallback(mozilla::dom::FrameRequestCallback& aCallback,
                                         int32_t *aHandle);
   void CancelFrameRequestCallback(int32_t aHandle);
 
-  typedef nsTArray<FrameRequestCallbackHolder> FrameRequestCallbackList;
+  typedef nsTArray<nsRefPtr<mozilla::dom::FrameRequestCallback>> FrameRequestCallbackList;
   /**
    * Put this document's frame request callbacks into the provided
    * list, and forget about them.
@@ -2169,9 +2175,9 @@ public:
 
   virtual Element* FindImageMap(const nsAString& aNormalizedMapName) = 0;
 
-  // Add aLink to the set of links that need their status resolved. 
+  // Add aLink to the set of links that need their status resolved.
   void RegisterPendingLinkUpdate(mozilla::dom::Link* aLink);
-  
+
   // Remove aLink from the set of links that need their status resolved.
   // This function must be called when links are removed from the document.
   void UnregisterPendingLinkUpdate(mozilla::dom::Link* aElement);
@@ -2203,7 +2209,7 @@ public:
                      uint32_t aParamsLength = 0) const;
 
   virtual void PostVisibilityUpdateEvent() = 0;
-  
+
   bool IsSyntheticDocument() const { return mIsSyntheticDocument; }
 
   void SetNeedLayoutFlush() {
@@ -2506,9 +2512,9 @@ public:
   already_AddRefed<mozilla::dom::TouchList> CreateTouchList();
   already_AddRefed<mozilla::dom::TouchList>
     CreateTouchList(mozilla::dom::Touch& aTouch,
-                    const mozilla::dom::Sequence<mozilla::dom::OwningNonNull<mozilla::dom::Touch> >& aTouches);
+                    const mozilla::dom::Sequence<mozilla::OwningNonNull<mozilla::dom::Touch> >& aTouches);
   already_AddRefed<mozilla::dom::TouchList>
-    CreateTouchList(const mozilla::dom::Sequence<mozilla::dom::OwningNonNull<mozilla::dom::Touch> >& aTouches);
+    CreateTouchList(const mozilla::dom::Sequence<mozilla::OwningNonNull<mozilla::dom::Touch> >& aTouches);
 
   void SetStyleSheetChangeEventsEnabled(bool aValue)
   {
@@ -2631,6 +2637,8 @@ protected:
   bool mReferrerPolicySet;
   ReferrerPolicyEnum mReferrerPolicy;
 
+  bool mUpgradeInsecureRequests;
+
   mozilla::WeakPtr<nsDocShell> mDocumentContainer;
 
   nsCString mCharacterSet;
@@ -2686,136 +2694,128 @@ protected:
   mozilla::dom::VisibilityState mVisibilityState;
 
   // True if BIDI is enabled.
-  bool mBidiEnabled;
+  bool mBidiEnabled : 1;
   // True if a MathML element has ever been owned by this document.
-  bool mMathMLEnabled;
+  bool mMathMLEnabled : 1;
 
   // True if this document is the initial document for a window.  This should
   // basically be true only for documents that exist in newly-opened windows or
   // documents created to satisfy a GetDocument() on a window when there's no
   // document in it.
-  bool mIsInitialDocumentInWindow;
+  bool mIsInitialDocumentInWindow : 1;
 
   // True if we're loaded as data and therefor has any dangerous stuff, such
   // as scripts and plugins, disabled.
-  bool mLoadedAsData;
+  bool mLoadedAsData : 1;
 
   // This flag is only set in XMLDocument, for e.g. documents used in XBL. We
   // don't want animations to play in such documents, so we need to store the
   // flag here so that we can check it in nsDocument::GetAnimationController.
-  bool mLoadedAsInteractiveData;
+  bool mLoadedAsInteractiveData : 1;
 
   // If true, whoever is creating the document has gotten it to the
   // point where it's safe to start layout on it.
-  bool mMayStartLayout;
-  
+  bool mMayStartLayout : 1;
+
   // True iff we've ever fired a DOMTitleChanged event for this document
-  bool mHaveFiredTitleChange;
+  bool mHaveFiredTitleChange : 1;
 
   // True iff IsShowing() should be returning true
-  bool mIsShowing;
+  bool mIsShowing : 1;
 
   // True iff the document "page" is not hidden (i.e. currently in the
   // bfcache)
-  bool mVisible;
+  bool mVisible : 1;
 
   // True if our content viewer has been removed from the docshell
   // (it may still be displayed, but in zombie state). Form control data
   // has been saved.
-  bool mRemovedFromDocShell;
+  bool mRemovedFromDocShell : 1;
 
   // True iff DNS prefetch is allowed for this document.  Note that if the
   // document has no window, DNS prefetch won't be performed no matter what.
-  bool mAllowDNSPrefetch;
-  
+  bool mAllowDNSPrefetch : 1;
+
   // True when this document is a static clone of a normal document
-  bool mIsStaticDocument;
+  bool mIsStaticDocument : 1;
 
   // True while this document is being cloned to a static document.
-  bool mCreatingStaticClone;
+  bool mCreatingStaticClone : 1;
 
   // True iff the document is being unlinked or deleted.
-  bool mInUnlinkOrDeletion;
+  bool mInUnlinkOrDeletion : 1;
 
   // True if document has ever had script handling object.
-  bool mHasHadScriptHandlingObject;
+  bool mHasHadScriptHandlingObject : 1;
 
   // True if we're an SVG document being used as an image.
-  bool mIsBeingUsedAsImage;
+  bool mIsBeingUsedAsImage : 1;
 
   // True is this document is synthetic : stand alone image, video, audio
   // file, etc.
-  bool mIsSyntheticDocument;
+  bool mIsSyntheticDocument : 1;
 
   // True if this document has links whose state needs updating
-  bool mHasLinksToUpdate;
+  bool mHasLinksToUpdate : 1;
 
   // True if a layout flush might not be a no-op
-  bool mNeedLayoutFlush;
+  bool mNeedLayoutFlush : 1;
 
   // True if a style flush might not be a no-op
-  bool mNeedStyleFlush;
+  bool mNeedStyleFlush : 1;
 
   // True if a DOMMutationObserver is perhaps attached to a node in the document.
-  bool mMayHaveDOMMutationObservers;
+  bool mMayHaveDOMMutationObservers : 1;
 
   // True if an nsIAnimationObserver is perhaps attached to a node in the document.
-  bool mMayHaveAnimationObservers;
+  bool mMayHaveAnimationObservers : 1;
 
   // True if a document has loaded Mixed Active Script (see nsMixedContentBlocker.cpp)
-  bool mHasMixedActiveContentLoaded;
+  bool mHasMixedActiveContentLoaded : 1;
 
   // True if a document has blocked Mixed Active Script (see nsMixedContentBlocker.cpp)
-  bool mHasMixedActiveContentBlocked;
+  bool mHasMixedActiveContentBlocked : 1;
 
   // True if a document has loaded Mixed Display/Passive Content (see nsMixedContentBlocker.cpp)
-  bool mHasMixedDisplayContentLoaded;
+  bool mHasMixedDisplayContentLoaded : 1;
 
   // True if a document has blocked Mixed Display/Passive Content (see nsMixedContentBlocker.cpp)
-  bool mHasMixedDisplayContentBlocked;
+  bool mHasMixedDisplayContentBlocked : 1;
 
   // True if a document has blocked Tracking Content
-  bool mHasTrackingContentBlocked;
+  bool mHasTrackingContentBlocked : 1;
 
   // True if a document has loaded Tracking Content
-  bool mHasTrackingContentLoaded;
+  bool mHasTrackingContentLoaded : 1;
 
   // True if DisallowBFCaching has been called on this document.
-  bool mBFCacheDisallowed;
+  bool mBFCacheDisallowed : 1;
 
   // If true, we have an input encoding.  If this is false, then the
   // document was created entirely in memory
-  bool mHaveInputEncoding;
+  bool mHaveInputEncoding : 1;
 
-  bool mHasHadDefaultView;
+  bool mHasHadDefaultView : 1;
 
   // Whether style sheet change events will be dispatched for this document
-  bool mStyleSheetChangeEventsEnabled;
+  bool mStyleSheetChangeEventsEnabled : 1;
 
   // Whether the document was created by a srcdoc iframe.
-  bool mIsSrcdocDocument;
+  bool mIsSrcdocDocument : 1;
 
   // Records whether we've done a document.open. If this is true, it's possible
   // for nodes from this document to have outdated wrappers in their wrapper
   // caches.
-  bool mDidDocumentOpen;
-
-#ifdef DEBUG
-  /**
-   * This is true while FlushPendingLinkUpdates executes.  Calls to
-   * [Un]RegisterPendingLinkUpdate will assert when this is true.
-   */
-  bool mIsLinkUpdateRegistrationsForbidden;
-#endif
+  bool mDidDocumentOpen : 1;
 
   // Is the current mFontFaceSet valid?
-  bool mFontFaceSetDirty;
+  bool mFontFaceSetDirty : 1;
 
   // Has GetUserFontSet() been called?
-  bool mGetUserFontSetCalled;
+  bool mGetUserFontSetCalled : 1;
 
   // Do we currently have an event posted to call FlushUserFontSet?
-  bool mPostedFlushUserFontSet;
+  bool mPostedFlushUserFontSet : 1;
 
   enum Type {
     eUnknown, // should never be used
@@ -2826,17 +2826,25 @@ protected:
     eXUL
   };
 
-  uint8_t mType;
+  Type mType;
 
   uint8_t mDefaultElementType;
 
-  enum {
+  enum Tri {
     eTriUnset = 0,
     eTriFalse,
     eTriTrue
   };
 
-  uint8_t mAllowXULXBL;
+  Tri mAllowXULXBL;
+
+#ifdef DEBUG
+  /**
+   * This is true while FlushPendingLinkUpdates executes.  Calls to
+   * [Un]RegisterPendingLinkUpdate will assert when this is true.
+   */
+  bool mIsLinkUpdateRegistrationsForbidden;
+#endif
 
   // The document's script global object, the object from which the
   // document can get its script context and scope. This is the
@@ -2875,7 +2883,7 @@ protected:
   // if this document is part of a multipart document,
   // the ID can be used to distinguish it from the other parts.
   uint32_t mPartID;
-  
+
   // Cycle collector generation in which we're certain that this document
   // won't be collected
   uint32_t mMarkedCCGeneration;
@@ -3024,8 +3032,8 @@ NS_NewVideoDocument(nsIDocument** aInstancePtrResult);
 // Also, both aDocumentURI and aBaseURI must not be null.
 nsresult
 NS_NewDOMDocument(nsIDOMDocument** aInstancePtrResult,
-                  const nsAString& aNamespaceURI, 
-                  const nsAString& aQualifiedName, 
+                  const nsAString& aNamespaceURI,
+                  const nsAString& aQualifiedName,
                   nsIDOMDocumentType* aDoctype,
                   nsIURI* aDocumentURI,
                   nsIURI* aBaseURI,

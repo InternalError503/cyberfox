@@ -19,6 +19,7 @@
 #include "nsCRT.h"
 #include "nsHttp.h"
 #include "nsICryptoHash.h"
+#include "nsNetCID.h"
 #include "mozilla/BasePrincipal.h"
 #include "mozilla/dom/HeadersBinding.h"
 #include "mozilla/dom/RequestBinding.h"
@@ -54,7 +55,7 @@ const uint32_t kWalAutoCheckpointPages = kWalAutoCheckpointSize / kPageSize;
 static_assert(kWalAutoCheckpointSize % kPageSize == 0,
               "WAL checkpoint size must be multiple of page size");
 
-} // anonymous namespace
+} // namespace
 
 // If any of the static_asserts below fail, it means that you have changed
 // the corresponding WebIDL enum in a way that may be incompatible with the
@@ -140,8 +141,11 @@ static_assert(nsIContentPolicy::TYPE_INVALID == 0 &&
               nsIContentPolicy::TYPE_INTERNAL_IFRAME == 29 &&
               nsIContentPolicy::TYPE_INTERNAL_AUDIO == 30 &&
               nsIContentPolicy::TYPE_INTERNAL_VIDEO == 31 &&
-              nsIContentPolicy::TYPE_INTERNAL_TRACK == 32,
-              "nsContentPolicytType values are as expected");
+              nsIContentPolicy::TYPE_INTERNAL_TRACK == 32 &&
+              nsIContentPolicy::TYPE_INTERNAL_XMLHTTPREQUEST == 33 &&
+              nsIContentPolicy::TYPE_INTERNAL_EVENTSOURCE == 34 &&
+              nsIContentPolicy::TYPE_INTERNAL_SERVICE_WORKER == 35,
+              "nsContentPolicyType values are as expected");
 
 namespace {
 
@@ -203,7 +207,7 @@ static nsresult CreateAndBindKeyStatement(mozIStorageConnection* aConn,
                                           mozIStorageStatement** aStateOut);
 static nsresult HashCString(nsICryptoHash* aCrypto, const nsACString& aIn,
                             nsACString& aOut);
-} // anonymous namespace
+} // namespace
 
 nsresult
 CreateSchema(mozIStorageConnection* aConn)
@@ -1832,7 +1836,6 @@ ReadResponse(mozIStorageConnection* aConn, EntryId aEntryId,
   if (!serializedInfo.IsEmpty()) {
     nsAutoCString originNoSuffix;
     OriginAttributes attrs;
-    fprintf(stderr, "\n%s\n", serializedInfo.get());
     if (!attrs.PopulateFromOrigin(serializedInfo, originNoSuffix)) {
       NS_WARNING("Something went wrong parsing a serialized principal!");
       return NS_ERROR_FAILURE;
@@ -2117,7 +2120,7 @@ HashCString(nsICryptoHash* aCrypto, const nsACString& aIn, nsACString& aOut)
   return rv;
 }
 
-} // anonymouns namespace
+} // namespace
 
 nsresult
 IncrementalVacuum(mozIStorageConnection* aConn)

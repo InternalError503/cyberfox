@@ -489,16 +489,12 @@ DllBlockSet::Add(const char* name, unsigned long long version)
 void
 DllBlockSet::Write(HANDLE file)
 {
-  // It would be nicer to use AutoCriticalSection here. However, its destructor
-  // might not run if an exception occurs, in which case we would never leave
-  // the critical section. (MSVC warns about this possibility.) So we
-  // enter and leave manually.
-  ::EnterCriticalSection(&sLock);
+  AutoCriticalSection lock(&sLock);
+  DWORD nBytes;
 
   // Because this method is called after a crash occurs, and uses heap memory,
   // protect this entire block with a structured exception handler.
   MOZ_SEH_TRY {
-    DWORD nBytes;
     for (DllBlockSet* b = gFirst; b; b = b->mNext) {
       // write name[,v.v.v.v];
       WriteFile(file, b->mName, strlen(b->mName), &nBytes, nullptr);
@@ -522,8 +518,6 @@ DllBlockSet::Write(HANDLE file)
     }
   }
   MOZ_SEH_EXCEPT (EXCEPTION_EXECUTE_HANDLER) { }
-
-  ::LeaveCriticalSection(&sLock);
 }
 
 static

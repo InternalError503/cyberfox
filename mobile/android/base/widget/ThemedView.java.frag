@@ -8,7 +8,7 @@
 package org.mozilla.gecko.widget;
 
 import org.mozilla.gecko.GeckoApplication;
-import org.mozilla.gecko.LightweightTheme;
+import org.mozilla.gecko.lwt.LightweightTheme;
 import org.mozilla.gecko.R;
 
 import android.content.Context;
@@ -114,6 +114,7 @@ public class Themed@VIEW_NAME_SUFFIX@ extends @BASE_TYPE@
         if (mIsPrivate != isPrivate) {
             mIsPrivate = isPrivate;
             refreshDrawableState();
+            invalidate();
         }
     }
 
@@ -130,6 +131,7 @@ public class Themed@VIEW_NAME_SUFFIX@ extends @BASE_TYPE@
             }
 
             refreshDrawableState();
+            invalidate();
         }
     }
 
@@ -138,6 +140,7 @@ public class Themed@VIEW_NAME_SUFFIX@ extends @BASE_TYPE@
             mIsLight = false;
             mIsDark = false;
             refreshDrawableState();
+            invalidate();
         }
     }
 

@@ -22,7 +22,7 @@ class Promise;
 
 namespace workers {
 class WorkerPrivate;
-}
+} // namespace workers
 
 // A proxy to catch the resolved/rejected Promise's result from the main thread
 // and resolve/reject that on the worker thread eventually.
@@ -69,8 +69,7 @@ class PromiseWorkerProxy : public PromiseNativeHandler,
 {
   friend class PromiseWorkerProxyRunnable;
 
-  // This overrides the non-threadsafe refcounting in PromiseNativeHandler.
-  NS_INLINE_DECL_THREADSAFE_REFCOUNTING(PromiseWorkerProxy, override)
+  NS_DECL_THREADSAFE_ISUPPORTS
 
 public:
   static already_AddRefed<PromiseWorkerProxy>

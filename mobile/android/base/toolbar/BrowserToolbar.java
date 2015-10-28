@@ -133,6 +133,8 @@ public abstract class BrowserToolbar extends ThemedRelativeLayout
     protected TabHistoryController tabHistoryController;
 
     private final Paint shadowPaint;
+    private final int shadowColor;
+    private final int shadowPrivateColor;
     private final int shadowSize;
 
     private final ToolbarPrefs prefs;
@@ -200,7 +202,9 @@ public abstract class BrowserToolbar extends ThemedRelativeLayout
         shadowSize = res.getDimensionPixelSize(R.dimen.browser_toolbar_shadow_size);
 
         shadowPaint = new Paint();
-        shadowPaint.setColor(res.getColor(R.color.url_bar_shadow));
+        shadowColor = res.getColor(R.color.url_bar_shadow);
+        shadowPrivateColor = res.getColor(R.color.url_bar_shadow_private);
+        shadowPaint.setColor(shadowColor);
         shadowPaint.setStrokeWidth(0.0f);
 
         setUIMode(UIMode.DISPLAY);
@@ -530,6 +534,7 @@ public abstract class BrowserToolbar extends ThemedRelativeLayout
     private void updateProgressVisibility(Tab selectedTab, int progress) {
         if (!isEditing() && selectedTab.getState() == Tab.STATE_LOADING) {
             progressBar.setProgress(progress);
+            progressBar.setPrivateMode(selectedTab.isPrivate());
             progressBar.setVisibility(View.VISIBLE);
         } else {
             progressBar.setVisibility(View.GONE);
@@ -841,6 +846,8 @@ public abstract class BrowserToolbar extends ThemedRelativeLayout
         tabsButton.setPrivateMode(isPrivate);
         menuButton.setPrivateMode(isPrivate);
         urlEditLayout.setPrivateMode(isPrivate);
+
+        shadowPaint.setColor(isPrivate ? shadowPrivateColor : shadowColor);
     }
 
     public void show() {

@@ -105,33 +105,16 @@ template<class EntryType>
 class AutoHashtable : public nsTHashtable<EntryType>
 {
 public:
-  explicit AutoHashtable(uint32_t initLength = PL_DHASH_DEFAULT_INITIAL_LENGTH);
+  explicit AutoHashtable(uint32_t initLength =
+                         PLDHashTable::kDefaultInitialLength);
   typedef bool (*ReflectEntryFunc)(EntryType *entry, JSContext *cx, JS::Handle<JSObject*> obj);
   bool ReflectIntoJS(ReflectEntryFunc entryFunc, JSContext *cx, JS::Handle<JSObject*> obj);
-private:
-  struct EnumeratorArgs {
-    JSContext *cx;
-    JS::Handle<JSObject*> obj;
-    ReflectEntryFunc entryFunc;
-  };
-  static PLDHashOperator ReflectEntryStub(EntryType *entry, void *arg);
 };
 
 template<class EntryType>
 AutoHashtable<EntryType>::AutoHashtable(uint32_t initLength)
   : nsTHashtable<EntryType>(initLength)
 {
-}
-
-template<typename EntryType>
-PLDHashOperator
-AutoHashtable<EntryType>::ReflectEntryStub(EntryType *entry, void *arg)
-{
-  EnumeratorArgs *args = static_cast<EnumeratorArgs *>(arg);
-  if (!args->entryFunc(entry, args->cx, args->obj)) {
-    return PL_DHASH_STOP;
-  }
-  return PL_DHASH_NEXT;
 }
 
 /**
@@ -143,9 +126,12 @@ bool
 AutoHashtable<EntryType>::ReflectIntoJS(ReflectEntryFunc entryFunc,
                                         JSContext *cx, JS::Handle<JSObject*> obj)
 {
-  EnumeratorArgs args = { cx, obj, entryFunc };
-  uint32_t num = this->EnumerateEntries(ReflectEntryStub, static_cast<void*>(&args));
-  return num == this->Count();
+  for (auto iter = this->Iter(); !iter.Done(); iter.Next()) {
+    if (!entryFunc(iter.Get(), cx, obj)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // This class is conceptually a list of ProcessedStack objects, but it represents them
@@ -413,10 +399,12 @@ public:
   }
 
   size_t SizeOfExcludingThis(mozilla::MallocSizeOf aMallocSizeOf) const {
-    size_t size;
-    size = mFileStats.SizeOfExcludingThis(SizeOfFileIOEntryTypeExcludingThis,
-                                          aMallocSizeOf) +
-           mSafeDirs.SizeOfExcludingThis(aMallocSizeOf);
+    size_t size = 0;
+    size += mFileStats.ShallowSizeOfExcludingThis(aMallocSizeOf);
+    for (auto iter = mFileStats.ConstIter(); !iter.Done(); iter.Next()) {
+      size += iter.Get()->GetKey().SizeOfExcludingThisIfUnshared(aMallocSizeOf);
+    }
+    size += mSafeDirs.ShallowSizeOfExcludingThis(aMallocSizeOf);
     uint32_t safeDirsLen = mSafeDirs.Length();
     for (uint32_t i = 0; i < safeDirsLen; ++i) {
       size += mSafeDirs[i].SizeOfExcludingThis(aMallocSizeOf);
@@ -465,13 +453,6 @@ private:
    */
   static bool ReflectFileStats(FileIOEntryType* entry, JSContext *cx,
                                JS::Handle<JSObject*> obj);
-
-  static size_t SizeOfFileIOEntryTypeExcludingThis(FileIOEntryType* aEntry,
-                                                   mozilla::MallocSizeOf mallocSizeOf,
-                                                   void*)
-  {
-    return aEntry->GetKey().SizeOfExcludingThisIfUnshared(mallocSizeOf);
-  }
 };
 
 TelemetryIOInterposeObserver::TelemetryIOInterposeObserver(nsIFile* aXreDir)
@@ -798,17 +779,9 @@ private:
   KeyedHistogramMapType mSubsessionMap;
 #endif
 
-  struct ReflectKeysArgs {
-    JSContext* jsContext;
-    JS::AutoValueVector* vector;
-  };
-  static PLDHashOperator ReflectKeys(KeyedHistogramEntry* entry, void* arg);
-
   static bool ReflectKeyedHistogram(KeyedHistogramEntry* entry,
                                     JSContext* cx,
                                     JS::Handle<JSObject*> obj);
-
-  static PLDHashOperator ClearHistogramEnumerator(KeyedHistogramEntry*, void*);
 
   const nsCString mName;
   const nsCString mExpiration;
@@ -1139,7 +1112,7 @@ FillRanges(JSContext *cx, JS::Handle<JSObject*> array, Histogram *h)
 {
   JS::Rooted<JS::Value> range(cx);
   for (size_t i = 0; i < h->bucket_count(); i++) {
-    range = INT_TO_JSVAL(h->ranges(i));
+    range.setInt32(h->ranges(i));
     if (!JS_DefineElement(cx, array, i, range, JSPROP_ENUMERATE))
       return false;
   }
@@ -1848,10 +1821,8 @@ TelemetryImpl::AsyncFetchTelemetryData(nsIFetchTelemetryDataCallback *aCallback)
 
 TelemetryImpl::TelemetryImpl():
 mHistogramMap(Telemetry::HistogramCount),
-mCanRecordBase(XRE_GetProcessType() == GeckoProcessType_Default ||
-               XRE_GetProcessType() == GeckoProcessType_Content),
-mCanRecordExtended(XRE_GetProcessType() == GeckoProcessType_Default ||
-                   XRE_GetProcessType() == GeckoProcessType_Content),
+mCanRecordBase(XRE_IsParentProcess() || XRE_IsContentProcess()),
+mCanRecordExtended(XRE_IsParentProcess() || XRE_IsContentProcess()),
 mHashMutex("Telemetry::mHashMutex"),
 mHangReportsMutex("Telemetry::mHangReportsMutex"),
 mThreadHangStatsMutex("Telemetry::mThreadHangStatsMutex"),
@@ -3608,8 +3579,8 @@ TelemetryImpl::SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf)
   size_t n = aMallocSizeOf(this);
 
   // Ignore the hashtables in mAddonMap; they are not significant.
-  n += mAddonMap.SizeOfExcludingThis(nullptr, aMallocSizeOf);
-  n += mHistogramMap.SizeOfExcludingThis(nullptr, aMallocSizeOf);
+  n += mAddonMap.ShallowSizeOfExcludingThis(aMallocSizeOf);
+  n += mHistogramMap.ShallowSizeOfExcludingThis(aMallocSizeOf);
   { // Scope for mHashMutex lock
     MutexAutoLock lock(mHashMutex);
     n += mPrivateSQL.SizeOfExcludingThis(aMallocSizeOf);
@@ -3639,7 +3610,7 @@ TelemetryImpl::SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf)
   return n;
 }
 
-} // anonymous namespace
+} // namespace
 
 namespace mozilla {
 void
@@ -4235,14 +4206,6 @@ KeyedHistogram::GetDataset(uint32_t* dataset) const
   return NS_OK;
 }
 
-/* static */
-PLDHashOperator
-KeyedHistogram::ClearHistogramEnumerator(KeyedHistogramEntry* entry, void*)
-{
-  entry->mData->Clear();
-  return PL_DHASH_NEXT;
-}
-
 nsresult
 KeyedHistogram::Add(const nsCString& key, uint32_t sample)
 {
@@ -4274,29 +4237,19 @@ void
 KeyedHistogram::Clear(bool onlySubsession)
 {
 #if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
-  mSubsessionMap.EnumerateEntries(&KeyedHistogram::ClearHistogramEnumerator, nullptr);
+  for (auto iter = mSubsessionMap.Iter(); !iter.Done(); iter.Next()) {
+    iter.Get()->mData->Clear();
+  }
   mSubsessionMap.Clear();
   if (onlySubsession) {
     return;
   }
 #endif
 
-  mHistogramMap.EnumerateEntries(&KeyedHistogram::ClearHistogramEnumerator, nullptr);
+  for (auto iter = mHistogramMap.Iter(); !iter.Done(); iter.Next()) {
+    iter.Get()->mData->Clear();
+  }
   mHistogramMap.Clear();
-}
-
-/* static */
-PLDHashOperator
-KeyedHistogram::ReflectKeys(KeyedHistogramEntry* entry, void* arg)
-{
-  ReflectKeysArgs* args = static_cast<ReflectKeysArgs*>(arg);
-
-  JS::RootedValue jsKey(args->jsContext);
-  const NS_ConvertUTF8toUTF16 key(entry->GetKey());
-  jsKey.setString(JS_NewUCStringCopyN(args->jsContext, key.Data(), key.Length()));
-  args->vector->append(jsKey);
-
-  return PL_DHASH_NEXT;
 }
 
 nsresult
@@ -4307,11 +4260,11 @@ KeyedHistogram::GetJSKeys(JSContext* cx, JS::CallArgs& args)
     return NS_ERROR_OUT_OF_MEMORY;
   }
 
-  ReflectKeysArgs reflectArgs = { cx, &keys };
-  const uint32_t num = mHistogramMap.EnumerateEntries(&KeyedHistogram::ReflectKeys,
-                                                      static_cast<void*>(&reflectArgs));
-  if (num != mHistogramMap.Count()) {
-    return NS_ERROR_FAILURE;
+  for (auto iter = mHistogramMap.Iter(); !iter.Done(); iter.Next()) {
+    JS::RootedValue jsKey(cx);
+    const NS_ConvertUTF8toUTF16 key(iter.Get()->GetKey());
+    jsKey.setString(JS_NewUCStringCopyN(cx, key.Data(), key.Length()));
+    keys.append(jsKey);
   }
 
   JS::RootedObject jsKeys(cx, JS_NewArrayObject(cx, keys));

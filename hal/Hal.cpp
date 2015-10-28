@@ -110,7 +110,7 @@ void InitLastIDToVibrate()
   ClearOnShutdown(&gLastIDToVibrate);
 }
 
-} // anonymous namespace
+} // namespace
 
 void
 Vibrate(const nsTArray<uint32_t>& pattern, nsIDOMWindow* window)
@@ -202,7 +202,6 @@ public:
   void RemoveObserver(Observer<InfoType>* aObserver) {
     bool removed = mObservers && mObservers->RemoveObserver(aObserver);
     if (!removed) {
-      NS_WARNING("RemoveObserver() called for unregistered observer");
       return;
     }
 

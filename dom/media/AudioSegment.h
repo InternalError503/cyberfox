@@ -28,9 +28,9 @@ public:
   virtual size_t SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const override
   {
     size_t amount = 0;
-    amount += mBuffers.SizeOfExcludingThis(aMallocSizeOf);
+    amount += mBuffers.ShallowSizeOfExcludingThis(aMallocSizeOf);
     for (size_t i = 0; i < mBuffers.Length(); i++) {
-      amount += mBuffers[i].SizeOfExcludingThis(aMallocSizeOf);
+      amount += mBuffers[i].ShallowSizeOfExcludingThis(aMallocSizeOf);
     }
 
     return amount;
@@ -148,7 +148,14 @@ struct AudioChunk {
     return true;
   }
 
-  int ChannelCount() const { return mChannelData.Length(); }
+  size_t ChannelCount() const { return mChannelData.Length(); }
+
+  float* ChannelFloatsForWrite(size_t aChannel)
+  {
+    MOZ_ASSERT(mBufferFormat == AUDIO_FORMAT_FLOAT32);
+    MOZ_ASSERT(!mBuffer->IsShared());
+    return static_cast<float*>(const_cast<void*>(mChannelData[aChannel]));
+  }
 
   bool IsMuted() const { return mVolume == 0.0f; }
 
@@ -169,7 +176,7 @@ struct AudioChunk {
     }
 
     // Memory in the array is owned by mBuffer.
-    amount += mChannelData.SizeOfExcludingThis(aMallocSizeOf);
+    amount += mChannelData.ShallowSizeOfExcludingThis(aMallocSizeOf);
     return amount;
   }
 
@@ -299,7 +306,14 @@ public:
     return chunk;
   }
   void ApplyVolume(float aVolume);
-  void WriteTo(uint64_t aID, AudioMixer& aMixer, uint32_t aChannelCount, uint32_t aSampleRate);
+  // Mix the segment into a mixer, interleaved. This is useful to output a
+  // segment to a system audio callback. It up or down mixes to aChannelCount
+  // channels.
+  void WriteTo(uint64_t aID, AudioMixer& aMixer, uint32_t aChannelCount,
+               uint32_t aSampleRate);
+  // Mix the segment into a mixer, keeping it planar, up or down mixing to
+  // aChannelCount channels.
+  void Mix(AudioMixer& aMixer, uint32_t aChannelCount, uint32_t aSampleRate);
 
   int ChannelCount() {
     NS_WARN_IF_FALSE(!mChunks.IsEmpty(),
@@ -332,6 +346,6 @@ public:
   }
 };
 
-}
+} // namespace mozilla
 
 #endif /* MOZILLA_AUDIOSEGMENT_H_ */

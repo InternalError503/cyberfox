@@ -206,8 +206,10 @@ BaselineCompiler::compile()
                             pcEntries.length(),
                             bytecodeTypeMapEntries,
                             yieldOffsets_.length()));
-    if (!baselineScript)
+    if (!baselineScript) {
+        ReportOutOfMemory(cx);
         return Method_Error;
+    }
 
     baselineScript->setMethod(code);
     baselineScript->setTemplateScope(templateScope);
@@ -868,7 +870,7 @@ BaselineCompiler::emitProfilerEnterFrame()
     // Starts off initially disabled.
     Label noInstrument;
     CodeOffsetLabel toggleOffset = masm.toggledJump(&noInstrument);
-    masm.profilerEnterFrame(BaselineStackReg, R0.scratchReg());
+    masm.profilerEnterFrame(masm.getStackPointer(), R0.scratchReg());
     masm.bind(&noInstrument);
 
     // Store the start offset in the appropriate location.
@@ -1592,6 +1594,12 @@ BaselineCompiler::emit_JSOP_DIV()
 
 bool
 BaselineCompiler::emit_JSOP_MOD()
+{
+    return emitBinaryArith();
+}
+
+bool
+BaselineCompiler::emit_JSOP_POW()
 {
     return emitBinaryArith();
 }
@@ -3312,6 +3320,34 @@ BaselineCompiler::emit_JSOP_TOID()
     return true;
 }
 
+typedef JSString* (*ToStringFn)(JSContext*, HandleValue);
+static const VMFunction ToStringInfo = FunctionInfo<ToStringFn>(ToStringSlow);
+
+bool
+BaselineCompiler::emit_JSOP_TOSTRING()
+{
+    // Keep top stack value in R0.
+    frame.popRegsAndSync(1);
+
+    // Inline path for string.
+    Label done;
+    masm.branchTestString(Assembler::Equal, R0, &done);
+
+    prepareVMCall();
+
+    pushArg(R0);
+
+    // Call ToStringSlow which doesn't handle string inputs.
+    if (!callVM(ToStringInfo))
+        return false;
+
+    masm.tagValue(JSVAL_TYPE_STRING, ReturnReg, R0);
+
+    masm.bind(&done);
+    frame.push(R0);
+    return true;
+}
+
 bool
 BaselineCompiler::emit_JSOP_TABLESWITCH()
 {
@@ -3750,7 +3786,7 @@ BaselineCompiler::emit_JSOP_RESUME()
         AbsoluteAddress addressOfEnabled(cx->runtime()->spsProfiler.addressOfEnabled());
         masm.branch32(Assembler::Equal, addressOfEnabled, Imm32(0), &skip);
         masm.loadPtr(AbsoluteAddress(cx->runtime()->addressOfProfilingActivation()), scratchReg);
-        masm.storePtr(BaselineStackReg,
+        masm.storePtr(masm.getStackPointer(),
                       Address(scratchReg, JitActivation::offsetOfLastProfilingFrame()));
         masm.bind(&skip);
     }

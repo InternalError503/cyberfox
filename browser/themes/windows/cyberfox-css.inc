@@ -168,6 +168,5 @@ list-style-image: url("chrome://browser/skin/appmenu-icons.png")!important;
 #menu_bookmarkThisPage,
 #context-bookmarklink,
 #context-bookmarkpage {
-  list-style-image: url("chrome://browser/skin/places/bookmark.png")!important;
-  -moz-image-region: rect(0px 48px 16px 32px);
+  list-style-image: url("chrome://browser/skin/places/bookmarks-notification-finish.png")!important;
 }

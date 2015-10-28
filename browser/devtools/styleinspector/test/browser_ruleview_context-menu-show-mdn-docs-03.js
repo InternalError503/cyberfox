@@ -14,7 +14,7 @@
 
 "use strict";
 
-const { PrefObserver } = devtools.require("devtools/styleeditor/utils");
+const { PrefObserver } = require("devtools/styleeditor/utils");
 const PREF_ENABLE_MDN_DOCS_TOOLTIP = "devtools.inspector.mdnDocsTooltip.enabled";
 const PROPERTY_NAME_CLASS = "ruleview-propertyname";
 
@@ -101,11 +101,11 @@ function* testMdnContextMenuItemVisibility(view, shouldBeVisible) {
   info("Set a CSS property name as popupNode");
   let root = rootElement(view);
   let node = root.querySelector("." + PROPERTY_NAME_CLASS).firstChild;
-  view.doc.popupNode = node;
+  view.styleDocument.popupNode = node;
 
   info("Update context menu state");
-  view._contextMenuUpdate();
-  let isVisible = !view.menuitemShowMdnDocs.hidden;
+  view._contextmenu._updateMenuItems();
+  let isVisible = !view._contextmenu.menuitemShowMdnDocs.hidden;
   is(isVisible, shouldBeVisible,
      "The MDN context menu item is " + message);
 }

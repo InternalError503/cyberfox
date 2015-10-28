@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+/* -*- Mode: C++; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 2 -*-
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -33,7 +33,7 @@ public:
   virtual ~TextureClientD3D11();
 
   // Creates a TextureClient and init width.
-  static TemporaryRef<TextureClientD3D11>
+  static already_AddRefed<TextureClientD3D11>
   Create(ISurfaceAllocator* aAllocator,
          gfx::SurfaceFormat aFormat,
          TextureFlags aFlags,
@@ -64,10 +64,12 @@ public:
 
   virtual gfx::DrawTarget* BorrowDrawTarget() override;
 
+  virtual void UpdateFromSurface(gfx::SourceSurface* aSurface) override;
+
   virtual bool AllocateForSurface(gfx::IntSize aSize,
                                   TextureAllocationFlags aFlags = ALLOC_DEFAULT) override;
 
-  virtual TemporaryRef<TextureClient>
+  virtual already_AddRefed<TextureClient>
   CreateSimilar(TextureFlags aFlags = TextureFlags::DEFAULT,
                 TextureAllocationFlags aAllocFlags = ALLOC_DEFAULT) const override;
 
@@ -93,7 +95,7 @@ public:
   virtual ~DXGIYCbCrTextureClient();
 
   // Creates a TextureClient and init width.
-  static TemporaryRef<DXGIYCbCrTextureClient>
+  static already_AddRefed<DXGIYCbCrTextureClient>
   Create(ISurfaceAllocator* aAllocator,
          TextureFlags aFlags,
          IUnknown* aTextureY,
@@ -128,7 +130,7 @@ public:
     // This TextureClient should not be used in a context where we use CreateSimilar
     // (ex. component alpha) because the underlying texture data is always created by
     // an external producer.
-    virtual TemporaryRef<TextureClient>
+    virtual already_AddRefed<TextureClient>
     CreateSimilar(TextureFlags, TextureAllocationFlags) const override{ return nullptr; }
 
 private:
@@ -152,12 +154,13 @@ public:
   virtual ~TextureSourceD3D11() {}
 
   virtual ID3D11Texture2D* GetD3D11Texture() const { return mTexture; }
-
+  virtual ID3D11ShaderResourceView* GetShaderResourceView();
 protected:
   virtual gfx::IntSize GetSize() const { return mSize; }
 
   gfx::IntSize mSize;
   RefPtr<ID3D11Texture2D> mTexture;
+  RefPtr<ID3D11ShaderResourceView> mSRV;
 };
 
 /**
@@ -190,6 +193,8 @@ public:
   virtual TextureSourceD3D11* AsSourceD3D11() override { return this; }
 
   virtual ID3D11Texture2D* GetD3D11Texture() const override;
+
+  virtual ID3D11ShaderResourceView* GetShaderResourceView() override;
 
   virtual DataTextureSource* AsDataTextureSource() override { return this; }
 
@@ -225,6 +230,7 @@ protected:
   void Reset();
 
   std::vector< RefPtr<ID3D11Texture2D> > mTileTextures;
+  std::vector< RefPtr<ID3D11ShaderResourceView> > mTileSRVs;
   RefPtr<CompositorD3D11> mCompositor;
   gfx::SurfaceFormat mFormat;
   TextureFlags mFlags;
@@ -257,7 +263,7 @@ public:
 
   virtual gfx::IntSize GetSize() const override { return mSize; }
 
-  virtual TemporaryRef<gfx::DataSourceSurface> GetAsSurface() override
+  virtual already_AddRefed<gfx::DataSourceSurface> GetAsSurface() override
   {
     return nullptr;
   }
@@ -296,7 +302,7 @@ public:
 
   virtual gfx::IntSize GetSize() const override{ return mSize; }
 
-  virtual TemporaryRef<gfx::DataSourceSurface> GetAsSurface() override
+  virtual already_AddRefed<gfx::DataSourceSurface> GetAsSurface() override
   {
     return nullptr;
   }

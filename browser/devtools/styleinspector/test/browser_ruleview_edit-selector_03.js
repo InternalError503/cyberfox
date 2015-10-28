@@ -29,14 +29,16 @@ function* testEditSelector(view, name) {
   let ruleEditor = getRuleViewRuleEditor(view, 1);
 
   info("Focusing an existing selector name in the rule-view");
-  let editor = yield focusEditableField(ruleEditor.selectorText);
+  let editor = yield focusEditableField(view, ruleEditor.selectorText);
 
   is(inplaceEditor(ruleEditor.selectorText), editor,
     "The selector editor got focused");
 
   info("Entering a new selector name and committing");
   editor.input.value = name;
+  let onRuleViewChanged = once(view, "ruleview-invalid-selector");
   EventUtils.synthesizeKey("VK_RETURN", {});
+  yield onRuleViewChanged;
 
   is(view._elementStyle.rules.length, 2, "Should have 2 rules.");
   is(getRuleViewRule(view, name), undefined,

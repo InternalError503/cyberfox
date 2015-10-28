@@ -380,9 +380,11 @@ RefPtr<NrIceCtx> NrIceCtx::Create(const std::string& name,
                                   bool offerer,
                                   bool set_interface_priorities,
                                   bool allow_loopback,
-                                  bool tcp_enabled) {
-
-  RefPtr<NrIceCtx> ctx = new NrIceCtx(name, offerer);
+                                  bool tcp_enabled,
+                                  bool allow_link_local,
+                                  bool hide_non_default,
+                                  Policy policy) {
+   RefPtr<NrIceCtx> ctx = new NrIceCtx(name, offerer, policy);
 
   // Initialize the crypto callbacks and logging stuff
   if (!initialized) {
@@ -477,6 +479,9 @@ RefPtr<NrIceCtx> NrIceCtx::Create(const std::string& name,
       NR_reg_set_char((char *)NR_STUN_REG_PREF_ALLOW_LOOPBACK_ADDRS, 1);
     }
 
+    if (allow_link_local) {
+      NR_reg_set_char((char *)NR_STUN_REG_PREF_ALLOW_LINK_LOCAL_ADDRS, 1);
+    }
     if (force_net_interface.Length() > 0) {
       // Stupid cast.... but needed
       const nsCString& flat = PromiseFlatCString(static_cast<nsACString&>(force_net_interface));
@@ -490,6 +495,12 @@ RefPtr<NrIceCtx> NrIceCtx::Create(const std::string& name,
   UINT4 flags = offerer ? NR_ICE_CTX_FLAGS_OFFERER:
       NR_ICE_CTX_FLAGS_ANSWERER;
   flags |= NR_ICE_CTX_FLAGS_AGGRESSIVE_NOMINATION;
+  if (policy == ICE_POLICY_RELAY) {
+    flags |= NR_ICE_CTX_FLAGS_RELAY_ONLY;
+  }
+
+  if (hide_non_default)
+    flags |= NR_ICE_CTX_FLAGS_ONLY_DEFAULT_ADDRS;
 
   r = nr_ice_ctx_create(const_cast<char *>(name.c_str()), flags,
                         &ctx->ctx_);
@@ -614,6 +625,11 @@ NrIceCtx::Controlling NrIceCtx::GetControlling() {
   return (peer_->controlling) ? ICE_CONTROLLING : ICE_CONTROLLED;
 }
 
+nsresult NrIceCtx::SetPolicy(Policy policy) {
+  policy_ = policy;
+  return NS_OK;
+}
+
 nsresult NrIceCtx::SetStunServers(const std::vector<NrIceStunServer>&
                                   stun_servers) {
   if (stun_servers.empty())
@@ -719,6 +735,9 @@ abort:
 
 nsresult NrIceCtx::StartGathering() {
   ASSERT_ON_THREAD(sts_target_);
+  if (policy_ == ICE_POLICY_NONE) {
+    return NS_OK;
+  }
   SetGatheringState(ICE_CTX_GATHER_STARTED);
   // This might start gathering for the first time, or again after
   // renegotiation, or might do nothing at all if gathering has already
@@ -793,6 +812,11 @@ nsresult NrIceCtx::ParseGlobalAttributes(std::vector<std::string> attrs) {
 nsresult NrIceCtx::StartChecks() {
   int r;
 
+  if (policy_ == ICE_POLICY_NONE) {
+    MOZ_MTLOG(ML_ERROR, "Couldn't start peer checks because policy == none");
+    SetConnectionState(ICE_CTX_FAILED);
+    return NS_ERROR_FAILURE;
+  }
   r=nr_ice_peer_ctx_pair_candidates(peer_);
   if (r) {
     MOZ_MTLOG(ML_ERROR, "Couldn't pair candidates on "

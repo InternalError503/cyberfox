@@ -72,7 +72,7 @@ public:
   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate);
 };
 
-} // anonymous namespace
+} // namespace
 
 BEGIN_WORKERS_NAMESPACE
 
@@ -212,8 +212,6 @@ MessagePort::CloseInternal()
   AssertCorrectThread();
   MOZ_ASSERT(!IsClosed());
   MOZ_ASSERT_IF(mStarted, mQueuedEvents.IsEmpty());
-
-  NS_WARN_IF_FALSE(mStarted, "Called close() before start()!");
 
   if (!mStarted) {
     mQueuedEvents.Clear();

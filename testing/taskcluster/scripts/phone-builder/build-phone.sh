@@ -8,13 +8,11 @@ if [ $TARGET == "aries" -o $TARGET == "shinano" ]; then
   rm -rf $WORKSPACE/B2G/out
 fi
 
-if ! test $MOZHARNESS_CONFIG; then
-  MOZHARNESS_CONFIG=b2g/taskcluster-phone.py
-fi
+MOZHARNESS_CONFIG=${MOZHARNESS_CONFIG:=b2g/taskcluster-phone.py}
 
 rm -rf $WORKSPACE/B2G/upload/
 
-./mozharness/scripts/b2g_build.py \
+$WORKSPACE/gecko/testing/mozharness/scripts/b2g_build.py \
   --config $MOZHARNESS_CONFIG \
   "$debug_flag" \
   --disable-mock \
@@ -25,19 +23,6 @@ rm -rf $WORKSPACE/B2G/upload/
   --target=$TARGET \
   --b2g-config-dir=$TARGET \
   --checkout-revision=$GECKO_HEAD_REV \
-  --base-repo=$GECKO_BASE_REPOSITORY \
-  --repo=$GECKO_HEAD_REPOSITORY
+  --repo=$WORKSPACE/gecko
 
-# Don't cache backups
-rm -rf $WORKSPACE/B2G/backup-*
-
-# Move files into artifact locations!
-mkdir -p $HOME/artifacts
-
-mv $WORKSPACE/B2G/upload/sources.xml $HOME/artifacts/sources.xml
-mv $WORKSPACE/B2G/upload/b2g-*.crashreporter-symbols.zip $HOME/artifacts/b2g-crashreporter-symbols.zip
-mv $WORKSPACE/B2G/upload/b2g-*.android-arm.tar.gz $HOME/artifacts/b2g-android-arm.tar.gz
-mv $WORKSPACE/B2G/upload/${TARGET}.zip $HOME/artifacts/${TARGET}.zip
-mv $WORKSPACE/B2G/upload/gaia.zip $HOME/artifacts/gaia.zip
-
-ccache -s
+. post-build.sh

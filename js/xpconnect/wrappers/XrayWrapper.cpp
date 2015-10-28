@@ -998,11 +998,11 @@ XrayTraits::attachExpandoObject(JSContext* cx, HandleObject target,
 
     // AddRef and store the principal.
     NS_ADDREF(origin);
-    JS_SetReservedSlot(expandoObject, JSSLOT_EXPANDO_ORIGIN, PRIVATE_TO_JSVAL(origin));
+    JS_SetReservedSlot(expandoObject, JSSLOT_EXPANDO_ORIGIN, JS::PrivateValue(origin));
 
     // Note the exclusive global, if any.
     JS_SetReservedSlot(expandoObject, JSSLOT_EXPANDO_EXCLUSIVE_GLOBAL,
-                       OBJECT_TO_JSVAL(exclusiveGlobal));
+                       ObjectOrNullValue(exclusiveGlobal));
 
     // If this is our first expando object, take the opportunity to preserve
     // the wrapper. This keeps our expandos alive even if the Xray wrapper gets
@@ -1012,7 +1012,7 @@ XrayTraits::attachExpandoObject(JSContext* cx, HandleObject target,
         preserveWrapper(target);
 
     // Insert it at the front of the chain.
-    JS_SetReservedSlot(expandoObject, JSSLOT_EXPANDO_NEXT, OBJECT_TO_JSVAL(chain));
+    JS_SetReservedSlot(expandoObject, JSSLOT_EXPANDO_NEXT, ObjectOrNullValue(chain));
     setExpandoChain(cx, target, expandoObject);
 
     return expandoObject;
@@ -1090,7 +1090,7 @@ bool CloneExpandoChain(JSContext* cx, JSObject* dstArg, JSObject* srcArg)
     RootedObject src(cx, srcArg);
     return GetXrayTraits(src)->cloneExpandoChain(cx, dst, src);
 }
-}
+} // namespace XrayUtils
 
 static JSObject*
 GetHolder(JSObject* obj)
@@ -1126,7 +1126,7 @@ IsXPCWNHolderClass(const JSClass* clasp)
   return clasp == &XPCWrappedNativeXrayTraits::HolderClass;
 }
 
-}
+} // namespace XrayUtils
 
 static nsGlobalWindow*
 AsWindow(JSContext* cx, JSObject* wrapper)
@@ -1255,9 +1255,9 @@ XPCWrappedNativeXrayTraits::resolveNativeProperty(JSContext* cx, HandleObject wr
     desc.setAttributes(JSPROP_ENUMERATE);
     desc.setGetter(nullptr);
     desc.setSetter(nullptr);
-    desc.value().set(JSVAL_VOID);
+    desc.value().setUndefined();
 
-    RootedValue fval(cx, JSVAL_VOID);
+    RootedValue fval(cx, JS::UndefinedValue());
     if (member->IsConstant()) {
         if (!member->GetConstantValue(ccx, iface, desc.value().address())) {
             JS_ReportError(cx, "Failed to convert constant native property to JS value");
@@ -1315,7 +1315,7 @@ wrappedJSObject_getter(JSContext* cx, unsigned argc, Value* vp)
     }
     RootedObject wrapper(cx, &args.thisv().toObject());
     if (!IsWrapper(wrapper) || !WrapperFactory::IsXrayWrapper(wrapper) ||
-        !AccessCheck::wrapperSubsumes(wrapper)) {
+        !WrapperFactory::AllowWaiver(wrapper)) {
         JS_ReportError(cx, "Unexpected object");
         return false;
     }
@@ -1378,7 +1378,7 @@ XrayTraits::resolveOwnProperty(JSContext* cx, const Wrapper& jsWrapper,
     // Handle .wrappedJSObject for subsuming callers. This should move once we
     // sort out own-ness for the holder.
     if (id == GetRTIdByIndex(cx, XPCJSRuntime::IDX_WRAPPED_JSOBJECT) &&
-        AccessCheck::wrapperSubsumes(wrapper))
+        WrapperFactory::AllowWaiver(wrapper))
     {
         if (!JS_AlreadyHasOwnPropertyById(cx, holder, id, &found))
             return false;
@@ -1414,8 +1414,7 @@ XPCWrappedNativeXrayTraits::resolveOwnProperty(JSContext* cx, const Wrapper& jsW
         nsGlobalWindow* win = AsWindow(cx, wrapper);
         // Note: As() unwraps outer windows to get to the inner window.
         if (win) {
-            bool unused;
-            nsCOMPtr<nsIDOMWindow> subframe = win->IndexedGetter(index, unused);
+            nsCOMPtr<nsIDOMWindow> subframe = win->IndexedGetter(index);
             if (subframe) {
                 nsGlobalWindow* global = static_cast<nsGlobalWindow*>(subframe.get());
                 global->EnsureInnerWindow();
@@ -1561,8 +1560,7 @@ DOMXrayTraits::resolveOwnProperty(JSContext* cx, const Wrapper& jsWrapper, Handl
         nsGlobalWindow* win = AsWindow(cx, wrapper);
         // Note: As() unwraps outer windows to get to the inner window.
         if (win) {
-            bool unused;
-            nsCOMPtr<nsIDOMWindow> subframe = win->IndexedGetter(index, unused);
+            nsCOMPtr<nsIDOMWindow> subframe = win->IndexedGetter(index);
             if (subframe) {
                 nsGlobalWindow* global = static_cast<nsGlobalWindow*>(subframe.get());
                 global->EnsureInnerWindow();
@@ -2320,4 +2318,4 @@ template<>
 const SCSecurityXrayXPCWN SCSecurityXrayXPCWN::singleton(0);
 template class SCSecurityXrayXPCWN;
 
-}
+} // namespace xpc

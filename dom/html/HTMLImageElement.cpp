@@ -17,7 +17,6 @@
 #include "nsIURL.h"
 #include "nsIIOService.h"
 #include "nsIServiceManager.h"
-#include "nsNetUtil.h"
 #include "nsContentUtils.h"
 #include "nsContainerFrame.h"
 #include "nsNodeInfoManager.h"
@@ -376,7 +375,7 @@ HTMLImageElement::GetAttributeMappingFunction() const
 
 nsresult
 HTMLImageElement::BeforeSetAttr(int32_t aNameSpaceID, nsIAtom* aName,
-                                const nsAttrValueOrString* aValue,
+                                nsAttrValueOrString* aValue,
                                 bool aNotify)
 {
 
@@ -755,7 +754,7 @@ HTMLImageElement::NaturalHeight()
 
   if (mResponsiveSelector) {
     double density = mResponsiveSelector->GetSelectedImageDensity();
-    MOZ_ASSERT(IsFinite(density) && density > 0.0);
+    MOZ_ASSERT(density >= 0.0);
     height = NSToIntRound(double(height) / density);
     height = std::max(height, 0u);
   }
@@ -783,7 +782,7 @@ HTMLImageElement::NaturalWidth()
 
   if (mResponsiveSelector) {
     double density = mResponsiveSelector->GetSelectedImageDensity();
-    MOZ_ASSERT(IsFinite(density) && density > 0.0);
+    MOZ_ASSERT(density >= 0.0);
     width = NSToIntRound(double(width) / density);
     width = std::max(width, 0u);
   }
@@ -801,10 +800,30 @@ HTMLImageElement::GetNaturalWidth(uint32_t* aNaturalWidth)
 nsresult
 HTMLImageElement::CopyInnerTo(Element* aDest)
 {
-  if (aDest->OwnerDoc()->IsStaticDocument()) {
-    CreateStaticImageClone(static_cast<HTMLImageElement*>(aDest));
+  bool destIsStatic = aDest->OwnerDoc()->IsStaticDocument();
+  auto dest = static_cast<HTMLImageElement*>(aDest);
+  if (destIsStatic) {
+    CreateStaticImageClone(dest);
   }
-  return nsGenericHTMLElement::CopyInnerTo(aDest);
+
+  nsresult rv = nsGenericHTMLElement::CopyInnerTo(aDest);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  if (!destIsStatic) {
+    // In SetAttr (called from nsGenericHTMLElement::CopyInnerTo), dest skipped
+    // doing the image load because we passed in false for aNotify.  But we
+    // really do want it to do the load, so set it up to happen once the cloning
+    // reaches a stable state.
+    if (!dest->InResponsiveMode() &&
+        dest->HasAttr(kNameSpaceID_None, nsGkAtoms::src)) {
+      nsContentUtils::AddScriptRunner(
+        NS_NewRunnableMethod(dest, &HTMLImageElement::MaybeLoadImage));
+    }
+  }
+
+  return NS_OK;
 }
 
 CORSMode

@@ -37,6 +37,16 @@ var gPrivacyPane = {
 #endif
 
   /**
+   * Linkify the Learn More link of the Private Browsing Mode Tracking
+   * Protection UI.
+   */
+  _initTrackingProtectionPBM: function () {
+    let link = document.getElementById("trackingProtectionPBMLearnMore");
+    let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "tracking-protection-pbm";
+    link.setAttribute("href", url);
+  },
+
+  /**
    * Initialize autocomplete to ensure prefs are in sync.
    */
   _initAutocomplete: function () {
@@ -69,9 +79,9 @@ var gPrivacyPane = {
 #ifdef NIGHTLY_BUILD
     this._initTrackingProtection();
 #endif
+    this._initTrackingProtectionPBM();
     this._initAutocomplete();
 
-    document.getElementById("searchesSuggestion").hidden = !AppConstants.NIGHTLY_BUILD;
   },
 
   // HISTORY MODE
@@ -139,7 +149,7 @@ var gPrivacyPane = {
     if (this._checkDefaultValues(this.prefsForDefault)) {
       if (getVal("browser.privatebrowsing.autostart"))
         mode = "dontremember";
-      else 
+      else
         mode = "remember";
     }
     else
@@ -188,7 +198,7 @@ var gPrivacyPane = {
       // select the remember forms history option
       document.getElementById("browser.formfill.enable").value = true;
 
-      // select the accept cookies option
+      // select the allow cookies option
       document.getElementById("network.cookie.cookieBehavior").value = 0;
       // select the cookie lifetime policy option
       document.getElementById("network.cookie.lifetimePolicy").value = 0;
@@ -403,7 +413,7 @@ var gPrivacyPane = {
 
     return accept.checked ? 0 : 2;
   },
-
+  
   /**
    * Converts between network.cookie.cookieBehavior and the third-party cookie UI
    */
@@ -447,10 +457,10 @@ var gPrivacyPane = {
   showCookieExceptions: function ()
   {
     var bundlePreferences = document.getElementById("bundlePreferences");
-    var params = { blockVisible   : true, 
-                   sessionVisible : true, 
-                   allowVisible   : true, 
-                   prefilledHost  : "", 
+    var params = { blockVisible   : true,
+                   sessionVisible : true,
+                   allowVisible   : true,
+                   prefilledHost  : "",
                    permissionType : "cookie",
                    windowTitle    : bundlePreferences.getString("cookiepermissionstitle"),
                    introText      : bundlePreferences.getString("cookiepermissionstext") };
@@ -461,7 +471,7 @@ var gPrivacyPane = {
 
   /**
    * Displays all the user's cookies in a dialog.
-   */  
+   */
   showCookies: function (aCategory)
   {
     document.documentElement.openWindow("Browser:Cookies",
@@ -508,6 +518,7 @@ var gPrivacyPane = {
     // reset the timeSpan pref
     if (aClearEverything)
       ts.value = timeSpanOrig;
+    Services.obs.notifyObservers(null, "clear-private-data", null);
   },
 
   /**
@@ -517,7 +528,7 @@ var gPrivacyPane = {
   _updateSanitizeSettingsButton: function () {
     var settingsButton = document.getElementById("clearDataSettings");
     var sanitizeOnShutdownPref = document.getElementById("privacy.sanitize.sanitizeOnShutdown");
-    
+
     settingsButton.disabled = !sanitizeOnShutdownPref.value;
    }
 

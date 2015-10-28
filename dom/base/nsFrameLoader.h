@@ -24,12 +24,14 @@
 #include "mozilla/Attributes.h"
 #include "nsStubMutationObserver.h"
 #include "Units.h"
+#include "nsIWebBrowserPersistable.h"
 
 class nsIURI;
 class nsSubDocumentFrame;
 class nsView;
 class nsIInProcessContentFrameMessageManager;
 class AutoResetInShow;
+class AutoResetInFrameSwap;
 class nsITabParent;
 class nsIDocShellTreeItem;
 class nsIDocShellTreeOwner;
@@ -41,22 +43,24 @@ class ContentParent;
 class PBrowserParent;
 class TabParent;
 struct StructuredCloneData;
-}
+} // namespace dom
 
 namespace layout {
 class RenderFrameParent;
-}
-}
+} // namespace layout
+} // namespace mozilla
 
 #if defined(MOZ_WIDGET_GTK)
 typedef struct _GtkWidget GtkWidget;
 #endif
 
 class nsFrameLoader final : public nsIFrameLoader,
+                            public nsIWebBrowserPersistable,
                             public nsStubMutationObserver,
                             public mozilla::dom::ipc::MessageManagerCallback
 {
   friend class AutoResetInShow;
+  friend class AutoResetInFrameSwap;
   typedef mozilla::dom::PBrowserParent PBrowserParent;
   typedef mozilla::dom::TabParent TabParent;
   typedef mozilla::layout::RenderFrameParent RenderFrameParent;
@@ -69,6 +73,7 @@ public:
   NS_DECL_CYCLE_COLLECTION_CLASS_AMBIGUOUS(nsFrameLoader, nsIFrameLoader)
   NS_DECL_NSIFRAMELOADER
   NS_DECL_NSIMUTATIONOBSERVER_ATTRIBUTECHANGED
+  NS_DECL_NSIWEBBROWSERPERSISTABLE
   nsresult CheckForRecursiveLoad(nsIURI* aURI);
   nsresult ReallyStartLoading();
   void StartDestroy();
@@ -223,6 +228,11 @@ private:
   bool ShouldUseRemoteProcess();
 
   /**
+   * Return true if the frame is a remote frame. Return false otherwise
+   */
+  bool IsRemoteFrame();
+
+  /**
    * Is this a frameloader for a bona fide <iframe mozbrowser> or
    * <iframe mozapp>?  (I.e., does the frame return true for
    * nsIMozBrowserFrame::GetReallyIsBrowserOrApp()?)
@@ -270,6 +280,7 @@ private:
    */
   nsresult MaybeCreateDocShell();
   nsresult EnsureMessageManager();
+  nsresult ReallyLoadFrameScripts();
 
   // Updates the subdocument position and size. This gets called only
   // when we have our own in-process DocShell.

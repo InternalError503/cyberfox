@@ -9,6 +9,7 @@
 
 #include "mozilla/a11y/Role.h"
 #include "nsIAccessibleText.h"
+#include "nsIAccessibleTypes.h"
 #include "Accessible.h"
 #include "nsString.h"
 #include "nsTArray.h"
@@ -30,7 +31,7 @@ public:
   ProxyAccessible(uint64_t aID, ProxyAccessible* aParent,
                   DocAccessibleParent* aDoc, role aRole) :
      mParent(aParent), mDoc(aDoc), mWrapper(0), mID(aID), mRole(aRole),
-     mOuterDoc(false)
+     mOuterDoc(false), mIsDoc(false)
   {
     MOZ_COUNT_CTOR(ProxyAccessible);
   }
@@ -80,6 +81,11 @@ public:
   uint64_t State() const;
 
   /*
+   * Return the native states for the proxied accessible.
+   */
+  uint64_t NativeState() const;
+
+  /*
    * Set aName to the name of the proxied accessible.
    */
   void Name(nsString& aName) const;
@@ -88,6 +94,11 @@ public:
    * Set aValue to the value of the proxied accessible.
    */
   void Value(nsString& aValue) const;
+
+  /*
+   * Set aHelp to the help string of the proxied accessible.
+   */
+  void Help(nsString& aHelp) const;
 
   /**
    * Set aDesc to the description of the proxied accessible.
@@ -110,6 +121,15 @@ public:
   void Relations(nsTArray<RelationType>* aTypes,
                  nsTArray<nsTArray<ProxyAccessible*>>* aTargetSets) const;
 
+  bool IsSearchbox() const;
+
+  nsIAtom* LandmarkRole() const;
+
+  nsIAtom* ARIARoleAtom() const;
+
+  int32_t GetLevelInternal();
+
+  int32_t CaretLineNumber();
   int32_t CaretOffset();
   bool SetCaretOffset(int32_t aOffset);
 
@@ -144,7 +164,7 @@ public:
   void DefaultTextAttributes(nsTArray<Attribute>* aAttrs);
 
   nsIntRect TextBounds(int32_t aStartOffset, int32_t aEndOffset,
-                       uint32_t aCoordType);
+                       uint32_t aCoordType = nsIAccessibleCoordinateType::COORDTYPE_SCREEN_RELATIVE);
 
   nsIntRect CharBounds(int32_t aOffset, uint32_t aCoordType);
 
@@ -172,6 +192,8 @@ public:
                               uint32_t aCoordinateType,
                               int32_t aX, int32_t aY);
 
+  void Text(nsString* aText);
+
   void ReplaceText(const nsString& aText);
 
   bool InsertText(const nsString& aText, int32_t aPosition);
@@ -193,6 +215,12 @@ public:
   uint32_t EndOffset(bool* aOk);
 
   bool IsLinkValid();
+
+  // XXX checking mRole alone may not result in same behavior as Accessibles
+  // due to ARIA roles
+  inline bool IsTable() const { return mRole == roles::TABLE; }
+  inline bool IsTableRow() const { return mRole == roles::ROW; }
+  inline bool IsTableCell() const { return mRole == roles::CELL; }
 
   uint32_t AnchorCount(bool* aOk);
 
@@ -218,9 +246,9 @@ public:
 
   uint32_t RowExtent();
 
-  void ColHeaderCells(nsTArray<uint64_t>* aCells);
+  void ColHeaderCells(nsTArray<ProxyAccessible*>* aCells);
 
-  void RowHeaderCells(nsTArray<uint64_t>* aCells);
+  void RowHeaderCells(nsTArray<ProxyAccessible*>* aCells);
 
   bool IsCellSelected();
 
@@ -277,12 +305,14 @@ public:
   double Step();
 
   void TakeFocus();
+  ProxyAccessible* FocusedChild();
   ProxyAccessible* ChildAtPoint(int32_t aX, int32_t aY,
                                 Accessible::EWhichChildAtPoint aWhichChild);
   nsIntRect Bounds();
 
   void Language(nsString& aLocale);
   void DocType(nsString& aType);
+  void Title(nsString& aTitle);
   void URL(nsString& aURL);
   void MimeType(nsString aMime);
   void URLDocTypeMimeType(nsString& aURL, nsString& aDocType,
@@ -299,10 +329,22 @@ public:
    */
   uint64_t ID() const { return mID; }
 
+  /**
+   * Return the document containing this proxy, or the proxy itself if it is a
+   * document.
+   */
+  DocAccessibleParent* Document() const { return mDoc; }
+
+  /**
+   * Return true if this proxy is a DocAccessibleParent.
+   */
+  bool IsDoc() const { return mIsDoc; }
+  DocAccessibleParent* AsDoc() const { return IsDoc() ? mDoc : nullptr; }
+
 protected:
   explicit ProxyAccessible(DocAccessibleParent* aThisAsDoc) :
     mParent(nullptr), mDoc(aThisAsDoc), mWrapper(0), mID(0),
-    mRole(roles::DOCUMENT)
+    mRole(roles::DOCUMENT), mOuterDoc(false), mIsDoc(true)
   { MOZ_COUNT_CTOR(ProxyAccessible); }
 
 protected:
@@ -313,8 +355,9 @@ private:
   DocAccessibleParent* mDoc;
   uintptr_t mWrapper;
   uint64_t mID;
-  role mRole : 31;
+  role mRole : 30;
   bool mOuterDoc : 1;
+  const bool mIsDoc: 1;
 };
 
 enum Interfaces

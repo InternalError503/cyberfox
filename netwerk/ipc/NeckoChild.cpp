@@ -30,6 +30,7 @@
 #include "nsINetworkPredictor.h"
 #include "nsINetworkPredictorVerifier.h"
 #include "mozilla/ipc/URIUtils.h"
+#include "nsNetUtil.h"
 
 using mozilla::dom::TCPSocketChild;
 using mozilla::dom::TCPServerSocketChild;
@@ -47,6 +48,8 @@ NeckoChild::NeckoChild()
 
 NeckoChild::~NeckoChild()
 {
+  //Send__delete__(gNeckoChild);
+  gNeckoChild = nullptr;
 }
 
 void NeckoChild::InitNeckoChild()
@@ -59,21 +62,6 @@ void NeckoChild::InitNeckoChild()
     NS_ASSERTION(cpc, "Content Protocol is NULL!");
     gNeckoChild = cpc->SendPNeckoConstructor(); 
     NS_ASSERTION(gNeckoChild, "PNecko Protocol init failed!");
-  }
-}
-
-// Note: not actually called; has some lifespan as child process, so
-// automatically destroyed at exit.  
-void NeckoChild::DestroyNeckoChild()
-{
-  MOZ_ASSERT(IsNeckoChild(), "DestroyNeckoChild called by non-child!");
-  static bool alreadyDestroyed = false;
-  MOZ_ASSERT(!alreadyDestroyed, "DestroyNeckoChild already called!");
-
-  if (!alreadyDestroyed) {
-    Send__delete__(gNeckoChild); 
-    gNeckoChild = nullptr;
-    alreadyDestroyed = true;
   }
 }
 
@@ -385,5 +373,6 @@ NeckoChild::RecvAppOfflineStatus(const uint32_t& aId, const bool& aOffline)
   return true;
 }
 
-}} // mozilla::net
+} // namespace net
+} // namespace mozilla
 

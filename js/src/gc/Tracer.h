@@ -10,6 +10,7 @@
 #include "jsfriendapi.h"
 
 #include "gc/Barrier.h"
+#include "js/TraceableHashTable.h"
 
 namespace js {
 
@@ -61,6 +62,12 @@ TraceEdge(JSTracer* trc, BarrieredBase<T>* thingp, const char* name);
 template <typename T>
 void
 TraceRoot(JSTracer* trc, T* thingp, const char* name);
+
+// Idential to TraceRoot, except that this variant will not crash if |*thingp|
+// is null.
+template <typename T>
+void
+TraceNullableRoot(JSTracer* trc, T* thingp, const char* name);
 
 // Like TraceEdge, but for edges that do not use one of the automatic barrier
 // classes and, thus, must be treated specially for moving GC. This method is
@@ -123,6 +130,22 @@ void
 TraceCycleCollectorChildren(JS::CallbackTracer* trc, ObjectGroup* group);
 
 } // namespace gc
+
+template <typename T>
+struct DefaultTracer<T*>
+{
+    static void trace(JSTracer* trc, T** t, const char* name) {
+        TraceManuallyBarrieredEdge(trc, t, name);
+    }
+};
+
+template <typename T>
+struct DefaultTracer<RelocatablePtr<T*>>
+{
+    static void trace(JSTracer* trc, RelocatablePtr<T*> t, const char* name) {
+        TraceEdge(trc, t, name);
+    }
+};
 
 } // namespace js
 

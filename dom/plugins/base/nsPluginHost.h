@@ -12,6 +12,7 @@
 #include "prlink.h"
 #include "prclist.h"
 #include "nsIPluginTag.h"
+#include "nsPluginPlayPreviewInfo.h"
 #include "nsPluginsDir.h"
 #include "nsPluginDirServiceProvider.h"
 #include "nsAutoPtr.h"
@@ -23,7 +24,6 @@
 #include "nsTObserverArray.h"
 #include "nsITimer.h"
 #include "nsPluginTags.h"
-#include "nsPluginPlayPreviewInfo.h"
 #include "nsIEffectiveTLDService.h"
 #include "nsIIDNService.h"
 #include "nsCRT.h"
@@ -37,8 +37,8 @@ namespace mozilla {
 namespace plugins {
 class PluginAsyncSurrogate;
 class PluginTag;
-} // namespace mozilla
 } // namespace plugins
+} // namespace mozilla
 
 class nsNPAPIPlugin;
 class nsIFile;
@@ -79,6 +79,7 @@ class nsPluginHost final : public nsIPluginHost,
                            public nsSupportsWeakReference
 {
   friend class nsPluginTag;
+  friend class nsFakePluginTag;
   virtual ~nsPluginHost();
 
 public:
@@ -103,7 +104,8 @@ public:
   // Acts like a bitfield
   enum PluginFilter {
     eExcludeNone     = nsIPluginHost::EXCLUDE_NONE,
-    eExcludeDisabled = nsIPluginHost::EXCLUDE_DISABLED
+    eExcludeDisabled = nsIPluginHost::EXCLUDE_DISABLED,
+    eExcludeFake     = nsIPluginHost::EXCLUDE_FAKE
   };
   // FIXME-jsplugins comment about fake
   bool HavePluginForType(const nsACString & aMimeType,
@@ -114,7 +116,9 @@ public:
                               /* out */ nsACString & aMimeType,
                               PluginFilter aFilter = eExcludeDisabled);
 
-  void GetPlugins(nsTArray<nsRefPtr<nsPluginTag> >& aPluginArray);
+  void GetPlugins(nsTArray<nsCOMPtr<nsIInternalPluginTag>>& aPluginArray,
+                  bool aIncludeDisabled = false);
+
   void FindPluginsForContent(uint32_t aPluginEpoch,
                              nsTArray<mozilla::plugins::PluginTag>* aPlugins,
                              uint32_t* aNewPluginEpoch);
@@ -175,10 +179,6 @@ public:
                     bool forceJSEnabled = false,
                     uint32_t getHeadersLength = 0,
                     const char* getHeaders = nullptr);
-
-  nsresult
-  DoURLLoadSecurityCheck(nsNPAPIPluginInstance *aInstance,
-                         const char* aURL);
 
   nsresult
   AddHeadersToChannel(const char *aHeadersData, uint32_t aHeadersDataLen,
@@ -243,6 +243,11 @@ public:
 
   void CreateWidget(nsPluginInstanceOwner* aOwner);
 
+  nsresult EnumerateSiteData(const nsACString& domain,
+                             const InfallibleTArray<nsCString>& sites,
+                             InfallibleTArray<nsCString>& result,
+                             bool firstMatchOnly);
+
 private:
   friend class nsPluginUnloadRunnable;
 
@@ -259,11 +264,32 @@ private:
   nsPluginTag*
   FindPreferredPlugin(const InfallibleTArray<nsPluginTag*>& matches);
 
-  // Return an nsPluginTag for this type, if any.  If aCheckEnabled is
-  // true, only enabled plugins will be returned.
+  // Find a plugin for the given type.  If aIncludeFake is true a fake plugin
+  // will be preferred if one exists; otherwise a fake plugin will never be
+  // returned.  If aCheckEnabled is false, disabled plugins can be returned.
+  nsIInternalPluginTag* FindPluginForType(const nsACString& aMimeType,
+                                          bool aIncludeFake, bool aCheckEnabled);
+
+  // Find specifically a fake plugin for the given type.  If aCheckEnabled is
+  // false, disabled plugins can be returned.
+  nsFakePluginTag* FindFakePluginForType(const nsACString & aMimeType,
+                                         bool aCheckEnabled);
+
+  // Find specifically a fake plugin for the given extension.  If aCheckEnabled
+  // is false, disabled plugins can be returned.  aMimeType will be filled in
+  // with the MIME type the plugin is registered for.
+  nsFakePluginTag* FindFakePluginForExtension(const nsACString & aExtension,
+                                              /* out */ nsACString & aMimeType,
+                                              bool aCheckEnabled);
+
+  // Find specifically a native (NPAPI) plugin for the given type.  If
+  // aCheckEnabled is false, disabled plugins can be returned.
   nsPluginTag* FindNativePluginForType(const nsACString & aMimeType,
                                        bool aCheckEnabled);
 
+  // Find specifically a native (NPAPI) plugin for the given extension.  If
+  // aCheckEnabled is false, disabled plugins can be returned.  aMimeType will
+  // be filled in with the MIME type the plugin is registered for.
   nsPluginTag* FindNativePluginForExtension(const nsACString & aExtension,
                                             /* out */ nsACString & aMimeType,
                                             bool aCheckEnabled);
@@ -278,9 +304,12 @@ private:
 
   // FIXME revisit, no ns prefix
   // Registers or unregisters the given mime type with the category manager
-  // (performs no checks - see UpdateCategoryManager)
-  enum nsRegisterType { ePluginRegister, ePluginUnregister };
-  void RegisterWithCategoryManager(nsCString &aMimeType, nsRegisterType aType);
+  enum nsRegisterType { ePluginRegister,
+                        ePluginUnregister,
+                        // Checks if this type should still be registered first
+                        ePluginMaybeUnregister };
+  void RegisterWithCategoryManager(const nsCString& aMimeType,
+                                   nsRegisterType aType);
 
   void AddPluginTag(nsPluginTag* aPluginTag);
 
@@ -337,6 +366,9 @@ private:
   nsRefPtr<nsPluginTag> mCachedPlugins;
   nsRefPtr<nsInvalidPluginTag> mInvalidPlugins;
   nsTArray< nsRefPtr<nsPluginPlayPreviewInfo> > mPlayPreviewMimeTypes;
+
+  nsTArray< nsRefPtr<nsFakePluginTag> > mFakePlugins;
+
   bool mPluginsLoaded;
 
   // set by pref plugin.override_internal_types
@@ -366,10 +398,6 @@ private:
 
   // Helpers for ClearSiteData and SiteHasData.
   nsresult NormalizeHostname(nsCString& host);
-  nsresult EnumerateSiteData(const nsACString& domain,
-                             const InfallibleTArray<nsCString>& sites,
-                             InfallibleTArray<nsCString>& result,
-                             bool firstMatchOnly);
 
   nsWeakPtr mCurrentDocument; // weak reference, we use it to id document only
 

@@ -6,15 +6,29 @@
 #include "APZEventState.h"
 
 #include "ActiveElementManager.h"
+#include "APZCCallbackHelper.h"
+#include "gfxPrefs.h"
 #include "mozilla/BasicEvents.h"
 #include "mozilla/Preferences.h"
+#include "mozilla/TouchEvents.h"
+#include "mozilla/layers/APZCCallbackHelper.h"
 #include "nsCOMPtr.h"
 #include "nsDocShell.h"
+#include "nsIDOMMouseEvent.h"
 #include "nsIDOMWindowUtils.h"
+#include "nsIScrollableFrame.h"
+#include "nsIScrollbarMediator.h"
 #include "nsITimer.h"
 #include "nsIWeakReferenceUtils.h"
 #include "nsIWidget.h"
+#include "nsLayoutUtils.h"
+#include "nsQueryFrame.h"
 #include "TouchManager.h"
+#include "nsIDOMMouseEvent.h"
+#include "nsLayoutUtils.h"
+#include "nsIScrollableFrame.h"
+#include "nsIScrollbarMediator.h"
+#include "mozilla/TouchEvents.h"
 
 #define APZES_LOG(...)
 // #define APZES_LOG(...) printf_stderr("APZES: " __VA_ARGS__)
@@ -68,7 +82,7 @@ WidgetModifiersToDOMModifiers(mozilla::Modifiers aModifiers)
   return result;
 }
 
-}
+} // namespace
 
 namespace mozilla {
 namespace layers {
@@ -202,7 +216,7 @@ APZEventState::ProcessLongTap(const nsCOMPtr<nsIPresShell>& aPresShell,
     return;
   }
 
-  SendPendingTouchPreventedResponse(false, aGuid);
+  SendPendingTouchPreventedResponse(false);
 
   // Converting the modifiers to DOM format for the DispatchMouseEvent call
   // is the most useless thing ever because nsDOMWindowUtils::SendMouseEvent
@@ -276,7 +290,10 @@ APZEventState::ProcessTouchEvent(const WidgetTouchEvent& aEvent,
     mActiveElementManager->HandleTouchEndEvent(mEndTouchIsClick);
     // fall through
   case NS_TOUCH_MOVE: {
-    sentContentResponse = SendPendingTouchPreventedResponse(isTouchPrevented, aGuid);
+    if (mPendingTouchPreventedResponse) {
+      MOZ_ASSERT(aGuid == mPendingTouchPreventedGuid);
+    }
+    sentContentResponse = SendPendingTouchPreventedResponse(isTouchPrevented);
     break;
   }
 
@@ -382,11 +399,9 @@ APZEventState::ProcessAPZStateChange(const nsCOMPtr<nsIDocument>& aDocument,
 }
 
 bool
-APZEventState::SendPendingTouchPreventedResponse(bool aPreventDefault,
-                                                 const ScrollableLayerGuid& aGuid)
+APZEventState::SendPendingTouchPreventedResponse(bool aPreventDefault)
 {
   if (mPendingTouchPreventedResponse) {
-    MOZ_ASSERT(aGuid == mPendingTouchPreventedGuid);
     mContentReceivedInputBlockCallback->Run(mPendingTouchPreventedGuid,
         mPendingTouchPreventedBlockId, aPreventDefault);
     mPendingTouchPreventedResponse = false;
@@ -402,6 +417,6 @@ APZEventState::GetWidget() const
   return result.forget();
 }
 
-}
-}
+} // namespace layers
+} // namespace mozilla
 

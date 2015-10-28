@@ -173,9 +173,6 @@ var gSecurityPane = {
       this.changeMasterPassword();
 
     this._initMasterPasswordUI();
-
-    // We might want to hide sync's password engine.
-    gSyncPane.updateWeavePrefs();
   },
 
   /**
@@ -195,6 +192,7 @@ var gSecurityPane = {
       promptService.alert(window,
                           bundle.getString("pw_change_failed_title"),
                           bundle.getString("pw_change2empty_in_fips_mode"));
+      this._initMasterPasswordUI();
     }
     else {
       document.documentElement.openSubDialog("chrome://mozapps/content/preferences/removemp.xul",

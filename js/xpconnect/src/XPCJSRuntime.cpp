@@ -15,6 +15,7 @@
 #include "XPCJSMemoryReporter.h"
 #include "WrapperFactory.h"
 #include "mozJSComponentLoader.h"
+#include "nsNetUtil.h"
 
 #include "nsIMemoryInfoDumper.h"
 #include "nsIMemoryReporter.h"
@@ -525,7 +526,7 @@ CurrentWindowOrNull(JSContext* cx)
     return glob ? WindowOrNull(glob) : nullptr;
 }
 
-}
+} // namespace xpc
 
 static void
 CompartmentDestroyedCallback(JSFreeOp* fop, JSCompartment* compartment)
@@ -568,24 +569,6 @@ void XPCJSRuntime::TraceAdditionalNativeGrayRoots(JSTracer* trc)
 
     for (XPCRootSetElem* e = mWrappedJSRoots; e ; e = e->GetNextRoot())
         static_cast<nsXPCWrappedJS*>(e)->TraceJS(trc);
-}
-
-// static
-void
-XPCJSRuntime::SuspectWrappedNative(XPCWrappedNative* wrapper,
-                                   nsCycleCollectionNoteRootCallback& cb)
-{
-    if (!wrapper->IsValid() || wrapper->IsWrapperExpired())
-        return;
-
-    MOZ_ASSERT(NS_IsMainThread(),
-               "Suspecting wrapped natives from non-main thread");
-
-    // Only record objects that might be part of a cycle as roots, unless
-    // the callback wants all traces (a debug feature).
-    JSObject* obj = wrapper->GetFlatJSObjectPreserveColor();
-    if (JS::ObjectIsMarkedGray(obj) || cb.WantAllTraces())
-        cb.NoteJSRoot(obj);
 }
 
 void
@@ -807,7 +790,7 @@ XPCJSRuntime::FinalizeCallback(JSFreeOp* fop,
             // At this point there may be JSObjects using them that have
             // been removed from the other maps.
             if (!nsXPConnect::XPConnect()->IsShuttingDown()) {
-                for (auto i = self->mNativeScriptableSharedMap->RemovingIter(); !i.Done(); i.Next()) {
+                for (auto i = self->mNativeScriptableSharedMap->Iter(); !i.Done(); i.Next()) {
                     auto entry = static_cast<XPCNativeScriptableSharedMap::Entry*>(i.Get());
                     XPCNativeScriptableShared* shared = entry->key;
                     if (shared->IsMarked()) {
@@ -820,14 +803,14 @@ XPCJSRuntime::FinalizeCallback(JSFreeOp* fop,
             }
 
             if (!isCompartmentGC) {
-                for (auto i = self->mClassInfo2NativeSetMap->RemovingIter(); !i.Done(); i.Next()) {
+                for (auto i = self->mClassInfo2NativeSetMap->Iter(); !i.Done(); i.Next()) {
                     auto entry = static_cast<ClassInfo2NativeSetMap::Entry*>(i.Get());
                     if (!entry->value->IsMarked())
                         i.Remove();
                 }
             }
 
-            for (auto i = self->mNativeSetMap->RemovingIter(); !i.Done(); i.Next()) {
+            for (auto i = self->mNativeSetMap->Iter(); !i.Done(); i.Next()) {
                 auto entry = static_cast<NativeSetMap::Entry*>(i.Get());
                 XPCNativeSet* set = entry->key_value;
                 if (set->IsMarked()) {
@@ -838,7 +821,7 @@ XPCJSRuntime::FinalizeCallback(JSFreeOp* fop,
                 }
             }
 
-            for (auto i = self->mIID2NativeInterfaceMap->RemovingIter(); !i.Done(); i.Next()) {
+            for (auto i = self->mIID2NativeInterfaceMap->Iter(); !i.Done(); i.Next()) {
                 auto entry = static_cast<IID2NativeInterfaceMap::Entry*>(i.Get());
                 XPCNativeInterface* iface = entry->value;
                 if (iface->IsMarked()) {
@@ -903,7 +886,7 @@ XPCJSRuntime::FinalizeCallback(JSFreeOp* fop,
             // referencing the protos in the dying list are themselves dead.
             // So, we can safely delete all the protos in the list.
 
-            for (auto i = self->mDyingWrappedNativeProtoMap->RemovingIter(); !i.Done(); i.Next()) {
+            for (auto i = self->mDyingWrappedNativeProtoMap->Iter(); !i.Done(); i.Next()) {
                 auto entry = static_cast<XPCWrappedNativeProtoMap::Entry*>(i.Get());
                 delete static_cast<const XPCWrappedNativeProto*>(entry->key);
                 i.Remove();
@@ -1354,7 +1337,7 @@ XPCJSRuntime::InterruptCallback(JSContext* cx)
     if (!nsContentUtils::IsInitialized())
         return true;
 
-    bool contentProcess = XRE_GetProcessType() == GeckoProcessType_Content;
+    bool contentProcess = XRE_IsContentProcess();
 
     // This is at least the second interrupt callback we've received since
     // returning to the event loop. See how long it's been, and what the limit
@@ -2309,6 +2292,10 @@ ReportCompartmentStats(const JS::CompartmentStats& cStats,
         cStats.regexpCompartment,
         "The regexp compartment and regexp data.");
 
+    ZCREPORT_BYTES(cJSPathPrefix + NS_LITERAL_CSTRING("saved-stacks-set"),
+        cStats.savedStacksSet,
+        "The saved stacks set.");
+
     if (sundriesGCHeap > 0) {
         // We deliberately don't use ZCREPORT_GC_BYTES here.
         REPORT_GC_BYTES(cJSPathPrefix + NS_LITERAL_CSTRING("sundries/gc-heap"),
@@ -2501,9 +2488,8 @@ ReportJSRuntimeExplicitTreeStats(const JS::RuntimeStats& rtStats,
         "Memory being used by the GC's nursery.");
 
     RREPORT_BYTES(rtPath + NS_LITERAL_CSTRING("runtime/gc/nursery-malloced-buffers"),
-        KIND_NONHEAP, rtStats.runtime.gc.nurseryMallocedBuffers,
-        "Out-of-line slots and elements belonging to objects in the "
-        "nursery.");
+        KIND_HEAP, rtStats.runtime.gc.nurseryMallocedBuffers,
+        "Out-of-line slots and elements belonging to objects in the nursery.");
 
     RREPORT_BYTES(rtPath + NS_LITERAL_CSTRING("runtime/gc/store-buffer/vals"),
         KIND_HEAP, rtStats.runtime.gc.storeBufferVals,
@@ -2549,7 +2535,7 @@ ReportJSRuntimeExplicitTreeStats(const JS::RuntimeStats& rtStats,
 
     REPORT_BYTES(rtPath2 + NS_LITERAL_CSTRING("runtime/gc/nursery-decommitted"),
         KIND_NONHEAP, rtStats.runtime.gc.nurseryDecommitted,
-        "Memory allocated to the GC's nursery this is decommitted, i.e. it takes up "
+        "Memory allocated to the GC's nursery that is decommitted, i.e. it takes up "
         "address space but no physical memory or swap space.");
 
     REPORT_GC_BYTES(rtPath + NS_LITERAL_CSTRING("gc-heap/unused-chunks"),
@@ -2581,7 +2567,7 @@ ReportJSRuntimeExplicitTreeStats(const JS::RuntimeStats& rtStats,
                                  size_t* rtTotalOut)
 {
     nsCOMPtr<amIAddonManager> am;
-    if (XRE_GetProcessType() == GeckoProcessType_Default) {
+    if (XRE_IsParentProcess()) {
         // Only try to access the service from the main process.
         am = do_GetService("@mozilla.org/addons/integration;1");
     }
@@ -2837,7 +2823,7 @@ JSReporter::CollectReports(WindowPaths* windowPaths,
     // stats seems like a bad idea.
 
     nsCOMPtr<amIAddonManager> addonManager;
-    if (XRE_GetProcessType() == GeckoProcessType_Default) {
+    if (XRE_IsParentProcess()) {
         // Only try to access the service from the main process.
         addonManager = do_GetService("@mozilla.org/addons/integration;1");
     }
@@ -3526,13 +3512,13 @@ XPCJSRuntime::OnJSContextNew(JSContext* cx)
     if (JSID_IS_VOID(mStrIDs[0])) {
         RootedString str(cx);
         for (unsigned i = 0; i < IDX_TOTAL_COUNT; i++) {
-            str = JS_InternString(cx, mStrings[i]);
+            str = JS_AtomizeAndPinString(cx, mStrings[i]);
             if (!str) {
                 mStrIDs[0] = JSID_VOID;
                 return false;
             }
             mStrIDs[i] = INTERNED_STRING_TO_JSID(cx, str);
-            mStrJSVals[i] = STRING_TO_JSVAL(str);
+            mStrJSVals[i].setString(str);
         }
 
         if (!mozilla::dom::DefineStaticJSVals(cx)) {
@@ -3560,7 +3546,7 @@ XPCJSRuntime::DescribeCustomObjects(JSObject* obj, const js::Class* clasp,
     XPCWrappedNativeProto* p =
         static_cast<XPCWrappedNativeProto*>(xpc_GetJSPrivate(obj));
     si = p->GetScriptableInfo();
-    
+
     if (!si) {
         return false;
     }
@@ -3654,7 +3640,7 @@ XPCJSRuntime::DebugDump(int16_t depth)
         // iterate sets...
         if (depth && mNativeSetMap->Count()) {
             XPC_LOG_INDENT();
-            for (auto i = mNativeSetMap->RemovingIter(); !i.Done(); i.Next()) {
+            for (auto i = mNativeSetMap->Iter(); !i.Done(); i.Next()) {
                 auto entry = static_cast<NativeSetMap::Entry*>(i.Get());
                 entry->key_value->DebugDump(depth);
             }

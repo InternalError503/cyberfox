@@ -7,8 +7,8 @@
 package org.mozilla.gecko.widget;
 
 import org.mozilla.gecko.GeckoApplication;
-import org.mozilla.gecko.R;
 import org.mozilla.gecko.lwt.LightweightTheme;
+import org.mozilla.gecko.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -106,6 +106,7 @@ public class ThemedLinearLayout extends android.widget.LinearLayout
         if (mIsPrivate != isPrivate) {
             mIsPrivate = isPrivate;
             refreshDrawableState();
+            invalidate();
         }
     }
 
@@ -122,6 +123,7 @@ public class ThemedLinearLayout extends android.widget.LinearLayout
             }
 
             refreshDrawableState();
+            invalidate();
         }
     }
 
@@ -130,6 +132,7 @@ public class ThemedLinearLayout extends android.widget.LinearLayout
             mIsLight = false;
             mIsDark = false;
             refreshDrawableState();
+            invalidate();
         }
     }
 

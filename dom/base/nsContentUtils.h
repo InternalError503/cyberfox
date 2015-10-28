@@ -842,6 +842,9 @@ public:
                                   uint32_t aLineNumber = 0,
                                   uint32_t aColumnNumber = 0);
 
+  static nsresult
+  MaybeReportInterceptionErrorToConsole(nsIDocument* aDocument, nsresult aError);
+
   static void LogMessageToConsole(const char* aMsg, ...);
   
   /**
@@ -932,6 +935,18 @@ public:
    * Map internal content policy types to external ones.
    */
   static nsContentPolicyType InternalContentPolicyTypeToExternal(nsContentPolicyType aType);
+
+  /**
+   * Map internal content policy types to external ones or script types:
+   *   * TYPE_INTERNAL_SCRIPT
+   *   * TYPE_INTERNAL_WORKER
+   *   * TYPE_INTERNAL_SHARED_WORKER
+   *   * TYPE_INTERNAL_SERVICE_WORKER
+   *
+   *
+   * Note: DO NOT call this function unless you know what you're doing!
+   */
+  static nsContentPolicyType InternalContentPolicyTypeToExternalOrScript(nsContentPolicyType aType);
 
   /**
    * Quick helper to determine whether there are any mutation listeners
@@ -1946,6 +1961,14 @@ public:
   }
 
   /*
+   * Returns true if notification should be sent for peformance timing events.
+   */
+  static bool SendPerformanceTimingNotifications()
+  {
+    return sSendPerformanceTimingNotifications;
+  }
+
+  /*
    * Returns true if URL setters should percent encode the Hash/Ref segment
    * and getters should return the percent decoded value of the segment
    */
@@ -2436,6 +2459,8 @@ public:
                                                 nsIDocument* aDoc,
                                                 nsIHttpChannel* aChannel);
 
+  static bool PushEnabled(JSContext* aCx, JSObject* aObj);
+
 private:
   static bool InitializeEventTable();
 
@@ -2539,6 +2564,7 @@ private:
   static bool sEncodeDecodeURLHash;
   static bool sGettersDecodeURLHash;
   static bool sPrivacyResistFingerprinting;
+  static bool sSendPerformanceTimingNotifications;
 
   static nsHtml5StringParser* sHTMLFragmentParser;
   static nsIParser* sXMLFragmentParser;

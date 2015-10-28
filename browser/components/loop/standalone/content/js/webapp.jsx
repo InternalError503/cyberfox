@@ -223,7 +223,7 @@ loop.webapp = (function($, _, OT, mozL10n) {
       var urlCreationDateClasses = cx({
         "light-color-font": true,
         "call-url-date": true, /* Used as a handler in the tests */
-        /*hidden until date is available*/
+        // Hidden until date is available.
         "hide": !this.props.urlCreationDateString.length
       });
 
@@ -580,6 +580,7 @@ loop.webapp = (function($, _, OT, mozL10n) {
     propTypes: {
       conversation: React.PropTypes.instanceOf(sharedModels.ConversationModel)
                          .isRequired,
+      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       onAfterFeedbackReceived: React.PropTypes.func.isRequired,
       sdk: React.PropTypes.object.isRequired
     },
@@ -590,10 +591,9 @@ loop.webapp = (function($, _, OT, mozL10n) {
                                     currentStatus: mozL10n.get("status_conversation_ended")});
       return (
         <div className="ended-conversation">
-          <sharedViews.FeedbackView
-            onAfterFeedbackReceived={this.props.onAfterFeedbackReceived} />
           <sharedViews.ConversationView
             audio={{enabled: false, visible: false}}
+            dispatcher={this.props.dispatcher}
             initiate={false}
             model={this.props.conversation}
             sdk={this.props.sdk}
@@ -682,7 +682,6 @@ loop.webapp = (function($, _, OT, mozL10n) {
     },
 
     resetCallStatus: function() {
-      this.props.dispatcher.dispatch(new sharedActions.FeedbackComplete());
       return function() {
         this.setState({callStatus: "start"});
       }.bind(this);
@@ -721,6 +720,7 @@ loop.webapp = (function($, _, OT, mozL10n) {
                                         currentStatus: mozL10n.get("status_in_conversation")});
           return (
             <sharedViews.ConversationView
+              dispatcher={this.props.dispatcher}
               initiate={true}
               model={this.props.conversation}
               sdk={this.props.sdk}
@@ -731,6 +731,7 @@ loop.webapp = (function($, _, OT, mozL10n) {
           return (
             <EndedConversationView
               conversation={this.props.conversation}
+              dispatcher={this.props.dispatcher}
               onAfterFeedbackReceived={this.resetCallStatus()}
               sdk={this.props.sdk} />
           );
@@ -1020,13 +1021,6 @@ loop.webapp = (function($, _, OT, mozL10n) {
     // Older non-flux based items.
     var notifications = new sharedModels.NotificationCollection();
 
-    var feedbackApiClient = new loop.FeedbackAPIClient(
-      loop.config.feedbackApiUrl, {
-        product: loop.config.feedbackProductName,
-        user_agent: navigator.userAgent,
-        url: document.location.origin
-      });
-
     // New flux items.
     var dispatcher = new loop.Dispatcher();
     var client = new loop.StandaloneClient({
@@ -1063,21 +1057,11 @@ loop.webapp = (function($, _, OT, mozL10n) {
         sdkDriver: sdkDriver
     });
 
-    var feedbackClient = new loop.FeedbackAPIClient(
-      loop.config.feedbackApiUrl, {
-      product: loop.config.feedbackProductName,
-      user_agent: navigator.userAgent,
-      url: document.location.origin
-    });
-
     // Stores
     var standaloneAppStore = new loop.store.StandaloneAppStore({
       conversation: conversation,
       dispatcher: dispatcher,
       sdk: OT
-    });
-    var feedbackStore = new loop.store.FeedbackStore(dispatcher, {
-      feedbackClient: feedbackClient
     });
     var standaloneMetricsStore = new loop.store.StandaloneMetricsStore(dispatcher, {
       activeRoomStore: activeRoomStore
@@ -1088,7 +1072,6 @@ loop.webapp = (function($, _, OT, mozL10n) {
 
     loop.store.StoreMixin.register({
       activeRoomStore: activeRoomStore,
-      feedbackStore: feedbackStore,
       // This isn't used in any views, but is saved here to ensure it
       // is kept alive.
       standaloneMetricsStore: standaloneMetricsStore,

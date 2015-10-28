@@ -135,7 +135,7 @@ public:
         AllocateAudioBlock(numChannels, &input);
         for (uint32_t i = 0; i < numChannels; ++i) {
           const float* src = static_cast<const float*>(aInput.mChannelData[i]);
-          float* dest = static_cast<float*>(const_cast<void*>(input.mChannelData[i]));
+          float* dest = input.ChannelFloatsForWrite(i);
           AudioBlockCopyChannelWithScale(src, aInput.mVolume, dest);
         }
       }
@@ -278,6 +278,6 @@ ConvolverNode::SetNormalize(bool aNormalize)
   SendInt32ParameterToStream(ConvolverNodeEngine::NORMALIZE, aNormalize);
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla
 

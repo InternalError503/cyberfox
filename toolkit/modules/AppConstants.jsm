@@ -80,17 +80,6 @@ this.AppConstants = Object.freeze({
   false,
 #endif
 
-  MOZ_SHARK:
-#ifdef XP_MACOSX
-#ifdef MOZ_SHARK
-  true,
-#else
-  false,
-#endif
-#else
-  false,
-#endif
-
   MOZ_TELEMETRY_REPORTING:
 #ifdef MOZ_TELEMETRY_REPORTING
   true,
@@ -107,6 +96,14 @@ this.AppConstants = Object.freeze({
 
   MOZ_WEBRTC:
 #ifdef MOZ_WEBRTC
+  true,
+#else
+  false,
+#endif
+
+# MOZ_B2G covers both device and desktop b2g
+  MOZ_B2G:
+#ifdef MOZ_B2G
   true,
 #else
   false,
@@ -177,4 +174,11 @@ this.AppConstants = Object.freeze({
   MOZ_UPDATE_CHANNEL: "@MOZ_UPDATE_CHANNEL@",
   MOZ_WIDGET_TOOLKIT: "@MOZ_WIDGET_TOOLKIT@",
   ANDROID_PACKAGE_NAME: "@ANDROID_PACKAGE_NAME@",
+  MOZ_ANDROID_APZ:
+#ifdef MOZ_ANDROID_APZ
+    true,
+#else
+    false,
+#endif
+  DEBUG_JS_MODULES: "@DEBUG_JS_MODULES@"
 });

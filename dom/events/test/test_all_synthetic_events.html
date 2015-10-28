@@ -32,6 +32,10 @@ const kEventConstructors = {
                                                          return new AnimationEvent(aName, aProps);
                                                        },
                                              },
+  AnimationPlaybackEvent:                    { create: function (aName, aProps) {
+                                                         return new AnimationPlaybackEvent(aName, aProps);
+                                                       },
+                                             },
   AudioProcessingEvent:                      { create: null, // Cannot create untrusted event from JS.
                                              },
   BeforeAfterKeyboardEvent:                  { create: function (aName, aProps) {
@@ -435,7 +439,14 @@ const kEventConstructors = {
                                                          return new SpeechRecognitionEvent(aName, aProps);
                                                        },
                                              },
+  SpeechSynthesisErrorEvent:                 { create: function (aName, aProps) {
+                                                         aProps.error = "synthesis-unavailable";
+                                                         aProps.utterance = new SpeechSynthesisUtterance("Hello World");
+                                                         return new SpeechSynthesisErrorEvent(aName, aProps);
+                                                       },
+                                             },
   SpeechSynthesisEvent:                      { create: function (aName, aProps) {
+                                                         aProps.utterance = new SpeechSynthesisUtterance("Hello World");
                                                          return new SpeechSynthesisEvent(aName, aProps);
                                                        },
                                              },

@@ -11,7 +11,7 @@
 #include "nsCoord.h"
 #include "nsIFrame.h"
 #include "nsISelectionListener.h"
-#include "nsRefPtr.h"
+#include "mozilla/nsRefPtr.h"
 #include "nsWeakReference.h"
 #include "mozilla/dom/CaretStateChangedEvent.h"
 #include "mozilla/EventForwards.h"
@@ -27,7 +27,7 @@ namespace mozilla {
 
 namespace dom {
 class Selection;
-}
+} // namespace dom
 
 class AccessibleCaret;
 

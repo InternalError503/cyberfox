@@ -38,7 +38,7 @@ SendRequest(BluetoothReplyRunnable* aRunnable, const Request& aRequest)
   }
 }
 
-} // anonymous namespace
+} // namespace
 
 // static
 BluetoothServiceChildProcess*
@@ -555,12 +555,6 @@ BluetoothServiceChildProcess::HandleShutdown()
     sBluetoothChild->BeginShutdown();
   }
   return NS_OK;
-}
-
-bool
-BluetoothServiceChildProcess::IsConnected(uint16_t aServiceUuid)
-{
-  MOZ_CRASH("This should never be called!");
 }
 
 nsresult

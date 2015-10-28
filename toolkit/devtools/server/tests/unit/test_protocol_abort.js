@@ -6,9 +6,9 @@
  * unexpectedly.
  */
 
-let protocol = devtools.require("devtools/server/protocol");
+let protocol = require("devtools/server/protocol");
 let {method, Arg, Option, RetVal} = protocol;
-let events = devtools.require("sdk/event/core");
+let events = require("sdk/event/core");
 
 function simpleHello() {
   return {
@@ -60,8 +60,11 @@ function run_test() {
     rootClient.simpleReturn().then(() => {
       ok(false, "Connection was aborted, request shouldn't resolve");
       do_test_finished();
-    }, () => {
+    }, e => {
+      let error = e.toString();
       ok(true, "Connection was aborted, request rejected correctly");
+      ok(error.includes("Request stack:"), "Error includes request stack");
+      ok(error.includes("test_protocol_abort.js"), "Stack includes this test");
       do_test_finished();
     });
 

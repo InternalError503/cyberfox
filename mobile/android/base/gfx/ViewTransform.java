@@ -5,9 +5,9 @@
 
 package org.mozilla.gecko.gfx;
 
-import org.mozilla.gecko.mozglue.generatorannotations.WrapEntireClassForJNI;
+import org.mozilla.gecko.annotation.WrapForJNI;
 
-@WrapEntireClassForJNI
+@WrapForJNI
 public class ViewTransform {
     public float x;
     public float y;

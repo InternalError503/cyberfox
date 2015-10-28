@@ -4,7 +4,7 @@
 
 var loop = loop || {};
 loop.shared = loop.shared || {};
-loop.shared.views = (function(_, l10n) {
+loop.shared.views = (function(_, mozL10n) {
   "use strict";
 
   var sharedActions = loop.shared.actions;
@@ -62,7 +62,7 @@ loop.shared.views = (function(_, l10n) {
       var prefix = this.props.enabled ? "mute" : "unmute";
       var suffix = "button_title";
       var msgId = [prefix, this.props.scope, this.props.type, suffix].join("_");
-      return l10n.get(msgId);
+      return mozL10n.get(msgId);
     },
 
     render: function() {
@@ -130,7 +130,7 @@ loop.shared.views = (function(_, l10n) {
       var prefix = this.props.state === SCREEN_SHARE_STATES.ACTIVE ?
         "active" : "inactive";
 
-      return l10n.get(prefix + "_screenshare_button_title");
+      return mozL10n.get(prefix + "_screenshare_button_title");
     },
 
     render: function() {
@@ -169,10 +169,10 @@ loop.shared.views = (function(_, l10n) {
           ), 
           React.createElement("ul", {className: dropdownMenuClasses, ref: "menu"}, 
             React.createElement("li", {onClick: this._handleShareTabs}, 
-              l10n.get("share_tabs_button_title2")
+              mozL10n.get("share_tabs_button_title2")
             ), 
             React.createElement("li", {className: windowSharingClasses, onClick: this._handleShareWindows}, 
-              l10n.get("share_windows_button_title")
+              mozL10n.get("share_windows_button_title")
             )
           )
         )
@@ -226,7 +226,7 @@ loop.shared.views = (function(_, l10n) {
     },
 
     _getHangupButtonLabel: function() {
-      return this.props.hangupButtonLabel || l10n.get("hangup_button_caption2");
+      return this.props.hangupButtonLabel || mozL10n.get("hangup_button_caption2");
     },
 
     render: function() {
@@ -236,7 +236,7 @@ loop.shared.views = (function(_, l10n) {
             React.createElement("button", {className: "btn btn-hangup", 
                     disabled: !this.props.enableHangup, 
                     onClick: this.handleClickHangup, 
-                    title: l10n.get("hangup_button_title")}, 
+                    title: mozL10n.get("hangup_button_title")}, 
               this._getHangupButtonLabel()
             )
           ), 
@@ -261,7 +261,7 @@ loop.shared.views = (function(_, l10n) {
             React.createElement(MediaControlButton, {action: this.handleToggleEdit, 
                                 enabled: this.props.edit.enabled, 
                                 scope: "local", 
-                                title: l10n.get(this.props.edit.enabled ?
+                                title: mozL10n.get(this.props.edit.enabled ?
                                   "context_edit_tooltip" : "context_hide_tooltip"), 
                                 type: "edit", 
                                 visible: this.props.edit.visible})
@@ -283,6 +283,7 @@ loop.shared.views = (function(_, l10n) {
 
     propTypes: {
       audio: React.PropTypes.object,
+      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
       initiate: React.PropTypes.bool,
       isDesktop: React.PropTypes.bool,
       model: React.PropTypes.object.isRequired,
@@ -482,6 +483,7 @@ loop.shared.views = (function(_, l10n) {
             ), 
             React.createElement(ConversationToolbar, {
               audio: this.state.audio, 
+              dispatcher: this.props.dispatcher, 
               hangup: this.hangup, 
               publishStream: this.publishStream, 
               video: this.state.video})
@@ -498,7 +500,6 @@ loop.shared.views = (function(_, l10n) {
     mixins: [Backbone.Events],
 
     propTypes: {
-      key: React.PropTypes.number.isRequired,
       notification: React.PropTypes.object.isRequired
     },
 
@@ -506,8 +507,7 @@ loop.shared.views = (function(_, l10n) {
       var notification = this.props.notification;
       return (
         React.createElement("div", {className: "notificationContainer"}, 
-          React.createElement("div", {className: "alert alert-" + notification.get("level"), 
-            key: this.props.key}, 
+          React.createElement("div", {className: "alert alert-" + notification.get("level")}, 
             React.createElement("span", {className: "message"}, notification.get("message"))
           ), 
           React.createElement("div", {className: "detailsBar details-" + notification.get("level"), 
@@ -571,7 +571,6 @@ loop.shared.views = (function(_, l10n) {
           this.props.notifications.map(function(notification, key) {
             return React.createElement(NotificationView, {key: key, notification: notification});
           })
-        
         )
       );
     }
@@ -649,6 +648,9 @@ loop.shared.views = (function(_, l10n) {
       disabled: React.PropTypes.bool,
       label: React.PropTypes.string,
       onChange: React.PropTypes.func.isRequired,
+      // If true, this will cause the label to be cut off at the end of the
+      // first line with an ellipsis, and a tooltip supplied.
+      useEllipsis: React.PropTypes.bool,
       // If `value` is not supplied, the consumer should rely on the boolean
       // `checked` state changes.
       value: React.PropTypes.string
@@ -660,6 +662,7 @@ loop.shared.views = (function(_, l10n) {
         checked: false,
         disabled: false,
         label: null,
+        useEllipsis: false,
         value: ""
       };
     },
@@ -702,6 +705,11 @@ loop.shared.views = (function(_, l10n) {
         checked: this.state.checked,
         disabled: this.props.disabled
       };
+      var labelClasses = {
+        "checkbox-label": true,
+        "ellipsis": this.props.useEllipsis
+      };
+
       if (this.props.additionalClass) {
         wrapperClasses[this.props.additionalClass] = true;
       }
@@ -710,9 +718,13 @@ loop.shared.views = (function(_, l10n) {
              disabled: this.props.disabled, 
              onClick: this._handleClick}, 
           React.createElement("div", {className: cx(checkClasses)}), 
-          this.props.label ?
-            React.createElement("label", null, this.props.label) :
-            null
+          
+            this.props.label ?
+              React.createElement("div", {className: cx(labelClasses), 
+                   title: this.props.useEllipsis ? this.props.label : ""}, 
+                this.props.label
+              ) : null
+          
         )
       );
     }
@@ -794,7 +806,7 @@ loop.shared.views = (function(_, l10n) {
         return null;
       }
 
-      return React.createElement("p", null, l10n.get("context_inroom_label"));
+      return React.createElement("p", null, mozL10n.get("context_inroom_label"));
     },
 
     render: function() {
@@ -945,6 +957,139 @@ loop.shared.views = (function(_, l10n) {
     }
   });
 
+  var MediaLayoutView = React.createClass({displayName: "MediaLayoutView",
+    propTypes: {
+      children: React.PropTypes.node,
+      dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
+      displayScreenShare: React.PropTypes.bool.isRequired,
+      isLocalLoading: React.PropTypes.bool.isRequired,
+      isRemoteLoading: React.PropTypes.bool.isRequired,
+      isScreenShareLoading: React.PropTypes.bool.isRequired,
+      // The poster URLs are for UI-showcase testing and development.
+      localPosterUrl: React.PropTypes.string,
+      localSrcVideoObject: React.PropTypes.object,
+      localVideoMuted: React.PropTypes.bool.isRequired,
+      // Passing in matchMedia, allows it to be overriden for ui-showcase's
+      // benefit. We expect either the override or window.matchMedia.
+      matchMedia: React.PropTypes.func.isRequired,
+      remotePosterUrl: React.PropTypes.string,
+      remoteSrcVideoObject: React.PropTypes.object,
+      renderRemoteVideo: React.PropTypes.bool.isRequired,
+      screenSharePosterUrl: React.PropTypes.string,
+      screenShareVideoObject: React.PropTypes.object,
+      showContextRoomName: React.PropTypes.bool.isRequired,
+      useDesktopPaths: React.PropTypes.bool.isRequired
+    },
+
+    isLocalMediaAbsolutelyPositioned: function(matchMedia) {
+      if (!matchMedia) {
+        matchMedia = this.props.matchMedia;
+      }
+      return matchMedia &&
+        // The screen width is less than 640px and we are not screen sharing.
+        ((matchMedia("screen and (max-width:640px)").matches &&
+         !this.props.displayScreenShare) ||
+         // or the screen width is less than 300px.
+         (matchMedia("screen and (max-width:300px)").matches));
+    },
+
+    getInitialState: function() {
+      return {
+        localMediaAboslutelyPositioned: this.isLocalMediaAbsolutelyPositioned()
+      };
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+      // This is all for the ui-showcase's benefit.
+      if (this.props.matchMedia != nextProps.matchMedia) {
+        this.updateLocalMediaState(null, nextProps.matchMedia);
+      }
+    },
+
+    componentDidMount: function() {
+      window.addEventListener("resize", this.updateLocalMediaState);
+    },
+
+    componentWillUnmount: function() {
+      window.removeEventListener("resize", this.updateLocalMediaState);
+    },
+
+    updateLocalMediaState: function(event, matchMedia) {
+      var newState = this.isLocalMediaAbsolutelyPositioned(matchMedia);
+      if (this.state.localMediaAboslutelyPositioned != newState) {
+        this.setState({
+          localMediaAboslutelyPositioned: newState
+        });
+      }
+    },
+
+    renderLocalVideo: function() {
+      return (
+        React.createElement("div", {className: "local"}, 
+          React.createElement(MediaView, {displayAvatar: this.props.localVideoMuted, 
+            isLoading: this.props.isLocalLoading, 
+            mediaType: "local", 
+            posterUrl: this.props.localPosterUrl, 
+            srcVideoObject: this.props.localSrcVideoObject})
+        )
+      );
+    },
+
+    render: function() {
+      var remoteStreamClasses = React.addons.classSet({
+        "remote": true,
+        "focus-stream": !this.props.displayScreenShare
+      });
+
+      var screenShareStreamClasses = React.addons.classSet({
+        "screen": true,
+        "focus-stream": this.props.displayScreenShare
+      });
+
+      var mediaWrapperClasses = React.addons.classSet({
+        "media-wrapper": true,
+        "receiving-screen-share": this.props.displayScreenShare,
+        "showing-local-streams": this.props.localSrcVideoObject ||
+          this.props.localPosterUrl,
+        "showing-remote-streams": this.props.remoteSrcVideoObject ||
+          this.props.remotePosterUrl || this.props.isRemoteLoading
+      });
+
+      return (
+        React.createElement("div", {className: "media-layout"}, 
+          React.createElement("div", {className: mediaWrapperClasses}, 
+            React.createElement("span", {className: "self-view-hidden-message"}, 
+              mozL10n.get("self_view_hidden_message")
+            ), 
+            React.createElement("div", {className: remoteStreamClasses}, 
+              React.createElement(MediaView, {displayAvatar: !this.props.renderRemoteVideo, 
+                isLoading: this.props.isRemoteLoading, 
+                mediaType: "remote", 
+                posterUrl: this.props.remotePosterUrl, 
+                srcVideoObject: this.props.remoteSrcVideoObject}), 
+               this.state.localMediaAboslutelyPositioned ?
+                this.renderLocalVideo() : null, 
+               this.props.children
+            ), 
+            React.createElement("div", {className: screenShareStreamClasses}, 
+              React.createElement(MediaView, {displayAvatar: false, 
+                isLoading: this.props.isScreenShareLoading, 
+                mediaType: "screen-share", 
+                posterUrl: this.props.screenSharePosterUrl, 
+                srcVideoObject: this.props.screenShareVideoObject})
+            ), 
+            React.createElement(loop.shared.views.chat.TextChatView, {
+              dispatcher: this.props.dispatcher, 
+              showRoomName: this.props.showContextRoomName, 
+              useDesktopPaths: false}), 
+             this.state.localMediaAboslutelyPositioned ?
+              null : this.renderLocalVideo()
+          )
+        )
+      );
+    }
+  });
+
   return {
     AvatarView: AvatarView,
     Button: Button,
@@ -954,6 +1099,7 @@ loop.shared.views = (function(_, l10n) {
     ConversationView: ConversationView,
     ConversationToolbar: ConversationToolbar,
     MediaControlButton: MediaControlButton,
+    MediaLayoutView: MediaLayoutView,
     MediaView: MediaView,
     LoadingView: LoadingView,
     ScreenShareControlButton: ScreenShareControlButton,

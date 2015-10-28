@@ -227,9 +227,9 @@ describe("loop.shared.mixins", function() {
 
       sandbox.stub(view, "getDOMNode").returns({
         querySelector: function(classSelector) {
-          if (classSelector.includes("local")) {
+          if (classSelector.indexOf("local") > -1) {
             return localElement;
-          } else if (classSelector.includes("screen")) {
+          } else if (classSelector.indexOf("screen") > -1) {
             return screenShareElement;
           }
           return remoteElement;
@@ -431,7 +431,8 @@ describe("loop.shared.mixins", function() {
         doNotDisturb: true,
         getAudioBlob: sinon.spy(function(name, callback) {
           callback(null, new Blob([new ArrayBuffer(10)], {type: "audio/ogg"}));
-        })
+        }),
+        getLoopPref: sandbox.stub()
       };
 
       fakeAudio = {

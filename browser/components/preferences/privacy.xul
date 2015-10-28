@@ -33,6 +33,9 @@
       <preference id="privacy.trackingprotection.enabled"
                   name="privacy.trackingprotection.enabled"
                   type="bool"/>
+      <preference id="privacy.trackingprotection.pbmode.enabled"
+                  name="privacy.trackingprotection.pbmode.enabled"
+                  type="bool"/>
       <!-- Tracking Geo Location -->
      <preference id="geo.enabled"
                   name="geo.enabled"
@@ -126,10 +129,8 @@
         <hbox align="center">
           <checkbox id="trackingProtection"
                     preference="privacy.trackingprotection.enabled"
-                    accesskey="&trackingProtection.accesskey;"
-                    label="&trackingProtection.label;" />
-          <image id="trackingProtectionImage"
-                 src="chrome://browser/skin/bad-content-blocked-16.png"/>
+                    accesskey="&trackingProtection5.accesskey;"
+                    label="&trackingProtection5.label;" />
         </hbox>
         <hbox align="center"
               class="indent">
@@ -138,11 +139,22 @@
                  value="&trackingProtectionLearnMore.label;"/>
         </hbox>
       </vbox>
+      <vbox id="trackingprotectionpbmbox">
+        <hbox align="center">
+          <checkbox id="trackingProtectionPBM"
+                    preference="privacy.trackingprotection.pbmode.enabled"
+                    accesskey="&trackingProtectionPBM5.accesskey;"
+                    label="&trackingProtectionPBM5.label;" />
+          <label id="trackingProtectionPBMLearnMore"
+                 class="text-link"
+                 value="&trackingProtectionPBMLearnMore.label;"/>
+        </hbox>
+      </vbox>
       <vbox>
         <hbox align="center">
           <checkbox id="privacyDoNotTrackCheckbox"
-                    label="&dntTrackingNotOkay.label2;"
-                    accesskey="&dntTrackingNotOkay.accesskey;"
+                    label="&dntTrackingNotOkay4.label;"
+                    accesskey="&dntTrackingNotOkay4.accesskey;"
                     preference="privacy.donottrackheader.enabled"/>
         </hbox>
         <hbox align="center"

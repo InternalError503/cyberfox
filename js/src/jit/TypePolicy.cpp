@@ -10,6 +10,8 @@
 #include "jit/MIR.h"
 #include "jit/MIRGraph.h"
 
+#include "jit/shared/Lowering-shared-inl.h"
+
 using namespace js;
 using namespace js::jit;
 
@@ -22,6 +24,8 @@ EnsureOperandNotFloat32(TempAllocator& alloc, MInstruction* def, unsigned op)
     if (in->type() == MIRType_Float32) {
         MToDouble* replace = MToDouble::New(alloc, in);
         def->block()->insertBefore(def, replace);
+        if (def->isRecoveredOnBailout())
+            replace->setRecoveredOnBailout();
         def->replaceOperand(op, replace);
     }
 }
@@ -465,6 +469,24 @@ ConvertToInt32Policy<Op>::staticAdjustInputs(TempAllocator& alloc, MInstruction*
 }
 
 template bool ConvertToInt32Policy<0>::staticAdjustInputs(TempAllocator& alloc, MInstruction* def);
+
+template <unsigned Op>
+bool
+TruncateToInt32Policy<Op>::staticAdjustInputs(TempAllocator& alloc, MInstruction* def)
+{
+    MDefinition* in = def->getOperand(Op);
+    if (in->type() == MIRType_Int32)
+        return true;
+
+    MTruncateToInt32* replace = MTruncateToInt32::New(alloc, in);
+    def->block()->insertBefore(def, replace);
+    def->replaceOperand(Op, replace);
+
+    return replace->typePolicy()->adjustInputs(alloc, replace);
+}
+
+template bool TruncateToInt32Policy<2>::staticAdjustInputs(TempAllocator& alloc, MInstruction* def);
+template bool TruncateToInt32Policy<3>::staticAdjustInputs(TempAllocator& alloc, MInstruction* def);
 
 template <unsigned Op>
 bool
@@ -1148,12 +1170,14 @@ FilterTypeSetPolicy::adjustInputs(TempAllocator& alloc, MInstruction* ins)
     _(Mix3Policy<ObjectPolicy<0>, BoxPolicy<1>, ObjectPolicy<2> >)      \
     _(Mix3Policy<ObjectPolicy<0>, IntPolicy<1>, BoxPolicy<2> >)         \
     _(Mix3Policy<ObjectPolicy<0>, IntPolicy<1>, IntPolicy<2> >)         \
+    _(Mix3Policy<ObjectPolicy<0>, IntPolicy<1>, TruncateToInt32Policy<2> >) \
     _(Mix3Policy<ObjectPolicy<0>, ObjectPolicy<1>, IntPolicy<2> >)      \
     _(Mix3Policy<StringPolicy<0>, IntPolicy<1>, IntPolicy<2>>)          \
     _(Mix3Policy<StringPolicy<0>, ObjectPolicy<1>, StringPolicy<2> >)   \
     _(Mix3Policy<StringPolicy<0>, StringPolicy<1>, StringPolicy<2> >)   \
     _(Mix4Policy<ObjectPolicy<0>, StringPolicy<1>, BoxPolicy<2>, BoxPolicy<3>>) \
     _(Mix4Policy<ObjectPolicy<0>, IntPolicy<1>, IntPolicy<2>, IntPolicy<3>>) \
+    _(Mix4Policy<ObjectPolicy<0>, IntPolicy<1>, TruncateToInt32Policy<2>, TruncateToInt32Policy<3> >) \
     _(Mix4Policy<SimdScalarPolicy<0>, SimdScalarPolicy<1>, SimdScalarPolicy<2>, SimdScalarPolicy<3> >) \
     _(MixPolicy<BoxPolicy<0>, ObjectPolicy<1> >)                        \
     _(MixPolicy<ConvertToStringPolicy<0>, ConvertToStringPolicy<1> >)   \
@@ -1206,8 +1230,8 @@ namespace jit {
     TEMPLATE_TYPE_POLICY_LIST(template<> DEFINE_TYPE_POLICY_SINGLETON_INSTANCES_)
 #undef DEFINE_TYPE_POLICY_SINGLETON_INSTANCES_
 
-}
-}
+} // namespace jit
+} // namespace js
 
 namespace {
 
@@ -1223,7 +1247,7 @@ thisTypeSpecialization()
     MOZ_CRASH("TypeSpecialization lacks definition of thisTypeSpecialization.");
 }
 
-}
+} // namespace
 
 TypePolicy*
 MGetElementCache::thisTypePolicy()

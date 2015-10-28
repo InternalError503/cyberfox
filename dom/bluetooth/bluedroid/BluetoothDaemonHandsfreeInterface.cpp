@@ -10,6 +10,8 @@
 
 BEGIN_BLUETOOTH_NAMESPACE
 
+using namespace mozilla::ipc;
+
 //
 // Handsfree module
 //
@@ -1799,8 +1801,8 @@ void
 BluetoothDaemonHandsfreeInterface::DispatchError(
   BluetoothHandsfreeResultHandler* aRes, BluetoothStatus aStatus)
 {
-  BluetoothResultRunnable1<BluetoothHandsfreeResultHandler, void,
-                           BluetoothStatus, BluetoothStatus>::Dispatch(
+  DaemonResultRunnable1<BluetoothHandsfreeResultHandler, void,
+                        BluetoothStatus, BluetoothStatus>::Dispatch(
     aRes, &BluetoothHandsfreeResultHandler::OnError,
     ConstantInitOp1<BluetoothStatus>(aStatus));
 }

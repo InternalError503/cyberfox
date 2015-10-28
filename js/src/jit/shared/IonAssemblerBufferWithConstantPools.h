@@ -460,6 +460,10 @@ struct AssemblerBufferWithConstantPools : public AssemblerBuffer<SliceSize, Inst
     // MacroAssembler before allocating any space.
     void initWithAllocator() {
         poolInfo_ = this->lifoAlloc_.template newArrayUninitialized<PoolInfo>(poolInfoSize_);
+        if (!poolInfo_) {
+            this->fail_oom();
+            return;
+        }
 
         new (&pool_) Pool (poolMaxOffset_, pcBias_, this->lifoAlloc_);
         if (pool_.poolData() == nullptr)
@@ -823,7 +827,7 @@ struct AssemblerBufferWithConstantPools : public AssemblerBuffer<SliceSize, Inst
             return;
         unsigned destOffset = branch.getOffset() + offset;
         if (offset > 0) {
-            while (curpool < numDumps_ && poolInfo_[curpool].offset <= destOffset) {
+            while (curpool < numDumps_ && poolInfo_[curpool].offset <= (size_t)destOffset) {
                 offset += poolInfo_[curpool].size;
                 curpool++;
             }

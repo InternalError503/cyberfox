@@ -28,6 +28,9 @@
 #include "imgITools.h"
 #include "nsStringStream.h"
 #include "nsNetUtil.h"
+#include "nsIOutputStream.h"
+#include "nsNetCID.h"
+#include "prtime.h"
 #ifdef MOZ_PLACES
 #include "mozIAsyncFavicons.h"
 #endif
@@ -44,7 +47,7 @@
 
 #ifdef NS_ENABLE_TSF
 #include <textstor.h>
-#include "nsTextStore.h"
+#include "TSFTextStore.h"
 #endif // #ifdef NS_ENABLE_TSF
 
 PRLogModuleInfo* gWindowsLog = nullptr;
@@ -569,7 +572,7 @@ WinUtils::PeekMessage(LPMSG aMsg, HWND aWnd, UINT aFirstMessage,
                       UINT aLastMessage, UINT aOption)
 {
 #ifdef NS_ENABLE_TSF
-  ITfMessagePump* msgPump = nsTextStore::GetMessagePump();
+  ITfMessagePump* msgPump = TSFTextStore::GetMessagePump();
   if (msgPump) {
     BOOL ret = FALSE;
     HRESULT hr = msgPump->PeekMessageW(aMsg, aWnd, aFirstMessage, aLastMessage,
@@ -587,7 +590,7 @@ WinUtils::GetMessage(LPMSG aMsg, HWND aWnd, UINT aFirstMessage,
                      UINT aLastMessage)
 {
 #ifdef NS_ENABLE_TSF
-  ITfMessagePump* msgPump = nsTextStore::GetMessagePump();
+  ITfMessagePump* msgPump = TSFTextStore::GetMessagePump();
   if (msgPump) {
     BOOL ret = FALSE;
     HRESULT hr = msgPump->GetMessageW(aMsg, aWnd, aFirstMessage, aLastMessage,
@@ -667,7 +670,8 @@ WinUtils::GetRegistryKey(HKEY aRoot,
     ::RegQueryValueExW(key, aValueName, nullptr, &type, (BYTE*) aBuffer,
                        &aBufferLength);
   ::RegCloseKey(key);
-  if (result != ERROR_SUCCESS || type != REG_SZ) {
+  if (result != ERROR_SUCCESS ||
+      (type != REG_SZ && type != REG_EXPAND_SZ)) {
     return false;
   }
   if (aBuffer) {

@@ -197,7 +197,8 @@ void
 nsViewManager::SetWindowDimensions(nscoord aWidth, nscoord aHeight)
 {
   if (mRootView) {
-    if (mRootView->IsEffectivelyVisible() && mPresShell && mPresShell->IsVisible()) {
+    if (mRootView->IsEffectivelyVisible() && mPresShell &&
+        mPresShell->IsVisible() && !mPresShell->IsInFullscreenChange()) {
       if (mDelayedResize != nsSize(NSCOORD_NONE, NSCOORD_NONE) &&
           mDelayedResize != nsSize(aWidth, aHeight)) {
         // We have a delayed resize; that now obsolete size may already have
@@ -440,8 +441,17 @@ nsViewManager::ProcessPendingUpdatesPaint(nsIWidget* aWidget)
       }
     }
     nsView* view = nsView::GetViewFor(aWidget);
+
     if (!view) {
       NS_ERROR("FlushDelayedResize destroyed the nsView?");
+      return;
+    }
+
+    nsIWidgetListener* previousListener = aWidget->GetPreviouslyAttachedWidgetListener();
+
+    if (previousListener &&
+        previousListener != view &&
+        view->IsPrimaryFramePaintSuppressed()) {
       return;
     }
 
@@ -487,7 +497,7 @@ void nsViewManager::FlushDirtyRegionToWidget(nsView* aView)
   // for it to make it on screen
   if (gfxPrefs::DrawFrameCounter()) {
     nsRect counterBounds = ToAppUnits(gfxPlatform::FrameCounterBounds(), AppUnitsPerDevPixel());
-    r = r.Or(r, counterBounds);
+    r.OrWith(counterBounds);
   }
 
   nsViewManager* widgetVM = nearestViewWithWidget->GetViewManager();
@@ -1149,3 +1159,4 @@ nsViewManager::InvalidateHierarchy()
     }
   }
 }
+

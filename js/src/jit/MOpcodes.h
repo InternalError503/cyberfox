@@ -206,7 +206,9 @@ namespace jit {
     _(LoadTypedArrayElementStatic)                                          \
     _(StoreTypedArrayElementHole)                                           \
     _(StoreTypedArrayElementStatic)                                         \
+    _(AtomicIsLockFree)                                                     \
     _(CompareExchangeTypedArrayElement)                                     \
+    _(AtomicExchangeTypedArrayElement)                                      \
     _(AtomicTypedArrayElementBinop)                                         \
     _(EffectiveAddress)                                                     \
     _(ClampToUint8)                                                         \
@@ -264,6 +266,7 @@ namespace jit {
     _(RecompileCheck)                                                       \
     _(MemoryBarrier)                                                        \
     _(AsmJSCompareExchangeHeap)                                             \
+    _(AsmJSAtomicExchangeHeap)                                              \
     _(AsmJSAtomicBinopHeap)                                                 \
     _(UnknownValue)                                                         \
     _(LexicalCheck)                                                         \

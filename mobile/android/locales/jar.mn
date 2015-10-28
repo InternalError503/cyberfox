@@ -9,7 +9,6 @@
   locale/@AB_CD@/browser/about.dtd                (%chrome/about.dtd)
   locale/@AB_CD@/browser/aboutAddons.dtd          (%chrome/aboutAddons.dtd)
   locale/@AB_CD@/browser/aboutAddons.properties   (%chrome/aboutAddons.properties)
-  locale/@AB_CD@/browser/aboutApps.dtd            (%chrome/aboutApps.dtd)
 #ifdef MOZ_DEVICES
   locale/@AB_CD@/browser/aboutDevices.dtd         (%chrome/aboutDevices.dtd)
 #endif
@@ -38,9 +37,9 @@
   locale/@AB_CD@/browser/payments.properties      (%chrome/payments.properties)
   locale/@AB_CD@/browser/handling.properties      (%chrome/handling.properties)
   locale/@AB_CD@/browser/webapp.properties        (%chrome/webapp.properties)
-#ifdef NIGHTLY_BUILD
   locale/@AB_CD@/browser/aboutLogins.dtd          (%chrome/aboutLogins.dtd)
   locale/@AB_CD@/browser/aboutLogins.properties  (%chrome/aboutLogins.properties)
+#ifdef NIGHTLY_BUILD
   locale/@AB_CD@/browser/webcompatReporter.properties (%chrome/webcompatReporter.properties)
 #endif
 

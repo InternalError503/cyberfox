@@ -18,7 +18,7 @@ var permissionObserver = {
   {
     if (aTopic == "perm-changed") {
       var permission = aSubject.QueryInterface(Components.interfaces.nsIPermission);
-      if (permission.host == gPermURI.host) {
+      if (permission.matchesURI(gPermURI, true)) {
         if (gPermissions.indexOf(permission.type) > -1)
           initRow(permission.type);
         else if (permission.type.startsWith("plugin"))
@@ -28,14 +28,13 @@ var permissionObserver = {
   }
 };
 
-function onLoadPermission()
+function onLoadPermission(uri)
 {
-  var uri = BrowserUtils.makeURIFromCPOW(gDocument.documentURIObject);
   var permTab = document.getElementById("permTab");
   if (SitePermissions.isSupportedURI(uri)) {
     gPermURI = uri;
     var hostText = document.getElementById("hostText");
-    hostText.value = gPermURI.host;
+    hostText.value = gPermURI.prePath;
 
     for (var i of gPermissions)
       initRow(i);

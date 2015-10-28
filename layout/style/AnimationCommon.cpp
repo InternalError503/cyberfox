@@ -13,6 +13,7 @@
 #include "nsCSSPropertySet.h"
 #include "nsCSSValue.h"
 #include "nsCycleCollectionParticipant.h"
+#include "nsDOMMutationObserver.h"
 #include "nsStyleContext.h"
 #include "nsIFrame.h"
 #include "nsLayoutUtils.h"
@@ -49,8 +50,6 @@ IsGeometricProperty(nsCSSProperty aProperty)
       return false;
   }
 }
-
-namespace css {
 
 CommonAnimationManager::CommonAnimationManager(nsPresContext *aPresContext)
   : mPresContext(aPresContext)
@@ -134,17 +133,47 @@ CommonAnimationManager::NeedsRefresh() const
 }
 
 AnimationCollection*
-CommonAnimationManager::GetAnimationsForCompositor(nsIContent* aContent,
-                                                   nsIAtom* aElementProperty,
+CommonAnimationManager::GetAnimationCollection(const nsIFrame* aFrame)
+{
+  nsIContent* content = aFrame->GetContent();
+  if (!content) {
+    return nullptr;
+  }
+  nsIAtom* animProp;
+  if (aFrame->IsGeneratedContentFrame()) {
+    nsIFrame* parent = aFrame->GetParent();
+    if (parent->IsGeneratedContentFrame()) {
+      return nullptr;
+    }
+    nsIAtom* name = content->NodeInfo()->NameAtom();
+    if (name == nsGkAtoms::mozgeneratedcontentbefore) {
+      animProp = GetAnimationsBeforeAtom();
+    } else if (name == nsGkAtoms::mozgeneratedcontentafter) {
+      animProp = GetAnimationsAfterAtom();
+    } else {
+      return nullptr;
+    }
+    content = content->GetParent();
+    if (!content) {
+      return nullptr;
+    }
+  } else {
+    if (!content->MayHaveAnimations()) {
+      return nullptr;
+    }
+    animProp = GetAnimationsAtom();
+  }
+
+  return static_cast<AnimationCollection*>(content->GetProperty(animProp));
+}
+
+AnimationCollection*
+CommonAnimationManager::GetAnimationsForCompositor(const nsIFrame* aFrame,
                                                    nsCSSProperty aProperty)
 {
-  if (!aContent->MayHaveAnimations())
-    return nullptr;
-
-  AnimationCollection* collection =
-    static_cast<AnimationCollection*>(aContent->GetProperty(aElementProperty));
+  AnimationCollection* collection = GetAnimationCollection(aFrame);
   if (!collection ||
-      !collection->HasAnimationOfProperty(aProperty) ||
+      !collection->HasCurrentAnimationOfProperty(aProperty) ||
       !collection->CanPerformOnCompositorThread(
         AnimationCollection::CanAnimate_AllowPartial)) {
     return nullptr;
@@ -153,12 +182,6 @@ CommonAnimationManager::GetAnimationsForCompositor(nsIContent* aContent,
   // This animation can be done on the compositor.
   return collection;
 }
-
-/*
- * nsISupports implementation
- */
-
-NS_IMPL_ISUPPORTS(CommonAnimationManager, nsIStyleRuleProcessor)
 
 nsRestyleHint
 CommonAnimationManager::HasStateDependentStyle(StateRuleProcessorData* aData)
@@ -179,7 +202,9 @@ CommonAnimationManager::HasDocumentStateDependentStyle(StateRuleProcessorData* a
 }
 
 nsRestyleHint
-CommonAnimationManager::HasAttributeDependentStyle(AttributeRuleProcessorData* aData)
+CommonAnimationManager::HasAttributeDependentStyle(
+    AttributeRuleProcessorData* aData,
+    RestyleHintData& aRestyleHintDataResult)
 {
   return nsRestyleHint(0);
 }
@@ -339,11 +364,12 @@ CommonAnimationManager::GetAnimations(dom::Element *aElement,
                             &AnimationCollection::PropertyDtor, false);
     if (NS_FAILED(rv)) {
       NS_WARNING("SetProperty failed");
-      delete collection;
+      // The collection must be destroyed via PropertyDtor, otherwise
+      // mCalledPropertyDtor assertion is triggered in destructor.
+      AnimationCollection::PropertyDtor(aElement, propName, collection, nullptr);
       return nullptr;
     }
-    if (propName == nsGkAtoms::animationsProperty ||
-        propName == nsGkAtoms::transitionsProperty) {
+    if (aPseudoType == nsCSSPseudoElements::ePseudo_NotPseudoElement) {
       aElement->SetMayHaveAnimations();
     }
 
@@ -414,7 +440,7 @@ CommonAnimationManager::LayerAnimationRecordFor(nsCSSProperty aProperty)
 /* static */ void
 CommonAnimationManager::Initialize()
 {
-  const auto& info = css::CommonAnimationManager::sLayerAnimationInfo;
+  const auto& info = CommonAnimationManager::sLayerAnimationInfo;
   for (size_t i = 0; i < ArrayLength(info); i++) {
     auto record = info[i];
     MOZ_ASSERT(nsCSSProps::PropHasFlags(record.mProperty,
@@ -508,8 +534,6 @@ AnimValuesStyleRule::List(FILE* out, int32_t aIndent) const
 }
 #endif
 
-} /* end sub-namespace css */
-
 bool
 AnimationCollection::CanAnimatePropertyOnCompositor(
   const dom::Element *aElement,
@@ -600,21 +624,12 @@ bool
 AnimationCollection::CanPerformOnCompositorThread(
   CanAnimateFlags aFlags) const
 {
-  nsIFrame* frame = nsLayoutUtils::GetStyleFrame(mElement);
-  if (!frame) {
+  dom::Element* element = GetElementToRestyle();
+  if (!element) {
     return false;
   }
-
-  if (mElementProperty != nsGkAtoms::transitionsProperty &&
-      mElementProperty != nsGkAtoms::animationsProperty) {
-    if (nsLayoutUtils::IsAnimationLoggingEnabled()) {
-      nsCString message;
-      message.AppendLiteral("Gecko bug: Async animation of pseudoelements"
-                            " not supported.  See bug 771367 (");
-      message.Append(nsAtomCString(mElementProperty));
-      message.Append(")");
-      LogAsyncAnimationFailure(message, mElement);
-    }
+  nsIFrame* frame = nsLayoutUtils::GetStyleFrame(element);
+  if (!frame) {
     return false;
   }
 
@@ -651,7 +666,7 @@ AnimationCollection::CanPerformOnCompositorThread(
     for (size_t propIdx = 0, propEnd = effect->Properties().Length();
          propIdx != propEnd; ++propIdx) {
       const AnimationProperty& prop = effect->Properties()[propIdx];
-      if (!CanAnimatePropertyOnCompositor(mElement,
+      if (!CanAnimatePropertyOnCompositor(element,
                                           prop.mProperty,
                                           aFlags) ||
           IsCompositorAnimationDisabledForFrame(frame)) {
@@ -680,7 +695,7 @@ AnimationCollection::PostUpdateLayerAnimations()
                                    CSS_PROPERTY_CAN_ANIMATE_ON_COMPOSITOR) &&
           !propsHandled.HasProperty(prop)) {
         propsHandled.AddProperty(prop);
-        nsChangeHint changeHint = css::CommonAnimationManager::
+        nsChangeHint changeHint = CommonAnimationManager::
           LayerAnimationRecordFor(prop)->mChangeHint;
         dom::Element* element = GetElementToRestyle();
         if (element) {
@@ -693,16 +708,31 @@ AnimationCollection::PostUpdateLayerAnimations()
 }
 
 bool
-AnimationCollection::HasAnimationOfProperty(nsCSSProperty aProperty) const
+AnimationCollection::HasCurrentAnimationOfProperty(nsCSSProperty
+                                                     aProperty) const
 {
-  for (size_t animIdx = mAnimations.Length(); animIdx-- != 0; ) {
-    const KeyframeEffectReadOnly* effect = mAnimations[animIdx]->GetEffect();
-    if (effect && effect->HasAnimationOfProperty(aProperty) &&
-        !effect->IsFinishedTransition()) {
+  for (Animation* animation : mAnimations) {
+    if (animation->HasCurrentEffect() &&
+        animation->GetEffect()->HasAnimationOfProperty(aProperty)) {
       return true;
     }
   }
   return false;
+}
+
+/*static*/ nsString
+AnimationCollection::PseudoTypeAsString(nsCSSPseudoElements::Type aPseudoType)
+{
+  switch (aPseudoType) {
+    case nsCSSPseudoElements::ePseudo_before:
+      return NS_LITERAL_STRING("::before");
+    case nsCSSPseudoElements::ePseudo_after:
+      return NS_LITERAL_STRING("::after");
+    default:
+      MOZ_ASSERT(aPseudoType == nsCSSPseudoElements::ePseudo_NotPseudoElement,
+                 "Unexpected pseudo type");
+      return EmptyString();
+  }
 }
 
 mozilla::dom::Element*
@@ -771,6 +801,13 @@ AnimationCollection::PropertyDtor(void *aObject, nsIAtom *aPropertyName,
   MOZ_ASSERT(!collection->mCalledPropertyDtor, "can't call dtor twice");
   collection->mCalledPropertyDtor = true;
 #endif
+  {
+    nsAutoAnimationMutationBatch mb(collection->mElement);
+
+    for (size_t animIdx = collection->mAnimations.Length(); animIdx-- != 0; ) {
+      collection->mAnimations[animIdx]->CancelFromStyle();
+    }
+  }
   delete collection;
 }
 
@@ -862,10 +899,15 @@ AnimationCollection::CanThrottleTransformChanges(TimeStamp aTime)
     return true;
   }
 
+  dom::Element* element = GetElementToRestyle();
+  if (!element) {
+    return false;
+  }
+
   // If the nearest scrollable ancestor has overflow:hidden,
   // we don't care about overflow.
   nsIScrollableFrame* scrollable = nsLayoutUtils::GetNearestScrollableFrame(
-                                     nsLayoutUtils::GetStyleFrame(mElement));
+                                     nsLayoutUtils::GetStyleFrame(element));
   if (!scrollable) {
     return true;
   }
@@ -883,16 +925,27 @@ AnimationCollection::CanThrottleTransformChanges(TimeStamp aTime)
 bool
 AnimationCollection::CanThrottleAnimation(TimeStamp aTime)
 {
-  nsIFrame* frame = nsLayoutUtils::GetStyleFrame(mElement);
+  dom::Element* element = GetElementToRestyle();
+  if (!element) {
+    return false;
+  }
+  nsIFrame* frame = nsLayoutUtils::GetStyleFrame(element);
   if (!frame) {
     return false;
   }
 
-
-  const auto& info = css::CommonAnimationManager::sLayerAnimationInfo;
+  const auto& info = CommonAnimationManager::sLayerAnimationInfo;
   for (size_t i = 0; i < ArrayLength(info); i++) {
     auto record = info[i];
-    if (!HasAnimationOfProperty(record.mProperty)) {
+    // We only need to worry about *current* animations here.
+    // - If we have a newly-finished animation, Animation::CanThrottle will
+    //   detect that and force an unthrottled sample.
+    // - If we have a newly-idle animation, then whatever caused the animation
+    //   to be idle will update the animation generation so we'll return false
+    //   from the layer generation check below for any other running compositor
+    //   animations (and if no other compositor animations exist we won't get
+    //   this far).
+    if (!HasCurrentAnimationOfProperty(record.mProperty)) {
       continue;
     }
 
@@ -956,4 +1009,24 @@ AnimationCollection::HasCurrentAnimationsForProperties(
   return false;
 }
 
+nsPresContext*
+OwningElementRef::GetRenderedPresContext() const
+{
+  if (!mElement) {
+    return nullptr;
+  }
+
+  nsIDocument* doc = mElement->GetComposedDoc();
+  if (!doc) {
+    return nullptr;
+  }
+
+  nsIPresShell* shell = doc->GetShell();
+  if (!shell) {
+    return nullptr;
+  }
+
+  return shell->GetPresContext();
 }
+
+} // namespace mozilla

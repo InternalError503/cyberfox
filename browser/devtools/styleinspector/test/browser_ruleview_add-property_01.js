@@ -42,7 +42,7 @@ function* testCreateNew(view) {
   let elementRuleEditor = getRuleViewRuleEditor(view, 0);
 
   info("Focusing a new property name in the rule-view");
-  let editor = yield focusEditableField(elementRuleEditor.closeBrace);
+  let editor = yield focusEditableField(view, elementRuleEditor.closeBrace);
 
   is(inplaceEditor(elementRuleEditor.newPropSpan), editor, "The new property editor got focused");
   let input = editor.input;
@@ -53,12 +53,12 @@ function* testCreateNew(view) {
   info("Pressing return to commit and focus the new value field");
   let onValueFocus = once(elementRuleEditor.element, "focus", true);
   let onModifications = elementRuleEditor.rule._applyingModifications;
-  EventUtils.synthesizeKey("VK_RETURN", {}, view.doc.defaultView);
+  EventUtils.synthesizeKey("VK_RETURN", {}, view.styleWindow);
   yield onValueFocus;
   yield onModifications;
 
   // Getting the new value editor after focus
-  editor = inplaceEditor(view.doc.activeElement);
+  editor = inplaceEditor(view.styleDocument.activeElement);
   let textProp = elementRuleEditor.rule.textProps[0];
 
   is(elementRuleEditor.rule.textProps.length,  1, "Created a new text property.");

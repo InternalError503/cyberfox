@@ -15,7 +15,10 @@
 #include "nsHttpResponseHead.h"
 #include "nsHttpChunkedDecoder.h"
 #include "nsTransportUtils.h"
+#include "nsNetCID.h"
 #include "nsNetUtil.h"
+#include "nsIChannel.h"
+#include "nsIPipe.h"
 #include "nsCRT.h"
 
 #include "nsISeekableStream.h"
@@ -32,6 +35,7 @@
 #include "nsIInputStream.h"
 #include "nsITransport.h"
 #include "nsIOService.h"
+#include "nsISchedulingContext.h"
 #include <algorithm>
 
 #ifdef MOZ_WIDGET_GONK
@@ -250,10 +254,10 @@ nsHttpTransaction::Init(uint32_t caps,
 
 #ifdef MOZ_WIDGET_GONK
     if (mAppId != NECKO_NO_APP_ID) {
-        nsCOMPtr<nsINetworkInterface> activeNetwork;
-        GetActiveNetworkInterface(activeNetwork);
-        mActiveNetwork =
-            new nsMainThreadPtrHolder<nsINetworkInterface>(activeNetwork);
+        nsCOMPtr<nsINetworkInfo> activeNetworkInfo;
+        GetActiveNetworkInfo(activeNetworkInfo);
+        mActiveNetworkInfo =
+            new nsMainThreadPtrHolder<nsINetworkInfo>(activeNetworkInfo);
     }
 #endif
 
@@ -381,6 +385,12 @@ nsHttpTransaction::Init(uint32_t caps,
                      nsIOService::gDefaultSegmentSize,
                      nsIOService::gDefaultSegmentCount);
     if (NS_FAILED(rv)) return rv;
+
+#ifdef WIN32 // bug 1153929
+    MOZ_DIAGNOSTIC_ASSERT(mPipeOut);
+    uint32_t * vtable = (uint32_t *) mPipeOut.get();
+    MOZ_DIAGNOSTIC_ASSERT(*vtable != 0);
+#endif // WIN32
 
     Classify();
 
@@ -756,16 +766,28 @@ nsresult
 nsHttpTransaction::WriteSegments(nsAHttpSegmentWriter *writer,
                                  uint32_t count, uint32_t *countWritten)
 {
+    static bool reentrantFlag = false;
+    LOG(("nsHttpTransaction::WriteSegments %p reentrantFlag=%d",
+         this, reentrantFlag));
+    MOZ_DIAGNOSTIC_ASSERT(!reentrantFlag);
+    reentrantFlag = true;
     MOZ_ASSERT(PR_GetCurrentThread() == gSocketThread);
 
-    if (mTransactionDone)
+    if (mTransactionDone) {
+        reentrantFlag = false;
         return NS_SUCCEEDED(mStatus) ? NS_BASE_STREAM_CLOSED : mStatus;
+    }
 
     mWriter = writer;
 
-    // Bug 1153929 - add checks to fix windows crash
-    MOZ_ASSERT(mPipeOut);
+#ifdef WIN32 // bug 1153929
+    MOZ_DIAGNOSTIC_ASSERT(mPipeOut);
+    uint32_t * vtable = (uint32_t *) mPipeOut.get();
+    MOZ_DIAGNOSTIC_ASSERT(*vtable != 0);
+#endif // WIN32
+
     if (!mPipeOut) {
+        reentrantFlag = false;
         return NS_ERROR_UNEXPECTED;
     }
 
@@ -796,6 +818,7 @@ nsHttpTransaction::WriteSegments(nsAHttpSegmentWriter *writer,
         }
     }
 
+    reentrantFlag = false;
     return rv;
 }
 
@@ -804,7 +827,7 @@ nsHttpTransaction::SaveNetworkStats(bool enforce)
 {
 #ifdef MOZ_WIDGET_GONK
     // Check if active network and appid are valid.
-    if (!mActiveNetwork || mAppId == NECKO_NO_APP_ID) {
+    if (!mActiveNetworkInfo || mAppId == NECKO_NO_APP_ID) {
         return NS_OK;
     }
 
@@ -824,7 +847,7 @@ nsHttpTransaction::SaveNetworkStats(bool enforce)
     // Create the event to save the network statistics.
     // the event is then dispathed to the main thread.
     nsRefPtr<nsRunnable> event =
-        new SaveNetworkStatsEvent(mAppId, mIsInBrowser, mActiveNetwork,
+        new SaveNetworkStatsEvent(mAppId, mIsInBrowser, mActiveNetworkInfo,
                                   mCountRecv, mCountSent, false);
     NS_DispatchToMainThread(event);
 
@@ -1054,7 +1077,13 @@ nsHttpTransaction::Close(nsresult reason)
 
     // closing this pipe triggers the channel's OnStopRequest method.
     mPipeOut->CloseWithStatus(reason);
-    mPipeOut = nullptr;
+
+#ifdef WIN32 // bug 1153929
+    MOZ_DIAGNOSTIC_ASSERT(mPipeOut);
+    uint32_t * vtable = (uint32_t *) mPipeOut.get();
+    MOZ_DIAGNOSTIC_ASSERT(*vtable != 0);
+    mPipeOut = nullptr; // just in case
+#endif // WIN32
 }
 
 nsHttpConnectionInfo *
@@ -1825,10 +1854,10 @@ nsHttpTransaction::CancelPipeline(uint32_t reason)
 
 
 void
-nsHttpTransaction::SetLoadGroupConnectionInfo(nsILoadGroupConnectionInfo *aLoadGroupCI)
+nsHttpTransaction::SetSchedulingContext(nsISchedulingContext *aSchedulingContext)
 {
-    LOG(("nsHttpTransaction %p SetLoadGroupConnectionInfo %p\n", this, aLoadGroupCI));
-    mLoadGroupCI = aLoadGroupCI;
+    LOG(("nsHttpTransaction %p SetSchedulingContext %p\n", this, aSchedulingContext));
+    mSchedulingContext = aSchedulingContext;
 }
 
 // Called when the transaction marked for blocking is associated with a connection
@@ -1843,32 +1872,32 @@ nsHttpTransaction::DispatchedAsBlocking()
 
     LOG(("nsHttpTransaction %p dispatched as blocking\n", this));
 
-    if (!mLoadGroupCI)
+    if (!mSchedulingContext)
         return;
 
     LOG(("nsHttpTransaction adding blocking transaction %p from "
-         "loadgroup %p\n", this, mLoadGroupCI.get()));
+         "scheduling context %p\n", this, mSchedulingContext.get()));
 
-    mLoadGroupCI->AddBlockingTransaction();
+    mSchedulingContext->AddBlockingTransaction();
     mDispatchedAsBlocking = true;
 }
 
 void
 nsHttpTransaction::RemoveDispatchedAsBlocking()
 {
-    if (!mLoadGroupCI || !mDispatchedAsBlocking)
+    if (!mSchedulingContext || !mDispatchedAsBlocking)
         return;
 
     uint32_t blockers = 0;
-    nsresult rv = mLoadGroupCI->RemoveBlockingTransaction(&blockers);
+    nsresult rv = mSchedulingContext->RemoveBlockingTransaction(&blockers);
 
     LOG(("nsHttpTransaction removing blocking transaction %p from "
-         "loadgroup %p. %d blockers remain.\n", this,
-         mLoadGroupCI.get(), blockers));
+         "scheduling context %p. %d blockers remain.\n", this,
+         mSchedulingContext.get(), blockers));
 
     if (NS_SUCCEEDED(rv) && !blockers) {
         LOG(("nsHttpTransaction %p triggering release of blocked channels "
-             " with loadgroupci=%p\n", this, mLoadGroupCI.get()));
+             " with scheduling context=%p\n", this, mSchedulingContext.get()));
         gHttpHandler->ConnMgr()->ProcessPendingQ();
     }
 
@@ -1879,9 +1908,9 @@ void
 nsHttpTransaction::ReleaseBlockingTransaction()
 {
     RemoveDispatchedAsBlocking();
-    LOG(("nsHttpTransaction %p loadgroupci set to null "
-         "in ReleaseBlockingTransaction() - was %p\n", this, mLoadGroupCI.get()));
-    mLoadGroupCI = nullptr;
+    LOG(("nsHttpTransaction %p scheduling context set to null "
+         "in ReleaseBlockingTransaction() - was %p\n", this, mSchedulingContext.get()));
+    mSchedulingContext = nullptr;
 }
 
 void
@@ -2252,5 +2281,5 @@ nsHttpTransaction::GetNetworkAddresses(NetAddr &self, NetAddr &peer)
     peer = mPeerAddr;
 }
 
-} // namespace mozilla::net
+} // namespace net
 } // namespace mozilla

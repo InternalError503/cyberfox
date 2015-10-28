@@ -49,31 +49,6 @@ LIRGeneratorMIPS::tempByteOpRegister()
 }
 
 void
-LIRGeneratorMIPS::lowerConstantDouble(double d, MInstruction* mir)
-{
-    return define(new(alloc()) LDouble(d), mir);
-}
-
-void
-LIRGeneratorMIPS::lowerConstantFloat32(float d, MInstruction* mir)
-{
-    define(new(alloc()) LFloat32(d), mir);
-}
-
-void
-LIRGeneratorMIPS::visitConstant(MConstant* ins)
-{
-    if (ins->type() == MIRType_Double)
-        lowerConstantDouble(ins->value().toDouble(), ins);
-    else if (ins->type() == MIRType_Float32)
-        lowerConstantFloat32(ins->value().toDouble(), ins);
-    else if (ins->canEmitAtUses())
-        emitAtUses(ins);
-    else
-        LIRGeneratorShared::visitConstant(ins);
-}
-
-void
 LIRGeneratorMIPS::visitBox(MBox* box)
 {
     MDefinition* inner = box->getOperand(0);
@@ -568,7 +543,19 @@ LIRGeneratorMIPS::visitCompareExchangeTypedArrayElement(MCompareExchangeTypedArr
 }
 
 void
+LIRGeneratorMIPS::visitAtomicExchangeTypedArrayElement(MAtomicExchangeTypedArrayElement* ins)
+{
+    MOZ_CRASH("NYI");
+}
+
+void
 LIRGeneratorMIPS::visitAsmJSCompareExchangeHeap(MAsmJSCompareExchangeHeap* ins)
+{
+    MOZ_CRASH("NYI");
+}
+
+void
+LIRGeneratorMIPS::visitAsmJSAtomicExchangeHeap(MAsmJSAtomicExchangeHeap* ins)
 {
     MOZ_CRASH("NYI");
 }

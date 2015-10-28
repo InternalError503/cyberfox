@@ -10,6 +10,7 @@
 
 #include "ExtendedValidation.h"
 #include "OCSPRequestor.h"
+#include "OCSPVerificationTrustDomain.h"
 #include "certdb.h"
 #include "cert.h"
 #include "mozilla/UniquePtr.h"
@@ -48,6 +49,8 @@ NSSCertDBTrustDomain::NSSCertDBTrustDomain(SECTrustType certDBTrustType,
                                            uint32_t certShortLifetimeInDays,
                                            CertVerifier::PinningMode pinningMode,
                                            unsigned int minRSABits,
+                                           ValidityCheckingMode validityCheckingMode,
+                                           SignatureDigestOption signatureDigestOption,
                               /*optional*/ const char* hostname,
                               /*optional*/ ScopedCERTCertList* builtChain)
   : mCertDBTrustType(certDBTrustType)
@@ -58,6 +61,8 @@ NSSCertDBTrustDomain::NSSCertDBTrustDomain(SECTrustType certDBTrustType,
   , mCertShortLifetimeInDays(certShortLifetimeInDays)
   , mPinningMode(pinningMode)
   , mMinRSABits(minRSABits)
+  , mValidityCheckingMode(validityCheckingMode)
+  , mSignatureDigestOption(signatureDigestOption)
   , mHostname(hostname)
   , mBuiltChain(builtChain)
   , mCertBlocklist(do_GetService(NS_CERTBLOCKLIST_CONTRACTID))
@@ -634,7 +639,17 @@ NSSCertDBTrustDomain::VerifyAndMaybeCacheEncodedOCSPResponse(
 {
   Time thisUpdate(Time::uninitialized);
   Time validThrough(Time::uninitialized);
-  Result rv = VerifyEncodedOCSPResponse(*this, certID, time,
+
+  // We use a try and fallback approach which first mandates good signature
+  // digest algorithms, then falls back to SHA-1 if this fails. If a delegated
+  // OCSP response signing certificate was issued with a SHA-1 signature,
+  // verification initially fails. We cache the failure and then re-use that
+  // result even when doing fallback (i.e. when weak signature digest algorithms
+  // should succeed). To address this we use an OCSPVerificationTrustDomain
+  // here, rather than using *this, to ensure verification succeeds for all
+  // allowed signature digest algorithms.
+  OCSPVerificationTrustDomain trustDomain(*this);
+  Result rv = VerifyEncodedOCSPResponse(trustDomain, certID, time,
                                         maxLifetimeInDays, encodedResponse,
                                         expired, &thisUpdate, &validThrough);
   // If a response was stapled and expired, we don't want to cache it. Return
@@ -794,8 +809,28 @@ NSSCertDBTrustDomain::IsChainValid(const DERArray& certArray, Time time)
 }
 
 Result
-NSSCertDBTrustDomain::CheckSignatureDigestAlgorithm(DigestAlgorithm)
+NSSCertDBTrustDomain::CheckSignatureDigestAlgorithm(DigestAlgorithm aAlg,
+                                                    EndEntityOrCA endEntityOrCA)
 {
+  MOZ_LOG(gCertVerifierLog, LogLevel::Debug,
+          ("NSSCertDBTrustDomain: CheckSignatureDigestAlgorithm"));
+  if (aAlg == DigestAlgorithm::sha1) {
+    if (mSignatureDigestOption == DisableSHA1Everywhere) {
+      return Result::ERROR_CERT_SIGNATURE_ALGORITHM_DISABLED;
+    }
+
+    if (endEntityOrCA == EndEntityOrCA::MustBeCA) {
+    MOZ_LOG(gCertVerifierLog, LogLevel::Debug, ("CA cert is SHA1"));
+      return mSignatureDigestOption == DisableSHA1ForCA
+             ? Result::ERROR_CERT_SIGNATURE_ALGORITHM_DISABLED
+             : Success;
+    } else {
+    MOZ_LOG(gCertVerifierLog, LogLevel::Debug, ("EE cert is SHA1"));
+      return mSignatureDigestOption == DisableSHA1ForEE
+             ? Result::ERROR_CERT_SIGNATURE_ALGORITHM_DISABLED
+             : Success;
+    }
+  }
   return Success;
 }
 
@@ -838,6 +873,44 @@ NSSCertDBTrustDomain::VerifyECDSASignedDigest(const SignedDigest& signedDigest,
 {
   return VerifyECDSASignedDigestNSS(signedDigest, subjectPublicKeyInfo,
                                     mPinArg);
+}
+
+Result
+NSSCertDBTrustDomain::CheckValidityIsAcceptable(Time notBefore, Time notAfter,
+                                                EndEntityOrCA endEntityOrCA,
+                                                KeyPurposeId keyPurpose)
+{
+  if (endEntityOrCA != EndEntityOrCA::MustBeEndEntity) {
+    return Success;
+  }
+  if (keyPurpose == KeyPurposeId::id_kp_OCSPSigning) {
+    return Success;
+  }
+
+  Duration DURATION_39_MONTHS((3 * 365 + 3 * 31) * Time::ONE_DAY_IN_SECONDS);
+  Duration maxValidityDuration(UINT64_MAX);
+  Duration validityDuration(notBefore, notAfter);
+
+  switch (mValidityCheckingMode) {
+    case ValidityCheckingMode::CheckingOff:
+      return Success;
+    case ValidityCheckingMode::CheckForEV:
+      // The EV Guidelines say the maximum is 27 months, but we use a higher
+      // limit here:
+      //  a) To (hopefully) minimize compatibility breakage.
+      //  b) Because there was some talk about raising the limit to 39 months to
+      //     match the BR limit.
+      maxValidityDuration = DURATION_39_MONTHS;
+      break;
+    default:
+      PR_NOT_REACHED("We're not handling every ValidityCheckingMode type");
+  }
+
+  if (validityDuration > maxValidityDuration) {
+    return Result::ERROR_VALIDITY_TOO_LONG;
+  }
+
+  return Success;
 }
 
 namespace {

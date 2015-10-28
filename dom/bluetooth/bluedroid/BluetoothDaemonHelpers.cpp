@@ -11,24 +11,12 @@
 
 BEGIN_BLUETOOTH_NAMESPACE
 
+using mozilla::ipc::DaemonSocketPDUHelpers::Convert;
+using mozilla::ipc::DaemonSocketPDUHelpers::PackPDU;
+
 //
 // Conversion
 //
-
-nsresult
-Convert(bool aIn, uint8_t& aOut)
-{
-  static const bool sValue[] = {
-    CONVERT(false, 0x00),
-    CONVERT(true, 0x01)
-  };
-  if (NS_WARN_IF(aIn >= MOZ_ARRAY_LENGTH(sValue))) {
-    aOut = 0;
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = sValue[aIn];
-  return NS_OK;
-}
 
 nsresult
 Convert(bool aIn, BluetoothScanMode& aOut)
@@ -42,42 +30,6 @@ Convert(bool aIn, BluetoothScanMode& aOut)
     return NS_ERROR_ILLEGAL_VALUE;
   }
   aOut = sScanMode[aIn];
-  return NS_OK;
-}
-
-nsresult
-Convert(int aIn, uint8_t& aOut)
-{
-  if (NS_WARN_IF(aIn < std::numeric_limits<uint8_t>::min()) ||
-      NS_WARN_IF(aIn > std::numeric_limits<uint8_t>::max())) {
-    aOut = 0; // silences compiler warning
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = static_cast<uint8_t>(aIn);
-  return NS_OK;
-}
-
-nsresult
-Convert(int aIn, int16_t& aOut)
-{
-  if (NS_WARN_IF(aIn < std::numeric_limits<int16_t>::min()) ||
-      NS_WARN_IF(aIn > std::numeric_limits<int16_t>::max())) {
-    aOut = 0; // silences compiler warning
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = static_cast<int16_t>(aIn);
-  return NS_OK;
-}
-
-nsresult
-Convert(int aIn, int32_t& aOut)
-{
-  if (NS_WARN_IF(aIn < std::numeric_limits<int32_t>::min()) ||
-      NS_WARN_IF(aIn > std::numeric_limits<int32_t>::max())) {
-    aOut = 0; // silences compiler warning
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = static_cast<int32_t>(aIn);
   return NS_OK;
 }
 
@@ -111,41 +63,6 @@ Convert(int32_t aIn, BluetoothScanMode& aOut)
     return NS_ERROR_ILLEGAL_VALUE;
   }
   aOut = sScanMode[aIn];
-  return NS_OK;
-}
-
-nsresult
-Convert(uint8_t aIn, bool& aOut)
-{
-  static const bool sBool[] = {
-    CONVERT(0x00, false),
-    CONVERT(0x01, true)
-  };
-  if (NS_WARN_IF(aIn >= MOZ_ARRAY_LENGTH(sBool))) {
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = sBool[aIn];
-  return NS_OK;
-}
-
-nsresult
-Convert(uint8_t aIn, char& aOut)
-{
-  aOut = static_cast<char>(aIn);
-  return NS_OK;
-}
-
-nsresult
-Convert(uint8_t aIn, int& aOut)
-{
-  aOut = static_cast<int>(aIn);
-  return NS_OK;
-}
-
-nsresult
-Convert(uint8_t aIn, unsigned long& aOut)
-{
-  aOut = static_cast<unsigned long>(aIn);
   return NS_OK;
 }
 
@@ -403,6 +320,12 @@ Convert(uint8_t aIn, BluetoothHandsfreeWbsConfig& aOut)
 }
 
 nsresult
+Convert(uint8_t aIn, BluetoothTypeOfDevice& aOut)
+{
+  return Convert((int32_t)aIn, aOut);
+}
+
+nsresult
 Convert(uint8_t aIn, BluetoothPropertyType& aOut)
 {
   static const BluetoothPropertyType sPropertyType[] = {
@@ -527,36 +450,6 @@ Convert(int32_t aIn, BluetoothGattStatus& aOut)
 }
 
 nsresult
-Convert(uint32_t aIn, int& aOut)
-{
-  aOut = static_cast<int>(aIn);
-  return NS_OK;
-}
-
-nsresult
-Convert(uint32_t aIn, uint8_t& aOut)
-{
-  if (NS_WARN_IF(aIn < std::numeric_limits<uint8_t>::min()) ||
-      NS_WARN_IF(aIn > std::numeric_limits<uint8_t>::max())) {
-    aOut = 0; // silences compiler warning
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = static_cast<uint8_t>(aIn);
-  return NS_OK;
-}
-
-nsresult
-Convert(size_t aIn, uint16_t& aOut)
-{
-  if (NS_WARN_IF(aIn >= (1ul << 16))) {
-    aOut = 0; // silences compiler warning
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-  aOut = static_cast<uint16_t>(aIn);
-  return NS_OK;
-}
-
-nsresult
 Convert(const nsAString& aIn, BluetoothAddress& aOut)
 {
   NS_ConvertUTF16toUTF8 bdAddressUTF8(aIn);
@@ -628,6 +521,19 @@ Convert(const nsAString& aIn, BluetoothServiceName& aOut)
   memcpy(aOut.mName, str, len);
   memset(aOut.mName + len, 0, sizeof(aOut.mName) - len);
 
+  return NS_OK;
+}
+
+nsresult
+Convert(nsresult aIn, BluetoothStatus& aOut)
+{
+  if (NS_SUCCEEDED(aIn)) {
+    aOut = STATUS_SUCCESS;
+  } else if (aIn == NS_ERROR_OUT_OF_MEMORY) {
+    aOut = STATUS_NOMEM;
+  } else {
+    aOut = STATUS_FAIL;
+  }
   return NS_OK;
 }
 
@@ -932,10 +838,12 @@ Convert(BluetoothPropertyType aIn, uint8_t& aOut)
 nsresult
 Convert(const BluetoothRemoteName& aIn, nsAString& aOut)
 {
+  const char* name = reinterpret_cast<const char*>(aIn.mName);
+
   // We construct an nsCString here because the string
   // returned from the PDU is not 0-terminated.
   aOut = NS_ConvertUTF8toUTF16(
-    nsCString(reinterpret_cast<const char*>(aIn.mName), sizeof(aIn.mName)));
+    nsCString(name, strnlen(name, sizeof(aIn.mName))));
   return NS_OK;
 }
 
@@ -1235,12 +1143,6 @@ PackPDU(const BluetoothConfigurationParameter& aIn, DaemonSocketPDU& aPDU)
 {
   return PackPDU(aIn.mType, aIn.mLength,
                  PackArray<uint8_t>(aIn.mValue.get(), aIn.mLength), aPDU);
-}
-
-nsresult
-PackPDU(const DaemonSocketPDUHeader& aIn, DaemonSocketPDU& aPDU)
-{
-  return PackPDU(aIn.mService, aIn.mOpcode, aIn.mLength, aPDU);
 }
 
 nsresult
@@ -1849,65 +1751,6 @@ UnpackPDU(DaemonSocketPDU& aPDU, BluetoothGattNotifyParam& aOut)
   }
   /* unpack value */
   return aPDU.Read(aOut.mValue, aOut.mLength);
-}
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, nsDependentCString& aOut)
-{
-  // We get a pointer to the first character in the PDU, a length
-  // of 1 ensures we consume the \0 byte. With 'str' pointing to
-  // the string in the PDU, we can copy the actual bytes.
-
-  const char* str = reinterpret_cast<const char*>(aPDU.Consume(1));
-  if (NS_WARN_IF(!str)) {
-    return NS_ERROR_ILLEGAL_VALUE; // end of PDU
-  }
-
-  const char* end = static_cast<char*>(memchr(str, '\0', aPDU.GetSize() + 1));
-  if (NS_WARN_IF(!end)) {
-    return NS_ERROR_ILLEGAL_VALUE; // no string terminator
-  }
-
-  ptrdiff_t len = end - str;
-
-  const uint8_t* rest = aPDU.Consume(len);
-  if (NS_WARN_IF(!rest)) {
-    // We couldn't consume bytes that should have been there.
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-
-  aOut.Rebind(str, len);
-
-  return NS_OK;
-}
-
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, const UnpackCString0& aOut)
-{
-  nsDependentCString cstring;
-
-  nsresult rv = UnpackPDU(aPDU, cstring);
-  if (NS_FAILED(rv)) {
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-
-  aOut.mString->AssignASCII(cstring.get(), cstring.Length());
-
-  return NS_OK;
-}
-
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, const UnpackString0& aOut)
-{
-  nsDependentCString cstring;
-
-  nsresult rv = UnpackPDU(aPDU, cstring);
-  if (NS_FAILED(rv)) {
-    return NS_ERROR_ILLEGAL_VALUE;
-  }
-
-  *aOut.mString = NS_ConvertUTF8toUTF16(cstring);
-
-  return NS_OK;
 }
 
 END_BLUETOOTH_NAMESPACE

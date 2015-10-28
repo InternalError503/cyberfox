@@ -1271,7 +1271,7 @@
     "expires_in_version": "never",
     "kind": "enumerated",
     "n_values": 10,
-    "description": "Was the URL upgraded to HTTPS?  (0=already HTTPS, 1=no reason to upgrade, 2=STS upgrade blocked by pref, 3=upgraded with STS)"
+    "description": "Was the URL upgraded to HTTPS?  (0=already HTTPS, 1=no reason to upgrade, 2=STS upgrade blocked by pref, 3=upgraded with STS, 4=upgraded with CSP)"
   },
   "SSL_HANDSHAKE_VERSION": {
     "expires_in_version": "never",
@@ -1456,7 +1456,7 @@
     "description": "SPDY: KB read per connection"
   },
   "SPDY_SETTINGS_UL_BW": {
-    "expires_in_version": "never",
+    "expires_in_version": "42",
     "kind": "exponential",
     "high": "10000",
     "n_buckets": 100,
@@ -1464,7 +1464,7 @@
     "description": "SPDY: Settings Upload Bandwidth"
   },
   "SPDY_SETTINGS_DL_BW": {
-    "expires_in_version": "never",
+    "expires_in_version": "42",
     "kind": "exponential",
     "high": "10000",
     "n_buckets": 100,
@@ -1472,7 +1472,7 @@
     "description": "SPDY: Settings Download Bandwidth"
   },
   "SPDY_SETTINGS_RTT": {
-    "expires_in_version": "never",
+    "expires_in_version": "42",
     "kind": "exponential",
     "high": "1000",
     "n_buckets": 100,
@@ -1485,10 +1485,10 @@
     "high": "5000",
     "n_buckets": 100,
     "extended_statistics_ok": true,
-    "description": "SPDY: Settings Max Streams parameter"
+    "description": "H2: Settings Max Streams parameter"
   },
   "SPDY_SETTINGS_CWND": {
-    "expires_in_version": "never",
+    "expires_in_version": "42",
     "kind": "exponential",
     "high": "500",
     "n_buckets": 50,
@@ -1496,7 +1496,7 @@
     "description": "SPDY: Settings CWND (packets)"
   },
   "SPDY_SETTINGS_RETRANS": {
-    "expires_in_version": "never",
+    "expires_in_version": "42",
     "kind": "exponential",
     "high": "100",
     "n_buckets": 50,
@@ -1509,7 +1509,7 @@
     "high": "1000",
     "n_buckets": 50,
     "extended_statistics_ok": true,
-    "description": "SPDY: Settings IW (rounded to KB)"
+    "description": "H2: Settings Initial Window (rounded to KB)"
   },
   "DISK_CACHE_CORRUPT_DETAILS": {
     "expires_in_version": "40",
@@ -1657,7 +1657,12 @@
     "extended_statistics_ok": true,
     "description": "Time from submission to dispatch of SPDY transaction (ms)"
   },
-  "HTTP_DISK_CACHE_OVERHEAD": {
+  "HTTP_SAW_QUIC_ALT_PROTOCOL": {
+    "expires_in_version": "never",
+    "kind": "boolean",
+    "description": "Fraction of responses with a quic alt-protocol advertisement."
+  },
+ "HTTP_DISK_CACHE_OVERHEAD": {
     "expires_in_version": "default",
     "kind": "exponential",
     "high": "32000000",
@@ -1884,13 +1889,6 @@
     "high": "10 * 1000",
     "n_buckets": 50,
     "description": "Time spent waiting on the cache service lock (ms) on the main thread in NSCACHESERVICE_ONPROFILECHANGED"
-  },
-  "CACHE_SERVICE_LOCK_WAIT_MAINTHREAD_NSCACHESERVICE_LEAVEPRIVATEBROWSING": {
-    "expires_in_version": "never",
-    "kind": "exponential",
-    "high": "10 * 1000",
-    "n_buckets": 50,
-    "description": "Time spent waiting on the cache service lock (ms) on the main thread in NSCACHESERVICE_LEAVEPRIVATEBROWSING"
   },
   "CACHE_SERVICE_LOCK_WAIT_MAINTHREAD_NSCACHESERVICE_ISSTORAGEENABLEDFORPOLICY": {
     "expires_in_version": "never",
@@ -2484,7 +2482,118 @@
     "kind": "exponential",
     "high": "60000",
     "n_buckets": 1000,
-    "description": "Time spend blocked on poll (ms)."
+    "description": "Time spent blocked on poll (ms)."
+  },
+  "PRCONNECT_BLOCKING_TIME_NORMAL": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Connect when we are not shutting down and there has been niether a network nor an offline state change in the last 60s (ms)."
+  },
+  "PRCONNECT_BLOCKING_TIME_SHUTDOWN": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Connect during a shutdown (ms)."
+  },
+  "PRCONNECT_BLOCKING_TIME_CONNECTIVITY_CHANGE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Connect when there has been the connectiviy change in the last 60s (ms)."
+  },
+  "PRCONNECT_BLOCKING_TIME_LINK_CHANGE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Connect when there has been a link change in the last 60s (ms)."
+  },
+  "PRCONNECT_BLOCKING_TIME_OFFLINE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Connect when the offline state has changed in the last 60s (ms)."
+  },
+  "PRCONNECTCONTINUE_BLOCKING_TIME_NORMAL": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_ConnectContinue when we are not shutting down and there has been niether a network nor an offline state change in the last 60s (ms)."
+  },
+  "PRCONNECTCONTINUE_BLOCKING_TIME_SHUTDOWN": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_ConnectContinue during a shutdown (ms)."
+  },
+  "PRCONNECTCONTINUE_BLOCKING_TIME_CONNECTIVITY_CHANGE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_ConnectContinue when there has been the connectivity change in the last 60s (ms)."
+  },
+  "PRCONNECTCONTINUE_BLOCKING_TIME_LINK_CHANGE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_ConnectContinue when there has been a link change in the last 60s (ms)."
+  },
+  "PRCONNECTCONTINUE_BLOCKING_TIME_OFFLINE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_ConnectContinue when the offline state has changed in the last 60s (ms)."
+  },
+  "PRCLOSE_BLOCKING_TIME_NORMAL": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Close when we are not shutting down and there has been niether a network nor an offline state change in the last 60s (ms)."
+  },
+  "PRCLOSE_BLOCKING_TIME_SHUTDOWN": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Close during a shutdown (ms)."
+  },
+  "PRCLOSE_BLOCKING_TIME_CONNECTIVITY_CHANGE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Close when there has been the connectivity change in the last 60s (ms)."
+  },
+  "PRCLOSE_BLOCKING_TIME_LINK_CHANGE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Close when there has been a link change in the last 60s (ms)."
+  },
+  "PRCLOSE_BLOCKING_TIME_OFFLINE": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "60000",
+    "n_buckets": 1000,
+    "description": "Time spent blocked in PR_Close when the offline state has changed in the last 60s (ms)."
+  },
+  "IPV4_AND_IPV6_ADDRESS_CONNECTIVITY": {
+    "expires_in_version": "never",
+    "kind": "enumerated",
+    "n_values": 4,
+    "description": "Count the number of 0) successful connections to an ipv4 address, 1) failed connection an ipv4 address, 2) successful connection to an ipv6 address and 3) failed connections to an ipv6 address."
   },
   "URL_PATH_ENDS_IN_EXCLAMATION": {
     "expires_in_version": "never",
@@ -4117,6 +4226,23 @@
     "kind": "count",
     "description": "Windows 10+ only: The number of times tablet-mode is used during a session"
   },
+  "FX_TOUCH_USED": {
+    "expires_in_version": "46",
+    "kind": "count",
+    "description": "Windows only. Counts occurrences of touch events"
+  },
+  "FX_URLBAR_SELECTED_RESULT_INDEX": {
+    "expires_in_version": "45",
+    "kind": "enumerated",
+    "n_values": 17,
+    "description": "Firefox: The index of the selected result in the URL bar popup"
+  },
+  "FX_URLBAR_SELECTED_RESULT_TYPE": {
+    "expires_in_version": "45",
+    "kind": "enumerated",
+    "n_values": 14,
+    "description": "Firefox: The type of the selected result in the URL bar popup"
+  },
   "INNERWINDOWS_WITH_MUTATION_LISTENERS": {
     "expires_in_version": "never",
     "kind": "boolean",
@@ -4681,6 +4807,12 @@
     "keyed": true,
     "description": "Count of individual invalid ping types that were submitted to Telemetry."
   },
+  "TELEMETRY_PING_EVICTED_FOR_SERVER_ERRORS": {
+    "alert_emails": ["telemetry-client-dev@mozilla.com"],
+    "expires_in_version": "never",
+    "kind": "count",
+    "description": "Number of Telemetry ping files evicted due to server errors (4XX HTTP code received)"
+  },
   "TELEMETRY_SESSIONDATA_FAILED_LOAD": {
     "alert_emails": ["telemetry-client-dev@mozilla.com"],
     "expires_in_version": "never",
@@ -4704,12 +4836,6 @@
     "expires_in_version": "never",
     "kind": "flag",
     "description": "Set if Telemetry failed to save the session data to disk."
-  },
-  "TELEMETRY_PING_EVICTED_FOR_SERVER_ERRORS": {
-    "alert_emails": ["telemetry-client-dev@mozilla.com"],
-    "expires_in_version": "never",
-    "kind": "count",
-    "description": "Number of Telemetry ping files evicted due to server errors (4XX HTTP code received)"
   },
   "TELEMETRY_TEST_FLAG": {
     "expires_in_version": "never",
@@ -4779,6 +4905,20 @@
     "expires_in_version": "default",
     "kind": "boolean",
     "description": "New tab page is enhanced (showing suggestions)."
+  },
+  "NEWTAB_PAGE_LIFE_SPAN": {
+    "expires_in_version": "default",
+    "kind": "exponential",
+    "high": "1200",
+    "n_buckets": 100,
+    "description": "Life-span of a new tab without suggested tile: time delta between first-visible and unload events (half-seconds)."
+  },
+  "NEWTAB_PAGE_LIFE_SPAN_SUGGESTED": {
+    "expires_in_version": "default",
+    "kind": "exponential",
+    "high": "1200",
+    "n_buckets": 100,
+    "description": "Life-span of a new tab with suggested tile: time delta between first-visible and unload events (half-seconds)."
   },
   "NEWTAB_PAGE_PINNED_SITES_COUNT": {
     "expires_in_version": "default",
@@ -4907,11 +5047,11 @@
     "description": "Time for a URL bar DB search to return (ms)",
     "cpp_guard": "ANDROID"
   },
-  "FENNEC_STARTUP_GECKOAPP_ACTION": {
+  "FENNEC_GECKOAPP_STARTUP_ACTION": {
     "expires_in_version": "never",
     "kind": "enumerated",
-    "n_values": 4,
-    "description": "The way the GeckoApp was launched. (Normal, URL, Prefetch, Redirector)",
+    "n_values": 10,
+    "description": "The way the GeckoApp was launched. (Normal, URL, Prefetch, WebApp, Guest)",
     "cpp_guard": "ANDROID"
   },
   "FENNEC_STARTUP_TIME_GECKOREADY": {
@@ -5369,6 +5509,12 @@
     "kind": "enumerated",
     "n_values": 700,
     "description": "The Shumway feature is used during movie execution"
+  },
+  "SHUMWAY_LOAD_RESOURCE_RESULT": {
+    "expires_in_version": "default",
+    "kind": "enumerated",
+    "n_values": 10,
+    "description": "The Shumway external resource loading result"
   },
   "SHUMWAY_FALLBACK": {
     "expires_in_version": "default",
@@ -5897,6 +6043,20 @@
     "n_values": 256,
     "description": "WMF media decoder error or success (0) codes."
   },
+  "VIDEO_CAN_CREATE_AAC_DECODER": {
+    "alert_emails": ["cpearce@mozilla.com"],
+    "expires_in_version": "50",
+    "kind": "boolean",
+    "description": "Whether at startup we report we can playback MP4 (AAC) audio. This is single value is recorded at every startup.",
+    "releaseChannelCollection": "opt-out"
+  },
+  "VIDEO_CAN_CREATE_H264_DECODER": {
+    "alert_emails": ["cpearce@mozilla.com"],
+    "expires_in_version": "50",
+    "kind": "boolean",
+    "description": "Whether at startup we report we can playback MP4 (H.264) video. This is single value is recorded at every startup.",
+    "releaseChannelCollection": "opt-out"
+  },
   "VIDEO_CANPLAYTYPE_H264_CONSTRAINT_SET_FLAG": {
     "expires_in_version": "50",
     "kind": "enumerated",
@@ -6240,6 +6400,14 @@
     "n_buckets": "29",
     "description": "The number of times AddIceCandidate failed on a given PeerConnection, given that ICE failed."
   },
+  "WEBRTC_GET_USER_MEDIA_SECURE_ORIGIN": {
+    "alert_emails": ["seceng@mozilla.org"],
+    "expires_in_version": "50",
+    "kind": "enumerated",
+    "n_values": 15,
+    "description": "Origins for getUserMedia calls (0=other, 1=HTTPS, 2=file, 3=app, 4=localhost, 5=loop, 6=privileged)",
+    "releaseChannelCollection": "opt-out"
+  },
   "DEVTOOLS_DEBUGGER_RDP_LOCAL_TRACERDETACH_MS": {
     "expires_in_version": "never",
     "kind": "exponential",
@@ -6538,6 +6706,26 @@
     "kind": "boolean",
     "description": "How many times has the DevTools WebIDE been opened?"
   },
+  "DEVTOOLS_WEBIDE_PROJECT_EDITOR_OPENED_BOOLEAN": {
+    "expires_in_version": "never",
+    "kind": "boolean",
+    "description": "How many times has the DevTools WebIDE project editor been opened?"
+  },
+  "DEVTOOLS_WEBIDE_PROJECT_EDITOR_SAVE_BOOLEAN": {
+    "expires_in_version": "never",
+    "kind": "boolean",
+    "description": "How many times has a file been saved in the DevTools WebIDE project editor?"
+  },
+  "DEVTOOLS_WEBIDE_NEW_PROJECT_BOOLEAN": {
+    "expires_in_version": "never",
+    "kind": "boolean",
+    "description": "How many times has a new project been created in the DevTools WebIDE?"
+  },
+  "DEVTOOLS_WEBIDE_IMPORT_PROJECT_BOOLEAN": {
+    "expires_in_version": "never",
+    "kind": "boolean",
+    "description": "How many times has a project been imported into the DevTools WebIDE?"
+  },
   "DEVTOOLS_CUSTOM_OPENED_BOOLEAN": {
     "expires_in_version": "never",
     "kind": "boolean",
@@ -6682,6 +6870,26 @@
     "expires_in_version": "never",
     "kind": "flag",
     "description": "How many users have opened the DevTools WebIDE?"
+  },
+  "DEVTOOLS_WEBIDE_PROJECT_EDITOR_OPENED_PER_USER_FLAG": {
+    "expires_in_version": "never",
+    "kind": "flag",
+    "description": "How many users have opened the DevTools WebIDE project editor?"
+  },
+  "DEVTOOLS_WEBIDE_PROJECT_EDITOR_SAVE_PER_USER_FLAG": {
+    "expires_in_version": "never",
+    "kind": "flag",
+    "description": "How many users have saved a file in the DevTools WebIDE project editor?"
+  },
+  "DEVTOOLS_WEBIDE_NEW_PROJECT_PER_USER_FLAG": {
+    "expires_in_version": "never",
+    "kind": "flag",
+    "description": "How many users have created a new project in the DevTools WebIDE?"
+  },
+  "DEVTOOLS_WEBIDE_IMPORT_PROJECT_PER_USER_FLAG": {
+    "expires_in_version": "never",
+    "kind": "flag",
+    "description": "How many users have imported a project into the DevTools WebIDE?"
   },
   "DEVTOOLS_CUSTOM_OPENED_PER_USER_FLAG": {
     "expires_in_version": "never",
@@ -6863,6 +7071,13 @@
     "n_buckets": 100,
     "description": "How long has WebIDE been active (seconds)"
   },
+  "DEVTOOLS_WEBIDE_PROJECT_EDITOR_TIME_ACTIVE_SECONDS": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "10000000",
+    "n_buckets": 100,
+    "description": "How long has WebIDE's project editor been active (seconds)"
+  },
   "DEVTOOLS_CUSTOM_TIME_ACTIVE_SECONDS": {
     "expires_in_version": "never",
     "kind": "exponential",
@@ -7010,6 +7225,34 @@
     "n_buckets": "100",
     "description": "The mean number of pinned tabs (app tabs) in all windows for a session for devtools users."
   },
+  "DEVTOOLS_SAVE_HEAP_SNAPSHOT_MS": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "100000",
+    "n_buckets": "1000",
+    "description": "The time (in milliseconds) that it took to save a heap snapshot in mozilla::devtools::ChromeUtils::SaveHeapSnapshot."
+  },
+  "DEVTOOLS_READ_HEAP_SNAPSHOT_MS": {
+    "expires_in_version": "never",
+    "kind": "exponential",
+    "high": "100000",
+    "n_buckets": "1000",
+    "description": "The time (in milliseconds) that it took to read a heap snapshot in mozilla::devtools::ChromeUtils::ReadHeapSnapshot."
+  },
+  "DEVTOOLS_HEAP_SNAPSHOT_NODE_COUNT": {
+    "expires_in_version": "never",
+    "kind": "linear",
+    "high": "10000000",
+    "n_buckets": "10000",
+    "description": "The number of nodes serialized into a heap snapshot."
+  },
+  "DEVTOOLS_HEAP_SNAPSHOT_EDGE_COUNT": {
+    "expires_in_version": "never",
+    "kind": "linear",
+    "high": "10000000",
+    "n_buckets": "10000",
+    "description": "The number of edges serialized into a heap snapshot."
+  },
   "BROWSER_IS_USER_DEFAULT": {
     "expires_in_version": "never",
     "kind": "boolean",
@@ -7029,6 +7272,12 @@
     "n_buckets": "15",
     "releaseChannelCollection": "opt-out",
     "description": "The number of times that a profile has seen the 'Set Default Browser' dialog."
+  },
+  "BROWSER_SET_DEFAULT_ALWAYS_CHECK": {
+    "expires_in_version": "never",
+    "kind": "boolean",
+    "releaseChannelCollection": "opt-out",
+    "description": "True if the profile has `browser.shell.checkDefaultBrowser` set to true."
   },
   "BROWSER_SET_DEFAULT_RESULT": {
     "expires_in_version": "never",
@@ -7067,6 +7316,21 @@
     "kind": "enumerated",
     "n_values": 3,
     "description": "A simple counter of daily mixed-content unblock operations and top documents loaded"
+  },
+  "MIXED_CONTENT_HSTS": {
+    "alert_emails": ["seceng@mozilla.org"],
+    "expires_in_version": "never",
+    "kind": "enumerated",
+    "n_values": 10,
+    "description": "How often would blocked mixed content be allowed if HSTS upgrades were allowed? 0=display/no-HSTS, 1=display/HSTS, 2=active/no-HSTS, 3=active/HSTS"
+  },
+  "COOKIE_SCHEME_SECURITY": {
+    "alert_emails": ["seceng@mozilla.org"],
+    "expires_in_version": "50",
+    "kind": "enumerated",
+    "n_values": 10,
+    "releaseChannelCollection": "opt-out",
+    "description": "How often are secure cookies set from non-secure origins, and vice-versa? 0=nonsecure/http, 1=nonsecure/https, 2=secure/http, 3=secure/https"
   },
   "NTLM_MODULE_USED_2": {
     "expires_in_version": "never",
@@ -7422,7 +7686,7 @@
   },
   "SSL_PERMANENT_CERT_ERROR_OVERRIDES": {
     "alert_emails": ["seceng@mozilla.org"],
-    "expires_in_version": "42",
+    "expires_in_version": "default",
     "kind": "exponential",
     "high": 1024,
     "n_buckets": 10,
@@ -7535,6 +7799,12 @@
     "kind": "enumerated",
     "n_values": 4,
     "description": "Does enforcing a larger minimum RSA key size cause verification failures? 1 = no, 2 = yes, 3 = another error prevented finding a verified chain"
+  },
+  "CERT_CHAIN_SIGNATURE_DIGEST_STATUS": {
+    "expires_in_version": "default",
+    "kind": "enumerated",
+    "n_values": 6,
+    "description": "Information on weak signature digest algorithms in the chain: 1 = Only good algorithms, 2 = a weak algorithm was present in an end entity, 3 = a weak algorithm was present in a CA cert, 4 = a weak algorithm was present in both EE and CA certs, 5 = another error prevented signature algorithm from being determined"
   },
   "WEAVE_CONFIGURED": {
     "expires_in_version": "default",
@@ -7721,7 +7991,7 @@
     "expires_in_version": "never",
     "kind": "enumerated",
     "n_values": 4,
-    "description": "Tracking protection shield (0 = not shown, 1 = loaded, 2 = blocked, 3 = due to mixed content"
+    "description": "Tracking protection shield (0 = not shown, 1 = loaded, 2 = blocked)"
   },
   "TRACKING_PROTECTION_EVENTS": {
     "expires_in_version": "never",
@@ -7753,7 +8023,7 @@
   },
   "LOOP_TWO_WAY_MEDIA_CONN_LENGTH_1": {
     "alert_emails": ["firefox-dev@mozilla.org", "dmose@mozilla.com"],
-    "expires_in_version": "43",
+    "expires_in_version": "45",
     "kind": "enumerated",
     "n_values": 8,
     "releaseChannelCollection": "opt-out",
@@ -7761,7 +8031,7 @@
   },
   "LOOP_SHARING_STATE_CHANGE_1": {
     "alert_emails": ["firefox-dev@mozilla.org", "mdeboer@mozilla.com"],
-    "expires_in_version": "43",
+    "expires_in_version": "45",
     "kind": "enumerated",
     "n_values": 8,
     "releaseChannelCollection": "opt-out",
@@ -7805,6 +8075,13 @@
     "kind": "count",
     "releaseChannelCollection": "opt-out",
     "description": "Number times room context is clicked to visit the attached URL"
+  },
+  "LOOP_ROOM_SESSION_WITHCHAT": {
+    "alert_emails": ["firefox-dev@mozilla.org", "mdeboer@mozilla.com"],
+    "expires_in_version": "45",
+    "kind": "count",
+    "releaseChannelCollection": "opt-out",
+    "description": "Number of sessions where at least one chat message was exchanged"
   },
   "E10S_AUTOSTART": {
     "expires_in_version": "never",
@@ -8021,16 +8298,32 @@
   },
   "VIDEO_ADOBE_GMP_DISAPPEARED": {
     "alert_emails": ["cpearce@mozilla.com"],
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "flag",
     "description": "Whether or not the Adobe EME GMP was expected to be resident on disk but mysteriously isn't.",
     "releaseChannelCollection": "opt-out"
   },
+  "VIDEO_ADOBE_GMP_MISSING_FILES": {
+    "alert_emails": ["cpearce@mozilla.com"],
+    "expires_in_version": "50",
+    "kind": "enumerated",
+    "n_values" : 8,
+    "description": "Adobe EME GMP files missing (0=none, or sum of: 1=library, 2=info, 4=voucher)",
+    "releaseChannelCollection": "opt-out"
+  },
   "VIDEO_OPENH264_GMP_DISAPPEARED": {
     "alert_emails": ["cpearce@mozilla.com", "rjesup@mozilla.com"],
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "flag",
     "description": "Whether or not the OpenH264 GMP was expected to be resident on disk but mysteriously isn't.",
+    "releaseChannelCollection": "opt-out"
+  },
+  "VIDEO_OPENH264_GMP_MISSING_FILES": {
+    "alert_emails": ["cpearce@mozilla.com", "rjesup@mozilla.com"],
+    "expires_in_version": "50",
+    "kind": "enumerated",
+    "n_values" : 4,
+    "description": "OpenH264 GMP files missing (0=none, or sum of: 1=library, 2=info)",
     "releaseChannelCollection": "opt-out"
   },
   "FX_SANITIZE_TOTAL": {
@@ -8114,15 +8407,6 @@
     "extended_statistics_ok": true,
     "description": "Sanitize: Time it takes to sanitize recent downloads (ms)"
   },
-  "FX_SANITIZE_PASSWORDS": {
-    "alert_emails": ["firefox-dev@mozilla.org", "gavin@mozilla.com"],
-    "expires_in_version": "50",
-    "kind": "exponential",
-    "high": "30000",
-    "n_buckets": 20,
-    "extended_statistics_ok": true,
-    "description": "Sanitize: Time it takes to sanitize saved passwords (ms)"
-  },
   "FX_SANITIZE_SESSIONS": {
     "alert_emails": ["firefox-dev@mozilla.org", "gavin@mozilla.com"],
     "expires_in_version": "50",
@@ -8149,6 +8433,20 @@
     "n_buckets": 20,
     "extended_statistics_ok": true,
     "description": "Sanitize: Time it takes to sanitize the open windows list (ms)"
+  },
+  "PWMGR_ABOUT_LOGINS_GET_ALL_LOGINS_MS": {
+    "expires_in_version": "55",
+    "kind": "exponential",
+    "high": 60000,
+    "n_buckets": 30,
+    "extended_statistics_ok": true,
+    "description": "How long getAllLogins() on about:logins takes for mobile users"
+  },
+  "PWMGR_ABOUT_LOGINS_USAGE": {
+    "expires_in_version": "55",
+    "kind": "enumerated",
+    "n_values": 12,
+    "description": "Usage of about:logins 0= list of logins viewed, 1=a login's specifics page was viewed, 2=user edited login credentials 3=user toggled the show/hide button"
   },
   "PWMGR_BLOCKLIST_NUM_SITES": {
     "expires_in_version": "never",
@@ -8290,6 +8588,26 @@
     "kind": "count",
     "description": "The number of Sync 1.5 migrations completed by Android Sync."
   },
+  "FENNEC_SYNC_NUMBER_OF_SYNCS_STARTED": {
+    "expires_in_version": "45",
+    "kind": "count",
+    "description": "Counts the number of times that a sync has started."
+  },
+  "FENNEC_SYNC_NUMBER_OF_SYNCS_COMPLETED": {
+    "expires_in_version": "45",
+    "kind": "count",
+    "description": "Counts the number of times that a sync has completed with no errors."
+  },
+  "FENNEC_SYNC_NUMBER_OF_SYNCS_FAILED": {
+    "expires_in_version": "45",
+    "kind": "count",
+    "description": "Counts the number of times that a sync has failed with errors."
+  },
+  "FENNEC_SYNC_NUMBER_OF_SYNCS_FAILED_BACKOFF": {
+    "expires_in_version": "45",
+    "kind": "count",
+    "description": "Counts the number of times that a sync has failed because of trying to sync before server backoff interval has passed."
+  },
   "SLOW_SCRIPT_NOTICE_COUNT": {
     "alert_emails": ["perf-telemetry-alerts@mozilla.com"],
     "expires_in_version": "never",
@@ -8362,21 +8680,21 @@
     "description": "Reports results from the graphics sanity test to track which drivers are having problems (0=TEST_PASSED, 1=TEST_FAILED_RENDER, 2=TEST_FAILED_VIDEO, 3=TEST_CRASHED)"
   },
   "READER_MODE_SERIALIZE_DOM_MS": {
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "exponential",
     "high": "5000",
     "n_buckets": 15,
     "description": "Time (ms) to serialize a DOM to send to the reader worker"
   },
   "READER_MODE_WORKER_PARSE_MS": {
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "exponential",
     "high": "10000",
     "n_buckets": 30,
     "description": "Time (ms) for the reader worker to parse a document"
   },
   "READER_MODE_DOWNLOAD_MS": {
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "exponential",
     "low": 50,
     "high": "40000",
@@ -8384,13 +8702,13 @@
     "description": "Time (ms) to download a document to show in reader mode"
   },
   "READER_MODE_PARSE_RESULT" : {
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "enumerated",
     "n_values": 5,
     "description": "The result of trying to parse a document to show in reader view (0=Success, 1=Error too many elements, 2=Error in worker, 3=Error no article)"
   },
   "READER_MODE_DOWNLOAD_RESULT" : {
-    "expires_in_version": "42",
+    "expires_in_version": "50",
     "kind": "enumerated",
     "n_values": 5,
     "description": "The result of trying to download a document to show in reader view (0=Success, 1=Error XHR, 2=Error no document)"
@@ -8461,6 +8779,27 @@
     "expires_in_version": "43",
     "kind": "boolean",
     "description": "Is the title shown in the url bar (as determined by the titlebar title or url preference)?"
+  },
+  "GRAPHICS_SANITY_TEST_REASON": {
+    "alert_emails": ["danderson@mozilla.com"],
+    "expires_in_version": "43",
+    "kind": "enumerated",
+    "n_values": 20,
+    "releaseChannelCollection": "opt-out",
+    "description": "Reports why a graphics sanity test was run. 0=First Run, 1=App Updated, 2=Device Change, 3=Driver Change."
+  },
+  "PERMISSIONS_REMIGRATION_COMPARISON": {
+    "alert_emails": ["michael@thelayzells.com"],
+    "expires_in_version": "44",
+    "kind": "enumerated",
+    "n_values": 10,
+    "description": "Reports a comparison between row count of original and re-migration of the v7 permissions DB. 0=New == 0, 1=New < Old, 2=New == Old, 3=New > Old"
+  },
+  "PERMISSIONS_MIGRATION_7_ERROR": {
+    "alert_emails": ["michael@thelayzells.com"],
+    "expires_in_version": "44",
+    "kind": "boolean",
+    "description": "Was there an error while performing the v7 permissions DB migration?"
   },
   "LOOP_ICE_FINAL_CONNECTION_STATE": {
     "expires_in_version": "never",
@@ -8659,5 +8998,12 @@
     "high": "30",
     "n_buckets": "29",
     "description": "The number of times AddIceCandidate failed on a given PeerConnection, given that ICE failed."
+  },
+  "PLUGIN_ACTIVATION_COUNT": {
+    "alert_emails": ["cpeterson@mozilla.com"],
+    "expires_in_version": "48",
+    "kind": "count",
+    "keyed": true,
+    "description": "Counts number of times a certain plugin has been activated."
   }
 }

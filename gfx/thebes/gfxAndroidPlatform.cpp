@@ -340,7 +340,7 @@ gfxAndroidPlatform::MakePlatformFont(const nsAString& aFontName,
                                                                      aLength);
 }
 
-TemporaryRef<ScaledFont>
+already_AddRefed<ScaledFont>
 gfxAndroidPlatform::GetScaledFontForFont(DrawTarget* aTarget, gfxFont *aFont)
 {
     return GetScaledFontForFontWithCairoSkia(aTarget, aFont);
@@ -392,7 +392,7 @@ gfxAndroidPlatform::RequiresLinearZoom()
     // On B2G, we need linear zoom for the browser, but otherwise prefer
     // the improved glyph spacing that results from respecting the device
     // pixel resolution for glyph layout (see bug 816614).
-    return XRE_GetProcessType() == GeckoProcessType_Content &&
+    return XRE_IsContentProcess() &&
            ContentChild::GetSingleton()->IsForBrowser();
 #endif
 
@@ -415,7 +415,7 @@ gfxAndroidPlatform::UseAcceleratedSkiaCanvas()
 bool gfxAndroidPlatform::HaveChoiceOfHWAndSWCanvas()
 {
 #ifdef MOZ_WIDGET_ANDROID
-    if (AndroidBridge::Bridge()->GetAPIVersion() < 11) {
+    if (!AndroidBridge::Bridge() || AndroidBridge::Bridge()->GetAPIVersion() < 11) {
         // It's slower than software due to not having a compositing fast path
         return false;
     }

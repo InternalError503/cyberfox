@@ -38,6 +38,9 @@ const gNSURLStore = new Map();
 // The cache used to store inflated frames.
 const gInflatedFrameStore = new WeakMap();
 
+// The cache used to store frame data from `getInfo`.
+const gFrameData = new WeakMap();
+
 /**
  * Parses the raw location of this function call to retrieve the actual
  * function name, source url, host name, line and column.
@@ -239,12 +242,11 @@ function getInflatedFrameCache(frameTable) {
  * @param number index
  * @param object frameTable
  * @param object stringTable
- * @param object allocationsTable
  */
-function getOrAddInflatedFrame(cache, index, frameTable, stringTable, allocationsTable) {
+function getOrAddInflatedFrame(cache, index, frameTable, stringTable) {
   let inflatedFrame = cache[index];
   if (inflatedFrame === null) {
-    inflatedFrame = cache[index] = new InflatedFrame(index, frameTable, stringTable, allocationsTable);
+    inflatedFrame = cache[index] = new InflatedFrame(index, frameTable, stringTable);
   }
   return inflatedFrame;
 };
@@ -255,9 +257,8 @@ function getOrAddInflatedFrame(cache, index, frameTable, stringTable, allocation
  * @param number index
  * @param object frameTable
  * @param object stringTable
- * @param object allocationsTable
  */
-function InflatedFrame(index, frameTable, stringTable, allocationsTable) {
+function InflatedFrame(index, frameTable, stringTable) {
   const LOCATION_SLOT = frameTable.schema.location;
   const IMPLEMENTATION_SLOT = frameTable.schema.implementation;
   const OPTIMIZATIONS_SLOT = frameTable.schema.optimizations;
@@ -271,7 +272,6 @@ function InflatedFrame(index, frameTable, stringTable, allocationsTable) {
   this.optimizations = frame[OPTIMIZATIONS_SLOT];
   this.line = frame[LINE_SLOT];
   this.column = undefined;
-  this.allocations = allocationsTable ? allocationsTable[index] : 0;
   this.category = category;
   this.isContent = false;
 
@@ -449,6 +449,69 @@ function isNumeric(c) {
   return c >= CHAR_CODE_0 && c <= CHAR_CODE_9;
 }
 
+/**
+ * Calculates the relative costs of this frame compared to a root,
+ * and generates allocations information if specified. Uses caching
+ * if possible.
+ *
+ * @param {ThreadNode|FrameNode} node
+ *                               The node we are calculating.
+ * @param {ThreadNode} options.root
+ *                     The root thread node to calculate relative costs.
+ *                     Generates [self|total] [duration|percentage] values.
+ * @param {boolean} options.allocations
+ *                  Generates `totalAllocations` and `selfAllocations`.
+ *
+ * @return {object}
+ */
+function getFrameInfo (node, options) {
+  let data = gFrameData.get(node);
+
+  if (!data) {
+    if (node.nodeType === "Thread") {
+      data = Object.create(null);
+      data.functionName = global.L10N.getStr("table.root");
+    } else {
+      data = parseLocation(node.location, node.line, node.column);
+      data.hasOptimizations = node.hasOptimizations();
+      data.isContent = node.isContent;
+      data.isMetaCategory = node.isMetaCategory;
+    }
+    data.samples = node.youngestFrameSamples;
+    data.categoryData = global.CATEGORY_MAPPINGS[node.category] || {};
+    data.nodeType = node.nodeType;
+
+    // Frame name (function location or some meta information)
+    data.name = data.isMetaCategory ? data.categoryData.label : data.functionName || "";
+    data.tooltiptext = data.isMetaCategory ? data.categoryData.label : node.location || "";
+
+    gFrameData.set(node, data);
+  }
+
+  // If a root specified, calculate the relative costs in the context of
+  // this call tree. The cached store may already have this, but generate
+  // if it does not.
+  if (options && options.root && !data.COSTS_CALCULATED) {
+    let totalSamples = options.root.samples;
+    let totalDuration = options.root.duration;
+
+    data.selfDuration = node.youngestFrameSamples / totalSamples * totalDuration;
+    data.selfPercentage = node.youngestFrameSamples / totalSamples * 100;
+    data.totalDuration = node.samples / totalSamples * totalDuration;
+    data.totalPercentage = node.samples / totalSamples * 100;
+    data.COSTS_CALCULATED = true;
+  }
+
+  if (options && options.allocations && !data.ALLOCATION_DATA_CALCULATED) {
+    data.selfCount = node.youngestFrameSamples;
+    data.totalCount = node.samples;
+    data.ALLOCATION_DATA_CALCULATED = true;
+  }
+
+  return data;
+}
+
+exports.getFrameInfo = getFrameInfo;
 exports.computeIsContentAndCategory = computeIsContentAndCategory;
 exports.parseLocation = parseLocation;
 exports.getInflatedFrameCache = getInflatedFrameCache;

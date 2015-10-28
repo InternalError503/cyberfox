@@ -20,7 +20,7 @@
 #include "js/Class.h"
 
 #if JS_STACK_GROWTH_DIRECTION > 0
-# define JS_CHECK_STACK_SIZE(limit, sp) (MOZ_LIKELY(((uintptr_t)(sp) < (limit)))
+# define JS_CHECK_STACK_SIZE(limit, sp) (MOZ_LIKELY((uintptr_t)(sp) < (limit)))
 #else
 # define JS_CHECK_STACK_SIZE(limit, sp) (MOZ_LIKELY((uintptr_t)(sp) > (limit)))
 #endif
@@ -316,6 +316,7 @@ namespace js {
         js::Class::NON_NATIVE |                                                         \
             JSCLASS_IS_PROXY |                                                          \
             JSCLASS_IMPLEMENTS_BARRIERS |                                               \
+            JSCLASS_DELAY_METADATA_CALLBACK |                                           \
             flags,                                                                      \
         nullptr,                 /* addProperty */                                      \
         nullptr,                 /* delProperty */                                      \
@@ -636,7 +637,7 @@ inline bool
 StandardClassIsDependent(JSProtoKey key)
 {
     const Class* clasp = ProtoKeyToClass(key);
-    return clasp->spec.defined() && clasp->spec.dependent();
+    return clasp && clasp->spec.defined() && clasp->spec.dependent();
 }
 
 // Returns the key for the class inherited by a given standard class (that
@@ -1305,10 +1306,12 @@ class MOZ_STACK_CLASS AutoStableStringChars
     {}
     ~AutoStableStringChars();
 
-    bool init(JSContext* cx, JSString* s) MOZ_WARN_UNUSED_RESULT;
+    MOZ_WARN_UNUSED_RESULT
+    bool init(JSContext* cx, JSString* s);
 
     /* Like init(), but Latin1 chars are inflated to TwoByte. */
-    bool initTwoByte(JSContext* cx, JSString* s) MOZ_WARN_UNUSED_RESULT;
+    MOZ_WARN_UNUSED_RESULT
+    bool initTwoByte(JSContext* cx, JSString* s);
 
     bool isLatin1() const { return state_ == Latin1; }
     bool isTwoByte() const { return state_ == TwoByte; }
@@ -2263,7 +2266,9 @@ class JSJitMethodCallArgs : protected JS::detail::CallArgsBase<JS::detail::NoUse
         return argv_[-2].toObject();
     }
 
-    // Add get() as needed
+    JS::HandleValue get(unsigned i) const {
+        return Base::get(i);
+    }
 };
 
 struct JSJitMethodCallArgsTraits
@@ -2528,8 +2533,8 @@ JSID_FROM_BITS(size_t bits)
 namespace js {
 namespace detail {
 bool IdMatchesAtom(jsid id, JSAtom* atom);
-}
-}
+} // namespace detail
+} // namespace js
 
 /*
  * Must not be used on atoms that are representable as integer jsids.

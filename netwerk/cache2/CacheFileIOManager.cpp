@@ -427,37 +427,13 @@ CacheFileHandles::RemoveHandle(CacheFileHandle *aHandle)
   }
 }
 
-static PLDHashOperator
-GetAllHandlesEnum(CacheFileHandles::HandleHashKey* aEntry, void *aClosure)
-{
-  nsTArray<nsRefPtr<CacheFileHandle> > *array =
-    static_cast<nsTArray<nsRefPtr<CacheFileHandle> > *>(aClosure);
-
-  aEntry->GetHandles(*array);
-  return PL_DHASH_NEXT;
-}
-
 void
 CacheFileHandles::GetAllHandles(nsTArray<nsRefPtr<CacheFileHandle> > *_retval)
 {
   MOZ_ASSERT(CacheFileIOManager::IsOnIOThreadOrCeased());
-  mTable.EnumerateEntries(&GetAllHandlesEnum, _retval);
-}
-
-static PLDHashOperator
-GetActiveHandlesEnum(CacheFileHandles::HandleHashKey* aEntry, void *aClosure)
-{
-  nsTArray<nsRefPtr<CacheFileHandle> > *array =
-    static_cast<nsTArray<nsRefPtr<CacheFileHandle> > *>(aClosure);
-
-  nsRefPtr<CacheFileHandle> handle = aEntry->GetNewestHandle();
-  MOZ_ASSERT(handle);
-
-  if (!handle->IsDoomed()) {
-    array->AppendElement(handle);
+  for (auto iter = mTable.Iter(); !iter.Done(); iter.Next()) {
+    iter.Get()->GetHandles(*_retval);
   }
-
-  return PL_DHASH_NEXT;
 }
 
 void
@@ -465,7 +441,14 @@ CacheFileHandles::GetActiveHandles(
   nsTArray<nsRefPtr<CacheFileHandle> > *_retval)
 {
   MOZ_ASSERT(CacheFileIOManager::IsOnIOThreadOrCeased());
-  mTable.EnumerateEntries(&GetActiveHandlesEnum, _retval);
+  for (auto iter = mTable.Iter(); !iter.Done(); iter.Next()) {
+    nsRefPtr<CacheFileHandle> handle = iter.Get()->GetNewestHandle();
+    MOZ_ASSERT(handle);
+
+    if (!handle->IsDoomed()) {
+      _retval->AppendElement(handle);
+    }
+  }
 }
 
 void
@@ -2719,7 +2702,7 @@ EvictionNotifierRunnable::Run()
   return NS_OK;
 }
 
-} // anonymous namespace
+} // namespace
 
 nsresult
 CacheFileIOManager::EvictAllInternal()
@@ -3883,7 +3866,7 @@ CacheFileIOManager::UpdateSmartCacheSize(int64_t aFreeSpace)
 
 // Memory reporting
 
-namespace { // anon
+namespace {
 
 // A helper class that dispatches and waits for an event that gets result of
 // CacheFileIOManager->mHandles.SizeOfExcludingThis() on the I/O thread
@@ -3944,7 +3927,7 @@ private:
   size_t mSize;
 };
 
-} // anon
+} // namespace
 
 size_t
 CacheFileIOManager::SizeOfExcludingThisInternal(mozilla::MallocSizeOf mallocSizeOf) const
@@ -4004,5 +3987,5 @@ CacheFileIOManager::SizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf)
   return mallocSizeOf(gInstance) + SizeOfExcludingThis(mallocSizeOf);
 }
 
-} // net
-} // mozilla
+} // namespace net
+} // namespace mozilla

@@ -95,6 +95,13 @@ function shouldAllowRelink(acctName) {
   return !needRelinkWarning(acctName) || promptForRelink(acctName);
 }
 
+function updateDisplayedEmail(user) {
+  let emailDiv = document.getElementById("email");
+  if (emailDiv && user) {
+    emailDiv.textContent = user.email;
+  }
+}
+
 let wrapper = {
   iframe: null,
 
@@ -141,8 +148,13 @@ let wrapper = {
 
     if (accountData.customizeSync) {
       Services.prefs.setBoolPref(PREF_SYNC_SHOW_CUSTOMIZATION, true);
-      delete accountData.customizeSync;
     }
+    delete accountData.customizeSync;
+    // sessionTokenContext is erroneously sent by the content server.
+    // https://github.com/mozilla/fxa-content-server/issues/2766
+    // To avoid having the FxA storage manager not knowing what to do with
+    // it we delete it here.
+    delete accountData.sessionTokenContext;
 
     // We need to confirm a relink - see shouldAllowRelink for more
     let newAccountEmail = accountData.email;
@@ -168,6 +180,7 @@ let wrapper = {
               .getService(Ci.nsISupports)
               .wrappedJSObject;
     xps.whenLoaded().then(() => {
+      updateDisplayedEmail(accountData);
       return fxAccounts.setSignedInUser(accountData);
     }).then(() => {
       // If the user data is verified, we want it to immediately look like
@@ -201,7 +214,10 @@ let wrapper = {
     log("Received: 'session_status'.");
 
     fxAccounts.getSignedInUser().then(
-      (accountData) => this.injectData("message", { status: "session_status", data: accountData }),
+      (accountData) => {
+        updateDisplayedEmail(accountData);
+        this.injectData("message", { status: "session_status", data: accountData });
+      },
       (err) => this.injectData("message", { status: "error", error: err })
     );
   },
@@ -289,6 +305,8 @@ function init() {
       return;
     }
 
+    updateDisplayedEmail(user);
+
     // Ideally we'd use new URL(document.URL).searchParams, but for about: URIs,
     // searchParams is empty.
     let urlParams = new URLSearchParams(document.URL.split("?")[1] || "");
@@ -328,8 +346,6 @@ function init() {
       // No action specified.
       if (user) {
         show("stage", "manage");
-        let sb = Services.strings.createBundle("chrome://browser/locale/syncSetup.properties");
-        document.title = sb.GetStringFromName("manage.pageTitle");
       } else {
         // Attempt a migration if enabled or show the introductory page
         // otherwise.
@@ -397,6 +413,7 @@ function migrateToDevEdition(urlParams) {
   let fxAccountsStorage = OS.Path.join(defaultProfilePath, fxAccountsCommon.DEFAULT_STORAGE_FILENAME);
   return OS.File.read(fxAccountsStorage, { encoding: "utf-8" }).then(text => {
     let accountData = JSON.parse(text).accountData;
+    updateDisplayedEmail(accountData);
     return fxAccounts.setSignedInUser(accountData);
   }).then(() => {
     return fxAccounts.promiseAccountsForceSigninURI().then(url => {

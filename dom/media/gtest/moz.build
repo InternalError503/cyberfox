@@ -11,7 +11,8 @@ UNIFIED_SOURCES += [
     'TestGMPRemoveAndDelete.cpp',
     'TestGMPUtils.cpp',
     'TestIntervalSet.cpp',
-    'TestMediaPromise.cpp',
+    'TestMediaEventSource.cpp',
+    'TestMozPromise.cpp',
     'TestMP3Demuxer.cpp',
     'TestMP4Demuxer.cpp',
     # 'TestMP4Reader.cpp', disabled so we can turn check tests back on (bug 1175752)
@@ -44,6 +45,7 @@ TEST_HARNESS_FILES.gtest += [
     'mediasource_test.mp4',
     'noise.mp3',
     'noise_vbr.mp3',
+    'short-zero-in-moov.mp4',
     'test.webm',
 ]
 

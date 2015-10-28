@@ -19,6 +19,7 @@
 #include "gfxUserFontSet.h"
 #include "gfxUtils.h"
 #include "gfxFT2FontBase.h"
+#include "gfxPrefs.h"
 
 #include "mozilla/gfx/2D.h"
 
@@ -335,6 +336,18 @@ gfxPlatformGtk::GetDPIScale()
     return (dpi > 96) ? round(dpi/96.0) : 1.0;
 }
 
+bool
+gfxPlatformGtk::UseImageOffscreenSurfaces()
+{
+    // We want to turn on image offscreen surfaces ONLY for GTK3 builds since
+    // GTK2 theme rendering still requires xlib surfaces.
+#if (MOZ_WIDGET_GTK == 3)
+    return gfxPrefs::UseImageOffscreenSurfaces();
+#else
+    return false;
+#endif
+}
+
 gfxImageFormat
 gfxPlatformGtk::GetOffscreenFormat()
 {
@@ -540,7 +553,7 @@ gfxPlatformGtk::GetGdkDrawable(cairo_surface_t *target)
 }
 #endif
 
-TemporaryRef<ScaledFont>
+already_AddRefed<ScaledFont>
 gfxPlatformGtk::GetScaledFontForFont(DrawTarget* aTarget, gfxFont *aFont)
 {
     return GetScaledFontForFontWithCairoSkia(aTarget, aFont);

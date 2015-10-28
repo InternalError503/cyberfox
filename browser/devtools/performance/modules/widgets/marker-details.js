@@ -11,8 +11,6 @@ const { Cc, Ci, Cu, Cr } = require("chrome");
 
 loader.lazyRequireGetter(this, "EventEmitter",
   "devtools/toolkit/event-emitter");
-loader.lazyRequireGetter(this, "L10N",
-  "devtools/performance/global", true);
 loader.lazyRequireGetter(this, "MarkerUtils",
   "devtools/performance/marker-utils");
 
@@ -36,15 +34,25 @@ function MarkerDetails(parent, splitter) {
 
   this._parent.addEventListener("click", this._onClick);
   this._splitter.addEventListener("mouseup", this._onSplitterMouseUp);
+
+  this.hidden = true;
 }
 
 MarkerDetails.prototype = {
   /**
    * Sets this view's width.
-   * @param boolean
+   * @param number
    */
   set width(value) {
     this._parent.setAttribute("width", value);
+  },
+
+  /**
+   * Sets this view's width.
+   * @return number
+   */
+  get width() {
+    return +this._parent.getAttribute("width");
   },
 
   /**
@@ -52,7 +60,18 @@ MarkerDetails.prototype = {
    * @param boolean
    */
   set hidden(value) {
-    this._parent.hidden = value;
+    if (this._parent.hidden != value) {
+      this._parent.hidden = value;
+      this.emit("resize");
+    }
+  },
+
+  /**
+   * Gets this view's visibility.
+   * @param boolean
+   */
+  get hidden() {
+    return this._parent.hidden;
   },
 
   /**
@@ -102,7 +121,7 @@ MarkerDetails.prototype = {
    * for the moment.
    */
   _onClick: function (e) {
-    let data = findActionFromEvent(e.target);
+    let data = findActionFromEvent(e.target, this._parent);
     if (!data) {
       return;
     }
@@ -121,7 +140,7 @@ MarkerDetails.prototype = {
 };
 
 /**
- * Take an element from an event `target`, and asend through
+ * Take an element from an event `target`, and ascend through
  * the DOM, looking for an element with a `data-action` attribute. Return
  * the parsed `data-action` value found, or null if none found before
  * reaching the parent `container`.

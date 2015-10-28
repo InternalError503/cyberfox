@@ -58,6 +58,8 @@ ContainsHoistedDeclaration(ExclusiveContext* cx, ParseNode* node, bool* result)
 {
     JS_CHECK_RECURSION(cx, return false);
 
+  restart:
+
     // With a better-typed AST, we would have distinct parse node classes for
     // expressions and for statements and would characterize expressions with
     // ExpressionKind and statements with StatementKind.  Perhaps someday.  In
@@ -164,8 +166,8 @@ ContainsHoistedDeclaration(ExclusiveContext* cx, ParseNode* node, bool* result)
         if (*result)
             return true;
 
-        if (ParseNode* alternative = node->pn_kid3)
-            return ContainsHoistedDeclaration(cx, alternative, result);
+        if ((node = node->pn_kid3))
+            goto restart;
 
         *result = false;
         return true;
@@ -361,6 +363,7 @@ ContainsHoistedDeclaration(ExclusiveContext* cx, ParseNode* node, bool* result)
       case PNK_STAR:
       case PNK_DIV:
       case PNK_MOD:
+      case PNK_POW:
       case PNK_ASSIGN:
       case PNK_ADDASSIGN:
       case PNK_SUBASSIGN:
@@ -373,6 +376,7 @@ ContainsHoistedDeclaration(ExclusiveContext* cx, ParseNode* node, bool* result)
       case PNK_MULASSIGN:
       case PNK_DIVASSIGN:
       case PNK_MODASSIGN:
+      case PNK_POWASSIGN:
       case PNK_COMMA:
       case PNK_ARRAY:
       case PNK_OBJECT:
@@ -528,6 +532,10 @@ FoldBinaryNumeric(ExclusiveContext* cx, JSOp op, ParseNode* pn1, ParseNode* pn2,
         }
         break;
 
+      case JSOP_POW:
+        d = ecmaPow(d, d2);
+        break;
+
       default:;
     }
 
@@ -602,46 +610,1027 @@ condIf(const ParseNode* pn, ParseNodeKind kind)
 }
 
 static bool
-Fold(ExclusiveContext* cx, ParseNode** pnp,
-     FullParseHandler& handler, const ReadOnlyCompileOptions& options,
-     bool inGenexpLambda, SyntacticContext sc)
+Fold(ExclusiveContext* cx, ParseNode** pnp, Parser<FullParseHandler>& parser, bool inGenexpLambda,
+     SyntacticContext sc);
+
+static bool
+FoldTypeOfExpr(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+               bool inGenexpLambda)
 {
+    MOZ_ASSERT(node->isKind(PNK_TYPEOFEXPR));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode*& expr = node->pn_kid;
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    // Constant-fold the entire |typeof| if given a constant with known type.
+    RootedPropertyName result(cx);
+    if (expr->isKind(PNK_STRING) || expr->isKind(PNK_TEMPLATE_STRING))
+        result = cx->names().string;
+    else if (expr->isKind(PNK_NUMBER))
+        result = cx->names().number;
+    else if (expr->isKind(PNK_NULL))
+        result = cx->names().object;
+    else if (expr->isKind(PNK_TRUE) || expr->isKind(PNK_FALSE))
+        result = cx->names().boolean;
+    else if (expr->isKind(PNK_FUNCTION))
+        result = cx->names().function;
+
+    if (result) {
+        parser.prepareNodeForMutation(node);
+
+        node->setKind(PNK_STRING);
+        node->setArity(PN_NULLARY);
+        node->setOp(JSOP_NOP);
+        node->pn_atom = result;
+    }
+
+    return true;
+}
+
+static bool
+FoldVoid(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+         bool inGenexpLambda, SyntacticContext sc)
+{
+    MOZ_ASSERT(node->isKind(PNK_VOID));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode*& expr = node->pn_kid;
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    if (sc == SyntacticContext::Condition) {
+        if (expr->isKind(PNK_TRUE) ||
+            expr->isKind(PNK_FALSE) ||
+            expr->isKind(PNK_STRING) ||
+            expr->isKind(PNK_TEMPLATE_STRING) ||
+            expr->isKind(PNK_NUMBER) ||
+            expr->isKind(PNK_NULL) ||
+            expr->isKind(PNK_FUNCTION))
+        {
+            parser.prepareNodeForMutation(node);
+            node->setKind(PNK_FALSE);
+            node->setArity(PN_NULLARY);
+            node->setOp(JSOP_FALSE);
+        }
+    }
+
+    return true;
+}
+
+static bool
+FoldDeleteExpr(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+               bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETEEXPR));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode*& expr = node->pn_kid;
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    // Expression deletion evaluates the expression, then evaluates to
+    // true.  For trivial expressions, eliminate the expression evaluation.
+    if (expr->isKind(PNK_TRUE) ||
+        expr->isKind(PNK_FALSE) ||
+        expr->isKind(PNK_STRING) ||
+        expr->isKind(PNK_TEMPLATE_STRING) ||
+        expr->isKind(PNK_NUMBER) ||
+        expr->isKind(PNK_NULL) ||
+        expr->isKind(PNK_FUNCTION))
+    {
+        parser.prepareNodeForMutation(node);
+        node->setKind(PNK_TRUE);
+        node->setArity(PN_NULLARY);
+        node->setOp(JSOP_TRUE);
+    }
+
+    return true;
+}
+
+static bool
+FoldDeleteElement(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+                  bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETEELEM) || node->isKind(PNK_DELETESUPERELEM));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+    MOZ_ASSERT(node->pn_kid->isKind(PNK_ELEM) || node->pn_kid->isKind(PNK_SUPERELEM));
+
+    ParseNode*& expr = node->pn_kid;
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    // If we're deleting an element, but constant-folding converted our
+    // element reference into a dotted property access, we must *also*
+    // morph the node's kind.
+    //
+    // In principle this also applies to |super["foo"] -> super.foo|,
+    // but we don't constant-fold |super["foo"]| yet.
+    if (node->isKind(PNK_DELETEELEM)) {
+        MOZ_ASSERT(expr->isKind(PNK_ELEM) || expr->isKind(PNK_DOT));
+        if (expr->isKind(PNK_DOT))
+            node->setKind(PNK_DELETEPROP);
+    }
+
+    return true;
+}
+
+static bool
+FoldDeleteProperty(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+                   bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_DELETEPROP) || node->isKind(PNK_DELETESUPERPROP));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+    MOZ_ASSERT(node->pn_kid->isKind(PNK_DOT) || node->pn_kid->isKind(PNK_SUPERPROP));
+
+    ParseNode*& expr = node->pn_kid;
+#ifdef DEBUG
+    ParseNodeKind oldKind = expr->getKind();
+#endif
+
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    MOZ_ASSERT(expr->isKind(oldKind),
+               "kind should have remained invariant under folding");
+
+    return true;
+}
+
+static bool
+FoldNot(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+        bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_NOT));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode*& expr = node->pn_kid;
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Condition))
+        return false;
+
+    if (expr->isKind(PNK_NUMBER)) {
+        double d = expr->pn_dval;
+
+        parser.prepareNodeForMutation(node);
+        if (d == 0 || IsNaN(d)) {
+            node->setKind(PNK_TRUE);
+            node->setOp(JSOP_TRUE);
+        } else {
+            node->setKind(PNK_FALSE);
+            node->setOp(JSOP_FALSE);
+        }
+        node->setArity(PN_NULLARY);
+    } else if (expr->isKind(PNK_TRUE) || expr->isKind(PNK_FALSE)) {
+        bool newval = !expr->isKind(PNK_TRUE);
+
+        parser.prepareNodeForMutation(node);
+        node->setKind(newval ? PNK_TRUE : PNK_FALSE);
+        node->setArity(PN_NULLARY);
+        node->setOp(newval ? JSOP_TRUE : JSOP_FALSE);
+    }
+
+    return true;
+}
+
+static bool
+FoldUnaryArithmetic(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+                    bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_BITNOT) || node->isKind(PNK_POS) || node->isKind(PNK_NEG),
+               "need a different method for this node kind");
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode*& expr = node->pn_kid;
+    if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    if (expr->isKind(PNK_NUMBER) || expr->isKind(PNK_TRUE) || expr->isKind(PNK_FALSE)) {
+        double d = expr->isKind(PNK_NUMBER)
+                   ? expr->pn_dval
+                   : double(expr->isKind(PNK_TRUE));
+
+        if (node->isKind(PNK_BITNOT))
+            d = ~ToInt32(d);
+        else if (node->isKind(PNK_NEG))
+            d = -d;
+        else
+            MOZ_ASSERT(node->isKind(PNK_POS)); // nothing to do
+
+        parser.prepareNodeForMutation(node);
+        node->setKind(PNK_NUMBER);
+        node->setOp(JSOP_DOUBLE);
+        node->setArity(PN_NULLARY);
+        node->pn_dval = d;
+    }
+
+    return true;
+}
+
+static bool
+FoldIncrementDecrement(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+                       bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_PREINCREMENT) ||
+               node->isKind(PNK_POSTINCREMENT) ||
+               node->isKind(PNK_PREDECREMENT) ||
+               node->isKind(PNK_POSTDECREMENT));
+    MOZ_ASSERT(node->isArity(PN_UNARY));
+
+    ParseNode*& target = node->pn_kid;
+    MOZ_ASSERT(parser.isValidSimpleAssignmentTarget(target, Parser<FullParseHandler>::PermitAssignmentToFunctionCalls));
+
+    if (!Fold(cx, &target, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    MOZ_ASSERT(parser.isValidSimpleAssignmentTarget(target, Parser<FullParseHandler>::PermitAssignmentToFunctionCalls));
+
+    return true;
+}
+
+static bool
+FoldAndOr(ExclusiveContext* cx, ParseNode** nodePtr, Parser<FullParseHandler>& parser,
+          bool inGenexpLambda, SyntacticContext sc)
+{
+    ParseNode* node = *nodePtr;
+
+    MOZ_ASSERT(node->isKind(PNK_AND) || node->isKind(PNK_OR));
+    MOZ_ASSERT(node->isArity(PN_LIST));
+
+    bool isOrNode = node->isKind(PNK_OR);
+    ParseNode** elem = &node->pn_head;
+    do {
+        // Pass |sc| through to propagate conditionality.
+        if (!Fold(cx, elem, parser, inGenexpLambda, sc))
+            return false;
+
+        Truthiness t = Boolish(*elem);
+
+        // If we don't know the constant-folded node's truthiness, we can't
+        // reduce this node with its surroundings.  Continue folding any
+        // remaining nodes.
+        if (t == Unknown) {
+            elem = &(*elem)->pn_next;
+            continue;
+        }
+
+        // If the constant-folded node's truthiness will terminate the
+        // condition -- `a || true || expr` or |b && false && expr| -- then
+        // trailing nodes will never be evaluated.  Truncate the list after
+        // the known-truthiness node, as it's the overall result.
+        if ((t == Truthy) == isOrNode) {
+            ParseNode* afterNext;
+            for (ParseNode* next = (*elem)->pn_next; next; next = afterNext) {
+                afterNext = next->pn_next;
+                parser.handler.freeTree(next);
+                --node->pn_count;
+            }
+
+            // Terminate the original and/or list at the known-truthiness
+            // node.
+            (*elem)->pn_next = nullptr;
+            elem = &(*elem)->pn_next;
+            break;
+        }
+
+        MOZ_ASSERT((t == Truthy) == !isOrNode);
+
+        // We've encountered a vacuous node that'll never short- circuit
+        // evaluation.
+        if ((*elem)->pn_next) {
+            // This node is never the overall result when there are
+            // subsequent nodes.  Remove it.
+            ParseNode* elt = *elem;
+            *elem = elt->pn_next;
+            parser.handler.freeTree(elt);
+            --node->pn_count;
+        } else {
+            // Otherwise this node is the result of the overall expression,
+            // so leave it alone.  And we're done.
+            elem = &(*elem)->pn_next;
+            break;
+        }
+    } while (*elem);
+
+    // If the last node in the list was replaced, we need to update the
+    // tail pointer in the original and/or node.
+    node->pn_tail = elem;
+
+    node->checkListConsistency();
+
+    // If we removed nodes, we may have to replace a one-element list with
+    // its element.
+    if (node->pn_count == 1) {
+        ParseNode* first = node->pn_head;
+        ReplaceNode(nodePtr, first);
+
+        node->setKind(PNK_NULL);
+        node->setArity(PN_NULLARY);
+        parser.freeTree(node);
+    }
+
+    return true;
+}
+
+static bool
+FoldConditional(ExclusiveContext* cx, ParseNode** nodePtr, Parser<FullParseHandler>& parser,
+                bool inGenexpLambda)
+{
+    ParseNode** nextNode = nodePtr;
+
+    do {
+        // |nextNode| on entry points to the C?T:F expression to be folded.
+        // Reset it to exit the loop in the common case where F isn't another
+        // ?: expression.
+        nodePtr = nextNode;
+        nextNode = nullptr;
+
+        ParseNode* node = *nodePtr;
+        MOZ_ASSERT(node->isKind(PNK_CONDITIONAL));
+        MOZ_ASSERT(node->isArity(PN_TERNARY));
+
+        ParseNode*& expr = node->pn_kid1;
+        if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Condition))
+            return false;
+
+        ParseNode*& ifTruthy = node->pn_kid2;
+        if (!Fold(cx, &ifTruthy, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+
+        ParseNode*& ifFalsy = node->pn_kid3;
+
+        // If our C?T:F node has F as another ?: node, *iteratively* constant-
+        // fold F *after* folding C and T (and possibly eliminating C and one
+        // of T/F entirely); otherwise fold F normally.  Making |nextNode| non-
+        // null causes this loop to run again to fold F.
+        //
+        // Conceivably we could instead/also iteratively constant-fold T, if T
+        // were more complex than F.  Such an optimization is unimplemented.
+        if (ifFalsy->isKind(PNK_CONDITIONAL)) {
+            nextNode = &ifFalsy;
+        } else {
+            if (!Fold(cx, &ifFalsy, parser, inGenexpLambda, SyntacticContext::Other))
+                return false;
+        }
+
+        // Try to constant-fold based on the condition expression.
+        Truthiness t = Boolish(expr);
+        if (t == Unknown)
+            continue;
+
+        // Otherwise reduce 'C ? T : F' to T or F as directed by C.
+        ParseNode* replacement;
+        ParseNode* discarded;
+        if (t == Truthy) {
+            replacement = ifTruthy;
+            discarded = ifFalsy;
+        } else {
+            replacement = ifFalsy;
+            discarded = ifTruthy;
+        }
+
+        // Don't decay the overall expression if the replacement node is a
+        // a definition.
+        //
+        // The rationale for this pre-existing restriction is unclear; if you
+        // discover it, please document it!  Speculation is that it has
+        // something to do with constant-folding something like:
+        //
+        //   true ? function f() {} : false;
+        //
+        // into
+        //
+        //   function f() {}
+        //
+        // and worrying this might convert a function *expression* into a
+        // function *statement* that defined its name early.  But function
+        // expressions aren't isDefn(), so this can't be it.
+        //
+        // This lack of explanation is tolerated only because failing to
+        // optimize *should* always be okay.
+        if (replacement->isDefn())
+            continue;
+
+        // Otherwise perform a replacement.  This invalidates |nextNode|, so
+        // reset it (if the replacement requires folding) or clear it (if
+        // |ifFalsy| is dead code) as needed.
+        if (nextNode)
+            nextNode = (*nextNode == replacement) ? nodePtr : nullptr;
+        ReplaceNode(nodePtr, replacement);
+
+        parser.freeTree(discarded);
+    } while (nextNode);
+
+    return true;
+}
+
+static bool
+FoldIf(ExclusiveContext* cx, ParseNode** nodePtr, Parser<FullParseHandler>& parser,
+       bool inGenexpLambda)
+{
+    ParseNode** nextNode = nodePtr;
+
+    do {
+        // |nextNode| on entry points to the initial |if| to be folded.  Reset
+        // it to exit the loop when the |else| arm isn't another |if|.
+        nodePtr = nextNode;
+        nextNode = nullptr;
+
+        ParseNode* node = *nodePtr;
+        MOZ_ASSERT(node->isKind(PNK_IF));
+        MOZ_ASSERT(node->isArity(PN_TERNARY));
+
+        ParseNode*& expr = node->pn_kid1;
+        if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Condition))
+            return false;
+
+        ParseNode*& consequent = node->pn_kid2;
+        if (!Fold(cx, &consequent, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+
+        ParseNode*& alternative = node->pn_kid3;
+        if (alternative) {
+            // If in |if (C) T; else F;| we have |F| as another |if|,
+            // *iteratively* constant-fold |F| *after* folding |C| and |T| (and
+            // possibly completely replacing the whole thing with |T| or |F|);
+            // otherwise fold F normally.  Making |nextNode| non-null causes
+            // this loop to run again to fold F.
+            if (alternative->isKind(PNK_IF)) {
+                nextNode = &alternative;
+            } else {
+                if (!Fold(cx, &alternative, parser, inGenexpLambda,
+                          SyntacticContext::Other))
+                {
+                    return false;
+                }
+            }
+        }
+
+        // Eliminate the consequent or alternative if the condition has
+        // constant truthiness.  Don't eliminate if we have an |if (0)| in
+        // trailing position in a generator expression, as this is a special
+        // form we can't fold away.
+        Truthiness t = Boolish(expr);
+        if (t == Unknown || inGenexpLambda)
+            continue;
+
+        // Careful!  Either of these can be null: |replacement| in |if (0) T;|,
+        // and |discarded| in |if (true) T;|.
+        ParseNode* replacement;
+        ParseNode* discarded;
+        if (t == Truthy) {
+            replacement = consequent;
+            discarded = alternative;
+        } else {
+            replacement = alternative;
+            discarded = consequent;
+        }
+
+        bool performReplacement = true;
+        if (discarded) {
+            // A declaration that hoists outside the discarded arm prevents the
+            // |if| from being folded away.
+            bool containsHoistedDecls;
+            if (!ContainsHoistedDeclaration(cx, discarded, &containsHoistedDecls))
+                return false;
+
+            performReplacement = !containsHoistedDecls;
+        }
+
+        if (!performReplacement)
+            continue;
+
+        if (!replacement) {
+            // If there's no replacement node, we have a constantly-false |if|
+            // with no |else|.  Replace the entire thing with an empty
+            // statement list.
+            parser.prepareNodeForMutation(node);
+            node->setKind(PNK_STATEMENTLIST);
+            node->setArity(PN_LIST);
+            node->makeEmpty();
+        } else {
+            // As with PNK_CONDITIONAL, replace only if the replacement isn't a
+            // definition.  As there, the rationale for this restriction is
+            // unclear and undocumented: tolerated only because a failure to
+            // optimize *should* be safe.  The best guess is that this test was
+            // an incomplete, buggy version of the |ContainsHoistedDeclaration|
+            // test.
+            if (replacement->isDefn())
+                continue;
+
+            // Replacement invalidates |nextNode|, so reset it (if the
+            // replacement requires folding) or clear it (if |alternative|
+            // is dead code) as needed.
+            if (nextNode)
+                nextNode = (*nextNode == replacement) ? nodePtr : nullptr;
+            ReplaceNode(nodePtr, replacement);
+
+            // Morph the original node into a discardable node, then
+            // aggressively free it and the discarded arm (if any) to suss out
+            // any bugs in the preceding logic.
+            node->setKind(PNK_STATEMENTLIST);
+            node->setArity(PN_LIST);
+            node->makeEmpty();
+            if (discarded)
+                node->append(discarded);
+            parser.freeTree(node);
+        }
+    } while (nextNode);
+
+    return true;
+}
+
+static bool
+FoldFunction(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+             bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_FUNCTION));
+    MOZ_ASSERT(node->isArity(PN_CODE));
+
+    // Don't constant-fold inside "use asm" code, as this could create a parse
+    // tree that doesn't type-check as asm.js.
+    if (node->pn_funbox->useAsmOrInsideUseAsm())
+        return true;
+
+    // Note: pn_body is null for lazily-parsed functions.
+    if (ParseNode*& functionBody = node->pn_body) {
+        if (!Fold(cx, &functionBody, parser, node->pn_funbox->inGenexpLambda,
+                  SyntacticContext::Other))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool
+FoldBinaryArithmetic(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+                     bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_SUB) ||
+               node->isKind(PNK_STAR) ||
+               node->isKind(PNK_LSH) ||
+               node->isKind(PNK_RSH) ||
+               node->isKind(PNK_URSH) ||
+               node->isKind(PNK_DIV) ||
+               node->isKind(PNK_MOD));
+    MOZ_ASSERT(node->isArity(PN_LIST));
+    MOZ_ASSERT(node->pn_count >= 2);
+
+    // Fold each operand, ideally into a number.
+    ParseNode** listp = &node->pn_head;
+    for (; *listp; listp = &(*listp)->pn_next) {
+        if (!Fold(cx, listp, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+
+        if (!FoldType(cx, *listp, PNK_NUMBER))
+            return false;
+    }
+
+    // Repoint the list's tail pointer.
+    node->pn_tail = listp;
+
+    // Now fold all leading numeric terms together into a single number.
+    // (Trailing terms for the non-shift operations can't be folded together
+    // due to floating point imprecision.  For example, if |x === -2**53|,
+    // |x - 1 - 1 === -2**53| but |x - 2 === -2**53 - 2|.  Shifts could be
+    // folded, but it doesn't seem worth the effort.)
+    JSOp op = node->getOp();
+    ParseNode* elem = node->pn_head;
+    ParseNode* next = elem->pn_next;
+    if (elem->isKind(PNK_NUMBER)) {
+        while (true) {
+            if (!next || !next->isKind(PNK_NUMBER))
+                break;
+
+            ParseNode* afterNext = next->pn_next;
+            if (!FoldBinaryNumeric(cx, op, elem, next, elem))
+                return false;
+
+            parser.freeTree(next);
+            next = afterNext;
+            elem->pn_next = next;
+
+            node->pn_count--;
+        }
+
+        if (node->pn_count == 1) {
+            MOZ_ASSERT(node->pn_head == elem);
+            MOZ_ASSERT(elem->isKind(PNK_NUMBER));
+
+            double d = elem->pn_dval;
+            node->setKind(PNK_NUMBER);
+            node->setArity(PN_NULLARY);
+            node->setOp(JSOP_DOUBLE);
+            node->pn_dval = d;
+
+            parser.freeTree(elem);
+        }
+    }
+
+    return true;
+}
+
+static bool
+FoldExponentiation(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+                   bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_POW));
+    MOZ_ASSERT(node->isArity(PN_LIST));
+    MOZ_ASSERT(node->pn_count >= 2);
+
+    // Fold each operand, ideally into a number.
+    ParseNode** listp = &node->pn_head;
+    for (; *listp; listp = &(*listp)->pn_next) {
+        if (!Fold(cx, listp, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+
+        if (!FoldType(cx, *listp, PNK_NUMBER))
+            return false;
+    }
+
+    // Repoint the list's tail pointer.
+    node->pn_tail = listp;
+
+    // Unlike all other binary arithmetic operators, ** is right-associative:
+    // 2**3**5 is 2**(3**5), not (2**3)**5.  As list nodes singly-link their
+    // children, full constant-folding requires either linear space or dodgy
+    // in-place linked list reversal.  So we only fold one exponentiation: it's
+    // easy and addresses common cases like |2**32|.
+    if (node->pn_count > 2)
+        return true;
+
+    ParseNode* base = node->pn_head;
+    ParseNode* exponent = base->pn_next;
+    if (!base->isKind(PNK_NUMBER) || !exponent->isKind(PNK_NUMBER))
+        return true;
+
+    double d1 = base->pn_dval, d2 = exponent->pn_dval;
+
+    parser.prepareNodeForMutation(node);
+    node->setKind(PNK_NUMBER);
+    node->setArity(PN_NULLARY);
+    node->setOp(JSOP_DOUBLE);
+    node->pn_dval = ecmaPow(d1, d2);
+    return true;
+}
+
+static bool
+FoldList(ExclusiveContext* cx, ParseNode* list, Parser<FullParseHandler>& parser,
+         bool inGenexpLambda)
+{
+    MOZ_ASSERT(list->isArity(PN_LIST));
+
+    ParseNode** elem = &list->pn_head;
+    for (; *elem; elem = &(*elem)->pn_next) {
+        if (!Fold(cx, elem, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+    // Repoint the list's tail pointer if the final element was replaced.
+    list->pn_tail = elem;
+
+    list->checkListConsistency();
+
+    return true;
+}
+
+static bool
+FoldReturn(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+           bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_RETURN));
+    MOZ_ASSERT(node->isArity(PN_BINARY));
+
+    if (ParseNode*& expr = node->pn_left) {
+        if (!Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+#ifdef DEBUG
+    if (ParseNode* generatorSpecific = node->pn_right) {
+        MOZ_ASSERT(generatorSpecific->isKind(PNK_NAME));
+        MOZ_ASSERT(generatorSpecific->pn_atom->equals(".genrval"));
+        MOZ_ASSERT(generatorSpecific->isAssigned());
+    }
+#endif
+
+    return true;
+}
+
+static bool
+FoldTry(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+        bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_TRY));
+    MOZ_ASSERT(node->isArity(PN_TERNARY));
+
+    ParseNode*& statements = node->pn_kid1;
+    if (!Fold(cx, &statements, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    if (ParseNode*& catchList = node->pn_kid2) {
+        if (!Fold(cx, &catchList, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+    if (ParseNode*& finally = node->pn_kid3) {
+        if (!Fold(cx, &finally, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+    return true;
+}
+
+static bool
+FoldCatch(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+          bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_CATCH));
+    MOZ_ASSERT(node->isArity(PN_TERNARY));
+
+    ParseNode*& declPattern = node->pn_kid1;
+    if (!Fold(cx, &declPattern, parser, inGenexpLambda, SyntacticContext::Other))
+        return false;
+
+    if (ParseNode*& cond = node->pn_kid2) {
+        if (!Fold(cx, &cond, parser, inGenexpLambda, SyntacticContext::Condition))
+            return false;
+    }
+
+    if (ParseNode*& statements = node->pn_kid3) {
+        if (!Fold(cx, &statements, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+    return true;
+}
+
+static bool
+FoldClass(ExclusiveContext* cx, ParseNode* node, Parser<FullParseHandler>& parser,
+          bool inGenexpLambda)
+{
+    MOZ_ASSERT(node->isKind(PNK_CLASS));
+    MOZ_ASSERT(node->isArity(PN_TERNARY));
+
+    if (ParseNode*& classNames = node->pn_kid1) {
+        if (!Fold(cx, &classNames, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+    if (ParseNode*& heritage = node->pn_kid2) {
+        if (!Fold(cx, &heritage, parser, inGenexpLambda, SyntacticContext::Other))
+            return false;
+    }
+
+    ParseNode*& body = node->pn_kid3;
+    return Fold(cx, &body, parser, inGenexpLambda, SyntacticContext::Other);
+}
+
+bool
+Fold(ExclusiveContext* cx, ParseNode** pnp, Parser<FullParseHandler>& parser, bool inGenexpLambda,
+     SyntacticContext sc)
+{
+    JS_CHECK_RECURSION(cx, return false);
+
     ParseNode* pn = *pnp;
     ParseNode* pn1 = nullptr;
     ParseNode* pn2 = nullptr;
-    ParseNode* pn3 = nullptr;
 
-    JS_CHECK_RECURSION(cx, return false);
+    switch (pn->getKind()) {
+      case PNK_NEWTARGET:
+      case PNK_NOP:
+      case PNK_REGEXP:
+      case PNK_STRING:
+      case PNK_TRUE:
+      case PNK_FALSE:
+      case PNK_NULL:
+      case PNK_ELISION:
+      case PNK_NUMBER:
+      case PNK_DEBUGGER:
+      case PNK_BREAK:
+      case PNK_CONTINUE:
+      case PNK_TEMPLATE_STRING:
+      case PNK_THIS:
+      case PNK_GENERATOR:
+      case PNK_EXPORT_BATCH_SPEC:
+      case PNK_OBJECT_PROPERTY_NAME:
+      case PNK_SUPERPROP:
+      case PNK_FRESHENBLOCK:
+        MOZ_ASSERT(pn->isArity(PN_NULLARY));
+        goto afterFolding;
+
+      case PNK_TYPEOFNAME:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        MOZ_ASSERT(pn->pn_kid->isKind(PNK_NAME));
+        MOZ_ASSERT(!pn->pn_kid->maybeExpr());
+        return true;
+
+      case PNK_TYPEOFEXPR:
+        return FoldTypeOfExpr(cx, pn, parser, inGenexpLambda);
+
+      case PNK_VOID:
+        return FoldVoid(cx, pn, parser, inGenexpLambda, sc);
+
+      case PNK_DELETENAME: {
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        MOZ_ASSERT(pn->pn_kid->isKind(PNK_NAME));
+        return true;
+      }
+
+      case PNK_DELETEEXPR:
+        return FoldDeleteExpr(cx, pn, parser, inGenexpLambda);
+
+      case PNK_DELETEELEM:
+      case PNK_DELETESUPERELEM:
+        return FoldDeleteElement(cx, pn, parser, inGenexpLambda);
+
+      case PNK_DELETEPROP:
+      case PNK_DELETESUPERPROP:
+        return FoldDeleteProperty(cx, pn, parser, inGenexpLambda);
+
+      case PNK_CONDITIONAL:
+        return FoldConditional(cx, pnp, parser, inGenexpLambda);
+
+      case PNK_IF:
+        return FoldIf(cx, pnp, parser, inGenexpLambda);
+
+      case PNK_NOT:
+        return FoldNot(cx, pn, parser, inGenexpLambda);
+
+      case PNK_BITNOT:
+      case PNK_POS:
+      case PNK_NEG:
+        return FoldUnaryArithmetic(cx, pn, parser, inGenexpLambda);
+
+      case PNK_PREINCREMENT:
+      case PNK_POSTINCREMENT:
+      case PNK_PREDECREMENT:
+      case PNK_POSTDECREMENT:
+        return FoldIncrementDecrement(cx, pn, parser, inGenexpLambda);
+
+      case PNK_THROW:
+      case PNK_ARRAYPUSH:
+      case PNK_MUTATEPROTO:
+      case PNK_COMPUTED_NAME:
+      case PNK_SPREAD:
+      case PNK_SUPERELEM:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        return Fold(cx, &pn->pn_kid, parser, inGenexpLambda, SyntacticContext::Other);
+
+      case PNK_SEMI:
+        MOZ_ASSERT(pn->isArity(PN_UNARY));
+        if (ParseNode*& expr = pn->pn_kid)
+            return Fold(cx, &expr, parser, inGenexpLambda, SyntacticContext::Other);
+        return true;
+
+      case PNK_AND:
+      case PNK_OR:
+        return FoldAndOr(cx, pnp, parser, inGenexpLambda, sc);
+
+      case PNK_FUNCTION:
+        return FoldFunction(cx, pn, parser, inGenexpLambda);
+
+      case PNK_SUB:
+      case PNK_STAR:
+      case PNK_LSH:
+      case PNK_RSH:
+      case PNK_URSH:
+      case PNK_DIV:
+      case PNK_MOD:
+        return FoldBinaryArithmetic(cx, pn, parser, inGenexpLambda);
+
+      case PNK_POW:
+        return FoldExponentiation(cx, pn, parser, inGenexpLambda);
+
+      // Various list nodes not requiring care to minimally fold.  Some of
+      // these could be further folded/optimized, but we don't make the effort.
+      case PNK_BITOR:
+      case PNK_BITXOR:
+      case PNK_BITAND:
+      case PNK_STRICTEQ:
+      case PNK_EQ:
+      case PNK_STRICTNE:
+      case PNK_NE:
+      case PNK_LT:
+      case PNK_LE:
+      case PNK_GT:
+      case PNK_GE:
+      case PNK_INSTANCEOF:
+      case PNK_IN:
+      case PNK_COMMA:
+      case PNK_ARRAY:
+      case PNK_OBJECT:
+      case PNK_ARRAYCOMP:
+      case PNK_STATEMENTLIST:
+      case PNK_CLASSMETHODLIST:
+      case PNK_CATCHLIST:
+      case PNK_TEMPLATE_STRING_LIST:
+      case PNK_VAR:
+      case PNK_CONST:
+      case PNK_GLOBALCONST:
+      case PNK_LET:
+      case PNK_ARGSBODY:
+      case PNK_CALLSITEOBJ:
+      case PNK_EXPORT_SPEC_LIST:
+      case PNK_IMPORT_SPEC_LIST:
+        return FoldList(cx, pn, parser, inGenexpLambda);
+
+      case PNK_YIELD_STAR:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        MOZ_ASSERT(pn->pn_right->isKind(PNK_NAME));
+        MOZ_ASSERT(!pn->pn_right->isAssigned());
+        return Fold(cx, &pn->pn_left, parser, inGenexpLambda, SyntacticContext::Other);
+
+      case PNK_YIELD:
+        MOZ_ASSERT(pn->isArity(PN_BINARY));
+        MOZ_ASSERT((pn->pn_right->isKind(PNK_NAME) && !pn->pn_right->isAssigned()) ||
+                   (pn->pn_right->isKind(PNK_ASSIGN) &&
+                    pn->pn_right->pn_left->isKind(PNK_NAME) &&
+                    pn->pn_right->pn_right->isKind(PNK_GENERATOR)));
+        if (!pn->pn_left)
+            return true;
+        return Fold(cx, &pn->pn_left, parser, inGenexpLambda, SyntacticContext::Other);
+
+      case PNK_RETURN:
+        return FoldReturn(cx, pn, parser, inGenexpLambda);
+
+      case PNK_TRY:
+        return FoldTry(cx, pn, parser, inGenexpLambda);
+
+      case PNK_CATCH:
+        return FoldCatch(cx, pn, parser, inGenexpLambda);
+
+      case PNK_CLASS:
+        return FoldClass(cx, pn, parser, inGenexpLambda);
+
+      case PNK_EXPORT:
+      case PNK_ASSIGN:
+      case PNK_ADDASSIGN:
+      case PNK_SUBASSIGN:
+      case PNK_BITORASSIGN:
+      case PNK_BITXORASSIGN:
+      case PNK_BITANDASSIGN:
+      case PNK_LSHASSIGN:
+      case PNK_RSHASSIGN:
+      case PNK_URSHASSIGN:
+      case PNK_MULASSIGN:
+      case PNK_DIVASSIGN:
+      case PNK_MODASSIGN:
+      case PNK_POWASSIGN:
+      case PNK_ELEM:
+      case PNK_COLON:
+      case PNK_CASE:
+      case PNK_SHORTHAND:
+      case PNK_DOWHILE:
+      case PNK_WHILE:
+      case PNK_SWITCH:
+      case PNK_LETBLOCK:
+      case PNK_FOR:
+      case PNK_CLASSMETHOD:
+      case PNK_WITH:
+      case PNK_CLASSNAMES:
+      case PNK_DEFAULT:
+      case PNK_IMPORT:
+      case PNK_EXPORT_FROM:
+      case PNK_EXPORT_DEFAULT:
+      case PNK_FORIN:
+      case PNK_FOROF:
+      case PNK_FORHEAD:
+      case PNK_ADD:
+      case PNK_NEW:
+      case PNK_CALL:
+      case PNK_GENEXP:
+      case PNK_TAGGED_TEMPLATE:
+      case PNK_LABEL:
+      case PNK_DOT:
+      case PNK_LEXICALSCOPE:
+      case PNK_NAME:
+      case PNK_EXPORT_SPEC:
+      case PNK_IMPORT_SPEC:
+        MOZ_ASSERT(!pn->isArity(PN_CODE), "only functions are code nodes");
+        break; // for now
+
+      case PNK_LIMIT: // invalid sentinel value
+        MOZ_CRASH("invalid node kind");
+    }
 
     // First, recursively fold constants on the children of this node.
     switch (pn->getArity()) {
       case PN_CODE:
-        if (pn->isKind(PNK_FUNCTION) && pn->pn_funbox->useAsmOrInsideUseAsm())
-            return true;
-
-        // Note: pn_body is nullptr for functions which are being lazily parsed.
-        MOZ_ASSERT(pn->getKind() == PNK_FUNCTION);
-        if (pn->pn_body) {
-            if (!Fold(cx, &pn->pn_body, handler, options, pn->pn_funbox->inGenexpLambda,
-                      SyntacticContext::Other))
-                return false;
-        }
-        break;
+        MOZ_ASSERT(pn->isKind(PNK_FUNCTION));
+        MOZ_CRASH("should have been handled above");
 
       case PN_LIST:
       {
-        // Propagate Condition context through logical connectives.
-        SyntacticContext kidsc = SyntacticContext::Other;
-        if (pn->isKind(PNK_OR) || pn->isKind(PNK_AND))
-            kidsc = sc;
-
         // Don't fold a parenthesized call expression. See bug 537673.
         ParseNode** listp = &pn->pn_head;
-        if ((pn->isKind(PNK_CALL) || pn->isKind(PNK_NEW)) && (*listp)->isInParens())
+        if ((pn->isKind(PNK_CALL) || pn->isKind(PNK_TAGGED_TEMPLATE)) && (*listp)->isInParens())
             listp = &(*listp)->pn_next;
 
         for (; *listp; listp = &(*listp)->pn_next) {
-            if (!Fold(cx, listp, handler, options, inGenexpLambda, kidsc))
+            if (!Fold(cx, listp, parser, inGenexpLambda, SyntacticContext::Other))
                 return false;
         }
 
@@ -655,66 +1644,54 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
       }
 
       case PN_TERNARY:
+        MOZ_ASSERT(!pn->isKind(PNK_CONDITIONAL),
+                   "should be skipping this above");
+        MOZ_ASSERT(!pn->isKind(PNK_IF),
+                   "should be skipping this above");
         /* Any kid may be null (e.g. for (;;)). */
         if (pn->pn_kid1) {
-            if (!Fold(cx, &pn->pn_kid1, handler, options, inGenexpLambda, condIf(pn, PNK_IF)))
+            if (!Fold(cx, &pn->pn_kid1, parser, inGenexpLambda, SyntacticContext::Other))
                 return false;
         }
         pn1 = pn->pn_kid1;
 
         if (pn->pn_kid2) {
-            if (!Fold(cx, &pn->pn_kid2, handler, options, inGenexpLambda, condIf(pn, PNK_FORHEAD)))
+            if (!Fold(cx, &pn->pn_kid2, parser, inGenexpLambda, condIf(pn, PNK_FORHEAD)))
                 return false;
             if (pn->isKind(PNK_FORHEAD) && pn->pn_kid2->isKind(PNK_TRUE)) {
-                handler.freeTree(pn->pn_kid2);
+                parser.freeTree(pn->pn_kid2);
                 pn->pn_kid2 = nullptr;
             }
         }
         pn2 = pn->pn_kid2;
 
         if (pn->pn_kid3) {
-            if (!Fold(cx, &pn->pn_kid3, handler, options, inGenexpLambda, SyntacticContext::Other))
+            if (!Fold(cx, &pn->pn_kid3, parser, inGenexpLambda, SyntacticContext::Other))
                 return false;
         }
-        pn3 = pn->pn_kid3;
         break;
 
       case PN_BINARY:
       case PN_BINARY_OBJ:
-        if (pn->isKind(PNK_OR) || pn->isKind(PNK_AND)) {
-            // Propagate Condition context through logical connectives.
-            SyntacticContext kidsc = SyntacticContext::Other;
-            if (sc == SyntacticContext::Condition)
-                kidsc = sc;
-            if (!Fold(cx, &pn->pn_left, handler, options, inGenexpLambda, kidsc))
+        /* First kid may be null (for default case in switch). */
+        if (pn->pn_left) {
+            if (!Fold(cx, &pn->pn_left, parser, inGenexpLambda, condIf(pn, PNK_WHILE)))
                 return false;
-            if (!Fold(cx, &pn->pn_right, handler, options, inGenexpLambda, kidsc))
+        }
+        /* Second kid may be null (for return in non-generator). */
+        if (pn->pn_right) {
+            if (!Fold(cx, &pn->pn_right, parser, inGenexpLambda, condIf(pn, PNK_DOWHILE)))
                 return false;
-        } else {
-            /* First kid may be null (for default case in switch). */
-            if (pn->pn_left) {
-                if (!Fold(cx, &pn->pn_left, handler, options, inGenexpLambda, condIf(pn, PNK_WHILE)))
-                    return false;
-            }
-            /* Second kid may be null (for return in non-generator). */
-            if (pn->pn_right) {
-                if (!Fold(cx, &pn->pn_right, handler, options, inGenexpLambda, condIf(pn, PNK_DOWHILE)))
-                    return false;
-            }
         }
         pn1 = pn->pn_left;
         pn2 = pn->pn_right;
         break;
 
       case PN_UNARY:
+        MOZ_ASSERT(!IsDeleteKind(pn->getKind()),
+                   "should have been handled above");
         if (pn->pn_kid) {
-            SyntacticContext kidsc =
-                pn->isKind(PNK_NOT)
-                ? SyntacticContext::Condition
-                : IsDeleteKind(pn->getKind())
-                ? SyntacticContext::Delete
-                : SyntacticContext::Other;
-            if (!Fold(cx, &pn->pn_kid, handler, options, inGenexpLambda, kidsc))
+            if (!Fold(cx, &pn->pn_kid, parser, inGenexpLambda, SyntacticContext::Other))
                 return false;
         }
         pn1 = pn->pn_kid;
@@ -731,7 +1708,7 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
             ParseNode** lhsp = &pn->pn_expr;
             while (*lhsp && (*lhsp)->isArity(PN_NAME) && !(*lhsp)->isUsed())
                 lhsp = &(*lhsp)->pn_expr;
-            if (*lhsp && !Fold(cx, lhsp, handler, options, inGenexpLambda, SyntacticContext::Other))
+            if (*lhsp && !Fold(cx, lhsp, parser, inGenexpLambda, SyntacticContext::Other))
                 return false;
             pn1 = *lhsp;
         }
@@ -751,117 +1728,6 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
         return true;
 
     switch (pn->getKind()) {
-      case PNK_IF:
-        {
-            bool result;
-            if (ParseNode* consequent = pn2) {
-                if (!ContainsHoistedDeclaration(cx, consequent, &result))
-                    return false;
-                if (result)
-                    break;
-            }
-            if (ParseNode* alternative = pn3) {
-                if (!ContainsHoistedDeclaration(cx, alternative, &result))
-                    return false;
-                if (result)
-                    break;
-            }
-        }
-        /* FALL THROUGH */
-
-      case PNK_CONDITIONAL:
-        /* Reduce 'if (C) T; else E' into T for true C, E for false. */
-        switch (pn1->getKind()) {
-          case PNK_NUMBER:
-            if (pn1->pn_dval == 0 || IsNaN(pn1->pn_dval))
-                pn2 = pn3;
-            break;
-          case PNK_STRING:
-            if (pn1->pn_atom->length() == 0)
-                pn2 = pn3;
-            break;
-          case PNK_TRUE:
-            break;
-          case PNK_FALSE:
-          case PNK_NULL:
-            pn2 = pn3;
-            break;
-          default:
-            /* Early return to dodge common code that copies pn2 to pn. */
-            return true;
-        }
-
-#if JS_HAS_GENERATOR_EXPRS
-        /* Don't fold a trailing |if (0)| in a generator expression. */
-        if (!pn2 && inGenexpLambda)
-            break;
-#endif
-
-        if (pn2 && !pn2->isDefn()) {
-            ReplaceNode(pnp, pn2);
-            pn = pn2;
-        }
-        if (!pn2 || (pn->isKind(PNK_SEMI) && !pn->pn_kid)) {
-            /*
-             * False condition and no else, or an empty then-statement was
-             * moved up over pn.  Either way, make pn an empty block (not an
-             * empty statement, which does not decompile, even when labeled).
-             * NB: pn must be a PNK_IF as PNK_CONDITIONAL can never have a null
-             * kid or an empty statement for a child.
-             */
-            handler.prepareNodeForMutation(pn);
-            pn->setKind(PNK_STATEMENTLIST);
-            pn->setArity(PN_LIST);
-            pn->makeEmpty();
-        }
-        if (pn3 && pn3 != pn2)
-            handler.freeTree(pn3);
-        break;
-
-      case PNK_OR:
-      case PNK_AND:
-        if (sc == SyntacticContext::Condition) {
-            ParseNode** listp = &pn->pn_head;
-            MOZ_ASSERT(*listp == pn1);
-            uint32_t orig = pn->pn_count;
-            do {
-                Truthiness t = Boolish(pn1);
-                if (t == Unknown) {
-                    listp = &pn1->pn_next;
-                    continue;
-                }
-                if ((t == Truthy) == pn->isKind(PNK_OR)) {
-                    for (pn2 = pn1->pn_next; pn2; pn2 = pn3) {
-                        pn3 = pn2->pn_next;
-                        handler.freeTree(pn2);
-                        --pn->pn_count;
-                    }
-                    pn1->pn_next = nullptr;
-                    break;
-                }
-                MOZ_ASSERT((t == Truthy) == pn->isKind(PNK_AND));
-                if (pn->pn_count == 1)
-                    break;
-                *listp = pn1->pn_next;
-                handler.freeTree(pn1);
-                --pn->pn_count;
-            } while ((pn1 = *listp) != nullptr);
-
-            // We may have to replace a one-element list with its element.
-            pn1 = pn->pn_head;
-            if (pn->pn_count == 1) {
-                ReplaceNode(pnp, pn1);
-                pn = pn1;
-            } else if (orig != pn->pn_count) {
-                // Adjust list tail.
-                pn2 = pn1->pn_next;
-                for (; pn1; pn2 = pn1, pn1 = pn1->pn_next)
-                    continue;
-                pn->pn_tail = &pn2->pn_next;
-            }
-        }
-        break;
-
       case PNK_ADD: {
         MOZ_ASSERT(pn->isArity(PN_LIST));
 
@@ -875,7 +1741,7 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
             while (pn2 && pn2->isKind(PNK_NUMBER)) {
                 pn1->pn_dval += pn2->pn_dval;
                 pn1->pn_next = pn2->pn_next;
-                handler.freeTree(pn2);
+                parser.freeTree(pn2);
                 pn2 = pn1->pn_next;
                 pn->pn_count--;
                 folded = true;
@@ -919,7 +1785,7 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
                 if (!foldedStr)
                     return false;
                 pn1->pn_next = pn2->pn_next;
-                handler.freeTree(pn2);
+                parser.freeTree(pn2);
                 pn2 = pn1->pn_next;
                 pn->pn_count--;
                 folded = true;
@@ -958,39 +1824,6 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
         break;
       }
 
-      case PNK_SUB:
-      case PNK_STAR:
-      case PNK_LSH:
-      case PNK_RSH:
-      case PNK_URSH:
-      case PNK_DIV:
-      case PNK_MOD:
-        MOZ_ASSERT(pn->getArity() == PN_LIST);
-        MOZ_ASSERT(pn->pn_count >= 2);
-        for (pn2 = pn1; pn2; pn2 = pn2->pn_next) {
-            if (!FoldType(cx, pn2, PNK_NUMBER))
-                return false;
-        }
-        for (pn2 = pn1; pn2; pn2 = pn2->pn_next) {
-            /* XXX fold only if all operands convert to number */
-            if (!pn2->isKind(PNK_NUMBER))
-                break;
-        }
-        if (!pn2) {
-            JSOp op = pn->getOp();
-
-            pn2 = pn1->pn_next;
-            pn3 = pn2->pn_next;
-            if (!FoldBinaryNumeric(cx, op, pn1, pn2, pn))
-                return false;
-            while ((pn2 = pn3) != nullptr) {
-                pn3 = pn2->pn_next;
-                if (!FoldBinaryNumeric(cx, op, pn, pn2, pn))
-                    return false;
-            }
-        }
-        break;
-
       case PNK_TYPEOFNAME:
       case PNK_TYPEOFEXPR:
       case PNK_VOID:
@@ -998,57 +1831,19 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
       case PNK_BITNOT:
       case PNK_POS:
       case PNK_NEG:
-        if (pn1->isKind(PNK_NUMBER)) {
-            double d;
-
-            /* Operate on one numeric constant. */
-            d = pn1->pn_dval;
-            switch (pn->getKind()) {
-              case PNK_BITNOT:
-                d = ~ToInt32(d);
-                break;
-
-              case PNK_NEG:
-                d = -d;
-                break;
-
-              case PNK_POS:
-                break;
-
-              case PNK_NOT:
-                if (d == 0 || IsNaN(d)) {
-                    pn->setKind(PNK_TRUE);
-                    pn->setOp(JSOP_TRUE);
-                } else {
-                    pn->setKind(PNK_FALSE);
-                    pn->setOp(JSOP_FALSE);
-                }
-                pn->setArity(PN_NULLARY);
-                /* FALL THROUGH */
-
-              default:
-                /* Return early to dodge the common PNK_NUMBER code. */
-                return true;
-            }
-            pn->setKind(PNK_NUMBER);
-            pn->setOp(JSOP_DOUBLE);
-            pn->setArity(PN_NULLARY);
-            pn->pn_dval = d;
-            handler.freeTree(pn1);
-        } else if (pn1->isKind(PNK_TRUE) || pn1->isKind(PNK_FALSE)) {
-            if (pn->isKind(PNK_NOT)) {
-                ReplaceNode(pnp, pn1);
-                pn = pn1;
-                if (pn->isKind(PNK_TRUE)) {
-                    pn->setKind(PNK_FALSE);
-                    pn->setOp(JSOP_FALSE);
-                } else {
-                    pn->setKind(PNK_TRUE);
-                    pn->setOp(JSOP_TRUE);
-                }
-            }
-        }
-        break;
+      case PNK_CONDITIONAL:
+      case PNK_IF:
+      case PNK_AND:
+      case PNK_OR:
+      case PNK_SUB:
+      case PNK_STAR:
+      case PNK_LSH:
+      case PNK_RSH:
+      case PNK_URSH:
+      case PNK_DIV:
+      case PNK_MOD:
+      case PNK_POW:
+        MOZ_CRASH("should have been fully handled above");
 
       case PNK_ELEM: {
         // An indexed expression, pn1[pn2]. A few cases can be improved.
@@ -1084,7 +1879,7 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
             // Convert to a property access (like pn1.foo) which we optimize
             // better downstream. Don't bother with this for names which TI
             // considers to be indexes, to simplify downstream analysis.
-            ParseNode* expr = handler.newPropertyAccess(pn->pn_left, name, pn->pn_pos.end);
+            ParseNode* expr = parser.handler.newPropertyAccess(pn->pn_left, name, pn->pn_pos.end);
             if (!expr)
                 return false;
             expr->setInParens(pn->isInParens());
@@ -1096,11 +1891,11 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
             // node with |"prop"| as its child so that our |pn| doesn't have a
             // necessarily-weird structure (say, by nulling out |pn->pn_left|
             // only) that would fail AST sanity assertions performed by
-            // |handler.freeTree(pn)|.
+            // |parser.freeTree(pn)|.
             pn->setKind(PNK_TYPEOFEXPR);
             pn->setArity(PN_UNARY);
             pn->pn_kid = pn2;
-            handler.freeTree(pn);
+            parser.freeTree(pn);
 
             pn = expr;
         }
@@ -1110,6 +1905,7 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
       default:;
     }
 
+  afterFolding:
     if (sc == SyntacticContext::Condition) {
         Truthiness t = Boolish(pn);
         if (t != Unknown) {
@@ -1119,7 +1915,7 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
              * a method list corrupts the method list. However, methods are M's in
              * statements of the form 'this.foo = M;', which we never fold, so we're okay.
              */
-            handler.prepareNodeForMutation(pn);
+            parser.prepareNodeForMutation(pn);
             if (t == Truthy) {
                 pn->setKind(PNK_TRUE);
                 pn->setOp(JSOP_TRUE);
@@ -1137,12 +1933,10 @@ Fold(ExclusiveContext* cx, ParseNode** pnp,
 bool
 frontend::FoldConstants(ExclusiveContext* cx, ParseNode** pnp, Parser<FullParseHandler>* parser)
 {
-    // Don't fold constants if the code has requested "use asm" as
-    // constant-folding will misrepresent the source text for the purpose
-    // of type checking. (Also guard against entering a function containing
-    // "use asm", see PN_FUNC case below.)
+    // Don't constant-fold inside "use asm" code, as this could create a parse
+    // tree that doesn't type-check as asm.js.
     if (parser->pc->useAsmOrInsideUseAsm())
         return true;
 
-    return Fold(cx, pnp, parser->handler, parser->options(), false, SyntacticContext::Other);
+    return Fold(cx, pnp, *parser, false, SyntacticContext::Other);
 }

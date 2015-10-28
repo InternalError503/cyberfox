@@ -260,12 +260,12 @@ size_t
 AudioBuffer::SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const
 {
   size_t amount = aMallocSizeOf(this);
-  amount += mJSChannels.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mJSChannels.ShallowSizeOfExcludingThis(aMallocSizeOf);
   if (mSharedChannels) {
     amount += mSharedChannels->SizeOfIncludingThis(aMallocSizeOf);
   }
   return amount;
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla

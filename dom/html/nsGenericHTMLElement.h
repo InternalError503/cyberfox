@@ -39,8 +39,8 @@ namespace dom {
 class HTMLFormElement;
 class HTMLPropertiesCollection;
 class HTMLMenuElement;
-}
-}
+} // namespace dom
+} // namespace mozilla
 
 typedef nsMappedAttributeElement nsGenericHTMLElementBase;
 
@@ -711,6 +711,10 @@ public:
   static bool ParseImageAttribute(nsIAtom* aAttribute,
                                     const nsAString& aString,
                                     nsAttrValue& aResult);
+
+  static bool ParseReferrerAttribute(const nsAString& aString,
+                                     nsAttrValue& aResult);
+
   /**
    * Convert a frameborder string to value (yes/no/1/0)
    *
@@ -1229,8 +1233,8 @@ private:
 namespace mozilla {
 namespace dom {
 class HTMLFieldSetElement;
-}
-}
+} // namespace dom
+} // namespace mozilla
 
 #define FORM_ELEMENT_FLAG_BIT(n_) NODE_FLAG_BIT(ELEMENT_TYPE_SPECIFIC_BITS_OFFSET + (n_))
 
@@ -1351,7 +1355,7 @@ protected:
   virtual ~nsGenericHTMLFormElement();
 
   virtual nsresult BeforeSetAttr(int32_t aNameSpaceID, nsIAtom* aName,
-                                 const nsAttrValueOrString* aValue,
+                                 nsAttrValueOrString* aValue,
                                  bool aNotify) override;
 
   virtual nsresult AfterSetAttr(int32_t aNameSpaceID, nsIAtom* aName,
@@ -1742,6 +1746,7 @@ NS_DECLARE_NS_NEW_HTML_ELEMENT(Mod)
 NS_DECLARE_NS_NEW_HTML_ELEMENT(Data)
 NS_DECLARE_NS_NEW_HTML_ELEMENT(DataList)
 NS_DECLARE_NS_NEW_HTML_ELEMENT(Div)
+NS_DECLARE_NS_NEW_HTML_ELEMENT(ExtApp)
 NS_DECLARE_NS_NEW_HTML_ELEMENT(FieldSet)
 NS_DECLARE_NS_NEW_HTML_ELEMENT(Font)
 NS_DECLARE_NS_NEW_HTML_ELEMENT(Form)

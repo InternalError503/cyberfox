@@ -59,8 +59,8 @@ static const int32_t kDefaultTCPKeepCount =
 #else
                                               4;  // Specifiable in Linux.
 #endif
-}
-}
+} // namespace net
+} // namespace mozilla
 
 //-----------------------------------------------------------------------------
 
@@ -81,6 +81,10 @@ public:
     NS_DECL_NSITHREADOBSERVER
     NS_DECL_NSIRUNNABLE
     NS_DECL_NSIOBSERVER 
+    // missing from NS_DECL_NSIEVENTTARGET because MSVC
+    nsresult Dispatch(nsIRunnable* aEvent, uint32_t aFlags) {
+      return Dispatch(nsCOMPtr<nsIRunnable>(aEvent).forget(), aFlags);
+    }
 
     nsSocketTransportService();
 
@@ -109,6 +113,8 @@ public:
 
     // Returns true if keepalives are enabled in prefs.
     bool IsKeepaliveEnabled() { return mKeepaliveEnabledPref; }
+
+    bool IsTelemetryEnabled() { return mTelemetryEnabledPref; }
 protected:
 
     virtual ~nsSocketTransportService();

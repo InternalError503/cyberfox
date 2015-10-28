@@ -9,8 +9,8 @@ const Ci = Components.interfaces;
 Cu.import("resource:///modules/devtools/gDevTools.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 
-const {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
-const {require} = devtools;
+const {require} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+const {Toolbox} = require("devtools/framework/toolbox");
 const {Services} = Cu.import("resource://gre/modules/Services.jsm");
 const {AppProjects} = require("devtools/app-manager/app-projects");
 const {Connection} = require("devtools/client/connection-manager");
@@ -35,6 +35,8 @@ const HELP_URL = "https://developer.mozilla.org/docs/Tools/WebIDE/Troubleshootin
 
 const MAX_ZOOM = 1.4;
 const MIN_ZOOM = 0.6;
+
+const MS_PER_DAY = 86400000;
 
 // Download remote resources early
 getJSON("devtools.webide.addonsURL", true);
@@ -145,6 +147,8 @@ let UI = {
     window.removeEventListener("message", this.onMessage);
     this.updateConnectionTelemetry();
     this._telemetry.toolClosed("webide");
+    this._telemetry.toolClosed("webideProjectEditor");
+    this._telemetry.destroy();
   },
 
   canCloseProject: function() {
@@ -458,6 +462,39 @@ let UI = {
       }
     }
 
+    // Runtime commands
+    let monitorCmd = document.querySelector("#cmd_showMonitor");
+    let screenshotCmd = document.querySelector("#cmd_takeScreenshot");
+    let permissionsCmd = document.querySelector("#cmd_showPermissionsTable");
+    let detailsCmd = document.querySelector("#cmd_showRuntimeDetails");
+    let disconnectCmd = document.querySelector("#cmd_disconnectRuntime");
+    let devicePrefsCmd = document.querySelector("#cmd_showDevicePrefs");
+    let settingsCmd = document.querySelector("#cmd_showSettings");
+
+    if (AppManager.connected) {
+      if (AppManager.deviceFront) {
+        monitorCmd.removeAttribute("disabled");
+        detailsCmd.removeAttribute("disabled");
+        permissionsCmd.removeAttribute("disabled");
+        screenshotCmd.removeAttribute("disabled");
+      }
+      if (AppManager.preferenceFront) {
+        devicePrefsCmd.removeAttribute("disabled");
+      }
+      if (AppManager.settingsFront) {
+        settingsCmd.removeAttribute("disabled");
+      }
+      disconnectCmd.removeAttribute("disabled");
+    } else {
+      monitorCmd.setAttribute("disabled", "true");
+      detailsCmd.setAttribute("disabled", "true");
+      permissionsCmd.setAttribute("disabled", "true");
+      screenshotCmd.setAttribute("disabled", "true");
+      disconnectCmd.setAttribute("disabled", "true");
+      devicePrefsCmd.setAttribute("disabled", "true");
+      settingsCmd.setAttribute("disabled", "true");
+    }
+
     let runtimePanelButton = document.querySelector("#runtime-panel-button");
 
     if (AppManager.connected) {
@@ -635,13 +672,18 @@ let UI = {
     }
   },
 
-  updateProjectEditorMenusVisibility: function() {
+  /**
+   * Called when selecting or deselecting the project editor panel.
+   */
+  onChangeProjectEditorSelected: function() {
     if (this.projecteditor) {
       let panel = document.querySelector("#deck").selectedPanel;
       if (panel && panel.id == "deck-panel-projecteditor") {
         this.projecteditor.menuEnabled = true;
+        this._telemetry.toolOpened("webideProjectEditor");
       } else {
         this.projecteditor.menuEnabled = false;
+        this._telemetry.toolClosed("webideProjectEditor");
       }
     }
   },
@@ -656,8 +698,9 @@ let UI = {
       menubar: document.querySelector("#main-menubar"),
       menuindex: 1
     });
-    this.projecteditor.on("onEditorSave", (editor, resource) => {
+    this.projecteditor.on("onEditorSave", () => {
       AppManager.validateAndUpdateProject(AppManager.selectedProject);
+      this._telemetry.actionOccurred("webideProjectEditorSave");
     });
     return this.projecteditor.loaded;
   },
@@ -683,10 +726,6 @@ let UI = {
 
   isProjectEditorEnabled: function() {
     return Services.prefs.getBoolPref("devtools.webide.showProjectEditor");
-  },
-
-  isRuntimeConfigurationEnabled: function() {
-    return Services.prefs.getBoolPref("devtools.webide.enableRuntimeConfiguration");
   },
 
   openProject: function() {
@@ -717,11 +756,11 @@ let UI = {
 
     // Show ProjectEditor
 
-    this.selectDeckPanel("projecteditor");
-
     this.getProjectEditor().then(() => {
       this.updateProjectEditorHeader();
     }, console.error);
+
+    this.selectDeckPanel("projecteditor");
   },
 
   autoStartProject: Task.async(function*() {
@@ -775,6 +814,8 @@ let UI = {
 
     // Select project
     AppManager.selectedProject = project;
+
+    this._telemetry.actionOccurred("webideImportProject");
   }),
 
   // Remember the last selected project on the runtime
@@ -888,7 +929,7 @@ let UI = {
       panel.setAttribute("src", lazysrc);
     }
     deck.selectedPanel = panel;
-    this.updateProjectEditorMenusVisibility();
+    this.onChangeProjectEditorSelected();
     this.updateToolboxFullscreenState();
   },
 
@@ -896,7 +937,13 @@ let UI = {
     this.resetFocus();
     let deck = document.querySelector("#deck");
     deck.selectedPanel = null;
-    this.updateProjectEditorMenusVisibility();
+    this.onChangeProjectEditorSelected();
+  },
+
+  buildIDToDate(buildID) {
+    let fields = buildID.match(/(\d{4})(\d{2})(\d{2})/);
+    // Date expects 0 - 11 for months
+    return new Date(fields[1], Number.parseInt(fields[2]) - 1, fields[3]);
   },
 
   checkRuntimeVersion: Task.async(function* () {
@@ -907,7 +954,12 @@ let UI = {
       // warning against builds of the same day.
       let deviceID = desc.appbuildid.substr(0, 8);
       let localID = Services.appinfo.appBuildID.substr(0, 8);
-      if (deviceID > localID) {
+      let deviceDate = this.buildIDToDate(deviceID);
+      let localDate = this.buildIDToDate(localID);
+      // Allow device to be newer by up to a week.  This accommodates those with
+      // local device builds, since their devices will almost always be newer
+      // than the client.
+      if (deviceDate - localDate > 7 * MS_PER_DAY) {
         this.reportError("error_runtimeVersionTooRecent", deviceID, localID);
       }
     }
@@ -976,7 +1028,7 @@ let UI = {
     iframe.uid = new Date().getTime();
 
     document.querySelector("notificationbox").insertBefore(iframe, splitter.nextSibling);
-    let host = devtools.Toolbox.HostType.CUSTOM;
+    let host = Toolbox.HostType.CUSTOM;
     let options = { customIframe: iframe, zoom: false, uid: iframe.uid };
     this.toolboxIframe = iframe;
 

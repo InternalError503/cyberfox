@@ -37,7 +37,6 @@
 #include "nsPIDOMWindow.h"
 #include "nsIStyleRule.h"
 #include "nsIURL.h"
-#include "nsNetUtil.h"
 #include "nsEscape.h"
 #include "nsIFrameInlines.h"
 #include "nsIScrollableFrame.h"
@@ -995,6 +994,10 @@ nsGenericHTMLElement::ParseAttribute(int32_t aNamespaceID,
       return aResult.ParseIntValue(aValue);
     }
 
+    if (aAttribute == nsGkAtoms::referrer) {
+      return ParseReferrerAttribute(aValue, aResult);
+    }
+
     if (aAttribute == nsGkAtoms::name) {
       // Store name as an atom.  name="" means that the element has no name,
       // not that it has an emptystring as the name.
@@ -1260,6 +1263,19 @@ nsGenericHTMLElement::ParseImageAttribute(nsIAtom* aAttribute,
     return aResult.ParseIntWithBounds(aString, 0);
   }
   return false;
+}
+
+bool
+nsGenericHTMLElement::ParseReferrerAttribute(const nsAString& aString,
+                                             nsAttrValue& aResult)
+{
+  static const nsAttrValue::EnumTable kReferrerTable[] = {
+    { "no-referrer", net::RP_No_Referrer },
+    { "origin", net::RP_Origin },
+    { "unsafe-url", net::RP_Unsafe_URL },
+    { 0 }
+  };
+  return aResult.ParseEnumValue(aString, kReferrerTable, false);
 }
 
 bool
@@ -2103,7 +2119,7 @@ nsGenericHTMLFormElement::UnbindFromTree(bool aDeep, bool aNullParent)
 
 nsresult
 nsGenericHTMLFormElement::BeforeSetAttr(int32_t aNameSpaceID, nsIAtom* aName,
-                                        const nsAttrValueOrString* aValue,
+                                        nsAttrValueOrString* aValue,
                                         bool aNotify)
 {
   if (aNameSpaceID == kNameSpaceID_None) {

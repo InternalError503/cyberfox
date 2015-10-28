@@ -15,6 +15,9 @@
 #include "mozilla/WindowsVersion.h"
 #include "WMFDecoderModule.h"
 #endif
+#ifdef XP_MACOSX
+#include "nsCocoaFeatures.h"
+#endif
 #include "nsContentCID.h"
 #include "nsServiceManagerUtils.h"
 #include "mozIGeckoMediaPluginService.h"
@@ -26,6 +29,11 @@
 #include "nsAppDirectoryServiceDefs.h"
 #include "nsDirectoryServiceUtils.h"
 #include "nsDirectoryServiceDefs.h"
+#include "nsXULAppAPI.h"
+
+#if defined(XP_WIN) || defined(XP_MACOSX)
+#define PRIMETIME_EME_SUPPORTED 1
+#endif
 
 namespace mozilla {
 namespace dom {
@@ -102,6 +110,11 @@ static bool
 AdobePluginFileExists(const nsACString& aVersionStr,
                       const nsAString& aFilename)
 {
+  if (XRE_GetProcessType() != GeckoProcessType_Default) {
+    NS_WARNING("AdobePluginFileExists() lying because it doesn't work with e10s");
+    return true;
+  }
+
   nsCOMPtr<nsIFile> path;
   nsresult rv = NS_GetSpecialDirectory(NS_APP_USER_PROFILE_50_DIR, getter_AddRefs(path));
   if (NS_WARN_IF(NS_FAILED(rv))) {
@@ -167,8 +180,7 @@ EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
   }
 
 #ifdef XP_WIN
-  if (aKeySystem.EqualsLiteral("com.adobe.access") ||
-      aKeySystem.EqualsLiteral("com.adobe.primetime")) {
+  if (aKeySystem.EqualsLiteral("com.adobe.primetime")) {
     // Verify that anti-virus hasn't "helpfully" deleted the Adobe GMP DLL,
     // as we suspect may happen (Bug 1160382).
     bool somethingMissing = false;
@@ -180,7 +192,7 @@ EnsureMinCDMVersion(mozIGeckoMediaPluginService* aGMPService,
       aOutMessage = NS_LITERAL_CSTRING("Adobe plugin voucher was expected to be on disk but was not");
       somethingMissing = true;
     }
-    if (somethingMissing) {    
+    if (somethingMissing) {
       NS_WARNING("Adobe EME plugin or voucher disappeared from disk!");
       // Reset the prefs that Firefox's GMP downloader sets, so that
       // Firefox will try to download the plugin next time the updater runs.
@@ -225,21 +237,27 @@ MediaKeySystemAccess::GetKeySystemStatus(const nsAString& aKeySystem,
     return EnsureMinCDMVersion(mps, aKeySystem, aMinCdmVersion, aOutMessage, aOutCdmVersion);
   }
 
+#ifdef PRIMETIME_EME_SUPPORTED
+  if (aKeySystem.EqualsLiteral("com.adobe.primetime")) {
+    if (!Preferences::GetBool("media.gmp-eme-adobe.enabled", false)) {
+      aOutMessage = NS_LITERAL_CSTRING("Adobe EME disabled");
+      return MediaKeySystemStatus::Cdm_disabled;
+    }
 #ifdef XP_WIN
-  if ((aKeySystem.EqualsLiteral("com.adobe.access") ||
-       aKeySystem.EqualsLiteral("com.adobe.primetime"))) {
     // Win Vista and later only.
     if (!IsVistaOrLater()) {
       aOutMessage = NS_LITERAL_CSTRING("Minimum Windows version not met for Adobe EME");
       return MediaKeySystemStatus::Cdm_not_supported;
     }
-    if (!Preferences::GetBool("media.gmp-eme-adobe.enabled", false)) {
-      aOutMessage = NS_LITERAL_CSTRING("Adobe EME disabled");
-      return MediaKeySystemStatus::Cdm_disabled;
+#endif
+#ifdef XP_MACOSX
+    if (!nsCocoaFeatures::OnLionOrLater()) {
+      aOutMessage = NS_LITERAL_CSTRING("Minimum MacOSX version not met for Adobe EME");
+      return MediaKeySystemStatus::Cdm_not_supported;
     }
+#endif
     if (!EMEVoucherFileExists()) {
-      // The system doesn't have the codecs that Adobe EME relies
-      // on installed, or doesn't have a voucher for the plugin-container.
+      // Gecko doesn't have a voucher file for the plugin-container.
       // Adobe EME isn't going to work, so don't advertise that it will.
       aOutMessage = NS_LITERAL_CSTRING("Plugin-container voucher not present");
       return MediaKeySystemStatus::Cdm_not_supported;
@@ -352,6 +370,7 @@ MediaKeySystemAccess::NotifyObservers(nsIDOMWindow* aWindow,
   data.mStatus = aStatus;
   nsAutoString json;
   data.ToJSON(json);
+  EME_LOG("MediaKeySystemAccess::NotifyObservers() %s", NS_ConvertUTF16toUTF8(json).get());
   nsCOMPtr<nsIObserverService> obs = services::GetObserverService();
   if (obs) {
     obs->NotifyObservers(aWindow, "mediakeys-request", json.get());

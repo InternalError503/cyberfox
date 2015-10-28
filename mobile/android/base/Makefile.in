@@ -31,6 +31,7 @@ GARBAGE += \
   .aapt.deps \
   javah.out \
   jni-stubs.inc \
+  GeneratedJNINatives.h \
   GeneratedJNIWrappers.cpp \
   GeneratedJNIWrappers.h \
   $(NULL)
@@ -148,7 +149,7 @@ proguard_config_dir=$(topsrcdir)/mobile/android/config/proguard
 # time.  The idea is to set a high-water mark that is not to be crossed.
 classycle_jar := $(topsrcdir)/mobile/android/build/classycle/classycle-1.4.1.jar
 .geckoview.deps: geckoview.ddf $(classycle_jar) $(ALL_JARS)
-	java -cp $(classycle_jar) \
+	$(JAVA) -cp $(classycle_jar) \
 		classycle.dependency.DependencyChecker \
 		-mergeInnerClasses \
 		-dependencies=@$< \
@@ -169,7 +170,7 @@ classycle_jar := $(topsrcdir)/mobile/android/build/classycle/classycle-1.4.1.jar
 .bundled.proguard.deps: gecko-R.jar $(proguard_config_dir)/strip-libs.cfg
 	$(REPORT_BUILD)
 	@$(TOUCH) $@
-	java \
+	$(JAVA) \
 		-Xmx512m -Xms128m \
 		-jar $(ANDROID_SDK_ROOT)/tools/proguard/lib/proguard.jar \
 		@$(proguard_config_dir)/strip-libs.cfg \
@@ -184,7 +185,7 @@ classycle_jar := $(topsrcdir)/mobile/android/build/classycle/classycle-1.4.1.jar
 .proguard.deps: .geckoview.deps .bundled.proguard.deps $(ALL_JARS) $(proguard_config_dir)/proguard.cfg
 	$(REPORT_BUILD)
 	@$(TOUCH) $@
-	java \
+	$(JAVA) \
 		-Xmx512m -Xms128m \
 		-jar $(ANDROID_SDK_ROOT)/tools/proguard/lib/proguard.jar \
 		@$(proguard_config_dir)/proguard.cfg \
@@ -194,12 +195,9 @@ classycle_jar := $(topsrcdir)/mobile/android/build/classycle/classycle-1.4.1.jar
 		-libraryjars $(library_jars)
 
 CLASSES_WITH_JNI= \
-    org.mozilla.gecko.ANRReporter \
     org.mozilla.gecko.GeckoAppShell \
     org.mozilla.gecko.GeckoJavaSampler \
     org.mozilla.gecko.gfx.NativePanZoomController \
-    org.mozilla.gecko.util.NativeJSContainer \
-    org.mozilla.gecko.util.NativeJSObject \
     $(NULL)
 
 ifdef MOZ_WEBSMS_BACKEND
@@ -217,6 +215,8 @@ jni-stubs.inc: gecko-browser.jar gecko-mozglue.jar gecko-util.jar sync-thirdpart
 
 ANNOTATION_PROCESSOR_JAR_FILES := $(DEPTH)/build/annotationProcessors/annotationProcessors.jar
 
+# This annotation processing step also generates
+# GeneratedJNIWrappers.h and GeneratedJNINatives.h
 GeneratedJNIWrappers.cpp: $(ANNOTATION_PROCESSOR_JAR_FILES)
 GeneratedJNIWrappers.cpp: $(ALL_JARS)
 	$(JAVA) -classpath gecko-mozglue.jar:$(JAVA_BOOTCLASSPATH):$(JAVA_CLASSPATH):$(ANNOTATION_PROCESSOR_JAR_FILES) org.mozilla.gecko.annotationProcessors.AnnotationProcessor $(ALL_JARS)
@@ -336,16 +336,18 @@ all_resources = \
 # $(1): zip file to add to (or create).
 # $(2): directory to zip contents of.
 define zip_directory_with_relative_paths
-cd $(2) && zip -q $(1) -r * -x $(subst *,\\*,$(not_android_res_files))
+cd $(2) && zip -q $(1) -r * -x $(subst *,\*,$(not_android_res_files))
 
 endef
 
+ifndef MOZ_DISABLE_GECKOVIEW
 # We delete the archive before updating so that resources removed from
 # the filesystem are removed from the archive.
 geckoview_resources.zip: $(all_resources) $(GLOBAL_DEPS)
 	$(REPORT_BUILD)
 	$(RM) -rf $@
 	$(foreach dir,$(ANDROID_RES_DIRS),$(call zip_directory_with_relative_paths,$(CURDIR)/$@,$(dir)))
+endif
 
 # All of generated/org/mozilla/gecko/R.java, gecko.ap_, and R.txt are
 # produced by aapt; this saves aapt invocations.  The trailing
@@ -407,7 +409,7 @@ extra_packages := $(subst $(NULL) ,:,$(strip $(extra_packages)))
 # thinking aapt's outputs are stale.  This is safe because Make
 # removes the target file if any recipe command fails.
 
-CONSTRAINED_AAPT_CONFIGURATIONS := mdpi,hdpi
+CONSTRAINED_AAPT_CONFIGURATIONS := hdpi
 
 define aapt_command
 $(1): $$(call mkdir_deps,$(filter-out ./,$(dir $(3) $(4) $(5)))) $(2)
@@ -418,6 +420,7 @@ $(1): $$(call mkdir_deps,$(filter-out ./,$(dir $(3) $(4) $(5)))) $(2)
 		$(if $(MOZ_ANDROID_MAX_SDK_VERSION),--max-res-version $(MOZ_ANDROID_MAX_SDK_VERSION),) \
 		--auto-add-overlay \
 		$$(addprefix -S ,$$(ANDROID_RES_DIRS)) \
+		$$(addprefix -A ,$$(ANDROID_ASSETS_DIRS)) \
 		$(if $(extra_res_dirs),$$(addprefix -S ,$$(extra_res_dirs)),) \
 		$(if $(extra_packages),--extra-packages $$(extra_packages),) \
 		--custom-package org.mozilla.gecko \
@@ -446,12 +449,9 @@ $(eval $(call aapt_command,.aapt.nodeps,$(CURDIR)/AndroidManifest.xml FORCE,geck
 include $(topsrcdir)/config/android-common.mk
 
 update-generated-wrappers:
-	@mv $(topsrcdir)/widget/android/GeneratedJNIWrappers.cpp $(topsrcdir)/widget/android/GeneratedJNIWrappers.cpp.old
-	@mv $(topsrcdir)/widget/android/GeneratedJNIWrappers.h $(topsrcdir)/widget/android/GeneratedJNIWrappers.h.old
-	@echo old GeneratedJNIWrappers.cpp/h moved to GeneratedJNIWrappers.cpp/h.old
 	@cp $(CURDIR)/jni-stubs.inc $(topsrcdir)/mozglue/android
-	@cp $(CURDIR)/GeneratedJNIWrappers.* $(topsrcdir)/widget/android
-	@echo Updated GeneratedJNIWrappers
+	@cp $(CURDIR)/GeneratedJNIWrappers.cpp $(CURDIR)/GeneratedJNIWrappers.h $(CURDIR)/GeneratedJNINatives.h $(topsrcdir)/widget/android
+	@echo Updated generated JNI code
 
 .PHONY: update-generated-wrappers
 
@@ -478,10 +478,19 @@ gradle-omnijar: $(abspath $(DIST)/fennec/$(OMNIJAR_NAME))
 
 .PHONY: gradle-targets gradle-omnijar
 
-libs:: geckoview_resources.zip classes.dex jni-stubs.inc GeneratedJNIWrappers.cpp $(CURDIR)/fennec_ids.txt
+ifndef MOZ_DISABLE_GECKOVIEW
+libs:: geckoview_resources.zip
 	$(INSTALL) geckoview_resources.zip $(FINAL_TARGET)
+endif
+
+# GeneratedJNIWrappers.cpp target also generates
+# GeneratedJNIWrappers.h and GeneratedJNINatives.h
+libs:: classes.dex jni-stubs.inc GeneratedJNIWrappers.cpp $(CURDIR)/fennec_ids.txt
 	$(INSTALL) classes.dex $(FINAL_TARGET)
-	@(diff jni-stubs.inc $(topsrcdir)/mozglue/android/jni-stubs.inc >/dev/null && diff GeneratedJNIWrappers.cpp $(topsrcdir)/widget/android/GeneratedJNIWrappers.cpp >/dev/null) || \
+	@(diff jni-stubs.inc $(topsrcdir)/mozglue/android/jni-stubs.inc >/dev/null && \
+	  diff GeneratedJNIWrappers.cpp $(topsrcdir)/widget/android/GeneratedJNIWrappers.cpp >/dev/null && \
+	  diff GeneratedJNIWrappers.h $(topsrcdir)/widget/android/GeneratedJNIWrappers.h >/dev/null && \
+	  diff GeneratedJNINatives.h $(topsrcdir)/widget/android/GeneratedJNINatives.h >/dev/null) || \
 	 (echo '*****************************************************' && \
 	  echo '***   Error: The generated JNI code has changed   ***' && \
 	  echo '* To update generated code in the tree, please run  *' && \

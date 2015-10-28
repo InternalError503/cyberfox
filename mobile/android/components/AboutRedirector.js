@@ -53,10 +53,6 @@ let modules = {
     uri: "chrome://browser/content/aboutHome.xhtml",
     privileged: false
   },
-  apps: {
-    uri: "chrome://browser/content/aboutApps.xhtml",
-    privileged: true
-  },
   downloads: {
     uri: "chrome://browser/content/aboutDownloads.xhtml",
     privileged: true
@@ -75,6 +71,10 @@ let modules = {
     uri: "chrome://browser/content/aboutPrivateBrowsing.xhtml",
     privileged: true
   },
+  logins: {
+    uri: "chrome://browser/content/aboutLogins.xhtml",
+    privileged: true
+  },
 }
 
 if (AppConstants.MOZ_SERVICES_HEALTHREPORT) {
@@ -86,12 +86,6 @@ if (AppConstants.MOZ_SERVICES_HEALTHREPORT) {
 if (AppConstants.MOZ_DEVICES) {
   modules['devices'] = {
     uri: "chrome://browser/content/aboutDevices.xhtml",
-    privileged: true
-  };
-}
-if (AppConstants.NIGHTLY_BUILD) {
-  modules['logins'] = {
-    uri: "chrome://browser/content/aboutLogins.xhtml",
     privileged: true
   };
 }

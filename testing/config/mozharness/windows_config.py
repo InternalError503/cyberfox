@@ -31,7 +31,9 @@ config = {
                 "--symbols-path=%(symbols_path)s",
                 "--certificate-path=tests/certs",
                 "--quiet",
-                "--log-raw=%(raw_log_file)s"
+                "--log-raw=%(raw_log_file)s",
+                "--log-errorsummary=%(error_summary_file)s",
+                "--screenshot-on-fail",
             ],
             "run_filename": "runtests.py",
             "testsdir": "mochitest"
@@ -69,8 +71,6 @@ config = {
                 "--extra-profile-file=tests/bin/plugins",
                 "--symbols-path=%(symbols_path)s",
                 "--certificate-path=tests/certs",
-                "--autorun",
-                "--close-when-done",
                 "--console-level=INFO",
                 "--testing-modules-dir=tests/modules",
                 "--quiet"
@@ -83,6 +83,7 @@ config = {
                 "--symbols-path=%(symbols_path)s",
                 "--test-plugin-path=%(test_plugin_path)s",
                 "--log-raw=%(raw_log_file)s",
+                "--log-errorsummary=%(error_summary_file)s",
                 "--utility-path=tests/bin",
             ],
             "run_filename": "runxpcshelltests.py",

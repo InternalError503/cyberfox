@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import org.mozilla.gecko.R;
 import org.mozilla.gecko.Actions;
 import org.mozilla.gecko.AppConstants;
+import org.mozilla.gecko.tabqueue.TabQueueHelper;
 import org.mozilla.gecko.util.HardwareUtils;
 import org.mozilla.gecko.util.InputOptionsUtils;
 
@@ -32,8 +33,6 @@ public class testSettingsMenuItems extends PixelTest {
 
     // Privacy menu items.
     String[] PATH_PRIVACY;
-    String[] TRACKING_PROTECTION_LABEL_ARR;
-    String[] MANAGE_LOGINS_ARR;
     String[][] OPTIONS_PRIVACY;
 
     // Mozilla/vendor menu items.
@@ -96,14 +95,12 @@ public class testSettingsMenuItems extends PixelTest {
         };
 
         PATH_PRIVACY = new String[] { mStringHelper.PRIVACY_SECTION_LABEL };
-        TRACKING_PROTECTION_LABEL_ARR = new String[] { mStringHelper.TRACKING_PROTECTION_LABEL };
-        MANAGE_LOGINS_ARR = new String[] { mStringHelper.MANAGE_LOGINS_LABEL };
         OPTIONS_PRIVACY = new String[][] {
-                TRACKING_PROTECTION_LABEL_ARR,
+                { mStringHelper.TRACKING_PROTECTION_LABEL },
                 { mStringHelper.DNT_LABEL },
                 { mStringHelper.COOKIES_LABEL, "Enabled", "Enabled, excluding 3rd party", "Disabled" },
                 { mStringHelper.REMEMBER_LOGINS_LABEL },
-                MANAGE_LOGINS_ARR,
+                { mStringHelper.MANAGE_LOGINS_LABEL },
                 { mStringHelper.MASTER_PASSWORD_LABEL },
                 { mStringHelper.CLEAR_PRIVATE_DATA_LABEL, "", "Browsing history", "Search history", "Downloads", "Form history", "Cookies & active logins", mStringHelper.CLEAR_PRIVATE_DATA_LABEL, "Cache", "Offline website data", "Site settings", "Clear data" },
         };
@@ -120,7 +117,9 @@ public class testSettingsMenuItems extends PixelTest {
 
         PATH_DEVELOPER = new String[] { mStringHelper.DEVELOPER_TOOLS_SECTION_LABEL };
         OPTIONS_DEVELOPER = new String[][] {
-                { mStringHelper.REMOTE_DEBUGGING_LABEL },
+                { mStringHelper.REMOTE_DEBUGGING_USB_LABEL },
+                { mStringHelper.LEARN_MORE_LABEL },
+                { mStringHelper.REMOTE_DEBUGGING_WIFI_LABEL },
                 { mStringHelper.LEARN_MORE_LABEL },
         };
 
@@ -194,12 +193,6 @@ public class testSettingsMenuItems extends PixelTest {
             }
         }
 
-        if (!AppConstants.NIGHTLY_BUILD) {
-            final List<String[]> privacy = settingsMap.get(PATH_PRIVACY);
-            privacy.remove(TRACKING_PROTECTION_LABEL_ARR);
-            privacy.remove(MANAGE_LOGINS_ARR);
-        }
-
         // Automatic updates
         if (AppConstants.MOZ_UPDATER) {
             String[] autoUpdateUi = { "Download updates automatically", "Only over Wi-Fi", "Always", "Only over Wi-Fi", "Never" };
@@ -207,7 +200,7 @@ public class testSettingsMenuItems extends PixelTest {
         }
 
         // Tab Queue
-        if (AppConstants.NIGHTLY_BUILD && AppConstants.MOZ_ANDROID_TAB_QUEUE) {
+        if (TabQueueHelper.TAB_QUEUE_ENABLED) {
             final String[] tabQueue = { mStringHelper.TAB_QUEUE_LABEL, mStringHelper.TAB_QUEUE_SUMMARY };
             settingsMap.get(PATH_CUSTOMIZE).add(tabQueue);
         }
@@ -230,9 +223,15 @@ public class testSettingsMenuItems extends PixelTest {
         }
 
         // Voice input
-        if (AppConstants.NIGHTLY_BUILD && InputOptionsUtils.supportsVoiceRecognizer(this.getActivity().getApplicationContext(), this.getActivity().getResources().getString(R.string.voicesearch_prompt))) {
+        if (InputOptionsUtils.supportsVoiceRecognizer(this.getActivity().getApplicationContext(), this.getActivity().getResources().getString(R.string.voicesearch_prompt))) {
             String[] voiceInputUi = { mStringHelper.VOICE_INPUT_TITLE_LABEL, mStringHelper.VOICE_INPUT_SUMMARY_LABEL };
             settingsMap.get(PATH_DISPLAY).add(voiceInputUi);
+        }
+
+        // QR Code input
+        if (InputOptionsUtils.supportsQrCodeReader(this.getActivity().getApplicationContext())) {
+            String[] qrCodeInputUi = { mStringHelper.QRCODE_INPUT_TITLE_LABEL, mStringHelper.QRCODE_INPUT_SUMMARY_LABEL };
+            settingsMap.get(PATH_DISPLAY).add(qrCodeInputUi);
         }
     }
 

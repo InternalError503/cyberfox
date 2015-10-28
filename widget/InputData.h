@@ -21,11 +21,11 @@ namespace mozilla {
 
 namespace dom {
 class Touch;
-}
+} // namespace dom
 
 namespace gfx {
 class Matrix4x4;
-}
+} // namespace gfx
 
 enum InputType
 {
@@ -239,7 +239,7 @@ public:
   // and rotation angle.
   explicit MultiTouchInput(const WidgetMouseEvent& aMouseEvent);
 
-  void TransformToLocal(const gfx::Matrix4x4& aTransform);
+  bool TransformToLocal(const gfx::Matrix4x4& aTransform);
 
   MultiTouchType mType;
   nsTArray<SingleTouchData> mTouches;
@@ -311,7 +311,7 @@ public:
   {
   }
 
-  void TransformToLocal(const gfx::Matrix4x4& aTransform);
+  bool TransformToLocal(const gfx::Matrix4x4& aTransform);
 
   PanGestureType mType;
   ScreenPoint mPanStartPoint;
@@ -374,7 +374,7 @@ public:
   {
   }
 
-  void TransformToLocal(const gfx::Matrix4x4& aTransform);
+  bool TransformToLocal(const gfx::Matrix4x4& aTransform);
 
   PinchGestureType mType;
 
@@ -444,7 +444,7 @@ public:
   {
   }
 
-  void TransformToLocal(const gfx::Matrix4x4& aTransform);
+  bool TransformToLocal(const gfx::Matrix4x4& aTransform);
 
   TapGestureType mType;
 
@@ -506,7 +506,7 @@ public:
      mDeltaY(aDeltaY)
   {}
 
-  void TransformToLocal(const gfx::Matrix4x4& aTransform);
+  bool TransformToLocal(const gfx::Matrix4x4& aTransform);
 
   ScrollDeltaType mDeltaType;
   ScrollMode mScrollMode;
@@ -527,6 +527,6 @@ public:
   ParentLayerPoint mLocalOrigin;
 };
 
-}
+} // namespace mozilla
 
 #endif // InputData_h__

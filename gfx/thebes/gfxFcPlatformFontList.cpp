@@ -895,7 +895,7 @@ gfxFontconfigFont::~gfxFontconfigFont()
 }
 
 #ifdef USE_SKIA
-mozilla::TemporaryRef<mozilla::gfx::GlyphRenderingOptions>
+already_AddRefed<mozilla::gfx::GlyphRenderingOptions>
 gfxFontconfigFont::GetGlyphRenderingOptions(const TextRunDrawParams* aRunParams)
 {
   cairo_scaled_font_t *scaled_font = CairoScaledFont();
@@ -1409,6 +1409,10 @@ gfxFcPlatformFontList::FindGenericFamily(const nsAString& aGeneric,
     FcResult result;
     nsAutoRef<FcFontSet> faces(FcFontSort(nullptr, genericPattern, FcFalse,
                                           nullptr, &result));
+
+    if (!faces) {
+      return nullptr;
+    }
 
     // -- pick the first font for which a font family exists
     for (int i = 0; i < faces->nfont; i++) {

@@ -1047,7 +1047,7 @@ InspectorPanel.prototype = {
     if (!this.selection.isNode()) {
       return;
     }
-    this._copyLongStr(this.walker.innerHTML(this.selection.nodeFront));
+    this._copyLongString(this.walker.innerHTML(this.selection.nodeFront));
   },
 
   /**
@@ -1057,8 +1057,21 @@ InspectorPanel.prototype = {
     if (!this.selection.isNode()) {
       return;
     }
+    let node = this.selection.nodeFront;
 
-    this._copyLongStr(this.walker.outerHTML(this.selection.nodeFront));
+    switch (node.nodeType) {
+      case Ci.nsIDOMNode.ELEMENT_NODE :
+        this._copyLongString(this.walker.outerHTML(node));
+        break;
+      case Ci.nsIDOMNode.COMMENT_NODE :
+        this._getLongString(node.getNodeValue()).then(comment => {
+          clipboardHelper.copyString("<!--" + comment + "-->");
+        });
+        break;
+      case Ci.nsIDOMNode.DOCUMENT_TYPE_NODE :
+        clipboardHelper.copyString(node.doctypeString);
+        break;
+    }
   },
 
   /**
@@ -1071,13 +1084,29 @@ InspectorPanel.prototype = {
     }
   },
 
-  _copyLongStr: function(promise) {
-    return promise.then(longstr => {
-      return longstr.string().then(toCopy => {
-        longstr.release().then(null, console.error);
-        clipboardHelper.copyString(toCopy);
+  /**
+   * Copy the content of a longString (via a promise resolving a LongStringActor) to the clipboard
+   * @param  {Promise} longStringActorPromise promise expected to resolve a LongStringActor instance
+   * @return {Promise} promise resolving (with no argument) when the string is sent to the clipboard
+   */
+  _copyLongString: function(longStringActorPromise) {
+    return this._getLongString(longStringActorPromise).then(string => {
+      clipboardHelper.copyString(string);
+    }).catch(Cu.reportError);
+  },
+
+  /**
+   * Retrieve the content of a longString (via a promise resolving a LongStringActor)
+   * @param  {Promise} longStringActorPromise promise expected to resolve a LongStringActor instance
+   * @return {Promise} promise resolving with the retrieved string as argument
+   */
+  _getLongString: function(longStringActorPromise) {
+    return longStringActorPromise.then(longStringActor => {
+      return longStringActor.string().then(string => {
+        longStringActor.release().catch(Cu.reportError);
+        return string;
       });
-    }).then(null, console.error);
+    }).catch(Cu.reportError);
   },
 
   /**
@@ -1147,12 +1176,24 @@ InspectorPanel.prototype = {
 
   /**
    * This method is here for the benefit of the node-menu-link-follow menu item
-   * in the inspector contextual-menu. It's behavior depends on which node was
-   * right-clicked when the menu was opened.
+   * in the inspector contextual-menu.
    */
-  followAttributeLink: function(e) {
+  onFollowLink: function() {
     let type = this.panelDoc.popupNode.dataset.type;
     let link = this.panelDoc.popupNode.dataset.link;
+
+    this.followAttributeLink(type, link);
+  },
+
+  /**
+   * Given a type and link found in a node's attribute in the markup-view,
+   * attempt to follow that link (which may result in opening a new tab, the
+   * style editor or debugger).
+   */
+  followAttributeLink: function(type, link) {
+    if (!type || !link) {
+      return;
+    }
 
     if (type === "uri" || type === "cssresource" || type === "jsresource") {
       // Open link in a new tab.
@@ -1184,11 +1225,18 @@ InspectorPanel.prototype = {
 
   /**
    * This method is here for the benefit of the node-menu-link-copy menu item
-   * in the inspector contextual-menu. It's behavior depends on which node was
-   * right-clicked when the menu was opened.
+   * in the inspector contextual-menu.
    */
-  copyAttributeLink: function(e) {
+  onCopyLink: function() {
     let link = this.panelDoc.popupNode.dataset.link;
+
+    this.copyAttributeLink(link);
+  },
+
+  /**
+   * This method is here for the benefit of copying links.
+   */
+  copyAttributeLink: function(link) {
     // When the inspector menu was setup on click (see _setupNodeLinkMenu), we
     // already checked that resolveRelativeURL existed.
     this.inspector.resolveRelativeURL(link, this.selection.nodeFront).then(url => {

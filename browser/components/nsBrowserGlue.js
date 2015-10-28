@@ -87,6 +87,9 @@ XPCOMUtils.defineLazyModuleGetter(this, "RemotePrompt",
 XPCOMUtils.defineLazyModuleGetter(this, "ContentPrefServiceParent",
                                   "resource://gre/modules/ContentPrefServiceParent.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "Feeds",
+                                  "resource:///modules/Feeds.jsm");
+
 XPCOMUtils.defineLazyModuleGetter(this, "SelfSupportBackend",
                                   "resource:///modules/SelfSupportBackend.jsm");
 
@@ -158,6 +161,9 @@ XPCOMUtils.defineLazyModuleGetter(this, "AddonWatcher",
 
 XPCOMUtils.defineLazyModuleGetter(this, "LightweightThemeManager",
                                   "resource://gre/modules/LightweightThemeManager.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "ExtensionManagement",
+                                  "resource://gre/modules/ExtensionManagement.jsm");
 
 XPCOMUtils.defineLazyServiceGetter(this, "WindowsUIUtils",
                                    "@mozilla.org/windows-ui-utils;1", "nsIWindowsUIUtils");
@@ -539,7 +545,14 @@ BrowserGlue.prototype = {
     os.addObserver(this, "restart-in-safe-mode", false);
     os.addObserver(this, "flash-plugin-hang", false);
     os.addObserver(this, "xpi-signature-changed", false);
+    os.addObserver(this, "autocomplete-did-enter-text", false);
     os.addObserver(this, "tablet-mode-change", false);
+
+    ExtensionManagement.registerScript("chrome://browser/content/ext-utils.js");
+    ExtensionManagement.registerScript("chrome://browser/content/ext-browserAction.js");
+    ExtensionManagement.registerScript("chrome://browser/content/ext-contextMenus.js");
+    ExtensionManagement.registerScript("chrome://browser/content/ext-tabs.js");
+    ExtensionManagement.registerScript("chrome://browser/content/ext-windows.js");
 
     this._flashHangCount = 0;
   },
@@ -588,6 +601,7 @@ BrowserGlue.prototype = {
 #endif
     os.removeObserver(this, "flash-plugin-hang");
     os.removeObserver(this, "xpi-signature-changed");
+    os.removeObserver(this, "autocomplete-did-enter-text");
     os.removeObserver(this, "tablet-mode-change");
   },
 
@@ -633,6 +647,7 @@ BrowserGlue.prototype = {
     FormValidationHandler.init();
 
     RemotePrompt.init();
+    Feeds.init();
     ContentPrefServiceParent.init();
 
     LoginManagerParent.init();
@@ -805,7 +820,7 @@ BrowserGlue.prototype = {
     // handler and init message manager child shim for privileged api access.
     // With older versions of the extension installed, this load will fail
     // passively.
-    aWindow.messageManager.loadFrameScript("resource://pdf.js/pdfjschildbootstrap.js", true);
+    Services.ppmm.loadProcessScript("resource://pdf.js/pdfjschildbootstrap.js", true);
 
 #ifdef NIGHTLY_BUILD
     // Registering Shumway bootstrap script the child processes.
@@ -903,7 +918,6 @@ BrowserGlue.prototype = {
         Cu.import("resource://gre/modules/RokuApp.jsm");
         return new RokuApp(aService);
       },
-      mirror: true,
       types: ["video/mp4"],
       extensions: ["mp4"]
     };
@@ -1905,16 +1919,10 @@ BrowserGlue.prototype = {
          defaultThemeSelected = Services.prefs.getCharPref("general.skins.selectedSkin") == "classic/1.0";
       } catch(e) {}
 
-      let deveditionThemeEnabled = false;
-      try {
-         deveditionThemeEnabled = Services.prefs.getBoolPref("browser.devedition.theme.enabled");
-      } catch(e) {}
-
       // If we are on the devedition channel, the devedition theme is on by
       // default.  But we need to handle the case where they didn't want it
       // applied, and unapply the theme.
       let userChoseToNotUseDeveditionTheme =
-        !deveditionThemeEnabled ||
         !defaultThemeSelected ||
         (lightweightThemeSelected && selectedThemeID != "firefox-devedition@mozilla.org");
 
@@ -1922,8 +1930,6 @@ BrowserGlue.prototype = {
         Services.prefs.setCharPref("lightweightThemes.selectedThemeID", "");
       }
 
-      // Not clearing browser.devedition.theme.enabled, to preserve user's pref
-      // if for some reason this function runs again (even though it shouldn't)
       Services.prefs.clearUserPref("browser.devedition.showCustomizeButton");
     }
 
@@ -2249,9 +2255,7 @@ ContentPermissionPrompt.prototype = {
 
     if (!aOptions)
       aOptions = {};
-    aOptions.displayOrigin = (requestPrincipal.URI instanceof Ci.nsIFileURL) ?
-                             requestPrincipal.URI.file.path :
-                             requestPrincipal.URI.host;
+    aOptions.displayURI = requestPrincipal.URI;
 
     return chromeWin.PopupNotifications.show(browser, aNotificationId, aMessage, aAnchorId,
                                              mainAction, secondaryActions, aOptions);
@@ -2520,7 +2524,7 @@ let DefaultBrowserCheck = {
 
       this._setAsDefaultButtonClickStartTime = Math.floor(Date.now() / 1000);
       this._setAsDefaultTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-      this._setAsDefaultTimer.init(function() {
+      this._setAsDefaultTimer.init(() => {
         let isDefault = false;
         let isDefaultError = false;
         try {

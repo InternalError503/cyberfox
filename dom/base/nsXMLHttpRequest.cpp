@@ -28,6 +28,12 @@
 #include "nsIURI.h"
 #include "nsILoadGroup.h"
 #include "nsNetUtil.h"
+#include "nsStringStream.h"
+#include "nsIAuthPrompt.h"
+#include "nsIAuthPrompt2.h"
+#include "nsIOutputStream.h"
+#include "nsISupportsPrimitives.h"
+#include "nsIInterfaceRequestorUtils.h"
 #include "nsStreamUtils.h"
 #include "nsThreadUtils.h"
 #include "nsIUploadChannel.h"
@@ -574,7 +580,6 @@ nsXMLHttpRequest::SizeOfEventTargetIncludingThis(
   // - lots
 }
 
-/* readonly attribute nsIChannel channel; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetChannel(nsIChannel **aChannel)
 {
@@ -596,7 +601,6 @@ static void LogMessage(const char* aWarning, nsPIDOMWindow* aWindow)
                                   aWarning);
 }
 
-/* readonly attribute nsIDOMDocument responseXML; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetResponseXML(nsIDOMDocument **aResponseXML)
 {
@@ -710,7 +714,6 @@ nsXMLHttpRequest::AppendToResponseText(const char * aSrcBuffer,
   return NS_OK;
 }
 
-/* readonly attribute AString responseText; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetResponseText(nsAString& aResponseText)
 {
@@ -828,7 +831,6 @@ nsXMLHttpRequest::CreatePartialBlob()
   mResponseBlob = mBlobSet->GetBlobInternal(GetOwner(), contentType);
 }
 
-/* attribute AString responseType; */
 NS_IMETHODIMP nsXMLHttpRequest::GetResponseType(nsAString& aResponseType)
 {
   switch (mResponseType) {
@@ -889,7 +891,6 @@ nsXMLHttpRequest::StaticAssertions()
 }
 #endif
 
-/* attribute AString responseType; */
 NS_IMETHODIMP nsXMLHttpRequest::SetResponseType(const nsAString& aResponseType)
 {
   nsXMLHttpRequest::ResponseTypeEnum responseType;
@@ -958,7 +959,6 @@ nsXMLHttpRequest::SetResponseType(nsXMLHttpRequest::ResponseTypeEnum aResponseTy
 
 }
 
-/* readonly attribute jsval response; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetResponse(JSContext *aCx, JS::MutableHandle<JS::Value> aResult)
 {
@@ -1087,7 +1087,6 @@ nsXMLHttpRequest::IsDeniedCrossSiteRequest()
   return false;
 }
 
-/* readonly attribute AString responseURL; */
 void
 nsXMLHttpRequest::GetResponseURL(nsAString& aUrl)
 {
@@ -1116,7 +1115,6 @@ nsXMLHttpRequest::GetResponseURL(nsAString& aUrl)
   CopyUTF8toUTF16(temp, aUrl);
 }
 
-/* readonly attribute unsigned long status; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetStatus(uint32_t *aStatus)
 {
@@ -1253,7 +1251,6 @@ nsXMLHttpRequest::CloseRequestWithError(const nsAString& aType,
   mState &= ~XML_HTTP_REQUEST_SYNCLOOPING;
 }
 
-/* void abort (); */
 void
 nsXMLHttpRequest::Abort()
 {
@@ -1323,7 +1320,6 @@ nsXMLHttpRequest::IsSafeHeader(const nsACString& header, nsIHttpChannel* httpCha
   return isSafe;
 }
 
-/* ByteString getAllResponseHeaders(); */
 IMPL_CSTRING_GETTER(GetAllResponseHeaders)
 void
 nsXMLHttpRequest::GetAllResponseHeaders(nsCString& aResponseHeaders)
@@ -1715,7 +1711,7 @@ nsXMLHttpRequest::Open(const nsACString& inMethod, const nsACString& url,
   rv = CheckInnerWindowCorrectness();
   NS_ENSURE_SUCCESS(rv, rv);
   int16_t shouldLoad = nsIContentPolicy::ACCEPT;
-  rv = NS_CheckContentLoadPolicy(nsIContentPolicy::TYPE_XMLHTTPREQUEST,
+  rv = NS_CheckContentLoadPolicy(nsIContentPolicy::TYPE_INTERNAL_XMLHTTPREQUEST,
                                  uri,
                                  mPrincipal,
                                  doc,
@@ -1769,7 +1765,7 @@ nsXMLHttpRequest::Open(const nsACString& inMethod, const nsACString& url,
                        uri,
                        doc,
                        secFlags,
-                       nsIContentPolicy::TYPE_XMLHTTPREQUEST,
+                       nsIContentPolicy::TYPE_INTERNAL_XMLHTTPREQUEST,
                        loadGroup,
                        nullptr,   // aCallbacks
                        nsIRequest::LOAD_BACKGROUND);
@@ -1779,7 +1775,7 @@ nsXMLHttpRequest::Open(const nsACString& inMethod, const nsACString& url,
                        uri,
                        mPrincipal,
                        secFlags,
-                       nsIContentPolicy::TYPE_XMLHTTPREQUEST,
+                       nsIContentPolicy::TYPE_INTERNAL_XMLHTTPREQUEST,
                        loadGroup,
                        nullptr,   // aCallbacks
                        nsIRequest::LOAD_BACKGROUND);
@@ -1978,7 +1974,6 @@ nsXMLHttpRequest::OnDataAvailable(nsIRequest *request,
   return NS_OK;
 }
 
-/* void onStartRequest (in nsIRequest request, in nsISupports ctxt); */
 NS_IMETHODIMP
 nsXMLHttpRequest::OnStartRequest(nsIRequest *request, nsISupports *ctxt)
 {
@@ -2213,7 +2208,6 @@ nsXMLHttpRequest::OnStartRequest(nsIRequest *request, nsISupports *ctxt)
   return NS_OK;
 }
 
-/* void onStopRequest (in nsIRequest request, in nsISupports ctxt, in nsresult status, in wstring statusArg); */
 NS_IMETHODIMP
 nsXMLHttpRequest::OnStopRequest(nsIRequest *request, nsISupports *ctxt, nsresult status)
 {
@@ -2628,7 +2622,6 @@ nsXMLHttpRequest::GetRequestBody(nsIVariant* aVariant,
   return NS_OK;
 }
 
-/* void send (in nsIVariant aBody); */
 NS_IMETHODIMP
 nsXMLHttpRequest::Send(nsIVariant *aBody)
 {
@@ -2946,14 +2939,6 @@ nsXMLHttpRequest::Send(nsIVariant* aVariant, const Nullable<RequestBody>& aBody)
         if (scheme.LowerCaseEqualsLiteral("app") ||
             scheme.LowerCaseEqualsLiteral("jar")) {
           mIsMappedArrayBuffer = true;
-          if (XRE_GetProcessType() != GeckoProcessType_Default) {
-            nsCOMPtr<nsIJARChannel> jarChannel = do_QueryInterface(mChannel);
-            // For memory mapping from child process, we need to get file
-            // descriptor of the JAR file opened remotely on the parent proess.
-            // Set this to make sure that file descriptor can be obtained by
-            // child process.
-            jarChannel->EnsureChildFd();
-          }
         }
       }
     }
@@ -3040,7 +3025,6 @@ nsXMLHttpRequest::Send(nsIVariant* aVariant, const Nullable<RequestBody>& aBody)
   return rv;
 }
 
-/* void setRequestHeader (in ByteString header, in ByteString value); */
 // http://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-setrequestheader
 NS_IMETHODIMP
 nsXMLHttpRequest::SetRequestHeader(const nsACString& header,
@@ -3146,7 +3130,6 @@ nsXMLHttpRequest::SetRequestHeader(const nsACString& header,
   return rv;
 }
 
-/* attribute unsigned long timeout; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetTimeout(uint32_t *aTimeout)
 {
@@ -3210,7 +3193,6 @@ nsXMLHttpRequest::StartTimeoutTimer()
   );
 }
 
-/* readonly attribute unsigned short readyState; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetReadyState(uint16_t *aState)
 {
@@ -3238,7 +3220,6 @@ nsXMLHttpRequest::ReadyState()
   return DONE;
 }
 
-/* void overrideMimeType(in DOMString mimetype); */
 NS_IMETHODIMP
 nsXMLHttpRequest::SlowOverrideMimeType(const nsAString& aMimeType)
 {
@@ -3246,7 +3227,6 @@ nsXMLHttpRequest::SlowOverrideMimeType(const nsAString& aMimeType)
   return NS_OK;
 }
 
-/* attribute boolean mozBackgroundRequest; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetMozBackgroundRequest(bool *_retval)
 {
@@ -3289,7 +3269,6 @@ nsXMLHttpRequest::SetMozBackgroundRequest(bool aMozBackgroundRequest, nsresult& 
   }
 }
 
-/* attribute boolean withCredentials; */
 NS_IMETHODIMP
 nsXMLHttpRequest::GetWithCredentials(bool *_retval)
 {

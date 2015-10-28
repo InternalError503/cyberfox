@@ -61,7 +61,7 @@ LIRGeneratorX64::visitBox(MBox* box)
     if (opd->isConstant()) {
         define(new(alloc()) LValue(opd->toConstant()->value()), box, LDefinition(LDefinition::BOX));
     } else {
-        LBox* ins = new(alloc()) LBox(opd->type(), useRegister(opd));
+        LBox* ins = new(alloc()) LBox(useRegister(opd), opd->type());
         define(ins, box, LDefinition(LDefinition::BOX));
     }
 }
@@ -125,6 +125,12 @@ void
 LIRGeneratorX64::visitCompareExchangeTypedArrayElement(MCompareExchangeTypedArrayElement* ins)
 {
     lowerCompareExchangeTypedArrayElement(ins, /* useI386ByteRegisters = */ false);
+}
+
+void
+LIRGeneratorX64::visitAtomicExchangeTypedArrayElement(MAtomicExchangeTypedArrayElement* ins)
+{
+    lowerAtomicExchangeTypedArrayElement(ins, /* useI386ByteRegisters = */ false);
 }
 
 void
@@ -217,6 +223,23 @@ LIRGeneratorX64::visitAsmJSCompareExchangeHeap(MAsmJSCompareExchangeHeap* ins)
         new(alloc()) LAsmJSCompareExchangeHeap(useRegister(ptr), oldval, newval);
 
     defineFixed(lir, ins, LAllocation(AnyRegister(eax)));
+}
+
+void
+LIRGeneratorX64::visitAsmJSAtomicExchangeHeap(MAsmJSAtomicExchangeHeap* ins)
+{
+    MOZ_ASSERT(ins->ptr()->type() == MIRType_Int32);
+
+    const LAllocation ptr = useRegister(ins->ptr());
+    const LAllocation value = useRegister(ins->value());
+
+    // The output may not be used but will be clobbered regardless,
+    // so ignore the case where we're not using the value and just
+    // use the output register as a temp.
+
+    LAsmJSAtomicExchangeHeap* lir =
+        new(alloc()) LAsmJSAtomicExchangeHeap(ptr, value);
+    define(lir, ins);
 }
 
 void

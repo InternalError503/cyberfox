@@ -14,15 +14,15 @@
 
 namespace base {
   class Histogram;
-}
+} // namespace base
 
 namespace mozilla {
 namespace HangMonitor {
   class HangAnnotations;
-}
+} // namespace HangMonitor
 namespace Telemetry {
 
-#include "TelemetryHistogramEnums.h"
+#include "mozilla/TelemetryHistogramEnums.h"
 
 enum TimerResolution {
   Millisecond,
@@ -269,4 +269,5 @@ void WriteFailedProfileLock(nsIFile* aProfileDir);
 
 } // namespace Telemetry
 } // namespace mozilla
+
 #endif // Telemetry_h__

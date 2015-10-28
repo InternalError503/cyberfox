@@ -15,6 +15,8 @@
 #include "nsContentUtils.h"
 #include "nsIScriptSecurityManager.h"
 #include "nsNetUtil.h"
+#include "nsIInterfaceRequestorUtils.h"
+#include "nsServiceManagerUtils.h"
 #include "nsMimeTypes.h"
 #include "nsIStreamConverterService.h"
 #include "nsStringStream.h"
@@ -535,14 +537,8 @@ nsCORSListenerProxy::CheckRequestApproved(nsIRequest* aRequest)
   // Check if the request failed
   nsresult status;
   nsresult rv = aRequest->GetStatus(&status);
-  if (NS_FAILED(rv)) {
-    LogBlockedRequest(aRequest, "CORSRequestFailed", nullptr);
-    return rv;
-  }
-  if (NS_FAILED(status)) {
-    LogBlockedRequest(aRequest, "CORSRequestFailed", nullptr);
-    return status;
-  }
+  NS_ENSURE_SUCCESS(rv, rv);
+  NS_ENSURE_SUCCESS(status, status);
 
   // Test that things worked on a HTTP level
   nsCOMPtr<nsIHttpChannel> http = do_QueryInterface(aRequest);
@@ -817,6 +813,73 @@ nsCORSListenerProxy::OnRedirectVerifyCallback(nsresult result)
   return NS_OK;
 }
 
+// Please note that the CSP directive 'upgrade-insecure-requests' relies
+// on the promise that channels get updated from http: to https: before
+// the channel fetches any data from the netwerk. Such channels should
+// not be blocked by CORS and marked as cross origin requests. E.g.:
+// toplevel page: https://www.example.com loads
+//           xhr: http://www.example.com/foo which gets updated to
+//                https://www.example.com/foo
+// In such a case we should bail out of CORS and rely on the promise that
+// nsHttpChannel::Connect() upgrades the request from http to https.
+bool
+CheckUpgradeInsecureRequestsPreventsCORS(nsIPrincipal* aRequestingPrincipal,
+                                         nsIChannel* aChannel)
+{
+  nsCOMPtr<nsIURI> channelURI;
+  nsresult rv = NS_GetFinalChannelURI(aChannel, getter_AddRefs(channelURI));
+  NS_ENSURE_SUCCESS(rv, false);
+  bool isHttpScheme = false;
+  rv = channelURI->SchemeIs("http", &isHttpScheme);
+  NS_ENSURE_SUCCESS(rv, false);
+
+  // upgrade insecure requests is only applicable to http requests
+  if (!isHttpScheme) {
+    return false;
+  }
+
+  nsCOMPtr<nsIURI> principalURI;
+  rv = aRequestingPrincipal->GetURI(getter_AddRefs(principalURI));
+  NS_ENSURE_SUCCESS(rv, false);
+
+  // if the requestingPrincipal does not have a uri, there is nothing to do
+  if (!principalURI) {
+    return false;
+  }
+
+  nsCOMPtr<nsIURI>originalURI;
+  rv = aChannel->GetOriginalURI(getter_AddRefs(originalURI));
+  NS_ENSURE_SUCCESS(rv, false);
+
+  nsAutoCString principalHost, channelHost, origChannelHost;
+
+  // if we can not query a host from the uri, there is nothing to do
+  if (NS_FAILED(principalURI->GetAsciiHost(principalHost)) ||
+      NS_FAILED(channelURI->GetAsciiHost(channelHost)) ||
+      NS_FAILED(originalURI->GetAsciiHost(origChannelHost))) {
+    return false;
+  }
+
+  // if the hosts do not match, there is nothing to do
+  if (!principalHost.EqualsIgnoreCase(channelHost.get())) {
+    return false;
+  }
+
+  // also check that uri matches the one of the originalURI
+  if (!channelHost.EqualsIgnoreCase(origChannelHost.get())) {
+    return false;
+  }
+
+  nsCOMPtr<nsILoadInfo> loadInfo;
+  rv = aChannel->GetLoadInfo(getter_AddRefs(loadInfo));
+  NS_ENSURE_SUCCESS(rv, false);
+
+  // lets see if the loadInfo indicates that the request will
+  // be upgraded before fetching any data from the netwerk.
+  return loadInfo->GetUpgradeInsecureRequests();
+}
+
+
 nsresult
 nsCORSListenerProxy::UpdateChannel(nsIChannel* aChannel,
                                    DataURIHandling aAllowDataURI)
@@ -871,6 +934,17 @@ nsCORSListenerProxy::UpdateChannel(nsIChannel* aChannel,
       (originalURI == uri ||
        NS_SUCCEEDED(mRequestingPrincipal->CheckMayLoad(originalURI,
                                                        false, false)))) {
+    return NS_OK;
+  }
+
+  // if the CSP directive 'upgrade-insecure-requests' is used then we should
+  // not incorrectly require CORS if the only difference of a subresource
+  // request and the main page is the scheme.
+  // e.g. toplevel page: https://www.example.com loads
+  //                xhr: http://www.example.com/somefoo,
+  // then the xhr request will be upgraded to https before it fetches any data
+  // from the netwerk, hence we shouldn't require CORS in that specific case.
+  if (CheckUpgradeInsecureRequestsPreventsCORS(mRequestingPrincipal, aChannel)) {
     return NS_OK;
   }
 
@@ -1102,7 +1176,24 @@ nsCORSPreflightListener::OnStartRequest(nsIRequest *aRequest,
     // Everything worked, try to cache and then fire off the actual request.
     AddResultToCache(aRequest);
 
-    rv = mOuterChannel->AsyncOpen(mOuterListener, mOuterContext);
+    nsCOMPtr<nsILoadInfo> loadInfo = mOuterChannel->GetLoadInfo();
+    MOZ_ASSERT(loadInfo, "can not perform CORS preflight without a loadInfo");
+    if (!loadInfo) {
+      return NS_ERROR_FAILURE;
+    }
+    nsSecurityFlags securityMode = loadInfo->GetSecurityMode();
+
+    MOZ_ASSERT(securityMode == 0 ||
+               securityMode == nsILoadInfo::SEC_REQUIRE_CORS_DATA_INHERITS,
+               "how did we end up here?");
+
+    if (securityMode == nsILoadInfo::SEC_REQUIRE_CORS_DATA_INHERITS) {
+      MOZ_ASSERT(!mOuterContext, "AsyncOpen(2) does not take context as a second arg");
+      rv = mOuterChannel->AsyncOpen2(mOuterListener);
+    }
+    else {
+      rv = mOuterChannel->AsyncOpen(mOuterListener, mOuterContext);
+    }
   }
 
   if (NS_FAILED(rv)) {
@@ -1181,6 +1272,18 @@ NS_StartCORSPreflight(nsIChannel* aRequestChannel,
   nsresult rv = NS_GetFinalChannelURI(aRequestChannel, getter_AddRefs(uri));
   NS_ENSURE_SUCCESS(rv, rv);
 
+  nsCOMPtr<nsILoadInfo> loadInfo = aRequestChannel->GetLoadInfo();
+  MOZ_ASSERT(loadInfo, "can not perform CORS preflight without a loadInfo");
+  if (!loadInfo) {
+    return NS_ERROR_FAILURE;
+  }
+
+  nsSecurityFlags securityMode = loadInfo->GetSecurityMode();
+
+  MOZ_ASSERT(securityMode == 0 ||
+             securityMode == nsILoadInfo::SEC_REQUIRE_CORS_DATA_INHERITS,
+             "how did we end up here?");
+
   nsPreflightCache::CacheEntry* entry =
     sPreflightCache ?
     sPreflightCache->GetEntry(uri, aPrincipal, aWithCredentials, false) :
@@ -1188,6 +1291,9 @@ NS_StartCORSPreflight(nsIChannel* aRequestChannel,
 
   if (entry && entry->CheckRequest(method, aUnsafeHeaders)) {
     // We have a cached preflight result, just start the original channel
+    if (securityMode == nsILoadInfo::SEC_REQUIRE_CORS_DATA_INHERITS) {
+      return aRequestChannel->AsyncOpen2(aListener);
+    }
     return aRequestChannel->AsyncOpen(aListener, nullptr);
   }
 
@@ -1202,29 +1308,13 @@ NS_StartCORSPreflight(nsIChannel* aRequestChannel,
   rv = aRequestChannel->GetLoadFlags(&loadFlags);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsILoadInfo> loadInfo;
-  rv = aRequestChannel->GetLoadInfo(getter_AddRefs(loadInfo));
-  NS_ENSURE_SUCCESS(rv, rv);
-
   nsCOMPtr<nsIChannel> preflightChannel;
-  if (loadInfo) {
-    rv = NS_NewChannelInternal(getter_AddRefs(preflightChannel),
-                               uri,
-                               loadInfo,
-                               loadGroup,
-                               nullptr,   // aCallbacks
-                               loadFlags);
-  }
-  else {
-    rv = NS_NewChannel(getter_AddRefs(preflightChannel),
-                       uri,
-                       nsContentUtils::GetSystemPrincipal(),
-                       nsILoadInfo::SEC_NORMAL,
-                       nsIContentPolicy::TYPE_OTHER,
-                       loadGroup,
-                       nullptr,   // aCallbacks
-                       loadFlags);
-  }
+  rv = NS_NewChannelInternal(getter_AddRefs(preflightChannel),
+                             uri,
+                             loadInfo,
+                             loadGroup,
+                             nullptr,   // aCallbacks
+                             loadFlags);
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsIHttpChannel> preHttp = do_QueryInterface(preflightChannel);
@@ -1232,6 +1322,12 @@ NS_StartCORSPreflight(nsIChannel* aRequestChannel,
 
   rv = preHttp->SetRequestMethod(NS_LITERAL_CSTRING("OPTIONS"));
   NS_ENSURE_SUCCESS(rv, rv);
+
+  // Preflight requests should never be intercepted by service workers.
+  nsCOMPtr<nsIHttpChannelInternal> preInternal = do_QueryInterface(preflightChannel);
+  if (preInternal) {
+    preInternal->ForceNoIntercept();
+  }
   
   // Set up listener which will start the original channel
   nsCOMPtr<nsIStreamListener> preflightListener =
@@ -1239,16 +1335,19 @@ NS_StartCORSPreflight(nsIChannel* aRequestChannel,
                                 method, aWithCredentials);
   NS_ENSURE_TRUE(preflightListener, NS_ERROR_OUT_OF_MEMORY);
 
-  nsRefPtr<nsCORSListenerProxy> corsListener =
-    new nsCORSListenerProxy(preflightListener, aPrincipal,
-                            aWithCredentials, method,
-                            aUnsafeHeaders);
-  rv = corsListener->Init(preflightChannel, DataURIHandling::Disallow);
-  NS_ENSURE_SUCCESS(rv, rv);
-  preflightListener = corsListener;
-
   // Start preflight
-  rv = preflightChannel->AsyncOpen(preflightListener, nullptr);
+  if (securityMode == nsILoadInfo::SEC_REQUIRE_CORS_DATA_INHERITS) {
+    rv = preflightChannel->AsyncOpen2(preflightListener);
+  }
+  else {
+    nsRefPtr<nsCORSListenerProxy> corsListener =
+      new nsCORSListenerProxy(preflightListener, aPrincipal,
+                              aWithCredentials, method,
+                              aUnsafeHeaders);
+    rv = corsListener->Init(preflightChannel, DataURIHandling::Disallow);
+    NS_ENSURE_SUCCESS(rv, rv);
+    rv = preflightChannel->AsyncOpen(corsListener, nullptr);
+  }
   NS_ENSURE_SUCCESS(rv, rv);
   
   // Return newly created preflight channel

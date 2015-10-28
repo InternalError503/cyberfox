@@ -8,15 +8,15 @@ let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
 let { Preferences } = Cu.import("resource://gre/modules/Preferences.jsm", {});
 let { Task } = Cu.import("resource://gre/modules/Task.jsm", {});
 let { Promise } = Cu.import("resource://gre/modules/Promise.jsm", {});
-let { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+let { require } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+let { TargetFactory } = require("devtools/framework/target");
 let { gDevTools } = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
-let { DevToolsUtils } = Cu.import("resource://gre/modules/devtools/DevToolsUtils.jsm", {});
+const DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 let { DebuggerServer } = Cu.import("resource://gre/modules/devtools/dbg-server.jsm", {});
-let { console } = devtools.require("resource://gre/modules/devtools/Console.jsm");
-let { merge } = devtools.require("sdk/util/object");
+let { console } = require("resource://gre/modules/devtools/Console.jsm");
+let { merge } = require("sdk/util/object");
 let { generateUUID } = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
-let { getPerformanceFront, PerformanceFront } = devtools.require("devtools/performance/front");
-let TargetFactory = devtools.TargetFactory;
+let { getPerformanceFront, PerformanceFront } = require("devtools/performance/front");
 
 let mm = null;
 
@@ -24,6 +24,7 @@ const FRAME_SCRIPT_UTILS_URL = "chrome://browser/content/devtools/frame-script-u
 const EXAMPLE_URL = "http://example.com/browser/browser/devtools/performance/test/";
 const SIMPLE_URL = EXAMPLE_URL + "doc_simple-test.html";
 const MARKERS_URL = EXAMPLE_URL + "doc_markers.html";
+const ALLOCS_URL = EXAMPLE_URL + "doc_allocs.html";
 
 const MEMORY_SAMPLE_PROB_PREF = "devtools.performance.memory.sample-probability";
 const MEMORY_MAX_LOG_LEN_PREF = "devtools.performance.memory.max-log-length";
@@ -45,7 +46,7 @@ const EXPERIMENTAL_PREF = "devtools.performance.ui.experimental";
 // All tests are asynchronous.
 waitForExplicitFinish();
 
-gDevTools.testing = true;
+DevToolsUtils.testing = true;
 
 let DEFAULT_PREFS = [
   "devtools.debugger.log",
@@ -84,7 +85,7 @@ function loadFrameScripts () {
 }
 
 registerCleanupFunction(() => {
-  gDevTools.testing = false;
+  DevToolsUtils.testing = false;
   info("finish() was called, cleaning up...");
 
   // Rollback any pref changes
@@ -545,7 +546,7 @@ function getInflatedStackLocations(thread, sample) {
  * Synthesize a profile for testing.
  */
 function synthesizeProfileForTest(samples) {
-  const RecordingUtils = devtools.require("devtools/performance/recording-utils");
+  const RecordingUtils = require("devtools/performance/recording-utils");
 
   samples.unshift({
     time: 0,

@@ -122,6 +122,7 @@ public:
   // need to send some notification itself with the real origin.
   bool mShouldNotifyNewOrigin = true;
 };
+
 } // namespace dom
 } // namespace mozilla
 
@@ -1207,7 +1208,6 @@ public:
   virtual void RestorePreviousFullScreenState() override;
   virtual bool IsFullscreenLeaf() override;
   virtual bool IsFullScreenDoc() override;
-  virtual void SetApprovedForFullscreen(bool aIsApproved) override;
   virtual nsresult
     RemoteFrameFullscreenChanged(nsIDOMElement* aFrameElement) override;
 
@@ -1241,8 +1241,6 @@ public:
   //
   already_AddRefed<nsSimpleContentList> BlockedTrackingNodes() const;
 
-  static void ExitFullscreen(nsIDocument* aDoc);
-
   // Do the "fullscreen element ready check" from the fullscreen spec.
   // It returns true if the given element is allowed to go into fullscreen.
   bool FullscreenElementReadyCheck(Element* aElement, bool aWasCallerChrome);
@@ -1254,13 +1252,6 @@ public:
   // Removes all elements from the full-screen stack, removing full-scren
   // styles from the top element in the stack.
   void CleanupFullscreenState();
-
-  // Add/remove "fullscreen-approved" observer service notification listener.
-  // Chrome sends us a notification when fullscreen is approved for a
-  // document, with the notification subject as the document that was approved.
-  // We maintain this listener while in fullscreen mode.
-  nsresult AddFullscreenApprovedObserver();
-  nsresult RemoveFullscreenApprovedObserver();
 
   // Pushes aElement onto the full-screen stack, and removes full-screen styles
   // from the former full-screen stack top, and its ancestors, and applies the
@@ -1538,8 +1529,10 @@ protected:
 
   void NotifyStyleSheetApplicableStateChanged();
 
-  // Apply the fullscreen state to the document, and trigger related events.
-  void ApplyFullscreen(const FullscreenRequest& aRequest);
+  // Apply the fullscreen state to the document, and trigger related
+  // events. It returns false if the fullscreen element ready check
+  // fails and nothing gets changed.
+  bool ApplyFullscreen(const FullscreenRequest& aRequest);
 
   nsTArray<nsIObserver*> mCharSetObservers;
 
@@ -1662,26 +1655,6 @@ public:
   // terminated instead of letting it finish at its own pace.
   bool mParserAborted:1;
 
-  // Whether this document has been approved for fullscreen, either by explicit
-  // approval via the fullscreen-approval UI, or because it received
-  // approval because its document's host already had the "fullscreen"
-  // permission granted when the document requested fullscreen.
-  // 
-  // Note if a document's principal doesn't have a host, the permission manager
-  // can't store permissions for it, so we can only manage approval using this
-  // flag.
-  //
-  // Note we must track this separately from the "fullscreen" permission,
-  // so that pending pointer lock requests can determine whether documents
-  // whose principal doesn't have a host (i.e. those which can't store
-  // permissions in the permission manager) have been approved for fullscreen.
-  bool mIsApprovedForFullscreen:1;
-
-  // Whether this document has a fullscreen approved observer. Only documents
-  // which request fullscreen and which don't have a pre-existing approval for
-  // fullscreen will have an observer.
-  bool mHasFullscreenApprovedObserver:1;
-
   friend class nsPointerLockPermissionRequest;
   friend class nsCallRequestFullScreen;
   // When set, trying to lock the pointer doesn't require permission from the
@@ -1760,10 +1733,10 @@ private:
   void EnableStyleSheetsForSetInternal(const nsAString& aSheetSet,
                                        bool aUpdateCSSLoader);
 
-  // Revoke any pending notifications due to mozRequestAnimationFrame calls
+  // Revoke any pending notifications due to requestAnimationFrame calls
   void RevokeAnimationFrameNotifications();
   // Reschedule any notifications we need to handle
-  // mozRequestAnimationFrame, if it's OK to do so.
+  // requestAnimationFrame, if it's OK to do so.
   void MaybeRescheduleAnimationFrameNotifications();
 
   // These are not implemented and not supported.
