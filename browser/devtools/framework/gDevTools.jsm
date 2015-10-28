@@ -10,7 +10,10 @@ const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/devtools/Loader.jsm");
+const {require, devtools: loader} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+// Load target and toolbox lazily as they need gDevTools to be fully initialized
+loader.lazyRequireGetter(this, "TargetFactory", "devtools/framework/target", true);
+loader.lazyRequireGetter(this, "Toolbox", "devtools/framework/toolbox", true);
 
 XPCOMUtils.defineLazyModuleGetter(this, "promise",
                                   "resource://gre/modules/Promise.jsm", "Promise");
@@ -23,8 +26,9 @@ XPCOMUtils.defineLazyModuleGetter(this, "DebuggerServer",
 XPCOMUtils.defineLazyModuleGetter(this, "DebuggerClient",
                                   "resource://gre/modules/devtools/dbg-client.jsm");
 
-const EventEmitter = devtools.require("devtools/toolkit/event-emitter");
-const Telemetry = devtools.require("devtools/shared/telemetry");
+const DefaultTools = require("definitions").defaultTools;
+const EventEmitter = require("devtools/toolkit/event-emitter");
+const Telemetry = require("devtools/shared/telemetry");
 
 const TABS_OPEN_PEAK_HISTOGRAM = "DEVTOOLS_TABS_OPEN_PEAK_LINEAR";
 const TABS_OPEN_AVG_HISTOGRAM = "DEVTOOLS_TABS_OPEN_AVERAGE_LINEAR";
@@ -50,8 +54,6 @@ this.DevTools = function DevTools() {
   this.destroy = this.destroy.bind(this);
   this._teardown = this._teardown.bind(this);
 
-  this._testing = false;
-
   EventEmitter.decorate(this);
 
   Services.obs.addObserver(this._teardown, "devtools-unloaded", false);
@@ -59,36 +61,6 @@ this.DevTools = function DevTools() {
 };
 
 DevTools.prototype = {
-  /**
-   * When the testing flag is set we take appropriate action to prevent race
-   * conditions in our testing environment. This means setting
-   * dom.send_after_paint_to_content to false to prevent infinite MozAfterPaint
-   * loops and not autohiding the highlighter.
-   */
-  get testing() {
-    return this._testing;
-  },
-
-  set testing(state) {
-    let oldState = this._testing;
-    this._testing = state;
-
-    if (state !== oldState) {
-      if (state) {
-        this._savedSendAfterPaintToContentPref =
-          Services.prefs.getBoolPref("dom.send_after_paint_to_content");
-
-        // dom.send_after_paint_to_content is set to true (non-default) in
-        // testing/profiles/prefs_general.js so lets set it to the same as it is
-        // in a default browser profile for the duration of the test.
-        Services.prefs.setBoolPref("dom.send_after_paint_to_content", false);
-      } else {
-        Services.prefs.setBoolPref("dom.send_after_paint_to_content",
-                                   this._savedSendAfterPaintToContentPref);
-      }
-    }
-  },
-
   /**
    * Register a new developer tool.
    *
@@ -128,7 +100,7 @@ DevTools.prototype = {
     // Make sure that additional tools will always be able to be hidden.
     // When being called from main.js, defaultTools has not yet been exported.
     // But, we can assume that in this case, it is a default tool.
-    if (devtools.defaultTools && devtools.defaultTools.indexOf(toolDefinition) == -1) {
+    if (DefaultTools && DefaultTools.indexOf(toolDefinition) == -1) {
       toolDefinition.visibilityswitch = "devtools." + toolId + ".enabled";
     }
 
@@ -174,13 +146,13 @@ DevTools.prototype = {
   },
 
   getDefaultTools: function DT_getDefaultTools() {
-    return devtools.defaultTools.sort(this.ordinalSort);
+    return DefaultTools.sort(this.ordinalSort);
   },
 
   getAdditionalTools: function DT_getAdditionalTools() {
     let tools = [];
     for (let [key, value] of this._tools) {
-      if (devtools.defaultTools.indexOf(value) == -1) {
+      if (DefaultTools.indexOf(value) == -1) {
         tools.push(value);
       }
     }
@@ -426,7 +398,7 @@ DevTools.prototype = {
     }
     else {
       // No toolbox for target, create one
-      toolbox = new devtools.Toolbox(target, toolId, hostType, hostOptions);
+      toolbox = new Toolbox(target, toolId, hostType, hostOptions);
 
       this.emit("toolbox-created", toolbox);
 
@@ -569,18 +541,18 @@ let gDevToolsBrowser = {
    * of there
    */
   toggleToolboxCommand: function(gBrowser) {
-    let target = devtools.TargetFactory.forTab(gBrowser.selectedTab);
+    let target = TargetFactory.forTab(gBrowser.selectedTab);
     let toolbox = gDevTools.getToolbox(target);
 
     // If a toolbox exists, using toggle from the Main window :
     // - should close a docked toolbox
     // - should focus a windowed toolbox
-    let isDocked = toolbox && toolbox.hostType != devtools.Toolbox.HostType.WINDOW;
+    let isDocked = toolbox && toolbox.hostType != Toolbox.HostType.WINDOW;
     isDocked ? toolbox.destroy() : gDevTools.showToolbox(target);
   },
 
   toggleBrowserToolboxCommand: function(gBrowser) {
-    let target = devtools.TargetFactory.forWindow(gBrowser.ownerDocument.defaultView);
+    let target = TargetFactory.forWindow(gBrowser.ownerDocument.defaultView);
     let toolbox = gDevTools.getToolbox(target);
 
     toolbox ? toolbox.destroy()
@@ -682,7 +654,7 @@ let gDevToolsBrowser = {
    *   and the host is a window, we raise the toolbox window
    */
   selectToolCommand: function(gBrowser, toolId) {
-    let target = devtools.TargetFactory.forTab(gBrowser.selectedTab);
+    let target = TargetFactory.forTab(gBrowser.selectedTab);
     let toolbox = gDevTools.getToolbox(target);
     let toolDefinition = gDevTools.getToolDefinition(toolId);
 
@@ -692,7 +664,7 @@ let gDevToolsBrowser = {
     {
       toolbox.fireCustomKey(toolId);
 
-      if (toolDefinition.preventClosingOnKey || toolbox.hostType == devtools.Toolbox.HostType.WINDOW) {
+      if (toolDefinition.preventClosingOnKey || toolbox.hostType == Toolbox.HostType.WINDOW) {
         toolbox.raise();
       } else {
         toolbox.destroy();
@@ -700,7 +672,7 @@ let gDevToolsBrowser = {
       gDevTools.emit("select-tool-command", toolId);
     } else {
       gDevTools.showToolbox(target, toolId).then(() => {
-        let target = devtools.TargetFactory.forTab(gBrowser.selectedTab);
+        let target = TargetFactory.forTab(gBrowser.selectedTab);
         let toolbox = gDevTools.getToolbox(target);
 
         toolbox.fireCustomKey(toolId);
@@ -766,7 +738,7 @@ let gDevToolsBrowser = {
                   chrome: true,
                   isTabActor: false
                 };
-                return devtools.TargetFactory.forRemoteTab(options);
+                return TargetFactory.forRemoteTab(options);
               })
               .then(target => {
                 // Ensure closing the connection in order to cleanup
@@ -788,7 +760,7 @@ let gDevToolsBrowser = {
         .then(target => {
           // Display a new toolbox, in a new window, with debugger by default
           return gDevTools.showToolbox(target, "jsdebugger",
-                                       devtools.Toolbox.HostType.WINDOW);
+                                       Toolbox.HostType.WINDOW);
         });
   },
 
@@ -904,7 +876,7 @@ let gDevToolsBrowser = {
     let tm = Cc["@mozilla.org/thread-manager;1"].getService(Ci.nsIThreadManager);
 
     function slowScriptDebugHandler(aTab, aCallback) {
-      let target = devtools.TargetFactory.forTab(aTab);
+      let target = TargetFactory.forTab(aTab);
 
       gDevTools.showToolbox(target, "jsdebugger").then(toolbox => {
         let threadClient = toolbox.getCurrentPanel().panelWin.gThreadClient;
@@ -1206,8 +1178,8 @@ let gDevToolsBrowser = {
     for (let win of gDevToolsBrowser._trackedBrowserWindows) {
 
       let hasToolbox = false;
-      if (devtools.TargetFactory.isKnownTab(win.gBrowser.selectedTab)) {
-        let target = devtools.TargetFactory.forTab(win.gBrowser.selectedTab);
+      if (TargetFactory.isKnownTab(win.gBrowser.selectedTab)) {
+        let target = TargetFactory.forTab(win.gBrowser.selectedTab);
         if (gDevTools._toolboxes.has(target)) {
           hasToolbox = true;
         }
@@ -1355,4 +1327,4 @@ gDevTools.on("toolbox-destroyed", gDevToolsBrowser._updateMenuCheckbox);
 Services.obs.addObserver(gDevToolsBrowser.destroy, "quit-application", false);
 
 // Load the browser devtools main module as the loader's main module.
-devtools.main("main");
+loader.main("main");

@@ -10,16 +10,16 @@
 # instead of BrandFullName and typically should not be modified.
 !define BrandFullNameInternal "Cyberfox"
 !define CompanyName           "8pecxstudios"
-!define URLInfoAbout          "https://8pecxstudios.com/"
-!define URLUpdateInfo         "https://8pecxstudios.com/cyberfox-web-browser"
-!define HelpLink              "https://8pecxstudios.com/contact-us"
+!define URLInfoAbout          "https://cyberfox.8pecxstudios.com"
+!define URLUpdateInfo         "https://cyberfox.8pecxstudios.com#selection"
+!define HelpLink              "https://cyberfox.8pecxstudios/file-a-bug"
 
 ; The OFFICIAL define is a workaround to support different urls for Release and
 ; Beta since they share the same branding when building with other branches that
 ; set the update channel to beta.
 !define OFFICIAL
-!define URLStubDownload "https://8pecxstudios.com/download/latest/LatestVersionIntel.exe"
-!define URLManualDownload "https://8pecxstudios.com/download/latest/LatestVersionIntel.exe"
+!define URLStubDownload ""
+!define URLManualDownload ""
 !define Channel "release"
 
 # The installer's certificate name and issuer expected by the stub installer

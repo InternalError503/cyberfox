@@ -31,7 +31,7 @@ public class GeneratableElementIterator implements Iterator<AnnotatableEntity> {
         // Get all the elements of this class as AccessibleObjects.
         Member[] aMethods = aClass.getDeclaredMethods();
         Member[] aFields = aClass.getDeclaredFields();
-        Member[] aCtors = aClass.getConstructors();
+        Member[] aCtors = aClass.getDeclaredConstructors();
 
         // Shove them all into one buffer.
         Member[] objs = new Member[aMethods.length + aFields.length + aCtors.length];
@@ -50,7 +50,7 @@ public class GeneratableElementIterator implements Iterator<AnnotatableEntity> {
         // Check for "Wrap ALL the things" flag.
         for (Annotation annotation : aClass.getDeclaredAnnotations()) {
             final String annotationTypeName = annotation.annotationType().getName();
-            if (annotationTypeName.equals("org.mozilla.gecko.mozglue.generatorannotations.WrapEntireClassForJNI")) {
+            if (annotationTypeName.equals("org.mozilla.gecko.annotation.WrapForJNI")) {
                 mIterateEveryEntry = true;
                 break;
             }
@@ -71,7 +71,7 @@ public class GeneratableElementIterator implements Iterator<AnnotatableEntity> {
                 // WrappedJNIMethod has parameters. Use Reflection to obtain them.
                 Class<? extends Annotation> annotationType = annotation.annotationType();
                 final String annotationTypeName = annotationType.getName();
-                if (annotationTypeName.equals("org.mozilla.gecko.mozglue.generatorannotations.WrapElementForJNI")) {
+                if (annotationTypeName.equals("org.mozilla.gecko.annotation.WrapForJNI")) {
                     String stubName = null;
                     boolean isMultithreadedStub = false;
                     boolean noThrow = false;
@@ -104,15 +104,15 @@ public class GeneratableElementIterator implements Iterator<AnnotatableEntity> {
                         catchException = (Boolean) catchExceptionMethod.invoke(annotation);
 
                     } catch (NoSuchMethodException e) {
-                        System.err.println("Unable to find expected field on WrapElementForJNI annotation. Did the signature change?");
+                        System.err.println("Unable to find expected field on WrapForJNI annotation. Did the signature change?");
                         e.printStackTrace(System.err);
                         System.exit(3);
                     } catch (IllegalAccessException e) {
-                        System.err.println("IllegalAccessException reading fields on WrapElementForJNI annotation. Seems the semantics of Reflection have changed...");
+                        System.err.println("IllegalAccessException reading fields on WrapForJNI annotation. Seems the semantics of Reflection have changed...");
                         e.printStackTrace(System.err);
                         System.exit(4);
                     } catch (InvocationTargetException e) {
-                        System.err.println("InvocationTargetException reading fields on WrapElementForJNI annotation. This really shouldn't happen.");
+                        System.err.println("InvocationTargetException reading fields on WrapForJNI annotation. This really shouldn't happen.");
                         e.printStackTrace(System.err);
                         System.exit(5);
                     }

@@ -23,10 +23,10 @@ namespace mozilla {
 namespace layers {
 class CanvasLayer;
 class LayerManager;
-}
+} // namespace layers
 namespace gfx {
 class SourceSurface;
-}
+} // namespace gfx
 
 namespace dom {
 class CanvasCaptureMediaStream;
@@ -36,6 +36,7 @@ class HTMLCanvasPrintState;
 class PrintCallback;
 
 enum class CanvasContextType : uint8_t {
+  NoContext,
   Canvas2D,
   WebGL1,
   WebGL2
@@ -168,7 +169,7 @@ public:
    */
   bool GetIsOpaque();
 
-  virtual TemporaryRef<gfx::SourceSurface> GetSurfaceSnapshot(bool* aPremultAlpha = nullptr);
+  virtual already_AddRefed<gfx::SourceSurface> GetSurfaceSnapshot(bool* aPremultAlpha = nullptr);
 
   virtual bool ParseAttribute(int32_t aNamespaceID,
                                 nsIAtom* aAttribute,
@@ -262,6 +263,10 @@ public:
   void ResetPrintCallback();
 
   HTMLCanvasElement* GetOriginalCanvas();
+
+  CanvasContextType GetCurrentContextType() {
+    return mCurrentContextType;
+  }
 };
 
 class HTMLCanvasPrintState final : public nsWrapperCache

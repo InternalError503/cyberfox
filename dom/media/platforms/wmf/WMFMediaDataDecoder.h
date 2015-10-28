@@ -9,9 +9,9 @@
 
 
 #include "WMF.h"
-#include "MP4Reader.h"
 #include "MFTDecoder.h"
 #include "mozilla/RefPtr.h"
+#include "PlatformDecoderModule.h"
 
 namespace mozilla {
 
@@ -24,7 +24,7 @@ public:
 
   // Creates an initializs the MFTDecoder.
   // Returns nullptr on failure.
-  virtual TemporaryRef<MFTDecoder> Init() = 0;
+  virtual already_AddRefed<MFTDecoder> Init() = 0;
 
   // Submit a compressed sample for decoding.
   // This should forward to the MFTDecoder after performing
@@ -55,7 +55,7 @@ public:
 class WMFMediaDataDecoder : public MediaDataDecoder {
 public:
   WMFMediaDataDecoder(MFTManager* aOutputSource,
-                      FlushableMediaTaskQueue* aAudioTaskQueue,
+                      FlushableTaskQueue* aAudioTaskQueue,
                       MediaDataDecoderCallback* aCallback);
   ~WMFMediaDataDecoder();
 
@@ -91,7 +91,7 @@ private:
 
   void ProcessShutdown();
 
-  RefPtr<FlushableMediaTaskQueue> mTaskQueue;
+  RefPtr<FlushableTaskQueue> mTaskQueue;
   MediaDataDecoderCallback* mCallback;
 
   RefPtr<MFTDecoder> mDecoder;

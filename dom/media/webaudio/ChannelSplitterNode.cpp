@@ -38,7 +38,7 @@ public:
         AudioBlockCopyChannelWithScale(
             static_cast<const float*>(aInput[0].mChannelData[i]),
             aInput[0].mVolume,
-            static_cast<float*>(const_cast<void*>(aOutput[i].mChannelData[0])));
+            aOutput[i].ChannelFloatsForWrite(0));
       } else {
         // Pad with silent channels if needed
         aOutput[i].SetNull(WEBAUDIO_BLOCK_SIZE);
@@ -74,6 +74,6 @@ ChannelSplitterNode::WrapObject(JSContext* aCx, JS::Handle<JSObject*> aGivenProt
   return ChannelSplitterNodeBinding::Wrap(aCx, this, aGivenProto);
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla
 

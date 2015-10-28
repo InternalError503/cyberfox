@@ -4,12 +4,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef mozilla_dom_bluetooth_bluetoothservicebluedroid_h__
-#define mozilla_dom_bluetooth_bluetoothservicebluedroid_h__
+#ifndef mozilla_dom_bluetooth_bluedroid_BluetoothServiceBluedroid_h
+#define mozilla_dom_bluetooth_bluedroid_BluetoothServiceBluedroid_h
 
 #include "BluetoothCommon.h"
 #include "BluetoothInterface.h"
 #include "BluetoothService.h"
+#ifndef MOZ_B2G_BT_API_V1
+#include "nsDataHashtable.h"
+#endif
 
 BEGIN_BLUETOOTH_NAMESPACE
 
@@ -17,6 +20,7 @@ class BluetoothServiceBluedroid : public BluetoothService
                                 , public BluetoothNotificationHandler
 {
   class CancelDiscoveryResultHandler;
+  class CleanupResultHandler;
   class CreateBondResultHandler;
   class DisableResultHandler;
   class EnableResultHandler;
@@ -35,6 +39,8 @@ class BluetoothServiceBluedroid : public BluetoothService
   class SetAdapterPropertyResultHandler;
   class SspReplyResultHandler;
   class StartDiscoveryResultHandler;
+
+  class GetDeviceRequest;
 
 public:
   BluetoothServiceBluedroid();
@@ -158,8 +164,7 @@ public:
           BluetoothReplyRunnable* aRunnable);
 
 #ifndef MOZ_B2G_BT_API_V1
-  virtual bool
-  IsConnected(uint16_t aProfileId);
+  // Missing in bluetooth2
 #else
   virtual void
   IsConnected(const uint16_t aServiceUuid,
@@ -390,8 +395,46 @@ protected:
 
   static bool IsConnected(const nsAString& aRemoteBdAddr);
 #endif
+
+  // Adapter properties
+  nsString mBdAddress;
+  nsString mBdName;
+  bool mEnabled;
+  bool mDiscoverable;
+  bool mDiscovering;
+  nsTArray<nsString> mBondedAddresses;
+#ifndef MOZ_B2G_BT_API_V1
+  // Missing in Bluetooth v2
+#else
+  uint32_t mDiscoverableTimeout;
+#endif
+
+  // Backend error recovery
+  bool mIsRestart;
+  bool mIsFirstTimeToggleOffBt;
+
+  // Array of get device requests. Each request remembers
+  // 1) remaining device count to receive properties,
+  // 2) received remote device properties, and
+  // 3) runnable to reply success/error
+  nsTArray<GetDeviceRequest> mGetDeviceRequests;
+
+  // Runnable arrays
+  nsTArray<nsRefPtr<BluetoothReplyRunnable>> mSetAdapterPropertyRunnables;
+  nsTArray<nsRefPtr<BluetoothReplyRunnable>> mCreateBondRunnables;
+  nsTArray<nsRefPtr<BluetoothReplyRunnable>> mRemoveBondRunnables;
+
+#ifndef MOZ_B2G_BT_API_V1
+  nsTArray<nsRefPtr<BluetoothReplyRunnable>> mChangeAdapterStateRunnables;
+  nsTArray<nsRefPtr<BluetoothReplyRunnable>> mChangeDiscoveryRunnables;
+  nsTArray<nsRefPtr<BluetoothReplyRunnable>> mFetchUuidsRunnables;
+
+  // <address, name> mapping table for remote devices
+  nsDataHashtable<nsStringHashKey, nsString> mDeviceNameMap;
+#endif
+
 };
 
 END_BLUETOOTH_NAMESPACE
 
-#endif
+#endif // mozilla_dom_bluetooth_bluedroid_BluetoothServiceBluedroid_h

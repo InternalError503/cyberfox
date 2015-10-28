@@ -20,7 +20,7 @@ let {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 this.DevToolsUtils = devtools.require("devtools/toolkit/DevToolsUtils.js");
 
 XPCOMUtils.defineLazyServiceGetter(
-    this, "cookieManager", "@mozilla.org/cookiemanager;1", "nsICookieManager");
+    this, "cookieManager", "@mozilla.org/cookiemanager;1", "nsICookieManager2");
 
 Cu.import("chrome://marionette/content/actions.js");
 Cu.import("chrome://marionette/content/elements.js");
@@ -141,6 +141,7 @@ this.GeckoDriver = function(appName, device, emulator) {
     "browserVersion": Services.appinfo.version,
     "platformName": Services.appinfo.OS.toUpperCase(),
     "platformVersion": Services.appinfo.platformVersion,
+    "specificationLevel": "1",
 
     // Supported features
     "raisesAccessibilityExceptions": false,
@@ -148,6 +149,7 @@ this.GeckoDriver = function(appName, device, emulator) {
     "acceptSslCerts": false,
     "takesElementScreenshot": true,
     "takesScreenshot": true,
+    "proxy": {},
 
     // Selenium 2 compat
     "platform": Services.appinfo.OS.toUpperCase(),
@@ -499,9 +501,10 @@ GeckoDriver.prototype.listeningPromise = function() {
 
 /** Create a new session. */
 GeckoDriver.prototype.newSession = function(cmd, resp) {
+  let uuid = uuidGen.generateUUID().toString();
   this.sessionId = cmd.parameters.sessionId ||
       cmd.parameters.session_id ||
-      uuidGen.generateUUID().toString();
+      uuid.substring(1, uuid.length - 1);
 
   this.newSessionCommandId = cmd.id;
   this.setSessionCapabilities(cmd.parameters.capabilities);
@@ -626,6 +629,11 @@ GeckoDriver.prototype.setSessionCapabilities = function(newCaps) {
           to = copy(from[key], to);
           break;
         case "requiredCapabilities":
+          if (from[key]["proxy"]) {
+              this.setUpProxy(from[key]["proxy"]);
+              to["proxy"] = from[key]["proxy"];
+              delete from[key]["proxy"];
+          }
           for (let caps in from[key]) {
             if (from[key][caps] !== this.sessionCapabilities[caps]) {
               errors.push(from[key][caps] + " does not equal " +
@@ -650,6 +658,53 @@ GeckoDriver.prototype.setSessionCapabilities = function(newCaps) {
   let caps = copy(this.sessionCapabilities);
   caps = copy(newCaps, caps);
   this.sessionCapabilities = caps;
+};
+
+GeckoDriver.prototype.setUpProxy = function (proxy) {
+  logger.debug("Setup Proxy has been entered. Will attempt to setup the following proxy");
+  logger.debug("Proxy object contains " + JSON.stringify(proxy));
+  if (typeof proxy == "object" && proxy.hasOwnProperty("proxyType")) {
+
+    switch (proxy.proxyType.toUpperCase()) {
+      case "MANUAL":
+        Services.prefs.setIntPref("network.proxy.type", 1);
+        if (proxy.httpProxy && proxy.httpProxyPort){
+          Services.prefs.setCharPref("network.proxy.http", proxy.httpProxy);
+          Services.prefs.setIntPref("network.proxy.http_port", proxy.httpProxyPort);
+        }
+        if (proxy.sslProxy && proxy.sslProxyPort){
+          Services.prefs.setCharPref("network.proxy.ssl", proxy.sslProxy);
+          Services.prefs.setIntPref("network.proxy.ssl_port", proxy.sslProxyPort);
+        }
+        if (proxy.ftpProxy && proxy.ftpProxyPort) {
+          Services.prefs.setCharPref("network.proxy.ftp", proxy.ftpProxy);
+          Services.prefs.setIntPref("network.proxy.ftp_port", proxy.ftpProxyPort);
+        }
+        if (proxy.socksProxy) {
+          Services.prefs.setCharPref("network.proxy.socks", proxy.socksProxy);
+          Services.prefs.setIntPref("network.proxy.socks_port", proxy.socksProxyPort);
+          if (proxy.socksVersion) {
+            Services.prefs.setIntPref("network.proxy.socks_version", proxy.socksVersion);
+          }
+        }
+        break;
+      case "PAC":
+        Services.prefs.setIntPref("network.proxy.type", 2);
+        Services.prefs.setCharPref("network.proxy.autoconfig_url", proxy.pacUrl);
+        break;
+      case "AUTODETECT":
+        Services.prefs.setIntPref("network.proxy.type", 4);
+        break;
+      case "SYSTEM":
+        Services.prefs.setIntPref("network.proxy.type", 5);
+        break;
+      case "NOPROXY":
+      default:
+        Services.prefs.setIntPref("network.proxy.type", 0);
+    }
+  } else {
+    throw new InvalidArgumentError("the value of 'proxy' should be an object");
+  }
 };
 
 /**
@@ -1234,7 +1289,7 @@ GeckoDriver.prototype.getCurrentUrl = function(cmd, resp) {
 
     case Context.CONTENT:
       let isB2G = this.appName == "B2G";
-      resp.value = yield this.listener.getCurrentUrl({isB2G: isB2G});
+      resp.value = yield this.listener.getCurrentUrl(isB2G);
       break;
   }
 };
@@ -2809,9 +2864,9 @@ GeckoDriver.prototype.receiveMessage = function(message) {
       let isForCurrentPath = path => currentPath.indexOf(path) != -1;
       let results = [];
 
-      let en = cookieManager.enumerator;
+      let en = cookieManager.getCookiesFromHost(host);
       while (en.hasMoreElements()) {
-        let cookie = en.getNext().QueryInterface(Ci.nsICookie);
+        let cookie = en.getNext().QueryInterface(Ci.nsICookie2);
         // take the hostname and progressively shorten
         let hostname = host;
         do {
@@ -2823,7 +2878,8 @@ GeckoDriver.prototype.receiveMessage = function(message) {
               "path": cookie.path,
               "host": cookie.host,
               "secure": cookie.isSecure,
-              "expiry": cookie.expires
+              "expiry": cookie.expires,
+              "httpOnly": cookie.isHttpOnly
             });
             break;
           }
@@ -2840,7 +2896,7 @@ GeckoDriver.prototype.receiveMessage = function(message) {
           cookieToAdd.name,
           cookieToAdd.value,
           cookieToAdd.secure,
-          false,
+          cookieToAdd.httpOnly,
           false,
           cookieToAdd.expiry);
       return true;

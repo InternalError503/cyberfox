@@ -80,6 +80,7 @@ namespace jit {
     _(JSOP_MUL)                \
     _(JSOP_DIV)                \
     _(JSOP_MOD)                \
+    _(JSOP_POW)                \
     _(JSOP_LT)                 \
     _(JSOP_LE)                 \
     _(JSOP_GT)                 \
@@ -183,6 +184,7 @@ namespace jit {
     _(JSOP_RUNONCE)            \
     _(JSOP_REST)               \
     _(JSOP_TOID)               \
+    _(JSOP_TOSTRING)           \
     _(JSOP_TABLESWITCH)        \
     _(JSOP_ITER)               \
     _(JSOP_MOREITER)           \

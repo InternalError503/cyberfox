@@ -15,6 +15,7 @@
 #include "jslibmath.h"
 #include "jsstr.h"
 
+#include "jit/AtomicOperations.h"
 #include "jit/BaselineInspector.h"
 #include "jit/IonBuilder.h"
 #include "jit/JitSpewer.h"
@@ -24,6 +25,9 @@
 
 #include "jsatominlines.h"
 #include "jsobjinlines.h"
+#include "jsscriptinlines.h"
+
+#include "jit/AtomicOperations-inl.h"
 
 using namespace js;
 using namespace js::jit;
@@ -1211,6 +1215,20 @@ MMathFunction::foldsTo(TempAllocator& alloc)
     return MConstant::New(alloc, DoubleValue(out));
 }
 
+MDefinition*
+MAtomicIsLockFree::foldsTo(TempAllocator& alloc)
+{
+    MDefinition* input = getOperand(0);
+    if (!input->isConstantValue())
+        return this;
+
+    Value val = input->constantValue();
+    if (!val.isInt32())
+        return this;
+
+    return MConstant::New(alloc, BooleanValue(AtomicOperations::isLockfree(val.toInt32())));
+}
+
 MParameter*
 MParameter::New(TempAllocator& alloc, int32_t index, TemporaryTypeSet* types)
 {
@@ -2226,22 +2244,34 @@ MBinaryArithInstruction::foldsTo(TempAllocator& alloc)
 
     MDefinition* lhs = getOperand(0);
     MDefinition* rhs = getOperand(1);
-    if (MDefinition* folded = EvaluateConstantOperands(alloc, this))
+    if (MConstant* folded = EvaluateConstantOperands(alloc, this)) {
+        if (isTruncated()) {
+            if (!folded->block())
+                block()->insertBefore(this, folded);
+            return MTruncateToInt32::New(alloc, folded);
+        }
         return folded;
+    }
 
     // 0 + -0 = 0. So we can't remove addition
     if (isAdd() && specialization_ != MIRType_Int32)
         return this;
 
-    if (IsConstant(rhs, getIdentity()))
+    if (IsConstant(rhs, getIdentity())) {
+        if (isTruncated())
+            return MTruncateToInt32::New(alloc, lhs);
         return lhs;
+    }
 
     // subtraction isn't commutative. So we can't remove subtraction when lhs equals 0
     if (isSub())
         return this;
 
-    if (IsConstant(lhs, getIdentity()))
+    if (IsConstant(lhs, getIdentity())) {
+        if (isTruncated())
+            return MTruncateToInt32::New(alloc, rhs);
         return rhs; // x op id => x
+    }
 
     return this;
 }
@@ -4120,10 +4150,11 @@ MNewArray::MNewArray(CompilerConstraintList* constraints, uint32_t count, MConst
 {
     setResultType(MIRType_Object);
     if (templateObject()) {
-        TemporaryTypeSet* types = MakeSingletonTypeSet(constraints, templateObject());
-        setResultTypeSet(types);
-        if (types->convertDoubleElements(constraints) == TemporaryTypeSet::AlwaysConvertToDoubles)
-            convertDoubleElements_ = true;
+        if (TemporaryTypeSet* types = MakeSingletonTypeSet(constraints, templateObject())) {
+            setResultTypeSet(types);
+            if (types->convertDoubleElements(constraints) == TemporaryTypeSet::AlwaysConvertToDoubles)
+                convertDoubleElements_ = true;
+        }
     }
 }
 
@@ -4772,6 +4803,35 @@ MArrayJoin::foldsTo(TempAllocator& alloc)
 
     setNotRecoveredOnBailout();
     return MStringReplace::New(alloc, string, pattern, replacement);
+}
+
+MConvertUnboxedObjectToNative*
+MConvertUnboxedObjectToNative::New(TempAllocator& alloc, MDefinition* obj, ObjectGroup* group)
+{
+    MConvertUnboxedObjectToNative* res = new(alloc) MConvertUnboxedObjectToNative(obj, group);
+
+    ObjectGroup* nativeGroup = group->unboxedLayout().nativeGroup();
+
+    // Make a new type set for the result of this instruction which replaces
+    // the input group with the native group we will convert it to.
+    TemporaryTypeSet* types = obj->resultTypeSet();
+    if (types && !types->unknownObject()) {
+        TemporaryTypeSet* newTypes = types->cloneWithoutObjects(alloc.lifoAlloc());
+        if (newTypes) {
+            for (size_t i = 0; i < types->getObjectCount(); i++) {
+                TypeSet::ObjectKey* key = types->getObject(i);
+                if (!key)
+                    continue;
+                if (key->unknownProperties() || !key->isGroup() || key->group() != group)
+                    newTypes->addType(TypeSet::ObjectType(key), alloc.lifoAlloc());
+                else
+                    newTypes->addType(TypeSet::ObjectType(nativeGroup), alloc.lifoAlloc());
+            }
+            res->setResultTypeSet(newTypes);
+        }
+    }
+
+    return res;
 }
 
 bool

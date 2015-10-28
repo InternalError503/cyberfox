@@ -38,7 +38,7 @@ function indirectCallCannotGC(fullCaller, fullVariable)
     if (name == "op" && /GetWeakmapKeyDelegate/.test(caller))
         return true;
 
-    var CheckCallArgs = "AsmJSValidate.cpp:uint8 CheckCallArgs(FunctionCompiler*, js::frontend::ParseNode*, (uint8)(FunctionCompiler*,js::frontend::ParseNode*,Type)*, FunctionCompiler::Call*)";
+    var CheckCallArgs = "AsmJSValidate.cpp:uint8 CheckCallArgs(FunctionBuilder*, js::frontend::ParseNode*, (uint8)(FunctionBuilder*,js::frontend::ParseNode*,Type)*, Signature*)";
     if (name == "checkArg" && caller == CheckCallArgs)
         return true;
 
@@ -189,6 +189,8 @@ var ignoreFunctions = {
     // static and dynamic checks for no GC in the non-test code, and in the test
     // code we fall back to only the dynamic checks.
     "void test::RingbufferDumper::OnTestPartResult(testing::TestPartResult*)" : true,
+
+    "float64 JS_GetCurrentEmbedderTime()" : true,
 };
 
 function isProtobuf(name)
@@ -243,21 +245,6 @@ function ignoreGCFunction(mangled)
     return false;
 }
 
-function isRootedTypeName(name)
-{
-    if (name == "mozilla::ErrorResult" ||
-        name == "JSErrorResult" ||
-        name == "WrappableJSErrorResult" ||
-        name == "js::frontend::TokenStream" ||
-        name == "js::frontend::TokenStream::Position" ||
-        name == "ModuleCompiler" ||
-        name == "JSAddonId")
-    {
-        return true;
-    }
-    return false;
-}
-
 function stripUCSAndNamespace(name)
 {
     if (name.startsWith('struct '))
@@ -280,14 +267,34 @@ function stripUCSAndNamespace(name)
     return name;
 }
 
-function isRootedPointerTypeName(name)
+function isRootedGCTypeName(name)
+{
+    return (name == "JSAddonId");
+}
+
+function isRootedGCPointerTypeName(name)
 {
     name = stripUCSAndNamespace(name);
 
     if (name.startsWith('MaybeRooted<'))
         return /\(js::AllowGC\)1u>::RootType/.test(name);
 
+    if (name == "ErrorResult" ||
+        name == "JSErrorResult" ||
+        name == "WrappableJSErrorResult" ||
+        name == "frontend::TokenStream" ||
+        name == "frontend::TokenStream::Position" ||
+        name == "ModuleCompiler")
+    {
+        return true;
+    }
+
     return name.startsWith('Rooted') || name.startsWith('PersistentRooted');
+}
+
+function isRootedTypeName(name)
+{
+    return isRootedGCTypeName(name) || isRootedGCPointerTypeName(name);
 }
 
 function isUnsafeStorage(typeName)
@@ -354,6 +361,10 @@ function listGCPointers() {
     return [
         'JS::Value',
         'jsid',
+
+        'js::TypeSet',
+        'js::TypeSet::ObjectKey',
+        'js::TypeSet::Type',
 
         // AutoCheckCannotGC should also not be held live across a GC function.
         'JS::AutoCheckCannotGC',

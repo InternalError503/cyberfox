@@ -24,6 +24,9 @@
 #include "nsIHttpAuthenticableChannel.h"
 #include "nsIURI.h"
 #include "nsContentUtils.h"
+#include "nsServiceManagerUtils.h"
+#include "nsILoadContext.h"
+#include "nsIURL.h"
 
 namespace mozilla {
 namespace net {
@@ -1424,5 +1427,5 @@ nsHttpChannelAuthProvider::GetCurrentPath(nsACString &path)
 NS_IMPL_ISUPPORTS(nsHttpChannelAuthProvider, nsICancelable,
                   nsIHttpChannelAuthProvider, nsIAuthPromptCallback)
 
-} // namespace mozilla::net
+} // namespace net
 } // namespace mozilla

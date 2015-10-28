@@ -1491,16 +1491,21 @@ var gApplicationsPane = {
     }
 
     // Create a menu item for selecting a local application.
+    let canOpenWithOtherApp = true;
 #ifdef XP_WIN
     // On Windows, selecting an application to open another application
     // would be meaningless so we special case executables.
-    var executableType = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService)
+    let executableType = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService)
                                                   .getTypeFromExtension("exe");
-    if (handlerInfo.type != executableType)
+    canOpenWithOtherApp = handlerInfo.type != executableType;
 #endif
+    if (canOpenWithOtherApp)
     {
       let menuItem = document.createElement("menuitem");
-      menuItem.setAttribute("oncommand", "gApplicationsPane.chooseApp(event)");
+      menuItem.className = "choose-app-item";
+      menuItem.addEventListener("command", function(e) {
+        gApplicationsPane.chooseApp(e);
+      });
       let label = this._prefsBundle.getString("useOtherApp");
       menuItem.setAttribute("label", label);
       menuItem.setAttribute("tooltiptext", label);
@@ -1512,7 +1517,10 @@ var gApplicationsPane = {
       let menuItem = document.createElement("menuseparator");
       menuPopup.appendChild(menuItem);
       menuItem = document.createElement("menuitem");
-      menuItem.setAttribute("oncommand", "gApplicationsPane.manageApp(event)");
+      menuItem.className = "manage-app-item";
+      menuItem.addEventListener("command", function(e) {
+        gApplicationsPane.manageApp(e);
+      });
       menuItem.setAttribute("label", this._prefsBundle.getString("manageApp"));
       menuPopup.appendChild(menuItem);
     }
@@ -1636,7 +1644,7 @@ var gApplicationsPane = {
     var typeItem = this._list.selectedItem;
     var handlerInfo = this._handledTypes[typeItem.type];
 
-    let action = parseInt(aActionItem.getAttribute("action"), 10);
+    let action = parseInt(aActionItem.getAttribute("action"));
 
     // Set the plugin state if we're enabling or disabling a plugin.
     if (action == kActionUsePlugin)
@@ -1685,20 +1693,23 @@ var gApplicationsPane = {
     var typeItem = this._list.selectedItem;
     var handlerInfo = this._handledTypes[typeItem.type];
 
+    let onComplete = () => {
+      // Rebuild the actions menu so that we revert to the previous selection,
+      // or "Always ask" if the previous default application has been removed
+      this.rebuildActionsMenu();
+
+      // update the richlistitem too. Will be visible when selecting another row
+      typeItem.setAttribute("actionDescription",
+                            this._describePreferredAction(handlerInfo));
+      if (!this._setIconClassForPreferredAction(handlerInfo, typeItem)) {
+        typeItem.setAttribute("actionIcon",
+                              this._getIconURLForPreferredAction(handlerInfo));
+      }
+    };
+
     document.documentElement.openSubDialog("chrome://browser/content/preferences/applicationManager.xul",
-                                           "", handlerInfo);
+                                           "", handlerInfo, onComplete);
 
-    // Rebuild the actions menu so that we revert to the previous selection,
-    // or "Always ask" if the previous default application has been removed
-    this.rebuildActionsMenu();
-
-    // update the richlistitem too. Will be visible when selecting another row
-    typeItem.setAttribute("actionDescription",
-                          this._describePreferredAction(handlerInfo));
-    if (!this._setIconClassForPreferredAction(handlerInfo, typeItem)) {
-      typeItem.setAttribute("actionIcon",
-                            this._getIconURLForPreferredAction(handlerInfo));
-    }
   },
 
   chooseApp: function(aEvent) {
@@ -1747,18 +1758,21 @@ var gApplicationsPane = {
     params.filename      = null;
     params.handlerApp    = null;
 
-    window.openDialog("chrome://global/content/appPicker.xul", null,
+    let onAppSelected = () => {
+      if (this.isValidHandlerApp(params.handlerApp)) {
+        handlerApp = params.handlerApp;
+
+        // Add the app to the type's list of possible handlers.
+        handlerInfo.addPossibleApplicationHandler(handlerApp);
+      }
+
+      chooseAppCallback(handlerApp);
+    };
+
+    window.openDialog("chrome://global/content/appPicker.xul",
                       "chrome,modal,centerscreen,titlebar,dialog=yes",
-                      params);
+                    null, params, onAppSelected);
 
-    if (this.isValidHandlerApp(params.handlerApp)) {
-      handlerApp = params.handlerApp;
-
-      // Add the app to the type's list of possible handlers.
-      handlerInfo.addPossibleApplicationHandler(handlerApp);
-    }
-
-    chooseAppCallback(handlerApp);
 #else
     let winTitle = this._prefsBundle.getString("fpTitleChooseApp");
     let fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
@@ -1872,11 +1886,11 @@ var gApplicationsPane = {
     var uri = this._ioSvc.newURI(aWebAppURITemplate, null, null);
 
     // Unfortunately we can't use the favicon service to get the favicon,
-    // because the service looks for a record with the exact URL we give it, and
-    // users won't have such records for URLs they don't visit, and users won't
-    // visit the handler's URL template, they'll only visit URLs derived from
-    // that template (i.e. with %s in the template replaced by the URL of the
-    // content being handled).
+    // because the service looks in the annotations table for a record with
+    // the exact URL we give it, and users won't have such records for URLs
+    // they don't visit, and users won't visit the web app's URL template,
+    // they'll only visit URLs derived from that template (i.e. with %s
+    // in the template replaced by the URL of the content being handled).
 
     if (/^https?$/.test(uri.scheme) && this._prefSvc.getBoolPref("browser.chrome.favicons"))
       return uri.prePath + "/favicon.ico";

@@ -286,6 +286,7 @@ loop.roomViews = (function(mozL10n) {
 
   var DesktopRoomEditContextView = React.createClass({displayName: "DesktopRoomEditContextView",
     mixins: [React.addons.LinkedStateMixin],
+    maxRoomNameLength: 124,
 
     propTypes: {
       dispatcher: React.PropTypes.instanceOf(loop.Dispatcher).isRequired,
@@ -507,9 +508,11 @@ loop.roomViews = (function(mozL10n) {
             disabled: checked, 
             label: checkboxLabel, 
             onChange: this.handleCheckboxChange, 
+            useEllipsis: true, 
             value: location}), 
           React.createElement("form", {onSubmit: this.handleFormSubmit}, 
             React.createElement("input", {className: "room-context-name", 
+              maxLength: this.maxRoomNameLength, 
               onKeyDown: this.handleTextareaKeyDown, 
               placeholder: mozL10n.get("context_edit_name_placeholder"), 
               type: "text", 
@@ -523,7 +526,7 @@ loop.roomViews = (function(mozL10n) {
             React.createElement("textarea", {className: "room-context-comments", 
               onKeyDown: this.handleTextareaKeyDown, 
               placeholder: mozL10n.get("context_edit_comments_placeholder"), 
-              rows: "3", type: "text", 
+              rows: "2", type: "text", 
               valueLink: this.linkState("newRoomDescription")})
           ), 
           React.createElement("button", {className: "btn btn-info", 
@@ -556,7 +559,9 @@ loop.roomViews = (function(mozL10n) {
       // The poster URLs are for UI-showcase testing and development.
       localPosterUrl: React.PropTypes.string,
       mozLoop: React.PropTypes.object.isRequired,
-      remotePosterUrl: React.PropTypes.string
+      onCallTerminated: React.PropTypes.func.isRequired,
+      remotePosterUrl: React.PropTypes.string,
+      roomStore: React.PropTypes.instanceOf(loop.store.RoomStore).isRequired
     },
 
     getInitialState: function() {
@@ -634,6 +639,7 @@ loop.roomViews = (function(mozL10n) {
           return true;
 
         case ROOM_STATES.READY:
+        case ROOM_STATES.GATHER:
         case ROOM_STATES.INIT:
         case ROOM_STATES.JOINING:
         case ROOM_STATES.SESSION_CONNECTED:
@@ -660,7 +666,7 @@ loop.roomViews = (function(mozL10n) {
      * @returns {boolean}
      * @private
      */
-    _shouldRenderLocalLoading: function () {
+    _isLocalLoading: function () {
       return this.state.roomState === ROOM_STATES.MEDIA_WAIT &&
              !this.state.localSrcVideoObject;
     },
@@ -672,7 +678,7 @@ loop.roomViews = (function(mozL10n) {
      * @returns {boolean}
      * @private
      */
-    _shouldRenderRemoteLoading: function() {
+    _isRemoteLoading: function() {
       return !!(this.state.roomState === ROOM_STATES.HAS_PARTICIPANTS &&
                 !this.state.remoteSrcVideoObject &&
                 !this.state.mediaConnected);
@@ -688,6 +694,14 @@ loop.roomViews = (function(mozL10n) {
 
     handleEditContextClose: function() {
       this.setState({ showEditContext: false });
+    },
+
+    componentDidUpdate: function(prevProps, prevState) {
+      // Handle timestamp and window closing only when the call has terminated.
+      if (prevState.roomState === ROOM_STATES.ENDED &&
+          this.state.roomState === ROOM_STATES.ENDED) {
+        this.props.onCallTerminated();
+      }
     },
 
     render: function() {
@@ -723,70 +737,59 @@ loop.roomViews = (function(mozL10n) {
           );
         }
         case ROOM_STATES.ENDED: {
-          return (
-            React.createElement(sharedViews.FeedbackView, {
-              onAfterFeedbackReceived: this.closeWindow})
-          );
+          // When conversation ended we either display a feedback form or
+          // close the window. This is decided in the AppControllerView.
+          return null;
         }
         default: {
-
           return (
-            React.createElement("div", {className: "room-conversation-wrapper"}, 
-              React.createElement("div", {className: "video-layout-wrapper"}, 
-                React.createElement("div", {className: "conversation room-conversation"}, 
-                  React.createElement("div", {className: "media nested"}, 
-                    React.createElement(DesktopRoomInvitationView, {
-                      dispatcher: this.props.dispatcher, 
-                      error: this.state.error, 
-                      mozLoop: this.props.mozLoop, 
-                      onAddContextClick: this.handleAddContextClick, 
-                      onEditContextClose: this.handleEditContextClose, 
-                      roomData: roomData, 
-                      savingContext: this.state.savingContext, 
-                      show: shouldRenderInvitationOverlay, 
-                      showEditContext: shouldRenderInvitationOverlay && shouldRenderEditContextView, 
-                      socialShareProviders: this.state.socialShareProviders}), 
-                    React.createElement("div", {className: "video_wrapper remote_wrapper"}, 
-                      React.createElement("div", {className: "video_inner remote focus-stream"}, 
-                        React.createElement(sharedViews.MediaView, {displayAvatar: !this.shouldRenderRemoteVideo(), 
-                          isLoading: this._shouldRenderRemoteLoading(), 
-                          mediaType: "remote", 
-                          posterUrl: this.props.remotePosterUrl, 
-                          srcVideoObject: this.state.remoteSrcVideoObject})
-                      )
-                    ), 
-                    React.createElement("div", {className: localStreamClasses}, 
-                      React.createElement(sharedViews.MediaView, {displayAvatar: this.state.videoMuted, 
-                        isLoading: this._shouldRenderLocalLoading(), 
-                        mediaType: "local", 
-                        posterUrl: this.props.localPosterUrl, 
-                        srcVideoObject: this.state.localSrcVideoObject})
-                    ), 
-                    React.createElement(DesktopRoomEditContextView, {
-                      dispatcher: this.props.dispatcher, 
-                      error: this.state.error, 
-                      mozLoop: this.props.mozLoop, 
-                      onClose: this.handleEditContextClose, 
-                      roomData: roomData, 
-                      savingContext: this.state.savingContext, 
-                      show: !shouldRenderInvitationOverlay && shouldRenderEditContextView})
-                  ), 
-                  React.createElement(sharedViews.ConversationToolbar, {
-                    audio: {enabled: !this.state.audioMuted, visible: true}, 
-                    dispatcher: this.props.dispatcher, 
-                    edit: { visible: this.state.contextEnabled, enabled: !this.state.showEditContext}, 
-                    hangup: this.leaveRoom, 
-                    onEditClick: this.handleEditContextClick, 
-                    publishStream: this.publishStream, 
-                    screenShare: screenShareData, 
-                    video: {enabled: !this.state.videoMuted, visible: true}})
-                )
-              ), 
-              React.createElement(sharedViews.chat.TextChatView, {
+            React.createElement("div", {className: "room-conversation-wrapper desktop-room-wrapper"}, 
+              React.createElement(sharedViews.MediaLayoutView, {
                 dispatcher: this.props.dispatcher, 
-                showAlways: false, 
-                showRoomName: false, 
-                useDesktopPaths: true})
+                displayScreenShare: false, 
+                isLocalLoading: this._isLocalLoading(), 
+                isRemoteLoading: this._isRemoteLoading(), 
+                isScreenShareLoading: false, 
+                localPosterUrl: this.props.localPosterUrl, 
+                localSrcVideoObject: this.state.localSrcVideoObject, 
+                localVideoMuted: this.state.videoMuted, 
+                matchMedia: this.state.matchMedia || window.matchMedia.bind(window), 
+                remotePosterUrl: this.props.remotePosterUrl, 
+                remoteSrcVideoObject: this.state.remoteSrcVideoObject, 
+                renderRemoteVideo: this.shouldRenderRemoteVideo(), 
+                screenSharePosterUrl: null, 
+                screenShareVideoObject: this.state.screenShareVideoObject, 
+                showContextRoomName: false, 
+                useDesktopPaths: true}, 
+                React.createElement(DesktopRoomInvitationView, {
+                  dispatcher: this.props.dispatcher, 
+                  error: this.state.error, 
+                  mozLoop: this.props.mozLoop, 
+                  onAddContextClick: this.handleAddContextClick, 
+                  onEditContextClose: this.handleEditContextClose, 
+                  roomData: roomData, 
+                  savingContext: this.state.savingContext, 
+                  show: shouldRenderInvitationOverlay, 
+                  showEditContext: shouldRenderInvitationOverlay && shouldRenderEditContextView, 
+                  socialShareProviders: this.state.socialShareProviders}), 
+                React.createElement(DesktopRoomEditContextView, {
+                  dispatcher: this.props.dispatcher, 
+                  error: this.state.error, 
+                  mozLoop: this.props.mozLoop, 
+                  onClose: this.handleEditContextClose, 
+                  roomData: roomData, 
+                  savingContext: this.state.savingContext, 
+                  show: !shouldRenderInvitationOverlay && shouldRenderEditContextView})
+              ), 
+              React.createElement(sharedViews.ConversationToolbar, {
+                audio: {enabled: !this.state.audioMuted, visible: true}, 
+                dispatcher: this.props.dispatcher, 
+                edit: { visible: this.state.contextEnabled, enabled: !this.state.showEditContext}, 
+                hangup: this.leaveRoom, 
+                onEditClick: this.handleEditContextClick, 
+                publishStream: this.publishStream, 
+                screenShare: screenShareData, 
+                video: {enabled: !this.state.videoMuted, visible: true}})
             )
           );
         }

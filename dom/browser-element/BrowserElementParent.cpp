@@ -15,6 +15,7 @@
 #endif
 
 #include "BrowserElementParent.h"
+#include "BrowserElementAudioChannel.h"
 #include "mozilla/EventDispatcher.h"
 #include "mozilla/dom/HTMLIFrameElement.h"
 #include "mozilla/dom/ToJSValue.h"
@@ -129,7 +130,7 @@ DispatchCustomDOMEvent(Element* aFrameElement, const nsAString& aEventName,
   return NS_SUCCEEDED(rv);
 }
 
-} // anonymous namespace
+} // namespace
 
 namespace mozilla {
 

@@ -70,8 +70,8 @@ class CounterStyleManager;
 namespace layers {
 class ContainerLayer;
 class LayerManager;
-}
-}
+} // namespace layers
+} // namespace mozilla
 
 // supported values for cached bool types
 enum nsPresContext_CachedBoolPrefType {
@@ -1193,6 +1193,11 @@ protected:
 
   bool IsChromeSlow() const;
 
+  // Creates a one-shot timer with the given aCallback & aDelay.
+  // Returns a refcounted pointer to the timer (or nullptr on failure).
+  already_AddRefed<nsITimer> CreateTimer(nsTimerCallbackFunc aCallback,
+                                         uint32_t aDelay);
+
   // IMPORTANT: The ownership implicit in the following member variables
   // has been explicitly checked.  If you add any members to this class,
   // please make the ownership explicit (pinkerton, scc).
@@ -1373,6 +1378,9 @@ protected:
   // Have we added quirk.css to the style set?
   unsigned              mQuirkSheetAdded : 1;
 
+  // Is there a pref update to process once we have a container?
+  unsigned              mNeedsPrefUpdate : 1;
+
 #ifdef RESTYLE_LOGGING
   // Should we output debug information about restyling for this document?
   bool                  mRestyleLoggingEnabled;
@@ -1531,7 +1539,8 @@ protected:
       }
       return NS_OK;
     }
-    nsRootPresContext* mPresContext;
+    // The lifetime of this reference is handled by an nsRevocableEventPtr
+    nsRootPresContext* MOZ_NON_OWNING_REF mPresContext;
   };
 
   friend class nsPresContext;

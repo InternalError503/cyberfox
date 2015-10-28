@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; js-indent-level: 4 -*- */
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var gContentPane = {
   init: function ()
@@ -28,7 +28,11 @@ var gContentPane = {
     if (navigator.platform.toLowerCase().startsWith("win")) {
       emeUIEnabled = emeUIEnabled && parseFloat(Services.sysinfo.get("version")) >= 6;
     }
-    document.getElementById("playDRMContentRow").hidden = !emeUIEnabled;
+    if (!emeUIEnabled) {
+      // Don't want to rely on .hidden for the toplevel groupbox because
+      // of the pane hiding/showing code potentially interfering:
+      document.getElementById("playDRMContentRow").setAttribute("style", "display: none !important");
+    }
   },
 
   // UTILITY FUNCTIONS
@@ -92,6 +96,7 @@ var gContentPane = {
    * Displays the popup exceptions dialog where specific site popup preferences
    * can be set.
    */
+// Disable Javascript & Block Images Feature Dont Remove
   showPopupExceptions: function ()
   {
     var bundlePreferences = document.getElementById("bundlePreferences");
@@ -140,6 +145,7 @@ var gContentPane = {
     openDialog("chrome://browser/content/preferences/permissions.xul", 
                "Browser:Permissions", "resizable=yes", params);
   },
+
   // JAVASCRIPT
 
   /**
@@ -175,6 +181,7 @@ var gContentPane = {
     const kFontNameListFmtSansSerif = "font.name-list.sans-serif.%LANG%";
     const kFontSizeFmtVariable      = "font.size.variable.%LANG%";
 
+    var preferences = document.getElementById("contentPreferences");
     var prefs = [{ format   : aIsSerif ? kFontNameFmtSerif : kFontNameFmtSansSerif,
                    type     : "fontname",
                    element  : "defaultFont",
@@ -187,7 +194,6 @@ var gContentPane = {
                    type     : "int",
                    element  : "defaultFontSize",
                    fonttype : null }];
-    var preferences = document.getElementById("contentPreferences");
     for (var i = 0; i < prefs.length; ++i) {
       var preference = document.getElementById(prefs[i].format.replace(/%LANG%/, aLanguageGroup));
       if (!preference) {

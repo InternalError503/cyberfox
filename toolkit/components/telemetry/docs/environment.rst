@@ -141,12 +141,37 @@ Structure::
               {
                 screenWidth: <number>,  // screen width in pixels
                 screenHeight: <number>, // screen height in pixels
-                refreshRate: <number>,  // refresh rate in hertz (present on Windows only)
+                refreshRate: <number>,  // refresh rate in hertz (present on Windows only).
+                                        //  (values <= 1 indicate an unknown value)
                 pseudoDisplay: <bool>,  // networked screen (present on Windows only)
                 scale: <number>,        // backing scale factor (present on Mac only)
               },
               ...
             ],
+            features: {
+              compositor: <string>,     // Layers backend for compositing (eg "d3d11", "none", "opengl")
+
+              // Each the following features can have one of the following statuses:
+              //   "unused"      - This feature has not been requested.
+              //   "unavailable" - Safe Mode or OS restriction prevents use.
+              //   "blocked"     - Blocked due to an internal condition such as safe mode.
+              //   "blacklisted" - Blocked due to a blacklist restriction.
+              //   "disabled"    - User explicitly disabled this default feature.
+              //   "failed"      - This feature was attempted but failed to initialize.
+              //   "available"   - User has this feature available.
+              "d3d11" { // This feature is Windows-only.
+                status: <string>,
+                warp: <bool>,           // Software rendering (WARP) mode was chosen.
+                textureSharing: <bool>  // Whether or not texture sharing works.
+                version: <number>,      // The D3D11 device feature level.
+                blacklisted: <bool>,    // Whether D3D11 is blacklisted; use to see whether WARP
+                                        // was blacklist induced or driver-failure induced.
+              },
+              "d2d" { // This feature is Windows-only.
+                status: <string>,
+                version: <string>,      // Either "1.0" or "1.1".
+              },
+            },
           },
       },
       addons: {
@@ -251,3 +276,20 @@ searchCohort
 ~~~~~~~~~~~~
 
 If the user has been enrolled into a search default change experiment, this contains the string identifying the experiment the user is taking part in. Most user profiles will never be part of any search default change experiment, and will not send this value.
+
+userPrefs
+~~~~~~~~~
+
+This object contains user preferences.
+
+Each key in the object is the name of a preference. A key's value depends on the policy with which the preference was collected. There are two such policies, "value" and "state". For preferences collected under the "value" policy, the value will be the preference's value. For preferences collected under the "state" policy, the value will be an opaque marker signifying only that the preference has a user value. The "state" policy is therefore used when user privacy is a concern.
+
+The following is a partial list of collected preferences.
+
+- ``browser.search.suggest.enabled``: The "master switch" for search suggestions everywhere in Firefox (search bar, urlbar, etc.). Defaults to true.
+
+- ``browser.urlbar.suggest.searches``: True if search suggestions are enabled in the urlbar. Defaults to false.
+
+- ``browser.urlbar.unifiedcomplete``: True if the urlbar's UnifiedComplete back-end is enabled.
+
+- ``browser.urlbar.userMadeSearchSuggestionsChoice``: True if the user has clicked Yes or No in the urlbar's opt-in notification. Defaults to false.

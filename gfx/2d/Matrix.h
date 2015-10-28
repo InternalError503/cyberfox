@@ -670,12 +670,15 @@ public:
     _11 *= aX;
     _12 *= aX;
     _13 *= aX;
+    _14 *= aX;
     _21 *= aY;
     _22 *= aY;
     _23 *= aY;
+    _24 *= aY;
     _31 *= aZ;
     _32 *= aZ;
     _33 *= aZ;
+    _34 *= aZ;
 
     return *this;
   }
@@ -714,6 +717,11 @@ public:
   void SkewYZ(Float aSkew)
   {
       (*this)[2] += (*this)[1] * aSkew;
+  }
+
+  Matrix4x4 &ChangeBasis(const Point3D& aOrigin)
+  {
+    return ChangeBasis(aOrigin.x, aOrigin.y, aOrigin.z);
   }
 
   Matrix4x4 &ChangeBasis(Float aX, Float aY, Float aZ)
@@ -950,6 +958,18 @@ public:
 
   // Set all the members of the matrix to NaN
   void SetNAN();
+
+  void SkewXY(double aXSkew, double aYSkew);
+
+  void RotateX(double aTheta);
+
+  void RotateY(double aTheta);
+
+  void RotateZ(double aTheta);
+
+  void Perspective(float aDepth);
+
+  Point3D GetNormalVector() const;
 };
 
 class Matrix5x4
@@ -1029,7 +1049,7 @@ public:
   Float _51, _52, _53, _54;
 };
 
-}
-}
+} // namespace gfx
+} // namespace mozilla
 
 #endif /* MOZILLA_GFX_MATRIX_H_ */

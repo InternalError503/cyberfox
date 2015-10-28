@@ -7,8 +7,8 @@
 package org.mozilla.gecko.widget;
 
 import org.mozilla.gecko.GeckoApplication;
-import org.mozilla.gecko.R;
 import org.mozilla.gecko.lwt.LightweightTheme;
+import org.mozilla.gecko.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -111,6 +111,7 @@ public class ThemedTextView extends android.widget.TextView
         if (mIsPrivate != isPrivate) {
             mIsPrivate = isPrivate;
             refreshDrawableState();
+            invalidate();
         }
     }
 
@@ -127,6 +128,7 @@ public class ThemedTextView extends android.widget.TextView
             }
 
             refreshDrawableState();
+            invalidate();
         }
     }
 
@@ -135,6 +137,7 @@ public class ThemedTextView extends android.widget.TextView
             mIsLight = false;
             mIsDark = false;
             refreshDrawableState();
+            invalidate();
         }
     }
 

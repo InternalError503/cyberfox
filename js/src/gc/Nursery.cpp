@@ -13,7 +13,6 @@
 #include "jscompartment.h"
 #include "jsgc.h"
 #include "jsutil.h"
-#include "prmjtime.h"
 
 #include "gc/GCInternals.h"
 #include "gc/Memory.h"
@@ -23,6 +22,7 @@
 #if defined(DEBUG)
 #include "vm/ScopeObject.h"
 #endif
+#include "vm/Time.h"
 #include "vm/TypedArrayObject.h"
 #include "vm/TypeInference.h"
 
@@ -445,14 +445,6 @@ js::Nursery::collect(JSRuntime* rt, JS::gcreason::Reason reason, ObjectGroupList
     sb.traceWholeCells(mover);
     TIME_END(traceWholeCells);
 
-    TIME_START(traceRelocatableValues);
-    sb.traceRelocatableValues(mover);
-    TIME_END(traceRelocatableValues);
-
-    TIME_START(traceRelocatableCells);
-    sb.traceRelocatableCells(mover);
-    TIME_END(traceRelocatableCells);
-
     TIME_START(traceGenericEntries);
     sb.traceGenericEntries(&mover);
     TIME_END(traceGenericEntries);
@@ -481,12 +473,10 @@ js::Nursery::collect(JSRuntime* rt, JS::gcreason::Reason reason, ObjectGroupList
     collectToFixedPoint(mover, tenureCounts);
     TIME_END(collectToFP);
 
-    // Update the array buffer object's view lists.
+    // Sweep compartments to update the array buffer object's view lists.
     TIME_START(sweepArrayBufferViewList);
-    for (CompartmentsIter c(rt, SkipAtoms); !c.done(); c.next()) {
-        if (c->innerViews.needsSweepAfterMinorGC())
-            c->innerViews.sweepAfterMinorGC(rt);
-    }
+    for (CompartmentsIter c(rt, SkipAtoms); !c.done(); c.next())
+        c->sweepAfterMinorGC();
     TIME_END(sweepArrayBufferViewList);
 
     // Update any slot or element pointers whose destination has been tenured.
@@ -539,6 +529,12 @@ js::Nursery::collect(JSRuntime* rt, JS::gcreason::Reason reason, ObjectGroupList
     }
     TIME_END(pretenure);
 
+    TIME_START(logPromotionsToTenured);
+    for (ZonesIter zone(rt, SkipAtoms); !zone.done(); zone.next()) {
+        zone->logPromotionsToTenured();
+    }
+    TIME_END(logPromotionsToTenured);
+
     // We ignore gcMaxBytes when allocating for minor collection. However, if we
     // overflowed, we disable the nursery. The next time we allocate, we'll fail
     // because gcBytes >= gcMaxBytes.
@@ -554,40 +550,45 @@ js::Nursery::collect(JSRuntime* rt, JS::gcreason::Reason reason, ObjectGroupList
     TraceMinorGCEnd();
 
     if (enableProfiling_ && totalTime >= profileThreshold_) {
-        static bool printedHeader = false;
-        if (!printedHeader) {
-            fprintf(stderr,
-                    "MinorGC: Reason               PRate  Size Time   mkVals mkClls mkSlts mkWCll mkRVal mkRCll mkGnrc ckTbls mkRntm mkDbgr clrNOC collct swpABO updtIn runFin frSlts clrSB  sweep resize pretnr\n");
-            printedHeader = true;
+        struct {
+            const char* name;
+            int64_t time;
+        } PrintList[] = {
+            {"canIon", TIME_TOTAL(cancelIonCompilations)},
+            {"mkVals", TIME_TOTAL(traceValues)},
+            {"mkClls", TIME_TOTAL(traceCells)},
+            {"mkSlts", TIME_TOTAL(traceSlots)},
+            {"mcWCll", TIME_TOTAL(traceWholeCells)},
+            {"mkGnrc", TIME_TOTAL(traceGenericEntries)},
+            {"ckTbls", TIME_TOTAL(checkHashTables)},
+            {"mkRntm", TIME_TOTAL(markRuntime)},
+            {"mkDbgr", TIME_TOTAL(markDebugger)},
+            {"clrNOC", TIME_TOTAL(clearNewObjectCache)},
+            {"collct", TIME_TOTAL(collectToFP)},
+            {"swpABO", TIME_TOTAL(sweepArrayBufferViewList)},
+            {"updtIn", TIME_TOTAL(updateJitActivations)},
+            {"frSlts", TIME_TOTAL(freeMallocedBuffers)},
+            {" clrSB", TIME_TOTAL(clearStoreBuffer)},
+            {" sweep", TIME_TOTAL(sweep)},
+            {"resize", TIME_TOTAL(resize)},
+            {"pretnr", TIME_TOTAL(pretenure)},
+            {"logPtT", TIME_TOTAL(logPromotionsToTenured)}
+        };
+        static int printedHeader = 0;
+        if ((printedHeader++ % 200) == 0) {
+            fprintf(stderr, "MinorGC:               Reason  PRate Size    Time");
+            for (auto &entry : PrintList)
+                fprintf(stderr, " %s", entry.name);
+            fprintf(stderr, "\n");
         }
 
 #define FMT " %6" PRIu64
-        fprintf(stderr,
-                "MinorGC: %20s %5.1f%% %4d" FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT FMT "\n",
-                js::gcstats::ExplainReason(reason),
-                promotionRate * 100,
-                numActiveChunks_,
-                totalTime,
-                TIME_TOTAL(cancelIonCompilations),
-                TIME_TOTAL(traceValues),
-                TIME_TOTAL(traceCells),
-                TIME_TOTAL(traceSlots),
-                TIME_TOTAL(traceWholeCells),
-                TIME_TOTAL(traceRelocatableValues),
-                TIME_TOTAL(traceRelocatableCells),
-                TIME_TOTAL(traceGenericEntries),
-                TIME_TOTAL(checkHashTables),
-                TIME_TOTAL(markRuntime),
-                TIME_TOTAL(markDebugger),
-                TIME_TOTAL(clearNewObjectCache),
-                TIME_TOTAL(collectToFP),
-                TIME_TOTAL(sweepArrayBufferViewList),
-                TIME_TOTAL(updateJitActivations),
-                TIME_TOTAL(freeMallocedBuffers),
-                TIME_TOTAL(clearStoreBuffer),
-                TIME_TOTAL(sweep),
-                TIME_TOTAL(resize),
-                TIME_TOTAL(pretenure));
+        fprintf(stderr, "MinorGC: %20s %5.1f%% %4d " FMT, js::gcstats::ExplainReason(reason),
+                promotionRate * 100, numActiveChunks_, totalTime);
+        for (auto &entry : PrintList) {
+            fprintf(stderr, FMT, entry.time);
+        }
+        fprintf(stderr, "\n");
 #undef FMT
     }
 }
@@ -637,6 +638,7 @@ js::Nursery::freeMallocedBuffers()
 void
 js::Nursery::waitBackgroundFreeEnd()
 {
+    MOZ_ASSERT(freeMallocedBuffersTask);
     freeMallocedBuffersTask->join();
 }
 

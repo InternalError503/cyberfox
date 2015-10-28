@@ -355,9 +355,7 @@ class B2GBuild(LocalesMixin, PurgeMixin,
             config_dir = os.path.join(dirs['gecko_src'], 'b2g', 'config',
                                       self.config.get('b2g_config_dir', self.config['target']))
             manifest = os.path.abspath(os.path.join(config_dir, gecko_config['tooltool_manifest']))
-            self.tooltool_fetch(manifest=manifest,
-                                bootstrap_cmd=gecko_config.get('tooltool_bootstrap_cmd'),
-                                output_dir=dirs['work_dir'])
+            self.tooltool_fetch(manifest=manifest, output_dir=dirs['work_dir'])
 
     def unpack_blobs(self):
         dirs = self.query_abs_dirs()
@@ -526,7 +524,8 @@ class B2GBuild(LocalesMixin, PurgeMixin,
         cmd = ['./build.sh']
         if target is not None:
             # Workaround bug 984061
-            if target == 'package-tests':
+            # wcosta: blobfree builds also should run with -j1
+            if target in ('package-tests', 'blobfree'):
                 cmd.append('-j1')
             else:
                 # Ensure we always utilize the correct number of cores
@@ -712,6 +711,18 @@ class B2GBuild(LocalesMixin, PurgeMixin,
                     files.append(f)
                 if base_pattern in public_upload_patterns:
                     public_files.append(f)
+
+        device_name = self.config['target'].split('-')[0]
+        blobfree_zip = os.path.join(
+                        dirs['work_dir'],
+                        'out',
+                        'target',
+                        'product',
+                        device_name,
+                        device_name + '.blobfree-dist.zip')
+
+        if os.path.exists(blobfree_zip):
+            public_files.append(blobfree_zip)
 
         for base_f in files + public_files:
             f = base_f

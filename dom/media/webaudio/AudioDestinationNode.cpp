@@ -186,7 +186,7 @@ public:
   virtual size_t SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const override
   {
     size_t amount = AudioNodeEngine::SizeOfExcludingThis(aMallocSizeOf);
-    amount += mInputChannels.SizeOfExcludingThis(aMallocSizeOf);
+    amount += mInputChannels.ShallowSizeOfExcludingThis(aMallocSizeOf);
     return amount;
   }
 
@@ -243,7 +243,8 @@ public:
   explicit DestinationNodeEngine(AudioDestinationNode* aNode)
     : AudioNodeEngine(aNode)
     , mVolume(1.0f)
-    , mLastInputMuted(false)
+    , mLastInputMuted(true)
+    , mSuspended(false)
   {
     MOZ_ASSERT(aNode);
   }
@@ -255,6 +256,10 @@ public:
   {
     *aOutput = aInput;
     aOutput->mVolume *= mVolume;
+
+    if (mSuspended) {
+      return;
+    }
 
     bool newInputMuted = aInput.IsNull() || aInput.IsMuted();
     if (newInputMuted != mLastInputMuted) {
@@ -274,8 +279,19 @@ public:
     }
   }
 
+  virtual void SetInt32Parameter(uint32_t aIndex, int32_t aParam) override
+  {
+    if (aIndex == SUSPENDED) {
+      mSuspended = !!aParam;
+      if (mSuspended) {
+        mLastInputMuted = true;
+      }
+    }
+  }
+
   enum Parameters {
     VOLUME,
+    SUSPENDED,
   };
 
   virtual size_t SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const override
@@ -286,6 +302,7 @@ public:
 private:
   float mVolume;
   bool mLastInputMuted;
+  bool mSuspended;
 };
 
 static bool UseAudioChannelService()
@@ -293,44 +310,16 @@ static bool UseAudioChannelService()
   return Preferences::GetBool("media.useAudioChannelService");
 }
 
-class EventProxyHandler final : public nsIDOMEventListener
+static bool UseAudioChannelAPI()
 {
-public:
-  NS_DECL_ISUPPORTS
-
-  explicit EventProxyHandler(nsIDOMEventListener* aNode)
-  {
-    MOZ_ASSERT(aNode);
-    mWeakNode = do_GetWeakReference(aNode);
-  }
-
-  // nsIDOMEventListener
-  NS_IMETHOD HandleEvent(nsIDOMEvent* aEvent) override
-  {
-    nsCOMPtr<nsIDOMEventListener> listener = do_QueryReferent(mWeakNode);
-    if (!listener) {
-      return NS_OK;
-    }
-
-    auto node = static_cast<AudioDestinationNode*>(listener.get());
-    return node->HandleEvent(aEvent);
-  }
-
-private:
-  ~EventProxyHandler()
-  { }
-
-  nsWeakPtr mWeakNode;
-};
-
-NS_IMPL_ISUPPORTS(EventProxyHandler, nsIDOMEventListener)
+  return Preferences::GetBool("media.useAudioChannelAPI");
+}
 
 NS_IMPL_CYCLE_COLLECTION_INHERITED(AudioDestinationNode, AudioNode,
-                                   mAudioChannelAgent, mEventProxyHelper,
+                                   mAudioChannelAgent,
                                    mOfflineRenderingPromise)
 
 NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION_INHERITED(AudioDestinationNode)
-  NS_INTERFACE_MAP_ENTRY(nsIDOMEventListener)
   NS_INTERFACE_MAP_ENTRY(nsIAudioChannelAgentCallback)
 NS_INTERFACE_MAP_END_INHERITING(AudioNode)
 
@@ -341,12 +330,9 @@ AudioDestinationNode::AudioDestinationNode(AudioContext* aContext,
                                            bool aIsOffline,
                                            AudioChannel aChannel,
                                            uint32_t aNumberOfChannels,
-                                           uint32_t aLength,
-                                           float aSampleRate)
-  : AudioNode(aContext,
-              aIsOffline ? aNumberOfChannels : 2,
-              ChannelCountMode::Explicit,
-              ChannelInterpretation::Speakers)
+                                           uint32_t aLength, float aSampleRate)
+  : AudioNode(aContext, aIsOffline ? aNumberOfChannels : 2,
+              ChannelCountMode::Explicit, ChannelInterpretation::Speakers)
   , mFramesToProduce(aLength)
   , mAudioChannel(AudioChannel::Normal)
   , mIsOffline(aIsOffline)
@@ -354,6 +340,7 @@ AudioDestinationNode::AudioDestinationNode(AudioContext* aContext,
   , mExtraCurrentTime(0)
   , mExtraCurrentTimeSinceLastStartedBlocking(0)
   , mExtraCurrentTimeUpdatedSinceLastStableState(false)
+  , mCaptured(false)
 {
   bool startWithAudioDriver = true;
   MediaStreamGraph* graph = aIsOffline ?
@@ -398,19 +385,18 @@ AudioDestinationNode::SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const
 }
 
 void
-AudioDestinationNode::DestroyMediaStream()
+AudioDestinationNode::DestroyAudioChannelAgent()
 {
   if (mAudioChannelAgent && !Context()->IsOffline()) {
-    mAudioChannelAgent->StopPlaying();
+    mAudioChannelAgent->NotifyStoppedPlaying(nsIAudioChannelAgent::AUDIO_AGENT_NOTIFY);
     mAudioChannelAgent = nullptr;
-
-    nsCOMPtr<nsIDOMEventTarget> target = do_QueryInterface(GetOwner());
-    NS_ENSURE_TRUE_VOID(target);
-
-    target->RemoveSystemEventListener(NS_LITERAL_STRING("visibilitychange"),
-                                      mEventProxyHelper,
-                                      /* useCapture = */ true);
   }
+}
+
+void
+AudioDestinationNode::DestroyMediaStream()
+{
+  DestroyAudioChannelAgent();
 
   if (!mStream)
     return;
@@ -483,6 +469,20 @@ AudioDestinationNode::Unmute()
 }
 
 void
+AudioDestinationNode::Suspend()
+{
+  DestroyAudioChannelAgent();
+  SendInt32ParameterToStream(DestinationNodeEngine::SUSPENDED, 1);
+}
+
+void
+AudioDestinationNode::Resume()
+{
+  CreateAudioChannelAgent();
+  SendInt32ParameterToStream(DestinationNodeEngine::SUSPENDED, 0);
+}
+
+void
 AudioDestinationNode::OfflineShutdown()
 {
   MOZ_ASSERT(Context() && Context()->IsOffline(),
@@ -507,63 +507,62 @@ AudioDestinationNode::StartRendering(Promise* aPromise)
 }
 
 void
-AudioDestinationNode::SetCanPlay(bool aCanPlay)
+AudioDestinationNode::SetCanPlay(float aVolume, bool aMuted)
 {
-  mStream->SetTrackEnabled(AudioNodeStream::AUDIO_TRACK, aCanPlay);
+  if (!mStream) {
+    return;
+  }
+
+  mStream->SetTrackEnabled(AudioNodeStream::AUDIO_TRACK, !aMuted);
+  mStream->SetAudioOutputVolume(&gWebAudioOutputKey, aVolume);
 }
 
 NS_IMETHODIMP
-AudioDestinationNode::HandleEvent(nsIDOMEvent* aEvent)
+AudioDestinationNode::WindowVolumeChanged(float aVolume, bool aMuted)
 {
-  nsAutoString type;
-  aEvent->GetType(type);
+  if (aMuted != mAudioChannelAgentPlaying) {
+    mAudioChannelAgentPlaying = aMuted;
 
-  if (!type.EqualsLiteral("visibilitychange")) {
-    return NS_ERROR_FAILURE;
+    if (UseAudioChannelAPI()) {
+      Context()->DispatchTrustedEvent(
+        !aMuted ? NS_LITERAL_STRING("mozinterruptend")
+                : NS_LITERAL_STRING("mozinterruptbegin"));
+    }
   }
 
-  nsCOMPtr<nsIDocShell> docshell = do_GetInterface(GetOwner());
-  NS_ENSURE_TRUE(docshell, NS_ERROR_FAILURE);
-
-  bool isActive = false;
-  docshell->GetIsActive(&isActive);
-
-  mAudioChannelAgent->SetVisibilityState(isActive);
+  SetCanPlay(aVolume, aMuted);
   return NS_OK;
 }
 
 NS_IMETHODIMP
-AudioDestinationNode::CanPlayChanged(int32_t aCanPlay)
-{
-  bool playing = aCanPlay == AudioChannelState::AUDIO_CHANNEL_STATE_NORMAL;
-  if (playing == mAudioChannelAgentPlaying) {
-    return NS_OK;
-  }
-
-  mAudioChannelAgentPlaying = playing;
-  SetCanPlay(playing);
-
-  Context()->DispatchTrustedEvent(
-    playing ? NS_LITERAL_STRING("mozinterruptend")
-            : NS_LITERAL_STRING("mozinterruptbegin"));
-
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-AudioDestinationNode::WindowVolumeChanged()
+AudioDestinationNode::WindowAudioCaptureChanged()
 {
   MOZ_ASSERT(mAudioChannelAgent);
 
-  if (!mStream) {
+  if (!mStream || Context()->IsOffline()) {
     return NS_OK;
   }
 
-  float volume;
-  nsresult rv = mAudioChannelAgent->GetWindowVolume(&volume);
-  NS_ENSURE_SUCCESS(rv, rv);
+  nsCOMPtr<nsPIDOMWindow> ownerWindow = GetOwner();
+  if (!ownerWindow) {
+    return NS_OK;
+  }
 
-  mStream->SetAudioOutputVolume(&gWebAudioOutputKey, volume);
+  bool captured = ownerWindow->GetAudioCaptured();
+
+  if (captured != mCaptured) {
+    if (captured) {
+      nsCOMPtr<nsPIDOMWindow> window = Context()->GetParentObject();
+      uint64_t id = window->WindowID();
+      mCaptureStreamPort =
+        mStream->Graph()->ConnectToCaptureStream(id, mStream);
+    } else {
+      mCaptureStreamPort->Disconnect();
+      mCaptureStreamPort->Destroy();
+    }
+    mCaptured = captured;
+  }
+
   return NS_OK;
 }
 
@@ -598,7 +597,7 @@ AudioDestinationNode::SetMozAudioChannelType(AudioChannel aValue, ErrorResult& a
 bool
 AudioDestinationNode::CheckAudioChannelPermissions(AudioChannel aValue)
 {
-  if (!Preferences::GetBool("media.useAudioChannelService")) {
+  if (!UseAudioChannelService()) {
     return true;
   }
 
@@ -641,22 +640,8 @@ AudioDestinationNode::CreateAudioChannelAgent()
     return;
   }
 
-  if (!mEventProxyHelper) {
-    nsCOMPtr<nsIDOMEventTarget> target = do_QueryInterface(GetOwner());
-    if (target) {
-      // We use a proxy because otherwise the event listerner would hold a
-      // reference of the destination node, and by extension, everything
-      // connected to it.
-      mEventProxyHelper = new EventProxyHandler(this);
-      target->AddSystemEventListener(NS_LITERAL_STRING("visibilitychange"),
-                                     mEventProxyHelper,
-                                     /* useCapture = */ true,
-                                     /* wantsUntrusted = */ false);
-    }
-  }
-
   if (mAudioChannelAgent) {
-    mAudioChannelAgent->StopPlaying();
+    mAudioChannelAgent->NotifyStoppedPlaying(nsIAudioChannelAgent::AUDIO_AGENT_NOTIFY);
   }
 
   mAudioChannelAgent = new AudioChannelAgent();
@@ -664,16 +649,7 @@ AudioDestinationNode::CreateAudioChannelAgent()
                                            static_cast<int32_t>(mAudioChannel),
                                            this);
 
-  nsCOMPtr<nsIDocShell> docshell = do_GetInterface(GetOwner());
-  if (docshell) {
-    bool isActive = false;
-    docshell->GetIsActive(&isActive);
-    mAudioChannelAgent->SetVisibilityState(isActive);
-
-    // The AudioChannelAgent must start playing immediately in order to avoid
-    // race conditions with mozinterruptbegin/end events.
-    InputMuted(false);
-  }
+  WindowAudioCaptureChanged();
 }
 
 void
@@ -750,22 +726,28 @@ AudioDestinationNode::InputMuted(bool aMuted)
   MOZ_ASSERT(Context() && !Context()->IsOffline());
 
   if (!mAudioChannelAgent) {
-    return;
+    if (aMuted) {
+      return;
+    }
+    CreateAudioChannelAgent();
   }
 
   if (aMuted) {
-    mAudioChannelAgent->StopPlaying();
+    mAudioChannelAgent->NotifyStoppedPlaying(nsIAudioChannelAgent::AUDIO_AGENT_NOTIFY);
     return;
   }
 
-  int32_t state = 0;
-  nsresult rv = mAudioChannelAgent->StartPlaying(&state);
+  float volume = 0.0;
+  bool muted = true;
+  nsresult rv = mAudioChannelAgent->NotifyStartedPlaying(nsIAudioChannelAgent::AUDIO_AGENT_NOTIFY,
+                                                         &volume, &muted);
   if (NS_WARN_IF(NS_FAILED(rv))) {
     return;
   }
 
-  CanPlayChanged(state);
+  WindowAudioCaptureChanged();
+  WindowVolumeChanged(volume, muted);
 }
 
-} // dom namespace
-} // mozilla namespace
+} // namespace dom
+} // namespace mozilla

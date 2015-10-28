@@ -29,6 +29,7 @@ let ClickEventHandler = {
     this._screenX = null;
     this._screenY = null;
     this._lastFrame = null;
+    this.autoscrollLoop = this.autoscrollLoop.bind(this);
 
     Services.els.addSystemEventListener(global, "mousedown", this, true);
 
@@ -142,9 +143,9 @@ let ClickEventHandler = {
     this._screenY = event.screenY;
     this._scrollErrorX = 0;
     this._scrollErrorY = 0;
-    this._lastFrame = content.mozAnimationStartTime;
+    this._lastFrame = content.performance.now();
 
-    content.mozRequestAnimationFrame(this);
+    content.requestAnimationFrame(this.autoscrollLoop);
   },
 
   stopScroll: function() {
@@ -211,11 +212,7 @@ let ClickEventHandler = {
       this._scrollable.scrollLeft += actualScrollX;
       this._scrollable.scrollTop += actualScrollY;
     }
-    content.mozRequestAnimationFrame(this);
-  },
-
-  sample: function(timestamp) {
-    this.autoscrollLoop(timestamp);
+    content.requestAnimationFrame(this.autoscrollLoop);
   },
 
   handleEvent: function(event) {
@@ -392,7 +389,7 @@ let Printing = {
     let data = message.data;
     switch(message.name) {
       case "Printing:Preview:Enter": {
-        this.enterPrintPreview(objects.contentWindow);
+        this.enterPrintPreview(Services.wm.getOuterWindowWithId(data.windowID));
         break;
       }
 
@@ -412,7 +409,7 @@ let Printing = {
       }
 
       case "Printing:Print": {
-        this.print(objects.contentWindow);
+        this.print(Services.wm.getOuterWindowWithId(data.windowID));
         break;
       }
     }
@@ -647,3 +644,83 @@ let FindBar = {
   },
 };
 FindBar.init();
+
+// An event listener for custom "WebChannelMessageToChrome" events on pages.
+addEventListener("WebChannelMessageToChrome", function (e) {
+  // If target is window then we want the document principal, otherwise fallback to target itself.
+  let principal = e.target.nodePrincipal ? e.target.nodePrincipal : e.target.document.nodePrincipal;
+
+  if (e.detail) {
+    sendAsyncMessage("WebChannelMessageToChrome", e.detail, { eventTarget: e.target }, principal);
+  } else  {
+    Cu.reportError("WebChannel message failed. No message detail.");
+  }
+}, true, true);
+
+// This should be kept in sync with /browser/base/content.js.
+// Add message listener for "WebChannelMessageToContent" messages from chrome scripts.
+addMessageListener("WebChannelMessageToContent", function (e) {
+  if (e.data) {
+    // e.objects.eventTarget will be defined if sending a response to
+    // a WebChannelMessageToChrome event. An unsolicited send
+    // may not have an eventTarget defined, in this case send to the
+    // main content window.
+    let eventTarget = e.objects.eventTarget || content;
+
+    // Use nodePrincipal if available, otherwise fallback to document principal.
+    let targetPrincipal = eventTarget instanceof Ci.nsIDOMWindow ? eventTarget.document.nodePrincipal : eventTarget.nodePrincipal;
+
+    if (e.principal.subsumes(targetPrincipal)) {
+      // If eventTarget is a window, use it as the targetWindow, otherwise
+      // find the window that owns the eventTarget.
+      let targetWindow = eventTarget instanceof Ci.nsIDOMWindow ? eventTarget : eventTarget.ownerDocument.defaultView;
+
+      eventTarget.dispatchEvent(new targetWindow.CustomEvent("WebChannelMessageToContent", {
+        detail: Cu.cloneInto({
+          id: e.data.id,
+          message: e.data.message,
+        }, targetWindow),
+      }));
+    } else {
+      Cu.reportError("WebChannel message failed. Principal mismatch.");
+    }
+  } else {
+    Cu.reportError("WebChannel message failed. No message data.");
+  }
+});
+
+let AudioPlaybackListener = {
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
+
+  init() {
+    Services.obs.addObserver(this, "audio-playback", false);
+    addMessageListener("AudioPlaybackMute", this);
+    addEventListener("unload", () => {
+      AudioPlaybackListener.uninit();
+    });
+  },
+
+  uninit() {
+    Services.obs.removeObserver(this, "audio-playback");
+    removeMessageListener("AudioPlaybackMute", this);
+  },
+
+  observe(subject, topic, data) {
+    if (topic === "audio-playback") {
+      if (subject && subject.top == global.content) {
+        let name = "AudioPlayback:";
+        name += (data === "active") ? "Start" : "Stop";
+        sendAsyncMessage(name);
+      }
+    }
+  },
+
+  receiveMessage(msg) {
+    if (msg.name == "AudioPlaybackMute") {
+      let utils = global.content.QueryInterface(Ci.nsIInterfaceRequestor)
+                                .getInterface(Ci.nsIDOMWindowUtils);
+      utils.audioMuted = msg.data.type === "mute";
+    }
+  },
+};
+AudioPlaybackListener.init();

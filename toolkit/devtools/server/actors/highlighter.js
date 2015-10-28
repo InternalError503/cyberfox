@@ -11,6 +11,7 @@ const {Arg, Option, method, RetVal} = protocol;
 const events = require("sdk/event/core");
 const Heritage = require("sdk/core/heritage");
 const EventEmitter = require("devtools/toolkit/event-emitter");
+const LayoutHelpers = require("devtools/toolkit/layout-helpers");
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 loader.lazyRequireGetter(this, "CssLogic",
@@ -20,8 +21,6 @@ loader.lazyRequireGetter(this, "setIgnoreLayoutChanges",
 loader.lazyGetter(this, "DOMUtils", function() {
   return Cc["@mozilla.org/inspector/dom-utils;1"].getService(Ci.inIDOMUtils);
 });
-loader.lazyImporter(this, "LayoutHelpers",
-  "resource://gre/modules/devtools/LayoutHelpers.jsm");
 
 // FIXME: add ":visited" and ":link" after bug 713106 is fixed
 const PSEUDO_CLASSES = [":hover", ":active", ":focus"];
@@ -158,6 +157,15 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
     return this._inspector && this._inspector.conn;
   },
 
+  form: function() {
+    return {
+      actor: this.actorID,
+      traits: {
+        autoHideOnDestroy: true
+      }
+    }
+  },
+
   _createHighlighter: function() {
     this._isPreviousWindowXUL = isXUL(this._tabActor.window);
 
@@ -199,6 +207,7 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
   destroy: function() {
     protocol.Actor.prototype.destroy.call(this);
 
+    this.hideBoxModel();
     this._destroyHighlighter();
     events.off(this._tabActor, "navigate", this._onNavigate);
 
@@ -416,7 +425,14 @@ let HighlighterActor = exports.HighlighterActor = protocol.ActorClass({
   })
 });
 
-let HighlighterFront = protocol.FrontClass(HighlighterActor, {});
+let HighlighterFront = protocol.FrontClass(HighlighterActor, {
+  // Update the object given a form representation off the wire.
+  form: function(json) {
+    this.actorID = json.actor;
+    // FF42+ HighlighterActors starts exposing custom form, with traits object
+    this.traits = json.traits || {};
+  }
+});
 
 /**
  * A generic highlighter actor class that instantiate a highlighter given its
@@ -2917,6 +2933,45 @@ RulersHighlighter.prototype = {
                         .setAttribute("transform", `translate(0, ${-scrollY})`);
   },
 
+  _update: function() {
+    setIgnoreLayoutChanges(true);
+
+    let zoom = LayoutHelpers.getCurrentZoom(this.win);
+    let isZoomChanged = zoom !== this._zoom;
+
+    if (isZoomChanged) {
+      this._zoom = zoom;
+      this.updateViewport();
+    }
+
+    setIgnoreLayoutChanges(false, this.win.document.documentElement);
+
+    this._rafID = this.win.requestAnimationFrame(() => this._update());
+  },
+
+  _cancelUpdate: function() {
+    if (this._rafID) {
+      this.win.cancelAnimationFrame(this._rafID);
+      this._rafID = 0;
+    }
+  },
+  updateViewport: function() {
+    let { devicePixelRatio } = this.win;
+
+    // Because `devicePixelRatio` is affected by zoom (see bug 809788),
+    // in order to get the "real" device pixel ratio, we need divide by `zoom`
+    let pixelRatio = devicePixelRatio / this._zoom;
+
+    // The "real" device pixel ratio is used to calculate the max stroke
+    // width we can actually assign: on retina, for instance, it would be 0.5,
+    // where on non high dpi monitor would be 1.
+    let minWidth = 1 / pixelRatio;
+    let strokeWidth = Math.min(minWidth, minWidth / this._zoom);
+
+    this.markup.getElement(this.ID_CLASS_PREFIX + "root").setAttribute("style",
+      `stroke-width:${strokeWidth};`);
+  },
+
   destroy: function() {
     this.hide();
 
@@ -2931,12 +2986,17 @@ RulersHighlighter.prototype = {
   show: function() {
     this.markup.removeAttributeForElement(this.ID_CLASS_PREFIX + "elements",
       "hidden");
+
+    this._update();
+
     return true;
   },
 
   hide: function() {
     this.markup.setAttributeForElement(this.ID_CLASS_PREFIX + "elements",
       "hidden", "true");
+
+    this._cancelUpdate();
   }
 };
 

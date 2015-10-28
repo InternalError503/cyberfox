@@ -166,7 +166,7 @@ PluginContent.prototype = {
       pluginName = BrowserUtils.makeNicePluginName(pluginTag.name);
 
       // Convert this from nsIPluginTag so it can be serialized.
-      let properties = ["name", "description", "filename", "version", "enabledState"];
+      let properties = ["name", "description", "filename", "version", "enabledState", "niceName"];
       let pluginTagCopy = {};
       for (let prop of properties) {
         pluginTagCopy[prop] = pluginTag[prop];
@@ -199,6 +199,9 @@ PluginContent.prototype = {
    */
   setVisibility : function (plugin, overlay, shouldShow) {
     overlay.classList.toggle("visible", shouldShow);
+    if (shouldShow) {
+      overlay.removeAttribute("dismissed");
+    }
   },
 
   /**
@@ -425,6 +428,7 @@ PluginContent.prototype = {
         break;
 
       case "PluginInstantiated":
+        Services.telemetry.getKeyedHistogramById('PLUGIN_ACTIVATION_COUNT').add(this._getPluginInfo(plugin).pluginTag.niceName);
         shouldShowNotification = true;
         break;
     }
@@ -434,8 +438,8 @@ PluginContent.prototype = {
     }
 
     // Show the in-content UI if it's not too big. The crashed plugin handler already did this.
+    let overlay = this.getPluginUI(plugin, "main");
     if (eventType != "PluginCrashed") {
-      let overlay = this.getPluginUI(plugin, "main");
       if (overlay != null) {
         this.setVisibility(plugin, overlay,
                            this.shouldShowOverlay(plugin, overlay));
@@ -452,8 +456,10 @@ PluginContent.prototype = {
     let closeIcon = this.getPluginUI(plugin, "closeIcon");
     if (closeIcon) {
       closeIcon.addEventListener("click", event => {
-        if (event.button == 0 && event.isTrusted)
+        if (event.button == 0 && event.isTrusted) {
           this.hideClickToPlayOverlay(plugin);
+          overlay.setAttribute("dismissed", "true");
+        }
       }, true);
     }
 
@@ -575,12 +581,12 @@ PluginContent.prototype = {
     }
 
     let runID = plugin.runID;
-    let submitURLOptIn = this.getPluginUI(plugin, "submitURLOptIn");
+    let submitURLOptIn = this.getPluginUI(plugin, "submitURLOptIn").checked;
     let keyVals = {};
     let userComment = this.getPluginUI(plugin, "submitComment").value.trim();
     if (userComment)
       keyVals.PluginUserComment = userComment;
-    if (this.getPluginUI(plugin, "submitURLOptIn").checked)
+    if (submitURLOptIn)
       keyVals.PluginContentURL = plugin.ownerDocument.URL;
 
     this.global.sendAsyncMessage("PluginContent:SubmitReport",
@@ -623,10 +629,13 @@ PluginContent.prototype = {
     let plugin = document.getBindingParent(event.target);
     let contentWindow = plugin.ownerDocument.defaultView.top;
     let objLoadingContent = plugin.QueryInterface(Ci.nsIObjectLoadingContent);
+    let overlay = this.getPluginUI(plugin, "main");
     // Have to check that the target is not the link to update the plugin
     if (!(event.originalTarget instanceof contentWindow.HTMLAnchorElement) &&
         (event.originalTarget.getAttribute('anonid') != 'closeIcon') &&
-          event.button == 0 && event.isTrusted) {
+        !overlay.hasAttribute('dismissed') &&
+        event.button == 0 &&
+        event.isTrusted) {
       this._showClickToPlayNotification(plugin, true);
     event.stopPropagation();
     event.preventDefault();
@@ -692,20 +701,6 @@ PluginContent.prototype = {
     this._showClickToPlayNotification(null, false);
   },
 
-  // Match the behaviour of nsPermissionManager
-  _getHostFromPrincipal: function (principal) {
-    if (!principal.URI || principal.URI.schemeIs("moz-nullprincipal")) {
-      return "(null)";
-    }
-
-    try {
-      if (principal.URI.host)
-        return principal.URI.host;
-    } catch (e) {}
-
-    return principal.origin;
-  },
-
   /**
    * Activate the plugins that the user has specified.
    */
@@ -723,12 +718,15 @@ PluginContent.prototype = {
         continue;
       }
       if (pluginInfo.permissionString == pluginHost.getPermissionStringForType(plugin.actualType)) {
+        let overlay = this.getPluginUI(plugin, "main");
         pluginFound = true;
         if (newState == "block") {
+          if (overlay) {
+            overlay.addEventListener("click", this, true);
+          }
           plugin.reload(true);
         } else {
           if (this.canActivatePlugin(plugin)) {
-            let overlay = this.getPluginUI(plugin, "main");
             if (overlay) {
               overlay.removeEventListener("click", this, true);
             }
@@ -770,7 +768,6 @@ PluginContent.prototype = {
     let pluginData = this.pluginData;
 
     let principal = this.content.document.nodePrincipal;
-    let principalHost = this._getHostFromPrincipal(principal);
     let location = this.content.document.location.href;
 
     for (let p of plugins) {
@@ -786,11 +783,11 @@ PluginContent.prototype = {
       let permissionObj = Services.perms.
         getPermissionObject(principal, pluginInfo.permissionString, false);
       if (permissionObj) {
-        pluginInfo.pluginPermissionHost = permissionObj.host;
+        pluginInfo.pluginPermissionPrePath = permissionObj.principal.originNoSuffix;
         pluginInfo.pluginPermissionType = permissionObj.expireType;
       }
       else {
-        pluginInfo.pluginPermissionHost = principalHost;
+        pluginInfo.pluginPermissionPrePath = principal.originNoSuffix;
         pluginInfo.pluginPermissionType = undefined;
       }
 
@@ -800,7 +797,6 @@ PluginContent.prototype = {
     this.global.sendAsyncMessage("PluginContent:ShowClickToPlayNotification", {
       plugins: [... this.pluginData.values()],
       showNow: showNow,
-      host: principalHost,
       location: location,
     }, null, principal);
   },
@@ -883,7 +879,6 @@ PluginContent.prototype = {
     this.global.sendAsyncMessage("PluginContent:UpdateHiddenPluginUI", {
       haveInsecure: haveInsecure,
       actions: [... actions.values()],
-      host: this._getHostFromPrincipal(principal),
       location: location,
     }, null, principal);
   },

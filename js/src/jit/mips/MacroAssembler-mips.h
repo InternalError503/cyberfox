@@ -63,7 +63,7 @@ static const ValueOperand softfpReturnOperand = ValueOperand(v1, v0);
 
 static Register CallReg = t9;
 static const int defaultShift = 3;
-static_assert(1 << defaultShift == sizeof(jsval), "The defaultShift is wrong");
+static_assert(1 << defaultShift == sizeof(JS::Value), "The defaultShift is wrong");
 
 class MacroAssemblerMIPS : public Assembler
 {
@@ -403,34 +403,6 @@ class MacroAssemblerMIPSCompat : public MacroAssemblerMIPS
     }
     void mov(Address src, Register dest) {
         MOZ_CRASH("NYI-IC");
-    }
-
-    void call(const Register reg) {
-        as_jalr(reg);
-        as_nop();
-    }
-
-    void call(Label* label) {
-        ma_bal(label);
-    }
-
-    void call(ImmWord imm) {
-        call(ImmPtr((void*)imm.value));
-    }
-    void call(ImmPtr imm) {
-        BufferOffset bo = m_buffer.nextOffset();
-        addPendingJump(bo, imm, Relocation::HARDCODED);
-        ma_call(imm);
-    }
-    void call(AsmJSImmPtr imm) {
-        movePtr(imm, CallReg);
-        call(CallReg);
-    }
-    void call(JitCode* c) {
-        BufferOffset bo = m_buffer.nextOffset();
-        addPendingJump(bo, ImmPtr(c->raw()), Relocation::JITCODE);
-        ma_liPatchable(ScratchRegister, Imm32((uint32_t)c->raw()));
-        ma_callJitHalfPush(ScratchRegister);
     }
 
     void callAndPushReturnAddress(Label* label) {

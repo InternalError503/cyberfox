@@ -57,10 +57,12 @@ let gIntro = {
 
   _generateParagraphs: function() {
     let customizeIcon = '<input type="button" class="newtab-control newtab-customize"/>';
-    this._paragraphs.push(`${newTabString("intro.paragraph9")} ${newTabString("intro.paragraph7")}`);
-    this._paragraphs.push(
-        `${newTabString("intro.paragraph2", [this._link(TILES_PRIVACY_LINK, newTabString("privacy.link"))])}
-         ${newTabString("intro.paragraph4.2", [customizeIcon, this._bold(newTabString("intro.controls"))])}`);
+    this._paragraphs.push(newTabString("intro1.paragraph1"));
+    this._paragraphs.push(newTabString("intro1.paragraph2",
+                            [
+                              this._link(TILES_PRIVACY_LINK, newTabString("privacy.link")),
+                              customizeIcon
+                            ]));
   },
 
   showIfNecessary: function() {

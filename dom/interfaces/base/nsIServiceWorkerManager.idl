@@ -9,6 +9,7 @@ interface nsIArray;
 interface nsIDocument;
 interface nsIInterceptedChannel;
 interface nsIPrincipal;
+interface nsIRunnable;
 interface nsIURI;
 
 [scriptable, uuid(52ee2c9d-ee87-4caf-9588-23ae77ff8798)]
@@ -33,7 +34,7 @@ interface nsIServiceWorkerInfo : nsISupports
   readonly attribute DOMString waitingCacheName;
 };
 
-[scriptable, builtinclass, uuid(e9abb123-0099-4d9e-85db-c8cd0aff19e6)]
+[scriptable, builtinclass, uuid(8d80dd18-597b-4378-b41e-768bfe48dd4f)]
 interface nsIServiceWorkerManager : nsISupports
 {
   /**
@@ -93,8 +94,11 @@ interface nsIServiceWorkerManager : nsISupports
 
   /*
    * Returns a ServiceWorker.
+   *  - aLoadFailedRunnable is an optional callback that will fire on main thread if
+   *    a ServiceWorker object is returned, but later fails to load for some reason.
    */
-  [noscript] nsISupports GetDocumentController(in nsIDOMWindow aWindow);
+  [noscript] nsISupports GetDocumentController(in nsIDOMWindow aWindow,
+                                               in nsIRunnable aLoadFailedRunnable);
 
   /*
    * Clears ServiceWorker registrations from memory and disk for the specified
@@ -126,6 +130,17 @@ interface nsIServiceWorkerManager : nsISupports
                            in nsIServiceWorkerUnregisterCallback aCallback,
                            in DOMString aScope);
 
+  void sendNotificationClickEvent(in ACString aOriginSuffix,
+                                  in ACString scope,
+                                  in AString aID,
+                                  in AString aTitle,
+                                  in AString aDir,
+                                  in AString aLang,
+                                  in AString aBody,
+                                  in AString aTag,
+                                  in AString aIcon,
+                                  in AString aData,
+                                  in AString aBehavior);
   void sendPushEvent(in ACString aOriginAttributes,
                      in ACString aScope,
                      in DOMString aData);

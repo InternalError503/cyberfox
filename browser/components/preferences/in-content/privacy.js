@@ -35,6 +35,16 @@ var gPrivacyPane = {
 #endif
 
   /**
+   * Linkify the Learn More link of the Private Browsing Mode Tracking
+   * Protection UI.
+   */
+  _initTrackingProtectionPBM: function () {
+    let link = document.getElementById("trackingProtectionPBMLearnMore");
+    let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "tracking-protection-pbm";
+    link.setAttribute("href", url);
+  },
+
+  /**
    * Initialize autocomplete to ensure prefs are in sync.
    */
   _initAutocomplete: function () {
@@ -73,6 +83,7 @@ var gPrivacyPane = {
 #ifdef NIGHTLY_BUILD
     this._initTrackingProtection();
 #endif
+    this._initTrackingProtectionPBM();
     this._initAutocomplete();
 
     setEventListener("privacy.sanitize.sanitizeOnShutdown", "change",
@@ -105,8 +116,6 @@ var gPrivacyPane = {
                      gPrivacyPane.showCookies);
     setEventListener("clearDataSettings", "command",
                      gPrivacyPane.showClearPrivateDataSettings);
-
-    document.getElementById("searchesSuggestion").hidden = !AppConstants.NIGHTLY_BUILD;
   },
 
   // HISTORY MODE
@@ -357,19 +366,6 @@ var gPrivacyPane = {
   },
 
   // HISTORY
-
-  /**
-   * Update browser.urlbar.autocomplete.enabled when a
-   * browser.urlbar.suggest.* pref is changed from the ui.
-   */
-  writeSuggestionPref() {
-    let getVal = (aPref) => {
-      return document.getElementById("browser.urlbar.suggest." + aPref).value;
-    }
-    // autocomplete.enabled is true if any of the suggestions is true
-    let enabled = ["history", "bookmark", "openpage", "searches"].map(getVal).some(v => v);
-    Services.prefs.setBoolPref("browser.urlbar.autocomplete.enabled", enabled);
-  },
 
   /*
    * Preferences:

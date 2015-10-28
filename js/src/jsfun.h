@@ -19,7 +19,7 @@ namespace js {
 class FunctionExtended;
 
 typedef JSNative           Native;
-}
+} // namespace js
 
 struct JSAtomState;
 
@@ -733,10 +733,6 @@ fun_apply(JSContext* cx, unsigned argc, Value* vp);
 
 extern bool
 fun_call(JSContext* cx, unsigned argc, Value* vp);
-
-extern JSObject*
-fun_bind(JSContext* cx, HandleObject target, HandleValue thisArg,
-         Value* boundArgs, unsigned argslen);
 
 } /* namespace js */
 

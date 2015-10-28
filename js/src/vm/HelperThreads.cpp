@@ -10,12 +10,12 @@
 
 #include "jsnativestack.h"
 #include "jsnum.h" // For FIX_FPU()
-#include "prmjtime.h"
 
 #include "frontend/BytecodeCompiler.h"
 #include "gc/GCInternals.h"
 #include "jit/IonBuilder.h"
 #include "vm/Debugger.h"
+#include "vm/Time.h"
 #include "vm/TraceLogging.h"
 
 #include "jscntxtinlines.h"
@@ -201,7 +201,7 @@ ParseTask::ParseTask(ExclusiveContext* cx, JSObject* exclusiveContextGlobal, JSC
                      JS::OffThreadCompileCallback callback, void* callbackData)
   : cx(cx), options(initCx), chars(chars), length(length),
     alloc(JSRuntime::TEMP_LIFO_ALLOC_PRIMARY_CHUNK_SIZE),
-    exclusiveContextGlobal(initCx, exclusiveContextGlobal),
+    exclusiveContextGlobal(initCx->runtime(), exclusiveContextGlobal),
     callback(callback), callbackData(callbackData),
     script(nullptr), errors(cx), overRecursed(false)
 {
@@ -1089,6 +1089,10 @@ HelperThread::handleAsmJSWorkload()
         success = true;
     } while(0);
 
+    // On success, try to move work to the finished list.
+    if (success)
+        success = HelperThreadState().asmJSFinishedList().append(asmData);
+
     // On failure, signal parent for harvesting in CancelOutstandingJobs().
     if (!success) {
         HelperThreadState().noteAsmJSFailure(asmData->func);
@@ -1097,12 +1101,9 @@ HelperThread::handleAsmJSWorkload()
         return;
     }
 
-    // On success, move work to the finished list.
-    HelperThreadState().asmJSFinishedList().append(asmData);
-    asmData = nullptr;
-
     // Notify the main thread in case it's blocked waiting for a LifoAlloc.
     HelperThreadState().notifyAll(GlobalHelperThreadState::CONSUMER);
+    asmData = nullptr;
 }
 
 void

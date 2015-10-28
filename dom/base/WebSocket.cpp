@@ -13,6 +13,8 @@
 #include "mozilla/DOMEventTargetHelper.h"
 #include "mozilla/net/WebSocketChannel.h"
 #include "mozilla/dom/File.h"
+#include "mozilla/dom/nsCSPContext.h"
+#include "mozilla/dom/nsCSPUtils.h"
 #include "mozilla/dom/ScriptSettings.h"
 #include "mozilla/dom/WorkerPrivate.h"
 #include "mozilla/dom/WorkerRunnable.h"
@@ -39,6 +41,8 @@
 #include "nsJSUtils.h"
 #include "nsIScriptError.h"
 #include "nsNetUtil.h"
+#include "nsIAuthPrompt.h"
+#include "nsIAuthPrompt2.h"
 #include "nsILoadGroup.h"
 #include "mozilla/Preferences.h"
 #include "xpcpublic.h"
@@ -75,6 +79,10 @@ public:
   NS_DECL_NSIREQUEST
   NS_DECL_THREADSAFE_ISUPPORTS
   NS_DECL_NSIEVENTTARGET
+  // missing from NS_DECL_NSIEVENTTARGET because MSVC
+  nsresult Dispatch(nsIRunnable* aEvent, uint32_t aFlags) {
+    return Dispatch(nsCOMPtr<nsIRunnable>(aEvent).forget(), aFlags);
+  }
 
   explicit WebSocketImpl(WebSocket* aWebSocket)
   : mWebSocket(aWebSocket)
@@ -311,7 +319,7 @@ private:
   nsresult mRv;
 };
 
-} // anonymous namespace
+} // namespace
 
 nsresult
 WebSocketImpl::PrintErrorOnConsole(const char *aBundleURI,
@@ -453,7 +461,7 @@ private:
   const nsCString mReasonString;
 };
 
-} // anonymous namespace
+} // namespace
 
 nsresult
 WebSocketImpl::CloseConnection(uint16_t aReasonCode,
@@ -584,7 +592,7 @@ private:
   WebSocketImpl* mImpl;
 };
 
-} // anonymous namespace
+} // namespace
 
 nsresult
 WebSocketImpl::Disconnect()
@@ -1141,7 +1149,7 @@ private:
   ErrorResult& mRv;
 };
 
-} // anonymous namespace
+} // namespace
 
 already_AddRefed<WebSocket>
 WebSocket::Constructor(const GlobalObject& aGlobal,
@@ -1460,59 +1468,13 @@ WebSocketImpl::Init(JSContext* aCx,
     }
   }
 
-  // Don't allow https:// to open ws://
-  if (!mSecure &&
-      !Preferences::GetBool("network.websocket.allowInsecureFromHTTPS",
-                            false)) {
-    // Confirmed we are opening plain ws:// and want to prevent this from a
-    // secure context (e.g. https). Check the principal's uri to determine if
-    // we were loaded from https.
-    nsCOMPtr<nsIGlobalObject> globalObject(GetEntryGlobal());
-    if (globalObject) {
-      nsCOMPtr<nsIPrincipal> principal(globalObject->PrincipalOrNull());
-      if (principal) {
-        nsCOMPtr<nsIURI> uri;
-        principal->GetURI(getter_AddRefs(uri));
-        if (uri) {
-          bool originIsHttps = false;
-          aRv = uri->SchemeIs("https", &originIsHttps);
-          if (NS_WARN_IF(aRv.Failed())) {
-            return;
-          }
-
-          if (originIsHttps) {
-            aRv.Throw(NS_ERROR_DOM_SECURITY_ERR);
-            return;
-          }
-        }
-      }
-    }
-  }
-
-  // Assign the sub protocol list and scan it for illegal values
-  for (uint32_t index = 0; index < aProtocolArray.Length(); ++index) {
-    for (uint32_t i = 0; i < aProtocolArray[index].Length(); ++i) {
-      if (aProtocolArray[index][i] < static_cast<char16_t>(0x0021) ||
-          aProtocolArray[index][i] > static_cast<char16_t>(0x007E)) {
-        aRv.Throw(NS_ERROR_DOM_SYNTAX_ERR);
-        return;
-      }
-    }
-
-    if (!mRequestedProtocolList.IsEmpty()) {
-      mRequestedProtocolList.AppendLiteral(", ");
-    }
-
-    AppendUTF16toUTF8(aProtocolArray[index], mRequestedProtocolList);
-  }
-
   nsCOMPtr<nsIURI> uri;
   {
     nsresult rv = NS_NewURI(getter_AddRefs(uri), mURI);
 
     // We crash here because we are sure that mURI is a valid URI, so either we
     // are OOM'ing or something else bad is happening.
-    if (NS_FAILED(rv)) {
+    if (NS_WARN_IF(NS_FAILED(rv))) {
       MOZ_CRASH();
     }
   }
@@ -1538,6 +1500,85 @@ WebSocketImpl::Init(JSContext* aCx,
     // Disallowed by content policy.
     aRv.Throw(NS_ERROR_CONTENT_BLOCKED);
     return;
+  }
+
+  // Potentially the page uses the CSP directive 'upgrade-insecure-requests'.
+  // In such a case we have to upgrade ws: to wss: and also update mSecure
+  // to reflect that upgrade. Please note that we can not upgrade from ws:
+  // to wss: before performing content policy checks because CSP needs to
+  // send reports in case the scheme is about to be upgraded.
+  if (!mSecure && originDoc && originDoc->GetUpgradeInsecureRequests()) {
+    // let's use the old specification before the upgrade for logging
+    NS_ConvertUTF8toUTF16 reportSpec(mURI);
+
+    // upgrade the request from ws:// to wss:// and mark as secure
+    mURI.ReplaceSubstring("ws://", "wss://");
+    if (NS_WARN_IF(mURI.Find("wss://") != 0)) {
+      return;
+    }
+    mSecure = true;
+
+    const char16_t* params[] = { reportSpec.get(), NS_LITERAL_STRING("wss").get() };
+    CSP_LogLocalizedStr(NS_LITERAL_STRING("upgradeInsecureRequest").get(),
+                        params, ArrayLength(params),
+                        EmptyString(), // aSourceFile
+                        EmptyString(), // aScriptSample
+                        0, // aLineNumber
+                        0, // aColumnNumber
+                        nsIScriptError::warningFlag, "CSP",
+                        mInnerWindowID);
+  }
+
+  // Don't allow https:// to open ws://
+  if (!mSecure &&
+      !Preferences::GetBool("network.websocket.allowInsecureFromHTTPS",
+                            false)) {
+    // Confirmed we are opening plain ws:// and want to prevent this from a
+    // secure context (e.g. https).
+    nsCOMPtr<nsIPrincipal> principal;
+    nsCOMPtr<nsIURI> originURI;
+    if (mWorkerPrivate) {
+      // For workers, retrieve the URI from the WorkerPrivate
+      principal = mWorkerPrivate->GetPrincipal();
+    } else {
+      // Check the principal's uri to determine if we were loaded from https.
+      nsCOMPtr<nsIGlobalObject> globalObject(GetEntryGlobal());
+      if (globalObject) {
+        principal = globalObject->PrincipalOrNull();
+      }
+    }
+
+    if (principal) {
+      principal->GetURI(getter_AddRefs(originURI));
+    }
+    if (originURI) {
+      bool originIsHttps = false;
+      aRv = originURI->SchemeIs("https", &originIsHttps);
+      if (NS_WARN_IF(aRv.Failed())) {
+        return;
+      }
+      if (originIsHttps) {
+        aRv.Throw(NS_ERROR_DOM_SECURITY_ERR);
+        return;
+      }
+    }
+  }
+
+  // Assign the sub protocol list and scan it for illegal values
+  for (uint32_t index = 0; index < aProtocolArray.Length(); ++index) {
+    for (uint32_t i = 0; i < aProtocolArray[index].Length(); ++i) {
+      if (aProtocolArray[index][i] < static_cast<char16_t>(0x0021) ||
+          aProtocolArray[index][i] > static_cast<char16_t>(0x007E)) {
+        aRv.Throw(NS_ERROR_DOM_SYNTAX_ERR);
+        return;
+      }
+    }
+
+    if (!mRequestedProtocolList.IsEmpty()) {
+      mRequestedProtocolList.AppendLiteral(", ");
+    }
+
+    AppendUTF16toUTF8(aProtocolArray[index], mRequestedProtocolList);
   }
 
   // the constructor should throw a SYNTAX_ERROR only if it fails to parse the
@@ -1764,7 +1805,7 @@ WebSocket::CreateAndDispatchMessageEvent(JSContext* aCx,
       nsresult rv = nsContentUtils::CreateArrayBuffer(aCx, aData,
                                                       arrayBuf.address());
       NS_ENSURE_SUCCESS(rv, rv);
-      jsData = OBJECT_TO_JSVAL(arrayBuf);
+      jsData.setObject(*arrayBuf);
     } else {
       NS_RUNTIMEABORT("Unknown binary type!");
       return NS_ERROR_UNEXPECTED;
@@ -1776,7 +1817,7 @@ WebSocket::CreateAndDispatchMessageEvent(JSContext* aCx,
     jsString = JS_NewUCStringCopyN(aCx, utf16Data.get(), utf16Data.Length());
     NS_ENSURE_TRUE(jsString, NS_ERROR_FAILURE);
 
-    jsData = STRING_TO_JSVAL(jsString);
+    jsData.setString(jsString);
   }
 
   // create an event that uses the MessageEvent interface,
@@ -2028,7 +2069,7 @@ private:
   WebSocketImpl* mWebSocketImpl;
 };
 
-} // anonymous namespace
+} // namespace
 
 void
 WebSocketImpl::AddRefObject()
@@ -2449,7 +2490,7 @@ private:
   nsRefPtr<WebSocketImpl> mImpl;
 };
 
-} // anonymous namespace
+} // namespace
 
 // Window closed, stop/reload button pressed, user navigated away from page, etc.
 NS_IMETHODIMP
@@ -2580,7 +2621,7 @@ class WorkerRunnableDispatcher final : public WorkerRunnable
 
 public:
   WorkerRunnableDispatcher(WebSocketImpl* aImpl, WorkerPrivate* aWorkerPrivate,
-                           nsIRunnable* aEvent)
+                           already_AddRefed<nsIRunnable>&& aEvent)
     : WorkerRunnable(aWorkerPrivate, WorkerThreadUnchangedBusyCount)
     , mWebSocketImpl(aImpl)
     , mEvent(aEvent)
@@ -2622,14 +2663,22 @@ private:
   nsCOMPtr<nsIRunnable> mEvent;
 };
 
-} // anonymous namespace
+} // namespace
 
 NS_IMETHODIMP
-WebSocketImpl::Dispatch(nsIRunnable* aEvent, uint32_t aFlags)
+WebSocketImpl::DispatchFromScript(nsIRunnable* aEvent, uint32_t aFlags)
 {
+  nsCOMPtr<nsIRunnable> event(aEvent);
+  return Dispatch(event.forget(), aFlags);
+}
+
+NS_IMETHODIMP
+WebSocketImpl::Dispatch(already_AddRefed<nsIRunnable>&& aEvent, uint32_t aFlags)
+{
+  nsCOMPtr<nsIRunnable> event_ref(aEvent);
   // If the target is the main-thread we can just dispatch the runnable.
   if (mIsMainThread) {
-    return NS_DispatchToMainThread(aEvent);
+    return NS_DispatchToMainThread(event_ref.forget());
   }
 
   MutexAutoLock lock(mMutex);
@@ -2646,7 +2695,7 @@ WebSocketImpl::Dispatch(nsIRunnable* aEvent, uint32_t aFlags)
   // If the target is a worker, we have to use a custom WorkerRunnableDispatcher
   // runnable.
   nsRefPtr<WorkerRunnableDispatcher> event =
-    new WorkerRunnableDispatcher(this, mWorkerPrivate, aEvent);
+    new WorkerRunnableDispatcher(this, mWorkerPrivate, event_ref.forget());
 
   if (!event->Dispatch(nullptr)) {
     return NS_ERROR_FAILURE;
@@ -2674,5 +2723,5 @@ WebSocket::AssertIsOnTargetThread() const
   MOZ_ASSERT(NS_IsMainThread() == mIsMainThread);
 }
 
-} // dom namespace
-} // mozilla namespace
+} // namespace dom
+} // namespace mozilla

@@ -11,6 +11,7 @@
 #include "RestyleTracker.h"
 
 #include "GeckoProfiler.h"
+#include "nsDocShell.h"
 #include "nsFrameManager.h"
 #include "nsIDocument.h"
 #include "nsStyleChangeList.h"
@@ -161,13 +162,17 @@ CollectRestyles(nsISupports* aElement,
   // Unset the restyle bits now, so if they get readded later as we
   // process we won't clobber that adding of the bit.
   element->UnsetFlags(collector->tracker->RestyleBit() |
-                      collector->tracker->RootBit());
+                      collector->tracker->RootBit() |
+                      collector->tracker->ConditionalDescendantsBit());
 
   RestyleEnumerateData** restyleArrayPtr = collector->restyleArrayPtr;
   RestyleEnumerateData* currentRestyle = *restyleArrayPtr;
   currentRestyle->mElement = element;
   currentRestyle->mRestyleHint = aData->mRestyleHint;
   currentRestyle->mChangeHint = aData->mChangeHint;
+  // We can move aData since we'll be clearing mPendingRestyles after
+  // we finish enumerating it.
+  currentRestyle->mRestyleHintData = Move(aData->mRestyleHintData);
 #if defined(MOZ_ENABLE_PROFILER_SPS) && !defined(MOZILLA_XPCOMRT_API)
   currentRestyle->mBacktrace = Move(aData->mBacktrace);
 #endif
@@ -185,7 +190,8 @@ CollectRestyles(nsISupports* aElement,
 inline void
 RestyleTracker::ProcessOneRestyle(Element* aElement,
                                   nsRestyleHint aRestyleHint,
-                                  nsChangeHint aChangeHint)
+                                  nsChangeHint aChangeHint,
+                                  const RestyleHintData& aRestyleHintData)
 {
   NS_PRECONDITION((aRestyleHint & eRestyle_LaterSiblings) == 0,
                   "Someone should have handled this before calling us");
@@ -210,7 +216,7 @@ RestyleTracker::ProcessOneRestyle(Element* aElement,
     }
 #endif
     mRestyleManager->RestyleElement(aElement, primaryFrame, aChangeHint,
-                                    *this, aRestyleHint);
+                                    *this, aRestyleHint, aRestyleHintData);
   } else if (aChangeHint &&
              (primaryFrame ||
               (aChangeHint & nsChangeHint_ReconstructFrame))) {
@@ -357,7 +363,7 @@ RestyleTracker::DoProcessRestyles()
             MakeUnique<RestyleTimelineMarker>(docShell,
                                               TRACING_INTERVAL_START,
                                               data->mRestyleHint);
-          docShell->AddProfileTimelineMarker(Move(marker));
+          TimelineConsumers::AddMarkerForDocShell(docShell, Move(marker));
         }
 
 #if defined(MOZ_ENABLE_PROFILER_SPS) && !defined(MOZILLA_XPCOMRT_API)
@@ -366,7 +372,8 @@ RestyleTracker::DoProcessRestyles()
           profilerRAII.emplace("Paint", "Styles", Move(data->mBacktrace));
         }
 #endif
-        ProcessOneRestyle(element, data->mRestyleHint, data->mChangeHint);
+        ProcessOneRestyle(element, data->mRestyleHint, data->mChangeHint,
+                          data->mRestyleHintData);
         AddRestyleRootsIfAwaitingRestyle(data->mDescendants);
 
         if (isTimelineRecording) {
@@ -374,7 +381,7 @@ RestyleTracker::DoProcessRestyles()
             MakeUnique<RestyleTimelineMarker>(docShell,
                                               TRACING_INTERVAL_END,
                                               data->mRestyleHint);
-          docShell->AddProfileTimelineMarker(Move(marker));
+          TimelineConsumers::AddMarkerForDocShell(docShell, Move(marker));
         }
       }
 
@@ -421,24 +428,28 @@ RestyleTracker::DoProcessRestyles()
               MakeUnique<RestyleTimelineMarker>(docShell,
                                                 TRACING_INTERVAL_START,
                                                 currentRestyle->mRestyleHint);
-            docShell->AddProfileTimelineMarker(Move(marker));
+            TimelineConsumers::AddMarkerForDocShell(docShell, Move(marker));
           }
 
           ProcessOneRestyle(currentRestyle->mElement,
                             currentRestyle->mRestyleHint,
-                            currentRestyle->mChangeHint);
+                            currentRestyle->mChangeHint,
+                            currentRestyle->mRestyleHintData);
 
           if (isTimelineRecording) {
             mozilla::UniquePtr<TimelineMarker> marker =
               MakeUnique<RestyleTimelineMarker>(docShell,
                                                 TRACING_INTERVAL_END,
                                                 currentRestyle->mRestyleHint);
-            docShell->AddProfileTimelineMarker(Move(marker));
+            TimelineConsumers::AddMarkerForDocShell(docShell, Move(marker));
           }
         }
       }
     }
   }
+
+  // mPendingRestyles is now empty.
+  mHaveSelectors = false;
 
   mRestyleManager->EndProcessingRestyles();
 }
@@ -503,6 +514,25 @@ RestyleTracker::AddRestyleRootsIfAwaitingRestyle(
       mRestyleRoots.AppendElement(element);
     }
   }
+}
+
+void
+RestyleTracker::ClearSelectors()
+{
+  if (!mHaveSelectors) {
+    return;
+  }
+  for (auto it = mPendingRestyles.Iter(); !it.Done(); it.Next()) {
+    RestyleData* data = it.Data();
+    if (data->mRestyleHint & eRestyle_SomeDescendants) {
+      data->mRestyleHint =
+        (data->mRestyleHint & ~eRestyle_SomeDescendants) | eRestyle_Subtree;
+      data->mRestyleHintData.mSelectorsForDescendants.Clear();
+    } else {
+      MOZ_ASSERT(data->mRestyleHintData.mSelectorsForDescendants.IsEmpty());
+    }
+  }
+  mHaveSelectors = false;
 }
 
 } // namespace mozilla

@@ -1,11 +1,13 @@
     <preferences id="searchPreferences" hidden="true" data-category="paneSearch">
 
-      <!-- Suggest -->
       <preference id="browser.search.suggest.enabled"
                   name="browser.search.suggest.enabled"
                   type="bool"/>
 
-      <!-- One off providers -->
+      <preference id="browser.urlbar.suggest.searches"
+                  name="browser.urlbar.suggest.searches"
+                  type="bool"/>
+
       <preference id="browser.search.hiddenOneOffs"
                   name="browser.search.hiddenOneOffs"
                   type="unichar"/>
@@ -40,6 +42,12 @@
                 label="&provideSearchSuggestions.label;"
                 accesskey="&provideSearchSuggestions.accesskey;"
                 preference="browser.search.suggest.enabled"/>
+      <hbox class="indent">
+        <checkbox id="urlBarSuggestion" label="&showURLBarSuggestions.label;"
+                  hidden="true"
+                  accesskey="&showURLBarSuggestions.accesskey;"
+                  preference="browser.urlbar.suggest.searches"/>
+      </hbox>
       <checkbox id="redirectSearchCheckbox"
                 label="&redirectWindowsSearch.label;"
                 accesskey="&redirectWindowsSearch.accesskey;"

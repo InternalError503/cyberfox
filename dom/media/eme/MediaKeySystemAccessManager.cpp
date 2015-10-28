@@ -13,6 +13,10 @@
 #ifdef XP_WIN
 #include "mozilla/WindowsVersion.h"
 #endif
+#ifdef XP_MACOSX
+#include "nsCocoaFeatures.h"
+#endif
+#include "nsPrintfCString.h"
 
 namespace mozilla {
 namespace dom {
@@ -73,6 +77,19 @@ MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
   Request(aPromise, aKeySystem, options, RequestType::Initial);
 }
 
+static bool
+ShouldTrialCreateGMP(const nsAString& aKeySystem)
+{
+  // Trial create where the CDM has a Windows Media Foundation decoder.
+#ifdef XP_WIN
+  return Preferences::GetBool("media.gmp.trial-create.enabled", false) &&
+         aKeySystem.EqualsLiteral("org.w3.clearkey") &&
+         IsVistaOrLater();
+#else
+  return false;
+#endif
+}
+
 void
 MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
                                      const nsAString& aKeySystem,
@@ -107,7 +124,18 @@ MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
 
   nsAutoCString message;
   nsAutoCString cdmVersion;
-  MediaKeySystemStatus status = MediaKeySystemAccess::GetKeySystemStatus(keySystem, minCdmVersion, message, cdmVersion);
+  MediaKeySystemStatus status =
+    MediaKeySystemAccess::GetKeySystemStatus(keySystem, minCdmVersion, message, cdmVersion);
+
+  nsPrintfCString msg("MediaKeySystemAccess::GetKeySystemStatus(%s, minVer=%d) "
+                      "result=%s version='%s' msg='%s'",
+                      NS_ConvertUTF16toUTF8(keySystem).get(),
+                      minCdmVersion,
+                      MediaKeySystemStatusValues::strings[(size_t)status].value,
+                      cdmVersion.get(),
+                      message.get());
+  LogToBrowserConsole(NS_ConvertUTF8toUTF16(msg));
+
   if ((status == MediaKeySystemStatus::Cdm_not_installed ||
        status == MediaKeySystemStatus::Cdm_insufficient_version) &&
       keySystem.EqualsLiteral("com.adobe.primetime")) {
@@ -140,8 +168,7 @@ MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
       // chrome, so we can show some UI to explain how the user can rectify
       // the situation.
       MediaKeySystemAccess::NotifyObservers(mWindow, keySystem, status);
-      aPromise->MaybeReject(NS_ERROR_DOM_NOT_SUPPORTED_ERR,
-                            NS_LITERAL_CSTRING("The key system has been disabled by the user"));
+      aPromise->MaybeReject(NS_ERROR_DOM_NOT_SUPPORTED_ERR, message);
       return;
     }
     aPromise->MaybeReject(NS_ERROR_DOM_INVALID_STATE_ERR,
@@ -153,16 +180,14 @@ MediaKeySystemAccessManager::Request(DetailedPromise* aPromise,
       MediaKeySystemAccess::IsSupported(keySystem, aOptions)) {
     nsRefPtr<MediaKeySystemAccess> access(
       new MediaKeySystemAccess(mWindow, keySystem, NS_ConvertUTF8toUTF16(cdmVersion)));
-#ifdef XP_WIN
-    if (IsVistaOrLater()) {
-      // On Windows, ensure we have tried creating a GMPVideoDecoder for this
+   if (ShouldTrialCreateGMP(keySystem)) {
+      // Ensure we have tried creating a GMPVideoDecoder for this
       // keySystem, and that we can use it to decode. This ensures that we only
       // report that we support this keySystem when the CDM us usable (i.e.
-      // all system libraries required are installed).
+      // report that we support this keySystem when the CDM us usable.
       mTrialCreator->MaybeAwaitTrialCreate(keySystem, access, aPromise, mWindow);
       return;
     }
-#endif
     aPromise->MaybeResolve(access);
     return;
   }

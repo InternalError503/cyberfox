@@ -4,14 +4,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef mozilla_dom_bluetooth_bluetoothdaemona2dpinterface_h
-#define mozilla_dom_bluetooth_bluetoothdaemona2dpinterface_h
+#ifndef mozilla_dom_bluetooth_bluedroid_BluetoothDaemonA2dpInterface_h
+#define mozilla_dom_bluetooth_bluedroid_BluetoothDaemonA2dpInterface_h
 
 #include "BluetoothDaemonHelpers.h"
 #include "BluetoothInterface.h"
-#include "BluetoothInterfaceHelpers.h"
+#include "mozilla/ipc/DaemonRunnables.h"
 
 BEGIN_BLUETOOTH_NAMESPACE
+
+using mozilla::ipc::DaemonSocketPDU;
+using mozilla::ipc::DaemonSocketPDUHeader;
 
 class BluetoothSetupResultHandler;
 
@@ -62,11 +65,12 @@ protected:
   // Responses
   //
 
-  typedef BluetoothResultRunnable0<BluetoothA2dpResultHandler, void>
+  typedef mozilla::ipc::DaemonResultRunnable0<
+    BluetoothA2dpResultHandler, void>
     ResultRunnable;
 
-  typedef BluetoothResultRunnable1<BluetoothA2dpResultHandler, void,
-                                   BluetoothStatus, BluetoothStatus>
+  typedef mozilla::ipc::DaemonResultRunnable1<
+    BluetoothA2dpResultHandler, void, BluetoothStatus, BluetoothStatus>
     ErrorRunnable;
 
   void ErrorRsp(const DaemonSocketPDUHeader& aHeader,
@@ -91,23 +95,19 @@ protected:
 
   class NotificationHandlerWrapper;
 
-  typedef BluetoothNotificationRunnable2<NotificationHandlerWrapper, void,
-                                         BluetoothA2dpConnectionState,
-                                         nsString,
-                                         BluetoothA2dpConnectionState,
-                                         const nsAString&>
+  typedef mozilla::ipc::DaemonNotificationRunnable2<
+    NotificationHandlerWrapper, void, BluetoothA2dpConnectionState, nsString,
+    BluetoothA2dpConnectionState, const nsAString&>
     ConnectionStateNotification;
 
-  typedef BluetoothNotificationRunnable2<NotificationHandlerWrapper, void,
-                                         BluetoothA2dpAudioState,
-                                         nsString,
-                                         BluetoothA2dpAudioState,
-                                         const nsAString&>
+  typedef mozilla::ipc::DaemonNotificationRunnable2<
+    NotificationHandlerWrapper, void, BluetoothA2dpAudioState, nsString,
+    BluetoothA2dpAudioState, const nsAString&>
     AudioStateNotification;
 
-  typedef BluetoothNotificationRunnable3<NotificationHandlerWrapper, void,
-                                         nsString, uint32_t, uint8_t,
-                                         const nsAString&, uint32_t, uint8_t>
+  typedef mozilla::ipc::DaemonNotificationRunnable3<
+    NotificationHandlerWrapper, void, nsString, uint32_t, uint8_t,
+    const nsAString&, uint32_t, uint8_t>
     AudioConfigNotification;
 
   class ConnectionStateInitOp;
@@ -162,4 +162,4 @@ private:
 
 END_BLUETOOTH_NAMESPACE
 
-#endif
+#endif // mozilla_dom_bluetooth_bluedroid_BluetoothDaemonA2dpInterface_h

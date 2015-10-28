@@ -245,14 +245,14 @@ MediaDecodeTask::Decode()
 {
   MOZ_ASSERT(!NS_IsMainThread());
 
-  mBufferDecoder->BeginDecoding(mDecoderReader->TaskQueue());
+  mBufferDecoder->BeginDecoding(mDecoderReader->OwnerThread());
 
   // Tell the decoder reader that we are not going to play the data directly,
   // and that we should not reject files with more channels than the audio
   // backend support.
   mDecoderReader->SetIgnoreAudioOutputFormat();
 
-  mDecoderReader->AsyncReadMetadata()->Then(mDecoderReader->TaskQueue(), __func__, this,
+  mDecoderReader->AsyncReadMetadata()->Then(mDecoderReader->OwnerThread(), __func__, this,
                                        &MediaDecodeTask::OnMetadataRead,
                                        &MediaDecodeTask::OnMetadataNotRead);
 }
@@ -281,7 +281,7 @@ MediaDecodeTask::OnMetadataNotRead(ReadMetadataFailureReason aReason)
 void
 MediaDecodeTask::RequestSample()
 {
-  mDecoderReader->RequestAudioData()->Then(mDecoderReader->TaskQueue(), __func__, this,
+  mDecoderReader->RequestAudioData()->Then(mDecoderReader->OwnerThread(), __func__, this,
                                            &MediaDecodeTask::SampleDecoded,
                                            &MediaDecodeTask::SampleNotDecoded);
 }
@@ -504,10 +504,10 @@ AsyncDecodeWebAudio(const char* aContentType, uint8_t* aBuffer,
     NS_DispatchToMainThread(event);
   } else {
     // If we did this without a temporary:
-    //   task->Reader()->TaskQueue()->Dispatch(task.forget())
+    //   task->Reader()->OwnerThread()->Dispatch(task.forget())
     // we might evaluate the task.forget() before calling Reader(). Enforce
     // a non-crashy order-of-operations.
-    MediaTaskQueue* taskQueue = task->Reader()->TaskQueue();
+    TaskQueue* taskQueue = task->Reader()->OwnerThread();
     taskQueue->Dispatch(task.forget());
   }
 }
@@ -614,7 +614,7 @@ WebAudioDecodeJob::SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const
   if (mOutput) {
     amount += mOutput->SizeOfIncludingThis(aMallocSizeOf);
   }
-  amount += mChannelBuffers.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mChannelBuffers.ShallowSizeOfExcludingThis(aMallocSizeOf);
   for (uint32_t i = 0; i < mChannelBuffers.Length(); ++i) {
     amount += mChannelBuffers[i].SizeOfExcludingThis(aMallocSizeOf);
   }
@@ -627,5 +627,5 @@ WebAudioDecodeJob::SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const
   return aMallocSizeOf(this) + SizeOfExcludingThis(aMallocSizeOf);
 }
 
-}
+} // namespace mozilla
 

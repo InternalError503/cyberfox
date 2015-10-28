@@ -101,7 +101,6 @@ nsSVGElement::WrapNode(JSContext *aCx, JS::Handle<JSObject*> aGivenProto)
 
 //----------------------------------------------------------------------
 
-/* readonly attribute SVGAnimatedString className; */
 NS_IMETHODIMP
 nsSVGElement::GetSVGClassName(nsISupports** aClassName)
 {
@@ -109,7 +108,6 @@ nsSVGElement::GetSVGClassName(nsISupports** aClassName)
   return NS_OK;
 }
 
-/* readonly attribute nsIDOMCSSStyleDeclaration style; */
 NS_IMETHODIMP
 nsSVGElement::GetStyle(nsIDOMCSSStyleDeclaration** aStyle)
 {
@@ -273,7 +271,7 @@ nsSVGElement::BindToTree(nsIDocument* aDocument, nsIContent* aParent,
     ParseStyleAttribute(stringValue, attrValue, true);
     // Don't bother going through SetInlineStyleRule, we don't want to fire off
     // mutation events or document notifications anyway
-    rv = mAttrsAndChildren.SetAndTakeAttr(nsGkAtoms::style, attrValue);
+    rv = mAttrsAndChildren.SetAndSwapAttr(nsGkAtoms::style, attrValue);
     NS_ENSURE_SUCCESS(rv, rv);
   }
 
@@ -1084,7 +1082,6 @@ nsSVGElement::sMaskMap[] = {
 //----------------------------------------------------------------------
 // nsIDOMSVGElement methods
 
-/* readonly attribute nsIDOMSVGSVGElement ownerSVGElement; */
 NS_IMETHODIMP
 nsSVGElement::GetOwnerSVGElement(nsIDOMSVGElement * *aOwnerSVGElement)
 {
@@ -1098,7 +1095,6 @@ nsSVGElement::GetOwnerSVGElement()
   return GetCtx(); // this may return nullptr
 }
 
-/* readonly attribute nsIDOMSVGElement viewportElement; */
 NS_IMETHODIMP
 nsSVGElement::GetViewportElement(nsIDOMSVGElement * *aViewportElement)
 {
@@ -1218,7 +1214,7 @@ MappedAttrParser::CreateStyleRule()
   return rule.forget();
 }
 
-} // anonymous namespace
+} // namespace
 
 //----------------------------------------------------------------------
 // Implementation Helpers:
@@ -1439,7 +1435,8 @@ nsSVGElement::WillChangeValue(nsIAtom* aName)
   uint8_t modType = attrValue
                   ? static_cast<uint8_t>(nsIDOMMutationEvent::MODIFICATION)
                   : static_cast<uint8_t>(nsIDOMMutationEvent::ADDITION);
-  nsNodeUtils::AttributeWillChange(this, kNameSpaceID_None, aName, modType);
+  nsNodeUtils::AttributeWillChange(this, kNameSpaceID_None, aName, modType,
+                                   nullptr);
 
   return emptyOrOldAttrValue;
 }
@@ -1454,6 +1451,8 @@ nsSVGElement::WillChangeValue(nsIAtom* aName)
  * b) WillChangeXXX will ensure the object represents a serialized version of
  *    the old attribute value so that the value doesn't change when the
  *    underlying SVG type is updated.
+ *
+ * aNewValue is replaced with the old value.
  */
 void
 nsSVGElement::DidChangeValue(nsIAtom* aName,
@@ -1489,7 +1488,7 @@ nsSVGElement::MaybeSerializeAttrBeforeRemoval(nsIAtom* aName, bool aNotify)
   nsAutoString serializedValue;
   attrValue->ToString(serializedValue);
   nsAttrValue oldAttrValue(serializedValue);
-  mAttrsAndChildren.SetAndTakeAttr(aName, oldAttrValue);
+  mAttrsAndChildren.SetAndSwapAttr(aName, oldAttrValue);
 }
 
 /* static */

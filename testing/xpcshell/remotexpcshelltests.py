@@ -10,8 +10,7 @@ import subprocess
 import runxpcshelltests as xpcshell
 import tempfile
 from zipfile import ZipFile
-from mozlog import structured
-from mozlog.structured import commandline
+from mozlog import commandline
 import shutil
 import mozdevice
 import mozfile
@@ -396,7 +395,6 @@ class XPCShellRemote(xpcshell.XPCShellTests, object):
                     "certutil",
                     "pk12util",
                     "BadCertServer",
-                    "ClientAuthServer",
                     "OCSPStaplingServer",
                     "GenerateOCSPResponse"]
         for fname in binaries:
@@ -603,7 +601,7 @@ def main():
         sys.exit(1)
 
     parser = RemoteXPCShellOptions()
-    structured.commandline.add_logging_group(parser)
+    commandline.add_logging_group(parser)
     options, args = parser.parse_args()
     if not options.localAPK:
         for file in os.listdir(os.path.join(options.objdir, "dist")):

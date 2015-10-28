@@ -101,8 +101,12 @@ const DEFAULT_ENVIRONMENT_PREFS = new Map([
   ["browser.newtabpage.enhanced", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["browser.polaris.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["browser.shell.checkDefaultBrowser", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["browser.search.suggest.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["browser.startup.homepage", TelemetryEnvironment.RECORD_PREF_STATE],
   ["browser.startup.page", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["browser.urlbar.suggest.searches", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["browser.urlbar.unifiedcomplete", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["browser.urlbar.userMadeSearchSuggestionsChoice", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["devtools.chrome.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["devtools.debugger.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["devtools.debugger.remote-enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
@@ -129,6 +133,7 @@ const DEFAULT_ENVIRONMENT_PREFS = new Map([
   ["layers.componentalpha.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["layers.d3d11.disable-warp", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["layers.d3d11.force-warp", TelemetryEnvironment.RECORD_PREF_VALUE],
+  ["layers.offmainthreadcomposition.enabled", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["layers.prefer-d3d9", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["layers.prefer-opengl", TelemetryEnvironment.RECORD_PREF_VALUE],
   ["layout.css.devPixelsPerPx", TelemetryEnvironment.RECORD_PREF_VALUE],
@@ -161,6 +166,7 @@ const PREF_SEARCH_COHORT = "browser.search.cohort";
 const EXPERIMENTS_CHANGED_TOPIC = "experiments-changed";
 const SEARCH_ENGINE_MODIFIED_TOPIC = "browser-search-engine-modified";
 const SEARCH_SERVICE_TOPIC = "browser-search-service";
+const COMPOSITOR_CREATED_TOPIC = "compositor:created";
 
 /**
  * Get the current browser.
@@ -678,6 +684,7 @@ function EnvironmentCache() {
     this._startWatchingPrefs();
     this._addonBuilder.watchForChanges();
     this._addObservers();
+    this._updateGraphicsFeatures();
     return this.currentEnvironment;
   };
 
@@ -813,12 +820,14 @@ EnvironmentCache.prototype = {
     // Watch the search engine change and service topics.
     Services.obs.addObserver(this, SEARCH_ENGINE_MODIFIED_TOPIC, false);
     Services.obs.addObserver(this, SEARCH_SERVICE_TOPIC, false);
+    Services.obs.addObserver(this, COMPOSITOR_CREATED_TOPIC, false);
   },
 
   _removeObservers: function () {
     // Remove the search engine change and service observers.
     Services.obs.removeObserver(this, SEARCH_ENGINE_MODIFIED_TOPIC);
     Services.obs.removeObserver(this, SEARCH_SERVICE_TOPIC);
+    Services.obs.removeObserver(this, COMPOSITOR_CREATED_TOPIC);
   },
 
   observe: function (aSubject, aTopic, aData) {
@@ -837,6 +846,12 @@ EnvironmentCache.prototype = {
         }
         // Now that the search engine init is complete, record the default search choice.
         this._updateSearchEngine();
+        break;
+      case COMPOSITOR_CREATED_TOPIC:
+        // Full graphics information is not available until we have created at
+        // least one off-main-thread-composited window. Thus we wait for the
+        // first compositor to be created and then query nsIGfxInfo again.
+        this._updateGraphicsFeatures();
         break;
     }
   },
@@ -902,6 +917,19 @@ EnvironmentCache.prototype = {
     let oldEnvironment = Cu.cloneInto(this._currentEnvironment, myScope);
     this._updateSearchEngine();
     this._onEnvironmentChange("search-engine-changed", oldEnvironment);
+  },
+
+  /**
+   * Update the graphics features object.
+   */
+  _updateGraphicsFeatures: function () {
+    let gfxData = this._currentEnvironment.system.gfx;
+    try {
+      let gfxInfo = Cc["@mozilla.org/gfx/info;1"].getService(Ci.nsIGfxInfo);
+      gfxData.features = gfxInfo.getFeatures();
+    } catch (e) {
+      this._log.error("nsIGfxInfo.getFeatures() caught error", e);
+    }
   },
 
   /**
@@ -1140,9 +1168,10 @@ EnvironmentCache.prototype = {
       //DWriteVersion: getGfxField("DWriteVersion", null),
       adapters: [],
       monitors: [],
+      features: {},
     };
 
-#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID)
+#if !defined(MOZ_WIDGET_GONK) && !defined(MOZ_WIDGET_ANDROID) && !defined(MOZ_WIDGET_GTK)
     let gfxInfo = Cc["@mozilla.org/gfx/info;1"].getService(Ci.nsIGfxInfo);
     try {
       gfxData.monitors = gfxInfo.getMonitors();
@@ -1150,6 +1179,13 @@ EnvironmentCache.prototype = {
       this._log.error("nsIGfxInfo.getMonitors() caught error", e);
     }
 #endif
+
+    try {
+      let gfxInfo = Cc["@mozilla.org/gfx/info;1"].getService(Ci.nsIGfxInfo);
+      gfxData.features = gfxInfo.getFeatures();
+    } catch (e) {
+      this._log.error("nsIGfxInfo.getFeatures() caught error", e);
+    }
 
     // GfxInfo does not yet expose a way to iterate through all the adapters.
     gfxData.adapters.push(getGfxAdapter(""));

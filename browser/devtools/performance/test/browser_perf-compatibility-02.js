@@ -39,7 +39,6 @@ let test = Task.async(function*() {
   isEmptyArray(allocations.sites, "allocations.sites");
   isEmptyArray(allocations.timestamps, "allocations.timestamps");
   isEmptyArray(allocations.frames, "allocations.frames");
-  isEmptyArray(allocations.counts, "allocations.counts");
 
   let sampleCount = 0;
 
@@ -66,8 +65,8 @@ let test = Task.async(function*() {
     "waterfall view button hidden when timeline mocked");
   is($("#select-js-calltree-view").hidden, false,
     "jscalltree view button not hidden when timeline/memory mocked");
-  is($("#select-js-flamegraph-view").hidden, true,
-    "jsflamegraph view button hidden when timeline mocked");
+  is($("#select-js-flamegraph-view").hidden, false,
+    "jsflamegraph view button not hidden when timeline mocked");
   is($("#select-memory-calltree-view").hidden, true,
     "memorycalltree view button hidden when memory mocked");
   is($("#select-memory-flamegraph-view").hidden, true,

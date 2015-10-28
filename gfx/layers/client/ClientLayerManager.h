@@ -88,8 +88,6 @@ public:
 
   virtual void Mutated(Layer* aLayer) override;
 
-  virtual bool IsOptimizedFor(PaintedLayer* aLayer, PaintedLayerCreationHint aHint) override;
-
   virtual already_AddRefed<PaintedLayer> CreatePaintedLayer() override;
   virtual already_AddRefed<PaintedLayer> CreatePaintedLayerWithHint(PaintedLayerCreationHint aHint) override;
   virtual already_AddRefed<ContainerLayer> CreateContainerLayer() override;
@@ -205,7 +203,7 @@ public:
   virtual bool RequestOverfill(mozilla::dom::OverfillCallback* aCallback) override;
   virtual void RunOverfillCallback(const uint32_t aOverfill) override;
 
-  virtual void DidComposite(uint64_t aTransactionId);
+  void DidComposite(uint64_t aTransactionId);
 
   virtual bool SupportsMixBlendModes(EnumSet<gfx::CompositionOp>& aMixBlendModes) override
   {
@@ -390,6 +388,16 @@ public:
   {
     return static_cast<ClientLayer*>(aLayer->ImplData());
   }
+
+  template <typename LayerType>
+  static inline void RenderMaskLayers(LayerType* aLayer) {
+    if (aLayer->GetMaskLayer()) {
+      ToClientLayer(aLayer->GetMaskLayer())->RenderLayer();
+    }
+    for (size_t i = 0; i < aLayer->GetAncestorMaskLayerCount(); i++) {
+      ToClientLayer(aLayer->GetAncestorMaskLayerAt(i))->RenderLayer();
+    }
+  }
 };
 
 // Create a shadow layer (PLayerChild) for aLayer, if we're forwarding
@@ -414,7 +422,7 @@ CreateShadowFor(ClientLayer* aLayer,
                   &ShadowLayerForwarder::Created ## _type ## Layer)
 
 
-}
-}
+} // namespace layers
+} // namespace mozilla
 
 #endif /* GFX_CLIENTLAYERMANAGER_H */

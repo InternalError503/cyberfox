@@ -70,7 +70,7 @@ SharedPlanarYCbCrImage::GetBuffer()
   return mTextureClient->GetBuffer();
 }
 
-TemporaryRef<gfx::SourceSurface>
+already_AddRefed<gfx::SourceSurface>
 SharedPlanarYCbCrImage::GetAsSourceSurface()
 {
   if (!mTextureClient) {
@@ -230,5 +230,5 @@ SharedPlanarYCbCrImage::Allocate(PlanarYCbCrData& aData)
   return mBufferSize > 0;
 }
 
-} // namespace
-} // namespace
+} // namespace layers
+} // namespace mozilla

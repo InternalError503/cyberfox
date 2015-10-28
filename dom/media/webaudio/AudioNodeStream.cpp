@@ -62,7 +62,7 @@ AudioNodeStream::SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const
   // - mEngine
 
   amount += ProcessedMediaStream::SizeOfExcludingThis(aMallocSizeOf);
-  amount += mLastChunks.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mLastChunks.ShallowSizeOfExcludingThis(aMallocSizeOf);
   for (size_t i = 0; i < mLastChunks.Length(); i++) {
     // NB: This is currently unshared only as there are instances of
     //     double reporting in DMD otherwise.
@@ -411,7 +411,7 @@ AudioNodeStream::AccumulateInputChunk(uint32_t aInputIndex, const AudioChunk& aC
 
   for (uint32_t c = 0; c < channels.Length(); ++c) {
     const float* inputData = static_cast<const float*>(channels[c]);
-    float* outputData = static_cast<float*>(const_cast<void*>(aBlock->mChannelData[c]));
+    float* outputData = aBlock->ChannelFloatsForWrite(c);
     if (inputData) {
       if (aInputIndex == 0) {
         AudioBlockCopyChannelWithScale(inputData, aChunk.mVolume, outputData);
@@ -660,4 +660,4 @@ AudioNodeStream::DestinationTimeFromTicks(AudioNodeStream* aDestination,
   return StreamTimeToSeconds(destinationTime);
 }
 
-}
+} // namespace mozilla

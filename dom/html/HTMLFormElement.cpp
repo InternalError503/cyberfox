@@ -12,6 +12,8 @@
 #include "mozilla/EventStateManager.h"
 #include "mozilla/EventStates.h"
 #include "mozilla/dom/AutocompleteErrorEvent.h"
+#include "mozilla/dom/nsCSPUtils.h"
+#include "mozilla/dom/nsCSPContext.h"
 #include "mozilla/dom/HTMLFormControlsCollection.h"
 #include "mozilla/dom/HTMLFormElementBinding.h"
 #include "mozilla/Move.h"
@@ -41,8 +43,10 @@
 #include "nsCategoryManagerUtils.h"
 #include "nsISimpleEnumerator.h"
 #include "nsRange.h"
+#include "nsIScriptError.h"
 #include "nsIScriptSecurityManager.h"
 #include "nsNetUtil.h"
+#include "nsIInterfaceRequestorUtils.h"
 #include "nsIWebProgress.h"
 #include "nsIDocShell.h"
 #include "nsFormData.h"
@@ -128,17 +132,6 @@ HTMLFormElement::~HTMLFormElement()
 
 // nsISupports
 
-static PLDHashOperator
-ElementTraverser(const nsAString& key, HTMLInputElement* element,
-                 void* userArg)
-{
-  nsCycleCollectionTraversalCallback *cb =
-    static_cast<nsCycleCollectionTraversalCallback*>(userArg);
-
-  cb->NoteXPCOMChild(ToSupports(element));
-  return PL_DHASH_NEXT;
-}
-
 NS_IMPL_CYCLE_COLLECTION_CLASS(HTMLFormElement)
 
 NS_IMPL_CYCLE_COLLECTION_TRAVERSE_BEGIN_INHERITED(HTMLFormElement,
@@ -146,7 +139,7 @@ NS_IMPL_CYCLE_COLLECTION_TRAVERSE_BEGIN_INHERITED(HTMLFormElement,
   NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mControls)
   NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mImageNameLookupTable)
   NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mPastNameLookupTable)
-  tmp->mSelectedRadioButtons.EnumerateRead(ElementTraverser, &cb);
+  NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mSelectedRadioButtons)
 NS_IMPL_CYCLE_COLLECTION_TRAVERSE_END
 
 NS_IMPL_CYCLE_COLLECTION_UNLINK_BEGIN_INHERITED(HTMLFormElement,
@@ -1746,6 +1739,40 @@ HTMLFormElement::GetActionURL(nsIURI** aActionURL,
     if (!permitsFormAction) {
       rv = NS_ERROR_CSP_FORM_ACTION_VIOLATION;
     }
+  }
+
+  // Potentially the page uses the CSP directive 'upgrade-insecure-requests'. In
+  // such a case we have to upgrade the action url from http:// to https://.
+  // If the actionURL is not http, then there is nothing to do.
+  bool isHttpScheme = false;
+  rv = actionURL->SchemeIs("http", &isHttpScheme);
+  NS_ENSURE_SUCCESS(rv, rv);
+  if (isHttpScheme && document->GetUpgradeInsecureRequests()) {
+    // let's use the old specification before the upgrade for logging
+    nsAutoCString spec;
+    rv = actionURL->GetSpec(spec);
+    NS_ENSURE_SUCCESS(rv, rv);
+    NS_ConvertUTF8toUTF16 reportSpec(spec);
+
+    // upgrade the actionURL from http:// to use https://
+    rv = actionURL->SetScheme(NS_LITERAL_CSTRING("https"));
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    // let's log a message to the console that we are upgrading a request
+    nsAutoCString scheme;
+    rv = actionURL->GetScheme(scheme);
+    NS_ENSURE_SUCCESS(rv, rv);
+    NS_ConvertUTF8toUTF16 reportScheme(scheme);
+
+    const char16_t* params[] = { reportSpec.get(), reportScheme.get() };
+    CSP_LogLocalizedStr(NS_LITERAL_STRING("upgradeInsecureRequest").get(),
+                        params, ArrayLength(params),
+                        EmptyString(), // aSourceFile
+                        EmptyString(), // aScriptSample
+                        0, // aLineNumber
+                        0, // aColumnNumber
+                        nsIScriptError::warningFlag, "CSP",
+                        document->InnerWindowID());
   }
 
   //

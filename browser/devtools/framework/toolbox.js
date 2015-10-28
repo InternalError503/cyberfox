@@ -418,7 +418,7 @@ Toolbox.prototype = {
       // destruction event, resulting in the shared profiler connection being
       // opened and closed outside of the test that originally opened the
       // toolbox.
-      if (gDevTools.testing) {
+      if (DevToolsUtils.testing) {
         yield profilerReady;
       }
 
@@ -1541,6 +1541,7 @@ Toolbox.prototype = {
         }
         if (!item) {
           item = this.doc.createElement("menuitem");
+          item.setAttribute("type", "radio");
           item.setAttribute("data-window-id", win.id);
           if (win.parentID) {
             item.setAttribute("data-parent-id", win.parentID);
@@ -1729,7 +1730,7 @@ Toolbox.prototype = {
           this.walker.on("highlighter-ready", this._highlighterReady);
           this.walker.on("highlighter-hide", this._highlighterHidden);
 
-          let autohide = !gDevTools.testing;
+          let autohide = !DevToolsUtils.testing;
           this._highlighter = yield this._inspector.getHighlighter(autohide);
         }
       }.bind(this));
@@ -1755,6 +1756,14 @@ Toolbox.prototype = {
         yield this.highlighterUtils.stopPicker();
         yield this._inspector.destroy();
         if (this._highlighter) {
+          // Note that if the toolbox is closed, this will work fine, but will fail
+          // in case the browser is closed and will trigger a noSuchActor message.
+          // We ignore the promise that |_hideBoxModel| returns, since we should still
+          // proceed with the rest of destruction if it fails.
+          // FF42+ now does the cleanup from the actor.
+          if (!this.highlighter.traits.autoHideOnDestroy) {
+            this.highlighterUtils.unhighlight();
+          }
           yield this._highlighter.destroy();
         }
         if (this._selection) {
@@ -1914,7 +1923,7 @@ Toolbox.prototype = {
 
       // Force GC to prevent long GC pauses when running tests and to free up
       // memory in general when the toolbox is closed.
-      if (gDevTools.testing) {
+      if (DevToolsUtils.testing) {
         win.QueryInterface(Ci.nsIInterfaceRequestor)
            .getInterface(Ci.nsIDOMWindowUtils)
            .garbageCollect();

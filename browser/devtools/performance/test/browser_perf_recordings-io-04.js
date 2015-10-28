@@ -5,7 +5,7 @@
  * Tests if the performance tool can import profiler data from the
  * original profiler tool (Performance Recording v1, and Profiler data v2) and the correct views and graphs are loaded.
  */
-let RecordingUtils = devtools.require("devtools/performance/recording-utils");
+let RecordingUtils = require("devtools/performance/recording-utils");
 
 let TICKS_DATA = (function () {
   let ticks = [];
@@ -130,7 +130,7 @@ let test = Task.async(function*() {
     memory: [].toSource(),
     ticks: TICKS_DATA.toSource(),
     profile: RecordingUtils.deflateProfile(JSON.parse(JSON.stringify(PROFILER_DATA))).toSource(),
-    allocations: ({sites:[], timestamps:[], frames:[], counts:[]}).toSource(),
+    allocations: ({sites:[], timestamps:[], frames:[]}).toSource(),
     withTicks: true,
     withMemory: false,
     sampleFrequency: void 0

@@ -445,7 +445,7 @@ _setNewTabPageToBookmarkClosed: function(rv, aEvent) {
 
       tabs = win.gBrowser.visibleTabs.slice(win.gBrowser._numPinnedTabs);
       
-      tabs = tabs.filter(this.isAboutPreferences);
+      tabs = tabs.filter(this.isNotAboutPreferences);
     }
     
     return tabs;
@@ -454,9 +454,9 @@ _setNewTabPageToBookmarkClosed: function(rv, aEvent) {
   /**
    * Check to see if a tab is not about:preferences
    */
-  isAboutPreferences: function (aElement, aIndex, aArray)
+  isNotAboutPreferences: function (aElement, aIndex, aArray)
   {
-    return (aElement.linkedBrowser.currentURI.spec != "about:preferences");
+    return (aElement.linkedBrowser.currentURI.spec.startsWith != "about:preferences");
   },
 
   /**

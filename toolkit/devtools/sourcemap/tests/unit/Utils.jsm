@@ -12,8 +12,15 @@
  * https://github.com/mozilla/source-map/
  */
 
-Components.utils.import('resource://gre/modules/devtools/Require.jsm');
-Components.utils.import('resource://gre/modules/devtools/SourceMap.jsm');
+let loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+  .getService(Components.interfaces.mozIJSSubScriptLoader);
+let exports = {};
+loader.loadSubScript("resource://gre/modules/devtools/sourcemap/source-map.js", exports);
+
+// Also bind on `this` for b2g bug on EXPORTED_SYMBOLS
+let define = this.define = exports.define;
+
+let require = exports.require;
 
 this.EXPORTED_SYMBOLS = [ "define", "runSourceMapTests" ];
 /* -*- Mode: js; js-indent-level: 2; -*- */
@@ -22,7 +29,7 @@ this.EXPORTED_SYMBOLS = [ "define", "runSourceMapTests" ];
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
-define('test/source-map/assert', ['exports'], function (exports) {
+define('test/source-map/assert', ['require', 'exports'], function (require, exports) {
 
   let do_throw = function (msg) {
     throw new Error(msg);
@@ -459,7 +466,7 @@ define('lib/source-map/util', ['require', 'exports', 'module' , ], function(requ
       }
       path = url.path;
     }
-    var isAbsolute = (path.charAt(0) === '/');
+    var isAbsolute = exports.isAbsolute(path);
 
     var parts = path.split(/\/+/);
     for (var part, up = 0, i = parts.length - 1; i >= 0; i--) {
@@ -553,6 +560,10 @@ define('lib/source-map/util', ['require', 'exports', 'module' , ], function(requ
     return joined;
   }
   exports.join = join;
+
+  exports.isAbsolute = function (aPath) {
+    return aPath.charAt(0) === '/' || !!aPath.match(urlRegexp);
+  };
 
   /**
    * Make a path relative to a URL or another path.

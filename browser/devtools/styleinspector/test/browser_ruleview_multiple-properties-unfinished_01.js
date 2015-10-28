@@ -22,17 +22,35 @@ add_task(function*() {
   yield testCreateNewMultiUnfinished(inspector, ruleEditor, view);
 });
 
+function waitRuleViewChanged(view, n) {
+  let deferred = promise.defer();
+  let count = 0;
+  let listener = function () {
+    if (++count == n) {
+      view.off("ruleview-changed", listener);
+      deferred.resolve();
+    }
+  }
+  view.on("ruleview-changed", listener);
+  return deferred.promise;
+}
 function* testCreateNewMultiUnfinished(inspector, ruleEditor, view) {
   let onMutation = inspector.once("markupmutation");
+  // There is 5 rule-view updates, one for the rule view creation,
+  // one for each new property
+  let onRuleViewChanged = waitRuleViewChanged(view, 5);
   yield createNewRuleViewProperty(ruleEditor,
     "color:blue;background : orange   ; text-align:center; border-color: ");
   yield onMutation;
+  yield onRuleViewChanged;
 
   is(ruleEditor.rule.textProps.length, 4, "Should have created new text properties.");
   is(ruleEditor.propertyList.children.length, 4, "Should have created property editors.");
 
-  EventUtils.sendString("red", view.doc.defaultView);
-  EventUtils.synthesizeKey("VK_RETURN", {}, view.doc.defaultView);
+  EventUtils.sendString("red", view.styleWindow);
+  onRuleViewChanged = view.once("ruleview-changed");
+  EventUtils.synthesizeKey("VK_RETURN", {}, view.styleWindow);
+  yield onRuleViewChanged;
 
   is(ruleEditor.rule.textProps.length, 4, "Should have the same number of text properties.");
   is(ruleEditor.propertyList.children.length, 5, "Should have added the changed value editor.");

@@ -147,7 +147,7 @@ namespace JS {
 
 struct RuntimeStats;
 
-}
+} // namespace JS
 
 #define XPCONNECT_GLOBAL_FLAGS_WITH_EXTRA_SLOTS(n)                            \
     JSCLASS_DOM_GLOBAL | JSCLASS_HAS_PRIVATE |                                \
@@ -510,6 +510,7 @@ class ErrorReport {
     void Init(JSErrorReport* aReport, const char* aFallbackMessage,
               bool aIsChrome, uint64_t aWindowID);
     void LogToConsole();
+    void LogToConsoleWithStack(JS::HandleObject aStack);
 
   public:
 

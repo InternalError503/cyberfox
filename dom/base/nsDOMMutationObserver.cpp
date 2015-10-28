@@ -6,16 +6,20 @@
 
 #include "nsDOMMutationObserver.h"
 
-#include "mozilla/dom/OwningNonNull.h"
-#include "nsError.h"
-#include "nsIScriptGlobalObject.h"
-#include "nsContentUtils.h"
-#include "nsThreadUtils.h"
-#include "nsIDOMMutationEvent.h"
-#include "nsTextFragment.h"
-#include "nsServiceManagerUtils.h"
+#include "mozilla/OwningNonNull.h"
+
 #include "mozilla/dom/Animation.h"
 #include "mozilla/dom/KeyframeEffect.h"
+
+#include "nsContentUtils.h"
+#include "nsError.h"
+#include "nsIDOMMutationEvent.h"
+#include "nsIScriptGlobalObject.h"
+#include "nsServiceManagerUtils.h"
+#include "nsTextFragment.h"
+#include "nsThreadUtils.h"
+
+using mozilla::dom::Animation;
 
 nsAutoTArray<nsRefPtr<nsDOMMutationObserver>, 4>*
   nsDOMMutationObserver::sScheduledMutationObservers = nullptr;
@@ -115,7 +119,8 @@ nsMutationReceiver::AttributeWillChange(nsIDocument* aDocument,
                                         mozilla::dom::Element* aElement,
                                         int32_t aNameSpaceID,
                                         nsIAtom* aAttribute,
-                                        int32_t aModType)
+                                        int32_t aModType,
+                                        const nsAttrValue* aNewValue)
 {
   if (nsAutoMutationBatch::IsBatching() ||
       !ObservesAttr(RegisterTarget(), aElement, aNameSpaceID, aAttribute)) {
@@ -345,12 +350,12 @@ void
 nsAnimationReceiver::RecordAnimationMutation(Animation* aAnimation,
                                              AnimationMutation aMutationType)
 {
-  KeyframeEffectReadOnly* effect = aAnimation->GetEffect();
+  mozilla::dom::KeyframeEffectReadOnly* effect = aAnimation->GetEffect();
   if (!effect) {
     return;
   }
 
-  Element* animationTarget = effect->GetTarget();
+  mozilla::dom::Element* animationTarget = effect->GetTarget();
   if (!animationTarget) {
     return;
   }
@@ -686,7 +691,11 @@ nsDOMMutationObserver::TakeRecords(
   for (uint32_t i = 0; i < mPendingMutationCount; ++i) {
     nsRefPtr<nsDOMMutationRecord> next;
     current->mNext.swap(next);
-    *aRetVal.AppendElement() = current.forget();
+    if (!mMergeAttributeRecords ||
+        !MergeableAttributeRecord(aRetVal.SafeLastElement(nullptr),
+                                  current)) {
+      *aRetVal.AppendElement() = current.forget();
+    }
     current.swap(next);
   }
   ClearPendingRecords();
@@ -743,6 +752,21 @@ nsDOMMutationObserver::Constructor(const mozilla::dom::GlobalObject& aGlobal,
   return observer.forget();
 }
 
+
+bool
+nsDOMMutationObserver::MergeableAttributeRecord(nsDOMMutationRecord* aOldRecord,
+                                                nsDOMMutationRecord* aRecord)
+{
+  MOZ_ASSERT(mMergeAttributeRecords);
+  return
+    aOldRecord &&
+    aOldRecord->mType == nsGkAtoms::attributes &&
+    aOldRecord->mType == aRecord->mType &&
+    aOldRecord->mTarget == aRecord->mTarget &&
+    aOldRecord->mAttrName == aRecord->mAttrName &&
+    aOldRecord->mAttrNamespace.Equals(aRecord->mAttrNamespace);
+}
+
 void
 nsDOMMutationObserver::HandleMutation()
 {
@@ -764,7 +788,7 @@ nsDOMMutationObserver::HandleMutation()
     return;
   }
 
-  mozilla::dom::Sequence<mozilla::dom::OwningNonNull<nsDOMMutationRecord> >
+  mozilla::dom::Sequence<mozilla::OwningNonNull<nsDOMMutationRecord> >
     mutations;
   if (mutations.SetCapacity(mPendingMutationCount, mozilla::fallible)) {
     // We can't use TakeRecords easily here, because it deals with a
@@ -774,7 +798,12 @@ nsDOMMutationObserver::HandleMutation()
     for (uint32_t i = 0; i < mPendingMutationCount; ++i) {
       nsRefPtr<nsDOMMutationRecord> next;
       current->mNext.swap(next);
-      *mutations.AppendElement(mozilla::fallible) = current;
+      if (!mMergeAttributeRecords ||
+          !MergeableAttributeRecord(mutations.Length() ?
+                                      mutations.LastElement().get() : nullptr,
+                                    current)) {
+        *mutations.AppendElement(mozilla::fallible) = current;
+      }
       current.swap(next);
     }
   }

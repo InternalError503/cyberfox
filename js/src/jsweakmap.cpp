@@ -345,8 +345,6 @@ TryPreserveReflector(JSContext* cx, HandleObject obj)
 static inline void
 WeakMapPostWriteBarrier(JSRuntime* rt, ObjectValueMap* weakMap, JSObject* key)
 {
-    // Strip the barriers from the type before inserting into the store buffer.
-    // This will automatically ensure that barriers do not fire during GC.
     if (key && IsInsideNursery(key))
         rt->gc.storeBuffer.putGeneric(gc::HashKeyRef<ObjectValueMap, JSObject*>(weakMap, key));
 }
@@ -514,13 +512,13 @@ static bool
 WeakMap_construct(JSContext* cx, unsigned argc, Value* vp)
 {
     CallArgs args = CallArgsFromVp(argc, vp);
-    RootedObject obj(cx, NewBuiltinClassInstance(cx, &WeakMapObject::class_));
-    if (!obj)
-        return false;
 
     // ES6 draft rev 31 (15 Jan 2015) 23.3.1.1 step 1.
-    // FIXME: bug 1083752
-    if (!WarnIfNotConstructing(cx, args, "WeakMap"))
+    if (!ThrowIfNotConstructing(cx, args, "WeakMap"))
+        return false;
+
+    RootedObject obj(cx, NewBuiltinClassInstance(cx, &WeakMapObject::class_));
+    if (!obj)
         return false;
 
     // Steps 5-6, 11.
@@ -708,6 +706,8 @@ ObjectWeakMap::add(JSContext* cx, JSObject* obj, JSObject* target)
         ReportOutOfMemory(cx);
         return false;
     }
+    if (IsInsideNursery(obj))
+        cx->runtime()->gc.storeBuffer.putGeneric(StoreBufferRef(&map, obj));
 
     return true;
 }

@@ -5,6 +5,7 @@
 
 package org.mozilla.gecko.util;
 
+import org.mozilla.gecko.annotation.WrapForJNI;
 import org.mozilla.gecko.mozglue.JNITarget;
 
 /**
@@ -15,13 +16,10 @@ import org.mozilla.gecko.mozglue.JNITarget;
  * thread, call {@link #clone()} to make a copy, and use the copy on the other thread.
  * When a copy is first used, it becomes attached to the thread using it.
  */
-@JNITarget
+@WrapForJNI
 public final class NativeJSContainer extends NativeJSObject
 {
-    private final long mNativeObject;
-
-    private NativeJSContainer(long nativeObject) {
-        mNativeObject = nativeObject;
+    private NativeJSContainer() {
     }
 
     /**
@@ -35,5 +33,6 @@ public final class NativeJSContainer extends NativeJSObject
      * Dispose all associated native objects. Subsequent use of any objects derived from
      * this container will throw a NullPointerException.
      */
-    public native void dispose();
+    @Override
+    public native void disposeNative();
 }

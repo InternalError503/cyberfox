@@ -9,6 +9,7 @@ Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/LoadContextInfo.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://gre/modules/BrowserUtils.jsm");
 Components.utils.import("resource://gre/modules/AppConstants.jsm");
 
 var gAdvancedPane = {
@@ -60,11 +61,10 @@ var gAdvancedPane = {
 #endif
 #ifdef MOZ_TELEMETRY_REPORTING
     this.initTelemetry();
-#endif
+#endif	
 #ifdef MOZ_SERVICES_HEALTHREPORT
     this.initSubmitHealthReport();
 #endif
-
     this.updateCacheSizeInputField();
     this.updateActualCacheSize();
     this.updateActualAppCacheSize();
@@ -215,6 +215,9 @@ var gAdvancedPane = {
    */
   initSubmitCrashes: function ()
   {
+    this._setupLearnMoreLink("toolkit.crashreporter.infoURL",
+                             "crashReporterLearnMore");
+
     var checkbox = document.getElementById("submitCrashesBox");
     try {
       var cr = Components.classes["@mozilla.org/toolkit/crash-reporter;1"].
@@ -223,7 +226,6 @@ var gAdvancedPane = {
     } catch (e) {
       checkbox.style.display = "none";
     }
-    this._setupLearnMoreLink("toolkit.crashreporter.infoURL", "crashReporterLearnMore");
   },
 
   /**
@@ -239,11 +241,10 @@ var gAdvancedPane = {
     } catch (e) { }
   },
 
-
   /**
    * The preference/checkbox is configured in XUL.
    *
-   * In all cases, set up the Learn More link sanely
+   * In all cases, set up the Learn More link sanely.
    */
   initTelemetry: function ()
   {
@@ -340,7 +341,9 @@ var gAdvancedPane = {
     this.observer = {
       onNetworkCacheDiskConsumption: function(consumption) {
         var size = DownloadUtils.convertByteUnits(consumption);
-        actualSizeLabel.value = prefStrBundle.getFormattedString("actualDiskCacheSize", size);
+        try{
+            actualSizeLabel.textContent = prefStrBundle.getFormattedString("actualDiskCacheSize", size);
+        } catch (e) {}
       },
 
       QueryInterface: XPCOMUtils.generateQI([
@@ -349,12 +352,14 @@ var gAdvancedPane = {
       ])
     };
 
-    actualSizeLabel.value = prefStrBundle.getString("actualDiskCacheSizeCalculated");
+    actualSizeLabel.textContent = prefStrBundle.getString("actualDiskCacheSizeCalculated");
 
-    var cacheService =
-      Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
-                .getService(Components.interfaces.nsICacheStorageService);
-    cacheService.asyncGetDiskConsumption(this.observer);
+    try {
+      var cacheService =
+        Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
+                  .getService(Components.interfaces.nsICacheStorageService);
+      cacheService.asyncGetDiskConsumption(this.observer);
+    } catch (e) {}
   },
 
   // Retrieves the amount of space currently used by offline cache
@@ -371,11 +376,13 @@ var gAdvancedPane = {
       }
     };
 
-    var cacheService =
-      Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
-                .getService(Components.interfaces.nsICacheStorageService);
-    var storage = cacheService.appCacheStorage(LoadContextInfo.default, null);
-    storage.asyncVisitStorage(visitor, false);
+    try {
+      var cacheService =
+        Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
+                  .getService(Components.interfaces.nsICacheStorageService);
+      var storage = cacheService.appCacheStorage(LoadContextInfo.default, null);
+      storage.asyncVisitStorage(visitor, false);
+    } catch (e) {}
   },
 
   updateCacheSizeUI: function (smartSizeEnabled)
@@ -426,9 +433,9 @@ var gAdvancedPane = {
    */
   clearCache: function ()
   {
-    var cache = Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
-                                 .getService(Components.interfaces.nsICacheStorageService);
     try {
+      var cache = Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
+                            .getService(Components.interfaces.nsICacheStorageService);
       cache.clear();
     } catch(ex) {}
     this.updateActualCacheSize();
@@ -467,26 +474,24 @@ var gAdvancedPane = {
                    manageCapability : Components.interfaces.nsIPermissionManager.DENY_ACTION,
                    windowTitle      : bundlePreferences.getString("offlinepermissionstitle"),
                    introText        : bundlePreferences.getString("offlinepermissionstext") };
-    document.documentElement.openWindow("Browser:Permissions",
-                                        "chrome://browser/content/preferences/permissions.xul",
-                                        "resizable", params);
+    document.documentElement.openWindow("chrome://browser/content/preferences/permissions.xul",
+               "Browser:Permissions",
+               "resizable",
+               params);
   },
 
   // XXX: duplicated in browser.js
-  _getOfflineAppUsage: function (host, groups)
+  _getOfflineAppUsage: function (perm, groups)
   {
     var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
                        getService(Components.interfaces.nsIApplicationCacheService);
-    if (!groups)
-      groups = cacheService.getGroups();
-
     var ios = Components.classes["@mozilla.org/network/io-service;1"].
               getService(Components.interfaces.nsIIOService);
 
     var usage = 0;
     for (var i = 0; i < groups.length; i++) {
       var uri = ios.newURI(groups[i], null, null);
-      if (uri.asciiHost == host) {
+      if (perm.matchesURI(uri, true)) {
         var cache = cacheService.getActiveCache(groups[i]);
         usage += cache.usage;
       }
@@ -508,9 +513,14 @@ var gAdvancedPane = {
       list.removeChild(list.firstChild);
     }
 
-    var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
-                       getService(Components.interfaces.nsIApplicationCacheService);
-    var groups = cacheService.getGroups();
+    var groups;
+    try {
+      var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
+                         getService(Components.interfaces.nsIApplicationCacheService);
+      groups = cacheService.getGroups();
+    } catch (e) {
+      return;
+    }
 
     var bundle = document.getElementById("bundlePreferences");
 
@@ -523,9 +533,9 @@ var gAdvancedPane = {
         var row = document.createElement("listitem");
         row.id = "";
         row.className = "offlineapp";
-        row.setAttribute("host", perm.host);
+        row.setAttribute("origin", perm.principal.origin);
         var converted = DownloadUtils.
-                        convertByteUnits(this._getOfflineAppUsage(perm.host, groups));
+                        convertByteUnits(this._getOfflineAppUsage(perm, groups));
         row.setAttribute("usage",
                          bundle.getFormattedString("offlineAppUsage",
                                                    converted));
@@ -549,7 +559,8 @@ var gAdvancedPane = {
   {
     var list = document.getElementById("offlineAppsList");
     var item = list.selectedItem;
-    var host = item.getAttribute("host");
+    var origin = item.getAttribute("origin");
+    var principal = BrowserUtils.principalFromOrigin(origin);
 
     var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                             .getService(Components.interfaces.nsIPromptService);
@@ -558,34 +569,35 @@ var gAdvancedPane = {
 
     var bundle = document.getElementById("bundlePreferences");
     var title = bundle.getString("offlineAppRemoveTitle");
-    var prompt = bundle.getFormattedString("offlineAppRemovePrompt", [host]);
+    var prompt = bundle.getFormattedString("offlineAppRemovePrompt", [principal.URI.prePath]);
     var confirm = bundle.getString("offlineAppRemoveConfirm");
     var result = prompts.confirmEx(window, title, prompt, flags, confirm,
                                    null, null, null, {});
     if (result != 0)
       return;
 
-    // clear offline cache entries
-    var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
-                       getService(Components.interfaces.nsIApplicationCacheService);
-    var ios = Components.classes["@mozilla.org/network/io-service;1"].
-              getService(Components.interfaces.nsIIOService);
-    var groups = cacheService.getGroups();
-    for (var i = 0; i < groups.length; i++) {
-        var uri = ios.newURI(groups[i], null, null);
-        if (uri.asciiHost == host) {
-            var cache = cacheService.getActiveCache(groups[i]);
-            cache.discard();
-        }
-    }
-
-    // remove the permission
+    // get the permission
     var pm = Components.classes["@mozilla.org/permissionmanager;1"]
                        .getService(Components.interfaces.nsIPermissionManager);
-    pm.remove(host, "offline-app",
-              Components.interfaces.nsIPermissionManager.ALLOW_ACTION);
-    pm.remove(host, "offline-app",
-              Components.interfaces.nsIOfflineCacheUpdateService.ALLOW_NO_WARN);
+    var perm = pm.getPermissionObject(principal, "offline-app", true);
+
+    // clear offline cache entries
+    try {
+      var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
+                         getService(Components.interfaces.nsIApplicationCacheService);
+      var ios = Components.classes["@mozilla.org/network/io-service;1"].
+                getService(Components.interfaces.nsIIOService);
+      var groups = cacheService.getGroups();
+      for (var i = 0; i < groups.length; i++) {
+          var uri = ios.newURI(groups[i], null, null);
+          if (perm.matchesURI(uri, true)) {
+              var cache = cacheService.getActiveCache(groups[i]);
+              cache.discard();
+          }
+      }
+    } catch (e) {}
+
+    pm.removePermission(perm);
 
     list.removeChild(item);
     gAdvancedPane.offlineAppSelected();
@@ -687,24 +699,6 @@ var gAdvancedPane = {
     }
     if (installed != 1) {
       document.getElementById("useService").hidden = true;
-    }
-    try {
-      const DRIVE_FIXED = 3;
-      const LPCWSTR = ctypes.char16_t.ptr;
-      const UINT = ctypes.uint32_t;
-      let kernel32 = ctypes.open("kernel32");
-      let GetDriveType = kernel32.declare("GetDriveTypeW", ctypes.default_abi, UINT, LPCWSTR);
-      var UpdatesDir = Components.classes["@mozilla.org/updates/update-service;1"].
-                       getService(Components.interfaces.nsIApplicationUpdateService);
-      let rootPath = UpdatesDir.getUpdatesDirectory();
-      while (rootPath.parent != null) {
-        rootPath = rootPath.parent;
-      }
-      if (GetDriveType(rootPath.path) != DRIVE_FIXED) {
-        document.getElementById("useService").hidden = true;
-      }
-      kernel32.close();
-    } catch(e) {
     }
 #endif
   },
@@ -810,9 +804,9 @@ var gAdvancedPane = {
    */
   showCertificates: function ()
   {
-    document.documentElement.openWindow("mozilla:certmanager",
-                                        "chrome://pippki/content/certManager.xul",
-                                        "", null);
+    document.documentElement.openWindow("chrome://pippki/content/certManager.xul",
+               "mozilla:certmanager",
+               "", null);
   },
 
   /**
@@ -820,9 +814,9 @@ var gAdvancedPane = {
    */
   showSecurityDevices: function ()
   {
-    document.documentElement.openWindow("mozilla:devicemanager",
-                                        "chrome://pippki/content/device_manager.xul",
-                                        "", null);
+    document.documentElement.openWindow("chrome://pippki/content/device_manager.xul",
+               "mozilla:devicemanager",
+               "", null);
   },
 
 #ifdef MOZ_UPDATER

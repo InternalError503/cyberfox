@@ -85,7 +85,7 @@ protected:
 
   virtual PBroadcastChannelChild*
   AllocPBroadcastChannelChild(const PrincipalInfo& aPrincipalInfo,
-                              const nsString& aOrigin,
+                              const nsCString& aOrigin,
                               const nsString& aChannel,
                               const bool& aPrivateBrowsing) override;
 
@@ -122,6 +122,12 @@ protected:
 
   virtual bool
   DeallocPMessagePortChild(PMessagePortChild* aActor) override;
+
+  virtual PNuwaChild*
+  AllocPNuwaChild() override;
+
+  virtual bool
+  DeallocPNuwaChild(PNuwaChild* aActor) override;
 };
 
 class BackgroundChildImpl::ThreadLocal final

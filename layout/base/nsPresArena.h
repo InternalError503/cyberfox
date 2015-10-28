@@ -137,15 +137,10 @@ private:
     { return NS_PTR_TO_INT32(aKey); }
 
     size_t SizeOfExcludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
-    { return mEntries.SizeOfExcludingThis(aMallocSizeOf); }
+    { return mEntries.ShallowSizeOfExcludingThis(aMallocSizeOf); }
 
     enum { ALLOW_MEMMOVE = false };
   };
-
-#if defined(MOZ_HAVE_MEM_CHECKS)
-  static PLDHashOperator UnpoisonFreeList(FreeList* aEntry, void*);
-#endif
-  static PLDHashOperator FreeListEnumerator(FreeList* aEntry, void* aData);
 
   nsTHashtable<FreeList> mFreeLists;
   PLArenaPool mPool;

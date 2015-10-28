@@ -70,7 +70,7 @@ OrientedImage::GetIntrinsicRatio(nsSize* aRatio)
   return rv;
 }
 
-NS_IMETHODIMP_(TemporaryRef<SourceSurface>)
+NS_IMETHODIMP_(already_AddRefed<SourceSurface>)
 OrientedImage::GetFrame(uint32_t aWhichFrame,
                         uint32_t aFlags)
 {
@@ -334,7 +334,7 @@ OrientedImage::GetImageSpaceInvalidationRect(const nsIntRect& aRect)
   }
 
   // Transform the invalidation rect into the correct orientation.
-  gfxMatrix matrix(OrientationMatrix(innerSize, /* aInvert = */ true));
+  gfxMatrix matrix(OrientationMatrix(innerSize));
   gfxRect invalidRect(matrix.TransformBounds(gfxRect(rect.x, rect.y,
                                                      rect.width, rect.height)));
   invalidRect.RoundOut();

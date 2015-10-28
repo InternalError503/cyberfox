@@ -118,7 +118,8 @@ public class Tabs implements GeckoEventListener {
             "DesktopMode:Changed",
             "Tab:ViewportMetadata",
             "Tab:StreamStart",
-            "Tab:StreamStop");
+            "Tab:StreamStop",
+            "Tab:AudioPlayingChange");
 
     }
 
@@ -581,6 +582,9 @@ public class Tabs implements GeckoEventListener {
             } else if (event.equals("Tab:StreamStop")) {
                 tab.setRecording(false);
                 notifyListeners(tab, TabEvents.RECORDING_CHANGE);
+            } else if (event.equals("Tab:AudioPlayingChange")) {
+                tab.setIsAudioPlaying(message.getBoolean("isAudioPlaying"));
+                notifyListeners(tab, TabEvents.AUDIO_PLAYING_CHANGE);
             }
 
         } catch (Exception e) {
@@ -641,6 +645,7 @@ public class Tabs implements GeckoEventListener {
         BOOKMARK_REMOVED,
         READING_LIST_ADDED,
         READING_LIST_REMOVED,
+        AUDIO_PLAYING_CHANGE,
     }
 
     public void notifyListeners(Tab tab, TabEvents msg) {
@@ -960,6 +965,9 @@ public class Tabs implements GeckoEventListener {
      * Use this for tabs opened by the browser chrome, so users can press the
      * "Back" button to return to the previous tab.
      *
+     * This method will open a new private tab if the currently selected tab
+     * is also private.
+     *
      * @param url URL of page to load
      */
     public void loadUrlInTab(String url) {
@@ -975,12 +983,17 @@ public class Tabs implements GeckoEventListener {
         // (i.e., we're restoring a session after a crash). In these cases,
         // don't mark any tabs as a parent.
         int parentId = -1;
-        Tab selectedTab = getSelectedTab();
+        int flags = LOADURL_NEW_TAB;
+
+        final Tab selectedTab = getSelectedTab();
         if (selectedTab != null) {
             parentId = selectedTab.getId();
+            if (selectedTab.isPrivate()) {
+                flags = flags | LOADURL_PRIVATE;
+            }
         }
 
-        loadUrl(url, null, parentId, LOADURL_NEW_TAB);
+        loadUrl(url, null, parentId, flags);
     }
 
     /**

@@ -19,6 +19,7 @@
 
 #include "gc/Nursery-inl.h"
 #include "vm/ArrayObject-inl.h"
+#include "vm/ScopeObject-inl.h"
 #include "vm/Shape-inl.h"
 
 using namespace js;
@@ -2258,7 +2259,7 @@ SetExistingProperty(JSContext* cx, HandleNativeObject obj, HandleId id, HandleVa
                 Rooted<ArrayObject*> arr(cx, &pobj->as<ArrayObject>());
                 return ArraySetLength(cx, arr, id, shape->attributes(), v, result);
             }
-            return NativeSetExistingDataProperty(cx, obj, shape, v, receiver, result);
+            return NativeSetExistingDataProperty(cx, pobj, shape, v, receiver, result);
         }
 
         // SpiderMonkey special case: assigning to an inherited slotless

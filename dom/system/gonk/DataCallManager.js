@@ -53,7 +53,9 @@ const DATACALLMANAGER_CID =
 const DATACALLHANDLER_CID =
   Components.ID("{132b650f-c4d8-4731-96c5-83785cb31dee}");
 const RILNETWORKINTERFACE_CID =
-  Components.ID("{8c11bef9-9b4f-4d96-bed7-f5a1f48eabda}");
+  Components.ID("{9574ee84-5d0d-4814-b9e6-8b279e03dcf4}");
+const RILNETWORKINFO_CID =
+  Components.ID("{dd6cf2f0-f0e3-449f-a69e-7c34fdcb8d4b}");
 
 const TOPIC_XPCOM_SHUTDOWN      = "xpcom-shutdown";
 const TOPIC_MOZSETTINGS_CHANGED = "mozsettings-changed";
@@ -61,19 +63,20 @@ const TOPIC_PREF_CHANGED        = "nsPref:changed";
 const TOPIC_DATA_CALL_ERROR     = "data-call-error";
 const PREF_RIL_DEBUG_ENABLED    = "ril.debugging.enabled";
 
-const NETWORK_TYPE_UNKNOWN     = Ci.nsINetworkInterface.NETWORK_TYPE_UNKNOWN;
-const NETWORK_TYPE_WIFI        = Ci.nsINetworkInterface.NETWORK_TYPE_WIFI;
-const NETWORK_TYPE_MOBILE      = Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE;
-const NETWORK_TYPE_MOBILE_MMS  = Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE_MMS;
-const NETWORK_TYPE_MOBILE_SUPL = Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE_SUPL;
-const NETWORK_TYPE_MOBILE_IMS  = Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE_IMS;
-const NETWORK_TYPE_MOBILE_DUN  = Ci.nsINetworkInterface.NETWORK_TYPE_MOBILE_DUN;
+const NETWORK_TYPE_UNKNOWN     = Ci.nsINetworkInfo.NETWORK_TYPE_UNKNOWN;
+const NETWORK_TYPE_WIFI        = Ci.nsINetworkInfo.NETWORK_TYPE_WIFI;
+const NETWORK_TYPE_MOBILE      = Ci.nsINetworkInfo.NETWORK_TYPE_MOBILE;
+const NETWORK_TYPE_MOBILE_MMS  = Ci.nsINetworkInfo.NETWORK_TYPE_MOBILE_MMS;
+const NETWORK_TYPE_MOBILE_SUPL = Ci.nsINetworkInfo.NETWORK_TYPE_MOBILE_SUPL;
+const NETWORK_TYPE_MOBILE_IMS  = Ci.nsINetworkInfo.NETWORK_TYPE_MOBILE_IMS;
+const NETWORK_TYPE_MOBILE_DUN  = Ci.nsINetworkInfo.NETWORK_TYPE_MOBILE_DUN;
+const NETWORK_TYPE_MOBILE_FOTA = Ci.nsINetworkInfo.NETWORK_TYPE_MOBILE_FOTA;
 
-const NETWORK_STATE_UNKNOWN       = Ci.nsINetworkInterface.NETWORK_STATE_UNKNOWN;
-const NETWORK_STATE_CONNECTING    = Ci.nsINetworkInterface.NETWORK_STATE_CONNECTING;
-const NETWORK_STATE_CONNECTED     = Ci.nsINetworkInterface.NETWORK_STATE_CONNECTED;
-const NETWORK_STATE_DISCONNECTING = Ci.nsINetworkInterface.NETWORK_STATE_DISCONNECTING;
-const NETWORK_STATE_DISCONNECTED  = Ci.nsINetworkInterface.NETWORK_STATE_DISCONNECTED;
+const NETWORK_STATE_UNKNOWN       = Ci.nsINetworkInfo.NETWORK_STATE_UNKNOWN;
+const NETWORK_STATE_CONNECTING    = Ci.nsINetworkInfo.NETWORK_STATE_CONNECTING;
+const NETWORK_STATE_CONNECTED     = Ci.nsINetworkInfo.NETWORK_STATE_CONNECTED;
+const NETWORK_STATE_DISCONNECTING = Ci.nsINetworkInfo.NETWORK_STATE_DISCONNECTING;
+const NETWORK_STATE_DISCONNECTED  = Ci.nsINetworkInfo.NETWORK_STATE_DISCONNECTED;
 
 const INT32_MAX = 2147483647;
 
@@ -144,6 +147,10 @@ DataCallManager.prototype = {
 
   debug: function(aMsg) {
     dump("-*- DataCallManager: " + aMsg + "\n");
+  },
+
+  get dataDefaultServiceId() {
+    return this._dataDefaultClientId;
   },
 
   getDataCallHandler: function(aClientId) {
@@ -414,7 +421,7 @@ DataCallHandler.prototype = {
     this._dataCalls = [];
     this.clientId = null;
 
-    this.dataCallinterface.unregisterListener(this);
+    this.dataCallInterface.unregisterListener(this);
     this.dataCallInterface = null;
 
     let mobileConnection =
@@ -444,6 +451,8 @@ DataCallHandler.prototype = {
         return NETWORK_TYPE_MOBILE_IMS;
       case "dun":
         return NETWORK_TYPE_MOBILE_DUN;
+      case "fota":
+        return NETWORK_TYPE_MOBILE_FOTA;
       default:
         return NETWORK_TYPE_UNKNOWN;
      }
@@ -622,8 +631,8 @@ DataCallHandler.prototype = {
       return;
     }
     let wifi_active = false;
-    if (gNetworkManager.active &&
-        gNetworkManager.active.type == NETWORK_TYPE_WIFI) {
+    if (gNetworkManager.activeNetworkInfo &&
+        gNetworkManager.activeNetworkInfo.type == NETWORK_TYPE_WIFI) {
       wifi_active = true;
     }
 
@@ -688,7 +697,8 @@ DataCallHandler.prototype = {
         aNetworkType === NETWORK_TYPE_MOBILE_MMS ||
         aNetworkType === NETWORK_TYPE_MOBILE_SUPL ||
         aNetworkType === NETWORK_TYPE_MOBILE_IMS ||
-        aNetworkType === NETWORK_TYPE_MOBILE_DUN) {
+        aNetworkType === NETWORK_TYPE_MOBILE_DUN ||
+        aNetworkType === NETWORK_TYPE_MOBILE_FOTA) {
       return true;
     }
 
@@ -705,7 +715,7 @@ DataCallHandler.prototype = {
     if (!networkInterface) {
       return NETWORK_STATE_UNKNOWN;
     }
-    return networkInterface.state;
+    return networkInterface.info.state;
   },
 
   setupDataCallByType: function(aNetworkType) {
@@ -756,8 +766,8 @@ DataCallHandler.prototype = {
     let dataDisconnecting = false;
     this.dataNetworkInterfaces.forEach(function(networkInterface) {
       if (networkInterface.enabled) {
-        if (networkInterface.state != NETWORK_STATE_UNKNOWN &&
-            networkInterface.state != NETWORK_STATE_DISCONNECTED) {
+        if (networkInterface.info.state != NETWORK_STATE_UNKNOWN &&
+            networkInterface.info.state != NETWORK_STATE_DISCONNECTED) {
           dataDisconnecting = true;
         }
         networkInterface.disconnect();
@@ -832,23 +842,14 @@ DataCallHandler.prototype = {
   /**
    * Notify about data call setup error, called from DataCall.
    */
-  notifyDataCallError: function(aMessage) {
+  notifyDataCallError: function(aDataCall, aErrorMsg) {
     // Notify data call error only for data APN
     let networkInterface = this.dataNetworkInterfaces.get(NETWORK_TYPE_MOBILE);
     if (networkInterface && networkInterface.enabled) {
       let dataCall = networkInterface.dataCall;
-      // If there is a cid, compare cid; otherwise it is probably an error on
-      // data call setup.
-      if (aMessage.cid !== undefined) {
-        if (aMessage.linkInfo.cid == dataCall.linkInfo.cid) {
-          Services.obs.notifyObservers(networkInterface, TOPIC_DATA_CALL_ERROR,
-                                       null);
-        }
-      } else {
-        if (this._compareDataCallOptions(dataCall, aMessage)) {
-          Services.obs.notifyObservers(networkInterface, TOPIC_DATA_CALL_ERROR,
-                                       null);
-        }
+      if (this._compareDataCallOptions(dataCall, aDataCall)) {
+        Services.obs.notifyObservers(networkInterface.info,
+                                     TOPIC_DATA_CALL_ERROR, aErrorMsg);
       }
     }
   },
@@ -1061,7 +1062,7 @@ DataCall.prototype = {
       }
 
       // Let DataCallHandler notify MobileConnectionService
-      this.dataCallHandler.notifyDataCallError(this);
+      this.dataCallHandler.notifyDataCallError(this, errorMsg);
 
       // For suggestedRetryTime, the value of INT32_MAX(0x7fffffff) means no retry.
       if (aDataCall.suggestedRetryTime === INT32_MAX ||
@@ -1238,7 +1239,7 @@ DataCall.prototype = {
 
   inRequestedTypes: function(aType) {
     for (let i = 0; i < this.requestedNetworkIfaces.length; i++) {
-      if (this.requestedNetworkIfaces[i].type == aType) {
+      if (this.requestedNetworkIfaces[i].info.type == aType) {
         return true;
       }
     }
@@ -1275,7 +1276,7 @@ DataCall.prototype = {
   },
 
   connect: function(aNetworkInterface) {
-    if (DEBUG) this.debug("connect: " + aNetworkInterface.type);
+    if (DEBUG) this.debug("connect: " + aNetworkInterface.info.type);
 
     if (this.requestedNetworkIfaces.indexOf(aNetworkInterface) == -1) {
       this.requestedNetworkIfaces.push(aNetworkInterface);
@@ -1291,7 +1292,7 @@ DataCall.prototype = {
       Services.tm.currentThread.dispatch(() => {
         // Do not notify if state changed while this event was being dispatched,
         // the state probably was notified already or need not to be notified.
-        if (aNetworkInterface.state == RIL.GECKO_NETWORK_STATE_CONNECTED) {
+        if (aNetworkInterface.info.state == RIL.GECKO_NETWORK_STATE_CONNECTED) {
           aNetworkInterface.notifyRILNetworkInterface();
         }
       }, Ci.nsIEventTarget.DISPATCH_NORMAL);
@@ -1401,7 +1402,7 @@ DataCall.prototype = {
   },
 
   disconnect: function(aNetworkInterface) {
-    if (DEBUG) this.debug("disconnect: " + aNetworkInterface.type);
+    if (DEBUG) this.debug("disconnect: " + aNetworkInterface.info.type);
 
     let index = this.requestedNetworkIfaces.indexOf(aNetworkInterface);
     if (index != -1) {
@@ -1422,7 +1423,7 @@ DataCall.prototype = {
       Services.tm.currentThread.dispatch(() => {
         // Do not notify if state changed while this event was being dispatched,
         // the state probably was notified already or need not to be notified.
-        if (aNetworkInterface.state == RIL.GECKO_NETWORK_STATE_DISCONNECTED) {
+        if (aNetworkInterface.info.state == RIL.GECKO_NETWORK_STATE_DISCONNECTED) {
           aNetworkInterface.notifyRILNetworkInterface();
 
           // Clear link info after notifying NetworkManager.
@@ -1445,7 +1446,7 @@ DataCall.prototype = {
   },
 
   deactivate: function() {
-    let reason = Ci.nsINetworkInterface.DATACALL_DEACTIVATE_NO_REASON;
+    let reason = Ci.nsIDataCallInterface.DATACALL_DEACTIVATE_NO_REASON;
     if (DEBUG) {
       this.debug("Going to disconnect data connection cid " + this.linkInfo.cid);
     }
@@ -1477,61 +1478,56 @@ DataCall.prototype = {
   }
 };
 
-function RILNetworkInterface(aDataCallHandler, aType, aApnSetting, aDataCall) {
-  if (!aDataCall) {
-    throw new Error("No dataCall for RILNetworkInterface: " + type);
-  }
-
-  this.dataCallHandler = aDataCallHandler;
+function RILNetworkInfo(aClientId, aType, aNetworkInterface)
+{
+  this.serviceId = aClientId;
   this.type = aType;
-  this.apnSetting = aApnSetting;
-  this.dataCall = aDataCall;
 
-  this.enabled = false;
+  this.networkInterface = aNetworkInterface;
 }
+RILNetworkInfo.prototype = {
+  classID:   RILNETWORKINFO_CID,
+  classInfo: XPCOMUtils.generateCI({classID: RILNETWORKINFO_CID,
+                                    classDescription: "RILNetworkInfo",
+                                    interfaces: [Ci.nsINetworkInfo,
+                                                 Ci.nsIRilNetworkInfo]}),
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsINetworkInfo,
+                                         Ci.nsIRilNetworkInfo]),
 
-RILNetworkInterface.prototype = {
-  classID:   RILNETWORKINTERFACE_CID,
-  classInfo: XPCOMUtils.generateCI({classID: RILNETWORKINTERFACE_CID,
-                                    classDescription: "RILNetworkInterface",
-                                    interfaces: [Ci.nsINetworkInterface,
-                                                 Ci.nsIRilNetworkInterface]}),
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsINetworkInterface,
-                                         Ci.nsIRilNetworkInterface]),
+  networkInterface: null,
 
-  // Hold reference to DataCall object which is determined at initilization.
-  dataCall: null,
+  getDataCall: function() {
+    return this.networkInterface.dataCall;
+  },
 
-  // If this RILNetworkInterface type is enabled or not.
-  enabled: null,
+  getApnSetting: function() {
+    return this.networkInterface.apnSetting;
+  },
+
+  debug: function(aMsg) {
+    dump("-*- RILNetworkInfo[" + this.serviceId + ":" + this.type + "]: " +
+         aMsg + "\n");
+  },
 
   /**
-   * nsINetworkInterface Implementation
+   * nsINetworkInfo Implementation
    */
-
   get state() {
-    if (!this.dataCall.inRequestedTypes(this.type)) {
+    let dataCall = this.getDataCall();
+    if (!dataCall.inRequestedTypes(this.type)) {
       return NETWORK_STATE_DISCONNECTED;
     }
-    return this.dataCall.state;
+    return dataCall.state;
   },
 
   type: null,
 
   get name() {
-    return this.dataCall.linkInfo.ifname;
-  },
-
-  get httpProxyHost() {
-    return this.apnSetting.proxy || "";
-  },
-
-  get httpProxyPort() {
-    return this.apnSetting.port || "";
+    return this.getDataCall().linkInfo.ifname;
   },
 
   getAddresses: function(aIps, aPrefixLengths) {
-    let addresses = this.dataCall.linkInfo.addresses;
+    let addresses = this.getDataCall().linkInfo.addresses;
 
     let ips = [];
     let prefixLengths = [];
@@ -1548,33 +1544,33 @@ RILNetworkInterface.prototype = {
   },
 
   getGateways: function(aCount) {
-    let linkInfo = this.dataCall.linkInfo;
+    let linkInfo = this.getDataCall().linkInfo;
 
     if (aCount) {
       aCount.value = linkInfo.gateways.length;
     }
+
     return linkInfo.gateways.slice();
   },
 
   getDnses: function(aCount) {
-    let linkInfo = this.dataCall.linkInfo;
+    let linkInfo = this.getDataCall().linkInfo;
 
     if (aCount) {
       aCount.value = linkInfo.dnses.length;
     }
+
     return linkInfo.dnses.slice();
   },
 
   /**
-   * nsIRilNetworkInterface Implementation
+   * nsIRilNetworkInfo Implementation
    */
 
-  get serviceId() {
-    return this.dataCallHandler.clientId;
-  },
+  serviceId: 0,
 
   get iccId() {
-    let icc = gIccService.getIccByServiceId(this.dataCallHandler.clientId);
+    let icc = gIccService.getIccByServiceId(this.serviceId);
     let iccInfo = icc && icc.iccInfo;
 
     return iccInfo && iccInfo.iccid;
@@ -1586,7 +1582,7 @@ RILNetworkInterface.prototype = {
       throw Cr.NS_ERROR_UNEXPECTED;
     }
 
-    return this.apnSetting.mmsc || "";
+    return this.getApnSetting().mmsc || "";
   },
 
   get mmsProxy() {
@@ -1595,7 +1591,7 @@ RILNetworkInterface.prototype = {
       throw Cr.NS_ERROR_UNEXPECTED;
     }
 
-    return this.apnSetting.mmsproxy || "";
+    return this.getApnSetting().mmsproxy || "";
   },
 
   get mmsPort() {
@@ -1606,26 +1602,66 @@ RILNetworkInterface.prototype = {
 
     // Note: Port 0 is reserved, so we treat it as invalid as well.
     // See http://www.iana.org/assignments/port-numbers
-    return this.apnSetting.mmsport || -1;
+    return this.getApnSetting().mmsport || -1;
+  },
+};
+
+function RILNetworkInterface(aDataCallHandler, aType, aApnSetting, aDataCall) {
+  if (!aDataCall) {
+    throw new Error("No dataCall for RILNetworkInterface: " + type);
+  }
+
+  this.dataCallHandler = aDataCallHandler;
+  this.enabled = false;
+  this.dataCall = aDataCall;
+  this.apnSetting = aApnSetting;
+
+  this.info = new RILNetworkInfo(aDataCallHandler.clientId, aType, this);
+}
+
+RILNetworkInterface.prototype = {
+  classID:   RILNETWORKINTERFACE_CID,
+  classInfo: XPCOMUtils.generateCI({classID: RILNETWORKINTERFACE_CID,
+                                    classDescription: "RILNetworkInterface",
+                                    interfaces: [Ci.nsINetworkInterface]}),
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsINetworkInterface]),
+
+  // If this RILNetworkInterface type is enabled or not.
+  enabled: null,
+
+  apnSetting: null,
+
+  dataCall: null,
+
+  /**
+   * nsINetworkInterface Implementation
+   */
+
+  info: null,
+
+  get httpProxyHost() {
+    return this.apnSetting.proxy || "";
+  },
+
+  get httpProxyPort() {
+    return this.apnSetting.port || "";
   },
 
   // Helpers
 
   debug: function(aMsg) {
     dump("-*- RILNetworkInterface[" + this.dataCallHandler.clientId + ":" +
-         this.type + "]: " + aMsg + "\n");
+         this.info.type + "]: " + aMsg + "\n");
   },
 
-  apnSetting: null,
-
   get connected() {
-    return this.state == NETWORK_STATE_CONNECTED;
+    return this.info.state == NETWORK_STATE_CONNECTED;
   },
 
   notifyRILNetworkInterface: function() {
     if (DEBUG) {
-      this.debug("notifyRILNetworkInterface type: " + this.type + ", state: " +
-                 this.state);
+      this.debug("notifyRILNetworkInterface type: " + this.info.type +
+                 ", state: " + this.info.state);
     }
 
     gNetworkManager.updateNetworkInterface(this);

@@ -6,14 +6,17 @@
 #include "nsMultiMixedConv.h"
 #include "plstr.h"
 #include "nsIHttpChannel.h"
-#include "nsNetUtil.h"
+#include "nsNetCID.h"
 #include "nsMimeTypes.h"
 #include "nsIStringStream.h"
 #include "nsCRT.h"
 #include "nsIHttpChannelInternal.h"
 #include "nsURLHelper.h"
 #include "nsIStreamConverterService.h"
+#include "nsICacheInfoChannel.h"
 #include <algorithm>
+#include "nsContentSecurityManager.h"
+#include "nsHttp.h"
 
 //
 // Helper function for determining the length of data bytes up to
@@ -203,10 +206,28 @@ nsPartChannel::Open(nsIInputStream **result)
 }
 
 NS_IMETHODIMP
+nsPartChannel::Open2(nsIInputStream** aStream)
+{
+    nsCOMPtr<nsIStreamListener> listener;
+    nsresult rv = nsContentSecurityManager::doContentSecurityCheck(this, listener);
+    NS_ENSURE_SUCCESS(rv, rv);
+    return Open(aStream);
+}
+
+NS_IMETHODIMP
 nsPartChannel::AsyncOpen(nsIStreamListener *aListener, nsISupports *aContext)
 {
     // This channel cannot be opened!
     return NS_ERROR_FAILURE;
+}
+
+NS_IMETHODIMP
+nsPartChannel::AsyncOpen2(nsIStreamListener *aListener)
+{
+  nsCOMPtr<nsIStreamListener> listener = aListener;
+  nsresult rv = nsContentSecurityManager::doContentSecurityCheck(this, listener);
+  NS_ENSURE_SUCCESS(rv, rv);
+  return AsyncOpen(listener, nullptr);
 }
 
 NS_IMETHODIMP
@@ -470,6 +491,10 @@ nsMultiMixedConv::AsyncConvertData(const char *aFromType, const char *aToType,
     //  and OnStopRequest() call combinations. We call of series of these for each sub-part
     //  in the raw stream.
     mFinalListener = aListener;
+
+    if (NS_LITERAL_CSTRING(APPLICATION_PACKAGE).Equals(aFromType)) {
+        mPackagedApp = true;
+    }
     return NS_OK;
 }
 
@@ -727,31 +752,49 @@ nsMultiMixedConv::OnStartRequest(nsIRequest *request, nsISupports *ctxt) {
 
     nsCOMPtr<nsIChannel> channel = do_QueryInterface(request, &rv);
     if (NS_FAILED(rv)) return rv;
-    
+
+    nsCOMPtr<nsICacheInfoChannel> cacheChan = do_QueryInterface(request);
+    if (cacheChan) {
+        cacheChan->IsFromCache(&mIsFromCache);
+    }
+
     // ask the HTTP channel for the content-type and extract the boundary from it.
     nsCOMPtr<nsIHttpChannel> httpChannel = do_QueryInterface(channel, &rv);
     if (NS_SUCCEEDED(rv)) {
         rv = httpChannel->GetResponseHeader(NS_LITERAL_CSTRING("content-type"), delimiter);
-        if (NS_FAILED(rv)) return rv;
+        if (NS_FAILED(rv) && !mPackagedApp) {
+            return rv;
+        }
     } else {
         // try asking the channel directly
         rv = channel->GetContentType(delimiter);
-        if (NS_FAILED(rv)) return NS_ERROR_FAILURE;
+        if (NS_FAILED(rv) && !mPackagedApp) {
+            return NS_ERROR_FAILURE;
+        }
     }
 
     // http://www.w3.org/TR/web-packaging/#streamable-package-format
     // Although it is compatible with multipart/* this format does not require
     // the boundary to be included in the header, as it can be ascertained from
     // the content of the file.
-    if (delimiter.Find("application/package") != kNotFound) {
+    if (delimiter.Find(NS_LITERAL_CSTRING(APPLICATION_PACKAGE)) != kNotFound) {
         mPackagedApp = true;
+        mHasAppContentType = true;
         mToken.Truncate();
         mTokenLen = 0;
     }
 
     bndry = strstr(delimiter.BeginWriting(), "boundary");
 
-    if (!bndry && mPackagedApp) {
+    bool requestSucceeded = true;
+    if (httpChannel) {
+        httpChannel->GetRequestSucceeded(&requestSucceeded);
+    }
+
+    // If the package has the appropriate content type, or if it is a successful
+    // packaged app request, without the required content type, there's no need
+    // for a boundary to be included in this header.
+    if (!bndry && (mHasAppContentType || (mPackagedApp && requestSucceeded))) {
         return NS_OK;
     }
 
@@ -775,9 +818,9 @@ nsMultiMixedConv::OnStartRequest(nsIRequest *request, nsISupports *ctxt) {
     mToken = boundaryString;
     mTokenLen = boundaryString.Length();
 
-   if (mTokenLen == 0 && !mPackagedApp) {
-       return NS_ERROR_FAILURE;
-   }
+    if (mTokenLen == 0 && !mPackagedApp) {
+        return NS_ERROR_FAILURE;
+    }
 
     return NS_OK;
 }
@@ -790,7 +833,14 @@ nsMultiMixedConv::OnStopRequest(nsIRequest *request, nsISupports *ctxt,
 
     // We should definitely have found a token at this point. Not having one
     // is clearly an error, so we need to pass it to the listener.
-    if (mToken.IsEmpty()) {
+    // However, since packaged apps usually have the boundary token at the
+    // begining of the content, if the package is served from the cache, and
+    // only metadata was saved for said package (meaning no content is available
+    // and `mFirstOnData` is true) then we wouldn't have a boundary even though
+    // no error has occured.
+    if (mToken.IsEmpty() &&
+        NS_SUCCEEDED(rv) && // don't hide channel error results
+        !(mPackagedApp && mIsFromCache && mFirstOnData)) {
         aStatus = NS_ERROR_FAILURE;
         rv = NS_ERROR_FAILURE;
     }
@@ -820,6 +870,12 @@ nsMultiMixedConv::OnStopRequest(nsIRequest *request, nsISupports *ctxt,
         //(void) mFinalListener->OnStartRequest(request, ctxt);
         
         (void) mFinalListener->OnStopRequest(request, ctxt, aStatus);
+    } else if (mIsFromCache && mFirstOnData) {
+        // `mFirstOnData` is true if the package's cache entry only holds
+        // metadata and no calls to OnDataAvailable are made.
+        // In this case we would not call OnStopRequest for any of the parts,
+        // so we need to call it here.
+        (void) mFinalListener->OnStopRequest(request, ctxt, aStatus);
     }
 
     return rv;
@@ -841,6 +897,8 @@ nsMultiMixedConv::nsMultiMixedConv() :
     mTotalSent          = 0;
     mIsByteRangeRequest = false;
     mPackagedApp        = false;
+    mHasAppContentType  = false;
+    mIsFromCache        = false;
 }
 
 nsMultiMixedConv::~nsMultiMixedConv() {
@@ -870,7 +928,9 @@ nsMultiMixedConv::SendStart(nsIChannel *aChannel) {
     nsresult rv = NS_OK;
 
     nsCOMPtr<nsIStreamListener> partListener(mFinalListener);
-    if (mContentType.IsEmpty()) {
+    // For packaged apps that don't have a content type we want to just
+    // go ahead and serve them with an empty content type
+    if (mContentType.IsEmpty() && !mPackagedApp) {
         mContentType.AssignLiteral(UNKNOWN_CONTENT_TYPE);
         nsCOMPtr<nsIStreamConverterService> serv =
             do_GetService(NS_STREAMCONVERTERSERVICE_CONTRACTID, &rv);
@@ -1019,7 +1079,7 @@ nsMultiMixedConv::ParseHeaders(nsIChannel *aChannel, char *&aPtr,
     // It may already be initialized, from a previous call of ParseHeaders
     // since the headers for a single part may come in more then one chunk
     if (mPackagedApp && !mResponseHead) {
-        mResponseHead = new nsHttpResponseHead();
+        mResponseHead = new mozilla::net::nsHttpResponseHead();
     }
 
     mContentLength = UINT64_MAX; // XXX what if we were already called?
@@ -1065,6 +1125,17 @@ nsMultiMixedConv::ParseHeaders(nsIChannel *aChannel, char *&aPtr,
             // examine header
             if (headerStr.LowerCaseEqualsLiteral("content-type")) {
                 mContentType = headerVal;
+
+                // If the HTTP channel doesn't have an application/package
+                // content type we still want to serve the resource, but with the
+                // "application/octet-stream" header, so we prevent execution of
+                // unsafe content
+                if (mPackagedApp && !mHasAppContentType) {
+                    mContentType = APPLICATION_OCTET_STREAM;
+                    mResponseHead->SetHeader(mozilla::net::nsHttp::Content_Type,
+                                             mContentType);
+                    mResponseHead->SetContentType(mContentType);
+                }
             } else if (headerStr.LowerCaseEqualsLiteral("content-length")) {
                 mContentLength = nsCRT::atoll(headerVal.get());
             } else if (headerStr.LowerCaseEqualsLiteral("content-disposition")) {

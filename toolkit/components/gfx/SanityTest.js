@@ -10,8 +10,11 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import('resource://gre/modules/Preferences.jsm');
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-const PAGE_WIDTH=72;
-const PAGE_HEIGHT=136;
+const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+const FRAME_SCRIPT_URL = "chrome://gfxsanity/content/gfxFrameScript.js";
+
+const PAGE_WIDTH=92;
+const PAGE_HEIGHT=166;
 const DRIVER_PREF="sanity-test.driver-version";
 const DEVICE_PREF="sanity-test.device-id";
 const VERSION_PREF="sanity-test.version";
@@ -24,6 +27,12 @@ const TEST_PASSED=0;
 const TEST_FAILED_RENDER=1;
 const TEST_FAILED_VIDEO=2;
 const TEST_CRASHED=3;
+
+// GRAPHICS_SANITY_TEST_REASON enumeration values.
+const REASON_FIRST_RUN=0;
+const REASON_FIREFOX_CHANGED=1;
+const REASON_DEVICE_CHANGED=2;
+const REASON_DRIVER_CHANGED=3;
 
 // GRAPHICS_SANITY_TEST_OS_SNAPSHOT histogram enumeration values
 const SNAPSHOT_VIDEO_OK=0;
@@ -60,18 +69,27 @@ function reportSnapshotResult(val) {
   histogram.add(val);
 }
 
+function reportTestReason(val) {
+  let histogram = Services.telemetry.getHistogramById("GRAPHICS_SANITY_TEST_REASON");
+  histogram.add(val);
+}
+
+function annotateCrashReport(value) {
+  try {
+    // "1" if we're annotating the crash report, "" to remove the annotation.
+    var crashReporter = Cc['@mozilla.org/toolkit/crash-reporter;1'].
+                          getService(Ci.nsICrashReporter);
+    crashReporter.annotateCrashReport("GraphicsSanityTest", value ? "1" : "");
+  } catch (e) {
+  }
+}
+
 function takeWindowSnapshot(win, ctx) {
   // TODO: drawWindow reads back from the gpu's backbuffer, which won't catch issues with presenting
   // the front buffer via the window manager. Ideally we'd use an OS level API for reading back
   // from the desktop itself to get a more accurate test.
   var flags = ctx.DRAWWINDOW_DRAW_CARET | ctx.DRAWWINDOW_DRAW_VIEW | ctx.DRAWWINDOW_USE_WIDGET_LAYERS;
   ctx.drawWindow(win.ownerGlobal, 0, 0, PAGE_WIDTH, PAGE_HEIGHT, "rgb(255,255,255)", flags);
-}
-
-function setTimeout(aMs, aCallback) {
-  var timer = Components.classes["@mozilla.org/timer;1"]
-              .createInstance(Components.interfaces.nsITimer);
-  timer.initWithCallback(aCallback, aMs, Ci.nsITimer.TYPE_ONE_SHOT);
 }
 
 // Verify that all the 4 coloured squares of the video
@@ -102,20 +120,24 @@ function verifyLayersRendering(ctx) {
 
 function testCompositor(win, ctx) {
   takeWindowSnapshot(win, ctx);
+  var testPassed = true;
 
   if (!verifyVideoRendering(ctx)) {
     reportResult(TEST_FAILED_VIDEO);
     Preferences.set(DISABLE_VIDEO_PREF, true);
-    return false;
+    testPassed = false;
   }
 
   if (!verifyLayersRendering(ctx)) {
     reportResult(TEST_FAILED_RENDER);
-    return false;
+    testPassed = false;
   }
 
-  reportResult(TEST_PASSED);
-  return true;
+  if (testPassed) {
+    reportResult(TEST_PASSED);
+  }
+
+  return testPassed;
 }
 
 let listener = {
@@ -124,19 +146,20 @@ let listener = {
   win: null,
   utils: null,
   canvas: null,
+  mm: null,
+
+  messages: [
+    "gfxSanity:ContentLoaded",
+  ],
 
   scheduleTest: function(win) {
     this.win = win;
     this.win.onload = this.onWindowLoaded.bind(this);
     this.utils = this.win.QueryInterface(Ci.nsIInterfaceRequestor)
                          .getInterface(Ci.nsIDOMWindowUtils);
-
-    let observerService = Cc["@mozilla.org/observer-service;1"].
-                          getService(Components.interfaces.nsIObserverService);
-    observerService.addObserver(this, "widget-first-paint", false);
   },
 
-  onWindowLoaded: function() {
+  runSanityTest: function() {
     this.canvas = this.win.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
     this.canvas.setAttribute("width", PAGE_WIDTH);
     this.canvas.setAttribute("height", PAGE_HEIGHT);
@@ -145,7 +168,38 @@ let listener = {
     // Perform the compositor backbuffer test, which currently we use for
     // actually deciding whether to enable hardware media decoding.
     testCompositor(this.win, this.ctx);
+
     this.endTest();
+  },
+
+  receiveMessage(message) {
+    let data = message.data;
+    switch (message.name) {
+      case "gfxSanity:ContentLoaded":
+        this.runSanityTest();
+        break;
+    }
+  },
+
+  onWindowLoaded: function() {
+    let browser = this.win.document.createElementNS(XUL_NS, "browser");
+    browser.setAttribute("type", "content");
+
+    let remoteBrowser = Services.appinfo.browserTabsRemoteAutostart;
+    browser.setAttribute("remote", remoteBrowser);
+
+    browser.style.width = PAGE_WIDTH + "px";
+    browser.style.height = PAGE_HEIGHT + "px";
+
+    this.win.document.documentElement.appendChild(browser);
+    // Have to set the mm after we append the child
+    this.mm = browser.messageManager;
+
+    this.messages.forEach((msgName) => {
+      this.mm.addMessageListener(msgName, this);
+    });
+
+    this.mm.loadFrameScript(FRAME_SCRIPT_URL, false);
   },
 
   endTest: function() {
@@ -158,9 +212,15 @@ let listener = {
     this.utils = null;
     this.canvas = null;
 
-    let observerService = Cc["@mozilla.org/observer-service;1"].
-                          getService(Components.interfaces.nsIObserverService);
-    observerService.removeObserver(this, "widget-first-paint");
+    this.messages.forEach((msgName) => {
+      this.mm.removeMessageListener(msgName, this);
+    });
+
+    this.mm = null;
+  
+    // Remove the annotation after we've cleaned everything up, to catch any
+    // incidental crashes from having performed the sanity test.
+    annotateCrashReport(false);
   }
 };
 
@@ -183,10 +243,24 @@ SanityTest.prototype = {
       return false;
     }
 
+    function checkPref(pref, value, reason) {
+      var prefValue = Preferences.get(pref, undefined);
+      if (prefValue == value) {
+        return true;
+      }
+      if (prefValue === undefined) {
+        reportTestReason(REASON_FIRST_RUN);
+      } else {
+        reportTestReason(reason);
+      }
+      return false;
+    }
+
     // TODO: Handle dual GPU setups
-    if (Preferences.get(DRIVER_PREF, "") == gfxinfo.adapterDriverVersion &&
-        Preferences.get(DEVICE_PREF, "") == gfxinfo.adapterDeviceID &&
-        Preferences.get(VERSION_PREF, "") == xulVersion) {
+    if (checkPref(DRIVER_PREF, gfxinfo.adapterDriverVersion, REASON_DRIVER_CHANGED) &&
+        checkPref(DEVICE_PREF, gfxinfo.adapterDeviceID, REASON_DEVICE_CHANGED) &&
+        checkPref(VERSION_PREF, xulVersion, REASON_FIREFOX_CHANGED))
+    {
       return false;
     }
 
@@ -207,9 +281,11 @@ SanityTest.prototype = {
     if (topic != "profile-after-change") return;
     if (!this.shouldRunTest()) return;
 
+    annotateCrashReport(true);
+
     // Open a tiny window to render our test page, and notify us when it's loaded
     var sanityTest = Services.ww.openWindow(null,
-        "chrome://gfxsanity/content/sanitytest.html",
+        "chrome://gfxsanity/content/sanityparent.html",
         "Test Page",
         "width=" + PAGE_WIDTH + ",height=" + PAGE_HEIGHT + ",chrome,titlebar=0,scrollbars=0",
         null);

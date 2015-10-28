@@ -19,7 +19,6 @@
 #include "jsprf.h"
 #include "jsscript.h"
 #include "jsstr.h"
-#include "prmjtime.h"
 
 #include "gc/Marking.h"
 #include "jit/BaselineJIT.h"
@@ -32,6 +31,7 @@
 #include "vm/HelperThreads.h"
 #include "vm/Opcodes.h"
 #include "vm/Shape.h"
+#include "vm/Time.h"
 #include "vm/UnboxedObject.h"
 
 #include "jsatominlines.h"
@@ -2833,9 +2833,6 @@ ObjectGroup::markUnknown(ExclusiveContext* cx)
     clearNewScript(cx);
     ObjectStateChange(cx, this, true);
 
-    if (ObjectGroup* unboxedGroup = maybeOriginalUnboxedGroup())
-        unboxedGroup->markUnknown(cx);
-
     /*
      * Existing constraints may have already been added to this object, which we need
      * to do the right thing for. We can't ensure that we will mark all unknown
@@ -2854,6 +2851,8 @@ ObjectGroup::markUnknown(ExclusiveContext* cx)
         }
     }
 
+    if (ObjectGroup* unboxedGroup = maybeOriginalUnboxedGroup())
+        MarkObjectGroupUnknownProperties(cx, unboxedGroup);
     if (maybeUnboxedLayout() && maybeUnboxedLayout()->nativeGroup())
         MarkObjectGroupUnknownProperties(cx, maybeUnboxedLayout()->nativeGroup());
     if (ObjectGroup* unboxedGroup = maybeOriginalUnboxedGroup())
@@ -3238,8 +3237,10 @@ JSScript::makeTypes(JSContext* cx)
 
     TypeScript* typeScript = (TypeScript*)
         zone()->pod_calloc<uint8_t>(TypeScript::SizeIncludingTypeArray(count));
-    if (!typeScript)
+    if (!typeScript) {
+        ReportOutOfMemory(cx);
         return false;
+    }
 
     types_ = typeScript;
     setTypesGeneration(cx->zone()->types.generation);
@@ -3316,6 +3317,16 @@ PreliminaryObjectArray::full() const
 {
     for (size_t i = 0; i < COUNT; i++) {
         if (!objects[i])
+            return false;
+    }
+    return true;
+}
+
+bool
+PreliminaryObjectArray::empty() const
+{
+    for (size_t i = 0; i < COUNT; i++) {
+        if (objects[i])
             return false;
     }
     return true;
@@ -3509,8 +3520,10 @@ TypeNewScript::makeNativeVersion(JSContext* cx, TypeNewScript* newScript,
     size_t initializerLength = cursor - newScript->initializerList + 1;
 
     nativeNewScript->initializerList = cx->zone()->pod_calloc<Initializer>(initializerLength);
-    if (!nativeNewScript->initializerList)
+    if (!nativeNewScript->initializerList) {
+        ReportOutOfMemory(cx);
         return nullptr;
+    }
     PodCopy(nativeNewScript->initializerList, newScript->initializerList, initializerLength);
 
     return nativeNewScript.forget();
@@ -3570,7 +3583,7 @@ struct DestroyTypeNewScript
     }
 };
 
-} // anonymous namespace
+} // namespace
 
 bool
 TypeNewScript::maybeAnalyze(JSContext* cx, ObjectGroup* group, bool* regenerate, bool force)
@@ -3717,8 +3730,10 @@ TypeNewScript::maybeAnalyze(JSContext* cx, ObjectGroup* group, bool* regenerate,
             return false;
 
         initializerList = group->zone()->pod_calloc<Initializer>(initializerVector.length());
-        if (!initializerList)
+        if (!initializerList) {
+            ReportOutOfMemory(cx);
             return false;
+        }
         PodCopy(initializerList, initializerVector.begin(), initializerVector.length());
     }
 

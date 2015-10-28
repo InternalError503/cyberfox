@@ -115,7 +115,8 @@ class SpidermonkeyBuild(MockMixin,
                                 'setup-analysis',
                                 'run-analysis',
                                 'collect-analysis-output',
-                                'upload-analysis',
+                                # Temporary - see bug 1211402
+                                #'upload-analysis',
                                 'check-expectations',
                             ],
                             config={
@@ -129,6 +130,7 @@ class SpidermonkeyBuild(MockMixin,
                                 'upload_remote_basepath': None,
                                 'enable_try_uploads': True,
                                 'source': None,
+                                'stage_product': 'firefox',
                             },
         )
 
@@ -220,7 +222,7 @@ class SpidermonkeyBuild(MockMixin,
             # None.
             revision = self.config.get('revision')
 
-        return revision[0:12] if revision else None
+        return revision
 
     def query_branch(self):
         if self.buildbot_config and 'properties' in self.buildbot_config:
@@ -387,10 +389,8 @@ class SpidermonkeyBuild(MockMixin,
         work_dir = self.query_abs_dirs()['abs_work_dir']
         if not os.path.exists(work_dir):
             self.mkdir_p(work_dir)
-        self.tooltool_fetch(self.query_compiler_manifest(), "sh " + self.config['compiler_setup'],
-                            work_dir)
-        self.tooltool_fetch(self.query_sixgill_manifest(), "sh " + self.config['sixgill_setup'],
-                            work_dir)
+        self.tooltool_fetch(self.query_compiler_manifest(), output_dir=work_dir)
+        self.tooltool_fetch(self.query_sixgill_manifest(), output_dir=work_dir)
 
     def clobber_shell(self):
         self.analysis.clobber_shell(self)

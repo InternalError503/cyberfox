@@ -8,6 +8,7 @@
 #include "mozilla/MemoryReporting.h"
 #include "mozilla/Move.h"
 #include "imgIContainer.h"
+#include "LookupResult.h"
 #include "MainThreadUtils.h"
 #include "RasterImage.h"
 
@@ -265,25 +266,26 @@ FrameAnimator::GetFirstFrameRefreshArea() const
   return mFirstFrameRefreshArea;
 }
 
-DrawableFrameRef
+LookupResult
 FrameAnimator::GetCompositedFrame(uint32_t aFrameNum)
 {
   MOZ_ASSERT(aFrameNum != 0, "First frame is never composited");
 
   // If we have a composited version of this frame, return that.
   if (mLastCompositedFrameIndex == int32_t(aFrameNum)) {
-    return mCompositingFrame->DrawableRef();
+    return LookupResult(mCompositingFrame->DrawableRef(), MatchType::EXACT);
   }
 
   // Otherwise return the raw frame. DoBlend is required to ensure that we only
   // hit this case if the frame is not paletted and doesn't require compositing.
-  DrawableFrameRef ref =
+  LookupResult result =
     SurfaceCache::Lookup(ImageKey(mImage),
                          RasterSurfaceKey(mSize,
                                           0,  // Default decode flags.
                                           aFrameNum));
-  MOZ_ASSERT(!ref || !ref->GetIsPaletted(), "About to return a paletted frame");
-  return ref;
+  MOZ_ASSERT(!result || !result.DrawableRef()->GetIsPaletted(),
+             "About to return a paletted frame");
+  return result;
 }
 
 int32_t
@@ -310,7 +312,7 @@ FrameAnimator::GetTimeoutForFrame(uint32_t aFrameNum) const
   // It seems that there are broken tools out there that set a 0ms or 10ms
   // timeout when they really want a "default" one.  So munge values in that
   // range.
-  if (data.mRawTimeout >= 0 && data.mRawTimeout <= 10 && mLoopCount != 0) {
+  if (data.mRawTimeout >= 0 && data.mRawTimeout <= 10) {
     return 100;
   }
 
@@ -332,12 +334,9 @@ DoCollectSizeOfCompositingSurfaces(const RawAccessFrameRef& aSurface,
   SurfaceMemoryCounter counter(key, /* aIsLocked = */ true, aType);
 
   // Extract the surface's memory usage information.
-  size_t heap = aSurface
-    ->SizeOfExcludingThis(gfxMemoryLocation::IN_PROCESS_HEAP, aMallocSizeOf);
+  size_t heap = 0, nonHeap = 0;
+  aSurface->AddSizeOfExcludingThis(aMallocSizeOf, heap, nonHeap);
   counter.Values().SetDecodedHeap(heap);
-
-  size_t nonHeap = aSurface
-    ->SizeOfExcludingThis(gfxMemoryLocation::IN_PROCESS_NONHEAP, nullptr);
   counter.Values().SetDecodedNonHeap(nonHeap);
 
   // Record it.
@@ -367,13 +366,13 @@ FrameAnimator::CollectSizeOfCompositingSurfaces(
 RawAccessFrameRef
 FrameAnimator::GetRawFrame(uint32_t aFrameNum) const
 {
-  DrawableFrameRef ref =
+  LookupResult result =
     SurfaceCache::Lookup(ImageKey(mImage),
                          RasterSurfaceKey(mSize,
                                           0,  // Default decode flags.
                                           aFrameNum));
-  return ref ? ref->RawAccessRef()
-             : RawAccessFrameRef();
+  return result ? result.DrawableRef()->RawAccessRef()
+                : RawAccessFrameRef();
 }
 
 //******************************************************************************

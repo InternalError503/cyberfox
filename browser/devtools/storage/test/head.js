@@ -4,14 +4,9 @@
 
 "use strict";
 
-let tempScope = {};
-Cu.import("resource://gre/modules/devtools/Loader.jsm", tempScope);
-Cu.import("resource://gre/modules/devtools/Console.jsm", tempScope);
-const console = tempScope.console;
-const devtools = tempScope.devtools;
-tempScope = null;
-const require = devtools.require;
-const TargetFactory = devtools.TargetFactory;
+let { require } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+let { TargetFactory } = require("devtools/framework/target");
+let { console } = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
 const SPLIT_CONSOLE_PREF = "devtools.toolbox.splitconsoleEnabled";
 const STORAGE_PREF = "devtools.storage.enabled";
@@ -21,18 +16,19 @@ const ALT_DOMAIN = "http://sectest1.example.org/" + PATH;
 const ALT_DOMAIN_SECURED = "https://sectest1.example.org:443/" + PATH;
 
 let {Promise: promise} = Cu.import("resource://gre/modules/Promise.jsm", {});
+let DevToolsUtils = require("devtools/toolkit/DevToolsUtils");
 
 waitForExplicitFinish();
 
 let gToolbox, gPanelWindow, gWindow, gUI;
 
 Services.prefs.setBoolPref(STORAGE_PREF, true);
-gDevTools.testing = true;
+DevToolsUtils.testing = true;
 registerCleanupFunction(() => {
   gToolbox = gPanelWindow = gWindow = gUI = null;
   Services.prefs.clearUserPref(STORAGE_PREF);
   Services.prefs.clearUserPref(SPLIT_CONSOLE_PREF);
-  gDevTools.testing = false;
+  DevToolsUtils.testing = false;
   while (gBrowser.tabs.length > 1) {
     gBrowser.removeCurrentTab();
   }

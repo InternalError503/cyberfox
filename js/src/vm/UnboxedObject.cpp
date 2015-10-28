@@ -338,7 +338,7 @@ UnboxedPlainObject::ensureExpando(JSContext* cx, Handle<UnboxedPlainObject*> obj
         return obj->expando_;
 
     UnboxedExpandoObject* expando =
-        NewObjectWithGivenProto<UnboxedExpandoObject>(cx, nullptr, AllocKind::OBJECT4);
+        NewObjectWithGivenProto<UnboxedExpandoObject>(cx, nullptr, gc::AllocKind::OBJECT4);
     if (!expando)
         return nullptr;
 
@@ -380,7 +380,6 @@ PropagatePropertyTypes(JSContext* cx, jsid id, ObjectGroup* oldGroup, ObjectGrou
         ReportOutOfMemory(cx);
         return false;
     }
-    MOZ_ASSERT(!types.empty());
     for (size_t j = 0; j < types.length(); j++)
         AddTypePropertyId(cx, newGroup, nullptr, id, types[j]);
     return true;
@@ -967,6 +966,18 @@ const Class UnboxedPlainObject::class_ = {
 // UnboxedArrayObject
 /////////////////////////////////////////////////////////////////////
 
+template <JSValueType Type>
+DenseElementResult
+AppendUnboxedDenseElements(UnboxedArrayObject* obj, uint32_t initlen, AutoValueVector* values)
+{
+    for (size_t i = 0; i < initlen; i++)
+        values->infallibleAppend(obj->getElementSpecific<Type>(i));
+    return DenseElementResult::Success;
+}
+
+DefineBoxedOrUnboxedFunctor3(AppendUnboxedDenseElements,
+                             UnboxedArrayObject*, uint32_t, AutoValueVector*);
+
 /* static */ bool
 UnboxedArrayObject::convertToNative(JSContext* cx, JSObject* obj)
 {
@@ -981,10 +992,12 @@ UnboxedArrayObject::convertToNative(JSContext* cx, JSObject* obj)
     size_t initlen = obj->as<UnboxedArrayObject>().initializedLength();
 
     AutoValueVector values(cx);
-    for (size_t i = 0; i < initlen; i++) {
-        if (!values.append(obj->as<UnboxedArrayObject>().getElement(i)))
-            return false;
-    }
+    if (!values.reserve(initlen))
+        return false;
+
+    AppendUnboxedDenseElementsFunctor functor(&obj->as<UnboxedArrayObject>(), initlen, &values);
+    DebugOnly<DenseElementResult> result = CallBoxedOrUnboxedSpecialization(functor, obj);
+    MOZ_ASSERT(result.value == DenseElementResult::Success);
 
     obj->setGroup(layout.nativeGroup());
 
@@ -1931,6 +1944,15 @@ js::TryConvertToUnboxedLayout(ExclusiveContext* cx, Shape* templateShape,
             // a null value for one of the properties, as we can't decide what type
             // it is supposed to have.
             if (UnboxedTypeSize(properties[i].type) == 0)
+                return true;
+        }
+
+        // Make sure that all properties on the template shape are property
+        // names, and not indexes.
+        for (Shape::Range<NoGC> r(templateShape); !r.empty(); r.popFront()) {
+            jsid id = r.front().propid();
+            uint32_t dummy;
+            if (!JSID_IS_ATOM(id) || JSID_TO_ATOM(id)->isIndex(&dummy))
                 return true;
         }
 

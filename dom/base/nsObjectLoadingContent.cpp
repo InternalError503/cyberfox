@@ -20,6 +20,7 @@
 #include "nsIDOMHTMLObjectElement.h"
 #include "nsIDOMHTMLAppletElement.h"
 #include "nsIExternalProtocolHandler.h"
+#include "nsIInterfaceRequestorUtils.h"
 #include "nsIHttpChannelInternal.h"
 #include "nsIObjectFrame.h"
 #include "nsIPermissionManager.h"
@@ -1484,8 +1485,10 @@ nsObjectLoadingContent::CheckLoadPolicy(int16_t *aContentPolicy)
 
   nsIDocument* doc = thisContent->OwnerDoc();
 
+  nsContentPolicyType contentPolicyType = GetContentPolicyType();
+
   *aContentPolicy = nsIContentPolicy::ACCEPT;
-  nsresult rv = NS_CheckContentLoadPolicy(nsIContentPolicy::TYPE_OBJECT,
+  nsresult rv = NS_CheckContentLoadPolicy(contentPolicyType,
                                           mURI,
                                           doc->NodePrincipal(),
                                           thisContent,
@@ -1531,7 +1534,7 @@ nsObjectLoadingContent::CheckProcessPolicy(int16_t *aContentPolicy)
       objectType = nsIContentPolicy::TYPE_DOCUMENT;
       break;
     case eType_Plugin:
-      objectType = nsIContentPolicy::TYPE_OBJECT;
+      objectType = GetContentPolicyType();
       break;
     default:
       NS_NOTREACHED("Calling checkProcessPolicy with a unloadable type");
@@ -1846,7 +1849,7 @@ nsObjectLoadingContent::UpdateObjectParameters(bool aJavaURI)
       // end up trying to dispatch to a nsFrameLoader, which will complain that
       // it couldn't find a way to handle application/octet-stream
       nsAutoCString parsedMime, dummy;
-      NS_ParseContentType(newMime, parsedMime, dummy);
+      NS_ParseResponseContentType(newMime, parsedMime, dummy);
       if (!parsedMime.IsEmpty()) {
         mChannel->SetContentType(parsedMime);
       }
@@ -2484,11 +2487,13 @@ nsObjectLoadingContent::OpenChannel()
     securityFlags |= nsILoadInfo::SEC_SANDBOXED;
   }
 
+  nsContentPolicyType contentPolicyType = GetContentPolicyType();
+
   rv = NS_NewChannel(getter_AddRefs(chan),
                      mURI,
                      thisContent,
                      securityFlags,
-                     nsIContentPolicy::TYPE_OBJECT,
+                     contentPolicyType,
                      group, // aLoadGroup
                      shim,  // aCallbacks
                      nsIChannel::LOAD_CALL_CONTENT_SNIFFERS |
@@ -2948,7 +2953,8 @@ nsObjectLoadingContent::LoadFallback(FallbackType aType, bool aNotify) {
     aType = eFallbackAlternate;
   }
 
-  if (thisContent->IsHTMLElement(nsGkAtoms::object) &&
+  if ((thisContent->IsHTMLElement(nsGkAtoms::object) ||
+       thisContent->IsHTMLElement(nsGkAtoms::applet)) &&
       (aType == eFallbackUnsupported ||
        aType == eFallbackDisabled ||
        aType == eFallbackBlocklisted))
@@ -3211,7 +3217,7 @@ nsObjectLoadingContent::ShouldPlay(FallbackType &aReason, bool aIgnoreCurrentTyp
     sPrefsInitialized = true;
   }
 
-  if (XRE_GetProcessType() == GeckoProcessType_Default &&
+  if (XRE_IsParentProcess() &&
       BrowserTabsRemoteAutostart()) {
     // Plugins running OOP from the chrome process along with plugins running
     // OOP from the content process will hang. Let's prevent that situation.

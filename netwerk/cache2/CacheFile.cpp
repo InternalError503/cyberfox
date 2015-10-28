@@ -1981,20 +1981,6 @@ CacheFile::InitIndexEntry()
   return NS_OK;
 }
 
-// Memory reporting
-
-namespace { // anon
-
-size_t
-CollectChunkSize(uint32_t const & aIdx,
-                 nsRefPtr<mozilla::net::CacheFileChunk> const & aChunk,
-                 mozilla::MallocSizeOf mallocSizeOf, void* aClosure)
-{
-  return aChunk->SizeOfIncludingThis(mallocSizeOf);
-}
-
-} // anon
-
 size_t
 CacheFile::SizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf) const
 {
@@ -2002,14 +1988,20 @@ CacheFile::SizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf) const
 
   size_t n = 0;
   n += mKey.SizeOfExcludingThisIfUnshared(mallocSizeOf);
-  n += mChunks.SizeOfExcludingThis(CollectChunkSize, mallocSizeOf);
-  n += mCachedChunks.SizeOfExcludingThis(CollectChunkSize, mallocSizeOf);
+  n += mChunks.ShallowSizeOfExcludingThis(mallocSizeOf);
+  for (auto iter = mChunks.ConstIter(); !iter.Done(); iter.Next()) {
+      n += iter.Data()->SizeOfIncludingThis(mallocSizeOf);
+  }
+  n += mCachedChunks.ShallowSizeOfExcludingThis(mallocSizeOf);
+  for (auto iter = mCachedChunks.ConstIter(); !iter.Done(); iter.Next()) {
+      n += iter.Data()->SizeOfIncludingThis(mallocSizeOf);
+  }
   if (mMetadata) {
     n += mMetadata->SizeOfIncludingThis(mallocSizeOf);
   }
 
   // Input streams are not elsewhere reported.
-  n += mInputs.SizeOfExcludingThis(mallocSizeOf);
+  n += mInputs.ShallowSizeOfExcludingThis(mallocSizeOf);
   for (uint32_t i = 0; i < mInputs.Length(); ++i) {
     n += mInputs[i]->SizeOfIncludingThis(mallocSizeOf);
   }
@@ -2020,8 +2012,8 @@ CacheFile::SizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf) const
   }
 
   // The listeners are usually classes reported just above.
-  n += mChunkListeners.SizeOfExcludingThis(nullptr, mallocSizeOf);
-  n += mObjsToRelease.SizeOfExcludingThis(mallocSizeOf);
+  n += mChunkListeners.ShallowSizeOfExcludingThis(mallocSizeOf);
+  n += mObjsToRelease.ShallowSizeOfExcludingThis(mallocSizeOf);
 
   // mHandle reported directly from CacheFileIOManager.
 
@@ -2034,5 +2026,5 @@ CacheFile::SizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf) const
   return mallocSizeOf(this) + SizeOfExcludingThis(mallocSizeOf);
 }
 
-} // net
-} // mozilla
+} // namespace net
+} // namespace mozilla

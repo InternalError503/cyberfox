@@ -48,6 +48,8 @@ let snapshotFormatters = {
 
     $("multiprocess-box").textContent = stringBundle().formatStringFromName("multiProcessStatus",
       [data.numRemoteWindows, data.numTotalWindows, data.remoteAutoStart], 3);
+
+    $("safemode-box").textContent = data.safeMode;
   },
 
 #ifdef MOZ_CRASHREPORTER

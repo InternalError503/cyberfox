@@ -76,7 +76,7 @@ add_task(function checkAllTheCSS() {
   // file or jar URI (depending on whether we're using a packaged build or not)
   // so that it's allowed to load other same-scheme URIs (i.e. the browser css).
   let resHandler = Services.io.getProtocolHandler("resource")
-                           .QueryInterface(Ci.nsIResProtocolHandler);
+                           .QueryInterface(Ci.nsISubstitutingProtocolHandler);
   let resURI = Services.io.newURI('resource://testing-common/resource_test_file.html', null, null);
   let testFile = resHandler.resolveURI(resURI);
   let windowless = Services.appShell.createWindowlessBrowser();

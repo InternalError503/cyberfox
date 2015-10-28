@@ -28,6 +28,7 @@
 #include "jsscriptinlines.h"
 
 #include "jit/CompileInfo-inl.h"
+#include "jit/shared/Lowering-shared-inl.h"
 #include "vm/NativeObject-inl.h"
 #include "vm/ObjectGroup-inl.h"
 #include "vm/ScopeObject-inl.h"
@@ -372,6 +373,56 @@ IonBuilder::DontInline(JSScript* targetScript, const char* reason)
     return InliningDecision_DontInline;
 }
 
+/*
+ * |hasCommonInliningPath| determines whether the current inlining path has been
+ * seen before based on the sequence of scripts in the chain of |IonBuilder|s.
+ *
+ * An inlining path for a function |f| is the sequence of functions whose
+ * inlinings precede |f| up to any previous occurrences of |f|.
+ * So, if we have the chain of inlinings
+ *
+ *          f1 -> f2 -> f -> f3 -> f4 -> f5 -> f
+ *          --------         --------------
+ *
+ * the inlining paths for |f| are [f2, f1] and [f5, f4, f3].
+ * When attempting to inline |f|, we find all existing inlining paths for |f|
+ * and check whether they share a common prefix with the path created were |f|
+ * inlined.
+ *
+ * For example, given mutually recursive functions |f| and |g|, a possible
+ * inlining is
+ *
+ *                           +---- Inlining stopped here...
+ *                           |
+ *                           v
+ *          a -> f -> g -> f \ -> g -> f -> g -> ...
+ *
+ * where the vertical bar denotes the termination of inlining.
+ * Inlining is terminated because we have already observed the inlining path
+ * [f] when inlining function |g|. Note that this will inline recursive
+ * functions such as |fib| only one level, as |fib| has a zero length inlining
+ * path which trivially prefixes all inlining paths.
+ *
+ */
+bool
+IonBuilder::hasCommonInliningPath(const JSScript* scriptToInline)
+{
+    // Find all previous inlinings of the |scriptToInline| and check for common
+    // inlining paths with the top of the inlining stack.
+    for (IonBuilder* it = this->callerBuilder_; it; it = it->callerBuilder_) {
+        if (it->script() != scriptToInline)
+            continue;
+
+        // This only needs to check the top of each stack for a match,
+        // as a match of length one ensures a common prefix.
+        IonBuilder* path = it->callerBuilder_;
+        if (!path || this->script() == path->script())
+            return true;
+    }
+
+    return false;
+}
+
 IonBuilder::InliningDecision
 IonBuilder::canInlineTarget(JSFunction* target, CallInfo& callInfo)
 {
@@ -468,14 +519,9 @@ IonBuilder::canInlineTarget(JSFunction* target, CallInfo& callInfo)
         return DontInline(inlineScript, "Too many actual args");
     }
 
-    // Allow inlining of recursive calls, but only one level deep.
-    IonBuilder* builder = callerBuilder_;
-    while (builder) {
-        if (builder->script() == inlineScript) {
-            trackOptimizationOutcome(TrackedOutcome::CantInlineRecursive);
-            return DontInline(inlineScript, "Recursive call");
-        }
-        builder = builder->callerBuilder_;
+    if (hasCommonInliningPath(inlineScript)) {
+        trackOptimizationOutcome(TrackedOutcome::HasCommonInliningPath);
+        return DontInline(inlineScript, "Common inlining path");
     }
 
     if (target->isHeavyweight()) {
@@ -1611,6 +1657,9 @@ IonBuilder::inspectOpcode(JSOp op)
       case JSOP_DIV:
       case JSOP_MOD:
         return jsop_binary(op);
+
+      case JSOP_POW:
+        return jsop_pow();
 
       case JSOP_POS:
         return jsop_pos();
@@ -4550,6 +4599,25 @@ IonBuilder::jsop_binary(JSOp op, MDefinition* left, MDefinition* right)
     if (ins->isEffectful())
         return resumeAfter(ins);
     return maybeInsertResume();
+}
+
+bool
+IonBuilder::jsop_pow()
+{
+    MDefinition* exponent = current->pop();
+    MDefinition* base = current->pop();
+
+    if (inlineMathPowHelper(base, exponent, MIRType_Double) == InliningStatus_Inlined) {
+        base->setImplicitlyUsedUnchecked();
+        exponent->setImplicitlyUsedUnchecked();
+        return true;
+    }
+
+    // For now, use MIRType_Double, as a safe cover-all. See bug 1188079.
+    MPow* pow = MPow::New(alloc(), base, exponent, MIRType_Double);
+    current->add(pow);
+    current->push(pow);
+    return true;
 }
 
 bool
@@ -7663,9 +7731,10 @@ IonBuilder::jsop_intrinsic(PropertyName* name)
         return pushTypeBarrier(ins, types, BarrierKind::TypeSet);
     }
 
-    // Bake in the intrinsic. Make sure that TI agrees with us on the type.
-    Value vp;
-    JS_ALWAYS_TRUE(script()->global().maybeGetIntrinsicValue(name, &vp));
+    // Bake in the intrinsic, guaranteed to exist because a non-empty typeset
+    // means the intrinsic was successfully gotten in the VM call above.
+    // Assert that TI agrees with us on the type.
+    Value vp = script()->global().existingIntrinsicValue(name);
     MOZ_ASSERT(types->hasType(TypeSet::GetValueType(vp)));
 
     pushConstant(vp);
@@ -7734,6 +7803,8 @@ IonBuilder::jsop_getelem()
     }
 
     obj = maybeUnboxForPropertyAccess(obj);
+    if (obj->type() == MIRType_Object)
+        obj = convertUnboxedObjects(obj);
 
     bool emitted = false;
 
@@ -8474,6 +8545,43 @@ IonBuilder::getElemTryCache(bool* emitted, MDefinition* obj, MDefinition* index)
     return true;
 }
 
+TemporaryTypeSet*
+IonBuilder::computeHeapType(const TemporaryTypeSet* objTypes, const jsid id)
+{
+    if (objTypes->unknownObject() || objTypes->getObjectCount() == 0)
+        return nullptr;
+
+    TemporaryTypeSet empty;
+    TemporaryTypeSet* acc = &empty;
+    LifoAlloc* lifoAlloc = alloc().lifoAlloc();
+
+    Vector<HeapTypeSetKey, 4, SystemAllocPolicy> properties;
+    if (!properties.reserve(objTypes->getObjectCount()))
+        return nullptr;
+
+    for (unsigned i = 0; i < objTypes->getObjectCount(); i++) {
+        TypeSet::ObjectKey* key = objTypes->getObject(i);
+
+        if (key->unknownProperties())
+            return nullptr;
+
+        HeapTypeSetKey property = key->property(id);
+        HeapTypeSet* currentSet = property.maybeTypes();
+
+        if (!currentSet || currentSet->unknown())
+            return nullptr;
+
+        properties.infallibleAppend(property);
+        acc = TypeSet::unionSets(acc, currentSet, lifoAlloc);
+    }
+
+    // Freeze all the properties associated with the refined type set.
+    for (HeapTypeSetKey* i = properties.begin(); i != properties.end(); i++)
+        i->freeze(constraints());
+
+    return acc;
+}
+
 bool
 IonBuilder::jsop_getelem_dense(MDefinition* obj, MDefinition* index, JSValueType unboxedType)
 {
@@ -8519,12 +8627,21 @@ IonBuilder::jsop_getelem_dense(MDefinition* obj, MDefinition* index, JSValueType
     // If we can load the element as a definite double, make sure to check that
     // the array has been converted to homogenous doubles first.
     TemporaryTypeSet* objTypes = obj->resultTypeSet();
+    bool inBounds = !readOutOfBounds && !needsHoleCheck;
+
+    if (inBounds) {
+        TemporaryTypeSet* heapTypes = computeHeapType(objTypes, JSID_VOID);
+        if (heapTypes && heapTypes->isSubset(types)) {
+            knownType = heapTypes->getKnownMIRType();
+            types = heapTypes;
+        }
+    }
+
     bool loadDouble =
         unboxedType == JSVAL_TYPE_MAGIC &&
         barrier == BarrierKind::NoBarrier &&
         loopDepth_ &&
-        !readOutOfBounds &&
-        !needsHoleCheck &&
+        inBounds &&
         knownType == MIRType_Double &&
         objTypes &&
         objTypes->convertDoubleElements(constraints()) == TemporaryTypeSet::AlwaysConvertToDoubles;
@@ -8560,8 +8677,10 @@ IonBuilder::jsop_getelem_dense(MDefinition* obj, MDefinition* index, JSValueType
         MOZ_ASSERT(knownType == MIRType_Value);
     }
 
-    if (knownType != MIRType_Value)
+    if (knownType != MIRType_Value) {
         load->setResultType(knownType);
+        load->setResultTypeSet(types);
+    }
 
     current->push(load);
     return pushTypeBarrier(load, types, barrier);
@@ -8776,7 +8895,7 @@ IonBuilder::jsop_setelem()
 
     MDefinition* value = current->pop();
     MDefinition* index = current->pop();
-    MDefinition* object = current->pop();
+    MDefinition* object = convertUnboxedObjects(current->pop());
 
     trackTypeInfo(TrackedTypeSite::Receiver, object->type(), object->resultTypeSet());
     trackTypeInfo(TrackedTypeSite::Index, index->type(), index->resultTypeSet());
@@ -9489,8 +9608,7 @@ IonBuilder::jsop_rest()
 }
 
 uint32_t
-IonBuilder::getDefiniteSlot(TemporaryTypeSet* types, PropertyName* name, uint32_t* pnfixed,
-                            BaselineInspector::ObjectGroupVector& convertUnboxedGroups)
+IonBuilder::getDefiniteSlot(TemporaryTypeSet* types, PropertyName* name, uint32_t* pnfixed)
 {
     if (!types || types->unknownObject()) {
         trackOptimizationOutcome(TrackedOutcome::NoTypeInfo);
@@ -9512,21 +9630,6 @@ IonBuilder::getDefiniteSlot(TemporaryTypeSet* types, PropertyName* name, uint32_
         if (key->isSingleton()) {
             trackOptimizationOutcome(TrackedOutcome::Singleton);
             return UINT32_MAX;
-        }
-
-        // If we encounter a group for an unboxed property which has a
-        // corresponding native group, look for a definite slot in that native
-        // group, and force conversion of incoming objects to the native group.
-        if (key->isGroup() && key->group()->maybeUnboxedLayout()) {
-            if (ObjectGroup* nativeGroup = key->group()->unboxedLayout().nativeGroup()) {
-                if (!convertUnboxedGroups.append(key->group()))
-                    CrashAtUnhandlableOOM("IonBuilder::getDefiniteSlot");
-                key = TypeSet::ObjectKey::get(nativeGroup);
-                if (key->unknownProperties()) {
-                    trackOptimizationOutcome(TrackedOutcome::UnknownProperties);
-                    return UINT32_MAX;
-                }
-            }
         }
 
         HeapTypeSetKey property = key->property(NameToId(name));
@@ -10015,6 +10118,27 @@ IonBuilder::maybeUnboxForPropertyAccess(MDefinition* def)
 
     MUnbox* unbox = MUnbox::New(alloc(), def, type, MUnbox::Fallible);
     current->add(unbox);
+
+    // Fixup type information for a common case where a property call
+    // is converted to the following bytecodes
+    //
+    //      a.foo()
+    // ================= Compiles to ================
+    //      LOAD "a"
+    //      DUP
+    //      CALLPROP "foo"
+    //      SWAP
+    //      CALL 0
+    //
+    // If we have better type information to unbox the first copy going into
+    // the CALLPROP operation, we can replace the duplicated copy on the
+    // stack as well.
+    if (*pc == JSOP_CALLPROP || *pc == JSOP_CALLELEM) {
+        uint32_t idx = current->stackDepth() - 1;
+        MOZ_ASSERT(current->getSlot(idx) == def);
+        current->setSlot(idx, unbox);
+    }
+
     return unbox;
 }
 
@@ -10044,6 +10168,8 @@ IonBuilder::jsop_getprop(PropertyName* name)
     }
 
     obj = maybeUnboxForPropertyAccess(obj);
+    if (obj->type() == MIRType_Object)
+        obj = convertUnboxedObjects(obj);
 
     BarrierKind barrier = PropertyReadNeedsTypeBarrier(analysisContext, constraints(),
                                                        obj, name, types);
@@ -10322,8 +10448,10 @@ IonBuilder::getPropTryConstant(bool* emitted, MDefinition* obj, PropertyName* na
     }
 
     JSObject* singleton = testSingletonPropertyTypes(obj, name);
-    if (!singleton)
+    if (!singleton) {
+        trackOptimizationOutcome(TrackedOutcome::NotSingleton);
         return true;
+    }
 
     // Property access is a known constant -- safe to emit.
     obj->setImplicitlyUsedUnchecked();
@@ -10341,6 +10469,8 @@ IonBuilder::SimdTypeDescrToMIRType(SimdTypeDescr::Type type)
     switch (type) {
       case SimdTypeDescr::Int32x4:   return MIRType_Int32x4;
       case SimdTypeDescr::Float32x4: return MIRType_Float32x4;
+      case SimdTypeDescr::Int8x16:
+      case SimdTypeDescr::Int16x8:
       case SimdTypeDescr::Float64x2: return MIRType_Undefined;
     }
     MOZ_CRASH("unimplemented MIR type for a SimdTypeDescr::Type");
@@ -10376,33 +10506,13 @@ IonBuilder::getPropTrySimdGetter(bool* emitted, MDefinition* obj, PropertyName* 
     const JSAtomState& names = compartment->runtime()->names();
 
     // Reading the signMask property.
-    if (name == names.signMask) {
-        MSimdSignMask* ins = MSimdSignMask::New(alloc(), obj, type);
-        current->add(ins);
-        current->push(ins);
-        trackOptimizationSuccess();
-        *emitted = true;
-        return true;
-    }
-
-    // Reading a lane property.
-    SimdLane lane;
-    if (name == names.x) {
-        lane = LaneX;
-    } else if (name == names.y) {
-        lane = LaneY;
-    } else if (name == names.z) {
-        lane = LaneZ;
-    } else if (name == names.w) {
-        lane = LaneW;
-    } else {
+    if (name != names.signMask) {
         // Unknown getprop access on a SIMD value
         trackOptimizationOutcome(TrackedOutcome::UnknownSimdProperty);
         return true;
     }
 
-    MIRType scalarType = SimdTypeToScalarType(type);
-    MSimdExtractElement* ins = MSimdExtractElement::New(alloc(), obj, type, scalarType, lane);
+    MSimdSignMask* ins = MSimdSignMask::New(alloc(), obj, type);
     current->add(ins);
     current->push(ins);
     trackOptimizationSuccess();
@@ -10523,11 +10633,42 @@ IonBuilder::getPropTryComplexPropOfTypedObject(bool* emitted,
 }
 
 MDefinition*
+IonBuilder::convertUnboxedObjects(MDefinition* obj)
+{
+    // If obj might be in any particular unboxed group which should be
+    // converted to a native representation, perform that conversion. This does
+    // not guarantee the object will not have such a group afterwards, if the
+    // object's possible groups are not precisely known.
+    TemporaryTypeSet* types = obj->resultTypeSet();
+    if (!types || types->unknownObject())
+        return obj;
+
+    BaselineInspector::ObjectGroupVector list(alloc());
+    for (size_t i = 0; i < types->getObjectCount(); i++) {
+        TypeSet::ObjectKey* key = obj->resultTypeSet()->getObject(i);
+        if (!key || !key->isGroup())
+            continue;
+
+        if (UnboxedLayout* layout = key->group()->maybeUnboxedLayout()) {
+            if (layout->nativeGroup() && !list.append(key->group()))
+                CrashAtUnhandlableOOM("IonBuilder::convertUnboxedObjects");
+        }
+    }
+
+    return convertUnboxedObjects(obj, list);
+}
+
+MDefinition*
 IonBuilder::convertUnboxedObjects(MDefinition* obj,
                                   const BaselineInspector::ObjectGroupVector& list)
 {
     for (size_t i = 0; i < list.length(); i++) {
-        obj = MConvertUnboxedObjectToNative::New(alloc(), obj, list[i]);
+        ObjectGroup* group = list[i];
+        if (TemporaryTypeSet* types = obj->resultTypeSet()) {
+            if (!types->hasType(TypeSet::ObjectType(group)))
+                continue;
+        }
+        obj = MConvertUnboxedObjectToNative::New(alloc(), obj, group);
         current->add(obj->toInstruction());
     }
     return obj;
@@ -10539,10 +10680,8 @@ IonBuilder::getPropTryDefiniteSlot(bool* emitted, MDefinition* obj, PropertyName
 {
     MOZ_ASSERT(*emitted == false);
 
-    BaselineInspector::ObjectGroupVector convertUnboxedGroups(alloc());
-
     uint32_t nfixed;
-    uint32_t slot = getDefiniteSlot(obj->resultTypeSet(), name, &nfixed, convertUnboxedGroups);
+    uint32_t slot = getDefiniteSlot(obj->resultTypeSet(), name, &nfixed);
     if (slot == UINT32_MAX)
         return true;
 
@@ -10551,8 +10690,6 @@ IonBuilder::getPropTryDefiniteSlot(bool* emitted, MDefinition* obj, PropertyName
         current->add(guard);
         obj = guard;
     }
-
-    obj = convertUnboxedObjects(obj, convertUnboxedGroups);
 
     MInstruction* load;
     if (slot < nfixed) {
@@ -11160,7 +11297,7 @@ bool
 IonBuilder::jsop_setprop(PropertyName* name)
 {
     MDefinition* value = current->pop();
-    MDefinition* obj = current->pop();
+    MDefinition* obj = convertUnboxedObjects(current->pop());
 
     bool emitted = false;
     startTrackingOptimizations();
@@ -11459,10 +11596,8 @@ IonBuilder::setPropTryDefiniteSlot(bool* emitted, MDefinition* obj,
         return true;
     }
 
-    BaselineInspector::ObjectGroupVector convertUnboxedGroups(alloc());
-
     uint32_t nfixed;
-    uint32_t slot = getDefiniteSlot(obj->resultTypeSet(), name, &nfixed, convertUnboxedGroups);
+    uint32_t slot = getDefiniteSlot(obj->resultTypeSet(), name, &nfixed);
     if (slot == UINT32_MAX)
         return true;
 
@@ -11479,8 +11614,6 @@ IonBuilder::setPropTryDefiniteSlot(bool* emitted, MDefinition* obj,
         }
         writeBarrier |= property.needsBarrier(constraints());
     }
-
-    obj = convertUnboxedObjects(obj, convertUnboxedGroups);
 
     MInstruction* store;
     if (slot < nfixed) {
@@ -12320,8 +12453,8 @@ IonBuilder::jsop_setaliasedvar(ScopeCoordinate sc)
 bool
 IonBuilder::jsop_in()
 {
-    MDefinition* obj = current->peek(-1);
-    MDefinition* id = current->peek(-2);
+    MDefinition* obj = convertUnboxedObjects(current->pop());
+    MDefinition* id = current->pop();
 
     do {
         if (shouldAbortOnPreliminaryGroups(obj))
@@ -12336,11 +12469,9 @@ IonBuilder::jsop_in()
         if (ElementAccessHasExtraIndexedProperty(this, obj))
             break;
 
-        return jsop_in_dense(unboxedType);
+        return jsop_in_dense(obj, id, unboxedType);
     } while (false);
 
-    current->pop();
-    current->pop();
     MIn* ins = MIn::New(alloc(), id, obj);
 
     current->add(ins);
@@ -12350,11 +12481,8 @@ IonBuilder::jsop_in()
 }
 
 bool
-IonBuilder::jsop_in_dense(JSValueType unboxedType)
+IonBuilder::jsop_in_dense(MDefinition* obj, MDefinition* id, JSValueType unboxedType)
 {
-    MDefinition* obj = current->pop();
-    MDefinition* id = current->pop();
-
     bool needsHoleCheck = !ElementAccessIsPacked(constraints(), obj);
 
     // Ensure id is an integer.

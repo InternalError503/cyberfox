@@ -120,7 +120,7 @@ namespace {
   // Dialer stops playing.
   static int sBusyToneInterval = 3700; //unit: ms
 #endif // MOZ_B2G_RIL
-} // anonymous namespace
+} // namespace
 
 #ifdef MOZ_B2G_RIL
 /* CallState for sCINDItems[CINDType::CALL].value
@@ -443,7 +443,7 @@ bool
 BluetoothHfpManager::Init()
 {
   // The function must run at b2g process since it would access SettingsService.
-  MOZ_ASSERT(IsMainProcess());
+  MOZ_ASSERT(XRE_IsParentProcess());
   MOZ_ASSERT(NS_IsMainThread());
 
   nsCOMPtr<nsIObserverService> obs = services::GetObserverService();
@@ -651,9 +651,10 @@ BluetoothHfpManager::HandleVoiceConnectionChanged(uint32_t aClientId)
 
   JS::Rooted<JS::Value> value(nsContentUtils::RootingCxForThread());
   voiceInfo->GetRelSignalStrength(&value);
-  NS_ENSURE_TRUE_VOID(value.isNumber());
-  uint8_t signal = ceil(value.toNumber() / 20.0);
-  UpdateCIND(CINDType::SIGNAL, signal);
+  if (value.isNumber()) {
+    uint8_t signal = ceil(value.toNumber() / 20.0);
+    UpdateCIND(CINDType::SIGNAL, signal);
+  }
 
   /**
    * Possible return values for mode are:
@@ -667,7 +668,10 @@ BluetoothHfpManager::HandleVoiceConnectionChanged(uint32_t aClientId)
 
   nsCOMPtr<nsIMobileNetworkInfo> network;
   voiceInfo->GetNetwork(getter_AddRefs(network));
-  NS_ENSURE_TRUE_VOID(network);
+  if (!network) {
+    BT_LOGD("Unable to get network information");
+    return;
+  }
   network->GetLongName(mOperatorName);
 
   // According to GSM 07.07, "<format> indicates if the format is alphanumeric

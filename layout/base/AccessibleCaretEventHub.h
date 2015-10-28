@@ -16,7 +16,7 @@
 #include "nsIScrollObserver.h"
 #include "nsISelectionListener.h"
 #include "nsPoint.h"
-#include "nsRefPtr.h"
+#include "mozilla/nsRefPtr.h"
 #include "nsWeakReference.h"
 
 class nsDocShell;
@@ -87,24 +87,24 @@ public:
 protected:
   virtual ~AccessibleCaretEventHub();
 
-#define NS_DECL_STATE_CLASS_GETTER(aClassName)                                 \
+#define MOZ_DECL_STATE_CLASS_GETTER(aClassName)                                \
   class aClassName;                                                            \
   static State* aClassName();
 
-#define NS_IMPL_STATE_CLASS_GETTER(aClassName)                                 \
+#define MOZ_IMPL_STATE_CLASS_GETTER(aClassName)                                \
   AccessibleCaretEventHub::State* AccessibleCaretEventHub::aClassName()        \
   {                                                                            \
     return AccessibleCaretEventHub::aClassName::Singleton();                   \
   }
 
   // Concrete state getters
-  NS_DECL_STATE_CLASS_GETTER(NoActionState)
-  NS_DECL_STATE_CLASS_GETTER(PressCaretState)
-  NS_DECL_STATE_CLASS_GETTER(DragCaretState)
-  NS_DECL_STATE_CLASS_GETTER(PressNoCaretState)
-  NS_DECL_STATE_CLASS_GETTER(ScrollState)
-  NS_DECL_STATE_CLASS_GETTER(PostScrollState)
-  NS_DECL_STATE_CLASS_GETTER(LongTapState)
+  MOZ_DECL_STATE_CLASS_GETTER(NoActionState)
+  MOZ_DECL_STATE_CLASS_GETTER(PressCaretState)
+  MOZ_DECL_STATE_CLASS_GETTER(DragCaretState)
+  MOZ_DECL_STATE_CLASS_GETTER(PressNoCaretState)
+  MOZ_DECL_STATE_CLASS_GETTER(ScrollState)
+  MOZ_DECL_STATE_CLASS_GETTER(PostScrollState)
+  MOZ_DECL_STATE_CLASS_GETTER(LongTapState)
 
   void SetState(State* aState);
 

@@ -14,8 +14,10 @@ SOURCES += [
 ]
 
 DEFINES['XPCOM_GLUE'] = True
-if CONFIG['DEBUG']:
+if CONFIG['MOZ_DEBUG']:
     DEFINES['DEBUG'] = True
+
+DEFINES['APP_VERSION'] = CONFIG['FIREFOX_VERSION']
 
 # Statically link against the CRT
 USE_STATIC_LIBS = True

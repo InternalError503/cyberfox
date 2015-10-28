@@ -95,13 +95,13 @@ function* testTooltipAppearsEvenInEditMode(view) {
   let uriSpan = valueSpan.querySelector(".theme-link");
   yield assertHoverTooltipOn(view.tooltips.previewTooltip, uriSpan);
 
-  is(view.doc.activeElement, editor.input,
+  is(view.styleDocument.activeElement, editor.input,
     "Tooltip was shown in edit mode, and inplace-editor still focused");
 }
 
 function turnToEditMode(ruleView) {
-  let brace = ruleView.doc.querySelector(".ruleview-ruleclose");
-  return focusEditableField(brace);
+  let brace = ruleView.styleDocument.querySelector(".ruleview-ruleclose");
+  return focusEditableField(ruleView, brace);
 }
 
 function* testComputedView(view) {

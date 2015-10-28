@@ -97,16 +97,16 @@ AudioNode::SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const
   // - mStream
   size_t amount = 0;
 
-  amount += mInputNodes.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mInputNodes.ShallowSizeOfExcludingThis(aMallocSizeOf);
   for (size_t i = 0; i < mInputNodes.Length(); i++) {
     amount += mInputNodes[i].SizeOfExcludingThis(aMallocSizeOf);
   }
 
   // Just measure the array. The entire audio node graph is measured via the
   // MediaStreamGraph's streams, so we don't want to double-count the elements.
-  amount += mOutputNodes.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mOutputNodes.ShallowSizeOfExcludingThis(aMallocSizeOf);
 
-  amount += mOutputParams.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mOutputParams.ShallowSizeOfExcludingThis(aMallocSizeOf);
   for (size_t i = 0; i < mOutputParams.Length(); i++) {
     amount += mOutputParams[i]->SizeOfIncludingThis(aMallocSizeOf);
   }
@@ -383,17 +383,12 @@ void
 AudioNode::DestroyMediaStream()
 {
   if (mStream) {
-    {
-      // Remove the node reference on the engine, and take care to not
-      // hold the lock when the stream gets destroyed, because that will
-      // cause the engine to be destroyed as well, and we don't want to
-      // be holding the lock as we're trying to destroy it!
-      AudioNodeStream* ns = mStream;
-      MutexAutoLock lock(ns->Engine()->NodeMutex());
-      MOZ_ASSERT(ns, "How come we don't have a stream here?");
-      MOZ_ASSERT(ns->Engine()->Node() == this, "Invalid node reference");
-      ns->Engine()->ClearNode();
-    }
+    // Remove the node pointer on the engine.
+    AudioNodeStream* ns = mStream;
+    MOZ_ASSERT(ns, "How come we don't have a stream here?");
+    MOZ_ASSERT(ns->Engine()->NodeMainThread() == this,
+               "Invalid node reference");
+    ns->Engine()->ClearNode();
 
     mStream->Destroy();
     mStream = nullptr;
@@ -433,5 +428,5 @@ AudioNode::SetPassThrough(bool aPassThrough)
   }
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla

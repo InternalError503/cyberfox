@@ -148,26 +148,6 @@ describe("loop.store.ConversationStore", function () {
       store.setStoreState({windowId: "42"});
     });
 
-    it("should retry publishing if on desktop, and in the videoMuted state", function() {
-      store._isDesktop = true;
-
-      store.connectionFailure(new sharedActions.ConnectionFailure({
-        reason: FAILURE_DETAILS.UNABLE_TO_PUBLISH_MEDIA
-      }));
-
-      sinon.assert.calledOnce(sdkDriver.retryPublishWithoutVideo);
-    });
-
-    it("should set videoMuted to try when retrying publishing", function() {
-      store._isDesktop = true;
-
-      store.connectionFailure(new sharedActions.ConnectionFailure({
-        reason: FAILURE_DETAILS.UNABLE_TO_PUBLISH_MEDIA
-      }));
-
-      expect(store.getStoreState().videoMuted).eql(true);
-    });
-
     it("should disconnect the session", function() {
       store.connectionFailure(
         new sharedActions.ConnectionFailure({reason: "fake"}));
@@ -398,6 +378,8 @@ describe("loop.store.ConversationStore", function () {
             new sharedActions.ConnectCall({sessionData: fakeSessionData}));
 
           sandbox.stub(dispatcher, "dispatch");
+          // This is already covered by a test. Stub just prevents console msgs.
+          sandbox.stub(window.console, "error");
         });
 
         it("should dispatch a connection progress action on success", function(done) {
@@ -522,6 +504,7 @@ describe("loop.store.ConversationStore", function () {
       describe("server response handling", function() {
         beforeEach(function() {
           sandbox.stub(dispatcher, "dispatch");
+          sandbox.stub(window.console, "error");
         });
 
         it("should dispatch a connect call action on success", function() {
@@ -709,6 +692,7 @@ describe("loop.store.ConversationStore", function () {
 
     describe("WebSocket connection result", function() {
       beforeEach(function() {
+        sandbox.stub(window.console, "error");
         store.connectCall(
           new sharedActions.ConnectCall({sessionData: fakeSessionData}));
 
@@ -729,6 +713,18 @@ describe("loop.store.ConversationStore", function () {
           });
         }, function() {
           done(new Error("Promise should have been resolve, not rejected"));
+        });
+      });
+
+      it("should log an error when connection fails", function(done) {
+        rejectConnectPromise();
+
+        connectPromise.then(function() {
+          done(new Error("Promise not reject"));
+        }, function() {
+          checkFailures(done, function() {
+            sinon.assert.calledOnce(console.error);
+          });
         });
       });
 
@@ -961,55 +957,131 @@ describe("loop.store.ConversationStore", function () {
     });
   });
 
-  describe("#localVideoEnabled", function() {
-    it("should set store.localSrcVideoObject from the action data", function () {
-      store.localVideoEnabled(
-        new sharedActions.LocalVideoEnabled({srcVideoObject: fakeVideoElement}));
+  describe("#mediaStreamCreated", function() {
+    it("should add a local video object to the store", function() {
+      expect(store.getStoreState()).to.not.have.property("localSrcVideoObject");
 
-      expect(store.getStoreState("localSrcVideoObject")).eql(fakeVideoElement);
+      store.mediaStreamCreated(new sharedActions.MediaStreamCreated({
+        hasVideo: false,
+        isLocal: true,
+        srcVideoObject: fakeVideoElement
+      }));
+
+      expect(store.getStoreState().localSrcVideoObject).eql(fakeVideoElement);
+      expect(store.getStoreState()).to.not.have.property("remoteSrcVideoObject");
+    });
+
+    it("should set the local video enabled", function() {
+      store.setStoreState({
+        localVideoEnabled: false,
+        remoteVideoEnabled: false
+      });
+
+      store.mediaStreamCreated(new sharedActions.MediaStreamCreated({
+        hasVideo: true,
+        isLocal: true,
+        srcVideoObject: fakeVideoElement
+      }));
+
+      expect(store.getStoreState().localVideoEnabled).eql(true);
+      expect(store.getStoreState().remoteVideoEnabled).eql(false);
+    });
+
+    it("should add a remote video object to the store", function() {
+      expect(store.getStoreState()).to.not.have.property("remoteSrcVideoObject");
+
+      store.mediaStreamCreated(new sharedActions.MediaStreamCreated({
+        hasVideo: false,
+        isLocal: false,
+        srcVideoObject: fakeVideoElement
+      }));
+
+      expect(store.getStoreState()).not.have.property("localSrcVideoObject");
+      expect(store.getStoreState().remoteSrcVideoObject).eql(fakeVideoElement);
+    });
+
+    it("should set the remote video enabled", function() {
+      store.setStoreState({
+        localVideoEnabled: false,
+        remoteVideoEnabled: false
+      });
+
+      store.mediaStreamCreated(new sharedActions.MediaStreamCreated({
+        hasVideo: true,
+        isLocal: false,
+        srcVideoObject: fakeVideoElement
+      }));
+
+      expect(store.getStoreState().localVideoEnabled).eql(false);
+      expect(store.getStoreState().remoteVideoEnabled).eql(true);
     });
   });
 
-  describe("#remoteVideoEnabled", function() {
-    it("should set store.remoteSrcVideoObject from the actionData", function () {
-      store.setStoreState({remoteSrcVideoObject: undefined});
-
-      store.remoteVideoEnabled(
-        new sharedActions.RemoteVideoEnabled({srcVideoObject: fakeVideoElement}));
-
-      expect(store.getStoreState("remoteSrcVideoObject")).eql(fakeVideoElement);
+  describe("#mediaStreamDestroyed", function() {
+    beforeEach(function() {
+      store.setStoreState({
+        localSrcVideoObject: fakeVideoElement,
+        remoteSrcVideoObject: fakeVideoElement
+      });
     });
 
-    it("should set store.remoteVideoEnabled to true", function () {
-      store.setStoreState({remoteVideoEnabled: false});
+    it("should clear the local video object", function() {
+      store.mediaStreamDestroyed(new sharedActions.MediaStreamDestroyed({
+        isLocal: true
+      }));
 
-      store.remoteVideoEnabled(
-        new sharedActions.RemoteVideoEnabled({srcVideoObject: fakeVideoElement}));
+      expect(store.getStoreState().localSrcVideoObject).eql(null);
+      expect(store.getStoreState().remoteSrcVideoObject).eql(fakeVideoElement);
+    });
 
-      expect(store.getStoreState("remoteVideoEnabled")).to.be.true;
+    it("should clear the remote video object", function() {
+      store.mediaStreamDestroyed(new sharedActions.MediaStreamDestroyed({
+        isLocal: false
+      }));
+
+      expect(store.getStoreState().localSrcVideoObject).eql(fakeVideoElement);
+      expect(store.getStoreState().remoteSrcVideoObject).eql(null);
     });
   });
 
-  describe("#remoteVideoDisabled", function() {
-    it("should set store.remoteVideoEnabled to false", function () {
-      store.setStoreState({remoteVideoEnabled: true});
+  describe("#remoteVideoStatus", function() {
+    it("should set remoteVideoEnabled to true", function() {
+      store.setStoreState({
+        remoteVideoEnabled: false
+      });
 
-      store.remoteVideoDisabled(new sharedActions.RemoteVideoDisabled({}));
+      store.remoteVideoStatus(new sharedActions.RemoteVideoStatus({
+        videoEnabled: true
+      }));
 
-      expect(store.getStoreState("remoteVideoEnabled")).to.be.false;
+      expect(store.getStoreState().remoteVideoEnabled).eql(true);
     });
 
-    it("should set store.remoteSrcVideoObject to undefined", function () {
-      store.setStoreState({remoteSrcVideoObject: fakeVideoElement});
+    it("should set remoteVideoEnabled to false", function() {
+      store.setStoreState({
+        remoteVideoEnabled: true
+      });
 
-      store.remoteVideoDisabled(new sharedActions.RemoteVideoDisabled({}));
+      store.remoteVideoStatus(new sharedActions.RemoteVideoStatus({
+        videoEnabled: false
+      }));
 
-      expect(store.getStoreState("remoteSrcVideoObject")).to.be.undefined;
+      expect(store.getStoreState().remoteVideoEnabled).eql(false);
     });
-
   });
 
   describe("#setMute", function() {
+    beforeEach(function() {
+      dispatcher.dispatch(
+        // Setup store to prevent console warnings.
+        new sharedActions.SetupWindowData({
+          windowId: "123456",
+          type: "outgoing",
+          contact: contact,
+          callType: sharedUtils.CALL_TYPES.AUDIO_VIDEO
+        }));
+    });
+
     it("should save the mute state for the audio stream", function() {
       store.setStoreState({"audioMuted": false});
 

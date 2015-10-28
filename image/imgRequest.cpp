@@ -631,7 +631,7 @@ imgRequest::SetCacheValidation(imgCacheEntry* aCacheEntry, nsIRequest* aRequest)
   }
 }
 
-namespace { // anon
+namespace {
 
 already_AddRefed<nsIApplicationCache>
 GetApplicationCache(nsIRequest* aRequest)
@@ -659,7 +659,7 @@ GetApplicationCache(nsIRequest* aRequest)
   return appCache.forget();
 }
 
-} // anon
+} // namespace
 
 bool
 imgRequest::CacheChanged(nsIRequest* aNewRequest)
@@ -710,7 +710,6 @@ imgRequest::HadInsecureRedirect() const
 
 /** nsIRequestObserver methods **/
 
-/* void onStartRequest (in nsIRequest request, in nsISupports ctxt); */
 NS_IMETHODIMP
 imgRequest::OnStartRequest(nsIRequest* aRequest, nsISupports* ctxt)
 {
@@ -912,6 +911,7 @@ struct NewPartResult final
     : mImage(aExistingImage)
     , mIsFirstPart(!aExistingImage)
     , mSucceeded(false)
+    , mShouldResetCacheEntry(false)
   { }
 
   nsAutoCString mContentType;
@@ -919,6 +919,7 @@ struct NewPartResult final
   nsRefPtr<Image> mImage;
   const bool mIsFirstPart;
   bool mSucceeded;
+  bool mShouldResetCacheEntry;
 };
 
 static NewPartResult
@@ -942,8 +943,8 @@ PrepareForNewPart(nsIRequest* aRequest, nsIInputStream* aInStr, uint32_t aCount,
                        : NS_ERROR_FAILURE;
     if (NS_FAILED(rv)) {
       MOZ_LOG(GetImgLog(),
-             LogLevel::Error, ("imgRequest::PrepareForNewPart "
-                            "-- Content type unavailable from the channel\n"));
+              LogLevel::Error, ("imgRequest::PrepareForNewPart -- "
+                                "Content type unavailable from the channel\n"));
       return result;
     }
   }
@@ -978,6 +979,9 @@ PrepareForNewPart(nsIRequest* aRequest, nsIInputStream* aInStr, uint32_t aCount,
       // Transition to the new part.
       auto multipartImage = static_cast<MultipartImage*>(aExistingImage);
       multipartImage->BeginTransitionToPart(partImage);
+
+      // Reset our cache entry size so it doesn't keep growing without bound.
+      result.mShouldResetCacheEntry = true;
     }
   } else {
     MOZ_ASSERT(!aExistingImage, "New part for non-multipart channel?");
@@ -1037,6 +1041,10 @@ imgRequest::FinishPreparingForNewPart(const NewPartResult& aResult)
     nsRefPtr<ProgressTracker> progressTracker = GetProgressTracker();
     progressTracker->OnImageAvailable();
     MOZ_ASSERT(progressTracker->HasImage());
+  }
+
+  if (aResult.mShouldResetCacheEntry) {
+    ResetCacheEntry();
   }
 
   if (IsDecodeRequested()) {
@@ -1251,7 +1259,17 @@ imgRequest::OnRedirectVerifyCallback(nsresult result)
                                     &schemeLocal))  ||
       (!isHttps && !isChrome && !schemeLocal)) {
     MutexAutoLock lock(mMutex);
-    mHadInsecureRedirect = true;
+
+    // The csp directive upgrade-insecure-requests performs an internal redirect
+    // to upgrade all requests from http to https before any data is fetched from
+    // the network. Do not pollute mHadInsecureRedirect in case of such an internal
+    // redirect.
+    nsCOMPtr<nsILoadInfo> loadInfo = mChannel->GetLoadInfo();
+    bool upgradeInsecureRequests = loadInfo ? loadInfo->GetUpgradeInsecureRequests()
+                                            : false;
+    if (!upgradeInsecureRequests) {
+      mHadInsecureRedirect = true;
+    }
   }
 
   // Update the current URI.

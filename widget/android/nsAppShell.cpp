@@ -48,6 +48,7 @@
 #include "GeckoProfiler.h"
 #ifdef MOZ_ANDROID_HISTORY
 #include "nsNetUtil.h"
+#include "nsIURI.h"
 #include "IHistory.h"
 #endif
 
@@ -133,7 +134,7 @@ nsAppShell::nsAppShell()
 {
     gAppShell = this;
 
-    if (XRE_GetProcessType() != GeckoProcessType_Default) {
+    if (!XRE_IsParentProcess()) {
         return;
     }
 

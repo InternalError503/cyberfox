@@ -15,7 +15,9 @@
 #include "nsMemory.h"
 #include "nsIStringStream.h"
 #include "nsIURL.h"
-#include "nsNetUtil.h"
+#include "nsNetCID.h"
+#include "nsIPipe.h"
+#include "nsIOutputStream.h"
 #include "nsIMIMEService.h"
 #include "nsCExternalHandlerService.h"
 #include "nsILocalFileMac.h"
@@ -23,6 +25,7 @@
 #include "nsTArray.h"
 #include "nsObjCExceptions.h"
 #include "nsProxyRelease.h"
+#include "nsContentSecurityManager.h"
 
 #include <Cocoa/Cocoa.h>
 
@@ -175,6 +178,15 @@ nsIconChannel::Open(nsIInputStream** _retval)
   return MakeInputStream(_retval, false);
 }
 
+NS_IMETHODIMP
+nsIconChannel::Open2(nsIInputStream** aStream)
+{
+  nsCOMPtr<nsIStreamListener> listener;
+  nsresult rv = nsContentSecurityManager::doContentSecurityCheck(this, listener);
+  NS_ENSURE_SUCCESS(rv, rv);
+  return Open(aStream);
+}
+
 nsresult
 nsIconChannel::ExtractIconInfoFromUrl(nsIFile** aLocalFile,
                                                uint32_t* aDesiredImageSize,
@@ -232,6 +244,15 @@ nsIconChannel::AsyncOpen(nsIStreamListener* aListener,
   }
 
   return rv;
+}
+
+NS_IMETHODIMP
+nsIconChannel::AsyncOpen2(nsIStreamListener* aListener)
+{
+  nsCOMPtr<nsIStreamListener> listener = aListener;
+  nsresult rv = nsContentSecurityManager::doContentSecurityCheck(this, listener);
+  NS_ENSURE_SUCCESS(rv, rv);
+  return AsyncOpen(listener, nullptr);
 }
 
 nsresult

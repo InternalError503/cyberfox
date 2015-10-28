@@ -13,15 +13,44 @@
 #include "nsIMultiPartChannel.h"
 #include "../../cache2/CacheFileUtils.h"
 #include "nsStreamUtils.h"
+#include "mozilla/Logging.h"
+#include "mozilla/DebugOnly.h"
 
 namespace mozilla {
 namespace net {
 
 static PackagedAppService *gPackagedAppService = nullptr;
 
+static PRLogModuleInfo *gPASLog = nullptr;
+#undef LOG
+#define LOG(args) MOZ_LOG(gPASLog, mozilla::LogLevel::Debug, args)
+
 NS_IMPL_ISUPPORTS(PackagedAppService, nsIPackagedAppService)
 
 NS_IMPL_ISUPPORTS(PackagedAppService::CacheEntryWriter, nsIStreamListener)
+
+static void
+LogURI(const char *aFunctionName, void *self, nsIURI *aURI, nsILoadContextInfo *aInfo = nullptr)
+{
+  if (MOZ_LOG_TEST(gPASLog, LogLevel::Debug)) {
+    nsAutoCString spec;
+    if (aURI) {
+      aURI->GetAsciiSpec(spec);
+    } else {
+      spec = "(null)";
+    }
+
+    nsAutoCString prefix;
+    if (aInfo) {
+      CacheFileUtils::AppendKeyPrefix(aInfo, prefix);
+      prefix += ":";
+    }
+
+    LOG(("[%p] %s > %s%s\n", self, aFunctionName, prefix.get(), spec.get()));
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 /* static */ nsresult
 PackagedAppService::CacheEntryWriter::Create(nsIURI *aURI,
@@ -44,6 +73,42 @@ PackagedAppService::CacheEntryWriter::Create(nsIURI *aURI,
   return NS_OK;
 }
 
+nsresult
+PackagedAppService::CacheEntryWriter::CopySecurityInfo(nsIChannel *aChannel)
+{
+  if (!aChannel) {
+    return NS_ERROR_INVALID_ARG;
+  }
+
+  nsCOMPtr<nsISupports> securityInfo;
+  aChannel->GetSecurityInfo(getter_AddRefs(securityInfo));
+  if (securityInfo) {
+    mEntry->SetSecurityInfo(securityInfo);
+  }
+
+  return NS_OK;
+}
+
+/* static */ nsresult
+PackagedAppService::CacheEntryWriter::CopyHeadersFromChannel(nsIChannel *aChannel,
+                                                  nsHttpResponseHead *aHead)
+{
+  if (!aChannel || !aHead) {
+    return NS_ERROR_INVALID_ARG;
+  }
+
+  nsCOMPtr<nsIHttpChannel> httpChan = do_QueryInterface(aChannel);
+  if (!httpChan) {
+    return NS_ERROR_FAILURE;
+  }
+
+  nsAutoCString value;
+  httpChan->GetResponseHeader(NS_LITERAL_CSTRING("Content-Security-Policy"), value);
+  aHead->SetHeader(nsHttp::ResolveAtom("Content-Security-Policy"), value);
+
+  return NS_OK;
+}
+
 NS_METHOD
 PackagedAppService::CacheEntryWriter::ConsumeData(nsIInputStream *aStream,
                                                   void *aClosure,
@@ -62,6 +127,7 @@ NS_IMETHODIMP
 PackagedAppService::CacheEntryWriter::OnStartRequest(nsIRequest *aRequest,
                                                      nsISupports *aContext)
 {
+  nsresult rv;
   nsCOMPtr<nsIResponseHeadProvider> provider(do_QueryInterface(aRequest));
   if (!provider) {
     return NS_ERROR_INVALID_ARG;
@@ -73,14 +139,31 @@ PackagedAppService::CacheEntryWriter::OnStartRequest(nsIRequest *aRequest,
 
   mEntry->SetPredictedDataSize(responseHead->TotalEntitySize());
 
-  nsAutoCString head;
-  responseHead->Flatten(head, true);
-  nsresult rv = mEntry->SetMetaDataElement("response-head", head.get());
+  rv = mEntry->SetMetaDataElement("request-method", "GET");
   if (NS_WARN_IF(NS_FAILED(rv))) {
     return rv;
   }
 
-  rv = mEntry->SetMetaDataElement("request-method", "GET");
+  nsCOMPtr<nsIMultiPartChannel> multiPartChannel = do_QueryInterface(aRequest);
+  if (!multiPartChannel) {
+    return NS_ERROR_FAILURE;
+  }
+  nsCOMPtr<nsIChannel> baseChannel;
+  multiPartChannel->GetBaseChannel(getter_AddRefs(baseChannel));
+
+  rv = CopySecurityInfo(baseChannel);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  rv = CopyHeadersFromChannel(baseChannel, responseHead);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  nsAutoCString head;
+  responseHead->Flatten(head, true);
+  rv = mEntry->SetMetaDataElement("response-head", head.get());
   if (NS_WARN_IF(NS_FAILED(rv))) {
     return rv;
   }
@@ -121,6 +204,48 @@ PackagedAppService::CacheEntryWriter::OnDataAvailable(nsIRequest *aRequest,
   return aInputStream->ReadSegments(ConsumeData, this, aCount, &n);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+NS_IMPL_ISUPPORTS(PackagedAppService::PackagedAppChannelListener, nsIStreamListener)
+
+NS_IMETHODIMP
+PackagedAppService::PackagedAppChannelListener::OnStartRequest(nsIRequest *aRequest,
+                                                               nsISupports *aContext)
+{
+  bool isFromCache = false;
+  nsCOMPtr<nsICacheInfoChannel> cacheChan = do_QueryInterface(aRequest);
+  if (cacheChan) {
+      cacheChan->IsFromCache(&isFromCache);
+  }
+
+  mDownloader->SetIsFromCache(isFromCache);
+  LOG(("[%p] Downloader isFromCache: %d\n", mDownloader.get(), isFromCache));
+
+  // XXX: This is the place to suspend the channel, doom existing cache entries
+  // for previous resources, and then resume the channel.
+  return mListener->OnStartRequest(aRequest, aContext);
+}
+
+NS_IMETHODIMP
+PackagedAppService::PackagedAppChannelListener::OnStopRequest(nsIRequest *aRequest,
+                                                    nsISupports *aContext,
+                                                    nsresult aStatusCode)
+{
+  return mListener->OnStopRequest(aRequest, aContext, aStatusCode);
+}
+
+NS_IMETHODIMP
+PackagedAppService::PackagedAppChannelListener::OnDataAvailable(nsIRequest *aRequest,
+                                                      nsISupports *aContext,
+                                                      nsIInputStream *aInputStream,
+                                                      uint64_t aOffset,
+                                                      uint32_t aCount)
+{
+  return mListener->OnDataAvailable(aRequest, aContext, aInputStream, aOffset, aCount);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 NS_IMPL_ISUPPORTS(PackagedAppService::PackagedAppDownloader, nsIStreamListener)
 
@@ -155,6 +280,9 @@ PackagedAppService::PackagedAppDownloader::OnStartRequest(nsIRequest *aRequest,
 
   nsCOMPtr<nsIURI> uri;
   nsresult rv = GetSubresourceURI(aRequest, getter_AddRefs(uri));
+
+  LogURI("PackagedAppDownloader::OnStartRequest", this, uri);
+
   if (NS_WARN_IF(NS_FAILED(rv))) {
     return NS_OK;
   }
@@ -236,6 +364,8 @@ PackagedAppService::PackagedAppDownloader::OnStopRequest(nsIRequest *aRequest,
   nsCOMPtr<nsIMultiPartChannel> multiChannel(do_QueryInterface(aRequest));
   nsresult rv;
 
+  LOG(("[%p] PackagedAppDownloader::OnStopRequest > status:%X multiChannel:%p\n",
+       this, aStatusCode, multiChannel.get()));
 
   // The request is normally a multiPartChannel. If it isn't, it generally means
   // an error has occurred in nsMultiMixedConv.
@@ -257,7 +387,9 @@ PackagedAppService::PackagedAppDownloader::OnStopRequest(nsIRequest *aRequest,
     CallCallbacks(uri, entry, aStatusCode);
   }
 
-  bool lastPart = false;
+  // lastPart will be true if this is the last part in the package,
+  // or if aRequest isn't a multipart channel
+  bool lastPart = true;
   if (multiChannel) {
     rv = multiChannel->GetIsLastPart(&lastPart);
     if (NS_SUCCEEDED(rv) && !lastPart) {
@@ -268,7 +400,10 @@ PackagedAppService::PackagedAppDownloader::OnStopRequest(nsIRequest *aRequest,
 
   // If this is the last part of the package, it means the requested resources
   // have not been found in the package so we return an appropriate error.
-  if (NS_SUCCEEDED(aStatusCode) && lastPart) {
+  // If the package response comes from the cache, we want to preserve the
+  // statusCode, so ClearCallbacks looks for the resource in the cache, instead
+  // of returning NS_ERROR_FILE_NOT_FOUND.
+  if (NS_SUCCEEDED(aStatusCode) && lastPart && !mIsFromCache) {
     aStatusCode = NS_ERROR_FILE_NOT_FOUND;
   }
 
@@ -304,12 +439,26 @@ PackagedAppService::PackagedAppDownloader::AddCallback(nsIURI *aURI,
   nsAutoCString spec;
   aURI->GetAsciiSpec(spec);
 
+  LogURI("PackagedAppDownloader::AddCallback", this, aURI);
+  LOG(("[%p]    > callback: %p\n", this, aCallback));
+
   // Check if we already have a resource waiting for this resource
   nsCOMArray<nsICacheEntryOpenCallback>* array = mCallbacks.Get(spec);
   if (array) {
-    // Add this resource to the callback array
-    array->AppendObject(aCallback);
+    if (array->Length() == 0) {
+      // The download of this resource has already completed, hence we don't
+      // need to wait for it to be inserted in the cache and we can serve it
+      // right now, directly.  See also the CallCallbacks method bellow.
+      LOG(("[%p]    > already downloaded\n", this));
+      mCacheStorage->AsyncOpenURI(aURI, EmptyCString(),
+                                  nsICacheStorage::OPEN_READONLY, aCallback);
+    } else {
+      LOG(("[%p]    > adding to array\n", this));
+      // Add this resource to the callback array
+      array->AppendObject(aCallback);
+    }
   } else {
+    LOG(("[%p]    > creating array\n", this));
     // This is the first callback for this URI.
     // Create a new array and add the callback
     nsCOMArray<nsICacheEntryOpenCallback>* newArray =
@@ -329,8 +478,11 @@ PackagedAppService::PackagedAppDownloader::CallCallbacks(nsIURI *aURI,
   // Hold on to this entry while calling the callbacks
   nsCOMPtr<nsICacheEntry> handle(aEntry);
 
+  LogURI("PackagedAppService::PackagedAppDownloader::CallCallbacks", this, aURI);
+  LOG(("[%p]    > status:%X\n", this, aResult));
+
   nsAutoCString spec;
-  aURI->GetSpec(spec);
+  aURI->GetAsciiSpec(spec);
 
   nsCOMArray<nsICacheEntryOpenCallback>* array = mCallbacks.Get(spec);
   if (array) {
@@ -341,76 +493,115 @@ PackagedAppService::PackagedAppDownloader::CallCallbacks(nsIURI *aURI,
       mCacheStorage->AsyncOpenURI(aURI, EmptyCString(),
                                   nsICacheStorage::OPEN_READONLY, callback);
     }
-    // Clear the array and remove it from the hashtable
+    // Clear the array but leave it in the hashtable
+    // An empty array means that the resource was already downloaded, and a
+    // new call to AddCallback can simply return it from the cache.
     array->Clear();
-    mCallbacks.Remove(spec);
-    aEntry->ForceValidFor(0);
+    LOG(("[%p]    > called callbacks\n", this));
+  } else {
+    // There were no listeners waiting for this resource, but we insert a new
+    // empty array into the hashtable so if any new callbacks are added while
+    // downloading the package, we can simply return it from the cache.
+    nsCOMArray<nsICacheEntryOpenCallback>* newArray =
+      new nsCOMArray<nsICacheEntryOpenCallback>();
+    mCallbacks.Put(spec, newArray);
+    LOG(("[%p]    > created array\n", this));
   }
-  return NS_OK;
-}
 
-PLDHashOperator
-PackagedAppService::PackagedAppDownloader::ClearCallbacksEnumerator(const nsACString& key,
-  nsAutoPtr<nsCOMArray<nsICacheEntryOpenCallback> >& callbackArray,
-  void* arg)
-{
-  MOZ_ASSERT(arg, "The void* parameter should be a pointer to nsresult");
-  nsresult *result = static_cast<nsresult*>(arg);
-  for (uint32_t i = 0; i < callbackArray->Length(); ++i) {
-    nsCOMPtr<nsICacheEntryOpenCallback> callback = callbackArray->ObjectAt(i);
-    callback->OnCacheEntryAvailable(nullptr, false, nullptr, *result);
-  }
-  // Remove entry from hashtable
-  return PL_DHASH_REMOVE;
+  aEntry->ForceValidFor(0);
+  return NS_OK;
 }
 
 nsresult
 PackagedAppService::PackagedAppDownloader::ClearCallbacks(nsresult aResult)
 {
   MOZ_RELEASE_ASSERT(NS_IsMainThread(), "mCallbacks hashtable is not thread safe");
-  mCallbacks.Enumerate(ClearCallbacksEnumerator, &aResult);
-  return NS_OK;
-}
+  LOG(("[%p] PackagedAppService::PackagedAppDownloader::ClearCallbacks > packageKey:%s status:%X\n",
+       this, mPackageKey.get(), aResult));
 
-NS_IMPL_ISUPPORTS(PackagedAppService::CacheEntryChecker, nsICacheEntryOpenCallback)
+  for (auto iter = mCallbacks.Iter(); !iter.Done(); iter.Next()) {
+    const nsACString& key = iter.Key();
+    const nsCOMArray<nsICacheEntryOpenCallback>* callbackArray = iter.UserData();
 
-NS_IMETHODIMP
-PackagedAppService::CacheEntryChecker::OnCacheEntryCheck(nsICacheEntry *aEntry,
-                                                         nsIApplicationCache *aApplicationCache,
-                                                         uint32_t *_retval)
-{
-  return mCallback->OnCacheEntryCheck(aEntry, aApplicationCache, _retval);
-}
+    if (NS_SUCCEEDED(aResult)) {
+      // For success conditions we try to open the cache entry.
+      // This can occur when the package metadata is served from the cache,
+      // as it hasn't changed, but the entries are still in the cache.
+      nsCOMPtr<nsIURI> uri;
+      DebugOnly<nsresult> rv = NS_NewURI(getter_AddRefs(uri), key);
+      MOZ_ASSERT(NS_SUCCEEDED(rv));
 
-NS_IMETHODIMP
-PackagedAppService::CacheEntryChecker::OnCacheEntryAvailable(nsICacheEntry *aEntry,
-                                                             bool aNew,
-                                                             nsIApplicationCache *aApplicationCache,
-                                                             nsresult aResult)
-{
-  if (aResult == NS_ERROR_CACHE_KEY_NOT_FOUND) {
-    MOZ_ASSERT(!aEntry, "No entry");
-    // trigger download
-    // download checks if package download is already in progress
-    gPackagedAppService->OpenNewPackageInternal(mURI, mCallback,
-                                                mLoadContextInfo);
-  } else {
-    // TODO: if aResult is another error code, should we pass it off to the
-    // consumer, or should we try to download the package again?
-    mCallback->OnCacheEntryAvailable(aEntry, aNew, aApplicationCache, aResult);
-    // TODO: update last access entry for the entire package
+      LOG(("[%p]    > calling AsyncOpenURI for %s\n", this, key.BeginReading()));
+      for (uint32_t i = 0; i < callbackArray->Length(); ++i) {
+        nsCOMPtr<nsICacheEntryOpenCallback> callback = callbackArray->ObjectAt(i);
+        mCacheStorage->AsyncOpenURI(uri, EmptyCString(),
+                                    nsICacheStorage::OPEN_READONLY, callback);
+      }
+
+    } else { // an error has occured
+      // We just call all the callbacks and pass the error result
+      LOG(("[%p]    > passing NULL cache entry for %s\n", this, key.BeginReading()));
+      for (uint32_t i = 0; i < callbackArray->Length(); ++i) {
+        nsCOMPtr<nsICacheEntryOpenCallback> callback = callbackArray->ObjectAt(i);
+        callback->OnCacheEntryAvailable(nullptr, false, nullptr, aResult);
+      }
+    }
+
+    // Finally, we remove this entry from the hashtable.
+    iter.Remove();
   }
+
   return NS_OK;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 PackagedAppService::PackagedAppService()
 {
   gPackagedAppService = this;
+  gPASLog = PR_NewLogModule("PackagedAppService");
+  LOG(("[%p] Created PackagedAppService\n", this));
 }
 
 PackagedAppService::~PackagedAppService()
 {
+  LOG(("[%p] Destroying PackagedAppService\n", this));
   gPackagedAppService = nullptr;
+}
+
+/* static */ nsresult
+PackagedAppService::GetPackageURI(nsIURI *aURI, nsIURI **aPackageURI)
+{
+  nsCOMPtr<nsIURL> url = do_QueryInterface(aURI);
+  if (!url) {
+    return NS_ERROR_INVALID_ARG;
+  }
+
+  nsAutoCString path;
+  nsresult rv = url->GetFilePath(path);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  int32_t pos = path.Find(PACKAGED_APP_TOKEN);
+  if (pos == kNotFound) {
+    return NS_ERROR_INVALID_ARG;
+  }
+
+  nsCOMPtr<nsIURI> packageURI;
+  rv = aURI->CloneIgnoringRef(getter_AddRefs(packageURI));
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  rv = packageURI->SetPath(Substring(path, 0, pos));
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  packageURI.forget(aPackageURI);
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
@@ -423,63 +614,14 @@ PackagedAppService::RequestURI(nsIURI *aURI,
     return NS_ERROR_INVALID_ARG;
   }
 
-  nsAutoCString path;
-  aURI->GetPath(path);
-  int32_t pos = path.Find(PACKAGED_APP_TOKEN);
-  if (pos == kNotFound) {
-    return NS_ERROR_INVALID_ARG;
-  }
 
   nsresult rv;
-  nsCOMPtr<nsICacheStorageService> cacheStorageService =
-    do_GetService("@mozilla.org/netwerk/cache-storage-service;1", &rv);
+  LogURI("PackagedAppService::RequestURI", this, aURI, aInfo);
 
-  if (NS_WARN_IF(NS_FAILED(rv))) {
-    return rv;
-  }
-
-  nsCOMPtr<nsICacheStorage> cacheStorage;
-
-  rv = cacheStorageService->DiskCacheStorage(aInfo, false,
-                                             getter_AddRefs(cacheStorage));
-
-  nsRefPtr<CacheEntryChecker> checker = new CacheEntryChecker(aURI, aCallback, aInfo);
-  return cacheStorage->AsyncOpenURI(aURI, EmptyCString(),
-                                    nsICacheStorage::OPEN_READONLY, checker);
-}
-
-nsresult
-PackagedAppService::NotifyPackageDownloaded(nsCString aKey)
-{
   MOZ_RELEASE_ASSERT(NS_IsMainThread(), "mDownloadingPackages hashtable is not thread safe");
-  mDownloadingPackages.Remove(aKey);
-  return NS_OK;
-}
-
-nsresult
-PackagedAppService::OpenNewPackageInternal(nsIURI *aURI,
-                                           nsICacheEntryOpenCallback *aCallback,
-                                           nsILoadContextInfo *aInfo)
-{
-  MOZ_RELEASE_ASSERT(NS_IsMainThread(), "mDownloadingPackages hashtable is not thread safe");
-
-  nsAutoCString path;
-  nsresult rv = aURI->GetPath(path);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-
-  int32_t pos = path.Find(PACKAGED_APP_TOKEN);
-  MOZ_ASSERT(pos != kNotFound,
-             "This should never be called if the token is missing");
 
   nsCOMPtr<nsIURI> packageURI;
-  rv = aURI->CloneIgnoringRef(getter_AddRefs(packageURI));
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-
-  rv = packageURI->SetPath(Substring(path, 0, pos));
+  rv = GetPackageURI(aURI, getter_AddRefs(packageURI));
   if (NS_FAILED(rv)) {
     return rv;
   }
@@ -505,11 +647,18 @@ PackagedAppService::OpenNewPackageInternal(nsIURI *aURI,
     return NS_OK;
   }
 
+  // We need to set this flag, because the package metadata
+  // needs to have a separate entry for anonymous channels.
+  uint32_t extra_flags = 0;
+  if (aInfo->IsAnonymous()) {
+    extra_flags = nsIRequest::LOAD_ANONYMOUS;
+  }
+
   nsCOMPtr<nsIChannel> channel;
   rv = NS_NewChannel(
     getter_AddRefs(channel), packageURI, nsContentUtils::GetSystemPrincipal(),
     nsILoadInfo::SEC_NORMAL, nsIContentPolicy::TYPE_OTHER, nullptr, nullptr,
-    nsIRequest::LOAD_NORMAL);
+    nsIRequest::LOAD_NORMAL | extra_flags);
 
   if (NS_WARN_IF(NS_FAILED(rv))) {
     return rv;
@@ -538,7 +687,7 @@ PackagedAppService::OpenNewPackageInternal(nsIURI *aURI,
   }
 
   nsCOMPtr<nsIStreamListener> mimeConverter;
-  rv = streamconv->AsyncConvertData("multipart/mixed", "*/*", downloader, nullptr,
+  rv = streamconv->AsyncConvertData(APPLICATION_PACKAGE, "*/*", downloader, nullptr,
                                     getter_AddRefs(mimeConverter));
   if (NS_WARN_IF(NS_FAILED(rv))) {
     return rv;
@@ -547,7 +696,19 @@ PackagedAppService::OpenNewPackageInternal(nsIURI *aURI,
   // Add the package to the hashtable.
   mDownloadingPackages.Put(key, downloader);
 
-  return channel->AsyncOpen(mimeConverter, nullptr);
+  nsRefPtr<PackagedAppChannelListener> listener =
+    new PackagedAppChannelListener(downloader, mimeConverter);
+
+  return channel->AsyncOpen(listener, nullptr);
+}
+
+nsresult
+PackagedAppService::NotifyPackageDownloaded(nsCString aKey)
+{
+  MOZ_RELEASE_ASSERT(NS_IsMainThread(), "mDownloadingPackages hashtable is not thread safe");
+  mDownloadingPackages.Remove(aKey);
+  LOG(("[%p] PackagedAppService::NotifyPackageDownloaded > %s\n", this, aKey.get()));
+  return NS_OK;
 }
 
 } // namespace net

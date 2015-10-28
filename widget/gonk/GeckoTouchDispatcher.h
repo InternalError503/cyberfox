@@ -22,7 +22,7 @@
 #include "Units.h"
 #include "mozilla/Mutex.h"
 #include <vector>
-#include "nsRefPtr.h"
+#include "mozilla/nsRefPtr.h"
 
 class nsIWidget;
 
@@ -94,4 +94,5 @@ private:
 };
 
 } // namespace mozilla
+
 #endif // GECKO_TOUCH_INPUT_DISPATCHER_h

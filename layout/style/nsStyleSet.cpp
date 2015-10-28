@@ -226,10 +226,10 @@ nsStyleSet::SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const
   for (uint32_t i = 0; i < mScopedDocSheetRuleProcessors.Length(); i++) {
     n += mScopedDocSheetRuleProcessors[i]->SizeOfIncludingThis(aMallocSizeOf);
   }
-  n += mScopedDocSheetRuleProcessors.SizeOfExcludingThis(aMallocSizeOf);
+  n += mScopedDocSheetRuleProcessors.ShallowSizeOfExcludingThis(aMallocSizeOf);
 
-  n += mRoots.SizeOfExcludingThis(aMallocSizeOf);
-  n += mOldRuleTrees.SizeOfExcludingThis(aMallocSizeOf);
+  n += mRoots.ShallowSizeOfExcludingThis(aMallocSizeOf);
+  n += mOldRuleTrees.ShallowSizeOfExcludingThis(aMallocSizeOf);
 
   return n;
 }
@@ -387,6 +387,14 @@ nsStyleSet::GatherRuleProcessors(sheetType aType)
 {
   NS_ENSURE_FALSE(mInShutdown, NS_ERROR_FAILURE);
 
+  // We might be in GatherRuleProcessors because we are dropping a sheet,
+  // resulting in an nsCSSSelector being destroyed.  Tell the
+  // RestyleManager for each document we're used in so that they can
+  // drop any nsCSSSelector pointers (used for eRestyle_SomeDescendants)
+  // in their mPendingRestyles.
+  if (IsCSSSheetType(aType)) {
+    ClearSelectors();
+  }
   nsCOMPtr<nsIStyleRuleProcessor> oldRuleProcessor(mRuleProcessors[aType]);
   nsTArray<nsCOMPtr<nsIStyleRuleProcessor>> oldScopedDocRuleProcessors;
   if (aType == eAgentSheet || aType == eUserSheet) {
@@ -2373,19 +2381,22 @@ nsStyleSet::HasStateDependentStyle(Element* aElement,
 struct MOZ_STACK_CLASS AttributeData : public AttributeRuleProcessorData {
   AttributeData(nsPresContext* aPresContext,
                 Element* aElement, nsIAtom* aAttribute, int32_t aModType,
-                bool aAttrHasChanged, TreeMatchContext& aTreeMatchContext)
+                bool aAttrHasChanged, const nsAttrValue* aOtherValue,
+                TreeMatchContext& aTreeMatchContext)
     : AttributeRuleProcessorData(aPresContext, aElement, aAttribute, aModType,
-                                 aAttrHasChanged, aTreeMatchContext),
+                                 aAttrHasChanged, aOtherValue, aTreeMatchContext),
       mHint(nsRestyleHint(0))
   {}
-  nsRestyleHint   mHint;
+  nsRestyleHint mHint;
+  RestyleHintData mHintData;
 };
 
 static bool
 SheetHasAttributeStyle(nsIStyleRuleProcessor* aProcessor, void *aData)
 {
   AttributeData* data = (AttributeData*)aData;
-  nsRestyleHint hint = aProcessor->HasAttributeDependentStyle(data);
+  nsRestyleHint hint =
+    aProcessor->HasAttributeDependentStyle(data, data->mHintData);
   data->mHint = nsRestyleHint(data->mHint | hint);
   return true; // continue
 }
@@ -2395,14 +2406,22 @@ nsRestyleHint
 nsStyleSet::HasAttributeDependentStyle(Element*       aElement,
                                        nsIAtom*       aAttribute,
                                        int32_t        aModType,
-                                       bool           aAttrHasChanged)
+                                       bool           aAttrHasChanged,
+                                       const nsAttrValue* aOtherValue,
+                                       mozilla::RestyleHintData&
+                                         aRestyleHintDataResult)
 {
   TreeMatchContext treeContext(false, nsRuleWalker::eLinksVisitedOrUnvisited,
                                aElement->OwnerDoc());
   InitStyleScopes(treeContext, aElement);
   AttributeData data(PresContext(), aElement, aAttribute,
-                     aModType, aAttrHasChanged, treeContext);
+                     aModType, aAttrHasChanged, aOtherValue, treeContext);
   WalkRuleProcessors(SheetHasAttributeStyle, &data, false);
+  if (!(data.mHint & eRestyle_Subtree)) {
+    // No point keeping the list of selectors around if we are going to
+    // restyle the whole subtree unconditionally.
+    aRestyleHintDataResult = Move(data.mHintData);
+  }
   return data.mHint;
 }
 
@@ -2476,4 +2495,26 @@ nsStyleSet::InitialStyleRule()
     mInitialStyleRule = new nsInitialStyleRule;
   }
   return mInitialStyleRule;
+}
+
+bool
+nsStyleSet::HasRuleProcessorUsedByMultipleStyleSets(sheetType aSheetType)
+{
+  MOZ_ASSERT(size_t(aSheetType) < ArrayLength(mRuleProcessors));
+  if (!IsCSSSheetType(aSheetType) || !mRuleProcessors[aSheetType]) {
+    return false;
+  }
+  nsCSSRuleProcessor* rp =
+    static_cast<nsCSSRuleProcessor*>(mRuleProcessors[aSheetType].get());
+  return rp->IsUsedByMultipleStyleSets();
+}
+
+void
+nsStyleSet::ClearSelectors()
+{
+  // We might be called before we've done our first rule tree construction.
+  if (!mRuleTree) {
+    return;
+  }
+  PresContext()->RestyleManager()->ClearSelectors();
 }

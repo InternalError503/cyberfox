@@ -30,7 +30,7 @@ public:
       CreateOffscreenSurface(const IntSize& aSize,
                              gfxImageFormat aFormat) override;
 
-    virtual mozilla::TemporaryRef<mozilla::gfx::ScaledFont>
+    virtual already_AddRefed<mozilla::gfx::ScaledFont>
       GetScaledFontForFont(mozilla::gfx::DrawTarget* aTarget, gfxFont *aFont) override;
 
     virtual nsresult GetFontList(nsIAtom *aLangGroup,
@@ -81,6 +81,10 @@ public:
 #endif
 
     virtual int GetScreenDepth() const override;
+
+    bool AccelerateLayersByDefault() override {
+      return true;
+    }
 
 protected:
     static gfxFontconfigUtils *sFontconfigUtils;

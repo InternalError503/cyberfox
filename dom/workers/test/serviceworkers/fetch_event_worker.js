@@ -7,6 +7,16 @@ onfetch = function(ev) {
     ));
   }
 
+  else if (ev.request.url.includes('file_CrossSiteXHR_server.sjs')) {
+    // N.B. this response would break the rules of CORS if it were allowed, but
+    //      this test relies upon the preflight request not being intercepted and
+    //      thus this response should not be used.
+    if (ev.request.method == 'OPTIONS') {
+      ev.respondWith(new Response('', {headers: {'Access-Control-Allow-Origin': '*',
+                                                 'Access-Control-Allow-Headers': 'X-Unsafe'}}))
+    }
+  }
+
   else if (ev.request.url.includes("synthesized-404.txt")) {
     ev.respondWith(Promise.resolve(
       new Response("synthesized response body", { status: 404 })
@@ -64,6 +74,17 @@ onfetch = function(ev) {
 
   else if (ev.request.url.includes("nonresponse2.txt")) {
     ev.respondWith(Promise.resolve({}));
+  }
+
+  else if (ev.request.url.includes("nonpromise.txt")) {
+    try {
+      // This should coerce to Promise(5) instead of throwing
+      ev.respondWith(5);
+    } catch (e) {
+      // test is expecting failure, so return a success if we get a thrown
+      // exception
+      ev.respondWith(new Response('respondWith(5) threw ' + e));
+    }
   }
 
   else if (ev.request.url.includes("headers.txt")) {

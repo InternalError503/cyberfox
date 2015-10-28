@@ -914,7 +914,8 @@ XULDocument::ExecuteOnBroadcastHandlerFor(Element* aBroadcaster,
 void
 XULDocument::AttributeWillChange(nsIDocument* aDocument,
                                  Element* aElement, int32_t aNameSpaceID,
-                                 nsIAtom* aAttribute, int32_t aModType)
+                                 nsIAtom* aAttribute, int32_t aModType,
+                                 const nsAttrValue* aNewValue)
 {
     MOZ_ASSERT(aElement, "Null content!");
     NS_PRECONDITION(aAttribute, "Must have an attribute that's changing!");
@@ -931,7 +932,8 @@ XULDocument::AttributeWillChange(nsIDocument* aDocument,
 void
 XULDocument::AttributeChanged(nsIDocument* aDocument,
                               Element* aElement, int32_t aNameSpaceID,
-                              nsIAtom* aAttribute, int32_t aModType)
+                              nsIAtom* aAttribute, int32_t aModType,
+                              const nsAttrValue* aOldValue)
 {
     NS_ASSERTION(aDocument == this, "unexpected doc");
 
@@ -943,8 +945,6 @@ XULDocument::AttributeChanged(nsIDocument* aDocument,
     if (aAttribute == nsGkAtoms::ref) {
         AddElementToRefMap(aElement);
     }
-
-    nsresult rv;
 
     // Synchronize broadcast listeners
     if (mBroadcasterMap &&
@@ -1012,8 +1012,10 @@ XULDocument::AttributeChanged(nsIDocument* aDocument,
     if (!persist.IsEmpty()) {
         // XXXldb This should check that it's a token, not just a substring.
         if (persist.Find(nsDependentAtomString(aAttribute)) >= 0) {
-            rv = Persist(aElement, kNameSpaceID_None, aAttribute);
-            if (NS_FAILED(rv)) return;
+            nsContentUtils::AddScriptRunner(NS_NewRunnableMethodWithArgs
+              <nsIContent*, int32_t, nsIAtom*>
+              (this, &XULDocument::DoPersist, aElement, kNameSpaceID_None,
+               aAttribute));
         }
     }
 }

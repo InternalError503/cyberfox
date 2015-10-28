@@ -25,7 +25,7 @@ public:
                 const VideoInfo& aConfig,
                 layers::LayersBackend aLayersBackend,
                 layers::ImageContainer* aImageContainer,
-                FlushableMediaTaskQueue* aVideoTaskQueue,
+                FlushableTaskQueue* aVideoTaskQueue,
                 MediaDataDecoderCallback* aCallback);
   virtual ~H264Converter();
 
@@ -38,6 +38,7 @@ public:
 
   // Return true if mimetype is H.264.
   static bool IsH264(const TrackInfo& aConfig);
+  nsresult GetLastError() const { return mLastError; }
 
 private:
   // Will create the required MediaDataDecoder if need AVCC and we have a SPS NAL.
@@ -52,7 +53,7 @@ private:
   VideoInfo mCurrentConfig;
   layers::LayersBackend mLayersBackend;
   nsRefPtr<layers::ImageContainer> mImageContainer;
-  nsRefPtr<FlushableMediaTaskQueue> mVideoTaskQueue;
+  nsRefPtr<FlushableTaskQueue> mVideoTaskQueue;
   MediaDataDecoderCallback* mCallback;
   nsRefPtr<MediaDataDecoder> mDecoder;
   bool mNeedAVCC;

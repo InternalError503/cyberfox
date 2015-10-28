@@ -95,8 +95,7 @@ public:
       // Apply the gain to the output buffer
       for (size_t channel = 0; channel < aOutput->mChannelData.Length(); ++channel) {
         const float* inputBuffer = static_cast<const float*> (aInput.mChannelData[channel]);
-        float* buffer = static_cast<float*> (const_cast<void*>
-                          (aOutput->mChannelData[channel]));
+        float* buffer = aOutput->ChannelFloatsForWrite(channel);
         AudioBlockCopyChannelWithScale(inputBuffer, computedGain, buffer);
       }
     }
@@ -164,5 +163,5 @@ GainNode::SendGainToStream(AudioNode* aNode)
   SendTimelineParameterToStream(This, GainNodeEngine::GAIN, *This->mGain);
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla

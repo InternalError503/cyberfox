@@ -77,7 +77,7 @@ function* runTestData(inspector, view, data) {
   let idRuleEditor = getRuleViewRuleEditor(view, 1);
 
   info("Focusing an existing selector name in the rule-view");
-  let editor = yield focusEditableField(idRuleEditor.selectorText);
+  let editor = yield focusEditableField(view, idRuleEditor.selectorText);
   is(inplaceEditor(idRuleEditor.selectorText), editor,
       "The selector editor got focused");
 
@@ -87,7 +87,7 @@ function* runTestData(inspector, view, data) {
   info("Entering the commit key " + commitKey + " " + modifiers);
   EventUtils.synthesizeKey(commitKey, modifiers);
 
-  let activeElement = view.doc.activeElement;
+  let activeElement = view.styleDocument.activeElement;
 
   if (commitKey === "VK_ESCAPE") {
     is(idRuleEditor.rule.selectorText, expected,

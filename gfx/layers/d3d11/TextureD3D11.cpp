@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+/* -*- Mode: C++; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 2 -*-
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -9,7 +9,6 @@
 #include "Effects.h"
 #include "mozilla/layers/YCbCrImageDataSerializer.h"
 #include "gfxWindowsPlatform.h"
-#include "gfxD2DSurface.h"
 #include "gfx2DGlue.h"
 #include "gfxPrefs.h"
 #include "ReadbackManagerD3D11.h"
@@ -64,6 +63,23 @@ GetTileRectD3D11(uint32_t aID, IntSize aSize, uint32_t aMaxSize)
                  verticalTile * aMaxSize,
                  horizontalTile < (horizontalTiles - 1) ? aMaxSize : aSize.width % aMaxSize,
                  verticalTile < (verticalTiles - 1) ? aMaxSize : aSize.height % aMaxSize);
+}
+
+ID3D11ShaderResourceView*
+TextureSourceD3D11::GetShaderResourceView()
+{
+  MOZ_ASSERT(mTexture == GetD3D11Texture(), "You need to override GetShaderResourceView if you're overriding GetD3D11Texture!");
+
+  if (!mSRV && mTexture) {
+    RefPtr<ID3D11Device> device;
+    mTexture->GetDevice(byRef(device));
+    HRESULT hr = device->CreateShaderResourceView(mTexture, nullptr, byRef(mSRV));
+    if (FAILED(hr)) {
+      gfxCriticalError(CriticalLog::DefaultOptions(false)) << "[D3D11] TextureSourceD3D11:GetShaderResourceView CreateSRV failure " << gfx::hexa(hr);
+      return nullptr;
+    }
+  }
+  return mSRV;
 }
 
 DataTextureSourceD3D11::DataTextureSourceD3D11(SurfaceFormat aFormat,
@@ -141,7 +157,7 @@ static void UnlockD3DTexture(T* aTexture)
   }
 }
 
-TemporaryRef<TextureHost>
+already_AddRefed<TextureHost>
 CreateTextureHostD3D11(const SurfaceDescriptor& aDesc,
                        ISurfaceAllocator* aDeallocator,
                        TextureFlags aFlags)
@@ -213,7 +229,7 @@ TextureClientD3D11::~TextureClientD3D11()
 }
 
 // static
-TemporaryRef<TextureClientD3D11>
+already_AddRefed<TextureClientD3D11>
 TextureClientD3D11::Create(ISurfaceAllocator* aAllocator,
                            gfx::SurfaceFormat aFormat,
                            TextureFlags aFlags,
@@ -228,7 +244,7 @@ TextureClientD3D11::Create(ISurfaceAllocator* aAllocator,
   return texture.forget();
 }
 
-TemporaryRef<TextureClient>
+already_AddRefed<TextureClient>
 TextureClientD3D11::CreateSimilar(TextureFlags aFlags,
                                   TextureAllocationFlags aAllocFlags) const
 {
@@ -245,7 +261,8 @@ TextureClientD3D11::CreateSimilar(TextureFlags aFlags,
 void
 TextureClientD3D11::SyncWithObject(SyncObject* aSyncObject)
 {
-  if (!aSyncObject) {
+  if (!aSyncObject || !NS_IsMainThread()) {
+    // When off the main thread we sync using a keyed mutex per texture.
     return;
   }
 
@@ -279,33 +296,35 @@ TextureClientD3D11::Lock(OpenMode aMode)
     return false;
   }
 
-  // Make sure that successful write-lock means we will have a DrawTarget to
-  // write into.
-  if (aMode & OpenMode::OPEN_WRITE) {
-    mDrawTarget = BorrowDrawTarget();
-    if (!mDrawTarget) {
-      Unlock();
-      return false;
+  if (NS_IsMainThread()) {
+    // Make sure that successful write-lock means we will have a DrawTarget to
+    // write into.
+    if (aMode & OpenMode::OPEN_WRITE) {
+      mDrawTarget = BorrowDrawTarget();
+      if (!mDrawTarget) {
+        Unlock();
+        return false;
+      }
     }
-  }
 
-  if (mNeedsClear) {
-    mDrawTarget = BorrowDrawTarget();
-    if (!mDrawTarget) {
+    if (mNeedsClear) {
+      mDrawTarget = BorrowDrawTarget();
+      if (!mDrawTarget) {
         Unlock();
         return false;
+      }
+      mDrawTarget->ClearRect(Rect(0, 0, GetSize().width, GetSize().height));
+      mNeedsClear = false;
     }
-    mDrawTarget->ClearRect(Rect(0, 0, GetSize().width, GetSize().height));
-    mNeedsClear = false;
-  }
-  if (mNeedsClearWhite) {
-    mDrawTarget = BorrowDrawTarget();
-    if (!mDrawTarget) {
+    if (mNeedsClearWhite) {
+      mDrawTarget = BorrowDrawTarget();
+      if (!mDrawTarget) {
         Unlock();
         return false;
+      }
+      mDrawTarget->FillRect(Rect(0, 0, GetSize().width, GetSize().height), ColorPattern(Color(1.0, 1.0, 1.0, 1.0)));
+      mNeedsClearWhite = false;
     }
-    mDrawTarget->FillRect(Rect(0, 0, GetSize().width, GetSize().height), ColorPattern(Color(1.0, 1.0, 1.0, 1.0)));
-    mNeedsClearWhite = false;
   }
 
   return true;
@@ -328,7 +347,7 @@ TextureClientD3D11::Unlock()
     mDrawTarget->Flush();
   }
 
-  if (mReadbackSink && mTexture10) {
+  if (NS_IsMainThread() && mReadbackSink && mTexture10) {
     ID3D10Device* device = gfxWindowsPlatform::GetPlatform()->GetD3D10Device();
 
     D3D10_TEXTURE2D_DESC desc;
@@ -364,6 +383,7 @@ DrawTarget*
 TextureClientD3D11::BorrowDrawTarget()
 {
   MOZ_ASSERT(mIsLocked, "Calling TextureClient::BorrowDrawTarget without locking :(");
+  MOZ_ASSERT(NS_IsMainThread());
 
   if (!mIsLocked || (!mTexture && !mTexture10)) {
     gfxCriticalError() << "Attempted to borrow a DrawTarget without locking the texture.";
@@ -386,6 +406,63 @@ TextureClientD3D11::BorrowDrawTarget()
       gfxWarning() << "Invalid draw target for borrowing";
   }
   return mDrawTarget;
+}
+
+void
+TextureClientD3D11::UpdateFromSurface(gfx::SourceSurface* aSurface)
+{
+  RefPtr<DataSourceSurface> srcSurf = aSurface->GetDataSurface();
+
+  if (!srcSurf) {
+    gfxCriticalError() << "Failed to GetDataSurface in UpdateFromSurface.";
+    return;
+  }
+
+  if (mDrawTarget) {
+    // Ensure unflushed work from our outstanding drawtarget won't override this
+    // update later.
+    mDrawTarget->Flush();
+  }
+
+  if (mSize != srcSurf->GetSize() || mFormat != srcSurf->GetFormat()) {
+    gfxCriticalError() << "Attempt to update texture client from a surface with a different size or format!";
+    return;
+  }
+
+  DataSourceSurface::MappedSurface sourceMap;
+  if (!srcSurf->Map(DataSourceSurface::READ, &sourceMap)) {
+    gfxCriticalError() << "Failed to map source surface for UpdateFromSurface.";
+    return;
+  }
+
+  if (mTexture) {
+    RefPtr<ID3D11Device> device;
+    mTexture->GetDevice(byRef(device));
+    RefPtr<ID3D11DeviceContext> ctx;
+    device->GetImmediateContext(byRef(ctx));
+
+    D3D11_BOX box;
+    box.front = 0;
+    box.back = 1;
+    box.top = box.left = 0;
+    box.right = aSurface->GetSize().width;
+    box.bottom = aSurface->GetSize().height;
+
+    ctx->UpdateSubresource(mTexture, 0, &box, sourceMap.mData, sourceMap.mStride, 0);
+  } else {
+    RefPtr<ID3D10Device> device;
+    mTexture10->GetDevice(byRef(device));
+
+    D3D10_BOX box;
+    box.front = 0;
+    box.back = 1;
+    box.top = box.left = 0;
+    box.right = aSurface->GetSize().width;
+    box.bottom = aSurface->GetSize().height;
+
+    device->UpdateSubresource(mTexture10, 0, &box, sourceMap.mData, sourceMap.mStride, 0);
+  }
+  srcSurf->Unmap();
 }
 
 static const GUID sD3D11TextureUsage =
@@ -448,8 +525,11 @@ TextureClientD3D11::AllocateForSurface(gfx::IntSize aSize, TextureAllocationFlag
   }
 
   gfxWindowsPlatform* windowsPlatform = gfxWindowsPlatform::GetPlatform();
-  ID3D11Device* d3d11device = windowsPlatform->GetD3D11ContentDevice();
-  bool haveD3d11Backend = windowsPlatform->GetContentBackend() == BackendType::DIRECT2D1_1;
+  ID3D11Device* d3d11device = windowsPlatform->GetD3D11DeviceForCurrentThread();
+
+  // When we're not on the main thread we're not going to be using Direct2D
+  // to access the contents of this texture client so we will always use D3D11.
+  bool haveD3d11Backend = windowsPlatform->GetContentBackend() == BackendType::DIRECT2D1_1 || !NS_IsMainThread();
 
   if (haveD3d11Backend) {
     MOZ_ASSERT(d3d11device != nullptr);
@@ -459,6 +539,11 @@ TextureClientD3D11::AllocateForSurface(gfx::IntSize aSize, TextureAllocationFlag
                                   D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 
     newDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
+
+    if (!NS_IsMainThread()) {
+      // On the main thread we use the syncobject to handle synchronization.
+      newDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
+    }
 
     hr = d3d11device->CreateTexture2D(&newDesc, nullptr, byRef(mTexture));
     if (FAILED(hr)) {
@@ -554,7 +639,7 @@ DXGIYCbCrTextureClient::~DXGIYCbCrTextureClient()
 }
 
 // static
-TemporaryRef<DXGIYCbCrTextureClient>
+already_AddRefed<DXGIYCbCrTextureClient>
 DXGIYCbCrTextureClient::Create(ISurfaceAllocator* aAllocator,
                                TextureFlags aFlags,
                                IUnknown* aTextureY,
@@ -896,6 +981,7 @@ DataTextureSourceD3D11::Update(DataSourceSurface* aSurface,
                          GetRequiredTilesD3D11(mSize.height, maxSize);
 
     mTileTextures.resize(tileCount);
+    mTileSRVs.resize(tileCount);
     mTexture = nullptr;
 
     for (uint32_t i = 0; i < tileCount; i++) {
@@ -928,10 +1014,34 @@ DataTextureSourceD3D11::GetD3D11Texture() const
                     : mTexture;
 }
 
+ID3D11ShaderResourceView*
+DataTextureSourceD3D11::GetShaderResourceView()
+{
+  if (mIterating) {
+    if (!mTileSRVs[mCurrentTile]) {
+      if (!mTileTextures[mCurrentTile]) {
+        return nullptr;
+      }
+      
+      RefPtr<ID3D11Device> device;
+      mTileTextures[mCurrentTile]->GetDevice(byRef(device));
+      HRESULT hr = device->CreateShaderResourceView(mTileTextures[mCurrentTile], nullptr, byRef(mTileSRVs[mCurrentTile]));
+      if (FAILED(hr)) {
+        gfxCriticalError(CriticalLog::DefaultOptions(false)) << "[D3D11] DataTextureSourceD3D11:GetShaderResourceView CreateSRV failure " << gfx::hexa(hr);
+        return nullptr;
+      }
+    }
+    return mTileSRVs[mCurrentTile];
+  }
+
+  return TextureSourceD3D11::GetShaderResourceView();
+}
+
 void
 DataTextureSourceD3D11::Reset()
 {
   mTexture = nullptr;
+  mTileSRVs.resize(0);
   mTileTextures.resize(0);
   mIsTiled = false;
   mSize.width = 0;
@@ -1025,13 +1135,6 @@ SyncObjectD3D11::FinalizeFrame()
   if (!mD3D10Texture && mD3D10SyncedTextures.size()) {
     ID3D10Device* device = gfxWindowsPlatform::GetPlatform()->GetD3D10Device();
 
-    if (!device) {
-      // We've lost our device during the frame, no point in syncing.
-      mD3D10SyncedTextures.clear();
-      gfxCriticalError() << "No device to execute texture syncing on!";
-      return;
-    }
-
     hr = device->OpenSharedResource(mHandle, __uuidof(ID3D10Texture2D), (void**)(ID3D10Texture2D**)byRef(mD3D10Texture));
     
     if (FAILED(hr) || !mD3D10Texture) {
@@ -1056,13 +1159,6 @@ SyncObjectD3D11::FinalizeFrame()
 
   if (!mD3D11Texture && mD3D11SyncedTextures.size()) {
     ID3D11Device* device = gfxWindowsPlatform::GetPlatform()->GetD3D11ContentDevice();
-    
-    if (!device) {
-      // We've lost our device during the frame, no point in syncing.
-      mD3D11SyncedTextures.clear();
-      gfxCriticalError() << "No device to execute texture syncing on!";
-      return;
-    }
 
     hr = device->OpenSharedResource(mHandle, __uuidof(ID3D11Texture2D), (void**)(ID3D11Texture2D**)byRef(mD3D11Texture));
     

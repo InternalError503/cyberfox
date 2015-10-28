@@ -9,7 +9,7 @@ describe("loop.shared.views.TextChatView", function () {
   var sharedViews = loop.shared.views;
   var TestUtils = React.addons.TestUtils;
   var CHAT_MESSAGE_TYPES = loop.store.CHAT_MESSAGE_TYPES;
-  var CHAT_CONTENT_TYPES = loop.store.CHAT_CONTENT_TYPES;
+  var CHAT_CONTENT_TYPES = loop.shared.utils.CHAT_CONTENT_TYPES;
 
   var dispatcher, fakeSdkDriver, sandbox, store, fakeClock;
 
@@ -38,7 +38,7 @@ describe("loop.shared.views.TextChatView", function () {
   });
 
   describe("TextChatEntriesView", function() {
-    var view;
+    var view, node;
 
     function mountTestComponent(extraProps) {
       var basicProps = {
@@ -51,6 +51,10 @@ describe("loop.shared.views.TextChatView", function () {
         React.createElement(loop.shared.views.chat.TextChatEntriesView,
           _.extend(basicProps, extraProps)));
     }
+
+    beforeEach(function() {
+      store.setStoreState({ textChatEnabled: true });
+    });
 
     it("should render message entries when message were sent/ received", function() {
       view = mountTestComponent({
@@ -67,7 +71,7 @@ describe("loop.shared.views.TextChatView", function () {
         }]
       });
 
-      var node = view.getDOMNode();
+      node = view.getDOMNode();
       expect(node).to.not.eql(null);
 
       var entries = node.querySelectorAll(".text-chat-entry");
@@ -123,73 +127,6 @@ describe("loop.shared.views.TextChatView", function () {
       });
 
       sinon.assert.notCalled(view.play);
-    });
-  });
-
-  describe("TextChatEntry", function() {
-    var view;
-
-    function mountTestComponent(extraProps) {
-      var props = _.extend({
-        contentType: CHAT_CONTENT_TYPES.TEXT,
-        dispatcher: dispatcher,
-        message: "test",
-        type: CHAT_MESSAGE_TYPES.RECEIVED,
-        timestamp: "2015-06-23T22:48:39.738Z"
-      }, extraProps);
-      return TestUtils.renderIntoDocument(
-        React.createElement(loop.shared.views.chat.TextChatEntry, props));
-    }
-
-    it("should not render a timestamp", function() {
-      view = mountTestComponent({
-        showTimestamp: false
-      });
-      var node = view.getDOMNode();
-
-      expect(node.querySelector(".text-chat-entry-timestamp")).to.eql(null);
-    });
-
-    it("should render a timestamp", function() {
-      view = mountTestComponent({
-        showTimestamp: true
-      });
-      var node = view.getDOMNode();
-
-      expect(node.querySelector(".text-chat-entry-timestamp")).to.not.eql(null);
-    });
-
-    // note that this is really an integration test to be sure that we don't
-    // inadvertently regress using LinkifiedTextView.
-    it("should linkify a URL starting with http", function (){
-      view = mountTestComponent({
-        showTimestamp: true,
-        timestamp: "2015-06-23T22:48:39.738Z",
-        type: CHAT_MESSAGE_TYPES.RECEIVED,
-        contentType: CHAT_CONTENT_TYPES.TEXT,
-        message: "Check out http://example.com and see what you think..."
-      });
-      var node = view.getDOMNode();
-
-      expect(node.querySelector("a")).to.not.eql(null);
-    });
-  });
-
-  describe("TextChatEntriesView", function() {
-    var view, node;
-
-    function mountTestComponent(extraProps) {
-      var props = _.extend({
-        dispatcher: dispatcher,
-        messageList: [],
-        useDesktopPaths: false
-      }, extraProps);
-      return TestUtils.renderIntoDocument(
-        React.createElement(loop.shared.views.chat.TextChatEntriesView, props));
-    }
-
-    beforeEach(function() {
-      store.setStoreState({ textChatEnabled: true });
     });
 
     it("should show timestamps if there are different senders", function() {
@@ -263,7 +200,7 @@ describe("loop.shared.views.TextChatView", function () {
           type: CHAT_MESSAGE_TYPES.RECEIVED,
           contentType: CHAT_CONTENT_TYPES.TEXT,
           message: "Is it me you're looking for?",
-          sentTimestamp: "2015-06-25T17:53:55.357Z"
+          receivedTimestamp: "2015-06-25T17:53:55.357Z"
         }]
       });
       node = view.getDOMNode();
@@ -273,21 +210,120 @@ describe("loop.shared.views.TextChatView", function () {
     });
   });
 
-  describe("TextChatView", function() {
+  describe("TextChatEntry", function() {
     var view;
+
+    function mountTestComponent(extraProps) {
+      var props = _.extend({
+        contentType: CHAT_CONTENT_TYPES.TEXT,
+        dispatcher: dispatcher,
+        message: "test",
+        type: CHAT_MESSAGE_TYPES.RECEIVED,
+        timestamp: "2015-06-23T22:48:39.738Z"
+      }, extraProps);
+      return TestUtils.renderIntoDocument(
+        React.createElement(loop.shared.views.chat.TextChatEntry, props));
+    }
+
+    it("should not render a timestamp", function() {
+      view = mountTestComponent({
+        showTimestamp: false,
+        timestamp: "2015-06-23T22:48:39.738Z",
+        type: CHAT_MESSAGE_TYPES.RECEIVED,
+        contentType: CHAT_CONTENT_TYPES.TEXT,
+        message: "foo"
+      });
+      var node = view.getDOMNode();
+
+      expect(node.querySelector(".text-chat-entry-timestamp")).to.eql(null);
+    });
+
+    it("should render a timestamp", function() {
+      view = mountTestComponent({
+        showTimestamp: true,
+        timestamp: "2015-06-23T22:48:39.738Z",
+        type: CHAT_MESSAGE_TYPES.RECEIVED,
+        contentType: CHAT_CONTENT_TYPES.TEXT,
+        message: "foo"
+      });
+      var node = view.getDOMNode();
+
+      expect(node.querySelector(".text-chat-entry-timestamp")).to.not.eql(null);
+    });
+
+    // note that this is really an integration test to be sure that we don't
+    // inadvertently regress using LinkifiedTextView.
+    it("should linkify a URL starting with http", function (){
+      view = mountTestComponent({
+        showTimestamp: true,
+        timestamp: "2015-06-23T22:48:39.738Z",
+        type: CHAT_MESSAGE_TYPES.RECEIVED,
+        contentType: CHAT_CONTENT_TYPES.TEXT,
+        message: "Check out http://example.com and see what you think..."
+      });
+      var node = view.getDOMNode();
+
+      expect(node.querySelector("a")).to.not.eql(null);
+    });
+  });
+
+  describe("TextChatView", function() {
+    var view, fakeServer;
 
     function mountTestComponent(extraProps) {
       var props = _.extend({
         dispatcher: dispatcher,
         showRoomName: false,
-        useDesktopPaths: false
+        useDesktopPaths: false,
+        showAlways: true
       }, extraProps);
       return TestUtils.renderIntoDocument(
         React.createElement(loop.shared.views.chat.TextChatView, props));
     }
 
     beforeEach(function() {
+      // Fake server to catch all XHR requests.
+      fakeServer = sinon.fakeServer.create();
       store.setStoreState({ textChatEnabled: true });
+    });
+
+    afterEach(function() {
+      fakeServer.restore();
+    });
+
+    it("should add a disabled class when text chat is disabled", function() {
+      view = mountTestComponent();
+
+      store.setStoreState({ textChatEnabled: false });
+
+      expect(view.getDOMNode().classList.contains("text-chat-disabled")).eql(true);
+    });
+
+    it("should not a disabled class when text chat is enabled", function() {
+      view = mountTestComponent();
+
+      store.setStoreState({ textChatEnabled: true });
+
+      expect(view.getDOMNode().classList.contains("text-chat-disabled")).eql(false);
+    });
+
+    it("should add an empty class when the entries list is empty", function() {
+      view = mountTestComponent();
+
+      expect(view.getDOMNode().classList.contains("text-chat-entries-empty")).eql(true);
+    });
+
+    it("should not add an empty class when the entries list is has items", function() {
+      view = mountTestComponent();
+
+      store.sendTextChatMessage({
+        contentType: CHAT_CONTENT_TYPES.TEXT,
+        message: "Hello!",
+        sentTimestamp: "1970-01-01T00:02:00.000Z",
+        receivedTimestamp: "1970-01-01T00:02:00.000Z"
+      });
+
+      expect(view.getDOMNode().classList.contains("text-chat-entries-empty")).eql(false);
     });
 
     it("should show timestamps from msgs sent more than 1 min apart", function() {
@@ -317,29 +353,6 @@ describe("loop.shared.views.TextChatView", function () {
 
       expect(node.querySelectorAll(".text-chat-entry-timestamp").length)
           .to.eql(2);
-    });
-
-    it("should not display the view if no messages and text chat not enabled", function() {
-      store.setStoreState({ textChatEnabled: false });
-
-      view = mountTestComponent();
-
-      expect(view.getDOMNode()).eql(null);
-    });
-
-    it("should display the view if no messages and text chat is enabled", function() {
-      view = mountTestComponent();
-
-      expect(view.getDOMNode()).not.eql(null);
-    });
-
-    it("should display only the text chat box if entry is enabled but there are no messages", function() {
-      view = mountTestComponent();
-
-      var node = view.getDOMNode();
-
-      expect(node.querySelector(".text-chat-box")).not.eql(null);
-      expect(node.querySelector(".text-chat-entries")).eql(null);
     });
 
     it("should render message entries when message were sent/ received", function() {
@@ -373,7 +386,7 @@ describe("loop.shared.views.TextChatView", function () {
       store.sendTextChatMessage({
         contentType: CHAT_CONTENT_TYPES.TEXT,
         message: "Foo",
-        timestamp: 0
+        sentTimestamp: "2015-06-25T17:53:55.357Z"
       });
 
       expect(node.querySelector(".sent")).to.not.eql(null);

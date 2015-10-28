@@ -24,7 +24,7 @@ namespace jit {
 
 static Register CallReg = ip;
 static const int defaultShift = 3;
-JS_STATIC_ASSERT(1 << defaultShift == sizeof(jsval));
+JS_STATIC_ASSERT(1 << defaultShift == sizeof(JS::Value));
 
 // MacroAssemblerARM is inheriting form Assembler defined in
 // Assembler-arm.{h,cpp}
@@ -538,7 +538,6 @@ class MacroAssemblerARMCompat : public MacroAssemblerARM
     { }
 
   public:
-    using MacroAssemblerARM::call;
 
     // Jumps + other functions that should be called from non-arm specific
     // code. Basically, an x86 front end on top of the ARM code.
@@ -567,42 +566,7 @@ class MacroAssemblerARMCompat : public MacroAssemblerARM
         MOZ_CRASH("NYI-IC");
     }
 
-    void call(const Register reg) {
-        as_blx(reg);
-    }
-    void call(Label* label) {
-        // For now, assume that it'll be nearby?
-        as_bl(label, Always);
-    }
-    void call(ImmWord imm) {
-        call(ImmPtr((void*)imm.value));
-    }
-    void call(ImmPtr imm) {
-        BufferOffset bo = m_buffer.nextOffset();
-        addPendingJump(bo, imm, Relocation::HARDCODED);
-        ma_call(imm);
-    }
-    void call(AsmJSImmPtr imm) {
-        movePtr(imm, CallReg);
-        call(CallReg);
-    }
-    void call(JitCode* c) {
-        BufferOffset bo = m_buffer.nextOffset();
-        addPendingJump(bo, ImmPtr(c->raw()), Relocation::JITCODE);
-        RelocStyle rs;
-        if (HasMOVWT())
-            rs = L_MOVWT;
-        else
-            rs = L_LDR;
-
-        ma_movPatchable(ImmPtr(c->raw()), ScratchRegister, Always, rs);
-        ma_callJitHalfPush(ScratchRegister);
-    }
-    void callAndPushReturnAddress(Label* label) {
-        AutoForbidPools afp(this, 2);
-        ma_push(pc);
-        call(label);
-    }
+    void callAndPushReturnAddress(Label* label);
 
     void branch(JitCode* c) {
         BufferOffset bo = m_buffer.nextOffset();
@@ -1416,6 +1380,18 @@ class MacroAssemblerARMCompat : public MacroAssemblerARM
                          Register newval, Register output);
 
     template<typename T>
+    void atomicExchangeARMv6(int nbytes, bool signExtend, const T& mem, Register value,
+                             Register output);
+
+    template<typename T>
+    void atomicExchangeARMv7(int nbytes, bool signExtend, const T& mem, Register value,
+                             Register output);
+
+    template<typename T>
+    void atomicExchange(int nbytes, bool signExtend, const T& address, Register value,
+                        Register output);
+
+    template<typename T>
     void atomicFetchOpARMv6(int nbytes, bool signExtend, AtomicOp op, const Register& value,
                             const T& mem, Register temp, Register output);
 
@@ -1470,6 +1446,31 @@ class MacroAssemblerARMCompat : public MacroAssemblerARM
     template<typename T>
     void compareExchange32(const T& mem, Register oldval, Register newval, Register output)  {
         compareExchange(4, false, mem, oldval, newval, output);
+    }
+
+    template<typename T>
+    void atomicExchange8SignExtend(const T& mem, Register value, Register output)
+    {
+        atomicExchange(1, true, mem, value, output);
+    }
+    template<typename T>
+    void atomicExchange8ZeroExtend(const T& mem, Register value, Register output)
+    {
+        atomicExchange(1, false, mem, value, output);
+    }
+    template<typename T>
+    void atomicExchange16SignExtend(const T& mem, Register value, Register output)
+    {
+        atomicExchange(2, true, mem, value, output);
+    }
+    template<typename T>
+    void atomicExchange16ZeroExtend(const T& mem, Register value, Register output)
+    {
+        atomicExchange(2, false, mem, value, output);
+    }
+    template<typename T>
+    void atomicExchange32(const T& mem, Register value, Register output) {
+        atomicExchange(4, false, mem, value, output);
     }
 
     template<typename T, typename S>
@@ -1823,16 +1824,6 @@ class MacroAssemblerARMCompat : public MacroAssemblerARM
     void memIntToValue(Address Source, Address Dest) {
         load32(Source, lr);
         storeValue(JSVAL_TYPE_INT32, lr, Dest);
-    }
-    void memMove32(Address Source, Address Dest) {
-        loadPtr(Source, lr);
-        storePtr(lr, Dest);
-    }
-    void memMove64(Address Source, Address Dest) {
-        loadPtr(Source, lr);
-        storePtr(lr, Dest);
-        loadPtr(Address(Source.base, Source.offset+4), lr);
-        storePtr(lr, Address(Dest.base, Dest.offset+4));
     }
 
     void lea(Operand addr, Register dest) {

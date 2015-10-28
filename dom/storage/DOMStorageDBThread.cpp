@@ -170,24 +170,13 @@ DOMStorageDBThread::ShouldPreloadScope(const nsACString& aScope)
   return mScopesHavingData.Contains(aScope);
 }
 
-namespace { // anon
-
-PLDHashOperator
-GetScopesHavingDataEnum(nsCStringHashKey* aKey, void* aArg)
-{
-  InfallibleTArray<nsCString>* scopes =
-      static_cast<InfallibleTArray<nsCString>*>(aArg);
-  scopes->AppendElement(aKey->GetKey());
-  return PL_DHASH_NEXT;
-}
-
-} // anon
-
 void
 DOMStorageDBThread::GetScopesHavingData(InfallibleTArray<nsCString>* aScopes)
 {
   MonitorAutoLock monitor(mThreadObserver->GetMonitor());
-  mScopesHavingData.EnumerateEntries(GetScopesHavingDataEnum, aScopes);
+  for (auto iter = mScopesHavingData.Iter(); !iter.Done(); iter.Next()) {
+    aScopes->AppendElement(iter.Get()->GetKey());
+  }
 }
 
 nsresult
@@ -198,16 +187,16 @@ DOMStorageDBThread::InsertDBOp(DOMStorageDBThread::DBOperation* aOperation)
   // Sentinel to don't forget to delete the operation when we exit early.
   nsAutoPtr<DOMStorageDBThread::DBOperation> opScope(aOperation);
 
-  if (mStopIOThread) {
-    // Thread use after shutdown demanded.
-    MOZ_ASSERT(false);
-    return NS_ERROR_NOT_INITIALIZED;
-  }
-
   if (NS_FAILED(mStatus)) {
     MonitorAutoUnlock unlock(mThreadObserver->GetMonitor());
     aOperation->Finalize(mStatus);
     return mStatus;
+  }
+
+  if (mStopIOThread) {
+    // Thread use after shutdown demanded.
+    MOZ_ASSERT(false);
+    return NS_ERROR_NOT_INITIALIZED;
   }
 
   switch (aOperation->Type()) {
@@ -391,7 +380,7 @@ DOMStorageDBThread::ThreadObserver::AfterProcessNextEvent(nsIThreadInternal *thr
 extern void
 ReverseString(const nsCSubstring& aSource, nsCSubstring& aResult);
 
-namespace { // anon
+namespace {
 
 class nsReverseStringSQLFunction final : public mozIStorageFunction
 {
@@ -423,12 +412,11 @@ nsReverseStringSQLFunction::OnFunctionCall(
   rv = outVar->SetAsAUTF8String(result);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  *aResult = outVar.get();
-  outVar.forget();
+  outVar.forget(aResult);
   return NS_OK;
 }
 
-} // anon
+} // namespace
 
 nsresult
 DOMStorageDBThread::OpenDatabaseConnection()
@@ -1076,7 +1064,7 @@ DOMStorageDBThread::PendingOperations::HasTasks()
   return !!mUpdates.Count() || !!mClears.Count();
 }
 
-namespace { // anon
+namespace {
 
 PLDHashOperator
 ForgetUpdatesForScope(const nsACString& aMapping,
@@ -1098,7 +1086,7 @@ ForgetUpdatesForScope(const nsACString& aMapping,
   return PL_DHASH_REMOVE;
 }
 
-} // anon
+} // namespace
 
 bool
 DOMStorageDBThread::PendingOperations::CheckForCoalesceOpportunity(DBOperation* aNewOp,
@@ -1185,7 +1173,7 @@ DOMStorageDBThread::PendingOperations::Add(DOMStorageDBThread::DBOperation* aOpe
   }
 }
 
-namespace { // anon
+namespace {
 
 PLDHashOperator
 CollectTasks(const nsACString& aMapping, nsAutoPtr<DOMStorageDBThread::DBOperation>& aOperation, void* aArg)
@@ -1197,7 +1185,7 @@ CollectTasks(const nsACString& aMapping, nsAutoPtr<DOMStorageDBThread::DBOperati
   return PL_DHASH_NEXT;
 }
 
-} // anon
+} // namespace
 
 bool
 DOMStorageDBThread::PendingOperations::Prepare()
@@ -1268,7 +1256,7 @@ DOMStorageDBThread::PendingOperations::Finalize(nsresult aRv)
   return true;
 }
 
-namespace { // anon
+namespace {
 
 class FindPendingOperationForScopeData
 {
@@ -1306,7 +1294,7 @@ FindPendingClearForScope(const nsACString& aMapping,
   return PL_DHASH_NEXT;
 }
 
-} // anon
+} // namespace
 
 bool
 DOMStorageDBThread::PendingOperations::IsScopeClearPending(const nsACString& aScope)
@@ -1331,7 +1319,7 @@ DOMStorageDBThread::PendingOperations::IsScopeClearPending(const nsACString& aSc
   return false;
 }
 
-namespace { // anon
+namespace {
 
 PLDHashOperator
 FindPendingUpdateForScope(const nsACString& aMapping,
@@ -1352,7 +1340,7 @@ FindPendingUpdateForScope(const nsACString& aMapping,
   return PL_DHASH_NEXT;
 }
 
-} // anon
+} // namespace
 
 bool
 DOMStorageDBThread::PendingOperations::IsScopeUpdatePending(const nsACString& aScope)
@@ -1377,5 +1365,5 @@ DOMStorageDBThread::PendingOperations::IsScopeUpdatePending(const nsACString& aS
   return false;
 }
 
-} // ::dom
-} // ::mozilla
+} // namespace dom
+} // namespace mozilla

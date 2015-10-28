@@ -112,6 +112,69 @@ def decorate_task_treeherder_routes(task, suffix):
     for env in treeheder_env:
         task['routes'].append('{}.{}'.format(TREEHERDER_ROUTES[env], suffix))
 
+def decorate_task_json_routes(build, task, json_routes, parameters):
+    """
+    Decorate the given task with routes.json routes.
+
+    :param dict task: task definition.
+    :param json_routes: the list of routes to use from routes.json
+    :param parameters: dictionary of parameters to use in route templates
+    """
+    fmt = parameters.copy()
+    fmt.update({
+        'build_product': task['extra']['build_product'],
+        'build_name': build['build_name'],
+        'build_type': build['build_type'],
+    })
+    routes = task.get('routes', [])
+    for route in json_routes:
+        routes.append(route.format(**fmt))
+
+    task['routes'] = routes
+
+def configure_dependent_task(task_path, parameters, taskid, templates, build_treeherder_config):
+    """
+    Configure a build dependent task. This is shared between post-build and test tasks.
+
+    :param task_path: location to the task yaml
+    :param parameters: parameters to load the template
+    :param taskid: taskid of the dependent task
+    :param templates: reference to the template builder
+    :param build_treeherder_config: parent treeherder config
+    :return: the configured task
+    """
+    task = templates.load(task_path, parameters)
+    task['taskId'] = taskid
+
+    if 'requires' not in task:
+        task['requires'] = []
+
+    task['requires'].append(parameters['build_slugid'])
+
+    if 'treeherder' not in task['task']['extra']:
+        task['task']['extra']['treeherder'] = {}
+
+    # Copy over any treeherder configuration from the build so
+    # tests show up under the same platform...
+    treeherder_config = task['task']['extra']['treeherder']
+
+    treeherder_config['collection'] = \
+        build_treeherder_config.get('collection', {})
+
+    treeherder_config['build'] = \
+        build_treeherder_config.get('build', {})
+
+    treeherder_config['machine'] = \
+        build_treeherder_config.get('machine', {})
+
+    if 'routes' not in task['task']:
+        task['task']['routes'] = []
+
+    if 'scopes' not in task['task']:
+        task['task']['scopes'] = []
+
+    return task
+
 @CommandProvider
 class DecisionTask(object):
     @Command('taskcluster-decision', category="ci",
@@ -224,6 +287,7 @@ class Graph(object):
 
         # Template parameters used when expanding the graph
         parameters = dict(gaia_info().items() + {
+            'index': 'index.garbage.staging.mshal-testing', #TODO
             'project': project,
             'pushlog_id': params.get('pushlog_id', 0),
             'docker_image': docker_image,
@@ -245,6 +309,12 @@ class Graph(object):
             params['project'],
             params.get('revision_hash', '')
         )
+
+        routes_file = os.path.join(ROOT, 'routes.json')
+        with open(routes_file) as f:
+            contents = json.load(f)
+            json_routes = contents['routes']
+            # TODO: Nightly and/or l10n routes
 
         # Task graph we are generating for taskcluster...
         graph = {
@@ -269,12 +339,13 @@ class Graph(object):
             build_parameters['build_slugid'] = slugid()
             build_task = templates.load(build['task'], build_parameters)
 
-            if 'routes' not in build_task['task']:
-                build_task['task']['routes'] = []
-
             if params['revision_hash']:
                 decorate_task_treeherder_routes(build_task['task'],
                                                 treeherder_route)
+                decorate_task_json_routes(build,
+                                          build_task['task'],
+                                          json_routes,
+                                          build_parameters)
 
             # Ensure each build graph is valid after construction.
             taskcluster_graph.build_task.validate(build_task)
@@ -331,6 +402,16 @@ class Graph(object):
                 message = '({}), extra.treeherder.collection must contain one type'
                 raise ValueError(message.fomrat(build['task']))
 
+            for post_build in build['post-build']:
+                # copy over the old parameters to update the template
+                post_parameters = copy.copy(build_parameters)
+                post_task = configure_dependent_task(post_build['task'],
+                                                     post_parameters,
+                                                     slugid(),
+                                                     templates,
+                                                     build_treeherder_config)
+                graph['tasks'].append(post_task)
+
             for test in build['dependents']:
                 test = test['allowed_build_tasks'][build['task']]
                 test_parameters = copy.copy(build_parameters)
@@ -340,7 +421,6 @@ class Graph(object):
                     test_parameters['tests_url'] = tests_url
                 if test_packages_url:
                     test_parameters['test_packages_url'] = test_packages_url
-
                 test_definition = templates.load(test['task'], {})['task']
                 chunk_config = test_definition['extra']['chunks']
 
@@ -356,35 +436,11 @@ class Graph(object):
                         continue
 
                     test_parameters['chunk'] = chunk
-                    test_task = templates.load(test['task'], test_parameters)
-                    test_task['taskId'] = slugid()
-
-                    if 'requires' not in test_task:
-                        test_task['requires'] = []
-
-                    test_task['requires'].append(test_parameters['build_slugid'])
-
-                    if 'treeherder' not in test_task['task']['extra']:
-                        test_task['task']['extra']['treeherder'] = {}
-
-                    # Copy over any treeherder configuration from the build so
-                    # tests show up under the same platform...
-                    test_treeherder_config = test_task['task']['extra']['treeherder']
-
-                    test_treeherder_config['collection'] = \
-                        build_treeherder_config.get('collection', {})
-
-                    test_treeherder_config['build'] = \
-                        build_treeherder_config.get('build', {})
-
-                    test_treeherder_config['machine'] = \
-                        build_treeherder_config.get('machine', {})
-
-                    if 'routes' not in test_task['task']:
-                        test_task['task']['routes'] = []
-
-                    if 'scopes' not in test_task['task']:
-                        test_task['task']['scopes'] = []
+                    test_task = configure_dependent_task(test['task'],
+                                                         test_parameters,
+                                                         slugid(),
+                                                         templates,
+                                                         build_treeherder_config)
 
                     if params['revision_hash']:
                         decorate_task_treeherder_routes(
@@ -422,10 +478,6 @@ class CIBuild(object):
     @CommandArgument('--head-rev',
         required=True,
         help='Commit revision to use')
-    @CommandArgument('--mozharness-repository',
-        help='URL for custom mozharness repo')
-    @CommandArgument('--mozharness-rev',
-        help='Commit revision to use from mozharness repository')
     @CommandArgument('--owner',
         default='foobar@mozilla.com',
         help='email address of who owns this graph')
@@ -447,16 +499,10 @@ class CIBuild(object):
 
         head_ref = params['head_ref'] or head_rev
 
-        mozharness = load_mozharness_info()
-
-        mozharness_repo = params['mozharness_repository']
-        if mozharness_repo is None:
-            mozharness_repo = mozharness['repo']
-
-        mozharness_rev = params['mozharness_rev']
-        if mozharness_rev is None:
-            mozharness_rev = mozharness['revision']
-
+        from taskcluster_graph.from_now import (
+            json_time_from_now,
+            current_json_time,
+        )
         build_parameters = dict(gaia_info().items() + {
             'docker_image': docker_image,
             'owner': params['owner'],
@@ -466,9 +512,6 @@ class CIBuild(object):
             'head_repository': head_repository,
             'head_rev': head_rev,
             'head_ref': head_ref,
-            'mozharness_repository': mozharness_repo,
-            'mozharness_ref': mozharness_rev,
-            'mozharness_rev': mozharness_rev
         }.items())
 
         try:

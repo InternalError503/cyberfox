@@ -20,8 +20,8 @@ namespace mozilla {
 namespace gfx {
 class DataSourceSurface;
 class SourceSurface;
-}
-}
+} // namespace gfx
+} // namespace mozilla
 
 /**
  * A raw image buffer. The format can be set in the constructor. Its main
@@ -114,7 +114,7 @@ public:
      * Copy to a Moz2D DataSourceSurface.
      * Marked as virtual so that browsercomps can access this method.
      */
-    virtual mozilla::TemporaryRef<mozilla::gfx::DataSourceSurface> CopyToB8G8R8A8DataSourceSurface();
+    virtual already_AddRefed<mozilla::gfx::DataSourceSurface> CopyToB8G8R8A8DataSourceSurface();
 
     /* return new Subimage with pointing to original image starting from aRect.pos
      * and size of aRect.size. New subimage keeping current image reference

@@ -49,6 +49,10 @@ a11y::ProxyDestroyed(ProxyAccessible* aProxy)
 {
   ProxyAccessibleWrap* wrapper =
     reinterpret_cast<ProxyAccessibleWrap*>(aProxy->GetWrapper());
+  MOZ_ASSERT(wrapper);
+  if (!wrapper)
+    return;
+
   wrapper->Shutdown();
   aProxy->SetWrapper(0);
   wrapper->Release();
@@ -66,5 +70,11 @@ a11y::ProxyStateChangeEvent(ProxyAccessible*, uint64_t, bool)
 
 void
 a11y::ProxyCaretMoveEvent(ProxyAccessible* aTarget, int32_t aOffset)
+{
+}
+
+void
+a11y::ProxyTextChangeEvent(ProxyAccessible*, const nsString&, int32_t, uint32_t,
+                     bool, bool)
 {
 }

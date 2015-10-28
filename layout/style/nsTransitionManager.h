@@ -9,19 +9,22 @@
 #define nsTransitionManager_h_
 
 #include "mozilla/Attributes.h"
+#include "mozilla/ContentEvents.h"
 #include "mozilla/MemoryReporting.h"
 #include "mozilla/dom/Animation.h"
 #include "mozilla/dom/KeyframeEffect.h"
 #include "AnimationCommon.h"
+#include "nsCSSProps.h"
 #include "nsCSSPseudoElements.h"
 
+class nsIGlobalObject;
 class nsStyleContext;
 class nsPresContext;
 class nsCSSPropertySet;
 
 namespace mozilla {
 struct StyleTransition;
-}
+} // namespace mozilla
 
 /*****************************************************************************
  * Per-Element data                                                          *
@@ -35,14 +38,14 @@ struct ElementPropertyTransition : public dom::KeyframeEffectReadOnly
                             dom::Element* aTarget,
                             nsCSSPseudoElements::Type aPseudoType,
                             const AnimationTiming &aTiming)
-    : dom::KeyframeEffectReadOnly(aDocument, aTarget, aPseudoType,
-                                  aTiming, EmptyString())
+    : dom::KeyframeEffectReadOnly(aDocument, aTarget, aPseudoType, aTiming)
   { }
 
-  virtual ElementPropertyTransition* AsTransition() override { return this; }
-  virtual const ElementPropertyTransition* AsTransition() const override { return this; }
-
-  virtual const nsString& Name() const override;
+  ElementPropertyTransition* AsTransition() override { return this; }
+  const ElementPropertyTransition* AsTransition() const override
+  {
+    return this;
+  }
 
   nsCSSProperty TransitionProperty() const {
     MOZ_ASSERT(Properties().Length() == 1,
@@ -74,17 +77,28 @@ struct ElementPropertyTransition : public dom::KeyframeEffectReadOnly
   double CurrentValuePortion() const;
 };
 
-class CSSTransition final : public dom::Animation
+namespace dom {
+
+class CSSTransition final : public Animation
 {
 public:
- explicit CSSTransition(dom::DocumentTimeline* aTimeline)
-    : dom::Animation(aTimeline)
+ explicit CSSTransition(nsIGlobalObject* aGlobal)
+    : dom::Animation(aGlobal)
+    , mWasFinishedOnLastTick(false)
   {
   }
 
-  virtual CSSTransition* AsCSSTransition() override { return this; }
+  JSObject* WrapObject(JSContext* aCx,
+                       JS::Handle<JSObject*> aGivenProto) override;
 
-  virtual dom::AnimationPlayState PlayStateFromJS() const override;
+  CSSTransition* AsCSSTransition() override { return this; }
+  const CSSTransition* AsCSSTransition() const override { return this; }
+
+  // CSSTransition interface
+  void GetTransitionProperty(nsString& aRetVal) const;
+
+  // Animation interface overrides
+  virtual AnimationPlayState PlayStateFromJS() const override;
   virtual void PlayFromJS(ErrorResult& aRv) override;
 
   // A variant of Play() that avoids posting style updates since this method
@@ -97,32 +111,118 @@ public:
     MOZ_ASSERT(!rv.Failed(), "Unexpected exception playing transition");
   }
 
-protected:
-  virtual ~CSSTransition() { }
+  void CancelFromStyle() override
+  {
+    mOwningElement = OwningElementRef();
+    Animation::CancelFromStyle();
+    MOZ_ASSERT(mSequenceNum == kUnsequenced);
+  }
 
-  virtual css::CommonAnimationManager* GetAnimationManager() const override;
+  void Tick() override;
+
+  nsCSSProperty TransitionProperty() const;
+
+  bool HasLowerCompositeOrderThan(const Animation& aOther) const override;
+  bool IsUsingCustomCompositeOrder() const override
+  {
+    return mOwningElement.IsSet();
+  }
+
+  void SetCreationSequence(uint64_t aIndex)
+  {
+    MOZ_ASSERT(IsUsingCustomCompositeOrder());
+    mSequenceNum = aIndex;
+  }
+
+  // Returns the element or pseudo-element whose transition-property property
+  // this CSSTransition corresponds to (if any). This is used for determining
+  // the relative composite order of transitions generated from CSS markup.
+  //
+  // Typically this will be the same as the target element of the keyframe
+  // effect associated with this transition. However, it can differ in the
+  // following circumstances:
+  //
+  // a) If script removes or replaces the effect of this transition,
+  // b) If this transition is cancelled (e.g. by updating the
+  //    transition-property or removing the owning element from the document),
+  // c) If this object is generated from script using the CSSTransition
+  //    constructor.
+  //
+  // For (b) and (c) the returned owning element will return !IsSet().
+  const OwningElementRef& OwningElement() const { return mOwningElement; }
+
+  // Sets the owning element which is used for determining the composite
+  // oder of CSSTransition objects generated from CSS markup.
+  //
+  // @see OwningElement()
+  void SetOwningElement(const OwningElementRef& aElement)
+  {
+    mOwningElement = aElement;
+  }
+
+protected:
+  virtual ~CSSTransition()
+  {
+    MOZ_ASSERT(!mOwningElement.IsSet(), "Owning element should be cleared "
+                                        "before a CSS transition is destroyed");
+  }
+
+  virtual CommonAnimationManager* GetAnimationManager() const override;
+
+  void QueueEvents();
+
+  // The (pseudo-)element whose computed transition-property refers to this
+  // transition (if any).
+  OwningElementRef mOwningElement;
+
+  bool mWasFinishedOnLastTick;
+};
+
+} // namespace dom
+
+struct TransitionEventInfo {
+  nsCOMPtr<nsIContent> mElement;
+  InternalTransitionEvent mEvent;
+
+  TransitionEventInfo(nsIContent *aElement, nsCSSProperty aProperty,
+                      TimeDuration aDuration,
+                      nsCSSPseudoElements::Type aPseudoType)
+    : mElement(aElement)
+    , mEvent(true, NS_TRANSITION_END)
+  {
+    // XXX Looks like nobody initialize WidgetEvent::time
+    mEvent.propertyName =
+      NS_ConvertUTF8toUTF16(nsCSSProps::GetStringValue(aProperty));
+    mEvent.elapsedTime = aDuration.ToSeconds();
+    mEvent.pseudoElement = AnimationCollection::PseudoTypeAsString(aPseudoType);
+  }
+
+  // InternalTransitionEvent doesn't support copy-construction, so we need
+  // to ourselves in order to work with nsTArray
+  TransitionEventInfo(const TransitionEventInfo &aOther)
+    : mElement(aOther.mElement)
+    , mEvent(true, NS_TRANSITION_END)
+  {
+    mEvent.AssignTransitionEventData(aOther.mEvent, false);
+  }
 };
 
 } // namespace mozilla
 
 class nsTransitionManager final
-  : public mozilla::css::CommonAnimationManager
+  : public mozilla::CommonAnimationManager
 {
 public:
   explicit nsTransitionManager(nsPresContext *aPresContext)
-    : mozilla::css::CommonAnimationManager(aPresContext)
+    : mozilla::CommonAnimationManager(aPresContext)
     , mInAnimationOnlyStyleUpdate(false)
   {
   }
 
-  typedef mozilla::AnimationCollection AnimationCollection;
+  NS_DECL_CYCLE_COLLECTION_CLASS(nsTransitionManager)
+  NS_DECL_CYCLE_COLLECTING_ISUPPORTS
 
-  static AnimationCollection*
-  GetAnimationsForCompositor(nsIContent* aContent, nsCSSProperty aProperty)
-  {
-    return mozilla::css::CommonAnimationManager::GetAnimationsForCompositor(
-      aContent, nsGkAtoms::transitionsProperty, aProperty);
-  }
+  typedef mozilla::AnimationCollection AnimationCollection;
 
   /**
    * StyleContextChanged
@@ -179,7 +279,18 @@ public:
 
   void FlushTransitions(FlushFlags aFlags);
 
+  void QueueEvent(mozilla::TransitionEventInfo&& aEventInfo)
+  {
+    mEventDispatcher.QueueEvent(
+      mozilla::Forward<mozilla::TransitionEventInfo>(aEventInfo));
+  }
+
+  void DispatchEvents()  { mEventDispatcher.DispatchEvents(mPresContext); }
+  void ClearEventQueue() { mEventDispatcher.ClearEventQueue(); }
+
 protected:
+  virtual ~nsTransitionManager() {}
+
   virtual nsIAtom* GetAnimationsAtom() override {
     return nsGkAtoms::transitionsProperty;
   }
@@ -202,6 +313,9 @@ private:
                              nsCSSPropertySet* aWhichStarted);
 
   bool mInAnimationOnlyStyleUpdate;
+
+  mozilla::DelayedEventDispatcher<mozilla::TransitionEventInfo>
+      mEventDispatcher;
 };
 
 #endif /* !defined(nsTransitionManager_h_) */

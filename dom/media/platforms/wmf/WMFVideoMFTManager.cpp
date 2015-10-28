@@ -30,6 +30,8 @@ using mozilla::layers::IMFYCbCrImage;
 using mozilla::layers::LayerManager;
 using mozilla::layers::LayersBackend;
 
+#if MOZ_WINSDK_MAXVER < 0x0A000000
+// Windows 10+ SDK has VP80 and VP90 defines
 const GUID MFVideoFormat_VP80 =
 {
   0x30385056,
@@ -45,6 +47,7 @@ const GUID MFVideoFormat_VP90 =
   0x0010,
   {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}
 };
+#endif
 
 const CLSID CLSID_WebmMfVp8Dec =
 {
@@ -172,7 +175,7 @@ WMFVideoMFTManager::InitializeDXVA(bool aForceD3D9)
   return mDXVA2Manager != nullptr;
 }
 
-TemporaryRef<MFTDecoder>
+already_AddRefed<MFTDecoder>
 WMFVideoMFTManager::Init()
 {
   RefPtr<MFTDecoder> decoder = InitInternal(/* aForceD3D9 = */ false);
@@ -187,7 +190,7 @@ WMFVideoMFTManager::Init()
   return decoder.forget();
 }
 
-TemporaryRef<MFTDecoder>
+already_AddRefed<MFTDecoder>
 WMFVideoMFTManager::InitInternal(bool aForceD3D9)
 {
   mUseHwAccel = false; // default value; changed if D3D setup succeeds.
@@ -198,13 +201,21 @@ WMFVideoMFTManager::InitInternal(bool aForceD3D9)
   HRESULT hr = decoder->Create(GetMFTGUID());
   NS_ENSURE_TRUE(SUCCEEDED(hr), nullptr);
 
-  if (useDxva) {
-    RefPtr<IMFAttributes> attr(decoder->GetAttributes());
-
-    UINT32 aware = 0;
-    if (attr) {
+  RefPtr<IMFAttributes> attr(decoder->GetAttributes());
+  UINT32 aware = 0;
+  if (attr) {
       attr->GetUINT32(MF_SA_D3D_AWARE, &aware);
-    }
+      attr->SetUINT32(CODECAPI_AVDecNumWorkerThreads,
+                      WMFDecoderModule::GetNumDecoderThreads());
+      hr = attr->SetUINT32(CODECAPI_AVLowLatencyMode, TRUE);
+      if (SUCCEEDED(hr)) {
+        LOG("Enabling Low Latency Mode");
+      } else {
+        LOG("Couldn't enable Low Latency Mode");
+      }
+  }
+
+  if (useDxva) {
     if (aware) {
       // TODO: Test if I need this anywhere... Maybe on Vista?
       //hr = attr->SetUINT32(CODECAPI_AVDecVideoAcceleration_H264, TRUE);
@@ -267,8 +278,8 @@ WMFVideoMFTManager::Input(MediaRawData* aSample)
     return E_FAIL;
   }
   // Forward sample data to the decoder.
-  return mDecoder->Input(aSample->mData,
-                         uint32_t(aSample->mSize),
+  return mDecoder->Input(aSample->Data(),
+                         uint32_t(aSample->Size()),
                          aSample->mTime);
 }
 
@@ -410,8 +421,10 @@ WMFVideoMFTManager::CreateBasicVideoFrame(IMFSample* aSample,
   b.mPlanes[2].mOffset = 0;
   b.mPlanes[2].mSkip = 0;
 
-  Microseconds pts = GetSampleTime(aSample);
-  Microseconds duration = GetSampleDuration(aSample);
+  media::TimeUnit pts = GetSampleTime(aSample);
+  NS_ENSURE_TRUE(pts.IsValid(), E_FAIL);
+  media::TimeUnit duration = GetSampleDuration(aSample);
+  NS_ENSURE_TRUE(duration.IsValid(), E_FAIL);
 
   nsRefPtr<layers::PlanarYCbCrImage> image =
     new IMFYCbCrImage(buffer, twoDBuffer);
@@ -426,8 +439,8 @@ WMFVideoMFTManager::CreateBasicVideoFrame(IMFSample* aSample,
     VideoData::CreateFromImage(mVideoInfo,
                                mImageContainer,
                                aStreamOffset,
-                               std::max(0LL, pts),
-                               duration,
+                               pts.ToMicroseconds(),
+                               duration.ToMicroseconds(),
                                image.forget(),
                                false,
                                -1,
@@ -458,13 +471,15 @@ WMFVideoMFTManager::CreateD3DVideoFrame(IMFSample* aSample,
   NS_ENSURE_TRUE(SUCCEEDED(hr), hr);
   NS_ENSURE_TRUE(image, E_FAIL);
 
-  Microseconds pts = GetSampleTime(aSample);
-  Microseconds duration = GetSampleDuration(aSample);
+  media::TimeUnit pts = GetSampleTime(aSample);
+  NS_ENSURE_TRUE(pts.IsValid(), E_FAIL);
+  media::TimeUnit duration = GetSampleDuration(aSample);
+  NS_ENSURE_TRUE(duration.IsValid(), E_FAIL);
   nsRefPtr<VideoData> v = VideoData::CreateFromImage(mVideoInfo,
                                                      mImageContainer,
                                                      aStreamOffset,
-                                                     pts,
-                                                     duration,
+                                                     pts.ToMicroseconds(),
+                                                     duration.ToMicroseconds(),
                                                      image.forget(),
                                                      false,
                                                      -1,

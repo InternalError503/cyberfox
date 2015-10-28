@@ -33,7 +33,7 @@
 #ifdef XP_WIN
 # include "jswin.h"
 #endif
-#include "prmjtime.h"
+
 
 #include "builtin/AtomicsObject.h"
 #include "frontend/Parser.h"
@@ -41,6 +41,8 @@
 #include "js/Class.h"
 #include "js/Conversions.h"
 #include "js/MemoryMetrics.h"
+
+#include "vm/Time.h"
 
 #include "jsobjinlines.h"
 
@@ -706,6 +708,8 @@ AddressOf(AsmJSImmKind kind, ExclusiveContext* cx)
         return RedirectCall(FuncCast(__aeabi_uidivmod), Args_General2);
       case AsmJSImm_AtomicCmpXchg:
         return RedirectCall(FuncCast<int32_t (int32_t, int32_t, int32_t, int32_t)>(js::atomics_cmpxchg_asm_callout), Args_General4);
+      case AsmJSImm_AtomicXchg:
+        return RedirectCall(FuncCast<int32_t (int32_t, int32_t, int32_t)>(js::atomics_xchg_asm_callout), Args_General3);
       case AsmJSImm_AtomicFetchAdd:
         return RedirectCall(FuncCast<int32_t (int32_t, int32_t, int32_t)>(js::atomics_add_asm_callout), Args_General3);
       case AsmJSImm_AtomicFetchSub:
@@ -860,7 +864,7 @@ AsmJSModule::initHeap(Handle<ArrayBufferObjectMaybeShared*> heap, JSContext* cx)
     // If we have any explicit bounds checks, we need to patch the heap length
     // checks at the right places. All accesses that have been recorded are the
     // only ones that need bound checks (see also
-    // CodeGeneratorX64::visitAsmJS{Load,Store,CompareExchange,AtomicBinop}Heap)
+    // CodeGeneratorX64::visitAsmJS{Load,Store,CompareExchange,Exchange,AtomicBinop}Heap)
     uint32_t heapLength = heap->byteLength();
     for (size_t i = 0; i < heapAccesses_.length(); i++) {
         const jit::AsmJSHeapAccess& access = heapAccesses_[i];
@@ -962,7 +966,7 @@ class MOZ_STACK_CLASS AutoMutateCode
     }
 };
 
-}; // anonymous namespace
+} // namespace
 
 bool
 AsmJSModule::detachHeap(JSContext* cx)
@@ -1015,7 +1019,7 @@ AsmJSModuleObject_trace(JSTracer* trc, JSObject* obj)
 
 const Class AsmJSModuleObject::class_ = {
     "AsmJSModuleObject",
-    JSCLASS_IS_ANONYMOUS | JSCLASS_IMPLEMENTS_BARRIERS |
+    JSCLASS_IS_ANONYMOUS | JSCLASS_IMPLEMENTS_BARRIERS | JSCLASS_DELAY_METADATA_CALLBACK |
     JSCLASS_HAS_RESERVED_SLOTS(AsmJSModuleObject::RESERVED_SLOTS),
     nullptr, /* addProperty */
     nullptr, /* delProperty */
@@ -1035,12 +1039,14 @@ const Class AsmJSModuleObject::class_ = {
 AsmJSModuleObject*
 AsmJSModuleObject::create(ExclusiveContext* cx, ScopedJSDeletePtr<AsmJSModule>* module)
 {
+    AutoSetNewObjectMetadata metadata(cx);
     JSObject* obj = NewObjectWithGivenProto(cx, &AsmJSModuleObject::class_, nullptr);
     if (!obj)
         return nullptr;
     AsmJSModuleObject* nobj = &obj->as<AsmJSModuleObject>();
 
     nobj->setReservedSlot(MODULE_SLOT, PrivateValue(module->forget()));
+
     return nobj;
 }
 
@@ -1738,6 +1744,13 @@ AsmJSModule::changeHeap(Handle<ArrayBufferObject*> newHeap, JSContext* cx)
     return true;
 }
 
+size_t
+AsmJSModule::heapLength() const
+{
+    MOZ_ASSERT(isDynamicallyLinked());
+    return maybeHeap_ ? maybeHeap_->byteLength() : 0;
+}
+
 void
 AsmJSModule::setProfilingEnabled(bool enabled, JSContext* cx)
 {
@@ -1787,6 +1800,9 @@ AsmJSModule::setProfilingEnabled(bool enabled, JSContext* cx)
         BOffImm calleeOffset;
         callerInsn->as<InstBLImm>()->extractImm(&calleeOffset);
         void* callee = calleeOffset.getDest(callerInsn);
+#elif defined(JS_CODEGEN_ARM64)
+        MOZ_CRASH();
+        void* callee = nullptr;
 #elif defined(JS_CODEGEN_MIPS)
         Instruction* instr = (Instruction*)(callerRetAddr - 4 * sizeof(uint32_t));
         void* callee = (void*)Assembler::ExtractLuiOriValue(instr, instr->next());
@@ -1811,6 +1827,8 @@ AsmJSModule::setProfilingEnabled(bool enabled, JSContext* cx)
         X86Encoding::SetRel32(callerRetAddr, newCallee);
 #elif defined(JS_CODEGEN_ARM)
         new (caller) InstBLImm(BOffImm(newCallee - caller), Assembler::Always);
+#elif defined(JS_CODEGEN_ARM64)
+        MOZ_CRASH();
 #elif defined(JS_CODEGEN_MIPS)
         Assembler::WriteLuiOriInstructions(instr, instr->next(),
                                            ScratchRegister, (uint32_t)newCallee);
@@ -1874,6 +1892,8 @@ AsmJSModule::setProfilingEnabled(bool enabled, JSContext* cx)
             MOZ_ASSERT(reinterpret_cast<Instruction*>(jump)->is<InstBImm>());
             new (jump) InstNOP();
         }
+#elif defined(JS_CODEGEN_ARM64)
+        MOZ_CRASH();
 #elif defined(JS_CODEGEN_MIPS)
         Instruction* instr = (Instruction*)jump;
         if (enabled) {

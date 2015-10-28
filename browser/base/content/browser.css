@@ -477,6 +477,27 @@ searchbar[oneoffui] {
   -moz-binding: url("chrome://browser/content/urlbarBindings.xml#urlbar-rich-result-popup");
 }
 
+#PopupAutoCompleteRichResult.showSearchSuggestionsNotification {
+  transition: height 100ms;
+}
+
+#PopupAutoCompleteRichResult > hbox[anonid="search-suggestions-notification"] {
+  visibility: collapse;
+  transition: margin-top 100ms;
+}
+
+#PopupAutoCompleteRichResult.showSearchSuggestionsNotification > hbox[anonid="search-suggestions-notification"] {
+  visibility: visible;
+}
+
+#PopupAutoCompleteRichResult > richlistbox {
+  transition: height 100ms;
+}
+
+#PopupAutoCompleteRichResult.showSearchSuggestionsNotification > richlistbox {
+  transition: none;
+}
+
 #urlbar[pageproxystate="invalid"] > #urlbar-icons > .urlbar-icon,
 #urlbar[pageproxystate="invalid"][focused="true"] > #urlbar-go-button ~ toolbarbutton,
 #urlbar[pageproxystate="valid"] > #urlbar-go-button,
@@ -555,7 +576,7 @@ toolbarbutton.bookmark-item {
 
 /* Apply crisp rendering for favicons at exactly 2dppx resolution */
 @media (resolution: 2dppx) {
-  .alltabs-popup > .menuitem-iconic > .menu-iconic-left > .menu-iconic-icon,
+  #alltabs-popup > .menuitem-iconic > .menu-iconic-left > .menu-iconic-icon,
   .menuitem-with-favicon > .menu-iconic-left > .menu-iconic-icon {
     image-rendering: -moz-crisp-edges;
   }
@@ -655,6 +676,7 @@ window[chromehidden~="toolbar"] toolbar:not(#nav-bar):not(#TabsToolbar):not(#pri
   width: 100%;
   height: 100%;
   z-index: 2147483647 !important;
+  pointer-events: none;
 }
 
 #full-screen-warning-container[fade-warning-out] {
@@ -663,22 +685,13 @@ window[chromehidden~="toolbar"] toolbar:not(#nav-bar):not(#TabsToolbar):not(#pri
   opacity: 0.0;
 }
 
-/* When the modal fullscreen approval UI is showing, don't allow interaction
-   with the page, but when we're just showing the warning upon entering
-   fullscreen on an already approved page, do allow interaction with the page.
- */
-#full-screen-warning-container:not([obscure-browser]) {
-  pointer-events: none;
-}
-
 #full-screen-warning-message {
   /* We must specify a max-width, otherwise word-wrap:break-word doesn't
      work in descendant <description> and <label> elements. Bug 630864. */
   max-width: 800px;
 }
 
-#full-screen-domain-text,
-#full-screen-remember-decision > .checkbox-label-box > .checkbox-label {
+#full-screen-domain-text {
   word-wrap: break-word;
   /* We must specify a min-width, otherwise word-wrap:break-word doesn't work. Bug 630864. */
   min-width: 1px;
@@ -744,6 +757,7 @@ window[chromehidden~="toolbar"] toolbar:not(#nav-bar):not(#TabsToolbar):not(#pri
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  -moz-stack-sizing: ignore;
 }
 
 #addon-progress-notification {
@@ -752,10 +766,6 @@ window[chromehidden~="toolbar"] toolbar:not(#nav-bar):not(#TabsToolbar):not(#pri
 
 #identity-request-notification {
   -moz-binding: url("chrome://browser/content/urlbarBindings.xml#identity-request-notification");
-}
-
-#bad-content-notification {
-  -moz-binding: url("chrome://browser/content/urlbarBindings.xml#bad-content-notification");
 }
 
 #click-to-play-plugins-notification {
@@ -1318,16 +1328,6 @@ toolbarpaletteitem[place="palette"][hidden] {
 #context-navigation > .menuitem-iconic > .menu-iconic-text,
 #context-navigation > .menuitem-iconic > .menu-accel-container {
   display: none;
-}
-
-/* Tracking protection doorhanger */
-.popup-notification-footer[popupid="bad-content"] {
-  display: none;
-}
-
-.popup-notification-footer[popupid="bad-content"][mixedblockdisabled],
-.popup-notification-footer[popupid="bad-content"][trackingblockdisabled] {
-  display: block;
 }
 
 #login-fill-doorhanger:not([inDetailView]) > #login-fill-clickcapturer {

@@ -40,7 +40,7 @@ namespace mozilla {
 
 namespace layers {
 
-class AsyncTransactionTracker;
+class AsyncTransactionWaiter;
 class CompositableForwarder;
 class ISurfaceAllocator;
 class CompositableClient;
@@ -79,7 +79,7 @@ public:
   MOZ_DECLARE_REFCOUNTED_VIRTUAL_TYPENAME(SyncObject)
   virtual ~SyncObject() { }
 
-  static TemporaryRef<SyncObject> CreateSyncObject(SyncHandle aHandle);
+  static already_AddRefed<SyncObject> CreateSyncObject(SyncHandle aHandle);
 
   enum class SyncType {
     D3D11,
@@ -138,6 +138,12 @@ protected:
   virtual ~TextureReadbackSink() {}
 };
 
+enum class BackendSelector
+{
+  Content,
+  Canvas
+};
+
 /**
  * TextureClient is a thin abstraction over texture data that need to be shared
  * between the content process and the compositor process. It is the
@@ -170,16 +176,16 @@ public:
   virtual ~TextureClient();
 
   // Creates and allocates a TextureClient usable with Moz2D.
-  static TemporaryRef<TextureClient>
+  static already_AddRefed<TextureClient>
   CreateForDrawing(ISurfaceAllocator* aAllocator,
                    gfx::SurfaceFormat aFormat,
                    gfx::IntSize aSize,
-                   gfx::BackendType aMoz2dBackend,
+                   BackendSelector aSelector,
                    TextureFlags aTextureFlags,
                    TextureAllocationFlags flags = ALLOC_DEFAULT);
 
   // Creates and allocates a BufferTextureClient supporting the YCbCr format.
-  static TemporaryRef<BufferTextureClient>
+  static already_AddRefed<BufferTextureClient>
   CreateForYCbCr(ISurfaceAllocator* aAllocator,
                  gfx::IntSize aYSize,
                  gfx::IntSize aCbCrSize,
@@ -188,7 +194,7 @@ public:
 
   // Creates and allocates a BufferTextureClient (can beaccessed through raw
   // pointers).
-  static TemporaryRef<BufferTextureClient>
+  static already_AddRefed<BufferTextureClient>
   CreateForRawBufferAccess(ISurfaceAllocator* aAllocator,
                            gfx::SurfaceFormat aFormat,
                            gfx::IntSize aSize,
@@ -199,14 +205,14 @@ public:
   // Creates and allocates a BufferTextureClient (can beaccessed through raw
   // pointers) with a certain buffer size. It's unfortunate that we need this.
   // providing format and sizes could let us do more optimization.
-  static TemporaryRef<BufferTextureClient>
+  static already_AddRefed<BufferTextureClient>
   CreateWithBufferSize(ISurfaceAllocator* aAllocator,
                        gfx::SurfaceFormat aFormat,
                        size_t aSize,
                        TextureFlags aTextureFlags);
 
   // Creates and allocates a TextureClient of the same type.
-  virtual TemporaryRef<TextureClient>
+  virtual already_AddRefed<TextureClient>
   CreateSimilar(TextureFlags aFlags = TextureFlags::DEFAULT,
                 TextureAllocationFlags aAllocFlags = ALLOC_DEFAULT) const = 0;
 
@@ -243,6 +249,7 @@ public:
 
   /**
    * Returns a DrawTarget to draw into the TextureClient.
+   * This function should never be called when not on the main thread!
    *
    * This must never be called on a TextureClient that is not sucessfully locked.
    * When called several times within one Lock/Unlock pair, this method should
@@ -268,6 +275,12 @@ public:
    */
   virtual gfx::DrawTarget* BorrowDrawTarget() { return nullptr; }
 
+  /**
+   * This function can be used to update the contents of the TextureClient
+   * off the main thread.
+   */
+  virtual void UpdateFromSurface(gfx::SourceSurface* aSurface) { MOZ_CRASH(); }
+
   // TextureClients that can expose a DrawTarget should override this method.
   virtual gfx::SurfaceFormat GetFormat() const
   {
@@ -278,7 +291,7 @@ public:
    * This method is strictly for debugging. It causes locking and
    * needless copies.
    */
-  virtual TemporaryRef<gfx::DataSourceSurface> GetAsSurface() {
+  virtual already_AddRefed<gfx::DataSourceSurface> GetAsSurface() {
     Lock(OpenMode::OPEN_READ);
     RefPtr<gfx::SourceSurface> surf = BorrowDrawTarget()->Snapshot();
     RefPtr<gfx::DataSourceSurface> data = surf->GetDataSurface();
@@ -368,7 +381,7 @@ public:
 
   void MarkImmutable() { AddFlags(TextureFlags::IMMUTABLE); }
 
-  bool IsSharedWithCompositor() const { return mShared; }
+  bool IsSharedWithCompositor() const;
 
   bool ShouldDeallocateInDestructor() const;
 
@@ -448,7 +461,7 @@ public:
   /**
    * Set AsyncTransactionTracker of RemoveTextureFromCompositableAsync() transaction.
    */
-  virtual void SetRemoveFromCompositableTracker(AsyncTransactionTracker* aTracker) {}
+  virtual void SetRemoveFromCompositableWaiter(AsyncTransactionWaiter* aWaiter) {}
 
   /**
    * This function waits until the buffer is no longer being used.
@@ -485,7 +498,7 @@ private:
    * Here goes the shut-down code that uses virtual methods.
    * Must only be called by Release().
    */
-  void Finalize();
+  B2G_ACL_EXPORT void Finalize();
 
   friend class AtomicRefCountedWithFinalize<TextureClient>;
 
@@ -502,7 +515,7 @@ protected:
    * deserialized.
    * Calling ToSurfaceDescriptor again after it has already returned true,
    * or never constructing a TextureHost with aDescriptor may result in a memory
-   * leak (see CairoTextureClientD3D9 for example).
+   * leak (see TextureClientD3D9 for example).
    */
   virtual bool ToSurfaceDescriptor(SurfaceDescriptor& aDescriptor) = 0;
 
@@ -586,6 +599,8 @@ public:
 
   virtual gfx::DrawTarget* BorrowDrawTarget() override;
 
+  virtual void UpdateFromSurface(gfx::SourceSurface* aSurface) override;
+
   virtual bool AllocateForSurface(gfx::IntSize aSize,
                                   TextureAllocationFlags aFlags = ALLOC_DEFAULT) override;
 
@@ -611,7 +626,7 @@ public:
 
   virtual bool HasInternalBuffer() const override { return true; }
 
-  virtual TemporaryRef<TextureClient>
+  virtual already_AddRefed<TextureClient>
   CreateSimilar(TextureFlags aFlags = TextureFlags::DEFAULT,
                 TextureAllocationFlags aAllocFlags = ALLOC_DEFAULT) const override;
 
@@ -717,6 +732,7 @@ protected:
   RefPtr<T> mData;
 };
 
-}
-}
+} // namespace layers
+} // namespace mozilla
+
 #endif

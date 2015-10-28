@@ -6,11 +6,15 @@
 #include "gfxPrefs.h"
 #include "nsAppDirectoryServiceDefs.h"
 #include "nsDirectoryServiceUtils.h"
+#ifdef MOZ_CRASHREPORTER
+#include "nsExceptionHandler.h"
+#endif
 #include "nsServiceManagerUtils.h"
 #include "nsString.h"
 #include "nsXULAppAPI.h"
 #include "mozilla/Preferences.h"
 #include "mozilla/Telemetry.h"
+#include "mozilla/Services.h"
 #include "mozilla/gfx/Logging.h"
 
 namespace mozilla {
@@ -70,6 +74,12 @@ DriverInitCrashDetection::~DriverInitCrashDetection()
     // If we attempted to initialize the driver, and got this far without
     // crashing, assume everything is okay.
     gfxPrefs::SetDriverInitStatus(int32_t(DriverInitStatus::Okay));
+
+#ifdef MOZ_CRASHREPORTER
+    // Remove the crash report annotation.
+    CrashReporter::AnnotateCrashReport(NS_LITERAL_CSTRING("GraphicsStartupTest"),
+                                       NS_LITERAL_CSTRING(""));
+#endif
   }
 }
 
@@ -104,6 +114,11 @@ DriverInitCrashDetection::AllowDriverInitAttempt()
   // If we crash, we'll just lose this. Not a big deal, next startup we'll
   // record the failure.
   RecordTelemetry(TelemetryState::EnvironmentChanged);
+
+#ifdef MOZ_CRASHREPORTER
+  CrashReporter::AnnotateCrashReport(NS_LITERAL_CSTRING("GraphicsStartupTest"),
+                                     NS_LITERAL_CSTRING("1"));
+#endif
 }
 
 bool
@@ -136,7 +151,7 @@ DriverInitCrashDetection::RecoverFromDriverInitCrash()
 bool
 DriverInitCrashDetection::UpdateEnvironment()
 {
-  mGfxInfo = do_GetService("@mozilla.org/gfx/info;1");
+  mGfxInfo = services::GetGfxInfo();
 
   bool changed = false;
   if (mGfxInfo) {

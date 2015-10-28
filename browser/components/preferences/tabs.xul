@@ -19,7 +19,7 @@
 <overlay id="TabsPaneOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 <script type="application/javascript" 
-        src="chrome://browser/content/preferences/in-content/main.js"/>
+        src="chrome://browser/content/preferences/main.js"/>
   <prefpane id="paneTabs"
             onpaneload="gTabsPane.init();"
             helpTopic="prefs-tabs">

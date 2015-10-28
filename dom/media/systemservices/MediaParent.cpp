@@ -13,8 +13,11 @@
 #include "MediaEngine.h"
 #include "VideoUtils.h"
 #include "nsThreadUtils.h"
+#include "nsNetCID.h"
 #include "nsNetUtil.h"
+#include "nsIOutputStream.h"
 #include "nsILineInputStream.h"
+#include "nsISafeOutputStream.h"
 #include "nsAppDirectoryServiceDefs.h"
 #include "nsISupportsImpl.h"
 #include "mozilla/Logging.h"
@@ -45,7 +48,7 @@ class OriginKeyStore : public nsISupports
     static const size_t DecodedLength = 18;
     static const size_t EncodedLength = DecodedLength * 4 / 3;
 
-    OriginKey(const nsACString& aKey, int64_t aSecondsStamp)
+    explicit OriginKey(const nsACString& aKey, int64_t aSecondsStamp = 0) // 0 = temporal
     : mKey(aKey)
     , mSecondsStamp(aSecondsStamp) {}
 
@@ -56,10 +59,10 @@ class OriginKeyStore : public nsISupports
   class OriginKeysTable
   {
   public:
-    OriginKeysTable() {}
+    OriginKeysTable() : mPersistCount(0) {}
 
     nsresult
-    GetOriginKey(const nsACString& aOrigin, nsCString& result)
+    GetOriginKey(const nsACString& aOrigin, nsCString& aResult, bool aPersist = false)
     {
       OriginKey* key;
       if (!mKeys.Get(aOrigin, &key)) {
@@ -68,10 +71,14 @@ class OriginKeyStore : public nsISupports
         if (NS_WARN_IF(NS_FAILED(rv))) {
           return rv;
         }
-        key = new OriginKey(salt, PR_Now() / PR_USEC_PER_SEC);
+        key = new OriginKey(salt);
         mKeys.Put(aOrigin, key);
       }
-      result = key->mKey;
+      if (aPersist && !key->mSecondsStamp) {
+        key->mSecondsStamp = PR_Now() / PR_USEC_PER_SEC;
+        mPersistCount++;
+      }
+      aResult = key->mKey;
       return NS_OK;
     }
 
@@ -95,10 +102,12 @@ class OriginKeyStore : public nsISupports
       // Avoid int64_t* <-> void* casting offset
       OriginKey since(nsCString(), aSinceWhen  / PR_USEC_PER_SEC);
       mKeys.Enumerate(HashCleaner, &since);
+      mPersistCount = 0;
     }
 
   protected:
     nsClassHashtable<nsCStringHashKey, OriginKey> mKeys;
+    size_t mPersistCount;
   };
 
   class OriginKeysLoader : public OriginKeysTable
@@ -107,11 +116,11 @@ class OriginKeyStore : public nsISupports
     OriginKeysLoader() {}
 
     nsresult
-    GetOriginKey(const nsACString& aOrigin, nsCString& result)
+    GetOriginKey(const nsACString& aOrigin, nsCString& aResult, bool aPersist)
     {
-      auto before = mKeys.Count();
-      OriginKeysTable::GetOriginKey(aOrigin, result);
-      if (mKeys.Count() != before) {
+      auto before = mPersistCount;
+      OriginKeysTable::GetOriginKey(aOrigin, aResult, aPersist);
+      if (mPersistCount != before) {
         Save();
       }
       return NS_OK;
@@ -159,6 +168,7 @@ class OriginKeyStore : public nsISupports
       }
       nsCOMPtr<nsILineInputStream> i = do_QueryInterface(stream);
       MOZ_ASSERT(i);
+      MOZ_ASSERT(!mPersistCount);
 
       nsCString line;
       bool hasMoreLines;
@@ -205,6 +215,7 @@ class OriginKeyStore : public nsISupports
         }
         mKeys.Put(origin, new OriginKey(key, secondsstamp));
       }
+      mPersistCount = mKeys.Count();
       return NS_OK;
     }
 
@@ -212,6 +223,10 @@ class OriginKeyStore : public nsISupports
     HashWriter(const nsACString& aOrigin, OriginKey* aOriginKey, void *aUserArg)
     {
       auto* stream = static_cast<nsIOutputStream *>(aUserArg);
+
+      if (!aOriginKey->mSecondsStamp) {
+        return PL_DHASH_NEXT; // don't write temporal ones
+      }
 
       nsCString buffer;
       buffer.Append(aOriginKey->mKey);
@@ -372,8 +387,9 @@ Parent<Super>* GccGetSingleton() { return Parent<Super>::GetSingleton(); };
 
 template<class Super> bool
 Parent<Super>::RecvGetOriginKey(const uint32_t& aRequestId,
-                         const nsCString& aOrigin,
-                         const bool& aPrivateBrowsing)
+                                const nsCString& aOrigin,
+                                const bool& aPrivateBrowsing,
+                                const bool& aPersist)
 {
   MOZ_ASSERT(NS_IsMainThread());
 
@@ -398,15 +414,15 @@ Parent<Super>::RecvGetOriginKey(const uint32_t& aRequestId,
   nsRefPtr<OriginKeyStore> store(mOriginKeyStore);
   bool sameProcess = mSameProcess;
 
-  rv = sts->Dispatch(NewRunnableFrom([id, profileDir, store, sameProcess,
-                                      aOrigin, aPrivateBrowsing]() -> nsresult {
+  rv = sts->Dispatch(NewRunnableFrom([id, profileDir, store, sameProcess, aOrigin,
+                                      aPrivateBrowsing, aPersist]() -> nsresult {
     MOZ_ASSERT(!NS_IsMainThread());
     store->mOriginKeys.SetProfileDir(profileDir);
     nsCString result;
     if (aPrivateBrowsing) {
       store->mPrivateBrowsingOriginKeys.GetOriginKey(aOrigin, result);
     } else {
-      store->mOriginKeys.GetOriginKey(aOrigin, result);
+      store->mOriginKeys.GetOriginKey(aOrigin, result, aPersist);
     }
 
     // Pass result back to main thread.
@@ -458,7 +474,8 @@ Parent<Super>::RecvGetOriginKey(const uint32_t& aRequestId,
 }
 
 template<class Super> bool
-Parent<Super>::RecvSanitizeOriginKeys(const uint64_t& aSinceWhen)
+Parent<Super>::RecvSanitizeOriginKeys(const uint64_t& aSinceWhen,
+                                      const bool& aOnlyPrivateBrowsing)
 {
   MOZ_ASSERT(NS_IsMainThread());
   nsCOMPtr<nsIFile> profileDir;
@@ -473,11 +490,14 @@ Parent<Super>::RecvSanitizeOriginKeys(const uint64_t& aSinceWhen)
   MOZ_ASSERT(sts);
   nsRefPtr<OriginKeyStore> store(mOriginKeyStore);
 
-  rv = sts->Dispatch(NewRunnableFrom([profileDir, store, aSinceWhen]() -> nsresult {
+  rv = sts->Dispatch(NewRunnableFrom([profileDir, store, aSinceWhen,
+                                      aOnlyPrivateBrowsing]() -> nsresult {
     MOZ_ASSERT(!NS_IsMainThread());
-    store->mOriginKeys.SetProfileDir(profileDir);
     store->mPrivateBrowsingOriginKeys.Clear(aSinceWhen);
-    store->mOriginKeys.Clear(aSinceWhen);
+    if (!aOnlyPrivateBrowsing) {
+      store->mOriginKeys.SetProfileDir(profileDir);
+      store->mOriginKeys.Clear(aSinceWhen);
+    }
     return NS_OK;
   }), NS_DISPATCH_NORMAL);
   if (NS_WARN_IF(NS_FAILED(rv))) {
@@ -503,16 +523,12 @@ Parent<Super>::Parent(bool aSameProcess)
   if (!gMediaParentLog)
     gMediaParentLog = PR_NewLogModule("MediaParent");
   LOG(("media::Parent: %p", this));
-
-  MOZ_COUNT_CTOR(Parent);
 }
 
 template<class Super>
 Parent<Super>::~Parent()
 {
   LOG(("~media::Parent: %p", this));
-
-  MOZ_COUNT_DTOR(Parent);
 }
 
 PMediaParent*
@@ -531,8 +547,8 @@ DeallocPMediaParent(media::PMediaParent *aActor)
   return true;
 }
 
-}
-}
+} // namespace media
+} // namespace mozilla
 
 // Instantiate templates to satisfy linker
 template class mozilla::media::Parent<mozilla::media::NonE10s>;

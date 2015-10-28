@@ -9,7 +9,6 @@
 #include "gfxPlatform.h"
 #include "gfxRect.h"
 #include "gfxMatrix.h"
-#include "gfx3DMatrix.h"
 #include "gfxContext.h"
 #include "mozilla/gfx/Matrix.h"
 #include "mozilla/gfx/Rect.h"
@@ -310,53 +309,7 @@ inline gfxContext::GraphicsOperator ThebesOp(CompositionOp aOp)
   }
 }
 
-inline Matrix4x4
-ToMatrix4x4(const gfx3DMatrix& aIn)
-{
-  Matrix4x4 m;
-  m._11 = aIn._11;
-  m._12 = aIn._12;
-  m._13 = aIn._13;
-  m._14 = aIn._14;
-  m._21 = aIn._21;
-  m._22 = aIn._22;
-  m._23 = aIn._23;
-  m._24 = aIn._24;
-  m._31 = aIn._31;
-  m._32 = aIn._32;
-  m._33 = aIn._33;
-  m._34 = aIn._34;
-  m._41 = aIn._41;
-  m._42 = aIn._42;
-  m._43 = aIn._43;
-  m._44 = aIn._44;
-  return m;
-}
-
-inline gfx3DMatrix
-To3DMatrix(const Matrix4x4& aIn)
-{
-  gfx3DMatrix m;
-  m._11 = aIn._11;
-  m._12 = aIn._12;
-  m._13 = aIn._13;
-  m._14 = aIn._14;
-  m._21 = aIn._21;
-  m._22 = aIn._22;
-  m._23 = aIn._23;
-  m._24 = aIn._24;
-  m._31 = aIn._31;
-  m._32 = aIn._32;
-  m._33 = aIn._33;
-  m._34 = aIn._34;
-  m._41 = aIn._41;
-  m._42 = aIn._42;
-  m._43 = aIn._43;
-  m._44 = aIn._44;
-  return m;
-}
-
-}
-}
+} // namespace gfx
+} // namespace mozilla
 
 #endif

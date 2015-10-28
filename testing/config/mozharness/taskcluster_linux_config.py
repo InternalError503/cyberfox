@@ -4,20 +4,31 @@
 
 config = {
     "reftest_options": [
-        "--appname=%(binary_path)s", "--utility-path=tests/bin",
-        "--extra-profile-file=tests/bin/plugins", "--symbols-path=%(symbols_path)s"
+        "--appname=%(binary_path)s",
+        "--utility-path=tests/bin",
+        "--extra-profile-file=tests/bin/plugins",
+        "--symbols-path=%(symbols_path)s"
     ],
     "mochitest_options": [
-        "--appname=%(binary_path)s", "--utility-path=tests/bin",
-        "--extra-profile-file=tests/bin/plugins", "--symbols-path=%(symbols_path)s",
-        "--certificate-path=tests/certs", "--setpref=webgl.force-enabled=true",
-        "--quiet", "--log-raw=%(raw_log_file)s"
+        "--appname=%(binary_path)s",
+        "--utility-path=tests/bin",
+        "--extra-profile-file=tests/bin/plugins",
+        "--symbols-path=%(symbols_path)s",
+        "--certificate-path=tests/certs",
+        "--setpref=webgl.force-enabled=true",
+        "--quiet",
+        "--log-raw=%(raw_log_file)s",
+        "--log-errorsummary=%(error_summary_file)s",
+        "--screenshot-on-fail",
     ],
     "webapprt_options": [
-        "--app=%(app_path)s", "--utility-path=tests/bin",
-        "--extra-profile-file=tests/bin/plugins", "--symbols-path=%(symbols_path)s",
-        "--certificate-path=tests/certs", "--autorun", "--close-when-done",
-        "--console-level=INFO", "--testing-modules-dir=tests/modules",
+        "--app=%(app_path)s",
+        "--utility-path=tests/bin",
+        "--extra-profile-file=tests/bin/plugins",
+        "--symbols-path=%(symbols_path)s",
+        "--certificate-path=tests/certs",
+        "--console-level=INFO",
+        "--testing-modules-dir=tests/modules",
         "--quiet"
     ],
     "xpcshell_options": [

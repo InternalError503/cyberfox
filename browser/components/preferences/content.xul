@@ -34,7 +34,6 @@
       <preference id="dom.disable_open_during_load"   name="dom.disable_open_during_load"   type="bool"/>
       <preference id="permissions.default.image"      name="permissions.default.image"      type="int"/>
       <preference id="javascript.enabled"             name="javascript.enabled"             type="bool"/>
-	    <preference id="plugins.click_to_play"          name="plugins.click_to_play"          type="bool"/>
       <preference id="pref.advanced.images.disable_button.view_image"
                   name="pref.advanced.images.disable_button.view_image"
                   type="bool"/>
@@ -122,14 +121,7 @@
                       oncommand="gContentPane.showAdvancedJS();"
                       preference="pref.advanced.javascript.disable_button.advanced"/>
             </vbox>
-          </row>
-		  <row id="pluginsclick_to_playRow">
-		  <vbox align="start">
-              <checkbox id="pluginsclick_to_play" label="&enableClickToPlay.label;"
-                      oncommand="plugins.click_to_play.toggle();"
-                      preference="plugins.click_to_play"/>
-            </vbox>
-			</row>  
+          </row> 
 <!-- End Disable Javascript & Block Images Feature Dont Remove -->
         </rows>
       </grid>

@@ -104,9 +104,7 @@ class MediaCache {
 public:
   friend class MediaCacheStream::BlockList;
   typedef MediaCacheStream::BlockList BlockList;
-  enum {
-    BLOCK_SIZE = MediaCacheStream::BLOCK_SIZE
-  };
+  static const int64_t BLOCK_SIZE = MediaCacheStream::BLOCK_SIZE;
 
   MediaCache() : mNextResourceID(1),
     mReentrantMonitor("MediaCache.mReentrantMonitor"),
@@ -391,7 +389,7 @@ size_t MediaCacheStream::SizeOfExcludingThis(
   // Looks like these are not owned:
   // - mClient
   // - mPrincipal
-  size_t size = mBlocks.SizeOfExcludingThis(aMallocSizeOf);
+  size_t size = mBlocks.ShallowSizeOfExcludingThis(aMallocSizeOf);
   size += mReadaheadBlocks.SizeOfExcludingThis(aMallocSizeOf);
   size += mMetadataBlocks.SizeOfExcludingThis(aMallocSizeOf);
   size += mPlayedBlocks.SizeOfExcludingThis(aMallocSizeOf);
@@ -403,8 +401,7 @@ size_t MediaCacheStream::SizeOfExcludingThis(
 size_t MediaCacheStream::BlockList::SizeOfExcludingThis(
                                 MallocSizeOf aMallocSizeOf) const
 {
-  return mEntries.SizeOfExcludingThis(/* sizeOfEntryExcludingThis = */ nullptr,
-                                      aMallocSizeOf);
+  return mEntries.ShallowSizeOfExcludingThis(aMallocSizeOf);
 }
 
 void MediaCacheStream::BlockList::AddFirstBlock(int32_t aBlock)
@@ -1409,8 +1406,14 @@ MediaCache::QueueUpdate()
   if (mUpdateQueued)
     return;
   mUpdateQueued = true;
-  nsCOMPtr<nsIRunnable> event = new UpdateEvent();
-  NS_DispatchToMainThread(event);
+  // XXX MediaCache does updates when decoders are still running at
+  // shutdown and get freed in the final cycle-collector cleanup.  So
+  // don't leak a runnable in that case.
+  nsCOMPtr<nsIThread> mainThread = do_GetMainThread();
+  if (mainThread) {
+    nsCOMPtr<nsIRunnable> event = new UpdateEvent();
+    mainThread->Dispatch(event.forget(), NS_DISPATCH_NORMAL);
+  }
 }
 
 void
@@ -2220,7 +2223,7 @@ MediaCacheStream::Read(char* aBuffer, uint32_t aCount, uint32_t* aBytes)
     uint32_t streamBlock = uint32_t(mStreamOffset/BLOCK_SIZE);
     uint32_t offsetInStreamBlock =
       uint32_t(mStreamOffset - streamBlock*BLOCK_SIZE);
-    int64_t size = std::min(aCount - count, BLOCK_SIZE - offsetInStreamBlock);
+    int64_t size = std::min<int64_t>(aCount - count, BLOCK_SIZE - offsetInStreamBlock);
 
     if (mStreamLength >= 0) {
       // Don't try to read beyond the end of the stream

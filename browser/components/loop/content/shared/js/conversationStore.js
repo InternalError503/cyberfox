@@ -6,6 +6,8 @@ var loop = loop || {};
 loop.store = loop.store || {};
 
 (function() {
+  "use strict";
+
   var sharedActions = loop.shared.actions;
   var CALL_TYPES = loop.shared.utils.CALL_TYPES;
   var REST_ERRNOS = loop.shared.utils.REST_ERRNOS;
@@ -144,21 +146,6 @@ loop.store = loop.store || {};
      * @param {sharedActions.ConnectionFailure} actionData The action data.
      */
     connectionFailure: function(actionData) {
-      /**
-       * XXX This is a workaround for desktop machines that do not have a
-       * camera installed. As we don't yet have device enumeration, when
-       * we do, this can be removed (bug 1138851), and the sdk should handle it.
-       */
-      if (this._isDesktop &&
-          actionData.reason === FAILURE_DETAILS.UNABLE_TO_PUBLISH_MEDIA &&
-          this.getStoreState().videoMuted === false) {
-        // We failed to publish with media, so due to the bug, we try again without
-        // video.
-        this.setStoreState({videoMuted: true});
-        this.sdkDriver.retryPublishWithoutVideo();
-        return;
-      }
-
       this._endSession();
       this.setStoreState({
         callState: CALL_STATES.TERMINATED,
@@ -235,9 +222,9 @@ loop.store = loop.store || {};
         "mediaConnected",
         "setMute",
         "fetchRoomEmailLink",
-        "localVideoEnabled",
-        "remoteVideoDisabled",
-        "remoteVideoEnabled",
+        "mediaStreamCreated",
+        "mediaStreamDestroyed",
+        "remoteVideoStatus",
         "windowUnload"
       ]);
 
@@ -453,40 +440,51 @@ loop.store = loop.store || {};
     },
 
     /**
-     * Handles when the remote stream has been enabled and is supplied.
+     * Handles a media stream being created. This may be a local or a remote stream.
      *
-     * @param  {sharedActions.RemoteVideoEnabled} actionData
+     * @param {sharedActions.MediaStreamCreated} actionData
      */
-    remoteVideoEnabled: function(actionData) {
+    mediaStreamCreated: function(actionData) {
+      if (actionData.isLocal) {
+        this.setStoreState({
+          localVideoEnabled: actionData.hasVideo,
+          localSrcVideoObject: actionData.srcVideoObject
+        });
+        return;
+      }
+
       this.setStoreState({
-        remoteVideoEnabled: true,
+        remoteVideoEnabled: actionData.hasVideo,
         remoteSrcVideoObject: actionData.srcVideoObject
       });
     },
 
     /**
-     * Handles when the remote stream has been disabled, e.g. due to video mute.
+     * Handles a media stream being destroyed. This may be a local or a remote stream.
      *
-     * @param {sharedActions.RemoteVideoDisabled} actionData
+     * @param {sharedActions.MediaStreamDestroyed} actionData
      */
-    remoteVideoDisabled: function(actionData) {
+    mediaStreamDestroyed: function(actionData) {
+      if (actionData.isLocal) {
+        this.setStoreState({
+          localSrcVideoObject: null
+        });
+        return;
+      }
+
       this.setStoreState({
-        remoteVideoEnabled: false,
-        remoteSrcVideoObject: undefined});
+        remoteSrcVideoObject: null
+      });
     },
 
     /**
-     * Handles when the local stream is supplied.
+     * Handles a remote stream having video enabled or disabled.
      *
-     * XXX should write a localVideoDisabled action in otSdkDriver.js to
-     * positively ensure proper cleanup (handled by window teardown currently)
-     * (see bug 1171978)
-     *
-     * @param  {sharedActions.LocalVideoEnabled} actionData
+     * @param {sharedActions.RemoteVideoStatus} actionData
      */
-    localVideoEnabled: function(actionData) {
+    remoteVideoStatus: function(actionData) {
       this.setStoreState({
-        localSrcVideoObject: actionData.srcVideoObject
+        remoteVideoEnabled: actionData.videoEnabled
       });
     },
 

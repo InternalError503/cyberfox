@@ -10,6 +10,7 @@
 <!ENTITY  onboard_start_subtext3 "Make your mobile Web browsing experience truly your own.">
 <!ENTITY  onboard_start_button_account "Sign in to &brandShortName;">
 <!ENTITY  onboard_start_button_browser "Start Browsing">
+<!ENTITY  onboard_start_restricted1 "Stay safe and in control with this simplified version of &brandShortName;.">
 
 <!-- Localization note: These are used as the titles of different pages on the home screen.
      They are automatically converted to all caps by the Android platform. -->
@@ -68,6 +69,8 @@
 <!ENTITY edit_mode_cancel "Cancel">
 
 <!ENTITY close_tab "Close Tab">
+<!ENTITY tab_audio_playing "This tab is playing audio">
+<!ENTITY tab_audio_muted "This tab has been muted">
 <!ENTITY one_tab "1 tab">
 <!-- Localization note (num_tabs2) : Number of tabs is always more than one.
      We can't use android plural forms, sadly. See bug #753859. -->
@@ -155,6 +158,9 @@
 <!ENTITY pref_search_hint "TIP: Add any website to your list of search providers by long-pressing on its search field and then tapping the &formatI; icon.">
 <!ENTITY pref_category_devtools "Developer tools">
 <!ENTITY pref_developer_remotedebugging "Remote debugging">
+<!ENTITY pref_developer_remotedebugging_usb "Remote debugging via USB">
+<!ENTITY pref_developer_remotedebugging_wifi "Remote debugging via Wi-Fi">
+<!ENTITY pref_developer_remotedebugging_wifi_disabled_summary "Wi-Fi debugging requires your device to have a QR code reader app installed.">
 <!ENTITY pref_category_logins "Logins">
 <!ENTITY pref_remember_signons2 "Remember logins">
 <!ENTITY pref_open_external_urls_privately_title "Open links in Private browsing">
@@ -192,15 +198,20 @@
 <!ENTITY pref_cookies_disabled "Disabled">
 
 <!ENTITY pref_tracking_protection_title "Tracking protection">
-<!ENTITY pref_tracking_protection_summary "&brandShortName; will prevent sites from tracking you">
+<!ENTITY pref_tracking_protection_summary3 "Enabled in Private Browsing">
 <!ENTITY pref_donottrack_title "Do not track">
 <!ENTITY pref_donottrack_summary "&brandShortName; will tell sites that you do not want to be tracked">
+
+<!ENTITY tracking_protection_prompt_title "Now with Tracking Protection">
+<!ENTITY tracking_protection_prompt_text "Actively block tracking elements so you don\'t have to worry.">
+<!ENTITY tracking_protection_prompt_tip_text "Visit Privacy settings to learn more">
+<!ENTITY tracking_protection_prompt_action_button "Got it!">
 
 <!ENTITY tab_queue_toast_message3 "Tab saved in &brandShortName;">
 <!ENTITY tab_queue_toast_action "Open now">
 <!ENTITY tab_queue_prompt_title "Opening multiple links?">
-<!ENTITY tab_queue_prompt_text3 "Save them until the next time you open &brandShortName;">
-<!ENTITY tab_queue_prompt_tip_text "you can change this later in Settings">
+<!ENTITY tab_queue_prompt_text4 "Save them until the next time you open &brandShortName;.">
+<!ENTITY tab_queue_prompt_tip_text2 "You can change this later in Settings">
 <!ENTITY tab_queue_prompt_positive_action_button "Enable">
 <!ENTITY tab_queue_prompt_negative_action_button "Not now">
 <!ENTITY tab_queue_notification_title "&brandShortName;">
@@ -330,7 +341,6 @@ size. -->
 <!ENTITY addons "Add-ons">
 <!ENTITY logins "Logins">
 <!ENTITY downloads "Downloads">
-<!ENTITY apps "Apps">
 <!ENTITY char_encoding "Character Encoding">
 
 <!ENTITY share "Share">
@@ -401,6 +411,11 @@ size. -->
 <!ENTITY pref_titlebar_mode_title "Show page title">
 <!ENTITY pref_titlebar_mode_url "Show page address">
 
+<!-- Localization note (pref_prevent_magnifying_glass): Label for setting that controls
+     whether or not the magnifying glass is disabled. -->
+<!ENTITY pref_prevent_magnifying_glass "Disable magnifying glass ">
+<!ENTITY pref_prevent_magnifying_glass_summary "Prevent magnifying glass for use in resolving ambiguous screen touches">
+
 <!-- Localization note (pref_scroll_title_bar2): Label for setting that controls
      whether or not the dynamic toolbar is enabled. -->
 <!ENTITY pref_scroll_title_bar2 "Full-screen browsing">
@@ -426,9 +441,9 @@ size. -->
 <!ENTITY site_settings_clear        "Clear">
 <!ENTITY site_settings_no_settings  "There are no settings to clear.">
 
-<!-- Localization note (reading_list_added2) : Used in a toast, please keep as short
+<!-- Localization note (reading_list_added3) : Used in a toast, please keep as short
      as possible. -->
-<!ENTITY reading_list_added2 "Added to list">
+<!ENTITY reading_list_added3 "Added to Reading List">
 <!ENTITY reading_list_removed "Page removed from your Reading List">
 <!-- Localization note (reading_list_remove) : Used to remove the currently open page from
      the user's reading list. The opposite of overlay_share_reading_list_btn_label. -->
@@ -545,21 +560,25 @@ The layout of the identity dialog prevents combining this into a single string w
 substitution variables.  If it is difficult to translate the sense of the string
 with that structure, consider a translation which ignores the preceding domain and
 just addresses the organization to follow, e.g. "This site is run by " -->
-<!ENTITY identity_run_by "which is run by">
-<!ENTITY identity_no_info "This website does not supply identity information.">
-<!ENTITY identity_not_encrypted "Your connection to this website is not encrypted.">
-<!ENTITY identity_encrypted "Encrypted">
+<!ENTITY identity_connection_secure "Secure Connection">
+<!ENTITY identity_connection_insecure "Insecure connection">
 
 <!-- Mixed content notifications in site identity popup -->
+<!ENTITY mixed_content_blocked_all "&brandShortName; has blocked insecure elements on this page.">
+<!ENTITY mixed_content_blocked_some "&brandShortName; has blocked some insecure elements on this page.">
+<!ENTITY mixed_content_display_loaded "This page has some insecure elements.">
+<!ENTITY mixed_content_protection_disabled "You have disabled protection from insecure elements.">
+
 <!ENTITY loaded_mixed_content_message "This page is displaying content that isn\'t secure.">
 <!ENTITY blocked_mixed_content_message_top "&brandShortName; has blocked content that isn\'t secure.">
 <!ENTITY blocked_mixed_content_message_bottom "Most websites will still work properly even when this content is blocked.">
 
 <!-- Tracking content notifications in site identity popup -->
-<!ENTITY loaded_tracking_content_message_top "Tracking protection disabled.">
-<!ENTITY loaded_tracking_content_message_bottom "Parts of this page may track your online activity.">
-<!ENTITY blocked_tracking_content_message_top2 "Tracking protection enabled.">
-<!ENTITY blocked_tracking_content_message_bottom2 "Parts of the page that track your online activity have been blocked.">
+<!ENTITY doorhanger_tracking_title "Tracking protection">
+<!ENTITY doorhanger_tracking_state_enabled "Enabled">
+<!ENTITY doorhanger_tracking_state_disabled "Disabled">
+<!ENTITY doorhanger_tracking_message_enabled1 "Attempts to track your online behavior have been blocked.">
+<!ENTITY doorhanger_tracking_message_disabled2 "This page includes elements that may track your browsing.">
 
 <!-- Common mixed and tracking content strings in site identity popup -->
 <!ENTITY learn_more "Learn More">
@@ -645,10 +664,6 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 
 <!-- Voice search in the awesome bar -->
 <!ENTITY voicesearch_prompt "Speak now">
-<!ENTITY voicesearch_failed_title "&brandShortName; Voice Search">
-<!ENTITY voicesearch_failed_message "There is a problem with voice search right now. Please try later.">
-<!ENTITY voicesearch_failed_message_recoverable "Sorry! We could not recognize your words. Please try again.">
-<!ENTITY voicesearch_failed_retry "Try again">
 
 <!-- Localization note (remote_tabs_last_synced): the variable is replaced by a
      "relative time span string" produced by Android.  This string describes the
@@ -666,3 +681,26 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!ENTITY find_matchcase "Aa">
 
 <!ENTITY intent_uri_cannot_open "Cannot open link">
+
+<!-- DevTools Authentication -->
+<!-- LOCALIZATION NOTE (devtools_auth_scan_header): This header text appears
+     above a QR reader that is actively scanning for QR codes.  The expected QR
+     code has already been displayed by the client trying to connect (such as
+     desktop Firefox via WebIDE), so you just need to aim this device at the QR
+     code. -->
+<!ENTITY devtools_auth_scan_header "Scanning for the QR code displayed on your other device">
+
+<!-- Restrictions -->
+<!-- Localization note: These are restrictions the device owner (e.g. parent) can enable for
+     a restricted profile (e.g. child). Used inside the Android settings UI. -->
+<!ENTITY restriction_disallow_import_settings_title2 "Disable \'Import from Android\'">
+<!ENTITY restriction_disallow_addons_title2 "Disable add-on installation">
+<!ENTITY restriction_disallow_devtools_title2 "Disable developer tools">
+<!ENTITY restriction_disallow_customize_home_title2 "Disable Home customization">
+<!ENTITY restriction_disallow_private_browsing_title2 "Disable Private Browsing">
+<!ENTITY restriction_disallow_location_services_title2 "Disable Location Services">
+<!ENTITY restriction_disallow_display_settings_title2 "Disable Display settings">
+<!ENTITY restriction_disallow_clear_history_title2 "Disable \'Clear browsing history\'">
+<!ENTITY restriction_disallow_master_password_title2 "Disable master password">
+<!ENTITY restriction_disallow_guest_browsing_title2 "Disable Guest Browsing">
+

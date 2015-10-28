@@ -4,16 +4,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef mozilla_dom_bluetooth_bluedroid_bluetoothdaemonsocketinterface_h__
-#define mozilla_dom_bluetooth_bluedroid_bluetoothdaemonsocketinterface_h__
+#ifndef mozilla_dom_bluetooth_bluedroid_BluetoothDaemonSocketInterface_h
+#define mozilla_dom_bluetooth_bluedroid_BluetoothDaemonSocketInterface_h
 
 #include "BluetoothDaemonHelpers.h"
 #include "BluetoothInterface.h"
-#include "BluetoothInterfaceHelpers.h"
+#include "mozilla/ipc/DaemonRunnables.h"
 
 BEGIN_BLUETOOTH_NAMESPACE
 
-using namespace mozilla::ipc;
+using mozilla::ipc::DaemonSocketPDU;
+using mozilla::ipc::DaemonSocketPDUHeader;
 
 class BluetoothDaemonSocketModule
 {
@@ -58,20 +59,21 @@ private:
   // Responses
   //
 
-  typedef BluetoothResultRunnable0<BluetoothSocketResultHandler, void>
+  typedef mozilla::ipc::DaemonResultRunnable0<
+    BluetoothSocketResultHandler, void>
     ResultRunnable;
 
-  typedef BluetoothResultRunnable1<BluetoothSocketResultHandler, void,
-                                   int, int>
+  typedef mozilla::ipc::DaemonResultRunnable1<
+    BluetoothSocketResultHandler, void, int, int>
     IntResultRunnable;
 
-  typedef BluetoothResultRunnable1<BluetoothSocketResultHandler, void,
-                                   BluetoothStatus, BluetoothStatus>
+  typedef mozilla::ipc::DaemonResultRunnable1<
+    BluetoothSocketResultHandler, void, BluetoothStatus, BluetoothStatus>
     ErrorRunnable;
 
-  typedef BluetoothResultRunnable3<BluetoothSocketResultHandler, void,
-                                   int, nsString, int,
-                                   int, const nsAString_internal&, int>
+  typedef mozilla::ipc::DaemonResultRunnable3<
+    BluetoothSocketResultHandler, void, int, nsString, int, int,
+    const nsAString_internal&, int>
     IntStringIntResultRunnable;
 
   void ErrorRsp(const DaemonSocketPDUHeader& aHeader,
@@ -120,4 +122,4 @@ private:
 
 END_BLUETOOTH_NAMESPACE
 
-#endif
+#endif // mozilla_dom_bluetooth_bluedroid_BluetoothDaemonSocketInterface_h

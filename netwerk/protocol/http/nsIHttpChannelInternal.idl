@@ -38,7 +38,7 @@ interface nsIHttpUpgradeListener : nsISupports
  * using any feature exposed by this interface, be aware that this interface
  * will change and you will be broken.  You have been warned.
  */
-[scriptable, uuid(26833ec7-4555-4f23-9281-3a12d4b76db1)]
+[scriptable, uuid(4c9e681e-efd8-4ed2-b57f-20d48c9b3c3b)]
 
 interface nsIHttpChannelInternal : nsISupports
 {
@@ -213,12 +213,6 @@ interface nsIHttpChannelInternal : nsISupports
      */
     attribute boolean allowAltSvc;
 
-    /**
-     * Add a new nsIPrincipal to the redirect chain. This is the only way to
-     * write to nsIRedirectHistory.redirects.
-     */
-    void addRedirect(in nsIPrincipal aPrincipal);
-
     readonly attribute PRTime lastModifiedTime;
 
     /**
@@ -252,12 +246,6 @@ interface nsIHttpChannelInternal : nsISupports
      * The network interface id that's associated with this channel.
      */
     attribute ACString networkInterfaceId;
-
-    /**
-     * Used only by nsChannelClassifier to resume connecting or abort the
-     * channel after a remote classification verdict.
-     */
-    void continueBeginConnect();
 
     /**
      * Read the proxy URI, which, if non-null, will be used to resolve

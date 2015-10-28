@@ -13,8 +13,8 @@ namespace mozilla {
 namespace gfx {
 class DrawTarget;
 class VsyncSource;
-} // gfx
-} // mozilla
+} // namespace gfx
+} // namespace mozilla
 
 class gfxPlatformMac : public gfxPlatform {
 public:
@@ -29,7 +29,7 @@ public:
       CreateOffscreenSurface(const IntSize& aSize,
                              gfxImageFormat aFormat) override;
 
-    mozilla::TemporaryRef<mozilla::gfx::ScaledFont>
+    already_AddRefed<mozilla::gfx::ScaledFont>
       GetScaledFontForFont(mozilla::gfx::DrawTarget* aTarget, gfxFont *aFont) override;
 
     nsresult GetStandardFamilyName(const nsAString& aFontName, nsAString& aFamilyName) override;
@@ -72,6 +72,11 @@ public:
       return true;
     }
 
+    bool SupportsBasicCompositor() const override {
+      // At the moment, BasicCompositor is broken on mac.
+      return false;
+    }
+
     bool UseAcceleratedCanvas();
 
     virtual bool UseProgressivePaint() override;
@@ -79,6 +84,9 @@ public:
 
     // lower threshold on font anti-aliasing
     uint32_t GetAntiAliasingThreshold() { return mFontAntiAliasingThreshold; }
+
+protected:
+    bool AccelerateLayersByDefault() override;
 
 private:
     virtual void GetPlatformCMSOutputProfile(void* &mem, size_t &size) override;

@@ -4,6 +4,8 @@
 
 #filter substitution
 
+// For the all MOZ_MULET ifdef conditions in this file: see bug 1174234
+
 #ifndef MOZ_MULET
 pref("toolkit.defaultChromeURI", "chrome://b2g/content/shell.html");
 pref("browser.chromeURL", "chrome://b2g/content/");
@@ -333,9 +335,7 @@ pref("media.video-queue.default-size", 3);
 
 // optimize images' memory usage
 pref("image.downscale-during-decode.enabled", true);
-pref("image.decode-only-on-draw.enabled", false);
 pref("image.mem.allow_locking_in_content_processes", true);
-pref("image.decode.retry-on-alloc-failure", true);
 // Limit the surface cache to 1/8 of main memory or 128MB, whichever is smaller.
 // Almost everything that was factored into 'max_decoded_image_kb' is now stored
 // in the surface cache.  1/8 of main memory is 32MB on a 256MB device, which is
@@ -360,10 +360,10 @@ pref("layout.css.touch_action.enabled", false);
 
 #ifdef MOZ_SAFE_BROWSING
 // Safe browsing does nothing unless this pref is set
-pref("browser.safebrowsing.enabled", true);
+pref("browser.safebrowsing.enabled", false);
 
 // Prevent loading of pages identified as malware
-pref("browser.safebrowsing.malware.enabled", true);
+pref("browser.safebrowsing.malware.enabled", false);
 
 pref("browser.safebrowsing.debug", false);
 pref("browser.safebrowsing.updateURL", "https://safebrowsing.google.com/safebrowsing/downloads?client=SAFEBROWSING_ID&appver=%VERSION%&pver=2.2&key=%GOOGLE_API_KEY%");
@@ -459,7 +459,9 @@ pref("dom.ipc.processCount", 100000);
 
 pref("dom.ipc.browser_frames.oop_by_default", false);
 
+#ifndef MOZ_MULET
 pref("dom.meta-viewport.enabled", true);
+#endif
 
 // SMS/MMS
 pref("dom.sms.enabled", true);
@@ -604,7 +606,7 @@ pref("app.update.incompatible.mode", 0);
 pref("app.update.staging.enabled", true);
 pref("app.update.service.enabled", true);
 
-pref("app.update.url", "https://aus4.mozilla.org/update/3/%PRODUCT%/%VERSION%/%BUILD_ID%/%PRODUCT_DEVICE%/%LOCALE%/%CHANNEL%/%OS_VERSION%/%DISTRIBUTION%/%DISTRIBUTION_VERSION%/update.xml");
+pref("app.update.url", "https://aus5.mozilla.org/update/3/%PRODUCT%/%VERSION%/%BUILD_ID%/%PRODUCT_DEVICE%/%LOCALE%/%CHANNEL%/%OS_VERSION%/%DISTRIBUTION%/%DISTRIBUTION_VERSION%/update.xml");
 pref("app.update.channel", "@MOZ_UPDATE_CHANNEL@");
 
 // Interval at which update manifest is fetched.  In units of seconds.
@@ -623,6 +625,9 @@ pref("app.update.socket.maxErrors", 20);
 // Enable update logging for now, to diagnose growing pains in the
 // field.
 pref("app.update.log", true);
+
+// SystemUpdate API
+pref("dom.system_update.active", "@mozilla.org/updates/update-prompt;1");
 #else
 // Explicitly disable the shutdown watchdog.  It's enabled by default.
 // When the updater is disabled, we want to know about shutdown hangs.
@@ -669,9 +674,6 @@ pref("dom.forms.number", true);
 // Don't enable <input type=color> yet as we don't have a color picker
 // implemented for b2g (bug 875751)
 pref("dom.forms.color", false);
-
-// Turns on gralloc-based direct texturing for Gonk
-pref("gfx.gralloc.enabled", false);
 
 // This preference instructs the JS engine to discard the
 // source of any privileged JS after compilation. This saves
@@ -928,6 +930,8 @@ pref("general.useragent.device_id", "");
 
 // Make <audio> and <video> talk to the AudioChannelService.
 pref("media.useAudioChannelService", true);
+// Add Mozilla AudioChannel APIs.
+pref("media.useAudioChannelAPI", true);
 
 pref("b2g.version", @MOZ_B2G_VERSION@);
 pref("b2g.osName", @MOZ_B2G_OS_NAME@);
@@ -939,10 +943,6 @@ pref("consoleservice.buffered", false);
 // Performance testing suggests 2k is a better page size for SQLite.
 pref("toolkit.storage.pageSize", 2048);
 #endif
-
-// Enable captive portal detection.
-pref("captivedetect.canonicalURL", "http://detectportal.firefox.com/success.txt");
-pref("captivedetect.canonicalContent", "success\n");
 
 // The url of the manifest we use for ADU pings.
 pref("ping.manifestURL", "https://marketplace.firefox.com/packaged.webapp");
@@ -984,7 +984,7 @@ pref("devtools.debugger.unix-domain-socket", "/data/local/debugger-socket");
 // falling back to Skia/software for smaller canvases
 #ifdef MOZ_WIDGET_GONK
 pref("gfx.canvas.azure.backends", "skia");
-pref("gfx.canvas.azure.accelerated", true);
+pref("gfx.canvas.azure.accelerated", false);
 #endif
 
 // Turn on dynamic cache size for Skia
@@ -995,6 +995,9 @@ pref("gfx.canvas.max-size-for-skia-gl", -1);
 
 // enable fence with readpixels for SurfaceStream
 pref("gfx.gralloc.fence-with-readpixels", true);
+
+// enable screen mirroring to external display
+pref("gfx.screen-mirroring.enabled", true);
 
 // The url of the page used to display network error details.
 pref("b2g.neterror.url", "net_error.html");
@@ -1016,7 +1019,6 @@ pref("media.webspeech.synth.enabled", true);
 
 // Enable Web Speech recognition API
 pref("media.webspeech.recognition.enable", true);
-pref("media.webspeech.service.default", "pocketsphinx");
 
 // Downloads API
 pref("dom.mozDownloads.enabled", true);
@@ -1035,7 +1037,10 @@ pref("security.exthelperapp.disable_background_handling", true);
 pref("osfile.reset_worker_delay", 5000);
 
 // APZC preferences.
-//
+#ifdef MOZ_WIDGET_GONK
+pref("apz.allow_zooming", true);
+#endif
+
 // Gaia relies heavily on scroll events for now, so lets fire them
 // more often than the default value (100).
 pref("apz.asyncscroll.throttle", 40);
@@ -1092,11 +1097,14 @@ pref("dom.wakelock.enabled", true);
 // Enable webapps add-ons
 pref("dom.apps.customization.enabled", true);
 
-// Enable touch caret by default
-pref("touchcaret.enabled", true);
+// Original caret implementation on collapsed selection.
+pref("touchcaret.enabled", false);
 
-// Enable selection caret by default
-pref("selectioncaret.enabled", true);
+// Original caret implementation on non-collapsed selection.
+pref("selectioncaret.enabled", false);
+
+// New implementation to unify touch-caret and selection-carets.
+pref("layout.accessiblecaret.enabled", true);
 
 // Enable sync and mozId with Firefox Accounts.
 pref("services.sync.fxaccounts.enabled", true);
@@ -1110,8 +1118,8 @@ pref("services.mobileid.server.uri", "https://msisdn.services.mozilla.com");
 pref("dom.mapped_arraybuffer.enabled", true);
 #endif
 
-// BroadcastChannel API
-pref("dom.broadcastChannel.enabled", true);
+// SystemUpdate API
+pref("dom.system_update.enabled", true);
 
 // UDPSocket API
 pref("dom.udpsocket.enabled", true);
@@ -1148,8 +1156,22 @@ pref("gfx.touch.resample", true);
 pref("dom.activities.developer_mode_only", "import-app");
 
 // mulet apparently loads firefox.js as well as b2g.js, so we have to explicitly
-// disable serviceworkers here to get them disabled in mulet.
+// disable serviceworkers and push here to get them disabled in mulet.
 pref("dom.serviceWorkers.enabled", false);
+pref("dom.push.enabled", false);
 
 // Retain at most 10 processes' layers buffers
 pref("layers.compositor-lru-size", 10);
+
+// Enable Cardboard VR on mobile, assuming VR at all is enabled
+pref("dom.vr.cardboard.enabled", true);
+
+// In B2G by deafult any AudioChannelAgent is muted when created.
+pref("dom.audiochannel.mutedByDefault", true);
+
+// Default device name for Presentation API
+pref("dom.presentation.device.name", "Firefox OS");
+
+// Enable notification of performance timing
+pref("dom.performance.enable_notify_performance_timing", true);
+

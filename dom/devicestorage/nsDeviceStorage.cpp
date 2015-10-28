@@ -37,6 +37,7 @@
 #include "nsAppDirectoryServiceDefs.h"
 #include "nsDirectoryServiceDefs.h"
 #include "nsNetUtil.h"
+#include "nsIOutputStream.h"
 #include "nsCycleCollectionParticipant.h"
 #include "nsIPrincipal.h"
 #include "nsJSUtils.h"
@@ -91,7 +92,7 @@ const char *kDownloadWatcherNotify = "download-watcher-notify";
 
 namespace mozilla {
   MOZ_TYPE_SPECIFIC_SCOPED_POINTER_TEMPLATE(ScopedPRFileDesc, PRFileDesc, PR_Close);
-}
+} // namespace mozilla
 
 StaticAutoPtr<DeviceStorageUsedSpaceCache>
   DeviceStorageUsedSpaceCache::sDeviceStorageUsedSpaceCache;
@@ -561,7 +562,7 @@ FileUpdateDispatcher::Observe(nsISupports* aSubject,
     return NS_OK;
   }
 
-  if (XRE_GetProcessType() != GeckoProcessType_Default) {
+  if (!XRE_IsParentProcess()) {
     // Child process. Forward the notification to the parent.
     ContentChild::GetSingleton()
       ->SendFilePathUpdateNotify(dsf->mStorageType,
@@ -692,7 +693,7 @@ DeviceStorageFile::Dump(const char* label)
     path = NS_LITERAL_STRING("(null)");
   }
   const char* ptStr;
-  if (XRE_GetProcessType() == GeckoProcessType_Default) {
+  if (XRE_IsParentProcess()) {
     ptStr = "parent";
   } else {
     ptStr = "child";
@@ -814,7 +815,7 @@ OverrideRootDir::Init()
   }
 
   if (sDirs->overrideRootDir) {
-    if (XRE_GetProcessType() == GeckoProcessType_Default) {
+    if (XRE_IsParentProcess()) {
       // Only the parent process can create directories. In testing, because
       // the preference is updated after startup, its entirely possible that
       // the preference updated notification will be received by a child
@@ -936,7 +937,7 @@ InitDirs()
   }
 #endif
 
-  if (XRE_GetProcessType() == GeckoProcessType_Default) {
+  if (XRE_IsParentProcess()) {
     NS_GetSpecialDirectory("UAppData", getter_AddRefs(sDirs->crashes));
     if (sDirs->crashes) {
       sDirs->crashes->Append(NS_LITERAL_STRING("Crash Reports"));
@@ -1913,12 +1914,12 @@ nsIFileToJsval(nsPIDOMWindow* aWindow, DeviceStorageFile* aFile)
   MOZ_ASSERT(aWindow);
 
   if (!aFile) {
-    return JSVAL_NULL;
+    return JS::NullValue();
   }
 
   if (aFile->mEditable) {
     // TODO - needs janv's file handle support.
-    return JSVAL_NULL;
+    return JS::NullValue();
   }
 
   nsString fullPath;
@@ -2058,7 +2059,7 @@ ContinueCursorEvent::~ContinueCursorEvent() {}
 void
 ContinueCursorEvent::Continue()
 {
-  if (XRE_GetProcessType() == GeckoProcessType_Default) {
+  if (XRE_IsParentProcess()) {
     DebugOnly<nsresult> rv = NS_DispatchToMainThread(this);
     MOZ_ASSERT(NS_SUCCEEDED(rv));
     return;
@@ -2244,7 +2245,7 @@ nsDOMDeviceStorageCursor::Allow(JS::HandleValue aChoices)
     return NS_DispatchToMainThread(r);
   }
 
-  if (XRE_GetProcessType() != GeckoProcessType_Default) {
+  if (!XRE_IsParentProcess()) {
     PDeviceStorageRequestChild* child
       = new DeviceStorageRequestChild(this, mFile);
     DeviceStorageEnumerationParams params(mFile->mStorageType,
@@ -2531,7 +2532,7 @@ public:
     }
 
     AutoJSContext cx;
-    JS::Rooted<JS::Value> result(cx, JSVAL_NULL);
+    JS::Rooted<JS::Value> result(cx, JS::NullValue());
 
     if (mFile) {
       result = nsIFileToJsval(window, mFile);
@@ -3013,7 +3014,7 @@ public:
           return NS_DispatchToCurrentThread(r);
         }
 
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
 
           DeviceStorageCreateFdParams params;
           params.type() = mFile->mStorageType;
@@ -3053,7 +3054,7 @@ public:
           return NS_DispatchToCurrentThread(r);
         }
 
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           BlobChild* actor
             = ContentChild::GetSingleton()->GetOrCreateActorForBlob(
               static_cast<Blob*>(mBlob.get()));
@@ -3099,7 +3100,7 @@ public:
           return NS_DispatchToCurrentThread(r);
         }
 
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           BlobChild* actor
             = ContentChild::GetSingleton()->GetOrCreateActorForBlob(
               static_cast<Blob*>(mBlob.get()));
@@ -3145,7 +3146,7 @@ public:
           return NS_DispatchToCurrentThread(r);
         }
 
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageGetParams params(mFile->mStorageType,
@@ -3179,7 +3180,7 @@ public:
           return NS_DispatchToCurrentThread(r);
         }
 
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageDeleteParams params(mFile->mStorageType,
@@ -3195,7 +3196,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_FREE_SPACE:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageFreeSpaceParams params(mFile->mStorageType,
@@ -3210,7 +3211,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_USED_SPACE:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageUsedSpaceParams params(mFile->mStorageType,
@@ -3231,7 +3232,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_AVAILABLE:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageAvailableParams params(mFile->mStorageType,
@@ -3246,7 +3247,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_STATUS:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageStatusParams params(mFile->mStorageType,
@@ -3267,7 +3268,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_FORMAT:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageFormatParams params(mFile->mStorageType,
@@ -3282,7 +3283,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_MOUNT:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageMountParams params(mFile->mStorageType,
@@ -3297,7 +3298,7 @@ public:
 
       case DEVICE_STORAGE_REQUEST_UNMOUNT:
       {
-        if (XRE_GetProcessType() != GeckoProcessType_Default) {
+        if (!XRE_IsParentProcess()) {
           PDeviceStorageRequestChild* child
             = new DeviceStorageRequestChild(mRequest, mFile);
           DeviceStorageUnmountParams params(mFile->mStorageType,

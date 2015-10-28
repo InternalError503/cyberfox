@@ -10,6 +10,7 @@
 #include "nsTArrayForwardDeclare.h"
 #include "mozilla/Alignment.h"
 #include "mozilla/Assertions.h"
+#include "mozilla/Attributes.h"
 #include "mozilla/BinarySearch.h"
 #include "mozilla/fallible.h"
 #include "mozilla/MathAlgorithms.h"
@@ -38,8 +39,8 @@ class nsIntRegion;
 namespace mozilla {
 namespace layers {
 struct TileClient;
-}
-}
+} // namespace layers
+} // namespace mozilla
 //
 // nsTArray is a resizable array class, like std::vector.
 //
@@ -308,13 +309,11 @@ struct nsTArray_SafeElementAtHelper<nsRefPtr<E>, Derived>
 };
 
 namespace mozilla {
-namespace dom {
 template<class T> class OwningNonNull;
-}
-}
+} // namespace mozilla
 
 template<class E, class Derived>
-struct nsTArray_SafeElementAtHelper<mozilla::dom::OwningNonNull<E>, Derived>
+struct nsTArray_SafeElementAtHelper<mozilla::OwningNonNull<E>, Derived>
 {
   typedef E*     elem_type;
   typedef size_t index_type;
@@ -660,7 +659,7 @@ struct nsTArray_CopyWithConstructors
 // The default behaviour is to use memcpy/memmove for everything.
 //
 template<class E>
-struct nsTArray_CopyChooser
+struct MOZ_NEEDS_MEMMOVABLE_TYPE nsTArray_CopyChooser
 {
   typedef nsTArray_CopyWithMemutils Type;
 };
@@ -940,8 +939,10 @@ public:
   }
 
   // @return The amount of memory used by this nsTArray_Impl, excluding
-  // sizeof(*this).
-  size_t SizeOfExcludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
+  // sizeof(*this). If you want to measure anything hanging off the array, you
+  // must iterate over the elements and measure them individually; hence the
+  // "Shallow" prefix.
+  size_t ShallowSizeOfExcludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
   {
     if (this->UsesAutoArrayBuffer() || Hdr() == EmptyHdr()) {
       return 0;
@@ -950,10 +951,12 @@ public:
   }
 
   // @return The amount of memory used by this nsTArray_Impl, including
-  // sizeof(*this).
-  size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
+  // sizeof(*this). If you want to measure anything hanging off the array, you
+  // must iterate over the elements and measure them individually; hence the
+  // "Shallow" prefix.
+  size_t ShallowSizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
   {
-    return aMallocSizeOf(this) + SizeOfExcludingThis(aMallocSizeOf);
+    return aMallocSizeOf(this) + ShallowSizeOfExcludingThis(aMallocSizeOf);
   }
 
   //
@@ -1179,6 +1182,31 @@ public:
   //
   // Mutation methods
   //
+
+  template<class Allocator, typename ActualAlloc = Alloc>
+  typename ActualAlloc::ResultType Assign(
+      const nsTArray_Impl<E, Allocator>& aOther)
+  {
+    return ActualAlloc::ConvertBoolToResultType(
+      !!ReplaceElementsAt<E, ActualAlloc>(0, Length(),
+                                          aOther.Elements(), aOther.Length()));
+  }
+
+  template<class Allocator>
+  /* MOZ_WARN_UNUSED_RESULT */
+  bool Assign(const nsTArray_Impl<E, Allocator>& aOther,
+              const mozilla::fallible_t&)
+  {
+    return Assign<Allocator, FallibleAlloc>(aOther);
+  }
+
+  template<class Allocator>
+  void Assign(nsTArray_Impl<E, Allocator>&& aOther)
+  {
+    Clear();
+    SwapElements(aOther);
+  }
+
   // This method call the destructor on each element of the array, empties it,
   // but does not shrink the array's capacity.
   // See also SetLengthAndRetainStorage.
@@ -2162,7 +2190,7 @@ public:
 // You shouldn't use this class directly.
 //
 template<class TArrayBase, size_t N>
-class nsAutoArrayBase : public TArrayBase
+class MOZ_NON_MEMMOVABLE nsAutoArrayBase : public TArrayBase
 {
   static_assert(N != 0, "nsAutoArrayBase<TArrayBase, 0> should be specialized");
 public:
@@ -2198,7 +2226,7 @@ protected:
   }
 
   template<typename Allocator>
-  nsAutoArrayBase(nsTArray_Impl<elem_type, Allocator>&& aOther)
+  explicit nsAutoArrayBase(nsTArray_Impl<elem_type, Allocator>&& aOther)
   {
     Init();
     this->SwapElements(aOther);
@@ -2335,6 +2363,12 @@ public:
   {
     return *reinterpret_cast<const nsAutoTArray<E, N>*>(this);
   }
+};
+
+template<class E, size_t N>
+struct nsTArray_CopyChooser<nsAutoTArray<E, N>>
+{
+  typedef nsTArray_CopyWithConstructors<nsAutoTArray<E, N>> Type;
 };
 
 // Assert that nsAutoTArray doesn't have any extra padding inside.

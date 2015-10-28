@@ -436,7 +436,7 @@ ProcessOrDeferMessage(HWND hwnd,
   return res;
 }
 
-} // anonymous namespace
+} // namespace
 
 // We need the pointer value of this in PluginInstanceChild.
 LRESULT CALLBACK
@@ -681,7 +681,7 @@ TimeoutHasExpired(const TimeoutData& aData)
   return now >= aData.targetTicks;
 }
 
-} // anonymous namespace
+} // namespace
 
 namespace mozilla {
 namespace ipc {
@@ -1131,6 +1131,8 @@ MessageChannel::WaitForInterruptNotify()
       timerId = SetTimer(nullptr, 0, mTimeoutMs, nullptr);
       NS_ASSERTION(timerId, "SetTimer failed!");
     }
+
+    NeuteredWindowRegion neuteredRgn(true);
 
     MSG msg = { 0 };
 

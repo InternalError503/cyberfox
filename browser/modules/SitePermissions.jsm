@@ -93,7 +93,7 @@ this.SitePermissions = {
     if (!this.isSupportedURI(aURI))
       return;
 
-    Services.perms.remove(aURI.host, aPermissionID);
+    Services.perms.remove(aURI, aPermissionID);
   },
 
   /* Returns the localized label for the permission with the given ID, to be
@@ -185,8 +185,6 @@ let gPermissionObject = {
   },
 
   "indexedDB": {},
-
-  "fullscreen": {},
 
   "pointerLock": {
     exactHostMatch: true

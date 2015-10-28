@@ -10,11 +10,13 @@ import java.util.EnumSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import org.mozilla.gecko.EventDispatcher;
 import org.mozilla.gecko.GeckoAppShell;
 import org.mozilla.gecko.GeckoEvent;
 import org.mozilla.gecko.GeckoProfile;
 import org.mozilla.gecko.R;
+import org.mozilla.gecko.RestrictedProfiles;
 import org.mozilla.gecko.Telemetry;
 import org.mozilla.gecko.TelemetryContract;
 import org.mozilla.gecko.db.BrowserContract.Combined;
@@ -22,6 +24,7 @@ import org.mozilla.gecko.db.BrowserContract.History;
 import org.mozilla.gecko.db.BrowserDB;
 import org.mozilla.gecko.home.HomeContextMenuInfo.RemoveItemType;
 import org.mozilla.gecko.home.HomePager.OnUrlOpenListener;
+import org.mozilla.gecko.restrictions.Restriction;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -39,6 +42,7 @@ import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +97,7 @@ public class HistoryPanel extends HomeFragment {
                 final Cursor c = mAdapter.getCursor(position);
                 final String url = c.getString(c.getColumnIndexOrThrow(History.URL));
 
-                Telemetry.sendUIEvent(TelemetryContract.Event.LOAD_URL, TelemetryContract.Method.LIST_ITEM);
+                Telemetry.sendUIEvent(TelemetryContract.Event.LOAD_URL, TelemetryContract.Method.LIST_ITEM, "history");
 
                 // This item is a TwoLinePageRow, so we allow switch-to-tab.
                 mUrlOpenListener.onUrlOpen(url, EnumSet.of(OnUrlOpenListener.Flags.ALLOW_SWITCH_TO_TAB));
@@ -162,6 +166,15 @@ public class HistoryPanel extends HomeFragment {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+
+        if (!RestrictedProfiles.isAllowed(getActivity(), Restriction.DISALLOW_CLEAR_HISTORY)) {
+            menu.findItem(R.id.home_remove).setVisible(false);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         mList = null;
@@ -206,7 +219,9 @@ public class HistoryPanel extends HomeFragment {
 
     private void updateUiFromCursor(Cursor c) {
         if (c != null && c.getCount() > 0) {
-            mClearHistoryButton.setVisibility(View.VISIBLE);
+            if (RestrictedProfiles.isAllowed(getActivity(), Restriction.DISALLOW_CLEAR_HISTORY)) {
+                mClearHistoryButton.setVisibility(View.VISIBLE);
+            }
             return;
         }
 
@@ -233,6 +248,10 @@ public class HistoryPanel extends HomeFragment {
                 emptyHint.setText(hintBuilder);
                 emptyHint.setMovementMethod(LinkMovementMethod.getInstance());
                 emptyHint.setVisibility(View.VISIBLE);
+            }
+
+            if (!RestrictedProfiles.isAllowed(getActivity(), Restriction.DISALLOW_PRIVATE_BROWSING)) {
+                emptyHint.setVisibility(View.GONE);
             }
 
             mList.setEmptyView(mEmptyView);

@@ -50,7 +50,8 @@ BaselineFrame::trace(JSTracer* trc, JitFrameIterator& frameIterator)
 
     if (isEvalFrame()) {
         TraceRoot(trc, &evalScript_, "baseline-evalscript");
-        TraceRoot(trc, evalNewTargetAddress(), "baseline-evalNewTarget");
+        if (isFunctionFrame())
+            TraceRoot(trc, evalNewTargetAddress(), "baseline-evalNewTarget");
     }
 
     if (hasArgsObj())
@@ -59,24 +60,9 @@ BaselineFrame::trace(JSTracer* trc, JitFrameIterator& frameIterator)
     // Mark locals and stack values.
     JSScript* script = this->script();
     size_t nfixed = script->nfixed();
-    size_t nlivefixed = script->nbodyfixed();
-
-    if (nfixed != nlivefixed) {
-        jsbytecode* pc;
-        frameIterator.baselineScriptAndPc(nullptr, &pc);
-
-        NestedScopeObject* staticScope = script->getStaticBlockScope(pc);
-        while (staticScope && !staticScope->is<StaticBlockObject>())
-            staticScope = staticScope->enclosingNestedScope();
-
-        if (staticScope) {
-            StaticBlockObject& blockObj = staticScope->as<StaticBlockObject>();
-            nlivefixed = blockObj.localOffset() + blockObj.numVariables();
-        }
-    }
-
-    MOZ_ASSERT(nlivefixed <= nfixed);
-    MOZ_ASSERT(nlivefixed >= script->nbodyfixed());
+    jsbytecode* pc;
+    frameIterator.baselineScriptAndPc(nullptr, &pc);
+    size_t nlivefixed = script->calculateLiveFixed(pc);
 
     // NB: It is possible that numValueSlots() could be zero, even if nfixed is
     // nonzero.  This is the case if the function has an early stack check.

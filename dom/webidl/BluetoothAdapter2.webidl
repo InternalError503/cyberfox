@@ -32,7 +32,7 @@ dictionary MediaPlayStatus
   DOMString   playStatus = "";
 };
 
-[CheckPermissions="bluetooth"]
+[CheckAnyPermissions="bluetooth"]
 interface BluetoothAdapter : EventTarget {
   readonly attribute BluetoothAdapterState  state;
   [AvailableIn=CertifiedApps]
@@ -40,6 +40,7 @@ interface BluetoothAdapter : EventTarget {
   readonly attribute DOMString              name;
   readonly attribute boolean                discoverable;
   readonly attribute boolean                discovering;
+  readonly attribute BluetoothGattServer?   gattServer;
 
   [AvailableIn=CertifiedApps]
   readonly attribute BluetoothPairingListener pairingReqs;

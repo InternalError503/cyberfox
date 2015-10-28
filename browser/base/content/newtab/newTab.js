@@ -28,7 +28,7 @@ let {
   blockedLinks: gBlockedLinks,
   gridPrefs: gGridPrefs
 } = NewTabUtils;
-let isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled"); 
+let isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled");
 XPCOMUtils.defineLazyGetter(this, "gStringBundle", function() {
   return Services.strings.
     createBundle("chrome://browser/locale/newTab.properties");
@@ -43,7 +43,7 @@ function newTabString(name, args) {
 }
 
 function inPrivateBrowsingMode() {
-  return PrivateBrowsingUtils.isWindowPrivate(window);
+  return PrivateBrowsingUtils.isContentWindowPrivate(window);
 }
 
 const HTML_NAMESPACE = "http://www.w3.org/1999/xhtml";

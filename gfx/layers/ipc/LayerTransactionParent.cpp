@@ -13,6 +13,7 @@
 #include "Layers.h"                     // for Layer, ContainerLayer, etc
 #include "ShadowLayerParent.h"          // for ShadowLayerParent
 #include "CompositableTransactionParent.h"  // for EditReplyVector
+#include "gfxPrefs.h"
 #include "mozilla/gfx/BasePoint3D.h"    // for BasePoint3D
 #include "mozilla/layers/CanvasLayerComposite.h"
 #include "mozilla/layers/ColorLayerComposite.h"
@@ -50,7 +51,7 @@ using mozilla::layout::RenderFrameParent;
 namespace mozilla {
 namespace gfx {
 class VRHMDInfo;
-}
+} // namespace gfx
 
 namespace layers {
 
@@ -244,11 +245,6 @@ LayerTransactionParent::RecvUpdate(InfallibleTArray<Edit>&& cset,
     return true;
   }
 
-  if (mLayerManager && mLayerManager->GetCompositor() &&
-      !targetConfig.naturalBounds().IsEmpty()) {
-    mLayerManager->GetCompositor()->SetScreenRotation(targetConfig.rotation());
-  }
-
   EditReplyVector replyv;
   AutoLayerTransactionParentAsyncMessageSender autoAsyncMessageSender(this);
 
@@ -351,6 +347,14 @@ LayerTransactionParent::RecvUpdate(InfallibleTArray<Edit>&& cset,
       layer->SetAnimations(common.animations());
       layer->SetInvalidRegion(common.invalidRegion());
       layer->SetFrameMetrics(common.metrics());
+      layer->SetDisplayListLog(common.displayListLog().get());
+
+      nsTArray<nsRefPtr<Layer>> maskLayers;
+      for (size_t i = 0; i < common.ancestorMaskLayersParent().Length(); i++) {
+        Layer* maskLayer = cast(common.ancestorMaskLayersParent().ElementAt(i))->AsLayer();
+        maskLayers.AppendElement(maskLayer);
+      }
+      layer->SetAncestorMaskLayers(maskLayers);
 
       typedef SpecificLayerAttributes Specific;
       const SpecificLayerAttributes& specific = attrs.specific();
@@ -574,7 +578,6 @@ LayerTransactionParent::RecvUpdate(InfallibleTArray<Edit>&& cset,
       if (!Attach(cast(op.layerParent()), host, true)) {
         return false;
       }
-
       host->SetCompositorID(mLayerManager->GetCompositor()->GetCompositorID());
       break;
     }
@@ -589,7 +592,7 @@ LayerTransactionParent::RecvUpdate(InfallibleTArray<Edit>&& cset,
 
   {
     AutoResolveRefLayers resolve(mShadowLayersManager->GetCompositionManager(this));
-    layer_manager()->EndTransaction(nullptr, nullptr, LayerManager::END_NO_IMMEDIATE_REDRAW);
+    layer_manager()->EndTransaction(TimeStamp(), LayerManager::END_NO_IMMEDIATE_REDRAW);
   }
 
   if (reply) {

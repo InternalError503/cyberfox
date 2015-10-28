@@ -490,12 +490,25 @@ var gUnseekableTests = [
   { name:"no-cues.webm", type:"video/webm" },
   { name:"bogus.duh", type:"bogus/duh"}
 ];
-// Android supports fragmented MP4 playback from 4.3.
-var androidVersion = SpecialPowers.Cc['@mozilla.org/system-info;1']
-                                  .getService(SpecialPowers.Ci.nsIPropertyBag2)
-                                  .getProperty('version');
-// Fragmented MP4.
-if (manifestNavigator().userAgent.indexOf("Mobile") != -1 && androidVersion >= 18) {
+
+var androidVersion = -1; // non-Android platforms
+if (manifestNavigator().userAgent.indexOf("Mobile") != -1) {
+  // See nsSystemInfo.cpp, the getProperty('version') returns different value
+  // on each platforms, so we need to distinguish the android and B2G platform.
+  var versionString = manifestNavigator().userAgent.indexOf("Android") != -1 ?
+                      'version' : 'sdk_version';
+  androidVersion = SpecialPowers.Cc['@mozilla.org/system-info;1']
+                                .getService(SpecialPowers.Ci.nsIPropertyBag2)
+                                .getProperty(versionString);
+}
+
+function getAndroidVersion() {
+  return androidVersion;
+}
+
+//Android supports fragmented MP4 playback from 4.3.
+//Fragmented MP4.
+if (getAndroidVersion() >= 18) {
   gUnseekableTests = gUnseekableTests.concat([
     { name:"street.mp4", type:"video/mp4" }
   ]);
@@ -1325,12 +1338,12 @@ function getMajorMimeType(mimetype) {
 // Force releasing decoder to avoid timeout in waiting for decoding resource.
 function removeNodeAndSource(n) {
   n.remove();
-  // Clearing mozSrcObject and/or src will actually set them to some default
+  // Clearing srcObject and/or src will actually set them to some default
   // URI that will fail to load, so make sure we don't produce a spurious
   // bailing error.
   n.onerror = null;
-  // reset |mozSrcObject| first since it takes precedence over |src|.
-  n.mozSrcObject = null;
+  // reset |srcObject| first since it takes precedence over |src|.
+  n.srcObject = null;
   n.src = "";
   while (n.firstChild) {
     n.removeChild(n.firstChild);
@@ -1536,8 +1549,7 @@ function setMediaTestsPrefs(callback, extraPrefs) {
 
 // B2G emulator and Android 2.3 are condidered slow platforms
 function isSlowPlatform() {
-  return SpecialPowers.Services.appinfo.name == "B2G" ||
-         navigator.userAgent.indexOf("Mobile") != -1 && androidVersion == 10;
+  return SpecialPowers.Services.appinfo.name == "B2G" || getAndroidVersion() == 10;
 }
 
 SimpleTest.requestFlakyTimeout("untriaged");

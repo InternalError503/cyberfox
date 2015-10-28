@@ -71,7 +71,7 @@ fetchXHR('synthesized-redirect-twice-synthesized.txt', function(xhr) {
   finish();
 });
 
-fetchXHR('fetch/redirect.sjs', function(xhr) {
+fetchXHR('redirect.sjs', function(xhr) {
   my_ok(xhr.status == 404, "redirected load should be uninterrupted");
   finish();
 });
@@ -92,6 +92,11 @@ fetchXHR('nonresponse.txt', null, function(xhr) {
 });
 
 fetchXHR('nonresponse2.txt', null, function(xhr) {
+  my_ok(xhr.status == 0, "load should not complete");
+  finish();
+});
+
+fetchXHR('nonpromise.txt', null, function(xhr) {
   my_ok(xhr.status == 0, "load should not complete");
   finish();
 });
@@ -139,6 +144,12 @@ fetchXHR('http://example.com/tests/dom/security/test/cors/file_CrossSiteXHR_serv
   my_ok(xhr.getResponseHeader("access-control-allow-origin") == null, "cors headers should be filtered out");
   finish();
 });
+
+// Test that CORS preflight requests cannot be intercepted
+fetchXHR('http://example.com/tests/dom/security/test/cors/file_CrossSiteXHR_server.sjs?status=200&allowOrigin=*', null, function(xhr) {
+  my_ok(xhr.status == 0, "cross origin load with incorrect headers should be a failure");
+  finish();
+}, [["X-Unsafe", "unsafe"]]);
 
 // Test that when the page fetches a url the controlling SW forces a redirect to
 // another location. This other location fetch should also be intercepted by

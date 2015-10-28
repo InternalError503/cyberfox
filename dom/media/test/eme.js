@@ -1,5 +1,16 @@
 const KEYSYSTEM_TYPE = "org.w3.clearkey";
 
+function IsMacOSSnowLeopardOrEarlier() {
+  var re = /Mac OS X (\d+)\.(\d+)/;
+  var ver = navigator.userAgent.match(re);
+  if (!ver || ver.length != 3) {
+    return false;
+  }
+  var major = ver[1] | 0;
+  var minor = ver[2] | 0;
+  return major == 10 && minor <= 6;
+}
+
 function bail(message)
 {
   return function(err) {
@@ -266,6 +277,19 @@ function SetupEME(test, token, params)
 {
   var v = document.createElement("video");
   v.crossOrigin = test.crossOrigin || false;
+  v.sessions = [];
+
+  v.closeSessions = function() {
+    return Promise.all(v.sessions.map(s => s.close().then(() => s.closed))).then(
+      () => {
+        v.setMediaKeys(null);
+        if (v.parentNode) {
+          v.parentNode.removeChild(v);
+        }
+        v.onerror = null;
+        v.src = null;
+      });
+  };
 
   // Log events dispatched to make debugging easier...
   [ "canplay", "canplaythrough", "ended", "error", "loadeddata",
@@ -300,6 +324,7 @@ function SetupEME(test, token, params)
     if (params && params.onsessioncreated) {
       params.onsessioncreated(session);
     }
+    v.sessions.push(session);
 
     return new Promise(function (resolve, reject) {
       session.addEventListener("message", UpdateSessionFunc(test, token, sessionType, resolve, reject));
@@ -388,7 +413,6 @@ function SetupEME(test, token, params)
 function SetupEMEPref(callback) {
   var prefs = [
     [ "media.mediasource.enabled", true ],
-    [ "media.mediasource.whitelist", false ],
     [ "media.fragmented-mp4.exposed", true ],
     [ "media.eme.apiVisible", true ],
   ];

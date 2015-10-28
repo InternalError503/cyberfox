@@ -90,6 +90,7 @@ user_pref("browser.safebrowsing.updateURL", "http://%(server)s/safebrowsing-dumm
 user_pref("browser.safebrowsing.appRepURL", "http://%(server)s/safebrowsing-dummy/update");
 user_pref("browser.trackingprotection.gethashURL", "http://%(server)s/safebrowsing-dummy/gethash");
 user_pref("browser.trackingprotection.updateURL", "http://%(server)s/safebrowsing-dummy/update");
+user_pref("privacy.trackingprotection.introURL", "http://%(server)s/trackingprotection/tour");
 // Point update checks to the local testing server for fast failures
 user_pref("extensions.update.url", "http://%(server)s/extensions-dummy/updateURL");
 user_pref("extensions.update.background.url", "http://%(server)s/extensions-dummy/updateBackgroundURL");
@@ -313,8 +314,7 @@ user_pref("browser.tabs.remote.autostart.2", false);
 // Don't forceably kill content processes after a timeout
 user_pref("dom.ipc.tabs.shutdownTimeoutSecs", 0);
 
-// Avoid performing Reading List and Reader Mode intros during tests.
-user_pref("browser.readinglist.introShown", true);
+// Avoid performing Reader Mode intros during tests.
 user_pref("browser.reader.detectedFirstArticle", true);
 
 // Don't let PAC generator to set PAC, as mochitest framework has its own PAC
@@ -324,7 +324,6 @@ user_pref("network.proxy.pac_generator", false);
 // Make tests run consistently on DevEdition (which has a lightweight theme
 // selected by default).
 user_pref("lightweightThemes.selectedThemeID", "");
-user_pref("browser.devedition.theme.enabled", false);
 
 // Disable periodic updates of service workers.
 user_pref("dom.serviceWorkers.periodic-updates.enabled", false);
@@ -336,4 +335,8 @@ user_pref("media.webspeech.synth.test", true);
 // connections.
 user_pref("browser.urlbar.suggest.searches", false);
 
-user_pref("view_source.tab", true);
+// Turn off the location bar search suggestions opt-in.  It interferes with
+// tests that don't expect it to be there.
+user_pref("browser.urlbar.userMadeSearchSuggestionsChoice", true);
+
+user_pref("dom.audiochannel.mutedByDefault", false);

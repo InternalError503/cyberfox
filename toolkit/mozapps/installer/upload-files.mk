@@ -287,6 +287,7 @@ DIST_FILES += \
   $(NULL)
 endif
 DIST_FILES += \
+  liblgpllibs.so \
   libxul.so \
   libnssckbi.so \
   libfreebl3.so \
@@ -367,6 +368,7 @@ endif
 # Create Android ARchives and metadata for download by local
 # developers using Gradle.
 ifdef MOZ_ANDROID_GECKOLIBS_AAR
+ifndef MOZ_DISABLE_GECKOVIEW
 geckoaar-revision := $(BUILDID)
 
 UPLOAD_EXTRA_FILES += \
@@ -390,10 +392,14 @@ INNER_MAKE_GECKOLIBS_AAR= \
     --revision $(geckoaar-revision) \
     --topsrcdir '$(topsrcdir)' \
     --distdir '$(_ABS_DIST)' \
+    --appname '$(MOZ_APP_NAME)' \
     '$(_ABS_DIST)'
 else
+INNER_MAKE_GECKOLIBS_AAR=echo 'Android geckolibs.aar packaging requires packaging geckoview'
+endif # MOZ_DISABLE_GECKOVIEW
+else
 INNER_MAKE_GECKOLIBS_AAR=echo 'Android geckolibs.aar packaging is disabled'
-endif
+endif # MOZ_ANDROID_GECKOLIBS_AAR
 
 ifdef MOZ_OMX_PLUGIN
 DIST_FILES += libomxplugin.so libomxplugingb.so libomxplugingb235.so \
@@ -464,6 +470,7 @@ INNER_MAKE_PACKAGE	= \
   ( cd $(STAGEPATH)$(MOZ_PKG_DIR)$(_BINPATH) && \
     unzip -o $(_ABS_DIST)/gecko.ap_ && \
     rm $(_ABS_DIST)/gecko.ap_ && \
+    $(ZIP) -r9D $(_ABS_DIST)/gecko.ap_ assets && \
     $(ZIP) $(if $(ALREADY_SZIPPED),-0 ,$(if $(MOZ_ENABLE_SZIP),-0 ))$(_ABS_DIST)/gecko.ap_ $(ASSET_SO_LIBRARIES) && \
     $(ZIP) -r9D $(_ABS_DIST)/gecko.ap_ $(DIST_FILES) -x $(NON_DIST_FILES) $(SZIP_LIBRARIES) && \
     $(if $(filter-out ./,$(OMNIJAR_DIR)), \
@@ -609,7 +616,6 @@ NO_PKG_FILES += \
 	certutil* \
 	pk12util* \
 	BadCertServer* \
-	ClientAuthServer* \
 	OCSPStaplingServer* \
 	GenerateOCSPResponse* \
 	chrome/chrome.rdf \
@@ -711,12 +717,15 @@ CHECKSUM_ALGORITHM_PARAM = -d sha512 -d md5 -d sha1
 CHECKSUM_FILE = '$(DIST)/$(PKG_PATH)/$(CHECKSUMS_FILE_BASENAME).checksums'
 CHECKSUM_FILES = $(CHECKSUM_FILE)
 
+# Upload MAR tools only if AB_CD is unset or en_US
+ifeq (,$(AB_CD:en-US=))
 ifeq (WINNT,$(OS_TARGET))
 UPLOAD_EXTRA_FILES += host/bin/mar.exe
 UPLOAD_EXTRA_FILES += host/bin/mbsdiff.exe
 else
 UPLOAD_EXTRA_FILES += host/bin/mar
 UPLOAD_EXTRA_FILES += host/bin/mbsdiff
+endif
 endif
 
 UPLOAD_FILES= \
@@ -750,6 +759,13 @@ UPLOAD_FILES += \
   $(call QUOTED_WILDCARD,$(DIST)/$(PKG_PATH)$(CODE_COVERAGE_ARCHIVE_BASENAME).zip)
 endif
 
+ifdef UNIFY_DIST
+UNIFY_ARCH := $(notdir $(patsubst %/,%,$(dir $(UNIFY_DIST))))
+UPLOAD_FILES += \
+  $(wildcard $(UNIFY_DIST)/$(SDK_PATH)$(PKG_BASENAME)-$(UNIFY_ARCH).sdk$(SDK_SUFFIX)) \
+  $(wildcard $(UNIFY_DIST)/$(SDK_PATH)$(PKG_BASENAME)-$(UNIFY_ARCH).sdk$(SDK_SUFFIX).asc)
+endif
+
 SIGN_CHECKSUM_CMD=
 ifdef MOZ_SIGN_CMD
 # If we're signing with gpg, we'll have a bunch of extra detached signatures to
@@ -771,7 +787,7 @@ ifndef MOZ_PKG_SRCDIR
 MOZ_PKG_SRCDIR = $(topsrcdir)
 endif
 
-DIR_TO_BE_PACKAGED ?= ../$(notdir $(topsrcdir))
+SRC_TAR_PREFIX = $(MOZ_APP_NAME)-$(MOZ_PKG_VERSION)
 SRC_TAR_EXCLUDE_PATHS += \
   --exclude='.hg*' \
   --exclude='CVS' \
@@ -784,7 +800,7 @@ ifdef MOZ_OBJDIR
 SRC_TAR_EXCLUDE_PATHS += --exclude='$(MOZ_OBJDIR)'
 endif
 CREATE_SOURCE_TAR = $(TAR) -c --owner=0 --group=0 --numeric-owner \
-  --mode=go-w $(SRC_TAR_EXCLUDE_PATHS) -f
+  --mode=go-w $(SRC_TAR_EXCLUDE_PATHS) --transform='s,^\./,$(SRC_TAR_PREFIX)/,' -f
 
 SOURCE_TAR = $(DIST)/$(PKG_SRCPACK_PATH)$(PKG_SRCPACK_BASENAME).tar.xz
 HG_BUNDLE_FILE = $(DIST)/$(PKG_SRCPACK_PATH)$(PKG_BUNDLE_BASENAME).bundle

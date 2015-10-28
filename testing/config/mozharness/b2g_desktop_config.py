@@ -16,7 +16,9 @@ config = {
                 "--symbols-path=%(symbols_path)s",
                 "--browser-arg=%(browser_arg)s",
                 "--quiet",
-                "--log-raw=%(raw_log_file)s"
+                "--log-raw=%(raw_log_file)s",
+                "--log-errorsummary=%(error_summary_file)s",
+                "--screenshot-on-fail",
             ],
             "run_filename": "runtestsb2g.py",
             "testsdir": "mochitest"

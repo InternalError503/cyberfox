@@ -34,16 +34,6 @@ import urllib2
 import zipfile
 import bisection
 
-from automationutils import (
-    environment,
-    processLeakLog,
-    dumpScreen,
-    ShutdownLeaks,
-    printstatus,
-    LSANLeaks,
-    setAutomationLog,
-)
-
 from datetime import datetime
 from manifestparser import TestManifest
 from manifestparser.filters import (
@@ -54,12 +44,16 @@ from manifestparser.filters import (
     subsuite,
     tags,
 )
+from leaks import ShutdownLeaks, LSANLeaks
 from mochitest_options import MochitestArgumentParser, build_obj
 from mozprofile import Profile, Preferences
 from mozprofile.permissions import ServerLocations
 from urllib import quote_plus as encodeURIComponent
-from mozlog.structured.formatters import TbplFormatter
-from mozlog.structured import commandline
+from mozlog.formatters import TbplFormatter
+from mozlog import commandline
+from mozrunner.utils import test_environment
+from mozscreenshot import dump_screen
+import mozleak
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -360,7 +354,7 @@ class MochitestServer(object):
         "Run the Mochitest server, returning the process ID of the server."
 
         # get testing environment
-        env = environment(xrePath=self._xrePath)
+        env = test_environment(xrePath=self._xrePath, log=self._log)
         env["XPCOM_DEBUG_BREAK"] = "warn"
         env["LD_LIBRARY_PATH"] = self._xrePath
 
@@ -527,7 +521,6 @@ class MochitestUtilsMixin(object):
                                                      "tbpl": sys.stdout
                                                  })
             MochitestUtilsMixin.log = self.log
-            setAutomationLog(self.log)
 
         self.message_logger = MessageLogger(logger=self.log)
 
@@ -1065,7 +1058,7 @@ class SSLTunnel:
                 ssltunnel)
             exit(1)
 
-        env = environment(xrePath=self.xrePath)
+        env = test_environment(xrePath=self.xrePath, log=self.log)
         env["LD_LIBRARY_PATH"] = self.xrePath
         self.process = mozprocess.ProcessHandler([ssltunnel, self.configFile],
                                                  env=env)
@@ -1235,9 +1228,6 @@ class Mochitest(MochitestUtilsMixin):
     def __init__(self, logger_options):
         super(Mochitest, self).__init__(logger_options)
 
-        # environment function for browserEnv
-        self.environment = environment
-
         # Max time in seconds to wait for server startup before tests will fail -- if
         # this seems big, it's mostly for debug machines where cold startup
         # (particularly after a build) takes forever.
@@ -1254,6 +1244,10 @@ class Mochitest(MochitestUtilsMixin):
 
         self.expectedError = {}
         self.result = {}
+
+    def environment(self, **kwargs):
+        kwargs['log'] = self.log
+        return test_environment(**kwargs)
 
     def extraPrefs(self, extraPrefs):
         """interpolate extra preferences from option strings"""
@@ -1559,7 +1553,7 @@ class Mochitest(MochitestUtilsMixin):
                 "Not taking screenshot here: see the one that was previously logged")
             return
         self.haveDumpedScreen = True
-        dumpScreen(utilityPath)
+        dump_screen(utilityPath, self.log)
 
     def killAndGetStack(
             self,
@@ -1577,26 +1571,15 @@ class Mochitest(MochitestUtilsMixin):
             self.dumpScreen(utilityPath)
 
         if mozinfo.info.get('crashreporter', True) and not debuggerInfo:
-            if mozinfo.isWin:
-                # We should have a "crashinject" program in our utility path
-                crashinject = os.path.normpath(
-                    os.path.join(
-                        utilityPath,
-                        "crashinject.exe"))
-                if os.path.exists(crashinject):
-                    status = subprocess.Popen(
-                        [crashinject, str(processPID)]).wait()
-                    printstatus(status, "crashinject")
-                    if status == 0:
-                        return
-            else:
-                try:
-                    os.kill(processPID, signal.SIGABRT)
-                except OSError:
-                    # https://bugzilla.mozilla.org/show_bug.cgi?id=921509
-                    self.log.info(
-                        "Can't trigger Breakpad, process no longer exists")
-                return
+            try:
+                minidump_path = os.path.join(self.profile.profile,
+                                             'minidumps')
+                mozcrash.kill_and_get_minidump(processPID, minidump_path)
+            except OSError:
+                # https://bugzilla.mozilla.org/show_bug.cgi?id=921509
+                self.log.info(
+                    "Can't trigger Breakpad, process no longer exists")
+            return
         self.log.info("Can't trigger Breakpad, just killing process")
         killPid(processPID, self.log)
 
@@ -1794,6 +1777,7 @@ class Mochitest(MochitestUtilsMixin):
                          outputTimeout=timeout)
             proc = runner.process_handler
             self.log.info("runtests.py | Application pid: %d" % proc.pid)
+            self.log.process_start("Main app process")
 
             if onLaunch is not None:
                 # Allow callers to specify an onLaunch callback to be fired after the
@@ -1808,7 +1792,7 @@ class Mochitest(MochitestUtilsMixin):
             # until bug 913970 is fixed regarding mozrunner `wait` not returning status
             # see https://bugzilla.mozilla.org/show_bug.cgi?id=913970
             status = proc.wait()
-            printstatus(status, "Main app process")
+            self.log.process_exit("Main app process", status)
             runner.process_handler = None
 
             # finalize output handler
@@ -2223,6 +2207,11 @@ class Mochitest(MochitestUtilsMixin):
             if self.urlOpts:
                 testURL += "?" + "&".join(self.urlOpts)
 
+            # On Mac, pass the path to the runtime, to ensure the test app
+            # uses that specific runtime instead of another one on the system.
+            if mozinfo.isMac and options.webapprtChrome:
+                options.browserArgs.extend(('-runtime', os.path.dirname(os.path.dirname(options.xrePath))))
+
             if options.webapprtContent:
                 options.browserArgs.extend(('-test-mode', testURL))
                 testURL = None
@@ -2286,7 +2275,12 @@ class Mochitest(MochitestUtilsMixin):
                 self.stopVMwareRecording()
             self.stopServers()
 
-        processLeakLog(self.leak_report_file, options)
+        mozleak.process_leak_log(
+            self.leak_report_file,
+            leak_thresholds=options.leakThresholds,
+            ignore_missing_leaks=options.ignoreMissingLeaks,
+            log=self.log,
+        )
 
         if self.nsprLogs:
             with zipfile.ZipFile("%s/nsprlog.zip" % self.browserEnv["MOZ_UPLOAD_DIR"], "w", zipfile.ZIP_DEFLATED) as logzip:

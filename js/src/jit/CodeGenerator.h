@@ -18,6 +18,8 @@
 # include "jit/x64/CodeGenerator-x64.h"
 #elif defined(JS_CODEGEN_ARM)
 # include "jit/arm/CodeGenerator-arm.h"
+#elif defined(JS_CODEGEN_ARM64)
+# include "jit/arm64/CodeGenerator-arm64.h"
 #elif defined(JS_CODEGEN_MIPS)
 # include "jit/mips/CodeGenerator-mips.h"
 #elif defined(JS_CODEGEN_NONE)
@@ -276,7 +278,9 @@ class CodeGenerator : public CodeGeneratorSpecific
     void visitLoadTypedArrayElementHole(LLoadTypedArrayElementHole* lir);
     void visitStoreUnboxedScalar(LStoreUnboxedScalar* lir);
     void visitStoreTypedArrayElementHole(LStoreTypedArrayElementHole* lir);
+    void visitAtomicIsLockFree(LAtomicIsLockFree* lir);
     void visitCompareExchangeTypedArrayElement(LCompareExchangeTypedArrayElement* lir);
+    void visitAtomicExchangeTypedArrayElement(LAtomicExchangeTypedArrayElement* lir);
     void visitAtomicTypedArrayElementBinop(LAtomicTypedArrayElementBinop* lir);
     void visitAtomicTypedArrayElementBinopForEffect(LAtomicTypedArrayElementBinopForEffect* lir);
     void visitClampIToUint8(LClampIToUint8* lir);
@@ -387,7 +391,7 @@ class CodeGenerator : public CodeGeneratorSpecific
     void addGetPropertyCache(LInstruction* ins, LiveRegisterSet liveRegs, Register objReg,
                              PropertyName* name, TypedOrValueRegister output,
                              bool monitoredResult, jsbytecode* profilerLeavePc);
-    void addGetElementCache(LInstruction* ins, Register obj, ConstantOrRegister index,
+    void addGetElementCache(LInstruction* ins, Register obj, TypedOrValueRegister index,
                             TypedOrValueRegister output, bool monitoredResult,
                             bool allowDoubleResult, jsbytecode* profilerLeavePc);
     void addSetPropertyCache(LInstruction* ins, LiveRegisterSet liveRegs, Register objReg,

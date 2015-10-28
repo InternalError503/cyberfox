@@ -4,18 +4,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef mozilla_dom_bluetooth_bluedroid_bluetoothdaemonhelpers_h__
-#define mozilla_dom_bluetooth_bluedroid_bluetoothdaemonhelpers_h__
+#ifndef mozilla_dom_bluetooth_bluedroid_BluetoothDaemonHelpers_h
+#define mozilla_dom_bluetooth_bluedroid_BluetoothDaemonHelpers_h
 
 #include "BluetoothCommon.h"
 #include "mozilla/ArrayUtils.h"
 #include "mozilla/dom/bluetooth/BluetoothTypes.h"
 #include "mozilla/ipc/DaemonSocketPDU.h"
-#include "nsThreadUtils.h"
-
-using namespace mozilla::ipc;
+#include "mozilla/ipc/DaemonSocketPDUHelpers.h"
 
 BEGIN_BLUETOOTH_NAMESPACE
+
+using mozilla::ipc::DaemonSocketPDU;
+using mozilla::ipc::DaemonSocketPDUHeader;
+using mozilla::ipc::DaemonSocketPDUHelpers::Convert;
+using mozilla::ipc::DaemonSocketPDUHelpers::PackPDU;
+using mozilla::ipc::DaemonSocketPDUHelpers::UnpackPDU;
+
+using namespace mozilla::ipc::DaemonSocketPDUHelpers;
 
 //
 // Helper structures
@@ -106,24 +112,6 @@ struct BluetoothConfigurationParameter {
   nsAutoArrayPtr<uint8_t> mValue;
 };
 
-struct DaemonSocketPDUHeader {
-  DaemonSocketPDUHeader()
-  : mService(0x00)
-  , mOpcode(0x00)
-  , mLength(0x00)
-  { }
-
-  DaemonSocketPDUHeader(uint8_t aService, uint8_t aOpcode, uint8_t aLength)
-  : mService(aService)
-  , mOpcode(aOpcode)
-  , mLength(aLength)
-  { }
-
-  uint8_t mService;
-  uint8_t mOpcode;
-  uint16_t mLength;
-};
-
 struct BluetoothPinCode {
   uint8_t mPinCode[16];
   uint8_t mLength;
@@ -140,45 +128,15 @@ struct BluetoothServiceName {
 //
 // Conversion
 //
-// PDUs can only store primitive data types, such as intergers or
-// strings. Gecko often uses more complex data types, such as
-// enumators or stuctures. Conversion functions convert between
-// primitive data and internal Gecko's data types during a PDU's
-// packing and unpacking.
-//
-
-nsresult
-Convert(bool aIn, uint8_t& aOut);
 
 nsresult
 Convert(bool aIn, BluetoothScanMode& aOut);
-
-nsresult
-Convert(int aIn, uint8_t& aOut);
-
-nsresult
-Convert(int aIn, int16_t& aOut);
-
-nsresult
-Convert(int aIn, int32_t& aOut);
 
 nsresult
 Convert(int32_t aIn, BluetoothTypeOfDevice& aOut);
 
 nsresult
 Convert(int32_t aIn, BluetoothScanMode& aOut);
-
-nsresult
-Convert(uint8_t aIn, bool& aOut);
-
-nsresult
-Convert(uint8_t aIn, char& aOut);
-
-nsresult
-Convert(uint8_t aIn, int& aOut);
-
-nsresult
-Convert(uint8_t aIn, unsigned long& aOut);
 
 nsresult
 Convert(uint8_t aIn, BluetoothA2dpAudioState& aOut);
@@ -242,15 +200,6 @@ Convert(uint8_t aIn, BluetoothStatus& aOut);
 
 nsresult
 Convert(int32_t aIn, BluetoothGattStatus& aOut);
-
-nsresult
-Convert(uint32_t aIn, int& aOut);
-
-nsresult
-Convert(uint32_t aIn, uint8_t& aOut);
-
-nsresult
-Convert(size_t aIn, uint16_t& aOut);
 
 nsresult
 Convert(const nsAString& aIn, BluetoothAddress& aOut);
@@ -339,41 +288,15 @@ Convert(BluetoothGattAuthReq aIn, int32_t& aOut);
 nsresult
 Convert(BluetoothGattWriteType aIn, int32_t& aOut);
 
+nsresult
+Convert(nsresult aIn, BluetoothStatus& aOut);
+
 //
 // Packing
 //
 
-// introduce link errors on non-handled data types
-template <typename T>
-nsresult
-PackPDU(T aIn, DaemonSocketPDU& aPDU);
-
 nsresult
 PackPDU(bool aIn, DaemonSocketPDU& aPDU);
-
-inline nsresult
-PackPDU(uint8_t aIn, DaemonSocketPDU& aPDU)
-{
-  return aPDU.Write(aIn);
-}
-
-inline nsresult
-PackPDU(uint16_t aIn, DaemonSocketPDU& aPDU)
-{
-  return aPDU.Write(aIn);
-}
-
-inline nsresult
-PackPDU(int32_t aIn, DaemonSocketPDU& aPDU)
-{
-  return aPDU.Write(aIn);
-}
-
-inline nsresult
-PackPDU(uint32_t aIn, DaemonSocketPDU& aPDU)
-{
-  return aPDU.Write(aIn);
-}
 
 nsresult
 PackPDU(const BluetoothAddress& aIn, DaemonSocketPDU& aPDU);
@@ -406,9 +329,6 @@ PackPDU(BluetoothAvrcpStatus aIn, DaemonSocketPDU& aPDU);
 
 nsresult
 PackPDU(const BluetoothConfigurationParameter& aIn, DaemonSocketPDU& aPDU);
-
-nsresult
-PackPDU(const DaemonSocketPDUHeader& aIn, DaemonSocketPDU& aPDU);
 
 nsresult
 PackPDU(const BluetoothHandsfreeAtResponse& aIn, DaemonSocketPDU& aPDU);
@@ -704,6 +624,36 @@ PackPDU(const T1& aIn1, const T2& aIn2, const T3& aIn3,
 }
 
 template <typename T1, typename T2, typename T3,
+          typename T4, typename T5, typename T6>
+inline nsresult
+PackPDU(const T1& aIn1, const T2& aIn2, const T3& aIn3,
+        const T4& aIn4, const T5& aIn5, const T6& aIn6,
+        DaemonSocketPDU& aPDU)
+{
+  nsresult rv = PackPDU(aIn1, aPDU);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  rv = PackPDU(aIn2, aPDU);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  rv = PackPDU(aIn3, aPDU);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  rv = PackPDU(aIn4, aPDU);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  rv = PackPDU(aIn5, aPDU);
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+  return PackPDU(aIn6, aPDU);
+}
+
+template <typename T1, typename T2, typename T3,
           typename T4, typename T5, typename T6,
           typename T7>
 inline nsresult
@@ -844,41 +794,6 @@ PackPDU(const T1& aIn1, const T2& aIn2, const T3& aIn3,
 // Unpacking
 //
 
-// introduce link errors on non-handled data types
-template <typename T>
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, T& aOut);
-
-inline nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, int8_t& aOut)
-{
-  return aPDU.Read(aOut);
-}
-
-inline nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, uint8_t& aOut)
-{
-  return aPDU.Read(aOut);
-}
-
-inline nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, uint16_t& aOut)
-{
-  return aPDU.Read(aOut);
-}
-
-inline nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, int32_t& aOut)
-{
-  return aPDU.Read(aOut);
-}
-
-inline nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, uint32_t& aOut)
-{
-  return aPDU.Read(aOut);
-}
-
 nsresult
 UnpackPDU(DaemonSocketPDU& aPDU, bool& aOut);
 
@@ -917,20 +832,6 @@ UnpackPDU(DaemonSocketPDU& aPDU, BluetoothAvrcpRemoteFeature& aOut);
 
 nsresult
 UnpackPDU(DaemonSocketPDU& aPDU, BluetoothBondState& aOut);
-
-inline nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, DaemonSocketPDUHeader& aOut)
-{
-  nsresult rv = UnpackPDU(aPDU, aOut.mService);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = UnpackPDU(aPDU, aOut.mOpcode);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  return UnpackPDU(aPDU, aOut.mLength);
-}
 
 nsresult
 UnpackPDU(DaemonSocketPDU& aPDU, BluetoothTypeOfDevice& aOut);
@@ -1004,9 +905,6 @@ UnpackPDU(DaemonSocketPDU& aPDU, BluetoothGattWriteParam& aOut);
 
 nsresult
 UnpackPDU(DaemonSocketPDU& aPDU, BluetoothGattNotifyParam& aOut);
-
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, nsDependentCString& aOut);
 
 /* |UnpackConversion| is a helper for convering unpacked values. Pass
  * an instance of this structure to |UnpackPDU| to read a value from
@@ -1112,44 +1010,6 @@ UnpackPDU(DaemonSocketPDU& aPDU, nsTArray<T>& aOut)
   return NS_OK;
 }
 
-/* |UnpackCString0| is a helper for unpacking 0-terminated C string,
- * including the \0 character. Pass an instance of this structure
- * as the first argument to |UnpackPDU| to unpack a string.
- */
-struct UnpackCString0
-{
-  UnpackCString0(nsCString& aString)
-    : mString(&aString)
-  { }
-
-  nsCString* mString; // non-null by construction
-};
-
-/* This implementation of |UnpackPDU| unpacks a 0-terminated C string.
- */
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, const UnpackCString0& aOut);
-
-/* |UnpackString0| is a helper for unpacking 0-terminated C string,
- * including the \0 character. Pass an instance of this structure
- * as the first argument to |UnpackPDU| to unpack a C string and convert
- * it to wide-character encoding.
- */
-struct UnpackString0
-{
-  UnpackString0(nsString& aString)
-    : mString(&aString)
-  { }
-
-  nsString* mString; // non-null by construction
-};
-
-/* This implementation of |UnpackPDU| unpacks a 0-terminated C string
- * and converts it to wide-character encoding.
- */
-nsresult
-UnpackPDU(DaemonSocketPDU& aPDU, const UnpackString0& aOut);
-
 /* |UnpackReversed| is a helper for unpacking data in reversed order. Pass an
  * instance of this structure as the second argument to |UnpackPDU| to unpack
  * data in reversed order.
@@ -1206,39 +1066,6 @@ UnpackPDU<BluetoothUuid>(DaemonSocketPDU& aPDU,
 //
 // Init operators
 //
-
-// |PDUInitOP| provides functionality for init operators that unpack PDUs.
-class PDUInitOp
-{
-protected:
-  PDUInitOp(DaemonSocketPDU& aPDU)
-  : mPDU(&aPDU)
-  { }
-
-  DaemonSocketPDU& GetPDU() const
-  {
-    return *mPDU; // cannot be nullptr
-  }
-
-  void WarnAboutTrailingData() const
-  {
-    size_t size = mPDU->GetSize();
-
-    if (MOZ_LIKELY(!size)) {
-      return;
-    }
-
-    uint8_t service, opcode;
-    uint16_t payloadSize;
-    mPDU->GetHeader(service, opcode, payloadSize);
-
-    BT_LOGR("Unpacked PDU of type (%x,%x) still contains %zu Bytes of data.",
-            service, opcode, size);
-  }
-
-private:
-  DaemonSocketPDU* mPDU; // Hold pointer to allow for constant instances
-};
 
 // |UnpackPDUInitOp| is a general-purpose init operator for all variants
 // of |BluetoothResultRunnable| and |BluetoothNotificationRunnable|. The
@@ -1364,4 +1191,4 @@ public:
 
 END_BLUETOOTH_NAMESPACE
 
-#endif
+#endif // mozilla_dom_bluetooth_bluedroid_BluetoothDaemonHelpers_h

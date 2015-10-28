@@ -15,6 +15,7 @@ include protocol PFilePicker;
 include protocol PIndexedDBPermissionRequest;
 include protocol PRenderFrame;
 include protocol PPluginWidget;
+include protocol PWebBrowserPersistDocument;
 include DOMTypes;
 include JavaScriptTypes;
 include URIParams;
@@ -108,6 +109,7 @@ prio(normal upto urgent) sync protocol PBrowser
     manages PIndexedDBPermissionRequest;
     manages PRenderFrame;
     manages PPluginWidget;
+    manages PWebBrowserPersistDocument;
 
 both:
     AsyncMessage(nsString aMessage, ClonedMessageData aData, CpowEntry[] aCpows,
@@ -118,6 +120,8 @@ both:
      * the page that is currently loaded in the <browser>.
      */
     PRenderFrame();
+
+    PWebBrowserPersistDocument();
 
 parent:
     /**
@@ -146,12 +150,19 @@ parent:
      */
     async SetNativeChildOfShareableWindow(uintptr_t childWindow);
 
+    /**
+     * When content moves focus from a native plugin window that's a child
+     * of the native browser window we need to move native focus to the
+     * browser. Otherwise the plugin window will never relinquish focus.
+     */
+    sync DispatchFocusToTopLevelWindow();
+
 parent:
     /**
      * When child sends this message, parent should move focus to
-     * the next or previous focusable element.
+     * the next or previous focusable element or document.
      */
-    MoveFocus(bool forward);
+    MoveFocus(bool forward, bool forDocumentNavigation);
 
     Event(RemoteDOMEvent aEvent);
 
@@ -162,7 +173,7 @@ parent:
                       bool aSizeSpecified,
                       nsString aURI,
                       nsString aName,
-                      nsString aFeatures,
+                      nsCString aFeatures,
                       nsString aBaseURI)
       returns (nsresult rv,
                bool windowOpened,
@@ -181,12 +192,12 @@ parent:
      * Notifies chrome that there is a focus change involving an editable
      * object (input, textarea, document, contentEditable. etc.)
      *
-     *  focus        PR_TRUE if editable object is receiving focus
-     *               PR_FALSE if losing focus
      *  contentCache Cache of content
+     *  notification Whole data of the notification
      *  preference   Native widget preference for IME updates
      */
-    prio(urgent) sync NotifyIMEFocus(bool focus, ContentCache contentCache)
+    prio(urgent) sync NotifyIMEFocus(ContentCache contentCache,
+                                     IMENotification notification)
       returns (nsIMEUpdatePreference preference);
 
     /**
@@ -195,35 +206,28 @@ parent:
      * Only called when NotifyIMEFocus returns PR_TRUE for mWantUpdates
      *
      *  contentCache Cache of content
-     *  offset       Starting offset of the change
-     *  end          Ending offset of the range deleted
-     *  newEnd       New ending offset after insertion
-     *  causedByComposition true if the change is caused by composition
-     *
-     *  for insertion, offset == end
-     *  for deletion, offset == newEnd
+     *  notification Whole data of the notification
      */
     prio(urgent) async NotifyIMETextChange(ContentCache contentCache,
-                                           uint32_t offset, uint32_t end,
-                                           uint32_t newEnd,
-                                           bool causedByComposition);
+                                           IMENotification notification);
 
     /**
      * Notifies chrome that there is a IME compostion rect updated
      *
      *  contentCache Cache of content
      */
-    prio(urgent) async NotifyIMESelectedCompositionRect(ContentCache contentCache);
+    prio(urgent) async NotifyIMECompositionUpdate(ContentCache contentCache,
+                                                  IMENotification notification);
 
     /**
      * Notifies chrome that there has been a change in selection
      * Only called when NotifyIMEFocus returns PR_TRUE for mWantUpdates
      *
      *  contentCache Cache of content
-     *  causedByComposition true if the change is caused by composition
+     *  notification Whole data of the notification
      */
     prio(urgent) async NotifyIMESelection(ContentCache contentCache,
-                                          bool causedByComposition);
+                                          IMENotification notification);
 
     /**
      * Notifies chrome of updating its content cache.
@@ -246,7 +250,8 @@ parent:
      *
      *  contentCache Cache of content
      */
-    prio(urgent) async NotifyIMEPositionChange(ContentCache contentCache);
+    prio(urgent) async NotifyIMEPositionChange(ContentCache contentCache,
+                                               IMENotification notification);
 
     /**
      * Instructs chrome to end any pending composition
@@ -263,6 +268,15 @@ parent:
      */
     prio(urgent) sync EndIMEComposition(bool cancel)
                         returns (bool noCompositionEvent, nsString composition);
+
+    /**
+     * OnEventNeedingAckHandled() is called after a child process dispatches a
+     * composition event or a selection event which is sent from the parent
+     * process.
+     *
+     * message      The message value of the handled event.
+     */
+    prio(urgent) async OnEventNeedingAckHandled(uint32_t message);
 
     /**
      * Tells chrome to start plugin IME.  If this results in a string getting
@@ -538,6 +552,10 @@ parent:
     InvokeDragSession(IPCDataTransfer[] transfers, uint32_t action,
                       nsCString visualData, uint32_t width, uint32_t height,
                       uint32_t stride, uint8_t format, int32_t dragAreaX, int32_t dragAreaY);
+
+    async AudioChannelActivityNotification(uint32_t aAudioChannel,
+                                           bool aActive);
+
 child:
     /**
      * Notify the remote browser that it has been Show()n on this
@@ -584,6 +602,18 @@ child:
     Deactivate();
 
     ParentActivated(bool aActivated);
+
+    /**
+     * StopIMEStateManagement() is called when the process loses focus and
+     * should stop managing IME state.
+     */
+    StopIMEStateManagement();
+
+    /**
+     * MenuKeyboardListenerInstalled() is called when menu keyboard listener
+     * is installed in the parent process.
+     */
+    MenuKeyboardListenerInstalled(bool aInstalled);
 
     /**
      * @see nsIDOMWindowUtils sendMouseEvent.
@@ -676,6 +706,11 @@ child:
      * Tell the child to update its docShell's active state.
      */
     SetIsDocShellActive(bool aIsActive);
+
+    /**
+     * Navigate by key (Tab/Shift+Tab/F6/Shift+f6).
+     */
+    NavigateByKey(bool aForward, bool aForDocumentNavigation);
 
     /**
      * The parent (chrome thread) requests that the child inform it when

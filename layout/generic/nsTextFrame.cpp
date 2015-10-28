@@ -1310,10 +1310,8 @@ BuildTextRuns(gfxContext* aContext, nsTextFrame* aForFrame,
     // just one line
     scanner.SetAtStartOfLine();
     scanner.SetCommonAncestorWithLastFrame(nullptr);
-    nsIFrame* child = textRunContainer->GetFirstPrincipalChild();
-    while (child) {
+    for (nsIFrame* child : textRunContainer->PrincipalChildList()) {
       scanner.ScanFrame(child);
-      child = child->GetNextSibling();
     }
     // Set mStartOfLine so FlushFrames knows its textrun ends a line
     scanner.SetAtStartOfLine();
@@ -4636,7 +4634,7 @@ public:
       aInvalidRegion->Or(oldRect, newRect);
     }
   }
-  
+
   virtual void DisableComponentAlpha() override {
     mDisableSubpixelAA = true;
   }
@@ -4959,6 +4957,12 @@ nsTextFrame::GetTextDecorations(
     if (f->IsFloating() || f->IsAbsolutelyPositioned()) {
       break;
     }
+
+    // If we're an outer <svg> element, which is classified as an atomic
+    // inline-level element, we're done.
+    if (f->GetType() == nsGkAtoms::svgOuterSVGFrame) {
+      break;
+    }
   }
 }
 
@@ -5190,6 +5194,7 @@ ComputeDescentLimitForSelectionUnderline(nsPresContext* aPresContext,
 // Make sure this stays in sync with DrawSelectionDecorations below
 static const SelectionType SelectionTypesWithDecorations =
   nsISelectionController::SELECTION_SPELLCHECK |
+  nsISelectionController::SELECTION_URLSTRIKEOUT |
   nsISelectionController::SELECTION_IME_RAWINPUT |
   nsISelectionController::SELECTION_IME_SELECTEDRAWTEXT |
   nsISelectionController::SELECTION_IME_CONVERTEDTEXT |
@@ -5299,6 +5304,9 @@ static void DrawSelectionDecorations(gfxContext* aContext,
     aTextPaintStyle.GetSelectionUnderlineForPaint(index, &color,
                                                   &relativeSize, &style);
 
+  gfxFloat offset = aDecoration == NS_STYLE_TEXT_DECORATION_LINE_UNDERLINE ?
+                      aFontMetrics.underlineOffset : aFontMetrics.maxAscent;
+
   switch (aType) {
     case nsISelectionController::SELECTION_IME_RAWINPUT:
     case nsISelectionController::SELECTION_IME_SELECTEDRAWTEXT:
@@ -5351,6 +5359,19 @@ static void DrawSelectionDecorations(gfxContext* aContext,
       if (!weDefineSelectionUnderline)
         return;
       break;
+    case nsISelectionController::SELECTION_URLSTRIKEOUT: {
+      nscoord inflationMinFontSize =
+        nsLayoutUtils::InflationMinFontSizeFor(aFrame);
+      float inflation =
+        GetInflationForTextDecorations(aFrame, inflationMinFontSize);
+      const gfxFont::Metrics metrics =
+        GetFirstFontMetrics(GetFontGroupForFrame(aFrame, inflation), aVertical);
+
+      relativeSize = 2.0f;
+      offset = metrics.strikeoutOffset + 0.5;
+      aDecoration = NS_STYLE_TEXT_DECORATION_LINE_LINE_THROUGH;
+      break;
+    }
     default:
       NS_WARNING("Requested selection decorations when there aren't any");
       return;
@@ -5358,10 +5379,7 @@ static void DrawSelectionDecorations(gfxContext* aContext,
   size.height *= relativeSize;
   PaintDecorationLine(aFrame, aContext, aDirtyRect, color, nullptr, pt,
     (aVertical ? (pt.y - aPt.y) : (pt.x - aPt.x)) + aICoordInFrame,
-    size, aAscent, 
-    aDecoration == NS_STYLE_TEXT_DECORATION_LINE_UNDERLINE ?
-      aFontMetrics.underlineOffset : aFontMetrics.maxAscent,
-    aDecoration, style, eSelectionDecoration,
+    size, aAscent, offset, aDecoration, style, eSelectionDecoration,
     aCallbacks, aVertical, descentLimit);
 }
 

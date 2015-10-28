@@ -4,6 +4,7 @@
 
 pref("startup.homepage_override_url","");
 pref("startup.homepage_welcome_url","");
+pref("startup.homepage_welcome_url.additional", "");
 pref("app.update.url.manual", ""); 
 pref("app.update.url.details", "");
 pref("app.releaseNotesURL", "");

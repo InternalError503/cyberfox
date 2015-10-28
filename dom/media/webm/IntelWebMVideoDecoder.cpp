@@ -5,13 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 #include "IntelWebMVideoDecoder.h"
 
+#include "mozilla/TaskQueue.h"
+
 #include "gfx2DGlue.h"
 #include "Layers.h"
 #include "MediaResource.h"
-#include "MediaTaskQueue.h"
 #include "mozilla/dom/HTMLMediaElement.h"
 #include "nsError.h"
-#include "SharedThreadPool.h"
+#include "mozilla/SharedThreadPool.h"
 #include "VorbisUtils.h"
 #include "nestegg/nestegg.h"
 
@@ -22,8 +23,6 @@
 #undef LOG
 PRLogModuleInfo* GetDemuxerLog();
 #define LOG(...) MOZ_LOG(GetDemuxerLog(), mozilla::LogLevel::Debug, (__VA_ARGS__))
-
-using namespace mp4_demuxer;
 
 namespace mozilla {
 
@@ -185,7 +184,7 @@ IntelWebMVideoDecoder::Demux(nsRefPtr<VP8Sample>& aSample, bool* aEOS)
   nsRefPtr<NesteggPacketHolder> next_holder(mReader->NextPacket(WebMReader::VIDEO));
   if (next_holder) {
     next_tstamp = holder->Timestamp();
-    mReader->PushVideoPacket(next_holder.forget());
+    mReader->PushVideoPacket(next_holder);
   } else {
     next_tstamp = tstamp;
     next_tstamp += tstamp - mReader->GetLastVideoFrameTime();
@@ -216,7 +215,7 @@ IntelWebMVideoDecoder::Demux(nsRefPtr<VP8Sample>& aSample, bool* aEOS)
                           data,
                           length,
                           si.is_kf);
-  if (!aSample->mData) {
+  if (!aSample->Data()) {
     return false;
   }
 

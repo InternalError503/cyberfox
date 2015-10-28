@@ -200,13 +200,10 @@ PluginInstanceParent::ActorDestroy(ActorDestroyReason why)
         UnsubclassPluginWindow();
     }
 #endif
-    // After this method, the data backing the remote surface may no
-    // longer be valid. The X surface may be destroyed, or the shared
-    // memory backing this surface may no longer be valid.
     if (mFrontSurface) {
         mFrontSurface = nullptr;
         if (mImageContainer) {
-            mImageContainer->SetCurrentImage(nullptr);
+            mImageContainer->ClearAllImages();
         }
 #ifdef MOZ_X11
         FinishX(DefaultXDisplay());
@@ -396,17 +393,6 @@ PluginInstanceParent::AnswerNPN_SetValue_NPPVpluginUsesDOMForCursor(
     return true;
 }
 
-class NotificationSink : public CompositionNotifySink
-{
-public:
-  explicit NotificationSink(PluginInstanceParent* aInstance) : mInstance(aInstance)
-  { }
-
-  virtual void DidComposite() { mInstance->DidComposite(); }
-private:
-  PluginInstanceParent *mInstance;
-};
-
 bool
 PluginInstanceParent::AnswerNPN_SetValue_NPPVpluginDrawingModel(
     const int& drawingModel, NPError* result)
@@ -455,6 +441,15 @@ PluginInstanceParent::AnswerNPN_SetValue_NPPVpluginEventModel(
     *result = NPERR_GENERIC_ERROR;
     return true;
 #endif
+}
+
+bool
+PluginInstanceParent::AnswerNPN_SetValue_NPPVpluginIsPlayingAudio(
+    const bool& isAudioPlaying, NPError* result)
+{
+    *result = mNPNIface->setvalue(mNPP, NPPVpluginIsPlayingAudio,
+                                  (void*)(intptr_t)isAudioPlaying);
+    return true;
 }
 
 bool
@@ -650,10 +645,13 @@ PluginInstanceParent::RecvShow(const NPRect& updatedRect,
         cairoData.mSourceSurface = gfxPlatform::GetPlatform()->GetSourceSurfaceForSurface(nullptr, surface);
         cairoImage->SetData(cairoData);
 
-        container->SetCurrentImage(cairoImage);
+        nsAutoTArray<ImageContainer::NonOwningImage,1> imageList;
+        imageList.AppendElement(
+            ImageContainer::NonOwningImage(image));
+        container->SetCurrentImages(imageList);
     }
     else if (mImageContainer) {
-        mImageContainer->SetCurrentImage(nullptr);
+        mImageContainer->ClearAllImages();
     }
 
     mFrontSurface = surface;
@@ -1153,11 +1151,18 @@ PluginInstanceParent::NPP_GetValue(NPPVariable aVariable,
 NPError
 PluginInstanceParent::NPP_SetValue(NPNVariable variable, void* value)
 {
+    NPError result;
     switch (variable) {
     case NPNVprivateModeBool:
-        NPError result;
         if (!CallNPP_SetValue_NPNVprivateModeBool(*static_cast<NPBool*>(value),
                                                   &result))
+            return NPERR_GENERIC_ERROR;
+
+        return result;
+
+    case NPNVmuteAudioBool:
+        if (!CallNPP_SetValue_NPNVmuteAudioBool(*static_cast<NPBool*>(value),
+                                                &result))
             return NPERR_GENERIC_ERROR;
 
         return result;
@@ -1504,7 +1509,7 @@ ActorSearch(NPObject* aKey,
     return PL_DHASH_NEXT;
 }
 
-} // anonymous namespace
+} // namespace
 #endif // DEBUG
 
 bool
@@ -1872,7 +1877,7 @@ PluginInstanceParent::SubclassPluginWindow(HWND aWnd)
         return;
     }
 
-    if (XRE_GetProcessType() == GeckoProcessType_Content) {
+    if (XRE_IsContentProcess()) {
         if (!aWnd) {
             NS_WARNING("PluginInstanceParent::SubclassPluginWindow unexpected null window");
             return;
@@ -1902,7 +1907,7 @@ PluginInstanceParent::SubclassPluginWindow(HWND aWnd)
 void
 PluginInstanceParent::UnsubclassPluginWindow()
 {
-    if (XRE_GetProcessType() == GeckoProcessType_Content) {
+    if (XRE_IsContentProcess()) {
         if (mPluginHWND) {
             // Remove 'this' from the plugin list safely
             nsAutoPtr<PluginInstanceParent> tmp;

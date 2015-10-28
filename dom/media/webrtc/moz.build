@@ -22,12 +22,15 @@ EXPORTS += [
 if CONFIG['MOZ_WEBRTC']:
     EXPORTS += ['AudioOutputObserver.h',
                 'MediaEngineWebRTC.h']
+    EXPORTS.mozilla.dom += [ 'RTCIdentityProviderRegistrar.h' ]
     UNIFIED_SOURCES += [
         'MediaEngineCameraVideoSource.cpp',
         'MediaEngineTabVideoSource.cpp',
         'MediaEngineWebRTCAudio.cpp',
         'MediaEngineWebRTCVideo.cpp',
         'MediaTrackConstraints.cpp',
+        'RTCCertificate.cpp',
+        'RTCIdentityProviderRegistrar.cpp',
     ]
     # MediaEngineWebRTC.cpp needs to be built separately.
     SOURCES += [
@@ -64,6 +67,9 @@ UNIFIED_SOURCES += [
 EXPORTS.mozilla += [
     'PeerIdentity.h',
 ]
+EXPORTS.mozilla.dom += [
+    'RTCCertificate.h',
+]
 
 include('/ipc/chromium/chromium-config.mozbuild')
 
@@ -77,9 +83,6 @@ if CONFIG['GNU_CC'] or CONFIG['CLANG_CL']:
   ]
 
 FINAL_LIBRARY = 'xul'
-if CONFIG['OS_ARCH'] == 'WINNT':
-    DEFINES['NOMINMAX'] = True
-
 
 if CONFIG['_MSC_VER']:
   CXXFLAGS += [

@@ -33,7 +33,7 @@ ProxyAccessible::Shutdown()
     if (mChildren.Length() != 1)
       MOZ_CRASH("outer doc doesn't own adoc!");
 
-    static_cast<DocAccessibleParent*>(mChildren[0])->Unbind();
+    mChildren[0]->AsDoc()->Unbind();
   }
 
   mChildren.Clear();
@@ -83,6 +83,14 @@ ProxyAccessible::State() const
   return state;
 }
 
+uint64_t
+ProxyAccessible::NativeState() const
+{
+  uint64_t state = 0;
+  unused << mDoc->SendNativeState(mID, &state);
+  return state;
+}
+
 void
 ProxyAccessible::Name(nsString& aName) const
 {
@@ -93,6 +101,12 @@ void
 ProxyAccessible::Value(nsString& aValue) const
 {
   unused << mDoc->SendValue(mID, &aValue);
+}
+
+void
+ProxyAccessible::Help(nsString& aHelp) const
+{
+  unused << mDoc->SendHelp(mID, &aHelp);
 }
 
 void
@@ -151,6 +165,46 @@ ProxyAccessible::Relations(nsTArray<RelationType>* aTypes,
     aTargetSets->AppendElement(Move(targets));
     aTypes->AppendElement(static_cast<RelationType>(type));
   }
+}
+
+bool
+ProxyAccessible::IsSearchbox() const
+{
+  bool retVal = false;
+  unused << mDoc->SendIsSearchbox(mID, &retVal);
+  return retVal;
+}
+
+nsIAtom*
+ProxyAccessible::LandmarkRole() const
+{
+  nsString landmark;
+  unused << mDoc->SendLandmarkRole(mID, &landmark);
+  return NS_GetStaticAtom(landmark);
+}
+
+nsIAtom*
+ProxyAccessible::ARIARoleAtom() const
+{
+  nsString role;
+  unused << mDoc->SendARIARoleAtom(mID, &role);
+  return NS_GetStaticAtom(role);
+}
+
+int32_t
+ProxyAccessible::GetLevelInternal()
+{
+  int32_t level = 0;
+  unused << mDoc->SendGetLevelInternal(mID, &level);
+  return level;
+}
+
+int32_t
+ProxyAccessible::CaretLineNumber()
+{
+  int32_t line = -1;
+  unused << mDoc->SendCaretOffset(mID, &line);
+  return line;
 }
 
 int32_t
@@ -331,6 +385,12 @@ ProxyAccessible::ScrollSubstringToPoint(int32_t aStartOffset,
 {
   unused << mDoc->SendScrollSubstringToPoint(mID, aStartOffset, aEndOffset,
                                              aCoordinateType, aX, aY);
+}
+
+void
+ProxyAccessible::Text(nsString* aText)
+{
+  unused << mDoc->SendText(mID, aText);
 }
 
 void
@@ -520,15 +580,27 @@ ProxyAccessible::RowExtent()
 }
 
 void
-ProxyAccessible::ColHeaderCells(nsTArray<uint64_t>* aCells)
+ProxyAccessible::ColHeaderCells(nsTArray<ProxyAccessible*>* aCells)
 {
-  unused << mDoc->SendColHeaderCells(mID, aCells);
+  nsTArray<uint64_t> targetIDs;
+  unused << mDoc->SendColHeaderCells(mID, &targetIDs);
+
+  size_t targetCount = targetIDs.Length();
+  for (size_t i = 0; i < targetCount; i++) {
+    aCells->AppendElement(mDoc->GetAccessible(targetIDs[i]));
+  }
 }
 
 void
-ProxyAccessible::RowHeaderCells(nsTArray<uint64_t>* aCells)
+ProxyAccessible::RowHeaderCells(nsTArray<ProxyAccessible*>* aCells)
 {
-  unused << mDoc->SendRowHeaderCells(mID, aCells);
+  nsTArray<uint64_t> targetIDs;
+  unused << mDoc->SendRowHeaderCells(mID, &targetIDs);
+
+  size_t targetCount = targetIDs.Length();
+  for (size_t i = 0; i < targetCount; i++) {
+    aCells->AppendElement(mDoc->GetAccessible(targetIDs[i]));
+  }
 }
 
 bool
@@ -925,6 +997,15 @@ ProxyAccessible::EmbeddedChildAt(size_t aChildIdx)
 }
 
 ProxyAccessible*
+ProxyAccessible::FocusedChild()
+{
+  uint64_t childID = 0;
+  bool ok = false;
+  unused << mDoc->SendFocusedChild(mID, &childID, &ok);
+  return ok ? mDoc->GetAccessible(childID) : nullptr;
+}
+
+ProxyAccessible*
 ProxyAccessible::ChildAtPoint(int32_t aX, int32_t aY,
                               Accessible::EWhichChildAtPoint aWhichChild)
 {
@@ -954,6 +1035,12 @@ void
 ProxyAccessible::DocType(nsString& aType)
 {
   unused << mDoc->SendDocType(mID, &aType);
+}
+
+void
+ProxyAccessible::Title(nsString& aTitle)
+{
+  unused << mDoc->SendTitle(mID, &aTitle);
 }
 
 void

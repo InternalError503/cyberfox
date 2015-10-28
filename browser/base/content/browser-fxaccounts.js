@@ -111,14 +111,7 @@ let gFxAccounts = {
     // notified of fxa-migration:state-changed in response if necessary.
     Services.obs.notifyObservers(null, "fxa-migration:state-request", null);
 
-    let contentUri = Services.urlFormatter.formatURLPref("identity.fxaccounts.remote.webchannel.uri");
-    // The FxAccountsWebChannel listens for events and updates
-    // the state machine accordingly.
-    let fxAccountsWebChannel = new FxAccountsWebChannel({
-      content_uri: contentUri,
-      channel_id: this.FxAccountsCommon.WEBCHANNEL_ID
-    });
-
+    EnsureFxAccountsWebChannel();
     this._initialized = true;
 
     this.updateUI();
@@ -270,6 +263,7 @@ let gFxAccounts = {
 
     let defaultLabel = this.panelUIStatus.getAttribute("defaultlabel");
     let errorLabel = this.panelUIStatus.getAttribute("errorlabel");
+    let signedInTooltiptext = this.panelUIStatus.getAttribute("signedinTooltiptext");
 
     let updateWithUserData = (userData) => {
       // Window might have been closed while fetching data.
@@ -283,6 +277,7 @@ let gFxAccounts = {
       this.panelUIFooter.removeAttribute("fxastatus");
       this.panelUIFooter.removeAttribute("fxaprofileimage");
       this.panelUIAvatar.style.removeProperty("list-style-image");
+      let showErrorBadge = false;
 
       if (!this._inCustomizationMode && userData) {
         // At this point we consider the user as logged-in (but still can be in an error state)
@@ -291,13 +286,20 @@ let gFxAccounts = {
           this.panelUIFooter.setAttribute("fxastatus", "error");
           this.panelUILabel.setAttribute("label", errorLabel);
           this.panelUIStatus.setAttribute("tooltiptext", tooltipDescription);
+          showErrorBadge = true;
         } else {
           this.panelUIFooter.setAttribute("fxastatus", "signedin");
           this.panelUILabel.setAttribute("label", userData.email);
+          this.panelUIStatus.setAttribute("tooltiptext", signedInTooltiptext);
         }
         if (profileInfoEnabled) {
           this.panelUIFooter.setAttribute("fxaprofileimage", "enabled");
         }
+      }
+      if (showErrorBadge) {
+        gMenuButtonBadgeManager.addBadge(gMenuButtonBadgeManager.BADGEID_FXA, "fxa-needs-authentication");
+      } else {
+        gMenuButtonBadgeManager.removeBadge(gMenuButtonBadgeManager.BADGEID_FXA);
       }
     }
 
@@ -491,5 +493,5 @@ XPCOMUtils.defineLazyGetter(gFxAccounts, "FxAccountsCommon", function () {
 XPCOMUtils.defineLazyModuleGetter(gFxAccounts, "fxaMigrator",
   "resource://services-sync/FxaMigrator.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "FxAccountsWebChannel",
+XPCOMUtils.defineLazyModuleGetter(this, "EnsureFxAccountsWebChannel",
   "resource://gre/modules/FxAccountsWebChannel.jsm");

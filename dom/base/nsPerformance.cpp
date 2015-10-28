@@ -21,6 +21,7 @@
 #include "PerformanceResourceTiming.h"
 #include "mozilla/ErrorResult.h"
 #include "mozilla/dom/PerformanceBinding.h"
+#include "mozilla/dom/PerformanceEntryEvent.h"
 #include "mozilla/dom/PerformanceTimingBinding.h"
 #include "mozilla/dom/PerformanceNavigationBinding.h"
 #include "mozilla/Preferences.h"
@@ -713,7 +714,7 @@ private:
   bool mEnabled;
 };
 
-} // anonymous namespace
+} // namespace
 
 /* static */ bool
 nsPerformance::IsEnabled(JSContext* aCx, JSObject* aGlobal)
@@ -738,20 +739,24 @@ nsPerformance::InsertUserEntry(PerformanceEntry* aEntry)
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  if (nsContentUtils::IsUserTimingLoggingEnabled()) {
-    nsAutoCString uri;
+  nsAutoCString uri;
+  uint64_t markCreationEpoch = 0;
+  if (nsContentUtils::IsUserTimingLoggingEnabled() ||
+      nsContentUtils::SendPerformanceTimingNotifications()) {
     nsresult rv = GetOwner()->GetDocumentURI()->GetHost(uri);
     if(NS_FAILED(rv)) {
       // If we have no URI, just put in "none".
       uri.AssignLiteral("none");
     }
-    PERFLOG("Performance Entry: %s|%s|%s|%f|%f|%" PRIu64 "\n",
-            uri.get(),
-            NS_ConvertUTF16toUTF8(aEntry->GetEntryType()).get(),
-            NS_ConvertUTF16toUTF8(aEntry->GetName()).get(),
-            aEntry->StartTime(),
-            aEntry->Duration(),
-            static_cast<uint64_t>(PR_Now() / PR_USEC_PER_MSEC));
+    markCreationEpoch = static_cast<uint64_t>(PR_Now() / PR_USEC_PER_MSEC);
+
+    if (nsContentUtils::IsUserTimingLoggingEnabled()) {
+      PerformanceBase::LogEntry(aEntry, uri);
+    }
+  }
+
+  if (nsContentUtils::SendPerformanceTimingNotifications()) {
+    TimingNotification(aEntry, uri, markCreationEpoch);
   }
 
   PerformanceBase::InsertUserEntry(aEntry);
@@ -978,6 +983,41 @@ void
 PerformanceBase::ClearMeasures(const Optional<nsAString>& aName)
 {
   ClearUserEntries(aName, NS_LITERAL_STRING("measure"));
+}
+
+void
+PerformanceBase::LogEntry(PerformanceEntry* aEntry, const nsACString& aOwner) const
+{
+  PERFLOG("Performance Entry: %s|%s|%s|%f|%f|%" PRIu64 "\n",
+          aOwner.BeginReading(),
+          NS_ConvertUTF16toUTF8(aEntry->GetEntryType()).get(),
+          NS_ConvertUTF16toUTF8(aEntry->GetName()).get(),
+          aEntry->StartTime(),
+          aEntry->Duration(),
+          static_cast<uint64_t>(PR_Now() / PR_USEC_PER_MSEC));
+}
+
+void
+PerformanceBase::TimingNotification(PerformanceEntry* aEntry, const nsACString& aOwner, uint64_t aEpoch)
+{
+  PerformanceEntryEventInit init;
+  init.mBubbles = false;
+  init.mCancelable = false;
+  init.mName = aEntry->GetName();
+  init.mEntryType = aEntry->GetEntryType();
+  init.mStartTime = aEntry->StartTime();
+  init.mDuration = aEntry->Duration();
+  init.mEpoch = aEpoch;
+  init.mOrigin = NS_ConvertUTF8toUTF16(aOwner.BeginReading());
+
+  nsRefPtr<PerformanceEntryEvent> perfEntryEvent =
+    PerformanceEntryEvent::Constructor(this, NS_LITERAL_STRING("performanceentry"), init);
+
+  nsCOMPtr<EventTarget> et = do_QueryInterface(GetOwner());
+  if (et) {
+    bool dummy = false;
+    et->DispatchEvent(perfEntryEvent, &dummy);
+  }
 }
 
 void

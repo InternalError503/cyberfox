@@ -72,6 +72,7 @@
 #include "nsIDocShell.h"
 
 #include "nsNetUtil.h"
+#include "nsNetCID.h"
 
 #include "mozilla/Mutex.h"
 #include "mozilla/PluginLibrary.h"
@@ -104,6 +105,8 @@ using mozilla::plugins::PluginModuleContentParent;
 #undef LOG
 #define LOG(args...)  __android_log_print(ANDROID_LOG_INFO, "GeckoPlugins" , ## args)
 #endif
+
+#include "nsIAudioChannelAgent.h"
 
 using namespace mozilla;
 using namespace mozilla::plugins::parent;
@@ -249,7 +252,7 @@ nsNPAPIPlugin::PluginCrashed(const nsAString& pluginDumpID,
 bool
 nsNPAPIPlugin::RunPluginOOP(const nsPluginTag *aPluginTag)
 {
-  if (XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (XRE_IsContentProcess()) {
     return true;
   }
 
@@ -404,7 +407,7 @@ GetNewPluginLibrary(nsPluginTag *aPluginTag)
     return nullptr;
   }
 
-  if (XRE_GetProcessType() == GeckoProcessType_Content) {
+  if (XRE_IsContentProcess()) {
     return PluginModuleContentParent::LoadModule(aPluginTag->mId, aPluginTag);
   }
 
@@ -681,7 +684,7 @@ doGetIdentifier(JSContext *cx, const NPUTF8* name)
 {
   NS_ConvertUTF8toUTF16 utf16name(name);
 
-  JSString *str = ::JS_InternUCStringN(cx, utf16name.get(), utf16name.Length());
+  JSString *str = ::JS_AtomizeAndPinUCStringN(cx, utf16name.get(), utf16name.Length());
 
   if (!str)
     return nullptr;
@@ -1232,13 +1235,9 @@ _getpluginelement(NPP npp)
   nsCOMPtr<nsIXPConnect> xpc(do_GetService(nsIXPConnect::GetCID()));
   NS_ENSURE_TRUE(xpc, nullptr);
 
-  nsCOMPtr<nsIXPConnectJSObjectHolder> holder;
+  JS::RootedObject obj(cx);
   xpc->WrapNative(cx, ::JS::CurrentGlobalOrNull(cx), element,
-                  NS_GET_IID(nsIDOMElement),
-                  getter_AddRefs(holder));
-  NS_ENSURE_TRUE(holder, nullptr);
-
-  JS::Rooted<JSObject*> obj(cx, holder->GetJSObject());
+                  NS_GET_IID(nsIDOMElement), obj.address());
   NS_ENSURE_TRUE(obj, nullptr);
 
   return nsJSObjWrapper::GetNewOrUsed(npp, cx, obj);
@@ -1397,6 +1396,7 @@ _releaseobject(NPObject* npobj)
 {
   if (!NS_IsMainThread()) {
     NPN_PLUGIN_LOG(PLUGIN_LOG_ALWAYS,("NPN_releaseobject called from the wrong thread\n"));
+    MOZ_CRASH("NPN_releaseobject called from the wrong thread");
   }
   if (!npobj)
     return;
@@ -2403,6 +2403,47 @@ _setvalue(NPP npp, NPPVariable variable, void *result)
     case NPPVpluginUsesDOMForCursorBool: {
       bool useDOMForCursor = (result != nullptr);
       return inst->SetUsesDOMForCursor(useDOMForCursor);
+    }
+
+    case NPPVpluginIsPlayingAudio: {
+      bool isMuted = !result;
+
+      nsNPAPIPluginInstance* inst = (nsNPAPIPluginInstance*) npp->ndata;
+      MOZ_ASSERT(inst);
+
+      if (isMuted && !inst->HasAudioChannelAgent()) {
+        return NPERR_NO_ERROR;
+      }
+
+      nsCOMPtr<nsIAudioChannelAgent> agent;
+      nsresult rv = inst->GetOrCreateAudioChannelAgent(getter_AddRefs(agent));
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return NPERR_NO_ERROR;
+      }
+
+      MOZ_ASSERT(agent);
+
+      if (isMuted) {
+        rv = agent->NotifyStoppedPlaying(nsIAudioChannelAgent::AUDIO_AGENT_NOTIFY);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return NPERR_NO_ERROR;
+        }
+      } else {
+        float volume = 0.0;
+        bool muted = true;
+        rv = agent->NotifyStartedPlaying(nsIAudioChannelAgent::AUDIO_AGENT_NOTIFY,
+                                         &volume, &muted);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return NPERR_NO_ERROR;
+        }
+
+        rv = inst->WindowVolumeChanged(volume, muted);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return NPERR_NO_ERROR;
+        }
+      }
+
+      return NPERR_NO_ERROR;
     }
 
 #ifndef MOZ_WIDGET_ANDROID

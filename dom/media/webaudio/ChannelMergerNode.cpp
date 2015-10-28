@@ -50,7 +50,7 @@ public:
         AudioBlockCopyChannelWithScale(
             static_cast<const float*>(aInput[i].mChannelData[j]),
             aInput[i].mVolume,
-            static_cast<float*>(const_cast<void*>(aOutput[0].mChannelData[channelIndex])));
+            aOutput[0].ChannelFloatsForWrite(channelIndex));
         ++channelIndex;
         if (channelIndex >= channelCount) {
           return;
@@ -87,6 +87,6 @@ ChannelMergerNode::WrapObject(JSContext* aCx, JS::Handle<JSObject*> aGivenProto)
   return ChannelMergerNodeBinding::Wrap(aCx, this, aGivenProto);
 }
 
-}
-}
+} // namespace dom
+} // namespace mozilla
 

@@ -11,6 +11,7 @@ include protocol PCacheStorage;
 include protocol PCacheStreamControl;
 include protocol PFileDescriptorSet;
 include protocol PMessagePort;
+include protocol PNuwa;
 include protocol PServiceWorkerManager;
 include protocol PUDPSocket;
 include protocol PVsync;
@@ -36,6 +37,7 @@ sync protocol PBackground
   manages PCacheStreamControl;
   manages PFileDescriptorSet;
   manages PMessagePort;
+  manages PNuwa;
   manages PServiceWorkerManager;
   manages PUDPSocket;
   manages PVsync;
@@ -49,7 +51,7 @@ parent:
   PVsync();
 
   PUDPSocket(OptionalPrincipalInfo pInfo, nsCString filter);
-  PBroadcastChannel(PrincipalInfo pInfo, nsString origin, nsString channel,
+  PBroadcastChannel(PrincipalInfo pInfo, nsCString origin, nsString channel,
                     bool privateBrowsing);
 
   PServiceWorkerManager();
@@ -59,6 +61,8 @@ parent:
   PCacheStorage(Namespace aNamespace, PrincipalInfo aPrincipalInfo);
 
   PMessagePort(nsID uuid, nsID destinationUuid, uint32_t sequenceId);
+
+  PNuwa();
 
   MessagePortForceClose(nsID uuid, nsID destinationUuid, uint32_t sequenceId);
 

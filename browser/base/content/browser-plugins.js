@@ -44,14 +44,14 @@ var gPluginHandler = {
     switch (msg.name) {
       case "PluginContent:ShowClickToPlayNotification":
         this.showClickToPlayNotification(msg.target, msg.data.plugins, msg.data.showNow,
-                                         msg.principal, msg.data.host, msg.data.location);
+                                         msg.principal, msg.data.location);
         break;
       case "PluginContent:RemoveNotification":
         this.removeNotification(msg.target, msg.data.name);
         break;
       case "PluginContent:UpdateHiddenPluginUI":
         this.updateHiddenPluginUI(msg.target, msg.data.haveInsecure, msg.data.actions,
-                                  msg.principal, msg.data.host, msg.data.location);
+                                  msg.principal, msg.data.location);
         break;
       case "PluginContent:HideNotificationBar":
         this.hideNotificationBar(msg.target, msg.data.name);
@@ -124,7 +124,15 @@ var gPluginHandler = {
 
   _clickToPlayNotificationEventCallback: function PH_ctpEventCallback(event) {
     if (event == "showing") {
-    //Some cool stuff goes here
+      Services.telemetry.getHistogramById("PLUGINS_NOTIFICATION_SHOWN")
+        .add(!this.options.primaryPlugin);
+      // Histograms always start at 0, even though our data starts at 1
+      let histogramCount = this.options.pluginData.size - 1;
+      if (histogramCount > 4) {
+        histogramCount = 4;
+      }
+      Services.telemetry.getHistogramById("PLUGINS_NOTIFICATION_PLUGIN_COUNT")
+        .add(histogramCount);
     }
     else if (event == "dismissed") {
       // Once the popup is dismissed, clicking the icon should show the full
@@ -142,6 +150,8 @@ var gPluginHandler = {
     let permission;
     let expireType;
     let expireTime;
+    let histogram =
+      Services.telemetry.getHistogramById("PLUGINS_NOTIFICATION_USER_ACTION");
 
     // Update the permission manager.
     // Also update the current state of pluginInfo.fallbackType so that
@@ -151,6 +161,7 @@ var gPluginHandler = {
         permission = Ci.nsIPermissionManager.ALLOW_ACTION;
         expireType = Ci.nsIPermissionManager.EXPIRE_SESSION;
         expireTime = Date.now() + Services.prefs.getIntPref(this.PREF_SESSION_PERSIST_MINUTES) * 60 * 1000;
+        histogram.add(0);
         aPluginInfo.fallbackType = Ci.nsIObjectLoadingContent.PLUGIN_ACTIVE;
         break;
 
@@ -159,6 +170,7 @@ var gPluginHandler = {
         expireType = Ci.nsIPermissionManager.EXPIRE_TIME;
         expireTime = Date.now() +
           Services.prefs.getIntPref(this.PREF_PERSISTENT_DAYS) * 24 * 60 * 60 * 1000;
+        histogram.add(1);
         aPluginInfo.fallbackType = Ci.nsIObjectLoadingContent.PLUGIN_ACTIVE;
         break;
 
@@ -166,6 +178,7 @@ var gPluginHandler = {
         permission = Ci.nsIPermissionManager.PROMPT_ACTION;
         expireType = Ci.nsIPermissionManager.EXPIRE_NEVER;
         expireTime = 0;
+        histogram.add(2);
         switch (aPluginInfo.blocklistState) {
           case Ci.nsIBlocklistService.STATE_VULNERABLE_UPDATE_AVAILABLE:
             aPluginInfo.fallbackType = Ci.nsIObjectLoadingContent.PLUGIN_VULNERABLE_UPDATABLE;
@@ -203,8 +216,8 @@ var gPluginHandler = {
     });
   },
 
-  showClickToPlayNotification: function (browser, plugins, showNow, principal,
-                                         host, location) {
+  showClickToPlayNotification: function (browser, plugins, showNow,
+                                         principal, location) {
     // It is possible that we've received a message from the frame script to show
     // a click to play notification for a principal that no longer matches the one
     // that the browser's content now has assigned (ie, the browser has browsed away
@@ -253,8 +266,7 @@ var gPluginHandler = {
         }
       }
       else {
-        // Set Click To Play Information Url
-        url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "clicktoplay";
+        url = Services.urlFormatter.formatURLPref("app.support.baseURL") + "clicktoplay";
       }
       pluginInfo.detailsLink = url;
 
@@ -283,7 +295,6 @@ var gPluginHandler = {
       primaryPlugin: primaryPluginPermission,
       pluginData: pluginData,
       principal: principal,
-      host: host,
     };
     PopupNotifications.show(browser, "click-to-play-plugins",
                             "", "plugins-notification-icon",
@@ -304,8 +315,10 @@ var gPluginHandler = {
       notificationBox.removeNotification(notification, true);
   },
 
-  updateHiddenPluginUI: function (browser, haveInsecure, actions, principal,
-                                  host, location) {
+  updateHiddenPluginUI: function (browser, haveInsecure, actions,
+                                  principal, location) {
+    let origin = principal.originNoSuffix;
+
     // It is possible that we've received a message from the frame script to show
     // the hidden plugin notification for a principal that no longer matches the one
     // that the browser's content now has assigned (ie, the browser has browsed away
@@ -352,6 +365,9 @@ var gPluginHandler = {
         return;
       }
 
+      Services.telemetry.getHistogramById("PLUGINS_INFOBAR_SHOWN").
+        add(true);
+
       let message;
       // Icons set directly cannot be manipulated using moz-image-region, so
       // we use CSS classes instead.
@@ -365,22 +381,22 @@ var gPluginHandler = {
           case Ci.nsIObjectLoadingContent.PLUGIN_CLICK_TO_PLAY:
             message = gNavigatorBundle.getFormattedString(
               "pluginActivateNew.message",
-              [pluginName, host]);
+              [pluginName, origin]);
             break;
           case Ci.nsIObjectLoadingContent.PLUGIN_VULNERABLE_UPDATABLE:
             message = gNavigatorBundle.getFormattedString(
               "pluginActivateOutdated.message",
-              [pluginName, host, brand]);
+              [pluginName, origin, brand]);
             break;
           case Ci.nsIObjectLoadingContent.PLUGIN_VULNERABLE_NO_UPDATE:
             message = gNavigatorBundle.getFormattedString(
               "pluginActivateVulnerable.message",
-              [pluginName, host, brand]);
+              [pluginName, origin, brand]);
         }
       } else {
         // Multi-plugin
         message = gNavigatorBundle.getFormattedString(
-          "pluginActivateMultiple.message", [host]);
+          "pluginActivateMultiple.message", [origin]);
       }
 
       let buttons = [
@@ -388,7 +404,8 @@ var gPluginHandler = {
           label: gNavigatorBundle.getString("pluginContinueBlocking.label"),
           accessKey: gNavigatorBundle.getString("pluginContinueBlocking.accesskey"),
           callback: function() {
-
+            Services.telemetry.getHistogramById("PLUGINS_INFOBAR_BLOCK").
+              add(true);
 
             Services.perms.addFromPrincipal(principal,
                                             "plugin-hidden-notification",
@@ -399,7 +416,8 @@ var gPluginHandler = {
           label: gNavigatorBundle.getString("pluginActivateTrigger.label"),
           accessKey: gNavigatorBundle.getString("pluginActivateTrigger.accesskey"),
           callback: function() {
-
+            Services.telemetry.getHistogramById("PLUGINS_INFOBAR_ALLOW").
+              add(true);
 
             let curNotification =
               PopupNotifications.getNotification("click-to-play-plugins",
@@ -532,7 +550,7 @@ var gPluginHandler = {
     let link = notification.ownerDocument.createElementNS(XULNS, "label");
     link.className = "text-link";
     link.setAttribute("value", gNavigatorBundle.getString("crashedpluginsMessage.learnMore"));
-    let crashurl = formatURL("app.helpdoc.baseURI", true);
+    let crashurl = formatURL("app.support.baseURL", true);
     crashurl += "plugin-crashed-notificationbar";
     link.href = crashurl;
     let description = notification.ownerDocument.getAnonymousElementByAttribute(notification, "anonid", "messageText");

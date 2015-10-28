@@ -54,7 +54,6 @@ public:
   virtual size_t SizeOfVideoQueueInFrames() override;
   virtual size_t SizeOfAudioQueueInFrames() override;
 
-  virtual bool IsDormantNeeded() override;
   virtual void ReleaseMediaResources() override;
 
   void OnAudioDecoded(AudioData* aSample);
@@ -124,12 +123,6 @@ public:
   nsRefPtr<ShutdownPromise> Shutdown() override;
 
   virtual void BreakCycles() override;
-
-  bool IsShutdown()
-  {
-    ReentrantMonitorAutoEnter decoderMon(mDecoder->GetReentrantMonitor());
-    return mDecoder->IsShutdown();
-  }
 
   // Return true if all of the active tracks contain data for the specified time.
   bool TrackBuffersContainTime(int64_t aTime);
@@ -213,7 +206,7 @@ private:
   int64_t GetReaderAudioTime(int64_t aTime) const;
   int64_t GetReaderVideoTime(int64_t aTime) const;
 
-  // Will reject the MediaPromise with END_OF_STREAM if mediasource has ended
+  // Will reject the MozPromise with END_OF_STREAM if mediasource has ended
   // or with WAIT_FOR_DATA otherwise.
   void CheckForWaitOrEndOfStream(MediaData::Type aType, int64_t aTime /* microseconds */);
 
@@ -241,15 +234,15 @@ private:
   nsRefPtr<TrackBuffer> mAudioTrack;
   nsRefPtr<TrackBuffer> mVideoTrack;
 
-  MediaPromiseRequestHolder<AudioDataPromise> mAudioRequest;
-  MediaPromiseRequestHolder<VideoDataPromise> mVideoRequest;
+  MozPromiseRequestHolder<AudioDataPromise> mAudioRequest;
+  MozPromiseRequestHolder<VideoDataPromise> mVideoRequest;
 
-  MediaPromiseHolder<AudioDataPromise> mAudioPromise;
-  MediaPromiseHolder<VideoDataPromise> mVideoPromise;
+  MozPromiseHolder<AudioDataPromise> mAudioPromise;
+  MozPromiseHolder<VideoDataPromise> mVideoPromise;
 
-  MediaPromiseHolder<WaitForDataPromise> mAudioWaitPromise;
-  MediaPromiseHolder<WaitForDataPromise> mVideoWaitPromise;
-  MediaPromiseHolder<WaitForDataPromise>& WaitPromise(MediaData::Type aType)
+  MozPromiseHolder<WaitForDataPromise> mAudioWaitPromise;
+  MozPromiseHolder<WaitForDataPromise> mVideoWaitPromise;
+  MozPromiseHolder<WaitForDataPromise>& WaitPromise(MediaData::Type aType)
   {
     return aType == MediaData::AUDIO_DATA ? mAudioWaitPromise : mVideoWaitPromise;
   }
@@ -262,9 +255,9 @@ private:
   int64_t mLastAudioTime;
   int64_t mLastVideoTime;
 
-  MediaPromiseRequestHolder<SeekPromise> mAudioSeekRequest;
-  MediaPromiseRequestHolder<SeekPromise> mVideoSeekRequest;
-  MediaPromiseHolder<SeekPromise> mSeekPromise;
+  MozPromiseRequestHolder<SeekPromise> mAudioSeekRequest;
+  MozPromiseRequestHolder<SeekPromise> mVideoSeekRequest;
+  MozPromiseHolder<SeekPromise> mSeekPromise;
 
   // Temporary seek information while we wait for the data
   // to be added to the track buffer.
@@ -286,7 +279,7 @@ private:
   bool mHasEssentialTrackBuffers;
 
   void ContinueShutdown();
-  MediaPromiseHolder<ShutdownPromise> mMediaSourceShutdownPromise;
+  MozPromiseHolder<ShutdownPromise> mMediaSourceShutdownPromise;
 #ifdef MOZ_FMP4
   nsRefPtr<SharedDecoderManager> mSharedDecoderManager;
 #endif

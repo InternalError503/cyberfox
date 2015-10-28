@@ -502,6 +502,17 @@ html[dir="rtl"] .checkbox {
   background-image: url("../img/check.svg#check-disabled");
 }
 
+.checkbox-label.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+}
+
+html[dir="rtl"] .checkbox-label.ellipsis {
+  text-align: right;
+}
+
 /* ContextUrlView classes */
 
 .context-content {

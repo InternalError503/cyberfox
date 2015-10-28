@@ -3,12 +3,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "mozilla/layers/CompositorChild.h"
-#include "mozilla/layers/CompositorParent.h"
-
 #include <android/log.h>
 #include <dlfcn.h>
 #include <math.h>
+#include <GLES2/gl2.h>
+
+#include "mozilla/layers/CompositorChild.h"
+#include "mozilla/layers/CompositorParent.h"
 
 #include "mozilla/Hal.h"
 #include "nsXULAppAPI.h"
@@ -46,6 +47,8 @@
 #include "SurfaceTexture.h"
 #include "GLContextProvider.h"
 
+#include "ANRReporter.h"
+
 using namespace mozilla;
 using namespace mozilla::gfx;
 using namespace mozilla::jni;
@@ -79,7 +82,7 @@ jclass AndroidBridge::GetClassGlobalRef(JNIEnv* env, const char* className)
         classRef = ClassObject::LocalRef::Adopt(env,
                 env->CallObjectMethod(sBridge->mClassLoader.Get(),
                                       sBridge->mClassLoaderLoadClass,
-                                      Param<String>::Type(className, env).Get()));
+                                      Param<String>(className, env).Get()));
     }
 
     if (!classRef) {
@@ -249,6 +252,7 @@ AndroidBridge::Init(JNIEnv *jEnv, Object::Param clsLoader)
     jAvailable = inputStream.getMethod("available", "()I");
 
     InitAndroidJavaWrappers(jEnv);
+    ANRReporter::Init();
 
     // jEnv should NOT be cached here by anything -- the jEnv here
     // is not valid for the real gecko main thread, which is set
@@ -469,6 +473,27 @@ AndroidBridge::GetHandlersForMimeType(const nsAString& aMimeType,
                                aDefaultApp, aAction,
                                NS_ConvertUTF16toUTF8(aMimeType));
     return true;
+}
+
+bool
+AndroidBridge::GetHWEncoderCapability()
+{
+  ALOG_BRIDGE("AndroidBridge::GetHWEncoderCapability");
+
+  bool value = GeckoAppShell::GetHWEncoderCapability();
+
+  return value;
+}
+
+
+bool
+AndroidBridge::GetHWDecoderCapability()
+{
+  ALOG_BRIDGE("AndroidBridge::GetHWDecoderCapability");
+
+  bool value = GeckoAppShell::GetHWDecoderCapability();
+
+  return value;
 }
 
 bool
@@ -740,7 +765,8 @@ AndroidBridge::CreateEGLSurfaceForCompositor()
     }
 
     JNIEnv* const env = GetJNIForThread(); // called on the compositor thread
-    return reinterpret_cast<EGLSurface>(
+    return reinterpret_cast<EGLSurface>(mAPIVersion >= 20 ?
+            env->GetLongField(eglSurface.Get(), jEGLSurfacePointerField) :
             env->GetIntField(eglSurface.Get(), jEGLSurfacePointerField));
 }
 
@@ -1041,9 +1067,7 @@ AndroidBridge::HandleGeckoMessage(JSContext* cx, JS::HandleObject object)
 {
     ALOG_BRIDGE("%s", __PRETTY_FUNCTION__);
 
-    JNIEnv* const env = GetJNIEnv();
-    auto message = Object::LocalRef::Adopt(env,
-        mozilla::widget::CreateNativeJSContainer(env, cx, object));
+    auto message = mozilla::widget::CreateNativeJSContainer(cx, object);
     GeckoAppShell::HandleGeckoMessageWrapper(message);
 }
 
@@ -1561,7 +1585,6 @@ nsAndroidBridge::~nsAndroidBridge()
 {
 }
 
-/* void handleGeckoEvent (in AString message); */
 NS_IMETHODIMP nsAndroidBridge::HandleGeckoMessage(JS::HandleValue val,
                                                   JSContext *cx)
 {
@@ -1595,21 +1618,18 @@ NS_IMETHODIMP nsAndroidBridge::HandleGeckoMessage(JS::HandleValue val,
     return NS_OK;
 }
 
-/* nsIAndroidDisplayport getDisplayPort(in boolean aPageSizeUpdate, in boolean isBrowserContentDisplayed, in int32_t tabId, in nsIAndroidViewport metrics); */
 NS_IMETHODIMP nsAndroidBridge::GetDisplayPort(bool aPageSizeUpdate, bool aIsBrowserContentDisplayed, int32_t tabId, nsIAndroidViewport* metrics, nsIAndroidDisplayport** displayPort)
 {
     AndroidBridge::Bridge()->GetDisplayPort(aPageSizeUpdate, aIsBrowserContentDisplayed, tabId, metrics, displayPort);
     return NS_OK;
 }
 
-/* void displayedDocumentChanged(); */
 NS_IMETHODIMP nsAndroidBridge::ContentDocumentChanged()
 {
     AndroidBridge::Bridge()->ContentDocumentChanged();
     return NS_OK;
 }
 
-/* boolean isContentDocumentDisplayed(); */
 NS_IMETHODIMP nsAndroidBridge::IsContentDocumentDisplayed(bool *aRet)
 {
     *aRet = AndroidBridge::Bridge()->IsContentDocumentDisplayed();
@@ -1651,9 +1671,9 @@ AndroidBridge::GetScreenOrientation()
 }
 
 void
-AndroidBridge::ScheduleComposite()
+AndroidBridge::InvalidateAndScheduleComposite()
 {
-    nsWindow::ScheduleComposite();
+    nsWindow::InvalidateAndScheduleComposite();
 }
 
 nsresult
@@ -1703,7 +1723,6 @@ AndroidBridge::PumpMessageLoop()
     return GeckoAppShell::PumpMessageLoop(msg);
 }
 
-/* attribute nsIAndroidBrowserApp browserApp; */
 NS_IMETHODIMP nsAndroidBridge::GetBrowserApp(nsIAndroidBrowserApp * *aBrowserApp)
 {
     if (nsAppShell::gAppShell)

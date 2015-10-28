@@ -37,10 +37,10 @@ const DEFAULT_AUTO_EXPAND_DEPTH = 3; // depth
 const DEFAULT_VISIBLE_CELLS = {
   duration: true,
   percentage: true,
-  allocations: false,
+  count: false,
   selfDuration: true,
   selfPercentage: true,
-  selfAllocations: false,
+  selfCount: false,
   samples: true,
   function: true
 };
@@ -133,66 +133,46 @@ CallView.prototype = Heritage.extend(AbstractTreeItem.prototype, {
    * @return nsIDOMNode
    */
   _displaySelf: function(document, arrowNode) {
-    let displayedData = this.getDisplayedData();
-    let frameInfo = this.frame.getInfo();
+    let frameInfo = this.getDisplayedData();
+    let cells = [];
 
     if (this.visibleCells.duration) {
-      var durationCell = this._createTimeCell(document, displayedData.totalDuration);
-    }
-    if (this.visibleCells.selfDuration) {
-      var selfDurationCell = this._createTimeCell(document, displayedData.selfDuration, true);
+      cells.push(this._createTimeCell(document, frameInfo.totalDuration));
     }
     if (this.visibleCells.percentage) {
-      var percentageCell = this._createExecutionCell(document, displayedData.totalPercentage);
+      cells.push(this._createExecutionCell(document, frameInfo.totalPercentage));
+    }
+    if (this.visibleCells.count) {
+      cells.push(this._createCountCell(document, frameInfo.totalCount));
+    }
+    if (this.visibleCells.selfDuration) {
+      cells.push(this._createTimeCell(document, frameInfo.selfDuration, true));
     }
     if (this.visibleCells.selfPercentage) {
-      var selfPercentageCell = this._createExecutionCell(document, displayedData.selfPercentage, true);
+      cells.push(this._createExecutionCell(document, frameInfo.selfPercentage, true));
     }
-    if (this.visibleCells.allocations) {
-      var allocationsCell = this._createAllocationsCell(document, displayedData.totalAllocations);
-    }
-    if (this.visibleCells.selfAllocations) {
-      var selfAllocationsCell = this._createAllocationsCell(document, displayedData.selfAllocations, true);
+    if (this.visibleCells.selfCount) {
+      cells.push(this._createCountCell(document, frameInfo.selfCount, true));
     }
     if (this.visibleCells.samples) {
-      var samplesCell = this._createSamplesCell(document, displayedData.samples);
+      cells.push(this._createSamplesCell(document, frameInfo.samples));
     }
     if (this.visibleCells.function) {
-      var functionCell = this._createFunctionCell(document, arrowNode, displayedData.name, frameInfo, this.level);
+      cells.push(this._createFunctionCell(document, arrowNode, frameInfo.name, frameInfo, this.level));
     }
 
     let targetNode = document.createElement("hbox");
     targetNode.className = "call-tree-item";
     targetNode.setAttribute("origin", frameInfo.isContent ? "content" : "chrome");
     targetNode.setAttribute("category", frameInfo.categoryData.abbrev || "");
-    targetNode.setAttribute("tooltiptext", displayedData.tooltiptext);
+    targetNode.setAttribute("tooltiptext", frameInfo.tooltiptext);
 
     if (this.hidden) {
       targetNode.style.display = "none";
     }
-    if (this.visibleCells.duration) {
-      targetNode.appendChild(durationCell);
-    }
-    if (this.visibleCells.percentage) {
-      targetNode.appendChild(percentageCell);
-    }
-    if (this.visibleCells.allocations) {
-      targetNode.appendChild(allocationsCell);
-    }
-    if (this.visibleCells.selfDuration) {
-      targetNode.appendChild(selfDurationCell);
-    }
-    if (this.visibleCells.selfPercentage) {
-      targetNode.appendChild(selfPercentageCell);
-    }
-    if (this.visibleCells.selfAllocations) {
-      targetNode.appendChild(selfAllocationsCell);
-    }
-    if (this.visibleCells.samples) {
-      targetNode.appendChild(samplesCell);
-    }
-    if (this.visibleCells.function) {
-      targetNode.appendChild(functionCell);
+
+    for (let i = 0; i < cells.length; i++) {
+      targetNode.appendChild(cells[i]);
     }
 
     return targetNode;
@@ -240,10 +220,10 @@ CallView.prototype = Heritage.extend(AbstractTreeItem.prototype, {
     cell.setAttribute("value", L10N.numberWithDecimals(percentage, 2) + PERCENTAGE_UNITS);
     return cell;
   },
-  _createAllocationsCell: function(doc, count, isSelf = false) {
+  _createCountCell: function(doc, count, isSelf = false) {
     let cell = doc.createElement("description");
     cell.className = "plain call-tree-cell";
-    cell.setAttribute("type", isSelf ? "self-allocations" : "allocations");
+    cell.setAttribute("type", isSelf ? "self-count" : "count");
     cell.setAttribute("crop", "end");
     cell.setAttribute("value", count || 0);
     return cell;
@@ -355,8 +335,10 @@ CallView.prototype = Heritage.extend(AbstractTreeItem.prototype, {
       return this._cachedDisplayedData;
     }
 
-    let data = this._cachedDisplayedData = Object.create(null);
-    let frameInfo = this.frame.getInfo();
+    return this._cachedDisplayedData = this.frame.getInfo({
+      root: this.root.frame,
+      allocations: (this.visibleCells.count || this.visibleCells.selfCount)
+    });
 
     /**
      * When inverting call tree, the costs and times are dependent on position
@@ -373,52 +355,6 @@ CallView.prototype = Heritage.extend(AbstractTreeItem.prototype, {
      * Every instance of a `CallView` represents a row in the call tree. The same
      * container node is used for all rows.
      */
-
-    // Leaf nodes in an inverted tree don't have to do anything special.
-    let isLeaf = this._level === 0;
-    let totalSamples = this.root.frame.samples;
-    let totalDuration = this.root.frame.duration;
-
-    // Self duration, cost
-    if (this.visibleCells.selfDuration) {
-      data.selfDuration = this.frame.youngestFrameSamples / totalSamples * totalDuration;
-    }
-    if (this.visibleCells.selfPercentage) {
-      data.selfPercentage = this.frame.youngestFrameSamples / totalSamples * 100;
-    }
-
-    // Total duration, cost
-    if (this.visibleCells.duration) {
-      data.totalDuration = this.frame.samples / totalSamples * totalDuration;
-    }
-    if (this.visibleCells.percentage) {
-      data.totalPercentage = this.frame.samples / totalSamples * 100;
-    }
-
-    // Raw samples.
-    if (this.visibleCells.samples) {
-      data.samples = this.frame.youngestFrameSamples;
-    }
-
-    // Self/total allocations count.
-    if (this.visibleCells.allocations) {
-      let childrenAllocations = this.frame.calls.reduce((acc, node) => acc + node.allocations, 0);
-      data.totalAllocations = this.frame.allocations + childrenAllocations;
-    }
-    if (this.visibleCells.selfAllocations) {
-      data.selfAllocations = this.frame.allocations;
-    }
-
-    // Frame name (function location or some meta information).
-    data.name = frameInfo.isMetaCategory
-      ? frameInfo.categoryData.label
-      : frameInfo.functionName || "";
-
-    data.tooltiptext = frameInfo.isMetaCategory
-      ? frameInfo.categoryData.label
-      : this.frame.location || "";
-
-    return this._cachedDisplayedData;
   },
 
   /**

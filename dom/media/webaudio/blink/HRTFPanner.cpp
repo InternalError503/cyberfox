@@ -41,7 +41,7 @@ const double MaxDelayTimeSeconds = 0.002;
 const int UninitializedAzimuth = -1;
 const unsigned RenderingQuantum = WEBAUDIO_BLOCK_SIZE;
 
-HRTFPanner::HRTFPanner(float sampleRate, mozilla::TemporaryRef<HRTFDatabaseLoader> databaseLoader)
+HRTFPanner::HRTFPanner(float sampleRate, already_AddRefed<HRTFDatabaseLoader> databaseLoader)
     : m_databaseLoader(databaseLoader)
     , m_sampleRate(sampleRate)
     , m_crossfadeSelection(CrossfadeSelection1)
@@ -80,10 +80,10 @@ size_t HRTFPanner::sizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) cons
     amount += m_convolverL2.sizeOfExcludingThis(aMallocSizeOf);
     amount += m_convolverR2.sizeOfExcludingThis(aMallocSizeOf);
     amount += m_delayLine.SizeOfExcludingThis(aMallocSizeOf);
-    amount += m_tempL1.SizeOfExcludingThis(aMallocSizeOf);
-    amount += m_tempL2.SizeOfExcludingThis(aMallocSizeOf);
-    amount += m_tempR1.SizeOfExcludingThis(aMallocSizeOf);
-    amount += m_tempR2.SizeOfExcludingThis(aMallocSizeOf);
+    amount += m_tempL1.ShallowSizeOfExcludingThis(aMallocSizeOf);
+    amount += m_tempL2.ShallowSizeOfExcludingThis(aMallocSizeOf);
+    amount += m_tempR1.ShallowSizeOfExcludingThis(aMallocSizeOf);
+    amount += m_tempR2.ShallowSizeOfExcludingThis(aMallocSizeOf);
 
     return amount;
 }

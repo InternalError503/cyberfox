@@ -32,13 +32,12 @@
 
   // 3. Shared components
   var ConversationToolbar = loop.shared.views.ConversationToolbar;
-  var FeedbackView = loop.shared.views.FeedbackView;
+  var FeedbackView = loop.feedbackViews.FeedbackView;
   var Checkbox = loop.shared.views.Checkbox;
   var TextChatView = loop.shared.views.chat.TextChatView;
 
   // Store constants
   var ROOM_STATES = loop.store.ROOM_STATES;
-  var FEEDBACK_STATES = loop.store.FEEDBACK_STATES;
   var CALL_TYPES = loop.shared.utils.CALL_TYPES;
 
   // Local helpers
@@ -76,23 +75,27 @@
 
   var dispatcher = new loop.Dispatcher();
 
-  // Feedback API client configured to send data to the stage input server,
-  // which is available at https://input.allizom.org
-  var stageFeedbackApiClient = new loop.FeedbackAPIClient(
-    "https://input.allizom.org/api/v1/feedback", {
-      product: "Loop"
-    }
-  );
+  var MockSDK = function() {
+    dispatcher.register(this, [
+      "setupStreamElements"
+    ]);
+  };
 
-  var mockSDK = _.extend({
+  MockSDK.prototype = {
+    setupStreamElements: function() {
+      // Dummy function to stop warnings.
+    },
+
     sendTextChatMessage: function(actionData) {
       dispatcher.dispatch(new loop.shared.actions.ReceivedTextChatMessage({
-        contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
+        contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
         message: actionData.message,
         receivedTimestamp: actionData.sentTimestamp
       }));
     }
-  }, Backbone.Events);
+  };
+
+  var mockSDK = new MockSDK();
 
   /**
    * Every view that uses an activeRoomStore needs its own; if they shared
@@ -127,7 +130,6 @@
     });
 
     store.forcedUpdate = function forcedUpdate(contentWindow) {
-
       // Since this is called by setTimeout, we don't want to lose any
       // exceptions if there's a problem and we need to debug, so...
       try {
@@ -147,6 +149,17 @@
             camera: {height: 480, orientation: 0, width: 640}
           },
           remoteVideoEnabled: options.remoteVideoEnabled,
+          // Override the matchMedia, this is so that the correct version is
+          // used for the frame.
+          //
+          // Currently, we use an icky hack, and the showcase conspires with
+          // react-frame-component to set iframe.contentWindow.matchMedia onto
+          // the store. Once React context matures a bit (somewhere between
+          // 0.14 and 1.0, apparently):
+          //
+          // https://facebook.github.io/react/blog/2015/02/24/streamlining-react-elements.html#solution-make-context-parent-based-instead-of-owner-based
+          //
+          // we should be able to use those to clean this up.
           matchMedia: contentWindow.matchMedia.bind(contentWindow),
           roomState: options.roomState,
           videoMuted: !!options.videoMuted
@@ -196,6 +209,10 @@
     roomState: ROOM_STATES.HAS_PARTICIPANTS
   });
 
+  var updatingMobileActiveRoomStore = makeActiveRoomStore({
+    roomState: ROOM_STATES.HAS_PARTICIPANTS
+  });
+
   var localFaceMuteRoomStore = makeActiveRoomStore({
     roomState: ROOM_STATES.HAS_PARTICIPANTS,
     videoMuted: true
@@ -212,12 +229,19 @@
     receivingScreenShare: true
   });
 
+  var updatingSharingRoomMobileStore = makeActiveRoomStore({
+    roomState: ROOM_STATES.HAS_PARTICIPANTS,
+    receivingScreenShare: true
+  });
+
   var loadingRemoteLoadingScreenStore = makeActiveRoomStore({
     mediaConnected: false,
+    receivingScreenShare: true,
     roomState: ROOM_STATES.HAS_PARTICIPANTS,
     remoteSrcVideoObject: false
   });
   var loadingScreenSharingRoomStore = makeActiveRoomStore({
+    receivingScreenShare: true,
     roomState: ROOM_STATES.HAS_PARTICIPANTS
   });
 
@@ -245,7 +269,10 @@
   });
 
   var invitationRoomStore = new loop.store.RoomStore(dispatcher, {
-    mozLoop: navigator.mozLoop
+    mozLoop: navigator.mozLoop,
+    activeRoomStore: makeActiveRoomStore({
+      roomState: ROOM_STATES.INIT
+    })
   });
 
   var roomStore = new loop.store.RoomStore(dispatcher, {
@@ -261,6 +288,20 @@
       roomState: ROOM_STATES.HAS_PARTICIPANTS,
       mediaConnected: false,
       remoteSrcVideoObject: false
+    })
+  });
+
+  var desktopRoomStoreMedium = new loop.store.RoomStore(dispatcher, {
+    mozLoop: navigator.mozLoop,
+    activeRoomStore: makeActiveRoomStore({
+      roomState: ROOM_STATES.HAS_PARTICIPANTS
+    })
+  });
+
+  var desktopRoomStoreLarge = new loop.store.RoomStore(dispatcher, {
+    mozLoop: navigator.mozLoop,
+    activeRoomStore: makeActiveRoomStore({
+      roomState: ROOM_STATES.HAS_PARTICIPANTS
     })
   });
 
@@ -283,17 +324,58 @@
     activeRoomStore: desktopRemoteFaceMuteActiveRoomStore
   });
 
-  var feedbackStore = new loop.store.FeedbackStore(dispatcher, {
-    feedbackClient: stageFeedbackApiClient
-  });
-  var conversationStore = new loop.store.ConversationStore(dispatcher, {
-    client: {},
-    mozLoop: navigator.mozLoop,
-    sdkDriver: mockSDK
-  });
   var textChatStore = new loop.store.TextChatStore(dispatcher, {
     sdkDriver: mockSDK
   });
+
+  /**
+   * Every view that uses an conversationStore needs its own; if they shared
+   * a conversation store, they'd interfere with each other.
+   *
+   * @param options
+   * @returns {loop.store.ConversationStore}
+   */
+  function makeConversationStore() {
+    var roomDispatcher = new loop.Dispatcher();
+
+    var store = new loop.store.ConversationStore(dispatcher, {
+      client: {},
+      mozLoop: navigator.mozLoop,
+      sdkDriver: mockSDK
+    });
+
+    store.forcedUpdate = function forcedUpdate(contentWindow) {
+      // Since this is called by setTimeout, we don't want to lose any
+      // exceptions if there's a problem and we need to debug, so...
+      try {
+        var newStoreState = {
+          // Override the matchMedia, this is so that the correct version is
+          // used for the frame.
+          //
+          // Currently, we use an icky hack, and the showcase conspires with
+          // react-frame-component to set iframe.contentWindow.matchMedia onto
+          // the store. Once React context matures a bit (somewhere between
+          // 0.14 and 1.0, apparently):
+          //
+          // https://facebook.github.io/react/blog/2015/02/24/streamlining-react-elements.html#solution-make-context-parent-based-instead-of-owner-based
+          //
+          // we should be able to use those to clean this up.
+          matchMedia: contentWindow.matchMedia.bind(contentWindow)
+        };
+
+        store.setStoreState(newStoreState);
+      } catch (ex) {
+        console.error("exception in forcedUpdate:", ex);
+      }
+    };
+
+    return store;
+  }
+
+  var conversationStores = [];
+  for (var index = 0; index < 5; index++) {
+    conversationStores[index] = makeConversationStore();
+  }
 
   // Update the text chat store with the room info.
   textChatStore.updateRoomInfo(new sharedActions.UpdateRoomInfo({
@@ -310,53 +392,47 @@
   textChatStore.setStoreState({textChatEnabled: true});
 
   dispatcher.dispatch(new sharedActions.SendTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
     message: "Rheet!",
     sentTimestamp: "2015-06-23T22:21:45.590Z"
   }));
   dispatcher.dispatch(new sharedActions.ReceivedTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
-    message: "Hi there",
-    receivedTimestamp: "2015-06-23T22:21:45.590Z"
-  }));
-  dispatcher.dispatch(new sharedActions.ReceivedTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
     message: "Hello",
     receivedTimestamp: "2015-06-23T23:24:45.590Z"
   }));
   dispatcher.dispatch(new sharedActions.SendTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
+    message: "Nowforareallylongwordwithoutspacesorpunctuationwhichshouldcause" +
+    "linewrappingissuesifthecssiswrong",
+    sentTimestamp: "2015-06-23T22:23:45.590Z"
+  }));
+  dispatcher.dispatch(new sharedActions.SendTextChatMessage({
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
     message: "Check out this menu from DNA Pizza:" +
     " http://example.com/DNA/pizza/menu/lots-of-different-kinds-of-pizza/" +
     "%8D%E0%B8%88%E0%B8%A1%E0%B8%A3%E0%8D%E0%B8%88%E0%B8%A1%E0%B8%A3%E0%",
     sentTimestamp: "2015-06-23T22:23:45.590Z"
   }));
-  dispatcher.dispatch(new sharedActions.SendTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
-    message: "Nowforareallylongwordwithoutspacesorpunctuationwhichshouldcause" +
-    "linewrappingissuesifthecssiswrong",
-    sentTimestamp: "2015-06-23T22:23:45.590Z"
-  }));
   dispatcher.dispatch(new sharedActions.ReceivedTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
     message: "That avocado monkey-brains pie sounds tasty!",
     receivedTimestamp: "2015-06-23T22:25:45.590Z"
   }));
   dispatcher.dispatch(new sharedActions.SendTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
     message: "What time should we meet?",
     sentTimestamp: "2015-06-23T22:27:45.590Z"
   }));
-  dispatcher.dispatch(new sharedActions.SendTextChatMessage({
-    contentType: loop.store.CHAT_CONTENT_TYPES.TEXT,
-    message: "8:00",
-    sentTimestamp: "2015-06-23T22:27:45.590Z"
+  dispatcher.dispatch(new sharedActions.ReceivedTextChatMessage({
+    contentType: loop.shared.utils.CHAT_CONTENT_TYPES.TEXT,
+    message: "8:00 PM",
+    receivedTimestamp: "2015-06-23T22:27:45.590Z"
   }));
 
   loop.store.StoreMixin.register({
     activeRoomStore: activeRoomStore,
-    conversationStore: conversationStore,
-    feedbackStore: feedbackStore,
+    conversationStore: conversationStores[0],
     textChatStore: textChatStore
   });
 
@@ -374,14 +450,6 @@
   var mockClient = {
     requestCallUrlInfo: noop
   };
-
-  var mockConversationModel = new loop.shared.models.ConversationModel({
-    callerId: "Mrs Jones",
-    urlCreationDate: (new Date() / 1000).toString()
-  }, {
-    sdk: mockSDK
-  });
-  mockConversationModel.startSession = noop;
 
   var mockWebSocket = new loop.CallConnectionWebSocket({
     url: "fake",
@@ -423,8 +491,8 @@
     shapes: {
       "10x10": ["close", "close-active", "close-disabled", "dropdown",
         "dropdown-white", "dropdown-active", "dropdown-disabled", "edit",
-        "edit-active", "edit-disabled", "expand", "expand-active", "expand-disabled",
-        "minimize", "minimize-active", "minimize-disabled"
+        "edit-active", "edit-disabled", "edit-white", "expand", "expand-active",
+        "expand-disabled", "minimize", "minimize-active", "minimize-disabled"
       ],
       "14x14": ["audio", "audio-active", "audio-disabled", "facemute",
         "facemute-active", "facemute-disabled", "hangup", "hangup-active",
@@ -778,7 +846,7 @@
               <div className="fx-embedded">
                 <CallFailedView dispatcher={dispatcher}
                                 outgoing={false}
-                                store={conversationStore} />
+                                store={conversationStores[0]} />
               </div>
             </Example>
             <Example dashed={true}
@@ -787,7 +855,7 @@
               <div className="fx-embedded">
                 <CallFailedView dispatcher={dispatcher}
                                 outgoing={true}
-                                store={conversationStore} />
+                                store={conversationStores[1]} />
               </div>
             </Example>
             <Example dashed={true}
@@ -796,18 +864,22 @@
               <div className="fx-embedded">
                 <CallFailedView dispatcher={dispatcher} emailLinkError={true}
                                 outgoing={true}
-                                store={conversationStore} />
+                                store={conversationStores[0]} />
               </div>
             </Example>
           </Section>
 
           <Section name="OngoingConversationView">
-            <FramedExample height={254}
-                           summary="Desktop ongoing conversation window"
-                           width={298}>
+            <FramedExample
+              dashed={true}
+              height={394}
+              onContentsRendered={conversationStores[0].forcedUpdate}
+              summary="Desktop ongoing conversation window"
+              width={298}>
               <div className="fx-embedded">
                 <OngoingConversationView
                   audio={{enabled: true}}
+                  conversationStore={conversationStores[0]}
                   dispatcher={dispatcher}
                   localPosterUrl="sample-img/video-screen-local.png"
                   mediaConnected={true}
@@ -817,28 +889,55 @@
               </div>
             </FramedExample>
 
-            <FramedExample height={600}
-                           summary="Desktop ongoing conversation window large"
-                           width={800}>
-                <div className="fx-embedded">
-                  <OngoingConversationView
-                    audio={{enabled: true}}
-                    dispatcher={dispatcher}
-                    localPosterUrl="sample-img/video-screen-local.png"
-                    mediaConnected={true}
-                    remotePosterUrl="sample-img/video-screen-remote.png"
-                    remoteVideoEnabled={true}
-                    video={{enabled: true}} />
-                </div>
+            <FramedExample
+              dashed={true}
+              height={400}
+              onContentsRendered={conversationStores[1].forcedUpdate}
+              summary="Desktop ongoing conversation window (medium)"
+              width={600}>
+              <div className="fx-embedded">
+                <OngoingConversationView
+                  audio={{enabled: true}}
+                  conversationStore={conversationStores[1]}
+                  dispatcher={dispatcher}
+                  localPosterUrl="sample-img/video-screen-local.png"
+                  mediaConnected={true}
+                  remotePosterUrl="sample-img/video-screen-remote.png"
+                  remoteVideoEnabled={true}
+                  video={{enabled: true}} />
+              </div>
             </FramedExample>
 
-            <FramedExample height={254}
+            <FramedExample
+              height={600}
+              onContentsRendered={conversationStores[2].forcedUpdate}
+              summary="Desktop ongoing conversation window (large)"
+              width={800}>
+              <div className="fx-embedded">
+                <OngoingConversationView
+                  audio={{enabled: true}}
+                  conversationStore={conversationStores[2]}
+                  dispatcher={dispatcher}
+                  localPosterUrl="sample-img/video-screen-local.png"
+                  mediaConnected={true}
+                  remotePosterUrl="sample-img/video-screen-remote.png"
+                  remoteVideoEnabled={true}
+                  video={{enabled: true}} />
+              </div>
+            </FramedExample>
+
+            <FramedExample
+              dashed={true}
+              height={394}
+              onContentsRendered={conversationStores[3].forcedUpdate}
               summary="Desktop ongoing conversation window - local face mute"
               width={298} >
               <div className="fx-embedded">
                 <OngoingConversationView
                   audio={{enabled: true}}
+                  conversationStore={conversationStores[3]}
                   dispatcher={dispatcher}
+                  localPosterUrl="sample-img/video-screen-local.png"
                   mediaConnected={true}
                   remotePosterUrl="sample-img/video-screen-remote.png"
                   remoteVideoEnabled={true}
@@ -846,15 +945,19 @@
               </div>
             </FramedExample>
 
-            <FramedExample height={254}
+            <FramedExample
+              dashed={true} height={394}
+              onContentsRendered={conversationStores[4].forcedUpdate}
               summary="Desktop ongoing conversation window - remote face mute"
               width={298} >
               <div className="fx-embedded">
                 <OngoingConversationView
                   audio={{enabled: true}}
+                  conversationStore={conversationStores[4]}
                   dispatcher={dispatcher}
                   localPosterUrl="sample-img/video-screen-local.png"
                   mediaConnected={true}
+                  remotePosterUrl="sample-img/video-screen-remote.png"
                   remoteVideoEnabled={false}
                   video={{enabled: true}} />
               </div>
@@ -864,23 +967,12 @@
 
           <Section name="FeedbackView">
             <p className="note">
-              <strong>Note:</strong> For the useable demo, you can access submitted data at&nbsp;
-              <a href="https://input.allizom.org/">input.allizom.org</a>.
             </p>
             <Example dashed={true}
                      style={{width: "300px", height: "272px"}}
                      summary="Default (useable demo)">
-              <FeedbackView feedbackStore={feedbackStore} />
-            </Example>
-            <Example dashed={true}
-                     style={{width: "300px", height: "272px"}}
-                     summary="Detailed form">
-              <FeedbackView feedbackState={FEEDBACK_STATES.DETAILS} feedbackStore={feedbackStore} />
-            </Example>
-            <Example dashed={true}
-                     style={{width: "300px", height: "272px"}}
-                     summary="Thank you!">
-              <FeedbackView feedbackState={FEEDBACK_STATES.SENT} feedbackStore={feedbackStore}/>
+              <FeedbackView mozLoop={{}}
+                            onAfterFeedbackReceived={function() {}} />
             </Example>
           </Section>
 
@@ -920,7 +1012,8 @@
 
           <Section name="DesktopRoomConversationView">
             <FramedExample
-              height={254}
+              height={398}
+              onContentsRendered={invitationRoomStore.activeRoomStore.forcedUpdate}
               summary="Desktop room conversation (invitation, text-chat inclusion/scrollbars don't happen in real client)"
               width={298}>
               <div className="fx-embedded">
@@ -928,6 +1021,7 @@
                   dispatcher={dispatcher}
                   localPosterUrl="sample-img/video-screen-local.png"
                   mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
                   roomState={ROOM_STATES.INIT}
                   roomStore={invitationRoomStore} />
               </div>
@@ -936,6 +1030,7 @@
             <FramedExample
               dashed={true}
               height={394}
+              onContentsRendered={desktopRoomStoreLoading.activeRoomStore.forcedUpdate}
               summary="Desktop room conversation (loading)"
               width={298}>
               {/* Hide scrollbars here. Rotating loading div overflows and causes
@@ -945,39 +1040,86 @@
                   dispatcher={dispatcher}
                   localPosterUrl="sample-img/video-screen-local.png"
                   mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
                   remotePosterUrl="sample-img/video-screen-remote.png"
                   roomState={ROOM_STATES.HAS_PARTICIPANTS}
                   roomStore={desktopRoomStoreLoading} />
               </div>
             </FramedExample>
 
-            <FramedExample height={254}
-                           summary="Desktop room conversation">
+            <FramedExample
+              dashed={true}
+              height={394}
+              onContentsRendered={roomStore.activeRoomStore.forcedUpdate}
+              summary="Desktop room conversation"
+              width={298}>
               <div className="fx-embedded">
                 <DesktopRoomConversationView
                   dispatcher={dispatcher}
                   localPosterUrl="sample-img/video-screen-local.png"
                   mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
                   remotePosterUrl="sample-img/video-screen-remote.png"
                   roomState={ROOM_STATES.HAS_PARTICIPANTS}
                   roomStore={roomStore} />
               </div>
             </FramedExample>
 
-            <FramedExample dashed={true}
-                           height={394}
-                           summary="Desktop room conversation local face-mute"
-                           width={298}>
+            <FramedExample
+              dashed={true}
+              height={482}
+              onContentsRendered={desktopRoomStoreMedium.activeRoomStore.forcedUpdate}
+              summary="Desktop room conversation (medium)"
+              width={602}>
+              <div className="fx-embedded">
+                <DesktopRoomConversationView
+                  dispatcher={dispatcher}
+                  localPosterUrl="sample-img/video-screen-local.png"
+                  mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
+                  remotePosterUrl="sample-img/video-screen-remote.png"
+                  roomState={ROOM_STATES.HAS_PARTICIPANTS}
+                  roomStore={desktopRoomStoreMedium} />
+              </div>
+            </FramedExample>
+
+            <FramedExample
+              dashed={true}
+              height={485}
+              onContentsRendered={desktopRoomStoreLarge.activeRoomStore.forcedUpdate}
+              summary="Desktop room conversation (large)"
+              width={646}>
+              <div className="fx-embedded">
+                <DesktopRoomConversationView
+                  dispatcher={dispatcher}
+                  localPosterUrl="sample-img/video-screen-local.png"
+                  mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
+                  remotePosterUrl="sample-img/video-screen-remote.png"
+                  roomState={ROOM_STATES.HAS_PARTICIPANTS}
+                  roomStore={desktopRoomStoreLarge} />
+              </div>
+            </FramedExample>
+
+            <FramedExample
+              dashed={true}
+              height={394}
+              onContentsRendered={desktopLocalFaceMuteRoomStore.activeRoomStore.forcedUpdate}
+              summary="Desktop room conversation local face-mute"
+              width={298}>
               <div className="fx-embedded">
                 <DesktopRoomConversationView
                   dispatcher={dispatcher}
                   mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
                   remotePosterUrl="sample-img/video-screen-remote.png"
                   roomStore={desktopLocalFaceMuteRoomStore} />
               </div>
             </FramedExample>
 
-            <FramedExample dashed={true} height={394}
+            <FramedExample dashed={true}
+                           height={394}
+                           onContentsRendered={desktopRemoteFaceMuteRoomStore.activeRoomStore.forcedUpdate}
                            summary="Desktop room conversation remote face-mute"
                            width={298} >
               <div className="fx-embedded">
@@ -985,6 +1127,8 @@
                   dispatcher={dispatcher}
                   localPosterUrl="sample-img/video-screen-local.png"
                   mozLoop={navigator.mozLoop}
+                  onCallTerminated={function(){}}
+                  remotePosterUrl="sample-img/video-screen-remote.png"
                   roomStore={desktopRemoteFaceMuteRoomStore} />
               </div>
             </FramedExample>
@@ -1102,8 +1246,7 @@
                     isFirefox={true}
                     localPosterUrl="sample-img/video-screen-local.png"
                     remotePosterUrl="sample-img/video-screen-remote.png"
-                    roomState={ROOM_STATES.HAS_PARTICIPANTS}
-                    screenSharePosterUrl="sample-img/video-screen-baz.png" />
+                    roomState={ROOM_STATES.HAS_PARTICIPANTS} />
                 </div>
             </FramedExample>
 
@@ -1123,8 +1266,7 @@
                     isFirefox={true}
                     localPosterUrl="sample-img/video-screen-local.png"
                     remotePosterUrl="sample-img/video-screen-remote.png"
-                    roomState={ROOM_STATES.HAS_PARTICIPANTS}
-                    screenSharePosterUrl="sample-img/video-screen-baz.png" />
+                    roomState={ROOM_STATES.HAS_PARTICIPANTS} />
                 </div>
             </FramedExample>
 
@@ -1176,20 +1318,6 @@
             <FramedExample cssClass="standalone"
                            dashed={true}
                            height={483}
-                           summary="Standalone room conversation (feedback)"
-                           width={644}>
-              <div className="standalone">
-                <StandaloneRoomView
-                  activeRoomStore={endedRoomStore}
-                  dispatcher={dispatcher}
-                  feedbackStore={feedbackStore}
-                  isFirefox={false} />
-              </div>
-            </FramedExample>
-
-            <FramedExample cssClass="standalone"
-                           dashed={true}
-                           height={483}
                            summary="Standalone room conversation (failed)"
                            width={644} >
               <div className="standalone">
@@ -1206,12 +1334,12 @@
               cssClass="standalone"
               dashed={true}
               height={480}
-              onContentsRendered={updatingActiveRoomStore.forcedUpdate}
+              onContentsRendered={updatingMobileActiveRoomStore.forcedUpdate}
               summary="Standalone room conversation (has-participants, 600x480)"
               width={600}>
                 <div className="standalone">
                   <StandaloneRoomView
-                    activeRoomStore={updatingActiveRoomStore}
+                    activeRoomStore={updatingMobileActiveRoomStore}
                     dispatcher={dispatcher}
                     isFirefox={true}
                     localPosterUrl="sample-img/video-screen-local.png"
@@ -1221,13 +1349,15 @@
             </FramedExample>
 
             <FramedExample
+              cssClass="standalone"
+              dashed={true}
               height={480}
-              onContentsRendered={updatingSharingRoomStore.forcedUpdate}
+              onContentsRendered={updatingSharingRoomMobileStore.forcedUpdate}
               summary="Standalone room convo (has-participants, receivingScreenShare, 600x480)"
               width={600} >
                 <div className="standalone" cssClass="standalone">
                   <StandaloneRoomView
-                    activeRoomStore={updatingSharingRoomStore}
+                    activeRoomStore={updatingSharingRoomMobileStore}
                     dispatcher={dispatcher}
                     isFirefox={true}
                     localPosterUrl="sample-img/video-screen-local.png"
@@ -1284,6 +1414,15 @@
   });
 
   window.addEventListener("DOMContentLoaded", function() {
+    var uncaughtError;
+    var consoleWarn = console.warn;
+    var caughtWarnings = [];
+    console.warn = function() {
+      var args = Array.slice(arguments);
+      caughtWarnings.push(args);
+      consoleWarn.apply(console, args);
+    };
+
     try {
       React.renderComponent(<App />, document.getElementById("main"));
 
@@ -1306,12 +1445,23 @@
 
       // This simulates the mocha layout for errors which means we can run
       // this alongside our other unit tests but use the same harness.
-      if (uncaughtError) {
-        $("#results").append("<div class='failures'><em>1</em></div>");
-        $("#results").append("<li class='test fail'>" +
-          "<h2>Errors rendering UI-Showcase</h2>" +
-          "<pre class='error'>" + uncaughtError + "\n" + uncaughtError.stack + "</pre>" +
-          "</li>");
+      var expectedWarningsCount = 18;
+      var warningsMismatch = caughtWarnings.length !== expectedWarningsCount;
+      if (uncaughtError || warningsMismatch) {
+        $("#results").append("<div class='failures'><em>" +
+          ((uncaughtError && warningsMismatch) ? 2 : 1) + "</em></div>");
+        if (warningsMismatch) {
+          $("#results").append("<li class='test fail'>" +
+            "<h2>Unexpected number of warnings detected in UI-Showcase</h2>" +
+            "<pre class='error'>Got: " + caughtWarnings.length + "\n" +
+            "Expected: " + expectedWarningsCount + "</pre></li>");
+        }
+        if (uncaughtError) {
+          $("#results").append("<li class='test fail'>" +
+            "<h2>Errors rendering UI-Showcase</h2>" +
+            "<pre class='error'>" + uncaughtError + "\n" + uncaughtError.stack + "</pre>" +
+            "</li>");
+        }
       } else {
         $("#results").append("<div class='failures'><em>0</em></div>");
       }

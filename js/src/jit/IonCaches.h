@@ -9,11 +9,16 @@
 
 #if defined(JS_CODEGEN_ARM)
 # include "jit/arm/Assembler-arm.h"
+#elif defined(JS_CODEGEN_ARM64)
+# include "jit/arm64/Assembler-arm64.h"
 #elif defined(JS_CODEGEN_MIPS)
 # include "jit/mips/Assembler-mips.h"
 #endif
+#include "jit/JitCompartment.h"
 #include "jit/Registers.h"
 #include "jit/shared/Assembler-shared.h"
+#include "js/TrackedOptimizationInfo.h"
+
 #include "vm/TypedArrayCommon.h"
 
 namespace js {
@@ -296,7 +301,8 @@ class IonCache
     // Combine both linkStub and attachStub into one function. In addition, it
     // produces a spew augmented with the attachKind string.
     bool linkAndAttachStub(JSContext* cx, MacroAssembler& masm, StubAttacher& attacher,
-                           IonScript* ion, const char* attachKind);
+                           IonScript* ion, const char* attachKind,
+                           JS::TrackedOutcome = JS::TrackedOutcome::ICOptStub_GenericSuccess);
 
 #ifdef DEBUG
     bool isAllocated() {
@@ -610,7 +616,7 @@ class GetElementIC : public IonCache
     LiveRegisterSet liveRegs_;
 
     Register object_;
-    ConstantOrRegister index_;
+    TypedOrValueRegister index_;
     TypedOrValueRegister output_;
 
     bool monitoredResult_ : 1;
@@ -624,7 +630,7 @@ class GetElementIC : public IonCache
     static const size_t MAX_FAILED_UPDATES;
 
   public:
-    GetElementIC(LiveRegisterSet liveRegs, Register object, ConstantOrRegister index,
+    GetElementIC(LiveRegisterSet liveRegs, Register object, TypedOrValueRegister index,
                  TypedOrValueRegister output, bool monitoredResult, bool allowDoubleResult)
       : liveRegs_(liveRegs),
         object_(object),
@@ -646,7 +652,7 @@ class GetElementIC : public IonCache
     Register object() const {
         return object_;
     }
-    ConstantOrRegister index() const {
+    TypedOrValueRegister index() const {
         return index_;
     }
     TypedOrValueRegister output() const {

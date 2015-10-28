@@ -36,6 +36,7 @@
 #include "mozilla/Attributes.h"
 #include "mozilla/EventForwards.h"
 #include "mozilla/MemoryReporting.h"
+#include "MobileViewportManager.h"
 #include "ZoomConstraintsClient.h"
 
 class nsRange;
@@ -105,6 +106,7 @@ public:
   virtual nsresult Initialize(nscoord aWidth, nscoord aHeight) override;
   virtual nsresult ResizeReflow(nscoord aWidth, nscoord aHeight) override;
   virtual nsresult ResizeReflowOverride(nscoord aWidth, nscoord aHeight) override;
+  virtual nsresult ResizeReflowIgnoreOverride(nscoord aWidth, nscoord aHeight) override;
   virtual nsIPageSequenceFrame* GetPageSequenceFrame() const override;
   virtual nsCanvasFrame* GetCanvasFrame() const override;
   virtual nsIFrame* GetRealPrimaryFrameFor(nsIContent* aContent) const override;
@@ -186,16 +188,18 @@ public:
                                               nscolor aBackgroundColor,
                                               gfxContext* aThebesContext) override;
 
-  virtual mozilla::TemporaryRef<SourceSurface>
+  virtual already_AddRefed<SourceSurface>
   RenderNode(nsIDOMNode* aNode,
              nsIntRegion* aRegion,
              nsIntPoint& aPoint,
-             nsIntRect* aScreenRect) override;
+             nsIntRect* aScreenRect,
+             uint32_t aFlags) override;
 
-  virtual mozilla::TemporaryRef<SourceSurface>
+  virtual already_AddRefed<SourceSurface>
   RenderSelection(nsISelection* aSelection,
                   nsIntPoint& aPoint,
-                  nsIntRect* aScreenRect) override;
+                  nsIntRect* aScreenRect,
+                  uint32_t aFlags) override;
 
   virtual already_AddRefed<nsPIDOMWindow> GetRootWindow() override;
 
@@ -354,7 +358,9 @@ public:
 
   virtual nsresult SetIsActive(bool aIsActive) override;
 
-  virtual bool GetIsViewportOverridden() override { return mViewportOverridden; }
+  virtual bool GetIsViewportOverridden() override {
+    return mViewportOverridden || (mMobileViewportManager != nullptr);
+  }
 
   virtual bool IsLayoutFlushObserver() override
   {
@@ -407,6 +413,7 @@ protected:
   void HandlePostedReflowCallbacks(bool aInterruptible);
   void CancelPostedReflowCallbacks();
 
+  void ScheduleBeforeFirstPaint();
   void UnsuppressAndInvalidate();
 
   void WillCauseReflow() {
@@ -445,9 +452,6 @@ protected:
   // MaybeScheduleReflow and the reflow timer ScheduleReflowOffTimer
   // sets up.
   void     ScheduleReflow();
-
-  // Reflow regardless of whether the override bit has been set.
-  nsresult ResizeReflowIgnoreOverride(nscoord aWidth, nscoord aHeight);
 
   // DoReflow returns whether the reflow finished without interruption
   bool DoReflow(nsIFrame* aFrame, bool aInterruptible);
@@ -542,14 +546,17 @@ protected:
    * aPoint - reference point, typically the mouse position
    * aScreenRect - [out] set to the area of the screen the painted area should
    *               be displayed at
+   * aFlags - set RENDER_AUTO_SCALE to scale down large images, but it must not
+   *          be set if a custom image was specified
    */
-  mozilla::TemporaryRef<SourceSurface>
+  already_AddRefed<SourceSurface>
   PaintRangePaintInfo(nsTArray<nsAutoPtr<RangePaintInfo> >* aItems,
                       nsISelection* aSelection,
                       nsIntRegion* aRegion,
                       nsRect aArea,
                       nsIntPoint& aPoint,
-                      nsIntRect* aScreenRect);
+                      nsIntRect* aScreenRect,
+                      uint32_t aFlags);
 
   /**
    * Methods to handle changes to user and UA sheet lists that we get
@@ -813,6 +820,7 @@ protected:
   TouchManager              mTouchManager;
 
   nsRefPtr<ZoomConstraintsClient> mZoomConstraintsClient;
+  nsRefPtr<MobileViewportManager> mMobileViewportManager;
 
   // TouchCaret
   nsRefPtr<mozilla::TouchCaret> mTouchCaret;

@@ -23,7 +23,6 @@ let test = Task.async(function*() {
   yield startRecording(panel);
   yield busyWait(100);
   yield waitUntil(() => PerformanceController.getCurrentRecording().getTicks().length);
-  yield waitUntil(() => PerformanceController.getCurrentRecording().getMemory().length);
   yield waitUntil(() => PerformanceController.getCurrentRecording().getMarkers().length);
   yield stopRecording(panel);
 
@@ -38,7 +37,6 @@ let test = Task.async(function*() {
   isEmptyArray(allocations.sites, "allocations.sites");
   isEmptyArray(allocations.timestamps, "allocations.timestamps");
   isEmptyArray(allocations.frames, "allocations.frames");
-  isEmptyArray(allocations.counts, "allocations.counts");
 
   let sampleCount = 0;
 

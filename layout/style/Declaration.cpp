@@ -367,8 +367,8 @@ Declaration::GetValue(nsCSSProperty aProperty, nsAString& aValue,
     case eCSSProperty_border_right:
     case eCSSProperty_border_bottom:
     case eCSSProperty_border_left:
-    case eCSSProperty_border_start:
-    case eCSSProperty_border_end:
+    case eCSSProperty_border_inline_start:
+    case eCSSProperty_border_inline_end:
     case eCSSProperty_border_block_start:
     case eCSSProperty_border_block_end:
     case eCSSProperty__moz_column_rule:
@@ -1392,7 +1392,7 @@ size_t
 Declaration::SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const
 {
   size_t n = aMallocSizeOf(this);
-  n += mOrder.SizeOfExcludingThis(aMallocSizeOf);
+  n += mOrder.ShallowSizeOfExcludingThis(aMallocSizeOf);
   n += mData          ? mData         ->SizeOfIncludingThis(aMallocSizeOf) : 0;
   n += mImportantData ? mImportantData->SizeOfIncludingThis(aMallocSizeOf) : 0;
   if (mVariables) {
@@ -1534,5 +1534,5 @@ Declaration::GetVariableValueIsImportant(const nsAString& aName) const
   return mImportantVariables && mImportantVariables->Has(aName);
 }
 
-} // namespace mozilla::css
+} // namespace css
 } // namespace mozilla

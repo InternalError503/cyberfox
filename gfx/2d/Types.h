@@ -266,6 +266,14 @@ public:
            uint32_t(r * 255.0f) << 16 | uint32_t(a * 255.0f) << 24;
   }
 
+  bool operator==(const Color& aColor) const {
+    return r == aColor.r && g == aColor.g && b == aColor.b && a == aColor.a;
+  }
+
+  bool operator!=(const Color& aColor) const {
+    return !(*this == aColor);
+  }
+
   Float r, g, b, a;
 };
 
@@ -279,8 +287,8 @@ struct GradientStop
   Color color;
 };
 
-}
-}
+} // namespace gfx
+} // namespace mozilla
 
 #if defined(XP_WIN) && defined(MOZ_GFX)
 #ifdef GFX2D_INTERNAL
@@ -322,6 +330,7 @@ enum SideBits {
   eSideBitsLeftRight = eSideBitsLeft | eSideBitsRight,
   eSideBitsAll = eSideBitsTopBottom | eSideBitsLeftRight
 };
+
 } // namespace mozilla
 
 #define NS_SIDE_TOP    mozilla::eSideTop

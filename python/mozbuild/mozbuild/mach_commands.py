@@ -394,15 +394,20 @@ class Build(MachCommandBase):
                 # For universal builds, we need to run the automation steps in
                 # the first architecture from MOZ_BUILD_PROJECTS
                 projects = make_extra.get('MOZ_BUILD_PROJECTS')
+                append_env = None
                 if projects:
-                    subdir = os.path.join(self.topobjdir, projects.split()[0])
+                    project = projects.split()[0]
+                    append_env = {b'MOZ_CURRENT_PROJECT': project.encode('utf-8')}
+                    subdir = os.path.join(self.topobjdir, project)
                 else:
                     subdir = self.topobjdir
                 moz_automation = os.getenv('MOZ_AUTOMATION') or make_extra.get('export MOZ_AUTOMATION', None)
                 if moz_automation and status == 0:
                     status = self._run_make(target='automation/build', directory=subdir,
                         line_handler=output.on_line, log=False, print_directory=False,
-                        ensure_exit_code=False, num_jobs=jobs, silent=not verbose)
+                        ensure_exit_code=False, num_jobs=jobs, silent=not verbose,
+                        append_env=append_env
+                    )
 
                 self.log(logging.WARNING, 'warning_summary',
                     {'count': len(monitor.warnings_database)},
@@ -422,9 +427,16 @@ class Build(MachCommandBase):
                 self.log(logging.INFO, 'ccache',
                          {'msg': ccache_diff.hit_rate_message()}, "{msg}")
 
-        if monitor.elapsed > 300:
+        notify_minimum_time = 300
+        try:
+            notify_minimum_time = int(os.environ.get('MACH_NOTIFY_MINTIME', '300'))
+        except ValueError:
+            # Just stick with the default
+            pass
+
+        if monitor.elapsed > notify_minimum_time:
             # Display a notification when the build completes.
-            self.notify('Build complete')
+            self.notify('Build complete' if not status else 'Build failed')
 
         if status:
             return status
@@ -650,13 +662,22 @@ class Warnings(MachCommandBase):
 
     @Command('warnings-summary', category='post-build',
         description='Show a summary of compiler warnings.')
+    @CommandArgument('-C', '--directory', default=None,
+        help='Change to a subdirectory of the build directory first.')
     @CommandArgument('report', default=None, nargs='?',
         help='Warnings report to display. If not defined, show the most '
             'recent report.')
-    def summary(self, report=None):
+    def summary(self, directory=None, report=None):
         database = self.database
 
-        type_counts = database.type_counts
+        if directory:
+            dirpath = self.join_ensure_dir(self.topsrcdir, directory)
+            if not dirpath:
+                return 1
+        else:
+            dirpath = None
+
+        type_counts = database.type_counts(dirpath)
         sorted_counts = sorted(type_counts.iteritems(),
             key=operator.itemgetter(1))
 
@@ -669,19 +690,41 @@ class Warnings(MachCommandBase):
 
     @Command('warnings-list', category='post-build',
         description='Show a list of compiler warnings.')
+    @CommandArgument('-C', '--directory', default=None,
+        help='Change to a subdirectory of the build directory first.')
+    @CommandArgument('--flags', default=None, nargs='+',
+        help='Which warnings flags to match.')
     @CommandArgument('report', default=None, nargs='?',
         help='Warnings report to display. If not defined, show the most '
             'recent report.')
-    def list(self, report=None):
+    def list(self, directory=None, flags=None, report=None):
         database = self.database
 
         by_name = sorted(database.warnings)
 
-        for warning in by_name:
-            filename = warning['filename']
+        topsrcdir = mozpath.normpath(self.topsrcdir)
 
-            if filename.startswith(self.topsrcdir):
-                filename = filename[len(self.topsrcdir) + 1:]
+        if directory:
+            directory = mozpath.normsep(directory)
+            dirpath = self.join_ensure_dir(topsrcdir, directory)
+            if not dirpath:
+                return 1
+
+        if flags:
+            # Flatten lists of flags.
+            flags = set(itertools.chain(*[flaglist.split(',') for flaglist in flags]))
+
+        for warning in by_name:
+            filename = mozpath.normsep(warning['filename'])
+
+            if filename.startswith(topsrcdir):
+                filename = filename[len(topsrcdir) + 1:]
+
+            if directory and not filename.startswith(directory):
+                continue
+
+            if flags and warning['flag'] not in flags:
+                continue
 
             if warning['column'] is not None:
                 print('%s:%d:%d [%s] %s' % (filename, warning['line'],
@@ -689,6 +732,16 @@ class Warnings(MachCommandBase):
             else:
                 print('%s:%d [%s] %s' % (filename, warning['line'],
                     warning['flag'], warning['message']))
+
+    def join_ensure_dir(self, dir1, dir2):
+        dir1 = mozpath.normpath(dir1)
+        dir2 = mozpath.normsep(dir2)
+        joined_path = mozpath.join(dir1, dir2)
+        if os.path.isdir(joined_path):
+            return joined_path
+        else:
+            print('Specified directory not found.')
+            return None
 
 @CommandProvider
 class GTestCommands(MachCommandBase):
@@ -717,7 +770,8 @@ class GTestCommands(MachCommandBase):
               debugger_args):
 
         # We lazy build gtest because it's slow to link
-        self._run_make(directory="testing/gtest", target='gtest', ensure_exit_code=True)
+        self._run_make(directory="testing/gtest", target='gtest',
+                       print_directory=False, ensure_exit_code=True)
 
         app_path = self.get_binary_path('app')
         args = [app_path, '-unittest'];
@@ -940,7 +994,7 @@ class RunProgram(MachCommandBase):
     @CommandArgumentGroup('DMD')
     @CommandArgument('--dmd', action='store_true', group='DMD',
         help='Enable DMD. The following arguments have no effect without this.')
-    @CommandArgument('--mode', choices=['live', 'dark-matter', 'cumulative'], group='DMD',
+    @CommandArgument('--mode', choices=['live', 'dark-matter', 'cumulative', 'scan'], group='DMD',
          help='Profiling mode. The default is \'dark-matter\'.')
     @CommandArgument('--sample-below', default=None, type=str, group='DMD',
         help='Sample blocks smaller than this. Use 1 for no sampling. The default is 4093.')

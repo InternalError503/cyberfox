@@ -18,6 +18,7 @@ const GRAB_DELAY = 400;
 const DRAG_DROP_AUTOSCROLL_EDGE_DISTANCE = 50;
 const DRAG_DROP_MIN_AUTOSCROLL_SPEED = 5;
 const DRAG_DROP_MAX_AUTOSCROLL_SPEED = 15;
+const AUTOCOMPLETE_POPUP_PANEL_ID = "markupview_autoCompletePopup";
 
 const {UndoStack} = require("devtools/shared/undo");
 const {editableField, InplaceEditor} = require("devtools/shared/inplace-editor");
@@ -30,8 +31,9 @@ const Heritage = require("sdk/core/heritage");
 const {setTimeout, clearTimeout, setInterval, clearInterval} = require("sdk/timers");
 const {parseAttribute} = require("devtools/shared/node-attribute-parser");
 const ELLIPSIS = Services.prefs.getComplexValue("intl.ellipsis", Ci.nsIPrefLocalizedString).data;
+const {Task} = require("resource://gre/modules/Task.jsm");
+const LayoutHelpers = require("devtools/toolkit/layout-helpers");
 
-Cu.import("resource://gre/modules/devtools/LayoutHelpers.jsm");
 Cu.import("resource://gre/modules/devtools/Templater.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -84,7 +86,10 @@ function MarkupView(aInspector, aFrame, aControllerWindow) {
   // Creating the popup to be used to show CSS suggestions.
   let options = {
     autoSelect: true,
-    theme: "auto"
+    theme: "auto",
+    // panelId option prevents the markupView autocomplete popup from
+    // sharing XUL elements with other views, such as ruleView (see Bug 1191093)
+    panelId: AUTOCOMPLETE_POPUP_PANEL_ID
   };
   this.popup = new AutocompletePopup(this.doc.defaultView.parent.document, options);
 
@@ -110,6 +115,9 @@ function MarkupView(aInspector, aFrame, aControllerWindow) {
 
   this._boundKeyDown = this._onKeyDown.bind(this);
   this._frame.contentWindow.addEventListener("keydown", this._boundKeyDown, false);
+
+  this._onCopy = this._onCopy.bind(this);
+  this._frame.contentWindow.addEventListener("copy", this._onCopy);
 
   this._boundFocus = this._onFocus.bind(this);
   this._frame.addEventListener("focus", this._boundFocus, false);
@@ -507,6 +515,20 @@ MarkupView.prototype = {
     return walker;
   },
 
+  _onCopy: function (evt) {
+    // Ignore copy events from editors
+    if (this._isInputOrTextarea(evt.target)) {
+      return;
+    }
+
+    let selection = this._inspector.selection;
+    if (selection.isNode()) {
+      this._inspector.copyOuterHTML();
+    }
+    evt.stopPropagation();
+    evt.preventDefault();
+  },
+
   /**
    * Key handling.
    */
@@ -514,8 +536,7 @@ MarkupView.prototype = {
     let handled = true;
 
     // Ignore keystrokes that originated in editors.
-    if (aEvent.target.tagName.toLowerCase() === "input" ||
-        aEvent.target.tagName.toLowerCase() === "textarea") {
+    if (this._isInputOrTextarea(aEvent.target)) {
       return;
     }
 
@@ -612,6 +633,14 @@ MarkupView.prototype = {
       aEvent.stopPropagation();
       aEvent.preventDefault();
     }
+  },
+
+  /**
+   * Check if a node is an input or textarea
+   */
+  _isInputOrTextarea : function (element) {
+    let name = element.tagName.toLowerCase();
+    return name === "input" || name === "textarea";
   },
 
   /**
@@ -1441,11 +1470,6 @@ MarkupView.prototype = {
 
     this._destroyer = promise.resolve();
 
-    // Note that if the toolbox is closed, this will work fine, but will fail
-    // in case the browser is closed and will trigger a noSuchActor message.
-    // We ignore the promise that |_hideBoxModel| returns, since we should still
-    // proceed with the rest of destruction if it fails.
-    this._hideBoxModel();
     this._clearBriefBoxModelTimer();
 
     this._elt.removeEventListener("click", this._onMouseClick, false);
@@ -1484,6 +1508,9 @@ MarkupView.prototype = {
     this._frame.contentWindow.removeEventListener("keydown",
       this._boundKeyDown, false);
     this._boundKeyDown = null;
+
+    this._frame.contentWindow.removeEventListener("copy", this._onCopy);
+    this._onCopy = null;
 
     this._inspector.selection.off("new-node-front", this._boundOnNewSelection);
     this._boundOnNewSelection = null;
@@ -1905,6 +1932,16 @@ MarkupContainer.prototype = {
       event.preventDefault();
     }
 
+    let isMiddleClick = event.button === 1;
+    let isMetaClick = event.button === 0 && (event.metaKey || event.ctrlKey);
+
+    if (isMiddleClick || isMetaClick) {
+      let link = target.dataset.link;
+      let type = target.dataset.type;
+      this.markup._inspector.followAttributeLink(type, link);
+      return;
+    }
+
     // Start dragging the container after a delay.
     this.markup._dragStartEl = target;
     setTimeout(() => {
@@ -1928,7 +1965,7 @@ MarkupContainer.prototype = {
   /**
    * On mouse up, stop dragging.
    */
-  _onMouseUp: function(event) {
+  _onMouseUp: Task.async(function*() {
     this._isMouseDown = false;
 
     if (!this.isDragging) {
@@ -1940,13 +1977,14 @@ MarkupContainer.prototype = {
 
     let dropTargetNodes = this.markup.dropTargetNodes;
 
-    if(!dropTargetNodes) {
+    if (!dropTargetNodes) {
       return;
     }
 
-    this.markup.walker.insertBefore(this.node, dropTargetNodes.parent,
-                                    dropTargetNodes.nextSibling);
-  },
+    yield this.markup.walker.insertBefore(this.node, dropTargetNodes.parent,
+                                          dropTargetNodes.nextSibling);
+    this.markup.emit("drop-completed");
+  }),
 
   /**
    * On mouse move, move the dragged element if any and indicate the drop target.
@@ -2314,10 +2352,7 @@ function GenericEditor(aContainer, aNode) {
     this.tag.textContent = aNode.isBeforePseudoElement ? "::before" : "::after";
   } else if (aNode.nodeType == Ci.nsIDOMNode.DOCUMENT_TYPE_NODE) {
     this.elt.classList.add("comment");
-    this.tag.textContent = '<!DOCTYPE ' + aNode.name +
-       (aNode.publicId ? ' PUBLIC "' +  aNode.publicId + '"': '') +
-       (aNode.systemId ? ' "' + aNode.systemId + '"' : '') +
-       '>';
+    this.tag.textContent = aNode.doctypeString;
   } else {
     this.tag.textContent = aNode.nodeName;
   }

@@ -41,8 +41,6 @@
 #include "mozilla/dom/WorkerPrivate.h"
 #include "nsThreadUtils.h"
 
-#include "mozilla/dom/FileListBinding.h"
-
 namespace mozilla {
 namespace dom {
 
@@ -227,6 +225,12 @@ bool
 Blob::IsFile() const
 {
   return mImpl->IsFile();
+}
+
+bool
+Blob::IsDirectory() const
+{
+  return mImpl->IsDirectory();
 }
 
 const nsTArray<nsRefPtr<BlobImpl>>*
@@ -421,10 +425,11 @@ File::Create(nsISupports* aParent, BlobImpl* aImpl)
 /* static */ already_AddRefed<File>
 File::Create(nsISupports* aParent, const nsAString& aName,
              const nsAString& aContentType, uint64_t aLength,
-             int64_t aLastModifiedDate)
+             int64_t aLastModifiedDate, BlobDirState aDirState)
 {
   nsRefPtr<File> file = new File(aParent,
-    new BlobImplBase(aName, aContentType, aLength, aLastModifiedDate));
+    new BlobImplBase(aName, aContentType, aLength, aLastModifiedDate,
+                     aDirState));
   return file.forget();
 }
 
@@ -1056,6 +1061,17 @@ BlobImplFile::SetPath(const nsAString& aPath)
   mPath = aPath;
 }
 
+void
+BlobImplFile::LookupAndCacheIsDirectory()
+{
+  MOZ_ASSERT(mIsFile,
+             "This should only be called when this object has been created "
+             "from an nsIFile to note that the nsIFile is a directory");
+  bool isDir;
+  mFile->IsDirectory(&isDir);
+  mDirState = isDir ? BlobDirState::eIsDir : BlobDirState::eIsNotDir;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // BlobImplMemory implementation
 
@@ -1215,42 +1231,6 @@ BlobImplTemporaryBlob::GetInternalStream(nsIInputStream** aStream,
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// FileList implementation
-
-NS_IMPL_CYCLE_COLLECTION_WRAPPERCACHE(FileList, mFiles)
-
-NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION(FileList)
-  NS_WRAPPERCACHE_INTERFACE_MAP_ENTRY
-  NS_INTERFACE_MAP_ENTRY_AMBIGUOUS(nsISupports, nsIDOMFileList)
-  NS_INTERFACE_MAP_ENTRY(nsIDOMFileList)
-NS_INTERFACE_MAP_END
-
-NS_IMPL_CYCLE_COLLECTING_ADDREF(FileList)
-NS_IMPL_CYCLE_COLLECTING_RELEASE(FileList)
-
-JSObject*
-FileList::WrapObject(JSContext *cx, JS::Handle<JSObject*> aGivenProto)
-{
-  return mozilla::dom::FileListBinding::Wrap(cx, this, aGivenProto);
-}
-
-NS_IMETHODIMP
-FileList::GetLength(uint32_t* aLength)
-{
-  *aLength = Length();
-
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-FileList::Item(uint32_t aIndex, nsISupports** aFile)
-{
-  nsCOMPtr<nsIDOMBlob> file = Item(aIndex);
-  file.forget(aFile);
-  return NS_OK;
-}
-
-////////////////////////////////////////////////////////////////////////////
 // BlobSet implementation
 
 already_AddRefed<Blob>
@@ -1315,5 +1295,5 @@ BlobSet::AppendBlobImpls(const nsTArray<nsRefPtr<BlobImpl>>& aBlobImpls)
   return NS_OK;
 }
 
-} // dom namespace
-} // mozilla namespace
+} // namespace dom
+} // namespace mozilla

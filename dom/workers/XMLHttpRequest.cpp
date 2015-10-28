@@ -811,6 +811,7 @@ public:
   , mHasUploadListeners(aHasUploadListeners)
   {
     mClosure.mClonedObjects.SwapElements(aClosure.mClonedObjects);
+    mClosure.mClonedImages.SwapElements(aClosure.mClonedImages);
     MOZ_ASSERT(aClosure.mMessagePorts.IsEmpty());
     MOZ_ASSERT(aClosure.mMessagePortIdentifiers.IsEmpty());
   }
@@ -892,7 +893,7 @@ public:
   }
 };
 
-} // anonymous namespace
+} // namespace
 
 bool
 Proxy::Init()
@@ -1187,7 +1188,7 @@ EventRunnable::PreDispatch(JSContext* aCx, WorkerPrivate* aWorkerPrivate)
   if (NS_SUCCEEDED(mResponseTextResult)) {
     mResponseResult = mResponseTextResult;
     if (mResponseText.IsVoid()) {
-      mResponse = JSVAL_NULL;
+      mResponse.setNull();
     }
   }
   else {
@@ -1237,6 +1238,7 @@ EventRunnable::PreDispatch(JSContext* aCx, WorkerPrivate* aWorkerPrivate)
           if (mResponseBuffer.write(aCx, response, transferable, callbacks,
                                     &closure)) {
             mResponseClosure.mClonedObjects.SwapElements(closure.mClonedObjects);
+            mResponseClosure.mClonedImages.SwapElements(closure.mClonedImages);
             MOZ_ASSERT(mResponseClosure.mMessagePorts.IsEmpty());
             MOZ_ASSERT(mResponseClosure.mMessagePortIdentifiers.IsEmpty());
           } else {
@@ -1348,6 +1350,7 @@ EventRunnable::WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate)
 
         WorkerStructuredCloneClosure closure;
         closure.mClonedObjects.SwapElements(mResponseClosure.mClonedObjects);
+        closure.mClonedImages.SwapElements(mResponseClosure.mClonedImages);
         MOZ_ASSERT(mResponseClosure.mMessagePorts.IsEmpty());
         MOZ_ASSERT(mResponseClosure.mMessagePortIdentifiers.IsEmpty());
 
@@ -2465,7 +2468,7 @@ XMLHttpRequest::GetResponse(JSContext* /* unused */,
         return;
       }
 
-      mStateData.mResponse = STRING_TO_JSVAL(str);
+      mStateData.mResponse.setString(str);
     }
   }
 

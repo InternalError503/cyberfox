@@ -60,6 +60,7 @@ JSCompartment::JSCompartment(Zone* zone, const JS::CompartmentOptions& options =
     regExps(runtime_),
     globalWriteBarriered(false),
     neuteredTypedObjects(0),
+    objectMetadataState(ImmediateMetadata()),
     propertyTree(thisForCtor()),
     selfHostingScriptSource(nullptr),
     objectMetadataTable(nullptr),
@@ -77,7 +78,9 @@ JSCompartment::JSCompartment(Zone* zone, const JS::CompartmentOptions& options =
     compartmentStats(nullptr),
     scheduledForDestruction(false),
     maybeAlive(true),
-    jitCompartment_(nullptr)
+    jitCompartment_(nullptr),
+    normalArgumentsTemplate_(nullptr),
+    strictArgumentsTemplate_(nullptr)
 {
     PodArrayZero(sawDeprecatedLanguageExtension);
     runtime_->numCompartments++;
@@ -481,13 +484,8 @@ JSCompartment::wrap(JSContext* cx, MutableHandle<PropertyDescriptor> desc)
     return wrap(cx, desc.value());
 }
 
-/*
- * This method marks pointers that cross compartment boundaries. It is called in
- * per-zone GCs (since full GCs naturally follow pointers across compartments)
- * and when compacting to update cross-compartment pointers.
- */
 void
-JSCompartment::markCrossCompartmentWrappers(JSTracer* trc)
+JSCompartment::traceOutgoingCrossCompartmentWrappers(JSTracer* trc)
 {
     MOZ_ASSERT(trc->runtime()->isHeapMajorCollecting());
     MOZ_ASSERT(!zone()->isCollecting() || trc->runtime()->gc.isHeapCompacting());
@@ -506,6 +504,17 @@ JSCompartment::markCrossCompartmentWrappers(JSTracer* trc)
     }
 }
 
+/* static */ void
+JSCompartment::traceIncomingCrossCompartmentEdgesForZoneGC(JSTracer* trc)
+{
+    MOZ_ASSERT(trc->runtime()->isHeapMajorCollecting());
+    for (CompartmentsIter c(trc->runtime(), SkipAtoms); !c.done(); c.next()) {
+        if (!c->zone()->isCollecting())
+            c->traceOutgoingCrossCompartmentWrappers(trc);
+    }
+    Debugger::markIncomingCrossCompartmentEdges(trc);
+}
+
 void
 JSCompartment::trace(JSTracer* trc)
 {
@@ -513,19 +522,56 @@ JSCompartment::trace(JSTracer* trc)
 }
 
 void
-JSCompartment::markRoots(JSTracer* trc)
+JSCompartment::traceRoots(JSTracer* trc, js::gc::GCRuntime::TraceOrMarkRuntime traceOrMark)
 {
-    MOZ_ASSERT(!trc->runtime()->isHeapMinorCollecting());
+    if (objectMetadataState.is<PendingMetadata>()) {
+        TraceRoot(trc,
+                  objectMetadataState.as<PendingMetadata>().unsafeGet(),
+                  "on-stack object pending metadata");
+    }
 
-    if (jitCompartment_)
-        jitCompartment_->mark(trc, this);
+    if (!trc->runtime()->isHeapMinorCollecting()) {
+        // JIT code and the global are never nursery allocated, so we only need
+        // to trace them when not doing a minor collection.
 
-    /*
-     * If a compartment is on-stack, we mark its global so that
-     * JSContext::global() remains valid.
-     */
-    if (enterCompartmentDepth && global_.unbarrieredGet())
-        TraceRoot(trc, global_.unsafeGet(), "on-stack compartment global");
+        if (jitCompartment_)
+            jitCompartment_->mark(trc, this);
+
+        // If a compartment is on-stack, we mark its global so that
+        // JSContext::global() remains valid.
+        if (enterCompartmentDepth && global_.unbarrieredGet())
+            TraceRoot(trc, global_.unsafeGet(), "on-stack compartment global");
+    }
+
+    // Nothing below here needs to be treated as a root if we aren't marking
+    // this zone for a collection.
+    if (traceOrMark == js::gc::GCRuntime::MarkRuntime && !zone()->isCollecting())
+        return;
+
+    // During a GC, these are treated as weak pointers.
+    if (traceOrMark == js::gc::GCRuntime::TraceRuntime) {
+        if (watchpointMap)
+            watchpointMap->markAll(trc);
+    }
+
+    /* Mark debug scopes, if present */
+    if (debugScopes)
+        debugScopes->mark(trc);
+
+    if (lazyArrayBuffers)
+        lazyArrayBuffers->trace(trc);
+
+    if (objectMetadataTable)
+        objectMetadataTable->trace(trc);
+}
+
+void
+JSCompartment::sweepAfterMinorGC()
+{
+    globalWriteBarriered = false;
+
+    if (innerViews.needsSweepAfterMinorGC())
+        innerViews.sweepAfterMinorGC(runtimeFromMainThread());
 }
 
 void
@@ -547,6 +593,17 @@ JSCompartment::sweepGlobalObject(FreeOp* fop)
         if (isDebuggee())
             Debugger::detachAllDebuggersFromGlobal(fop, global_);
         global_.set(nullptr);
+    }
+}
+
+void
+JSCompartment::sweepObjectPendingMetadata()
+{
+    if (objectMetadataState.is<PendingMetadata>()) {
+        // We should never finalize an object before it gets its metadata! That
+        // would mean we aren't calling the object metadata callback for every
+        // object!
+        MOZ_ALWAYS_TRUE(!IsAboutToBeFinalized(&objectMetadataState.as<PendingMetadata>()));
     }
 }
 
@@ -655,7 +712,31 @@ JSCompartment::sweepCrossCompartmentWrappers()
     }
 }
 
-void JSCompartment::fixupAfterMovingGC()
+void
+JSCompartment::sweepTemplateObjects()
+{
+    if (normalArgumentsTemplate_ && IsAboutToBeFinalized(&normalArgumentsTemplate_))
+        normalArgumentsTemplate_.set(nullptr);
+
+    if (strictArgumentsTemplate_ && IsAboutToBeFinalized(&strictArgumentsTemplate_))
+        strictArgumentsTemplate_.set(nullptr);
+}
+
+/* static */ void
+JSCompartment::fixupCrossCompartmentWrappersAfterMovingGC(JSTracer* trc)
+{
+    MOZ_ASSERT(trc->runtime()->gc.isHeapCompacting());
+
+    for (CompartmentsIter comp(trc->runtime(), SkipAtoms); !comp.done(); comp.next()) {
+        // Sweep the wrapper map to update its pointers to the wrappers.
+        comp->sweepCrossCompartmentWrappers();
+        // Trace the wrappers in the map to update their edges to their referents.
+        comp->traceOutgoingCrossCompartmentWrappers(trc);
+    }
+}
+
+void
+JSCompartment::fixupAfterMovingGC()
 {
     fixupGlobal();
     fixupInitialShapeTable();
@@ -931,3 +1012,35 @@ JSCompartment::addTelemetry(const char* filename, DeprecatedLanguageExtension e)
 
     sawDeprecatedLanguageExtension[e] = true;
 }
+
+AutoSetNewObjectMetadata::AutoSetNewObjectMetadata(ExclusiveContext* ecx
+                                                   MOZ_GUARD_OBJECT_NOTIFIER_PARAM_IN_IMPL)
+    : CustomAutoRooter(ecx)
+    , cx_(ecx->maybeJSContext())
+    , prevState_(ecx->compartment()->objectMetadataState)
+{
+    MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+    if (cx_)
+        cx_->compartment()->objectMetadataState = NewObjectMetadataState(DelayMetadata());
+}
+
+AutoSetNewObjectMetadata::~AutoSetNewObjectMetadata()
+{
+    // If we don't have a cx, we didn't change the metadata state, so no need to
+    // reset it here.
+    if (!cx_)
+        return;
+
+    if (!cx_->isExceptionPending() && cx_->compartment()->hasObjectPendingMetadata()) {
+        JSObject* obj = cx_->compartment()->objectMetadataState.as<PendingMetadata>();
+        // Make sure to restore the previous state before setting the object's
+        // metadata. SetNewObjectMetadata asserts that the state is not
+        // PendingMetadata in order to ensure that metadata callbacks are called
+        // in order.
+        cx_->compartment()->objectMetadataState = prevState_;
+        SetNewObjectMetadata(cx_, obj);
+    } else {
+        cx_->compartment()->objectMetadataState = prevState_;
+    }
+}
+

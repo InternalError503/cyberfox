@@ -697,11 +697,7 @@ public:
 
   virtual void OnFocusChangeInGecko(bool aFocus);
 
-  void OnSelectionChange()
-  {
-    mSelectedRange.location = NSNotFound;
-    mRangeForWritingMode.location = NSNotFound;
-  }
+  void OnSelectionChange(const IMENotification& aIMENotification);
 
   /**
    * DispatchCompositionChangeEvent() dispatches a compositionchange event on
@@ -850,12 +846,6 @@ public:
    * True if OSX believes that our view has keyboard focus.
    */
   bool IsFocused();
-
-  /**
-   * True if our view has keyboard focus (and our window is key), or if
-   * it would have keyboard focus if our window were key.
-   */
-  bool IsOrWouldBeFocused();
 
   static CFArrayRef CreateAllIMEModeList();
   static void DebugPrintAllIMEModes();

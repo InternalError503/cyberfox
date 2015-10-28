@@ -20,8 +20,8 @@
 namespace mozilla {
 namespace dom {
 class Blob;
-}
-}
+} // namespace dom
+} // namespace mozilla
 
 BEGIN_WORKERS_NAMESPACE
 
@@ -251,7 +251,7 @@ public:
   NullResponseText()
   {
     mStateData.mResponseText.SetIsVoid(true);
-    mStateData.mResponse = JSVAL_NULL;
+    mStateData.mResponse.setNull();
   }
 
   bool MozAnon() const

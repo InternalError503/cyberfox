@@ -41,6 +41,17 @@ var gMainPane = {
 
     this.updateBrowserStartupLastSession();
 
+#ifdef XP_WIN
+    // Functionality for "Show tabs in taskbar" on Windows 7 and up.
+    try {
+      let sysInfo = Components.classes["@mozilla.org/system-info;1"].
+                    getService(Components.interfaces.nsIPropertyBag2);
+      let ver = parseFloat(sysInfo.getProperty("version"));
+      let showTabsInTaskbar = document.getElementById("showTabsInTaskbar");
+      showTabsInTaskbar.hidden = ver < 6.1;
+    } catch (ex) {}
+#endif
+
 #ifdef MOZ_DEV_EDITION
     let separateProfileModeCheckbox = document.getElementById("separateProfileMode");
     let listener = gMainPane.separateProfileModeChange.bind(gMainPane);
@@ -103,6 +114,7 @@ var gMainPane = {
         } else {
           OS.File.writeAtomic(ignoreSeparateProfile, new Uint8Array()).then(quitApp, revertCheckbox);
         }
+        return;
       }
     }
 
@@ -173,9 +185,11 @@ var gMainPane = {
     return undefined;
   },
   
+ 
   /* 
   * New Tab Change Url VIA Options Pane Feature.
   */
+
   syncFromNewTabPref: function ()
   {
     let newTabPref = document.getElementById("browser.newtab.url");
@@ -205,9 +219,9 @@ var gMainPane = {
     return undefined;
   },
   
- /* 
+  /* 
   * End New Tab Change Url VIA Options Pane Feature.
-  */
+  */  
 
   /**
    * Sets the home page to the current displayed page (or frontmost tab, if the
@@ -225,7 +239,7 @@ var gMainPane = {
       homePage.value = tabs.map(getTabURI).join("|");
   },
 
-  /* 
+   /* 
   * New Tab Change Url VIA Options Pane Feature.
   */
 
@@ -250,7 +264,6 @@ var gMainPane = {
   /* 
   * End New Tab Change Url VIA Options Pane Feature.
   */
-  
   
   /**
    * Displays a dialog in which the user can select a bookmark to use as home
@@ -277,7 +290,9 @@ var gMainPane = {
   _updateUseCurrentButton: function () {
     let useCurrent = document.getElementById("useCurrent");
 
+
     let tabs = this._getTabsForHomePage();
+
     if (tabs.length > 1)
       useCurrent.label = useCurrent.getAttribute("label2");
     else
@@ -309,9 +324,10 @@ var gMainPane = {
     if (win && win.document.documentElement
                   .getAttribute("windowtype") == "navigator:browser") {
       // We should only include visible & non-pinned tabs
+
       tabs = win.gBrowser.visibleTabs.slice(win.gBrowser._numPinnedTabs);
     }
-
+    
     return tabs;
   },
 
@@ -323,7 +339,7 @@ var gMainPane = {
     var homePage = document.getElementById("browser.startup.homepage");
     homePage.value = homePage.defaultValue;
   },
- 
+  
   /* 
   * New Tab Change Url VIA Options Pane Feature.
   *
@@ -338,19 +354,16 @@ var gMainPane = {
   /* 
   * End New Tab Change Url VIA Options Pane Feature.
   */  
-  
-  
-  
 
   // DOWNLOADS
 
   /*
    * Preferences:
-   * 
+   *
    * browser.download.useDownloadDir - bool
    *   True - Save files directly to the folder configured via the
    *   browser.download.folderList preference.
-   *   False - Always ask the user where to save a file and default to 
+   *   False - Always ask the user where to save a file and default to
    *   browser.download.lastDir when displaying a folder picker dialog.
    * browser.download.dir - local file handle
    *   A local folder the user may have selected for downloaded files to be
@@ -389,7 +402,7 @@ var gMainPane = {
     // don't override the preference's value in UI
     return undefined;
   },
-  
+
   /**
    * Displays a file picker in which the user can choose the location where
    * downloads are automatically saved, updating preferences and UI in
@@ -437,7 +450,7 @@ var gMainPane = {
   }),
 
   /**
-   * Initializes the download folder display settings based on the user's 
+   * Initializes the download folder display settings based on the user's
    * preferences.
    */
   displayDownloadDirPref()
@@ -461,7 +474,7 @@ var gMainPane = {
     var fph = ios.getProtocolHandler("file")
                  .QueryInterface(Components.interfaces.nsIFileProtocolHandler);
     var iconUrlSpec;
-      
+
     // Display a 'pretty' label or the path in the UI.
     if (folderListPref.value == 2) {
       // Custom path selected and is configured
@@ -477,7 +490,7 @@ var gMainPane = {
       // not exposed it was rarely used.
       // With 3.0, a new desktop folder - 'Downloads' was introduced for
       // platforms and versions that don't support a default system downloads
-      // folder. See nsDownloadManager for details. 
+      // folder. See nsDownloadManager for details.
       downloadFolder.label = bundlePreferences.getString("downloadsFolderName");
       iconUrlSpec = fph.getURLSpecFromFile(yield this._indexToFolder(1));
     } else {
@@ -502,7 +515,7 @@ var gMainPane = {
    * Returns the Downloads folder.  If aFolder is "Desktop", then the Downloads
    * folder returned is the desktop folder; otherwise, it is a folder whose name
    * indicates that it is a download folder and whose path is as determined by
-   * the XPCOM directory service via the download manager's attribute 
+   * the XPCOM directory service via the download manager's attribute
    * defaultDownloadsDirectory.
    *
    * @throws if aFolder is not "Desktop" or "Downloads"
@@ -614,6 +627,7 @@ var gMainPane = {
    */
   setDefaultBrowser: function()
   {
+  	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){return;}
     let shellSvc = getShellService();
     if (!shellSvc)
       return;

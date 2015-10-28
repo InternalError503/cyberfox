@@ -63,9 +63,9 @@ public:
     , mLeftOverData(INT_MIN)
   {
     // HRTFDatabaseLoader needs to be fetched on the main thread.
-    TemporaryRef<HRTFDatabaseLoader> loader =
+    already_AddRefed<HRTFDatabaseLoader> loader =
       HRTFDatabaseLoader::createAndLoadAsynchronouslyIfNecessary(aNode->Context()->SampleRate());
-    mHRTFPanner = new HRTFPanner(aNode->Context()->SampleRate(), loader);
+    mHRTFPanner = new HRTFPanner(aNode->Context()->SampleRate(), Move(loader));
   }
 
   virtual void SetInt32Parameter(uint32_t aIndex, int32_t aParam) override
@@ -257,7 +257,7 @@ size_t
 PannerNode::SizeOfExcludingThis(MallocSizeOf aMallocSizeOf) const
 {
   size_t amount = AudioNode::SizeOfExcludingThis(aMallocSizeOf);
-  amount += mSources.SizeOfExcludingThis(aMallocSizeOf);
+  amount += mSources.ShallowSizeOfExcludingThis(aMallocSizeOf);
   return amount;
 }
 
@@ -562,6 +562,6 @@ PannerNode::SendDopplerToSourcesIfNeeded()
 }
 
 
-}
-}
+} // namespace dom
+} // namespace mozilla
 

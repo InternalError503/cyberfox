@@ -17,6 +17,7 @@
 #include "nsImageLoadingContent.h"
 #include "nsIStreamListener.h"
 #include "nsIChannelEventSink.h"
+#include "nsIContentPolicy.h"
 #include "nsIObjectLoadingContent.h"
 #include "nsIRunnable.h"
 #include "nsIThreadInternal.h"
@@ -35,8 +36,8 @@ namespace mozilla {
 namespace dom {
 template<typename T> class Sequence;
 struct MozPluginParameter;
-}
-}
+} // namespace dom
+} // namespace mozilla
 
 class nsObjectLoadingContent : public nsImageLoadingContent
                              , public nsIStreamListener
@@ -331,6 +332,11 @@ class nsObjectLoadingContent : public nsImageLoadingContent
                         bool aCompileEventHandler);
     void UnbindFromTree(bool aDeep = true,
                         bool aNullParent = true);
+
+    /**
+     * Return the content policy type used for loading the element.
+     */
+    virtual nsContentPolicyType GetContentPolicyType() const = 0;
 
   private:
 
