@@ -153,6 +153,7 @@
 #endif
 @BINPATH@/@DLL_PREFIX@lgpllibs@DLL_SUFFIX@
 @RESPATH@/browser/blocklist.xml
+@RESPATH@/browser/ua-update.json
 #if MOZ_AGENTS
 @RESPATH@/browser/agents.json
 #endif
