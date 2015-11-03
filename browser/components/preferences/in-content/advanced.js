@@ -374,7 +374,9 @@ var gAdvancedPane = {
     this.observer = {
       onNetworkCacheDiskConsumption: function(consumption) {
         var size = DownloadUtils.convertByteUnits(consumption);
-        actualSizeLabel.value = prefStrBundle.getFormattedString("actualDiskCacheSize", size);
+        try{
+            actualSizeLabel.value = prefStrBundle.getFormattedString("actualDiskCacheSize", size);
+        } catch (e) {}
       },
 
       QueryInterface: XPCOMUtils.generateQI([
