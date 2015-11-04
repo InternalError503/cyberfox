@@ -804,9 +804,9 @@ var gAdvancedPane = {
    */
   showCertificates: function ()
   {
-    document.documentElement.openWindow("chrome://pippki/content/certManager.xul",
-               "mozilla:certmanager",
-               "", null);
+    document.documentElement.openWindow("mozilla:certmanager",
+                                        "chrome://pippki/content/certManager.xul",
+                                        "", null);
   },
 
   /**
@@ -814,9 +814,9 @@ var gAdvancedPane = {
    */
   showSecurityDevices: function ()
   {
-    document.documentElement.openWindow("chrome://pippki/content/device_manager.xul",
-               "mozilla:devicemanager",
-               "", null);
+    document.documentElement.openWindow("mozilla:devicemanager",
+                                        "chrome://pippki/content/device_manager.xul",
+                                        "", null);
   },
 
 #ifdef MOZ_UPDATER
