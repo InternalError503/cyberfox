@@ -474,10 +474,9 @@ var gAdvancedPane = {
                    manageCapability : Components.interfaces.nsIPermissionManager.DENY_ACTION,
                    windowTitle      : bundlePreferences.getString("offlinepermissionstitle"),
                    introText        : bundlePreferences.getString("offlinepermissionstext") };
-    document.documentElement.openWindow("chrome://browser/content/preferences/permissions.xul",
-               "Browser:Permissions",
-               "resizable",
-               params);
+    document.documentElement.openWindow("Browser:Permissions",
+                                        "chrome://browser/content/preferences/permissions.xul",
+                                        "resizable", params);
   },
 
   // XXX: duplicated in browser.js
