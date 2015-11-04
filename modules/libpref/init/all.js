@@ -27,6 +27,8 @@ pref("general.useragent.compatMode.firefox", true);
 // overrides by default, don't initialize UserAgentOverrides.jsm.
 pref("general.useragent.site_specific_overrides", true);
 
+pref("general.useragent.updates.enabled", true);
+
 pref("general.config.obscure_value", 13); // for MCD .cfg files
 
 pref("general.warnOnAboutConfig", true);
