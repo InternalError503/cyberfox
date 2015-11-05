@@ -154,9 +154,9 @@
 @BINPATH@/@DLL_PREFIX@lgpllibs@DLL_SUFFIX@
 @RESPATH@/browser/blocklist.xml
 @RESPATH@/browser/ua-update.json
-#if MOZ_AGENTS
+##if MOZ_AGENTS
 @RESPATH@/browser/agents.json
-#endif
+##endif
 #ifdef XP_UNIX
 #ifndef XP_MACOSX
 @RESPATH@/run-mozilla.sh

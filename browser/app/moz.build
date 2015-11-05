@@ -26,9 +26,9 @@ SOURCES += [
 
 FINAL_TARGET_FILES += ['blocklist.xml']
 
-#if MOZ_AGENTS
+##if MOZ_AGENTS
 FINAL_TARGET_FILES += ['agents.json']
-#endif
+##endif
 
 FINAL_TARGET_FILES.defaults.profile += ['profile/prefs.js']
 
