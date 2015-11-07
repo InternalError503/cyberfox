@@ -480,6 +480,9 @@ var gCyberfoxCustom = {
 			Services.prefs.getBoolPref("app.update.available") && 
 			Services.prefs.getBoolPref("app.update.check.enabled")){
 			
+        //Clear any previous set urls
+        Services.prefs.clearUserPref("app.update.url.manual");
+			
 			//Set notification bar button.
 			var button = [];
 			button = [{
