@@ -10,5 +10,6 @@ twitter
 unbubbleeu
 wikipedia
 yahoo
+yahoo-en-CA:hidden
 youtube
 yandex

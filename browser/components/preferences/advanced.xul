@@ -78,9 +78,6 @@
 	  <preference id="browser.menu.aboutconfig" 
 						   name="browser.menu.aboutconfig" 
 						   type="bool"/>
-	  <preference id="browser.search.showOneOffButtons" 
-						   name="browser.search.showOneOffButtons" 
-						   type="bool"/>
 	  <preference id="app.update.check.enabled" 
 						   name="app.update.check.enabled" 
 						   type="bool"/>
@@ -461,10 +458,7 @@
 			<groupbox id="alternateOptionsGeneral" orient="vertical">
 				<caption label="&cyberfoxOptions.label;"/>				          	              	
 					<checkbox id="browser.preferences.inContent" label="&incontent.label;"
-							preference="browser.preferences.inContent"/>
- 					<checkbox id="browser.search.showOneOffButtons" label="&turnoffoneclicksearch.label;"
-							preference="browser.search.showOneOffButtons" 
-							tooltiptext="&restartRequiredMSG.label;" />		
+							preference="browser.preferences.inContent"/>	
  					<checkbox id="loop.enabled" label="&enablehellochat.label;"
 							preference="loop.enabled" 
 							tooltiptext="&restartRequiredMSG.label;" />								

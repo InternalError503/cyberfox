@@ -41,6 +41,9 @@
   <preference id="pref.privacy.disable_button.view_cookies"
               name="pref.privacy.disable_button.view_cookies"
               type="bool"/>
+  <preference id="pref.privacy.disable_button.change_blocklist"
+              name="pref.privacy.disable_button.change_blocklist"
+              type="bool"/>
 
   <!-- Location Bar -->
   <preference id="browser.urlbar.autocomplete.enabled"
@@ -118,6 +121,9 @@
                 preference="privacy.trackingprotection.pbmode.enabled"
                 accesskey="&trackingProtectionPBM5.accesskey;"
                 label="&trackingProtectionPBM5.label;" />
+      <button id="changeBlockList"
+              label="&changeBlockList.label;" accesskey="&changeBlockList.accesskey;"
+              preference="pref.privacy.disable_button.change_blocklist"/>
       <label id="trackingProtectionPBMLearnMore"
              class="text-link"
              value="&trackingProtectionPBMLearnMore.label;"/>

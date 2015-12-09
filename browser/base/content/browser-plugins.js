@@ -266,7 +266,7 @@ var gPluginHandler = {
         }
       }
       else {
-        url = Services.urlFormatter.formatURLPref("app.support.baseURL") + "clicktoplay";
+        url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "clicktoplay";
       }
       pluginInfo.detailsLink = url;
 
@@ -550,7 +550,7 @@ var gPluginHandler = {
     let link = notification.ownerDocument.createElementNS(XULNS, "label");
     link.className = "text-link";
     link.setAttribute("value", gNavigatorBundle.getString("crashedpluginsMessage.learnMore"));
-    let crashurl = formatURL("app.support.baseURL", true);
+    let crashurl = formatURL("app.helpdoc.baseURI", true);
     crashurl += "plugin-crashed-notificationbar";
     link.href = crashurl;
     let description = notification.ownerDocument.getAnonymousElementByAttribute(notification, "anonid", "messageText");

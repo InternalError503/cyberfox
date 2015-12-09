@@ -13,7 +13,7 @@ const GRID_WIDTH_EXTRA = 1; // provide 1px buffer to allow for rounding error
 /**
  * This singleton represents the grid that contains all sites.
  */
-let gGrid = {
+var gGrid = {
   /**
    * The DOM node of the grid.
    */

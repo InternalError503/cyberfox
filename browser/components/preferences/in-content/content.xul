@@ -27,10 +27,7 @@
               type="bool"/>
   <preference id="pref.advanced.javascript.disable_button.advanced"
               name="pref.advanced.javascript.disable_button.advanced"
-              type="bool"/>
-  <preference id="plugins.click_to_play"
-                  name="plugins.click_to_play"
-                  type="bool"/>				  
+              type="bool"/>			  
 <!-- End Disable Javascript & Block Images Feature Dont Remove -->
   <!-- Fonts -->
   <preference id="font.language.group"

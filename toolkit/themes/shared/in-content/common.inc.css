@@ -255,7 +255,7 @@ xul|button[type="menu"] > xul|*.button-box > xul|*.button-menu-dropmarker {
   height: 16px;
   border: none;
   background-color: transparent;
-  list-style-image: url("chrome://global/skin/in-content/dropdown.png");
+  list-style-image: url("chrome://global/skin/in-content/dropdown.svg#dropdown");
 }
 
 xul|*.help-button {
@@ -336,28 +336,16 @@ xul|menulist:not([editable="true"]) > xul|*.menulist-dropmarker {
   padding: 0;
   border: none;
   background-color: transparent;
-  list-style-image: url("chrome://global/skin/in-content/dropdown.png");
+  list-style-image: url("chrome://global/skin/in-content/dropdown.svg#dropdown");
+}
+
+xul|menulist:not([editable="true"]) > xul|*.menulist-dropmarker > xul|*.dropmarker-icon {
+  width: 18px;
+  height: 18px;
 }
 
 xul|menulist[disabled="true"]:not([editable="true"]) > xul|*.menulist-dropmarker {
-  list-style-image: url("chrome://global/skin/in-content/dropdown-disabled.png")
-}
-
-@media (min-resolution: 2dppx) {
-  xul|menulist:not([editable="true"]) > xul|*.menulist-dropmarker,
-  xul|button[type="menu"] > xul|*.button-box > xul|*.button-menu-dropmarker {
-    list-style-image: url("chrome://global/skin/in-content/dropdown@2x.png");
-  }
-
-  xul|menulist[disabled="true"]:not([editable="true"]) > xul|*.menulist-dropmarker {
-    list-style-image: url("chrome://global/skin/in-content/dropdown-disabled@2x.png")
-  }
-
-  xul|menulist:not([editable="true"]) > xul|*.menulist-dropmarker > xul|*.dropmarker-icon,
-  xul|button[type="menu"] > xul|*.button-box > xul|*.button-menu-dropmarker > xul|*.dropmarker-icon {
-    width: 10px;
-    height: 16px;
-  }
+  list-style-image: url("chrome://global/skin/in-content/dropdown.svg#dropdown-disabled")
 }
 
 xul|menulist > xul|menupopup,
@@ -519,13 +507,13 @@ html|input[type="checkbox"]:not(:disabled) + html|label:hover:before {
 }
 
 xul|*.checkbox-check[checked] {
-  background-image: url("chrome://global/skin/in-content/check.png"),
+  background-image: url("chrome://global/skin/in-content/check.svg#check"),
                     /* !important needed to override toolkit !important rule */
                     linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
 }
 
 html|input[type="checkbox"]:checked + html|label:before {
-  background-image: url("chrome://global/skin/in-content/check.png"), linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
+  background-image: url("chrome://global/skin/in-content/check.svg#check"), linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
 }
 
 xul|checkbox[disabled="true"] > xul|*.checkbox-check,
@@ -589,7 +577,7 @@ xul|*.radio-label-box {
 
 /* Category List */
 
-xul|*#categories {
+*|*#categories {
   -moz-appearance: none;
   background-color: var(--in-content-category-background);
   padding-top: 39px;
@@ -597,7 +585,7 @@ xul|*#categories {
   border-width: 0;
 }
 
-xul|*.category {
+*|*.category {
   -moz-appearance: none;
   color: var(--in-content-category-text);
   -moz-border-end-width: 0;
@@ -607,11 +595,11 @@ xul|*.category {
   transition: background-color 150ms;
 }
 
-xul|*.category:hover {
+*|*.category:hover {
   background-color: var(--in-content-category-background-hover);
 }
 
-xul|*.category[selected] {
+*|*.category[selected] {
   background-color: var(--in-content-category-background-active);
   color: var(--in-content-category-text-selected);
   -moz-padding-start: 11px; /* compensate the 4px border */
@@ -619,7 +607,7 @@ xul|*.category[selected] {
   box-shadow: inset 4px 0 0 0 #ff9500;
 }
 
-xul|*#categories[keyboard-navigation="true"]:-moz-focusring > xul|*.category[current] {
+*|*#categories[keyboard-navigation="true"]:-moz-focusring > *|*.category[current] {
   border-top: var(--in-content-category-border-focus);
   border-bottom: var(--in-content-category-border-focus);
 }
@@ -776,7 +764,7 @@ xul|treecolpicker {
 }
 
 xul|treecol:not([hideheader="true"]) > xul|*.treecol-sortdirection[sortDirection] {
-  list-style-image: url("chrome://global/skin/in-content/dropdown.png");
+  list-style-image: url("chrome://global/skin/in-content/dropdown.svg#dropdown");
   width: 18px;
   height: 18px;
 }

@@ -7,6 +7,7 @@
 BROWSER_CHROME_MANIFESTS += ['test/browser.ini']
 XPCSHELL_TESTS_MANIFESTS += [
     'test/unit/social/xpcshell.ini',
+    'test/xpcshell/xpcshell.ini',
 ]
 
 EXTRA_JS_MODULES += [
@@ -58,6 +59,3 @@ if CONFIG['NIGHTLY_BUILD']:
 EXTRA_PP_COMPONENTS += [
     'browsermodules.manifest',
 ]
-
-if CONFIG['MOZILLA_OFFICIAL']:
-    DEFINES['MOZILLA_OFFICIAL'] = 1

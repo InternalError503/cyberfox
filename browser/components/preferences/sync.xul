@@ -232,7 +232,7 @@
                 <vbox>
                   <label class="text-link"
                          onclick="gSyncPane.manageFirefoxAccount();"
-                         value="&manage.label;"/>
+                         value="&verifiedManage.label;"/>
                 </vbox>
                 <spacer flex="1"/>
                 <vbox>
