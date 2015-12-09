@@ -1,22 +1,30 @@
 @-moz-document url(about:newtab) {
 
+	html #newtab-customize-overlay,
 	#newtab-intro-what,
 	#newtab-search-form,
-	#newtab-customize-enhanced,
-	#newtab-customize-panel,
+	#newtab-margin-undo-container,
 	.newtab-suggested-bounds,
 	.newtab-suggested,
 	.newtab-sponsored {
 	  display: none !important;
 	}
+
 	.newtab-cell,
 	.newtab-link,
-	.newtab-thumbnail { 
+	.newtab-thumbnail,
+	.newtab-title	{ 
 	  border-radius: 0px !important;
+	  -moz-user-select: none;
 	}
 
-	#newtab-window .newtab-cell {
+	#newtab-window:not([fx40plus="true"]) .newtab-cell {
 	  margin: 20px 10px 20px !important;
+	}
+
+	html .newtab-cell,
+	#newtab-window[fx40plus="true"] .newtab-cell {
+	  margin: 20px 10px 0px !important;
 	}
 	
    .newtab-link {

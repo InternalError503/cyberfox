@@ -88,11 +88,11 @@
 #endif	
     <!-- Passwords -->
     <groupbox id="passwordsGroup" orient="vertical">
-      <caption label="&passwords.label;"/>
+      <caption label="&logins.label;"/>
 
       <hbox id="savePasswordsBox">
         <checkbox id="savePasswords" flex="1"
-                  label="&rememberPasswords.label;" accesskey="&rememberPasswords.accesskey;"
+                  label="&rememberLogins.label;" accesskey="&rememberLogins.accesskey;"
                   preference="signon.rememberSignons"
                   onsyncfrompreference="return gSecurityPane.readSavePasswords();"/>
         <button id="passwordExceptions"
@@ -115,7 +115,7 @@
       <hbox id="showPasswordsBox">
         <spacer flex="1"/>
         <button id="showPasswords"
-                label="&savedPasswords.label;" accesskey="&savedPasswords.accesskey;"
+                label="&savedLogins.label;" accesskey="&savedLogins.accesskey;"
                 oncommand="gSecurityPane.showPasswords();"
                 preference="pref.privacy.disable_button.view_passwords"/>
       </hbox>

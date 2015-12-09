@@ -40,10 +40,6 @@
   height: 16px;
 }
 
-#engineList treechildren::-moz-tree-row {
-  min-height: 36px;
-}
-
 #engineList treechildren::-moz-tree-drop-feedback {
   background-color: Highlight;
   width: 10000px; /* 100% doesn't work; 10k is hopefully larger than any window

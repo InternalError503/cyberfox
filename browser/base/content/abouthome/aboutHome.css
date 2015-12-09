@@ -418,7 +418,7 @@ body[narrow] #restorePreviousSession::before {
   width: 32px;
 }
 
-#aboutMozilla {
+#aboutCyberfox {
   display: block;
   position: relative; /* pin wordmark to edge of document, not of viewport */
   -moz-box-ordinal-group: 0;
@@ -426,18 +426,24 @@ body[narrow] #restorePreviousSession::before {
   transition: opacity 150ms;
 }
 
-#aboutMozilla:hover {
+#aboutCyberfox:hover {
   opacity: 1;
 }
 
-#aboutMozilla::before {
-  content: url("chrome://browser/content/abouthome/mozilla.png");
+#aboutCyberfox::before {
+  content: url("chrome://browser/content/abouthome/cyber-dark.png");
   display: block;
   position: absolute;
   top: 12px;
   right: 12px;
   width: 69px;
   height: 19px;
+}
+
+@media (max-width: 800px) {
+	#aboutCyberfox {
+		display:none;
+	}
 }
 
 /* [HiDPI]
@@ -464,13 +470,13 @@ body[narrow] #restorePreviousSession::before {
   }
 
   .launchButton::before,
-  #aboutMozilla::before {
+  #aboutCyberfox::before {
     transform: scale(.5);
     transform-origin: 0 0;
   }
 
   .launchButton:-moz-dir(rtl)::before,
-  #aboutMozilla:-moz-dir(rtl)::before {
+  #aboutCyberfox:-moz-dir(rtl)::before {
     transform: scale(.5) translateX(32px);
   }
 
@@ -513,10 +519,6 @@ body[narrow] #restorePreviousSession::before {
   #restorePreviousSession:-moz-dir(rtl)::before {
     transform: scale(-0.5, 0.5) translateX(24px);
     transform-origin: top center;
-  }
-
-  #aboutMozilla::before {
-    content: url("chrome://browser/content/abouthome/mozilla@2x.png");
   }
 }
 

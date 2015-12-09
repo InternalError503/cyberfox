@@ -199,3 +199,15 @@ label.small {
 }
 
 %endif
+
+#engineList treechildren::-moz-tree-image(engineShown, checked),
+#blocklistsTree treechildren::-moz-tree-image(selectionCol, checked) {
+  list-style-image: url("chrome://global/skin/in-content/check.svg#check");
+  width: 21px;
+  height: 21px;
+}
+
+#engineList treechildren::-moz-tree-image(engineShown, checked, selected),
+#blocklistsTree treechildren::-moz-tree-image(selectionCol, checked, selected) {
+  list-style-image: url("chrome://global/skin/in-content/check.svg#check-inverted");
+}

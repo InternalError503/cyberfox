@@ -10,37 +10,37 @@ var {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
 //Import services use one service for preferences.
 var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-var  contexts = Services.prefs.getBranch("browser.context.");
 
 classicthemerestorerjso.ctr = {
 
   prefs:			Services.prefs.getBranch("extensions.classicthemerestorer."),
   fxdefaulttheme:	Services.prefs.getBranch("general.skins.").getCharPref("selectedSkin") == 'classic/1.0',
-  appversion:		parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")),
+  appversion:		parseInt(Services.appinfo.version),
   oswindows:		Services.appinfo.OS=="WINNT",
   needsRestart: 	false,
   tmp_tu_active:	false,
+  contexts: Services.prefs.getBranch("browser.context."),
   // Exclude all preferences we don't want to sync, export or import.
-	blacklist: [
-		"extensions.classicthemerestorer.pref_actindx",
-		"extensions.classicthemerestorer.pref_actindx2",
-		"extensions.classicthemerestorer.ctrreset",
-		"extensions.classicthemerestorer.compatibility.treestyle",
-		"extensions.classicthemerestorer.compatibility.treestyle.disable",
-		"extensions.classicthemerestorer.compatibility.tabmix",
-		"extensions.classicthemerestorer.ctrpref.firstrun",
-		"extensions.classicthemerestorer.features.firstrun",
-		"extensions.classicthemerestorer.features.lastcheck",
-		"extensions.classicthemerestorer.features.updatecheck",
-		"extensions.classicthemerestorer.ctrpref.lastmod",
-		"extensions.classicthemerestorer.ctrpref.lastmodapply",
-		"extensions.classicthemerestorer.ctrpref.updatekey",
-		"extensions.classicthemerestorer.version",
-		"extensions.classicthemerestorer.ctrpref.lastmod.backup",
-		"extensions.classicthemerestorer.ctrpref.importjson",
-		"extensions.classicthemerestorer.ctrpref.active",
-		"extensions.classicthemerestorer.compatibility.personalmenu"
-		],	
+  blacklist: [
+	"extensions.classicthemerestorer.pref_actindx",
+	"extensions.classicthemerestorer.pref_actindx2",
+	"extensions.classicthemerestorer.ctrreset",
+	"extensions.classicthemerestorer.compatibility.treestyle",
+	"extensions.classicthemerestorer.compatibility.treestyle.disable",
+	"extensions.classicthemerestorer.compatibility.tabmix",
+	"extensions.classicthemerestorer.ctrpref.firstrun",
+	"extensions.classicthemerestorer.features.firstrun",
+	"extensions.classicthemerestorer.features.lastcheck",
+	"extensions.classicthemerestorer.features.updatecheck",
+	"extensions.classicthemerestorer.ctrpref.lastmod",
+	"extensions.classicthemerestorer.ctrpref.lastmodapply",
+	"extensions.classicthemerestorer.ctrpref.updatekey",
+	"extensions.classicthemerestorer.version",
+	"extensions.classicthemerestorer.ctrpref.lastmod.backup",
+	"extensions.classicthemerestorer.ctrpref.importjson",
+	"extensions.classicthemerestorer.ctrpref.active",
+	"extensions.classicthemerestorer.compatibility.personalmenu"
+	],
 
   initprefwindow: function() {
   
@@ -92,13 +92,14 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_nonavtbborder').disabled = true;
 		document.getElementById('ctraddon_pw_alttabstb').disabled = true;
 		document.getElementById('ctraddon_pw_alttabstb2').disabled = true;
+		document.getElementById('ctraddon_pw_ib_graycolor').disabled = true;
 		document.getElementById('ctraddon_pw_verifiedcolors').disabled = true;
 		document.getElementById('ctraddon_pw_colors_ntab_t').disabled = true;
 		document.getElementById('ctraddon_pw_notabfog').disabled = true;
 		document.getElementById('ctraddon_pw_notabbg').disabled = true;
 		document.getElementById('ctraddon_pw_noaddonbarbg').disabled = true;
 		
-		if (contexts.getBoolPref("classic")){}else{
+		if (this.contexts.getBoolPref("classic")){}else{
 			document.getElementById('ctraddon_pw_noconicons').disabled = true;
 		}
 		
@@ -108,6 +109,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_aerocolors').disabled = true;
 		document.getElementById('ctraddon_pw_tbsep_winc').disabled = true;
 		document.getElementById('ctraddon_pw_alt_addonsm').disabled = true;
+		document.getElementById('ctraddon_pw_tttitlebar').disabled = true;
 
 		document.getElementById('ctraddon_abhigher').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_smallnavbut').style.visibility = 'collapse';
@@ -130,6 +132,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_invertedicons').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_alttabstb').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_alttabstb2').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_ib_graycolor').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_verifiedcolors').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_notabfog').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_notabbg').style.visibility = 'collapse';
@@ -139,11 +142,11 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_nonavtbborder').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nobookbarbg').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_noaddonbarbg').style.visibility = 'collapse';
-		
-		if (contexts.getBoolPref("classic")){}else{
+
+		if (this.contexts.getBoolPref("classic")){}else{
 			document.getElementById('ctraddon_pw_noconicons').style.visibility = 'collapse';
 		}
-		
+
 		document.getElementById('ctraddon_pw_closeonleft').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nbcompact').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabc_act_tb').style.visibility = 'collapse';
@@ -151,13 +154,22 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_tbsep_winc').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_alt_addonsm').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_transpttbw10').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_transpttbew10').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_locsearchbw10').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabstoolbargroup').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_devthemegb').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_hightabpososx').style.visibility = 'collapse';
+		document.getElementById('ctraddon_altoptions_list').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_tttitlebar').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_am_compact').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_am_compact2').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_ib_nohovcolor').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_altreaderico').style.visibility = 'collapse';
 	} else {
 		document.getElementById('ctraddon_pw_special_info2').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_special_font').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'collapse';
+		document.getElementById('ctraddon_altoptions_list2').style.visibility = 'collapse';
 	};
 
 	document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
@@ -279,6 +291,27 @@ classicthemerestorerjso.ctr = {
 	};
 	AddonManager.addAddonListener(TFOBListener);
 	
+	// NoiaButtons
+	var NBOListener = {
+	   onEnabled: function(addon) {
+		  if(addon.id == 'NoiaButtons@ArisT2_Noia4dev') { 
+		    document.getElementById('ctraddon_pw_smallnavbut').disabled = true;
+		  }
+	   },
+	   onDisabled: function(addon) {
+		  document.getElementById('ctraddon_pw_smallnavbut').disabled = false;
+	   }
+	};
+	AddonManager.addAddonListener(NBOListener);
+	
+	AddonManager.getAddonByID('NoiaButtons@ArisT2_Noia4dev', function(addon) {
+	  if(addon && addon.isActive) {
+		document.getElementById('ctraddon_pw_smallnavbut').disabled = true;
+	  } else{
+		document.getElementById('ctraddon_pw_smallnavbut').disabled = false;
+	  }
+	});
+	
 	AddonManager.getAddonByID('the-addon-bar@GeekInTraining-GiT', function(addon) {
 	  if(addon && addon.isActive) {
 		document.getElementById('ctraddon_pw_statusbar').disabled = true;
@@ -347,7 +380,7 @@ classicthemerestorerjso.ctr = {
 	if (this.appversion < 38) {
 	  document.getElementById('ctraddon_pw_readermodegb').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_pocketgb').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_readermode2').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_altoptions_box').style.visibility = 'collapse';
 	}
 	if (this.appversion > 37) {
 	  document.getElementById('ctraddon_pw_bmarkoinpw').style.visibility = 'collapse';
@@ -355,20 +388,48 @@ classicthemerestorerjso.ctr = {
 	if (this.appversion < 40) {
 	  document.getElementById('ctraddon_pw_addonversion').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_alt_addonsm').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_am_compact').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_am_compact2').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_transpttbw10').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_altreaderico').style.visibility = 'collapse';
 	}
+	
+	if (this.appversion >= 40) {
+	  document.getElementById('ctraddon_pw_devthemegb').style.visibility = 'collapse';
+	}
+	
+	if (this.appversion >= 40 && this.appversion < 42) {
+	  document.getElementById('ctraddon_pw_nodevtheme2').style.visibility = 'collapse';
+	}
+
 	if (this.appversion < 41) {
 	  document.getElementById('ctraddon_pw_anewtaburlgbox').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_hideurlsrg').style.visibility = 'collapse';
 	}
 
 	if (this.appversion < 42) {
 	  document.getElementById('ctraddon_pw_fsaduration').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_tabsaudioicogb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_ib_nohovcolor').style.visibility = 'collapse';
 	}
-	
+
 	if (this.appversion >= 42) {
 	  document.getElementById('ctraddon_pw_readermode2').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_oldprefsgb').style.visibility = 'collapse';
 	}
+	
+	if (this.appversion < 43) {
+	  document.getElementById('ctraddon_pw_ctroldsearch').style.visibility = 'collapse';
+	}
+
+	if (this.appversion >= 43) {
+	  document.getElementById('ctraddon_pw_oldsearchgb').style.visibility = 'collapse';
+	}
+
+	if (this.appversion < 44) {
+	  document.getElementById('ctraddon_pw_altalertbox').style.visibility = 'collapse';
+	}
+
 
 	function PrefListener(branch_name, callback) {
 	  // Keeping a reference to the observed preference branch or it will get
@@ -386,7 +447,7 @@ classicthemerestorerjso.ctr = {
 	PrefListener.prototype.register = function(trigger) {
 	  this._branch.addObserver('', this, false);
 	  if (trigger) {
-		let that = this;
+		var that = this;
 		this._branch.getChildList('', {}).
 		  forEach(function (pref_leaf_name)
 			{ that._callback(that._branch, pref_leaf_name); });
@@ -591,6 +652,14 @@ classicthemerestorerjso.ctr = {
 					branch.setCharPref("aboutnewtabcustomurl", document.getElementById('ctraddon_ctnewtab_bg_urlbox').value.trim().replace(/ /g, "%20").replace(/\\/g,"/"));
 				} catch (e){ }
 			break;
+			
+			case "tabthrobbercusturl":
+
+				// Replace whiteSpace and backslash in custom background urls
+				try{
+					branch.setCharPref("tabthrobbercusturl", document.getElementById('ctraddon_tabthrobber_cust_urlbox').value.trim().replace(/ /g, "%20").replace(/\\/g,"/"));
+				} catch (e){ }
+			break;
 	
 		}
 	  }
@@ -609,6 +678,10 @@ classicthemerestorerjso.ctr = {
 	this.altTabsToolbarBgExtra(this.prefs.getBoolPref("alttabstb"));
 	this.ctrpwModeextra(this.prefs.getCharPref("nav_txt_ico"));
 	this.currentTabAppearance(this.prefs.getCharPref("tabs"));
+	this.currentAboutPrefs(this.prefs.getCharPref("altoptions"));
+	this.ctrpwTranspTbW10(this.prefs.getBoolPref("transpttbw10"));
+	this.ctrpwNavBarPadding(this.prefs.getBoolPref("navbarpad"));
+	this.ctrpwCompactAddonList(this.prefs.getBoolPref("am_compact"));
 	
 	var closetab_value = this.prefs.getCharPref("closetab");
   
@@ -629,15 +702,10 @@ classicthemerestorerjso.ctr = {
 
 	this.onCtrPanelSelect();
 
-		if (contexts.getBoolPref("classic")){
+		if (this.contexts.getBoolPref("classic")){
 			document.getElementById('ctraddon_pw_noconicons').disabled = true;
 		}else{
 			document.getElementById('ctraddon_pw_noconicons').disabled = false;
-		}
-		if (!this.oswindows){
-			document.getElementById('ctraddon_titleintitlebar').disabled = true;
-		} else {
-			document.getElementById('ctraddon_titleintitlebar').disabled = false;
 		}
 
 		//Hide no links start page check-box in firefox.	
@@ -890,6 +958,50 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_pw_hidetbwote_winc').style.visibility = itemvis;
 	document.getElementById('ctraddon_pw_hidetbwote2').style.visibility = itemvis;
   },
+  
+  ctrpwTranspTbW10: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_transptcw10').disabled = which;
+	document.getElementById('ctraddon_pw_transptcw10').style.visibility = itemvis;
+    document.getElementById('ctraddon_pw_transpttbew10').disabled = which;
+	document.getElementById('ctraddon_pw_transpttbew10').style.visibility = itemvis;
+
+  },
+  
+  ctrpwNavBarPadding: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_navbarpad_lr').disabled = which;
+	document.getElementById('ctraddon_pw_navbarpad_lr').style.visibility = itemvis;
+    document.getElementById('ctraddon_pw_navbarmar_lr').disabled = which;
+	document.getElementById('ctraddon_pw_navbarmar_lr').style.visibility = itemvis;
+  },
+  
+  ctrpwCompactAddonList: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_am_compact2').disabled = which;
+	document.getElementById('ctraddon_pw_am_compact2').style.visibility = itemvis;
+  },
  
   altTabsToolbarBgExtra: function(which) {
 	if (this.fxdefaulttheme) {
@@ -934,9 +1046,9 @@ classicthemerestorerjso.ctr = {
   },
  
   ctrpwAppbuttonextra: function(which,fromprefwindow) {
-  
+
   var tabsintitlebar = Services.prefs.getBranch("browser.tabs.").getBoolPref("drawInTitlebar");
-  
+
 	if (which=="appbutton_v1" && this.fxdefaulttheme){
 	  document.getElementById('ctraddon_altabico_list').disabled = false;
 	  document.getElementById('ctraddon_abhigher').disabled = false;
@@ -1021,6 +1133,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_appbutonclab').disabled = false;
 	  document.getElementById('ctraddon_pw_appbuttontxt').disabled = false;
 	  document.getElementById('ctraddon_appbclmmenus').disabled = false;
+	  document.getElementById('ctraddon_pw_appbautocol').disabled = false;
 
 	  if (tabsintitlebar==false && fromprefwindow==true) {
 		Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
@@ -1096,6 +1209,17 @@ classicthemerestorerjso.ctr = {
 	}
   },
   
+  currentAboutPrefs: function(which) {
+	
+	if(which=="options_win" || which=="options_win_alt") {
+	  document.getElementById('ctraddon_pw_aboutprefswsize').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_altoptionsi').style.visibility = 'visible';
+	} else {
+	  document.getElementById('ctraddon_pw_aboutprefswsize').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_altoptionsi').style.visibility = 'collapse';
+	}
+  },
+  
   ctrpwStarFeedDelay: function(){
 	document.getElementById('ctraddon_pw_starinurl').disabled = true;
 	document.getElementById('ctraddon_pw_feedinurl').disabled = true;
@@ -1123,23 +1247,27 @@ classicthemerestorerjso.ctr = {
   
   resetCTRpreferences: function() {
     var preferences = document.getElementsByTagName("preference");
-    for (let preference of preferences) {
-      preference.value = preference.defaultValue == null ? undefined : preference.defaultValue;
+    for (var preference of preferences) {
+      if(preference.name.indexOf("extensions.classicthemerestorer.")!=-1)
+		preference.value = preference.defaultValue == null ? undefined : preference.defaultValue;
     }
-
+	
+	this.initprefwindow();
+	
+	this.ctrpwStarFeedDelay();
+	
 	var tabsintitlebar = Services.prefs.getBranch("browser.tabs.").getBoolPref("drawInTitlebar");
-										
 	if (this.oswindows && tabsintitlebar) {
 	  this.prefs.setCharPref("appbutton",'appbutton_v2');
 	}
-	
-	this.initprefwindow();
-
-  this.ctrpwStarFeedDelay();
-
-	CustomizableUI.moveWidgetWithinArea("bookmarks-menu-button",5);	
-	CustomizableUI.removeWidgetFromArea("feed-button", CustomizableUI.TYPE_TOOLBAR);
-	this.needsBrowserRestart();
+	//Move buttons back to there default location, Need a small delay so prevent restart or ok button.
+	document.getElementById("ctraddon_pw_okbutton").disabled = true;
+	setTimeout(function(){
+		CustomizableUI.moveWidgetWithinArea("bookmarks-menu-button",5);	
+		CustomizableUI.removeWidgetFromArea("feed-button", CustomizableUI.TYPE_TOOLBAR);
+		classicthemerestorerjso.ctr.needsBrowserRestart();
+		document.getElementById("ctraddon_pw_okbutton").disabled = false;
+	},1350);//If changed here must update feedinurl timer in classic pre-set	
   },
 
   // 'classic' preset
@@ -1157,18 +1285,30 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("faviconurl",true);
 	this.prefs.setBoolPref("bmanimation",true);
 	this.prefs.setBoolPref("pananimation",true);
-  if (contexts.getBoolPref("classic")){}else{
+	if (classicthemerestorerjso.ctr.contexts.getBoolPref("classic")){}else{
 		this.prefs.setBoolPref("noconicons",true);
 	}
 	this.prefs.setBoolPref("alt_newtabp",true);
 	this.prefs.setBoolPref("skipprintpr",true);
 	this.prefs.setBoolPref("tbconmenu",true);
-	if(this.appversion >= 40) this.prefs.setBoolPref("alt_addonsm",true);
+	this.prefs.setBoolPref("activndicat",true);
+	this.prefs.setBoolPref("tbconmenu",true);
+
+	if(this.appversion >= 38) { 
+	  this.prefs.setCharPref("altoptions",'options_win_alt');
+	}
+	if(this.appversion >= 40) { 
+	  this.prefs.setBoolPref("alt_addonsm",true);
+	  this.prefs.setBoolPref("addonversion",true);
+	}
+	if(this.appversion >= 41) { 
+	  this.prefs.setBoolPref("hideurlsrg",true);
+	}
 	
 	setTimeout(function(){
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("starinurl",true);
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("feedinurl",true);
-	},1350);
+	},1350);//If changed here must update CustomizableUI timer in restore defaults.	
 	
 	if (this.oswindows && classicthemerestorerjso.ctr.tmp_tu_active==false)
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("dblclnewtab",true);
@@ -1180,15 +1320,16 @@ classicthemerestorerjso.ctr = {
   // 'Australis' preset
   australisCTRpreferences: function() {
 	this.resetCTRpreferences();
-	CustomizableUI.moveWidgetWithinArea("bookmarks-menu-button",5);
-	this.prefs.setCharPref("appbutton",'appbutton_off');	
+    Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
 	this.prefs.setCharPref("tabs",'tabs_default');
-  this.prefs.setBoolPref("statusbar",false);
+	this.prefs.setCharPref("appbutton",'appbutton_off');
+	
+	this.prefs.setBoolPref("statusbar",false);
 	this.prefs.setBoolPref("activndicat",false);
-  this.prefs.setBoolPref("toolsitem",false);
-  this.prefs.setBoolPref("cuibuttons",false);
+	this.prefs.setBoolPref("cuibuttons",false);
+	
 	if (this.oswindows) this.prefs.setBoolPref("dblclnewtab",true);
-  Services.prefs.getBranch("browser.tabs.").setBoolPref("drawInTitlebar", true);
+	
 	this.needsBrowserRestart();
 
   },
@@ -1221,7 +1362,7 @@ classicthemerestorerjso.ctr = {
 	  
 	var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
 
-	let preferenceArray = [];
+	var preferenceArray = [];
 		 
 	// Add filter header
 	preferenceArray.push("CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers");	
@@ -1369,7 +1510,7 @@ classicthemerestorerjso.ctr = {
 
 	var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
 
-	let preferenceArray = {
+	var preferenceArray = {
 	  preference: [],
 	  value: []
 	};
@@ -1444,7 +1585,7 @@ classicthemerestorerjso.ctr = {
 			}
 
 			if (fp.show() != nsIFilePicker.returnCancel) {
-			  let file = fp.file;
+			  var file = fp.file;
 			  if (aType === "txt") {
 				if (!/\.txt$/.test(file.leafName.toLowerCase()))
 				  file.leafName += ".txt";
@@ -1529,13 +1670,13 @@ classicthemerestorerjso.ctr = {
 	  },
  
   onCtrPanelSelect: function() {
-    let ctrAddonPrefBoxTab = document.getElementById("CtrRadioGroup");
-    let selectedPanel = document.getElementById(ctrAddonPrefBoxTab.value);
+    var ctrAddonPrefBoxTab = document.getElementById("CtrRadioGroup");
+    var selectedPanel = document.getElementById(ctrAddonPrefBoxTab.value);
     selectedPanel.parentNode.selectedPanel = selectedPanel;
 
-    for (let i=0; i < ctrAddonPrefBoxTab.itemCount; i++) {
-      let radioItem = ctrAddonPrefBoxTab.getItemAtIndex(i);
-      let pane = document.getElementById(radioItem.value);
+    for (var i=0; i < ctrAddonPrefBoxTab.itemCount; i++) {
+      var radioItem = ctrAddonPrefBoxTab.getItemAtIndex(i);
+      var pane = document.getElementById(radioItem.value);
       pane.setAttribute("selected", (radioItem.selected)? "true" : "false");
     }
   },
@@ -1633,7 +1774,7 @@ classicthemerestorerjso.ctr = {
             gClipboardHelper.copyString(Services.prefs.getCharPref("extensions.classicthemerestorer.hidexulfilter"));
 	},
 
-	selectBG: function(aPlace) {
+	selectImage: function(aID, aPref) {
 		try{
 		   const nsIFilePicker = Ci.nsIFilePicker;
 		   var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
@@ -1646,14 +1787,9 @@ classicthemerestorerjso.ctr = {
 		   if (fp.show() != nsIFilePicker.returnCancel) {
 			   IOpath = fp.file.path;
 			   stream.close();
-			   if (IOpath === ""){return null;}
-			if (aPlace === "abh"){   
-			  document.getElementById('ctraddon_ctabouthome_bg_urlbox').value = "file:" + IOpath ;
-			  Services.prefs.setCharPref("extensions.classicthemerestorer.abouthomecustomurl", "file:" + IOpath);
-			}else if (aPlace === "ntp"){
-			  document.getElementById('ctraddon_ctnewtab_bg_urlbox').value = "file:" + IOpath ;
-			  Services.prefs.setCharPref("extensions.classicthemerestorer.aboutnewtabcustomurl", "file:" + IOpath);
-			}			
+			  if (IOpath === ""){return null;}
+			  document.getElementById(aID).value = "file:" + IOpath ;
+			  Services.prefs.setCharPref('extensions.classicthemerestorer.' + aPref, "file:" + IOpath);		
 			  return true;
 		   }
 		   return null;

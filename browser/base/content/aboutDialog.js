@@ -9,7 +9,7 @@ const Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
 
 //Setup Localised Messages.
-let _locMSG = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
+var _locMSG = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
 
 const PREF_EM_HOTFIX_ID = "extensions.hotfix.id";
 
@@ -43,10 +43,10 @@ function init(aEvent) {
         }
 
         // Include the build ID and display warning if this is an "a#" (nightly or aurora) build
-        let version = Services.appinfo.version;
+        var version = Services.appinfo.version;
         if (/a\d+$/.test(version)) {
-            let buildID = Services.appinfo.appBuildID;
-            let buildDate = buildID.slice(0, 4) + "-" + buildID.slice(4, 6) + "-" + buildID.slice(6, 8);
+            var buildID = Services.appinfo.appBuildID;
+            var buildDate = buildID.slice(0, 4) + "-" + buildID.slice(4, 6) + "-" + buildID.slice(6, 8);
             document.getElementById("version").textContent += " (" + buildDate + ")";
             document.getElementById("communityDesc").hidden = true;
         }
@@ -102,12 +102,12 @@ function init(aEvent) {
 				
                     //Get Latest Browser Version
                     //Unfortunately same origin policy's prevent us using HTTPS here.
-                    let url = Services.prefs.getCharPref("app.update.check.url");
-                    let request = new XMLHttpRequest();
+                    var url = Services.prefs.getCharPref("app.update.check.url");
+                    var request = new XMLHttpRequest();
 
                     request.onload = function(aEvent) {
 
-                        let text = aEvent.target.responseText;
+                        var text = aEvent.target.responseText;
 
                         //Need to check if json is valid, If json not valid don't continue and show error.
                         function IsJsonValid(text) {
@@ -120,8 +120,8 @@ function init(aEvent) {
                         }
 
 
-                        let jsObject;
-                        let currentVersion;
+                        var jsObject;
+                        var currentVersion;
 
                         if (!IsJsonValid(text)) {
                             //hide buttons		  
@@ -192,9 +192,9 @@ function init(aEvent) {
                                 console.log(_locMSG.GetStringFromName("updateCheckErrorTitle") + " " + _locMSG.GetStringFromName("updateRequestError"));break;
                             case 1: console.log("Error Status: " + aEvent.target.status);break;
                             case 2:console.log("Error Status: " + aEvent.target.status);break;
-							case 3:console.log("Error Status: " + aEvent.target.status);break;
-							case 4:console.log("Error Status: " + aEvent.target.status);break;
-							default:console.log("Error Status: " + aEvent.target.status);break;
+                            case 3:console.log("Error Status: " + aEvent.target.status);break;
+                            case 4:console.log("Error Status: " + aEvent.target.status);break;
+                            default:console.log("Error Status: " + aEvent.target.status);break;
                         }
                         //hide buttons		  
                         ElementState("update-button-checkNow", true);

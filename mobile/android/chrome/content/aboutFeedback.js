@@ -7,9 +7,9 @@
 // input.mozilla.org expects "Firefox for Android" as the product.
 const FEEDBACK_PRODUCT_STRING = "Firefox for Android";
 
-let Cc = Components.classes;
-let Ci = Components.interfaces;
-let Cu = Components.utils;
+var Cc = Components.classes;
+var Ci = Components.interfaces;
+var Cu = Components.utils;
 const HEARTY_ICON_MDPI = "chrome://browser/skin/images/icon_heart_mdpi.png";
 const HEARTY_ICON_HDPI = "chrome://browser/skin/images/icon_heart_hdpi.png";
 const HEARTY_ICON_XHDPI = "chrome://browser/skin/images/icon_heart_xhdpi.png";
@@ -64,7 +64,7 @@ function init() {
     anchor.addEventListener("click", evt => window.close(), false);
   }
 
-  let sumoLink = Services.urlFormatter.formatURLPref("app.support.baseURL");
+  let sumoLink = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
   document.getElementById("help-section").addEventListener("click", function() {
     window.open(sumoLink, "_blank");
   }, false);

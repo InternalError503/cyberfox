@@ -185,7 +185,8 @@ browser.jar:
 
 #About:Home
 	content/browser/abouthome/8pecx-bg.png     	  (content/abouthome/8pecx-bg.png)
-	content/browser/abouthome/cyber.png     	    (content/abouthome/cyber.png)
+	content/browser/abouthome/cyber-light.png     	    (content/abouthome/cyber-light.png)
+	content/browser/abouthome/cyber-dark.png     	    (content/abouthome/cyber-dark.png)
     content/browser/abouthome/noise.png           (content/abouthome/noise.png)		
 #Browser Core
     content/browser/browser-cyberfox.js           (content/browser-cyberfox.js)

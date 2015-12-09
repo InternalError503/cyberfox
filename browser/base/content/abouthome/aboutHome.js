@@ -7,6 +7,7 @@
 // IndexedDB storage constants.
 const DATABASE_NAME = "abouthome";
 const DATABASE_VERSION = 1;
+var searchText;
 
 window.addEventListener("pageshow", function () {
   fitToWidth();
@@ -22,20 +23,36 @@ window.addEventListener("pagehide", function() {
   window.removeEventListener("resize", fitToWidth);
 });
 
+window.addEventListener("keypress", ev => {
+  // focus the search-box on keypress
+  if (document.activeElement.id == "searchText") // unless already focussed
+    return;
+
+  let modifiers = ev.ctrlKey + ev.altKey + ev.metaKey;
+  // ignore Ctrl/Cmd/Alt, but not Shift
+  // also ignore Tab, Insert, PageUp, etc., and Space
+  if (modifiers != 0 || ev.charCode == 0 || ev.charCode == 32)
+    return;
+
+  searchText.focus();
+  // need to send the first keypress outside the search-box manually to it
+  searchText.value += ev.key;
+});
+
 function onSearchSubmit(aEvent)
 {
   gContentSearchController.search(aEvent);
 }
 
 
-let gContentSearchController;
+var gContentSearchController;
 
 function setupSearch()
 {
   // The "autofocus" attribute doesn't focus the form element
   // immediately when the element is first drawn, so the
   // attribute is also used for styling when the page first loads.
-  let searchText = document.getElementById("searchText");
+  searchText = document.getElementById("searchText");
   searchText.addEventListener("blur", function searchText_onBlur() {
     searchText.removeEventListener("blur", searchText_onBlur);
     searchText.removeAttribute("autofocus");

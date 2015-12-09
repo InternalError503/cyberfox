@@ -4,9 +4,9 @@
 
 // Tests the list view
 
-let tempScope = {};
+var tempScope = {};
 Components.utils.import("resource://gre/modules/LightweightThemeManager.jsm", tempScope);
-let LightweightThemeManager = tempScope.LightweightThemeManager;
+var LightweightThemeManager = tempScope.LightweightThemeManager;
 
 var gProvider;
 var gManagerWindow;

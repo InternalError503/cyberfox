@@ -4,8 +4,8 @@
 
 "use strict";
 
-let Cu = Components.utils;
-let Ci = Components.interfaces;
+var Cu = Components.utils;
+var Ci = Components.interfaces;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
@@ -20,7 +20,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
 XPCOMUtils.defineLazyModuleGetter(this, "UpdateChannel",
   "resource://gre/modules/UpdateChannel.jsm");
 
-let {
+var {
   links: gLinks,
   allPages: gAllPages,
   linkChecker: gLinkChecker,
@@ -28,7 +28,7 @@ let {
   blockedLinks: gBlockedLinks,
   gridPrefs: gGridPrefs
 } = NewTabUtils;
-let isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled");
+var isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled");
 XPCOMUtils.defineLazyGetter(this, "gStringBundle", function() {
   return Services.strings.
     createBundle("chrome://browser/locale/newTab.properties");

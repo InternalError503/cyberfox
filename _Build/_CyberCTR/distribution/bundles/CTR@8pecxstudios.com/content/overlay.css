@@ -1,8 +1,6 @@
 @import url(chrome://ctraddon_os_special/skin/overlayextra.css);
 @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
 
-@-moz-document url(chrome://browser/content/browser.xul) {
-
 	#main-window {
 	  min-width: 300px !important;
 	}
@@ -155,6 +153,10 @@
 	  list-style-image: none !important;
 	  display: none !important;
 	  visibility:collapse !important;
+	}
+	
+	#main-window[fx44plus="true"]  #ctraddon_appbutton > .toolbarbutton-icon{
+	  max-width: unset !important;
 	}
 
 	/* style appbutton*/
@@ -377,6 +379,11 @@
 	  list-style-image: url(chrome://classic_theme_restorer/content/images/palette_ctr.png);
 	}
 	
+	/**/
+	#ctraddon_go-button:-moz-locale-dir(rtl) .toolbarbutton-icon {
+	  -moz-transform:rotate(180deg);
+	}
+	
 	/* CTRs activity throbber */
 	#ctraddon_navigator-throbber {
 	  background:url("chrome://classic_theme_restorer/content/images/throbber_notloading.png") center no-repeat;
@@ -401,6 +408,13 @@
 	}
 	#ctraddon_navigator-throbber[cui-areatype="menu-panel"]{
 	  margin-top:-30px !important;
+	}
+
+	#ctraddon_navigator-throbber {
+	  visibility: collapse;
+	}
+	#wrapper-ctraddon_navigator-throbber {
+	  display: none;
 	}
 	
 	/* show missing icon */
@@ -471,560 +485,20 @@
 	  border: 0 !important;
 	  min-width: 0px !important;
 	}
-
-}
-
-/* style/hide settings on CTRs options window */
-@-moz-document url(chrome://classic_theme_restorer/content/options.xul) {
-	#ctraddon_pw_noresizerxp,
-	#ctraddon_combrelstopinfo,
-	#ctraddon_appbutton_list1,
-	#ctraddon_appbutton_list2{
+	
+	/* Fx44+ fix */
+	#main-window[fx44plus="true"] toolbarbutton[id^="ctraddon_"] > .toolbarbutton-icon{
+	  max-width: unset !important;
+	}
+	
+	/* CTR preference items */
+	#ctraddon_toolsmenu_preferencesOSX {
 	  visibility: collapse;
-	}
-	.ctraddon_tabcolorlabel,
-	.ctraddon_font1{
-	  font-weight:bold;
-	  font-style:italic;
-	}
-	.ctraddon_topic{
-	  font-weight:bold;
-	}
-	.ctraddon_font2{
-	  font-style:italic;
+	  display: none;
 	}
 	
-	.tabcolorbox,
-	.tabhovcolorbox,
-	.tabpencolorbox,
-	.tabunrcolorbox,
-	.ntabcolorbox,
-	.ntabhovcolorbox,
-	#ntabcolorbox,
-	#ntabhovcolorbox,
-	#ClassicTRoptionsPane[defaultfxtheme="true"] #ctraddon_pw_colors_ntab_t,
-	#ctraddon_pw_tabs_devtabs{
-	  visibility: collapse;
+	#wrapper-ctraddon_preferences-button,
+	#ctraddon_preferences-button {
+	  visibility: collapse; 
+	  display: none;
 	}
-	
-	#ctraddon_ccap_t_squared,
-	#ctraddon_ccap_t_squaredc2,
-	#ctraddon_ccap_t_squared2,
-	#ctraddon_ccap_t_curved,
-	#ctraddon_ccap_t_curvedaero{
-	  visibility: collapse;
-	}
-	
-	#ClassicTRoptionsPane[defaultfxtheme="true"] textbox{
-	  min-height:22px !important;
-	}
-	#ctraddon_fontbox textbox {
-	  min-width: 50px !important;
-	  width: 122px !important;
-	  max-width: 122px !important;
-	}
-	
-	#ctraddon_pw_tab_ctabheight,
-	#ctraddon_pw_tabMinWidth,
-	#ctraddon_pw_tabMaxWidth,
-	#ctraddon_pw_tabClipWidth{
-	  width:60px !important;
-	  max-width:80px !important;
-	}
-	
-	#ctraddon_pw_nbisizedelay,
-	#ctraddon_pw_am_extrabars{
-	  width:50px !important;
-	}
-	
-	@media not all and (-moz-windows-theme:aero) {
-	  #tabs_curvedall{
-		visibility: collapse;
-		display:none;
-	  }
-	}
-	
-	.ctraddontabs, .ctraddontabpanel{
-	  border: 1px solid;
-	}
-	
-	.ctraddonsuboption{
-	  -moz-padding-start:21px;
-	}
-	.ctraddonsuboption2{
-	  -moz-padding-start:39px;
-	}
-	
-	#ClassicTRoptionsPane[defaultfxtheme="true"] .ctraddontabs{
-	  -moz-appearance: listbox;
-	  -moz-border-top-colors: ThreeDShadow ThreeDDarkShadow;
-	  -moz-border-right-colors: ThreeDHighlight ThreeDLightShadow;
-	  -moz-border-bottom-colors: ThreeDHighlight ThreeDLightShadow;
-	  -moz-border-left-colors: ThreeDShadow ThreeDDarkShadow;
-	  background: -moz-Field;
-	  color: -moz-FieldText;
-	  border: 2px solid;
-	}
-	
-	#ClassicTRoptionsPane[defaultfxtheme="true"] .ctraddontabpanel{
-	  -moz-appearance: none;
-	  background: -moz-dialog;
-	  color: -moz-FieldText;
-	  border: 0px solid;
-	}
-	
-	@media all and (-moz-windows-classic) {
-	  #ClassicTRoptionsPane[defaultfxtheme="true"] .ctraddontabpanel{
-		border: 1px solid;
-	  }
-	}
-	
-	radio.ctraddontab {
-	  -moz-appearance: none;
-	  margin: 0;
-	  padding: 1px;
-	  border: solid 1px transparent;
-	}
-
-	radio.ctraddontab[selected] {
-	  background: Highlight;
-	  color: HighlightText;
-	}
-	
-	radio.ctraddontab:not([selected]):hover {
-	  background: -moz-CellHighlight;
-	  color: -moz-CellHighlightText;
-	}
-	
-	radio.ctraddontab .radio-spacer-box,
-	radio.ctraddontab .radio-check,
-	radio.ctraddontab .radio-check-box1 {
-	  visibility: collapse;
-	}
-
-	.ctraddontabs {
-	  overflow-x: hidden;
-	  overflow-y: auto;
-	  min-width: 180px;
-	  width: 180px;
-	  max-width: 180px;
-	}
-	
-	.ctraddontabpanel {
-	  height:420px;
-	  max-height:470px;
-	  min-width:500px;
-	  width:480px;
-	  max-width:800px;
-	  overflow-x:auto;
-	  overflow-y:auto;
-	}
-	
-	.ctraddontabpanel {
-	  visibility: collapse;
-	}
-	
-	.ctraddontabpanel[selected="true"] {
-	  visibility: visible;
-	}
-	#ctraddon_pw_tabs_tabpanels tabpanel checkbox,
-	#ctraddon_pw_tabs_tabpanels tabpanel groupbox {
-	  max-width:400px !important;
-	}
-	
-	#ctraddon_pw_splitter {
-	  border:0;
-	}
-	
-	#ctraddon_pw_radiorestart{
-	  font-weight:bold;
-	  color:red;
-	  border:1px solid red;
-	  text-align:center;
-	  background: yellow;
-	}
-
-	.acprefdesc {
-	  font-size:95%;
-	}
-	
-	@media not all and (-moz-windows-classic) {
-	  #ctraddon_pw_tbsep_winc,
-	  #ctraddon_pw_hidetbwote_winc {
-		visibility: collapse !important;
-	  }
-	}
-	
-	@media not all and (-moz-os-version: windows-win10) {
-	  #ctraddon_pw_transpttbw10 {
-		visibility: collapse;
-	  }
-	}
-	
-	/* additional icons for some preference*/
-	
-	#ctraddon_altabico_white{
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/appbutton.png");
-	  -moz-margin-end:0;
-	}
-	#ctraddon_altabico_dark{
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/appbutton2.png");
-	  margin-left: 0;
-	  margin-right: 0;
-	}
-	#ctraddon_altabico_grey{
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/appbutton3.png");
-	  margin-left: 0;
-	  margin-right: 0;
-	}
-	#ctraddon_altabico_white_nd{
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/appbutton-inv.png");
-	  margin-left: 0;
-	  margin-right: 0;
-	}
-	#ctraddon_altabico_dark_nd{
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/appbutton-dark.png");
-	  margin-left: 0;
-	  margin-right: 0;
-	}
-	#ctraddon_altabico_grey_nd{
-	  list-style-image: url("chrome://classic_theme_restorer/content/images/appbutton-grey.png");
-	  margin-left: 0;
-	  margin-right: 0;
-	}
-	
-	/* -mox-padding-start is useless in this case, because Firefox does not allow something like 
-	   #itemid:-moz-locale-dir(rtl) for background-position on preference windows anyway.
-	   At least 'padding-left' does not create an empty space in front of ootion labels on rtl locales
-	*/
-	
-	#ctraddon_pw_tab_emptyfavicon label,
-	#ctraddon_pw_tab_noemptypticon label {
-	  background:url('chrome://classic_theme_restorer/content/images/default_dot_favicon.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	/* Tab close - pref icons */
-	#ctraddon_closeicon_def {
-	  -moz-margin-end:0;
-	}
-	#ctraddon_closeicon_red {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/close_alt.png');
-	  -moz-image-region: rect(0px, 16px, 16px, 0px);
-	}
-	#ctraddon_closeicon_w7{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/close.png');
-	  -moz-image-region: rect(0px, 16px, 16px, 0px);
-	}
-	#ctraddon_closeicon_w8{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/close2.png');
-	  -moz-image-region: rect(0px, 16px, 16px, 0px);
-	}
-	#ctraddon_closeicon_w10 {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/close_w10.png');
-	  -moz-image-region: rect(0px, 20px, 20px, 0px);
-	}
-	#ctraddon_closeicon_w10i {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/close_w10i.png');
-	  -moz-image-region: rect(0px, 20px, 20px, 0px);
-	}
-	#ctraddon_closeicon_w10red {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/close_w10red.png');
-	  -moz-image-region: rect(0px, 20px, 20px, 0px);
-	}
-	
-	#ctraddon_closeicon_red:hover,
-	#ctraddon_closeicon_w7:hover,
-	#ctraddon_closeicon_w8:hover {
-	  -moz-image-region: rect(0px, 32px, 16px, 16px);
-	}
-	#ctraddon_closeicon_red:active,
-	#ctraddon_closeicon_w7:active,
-	#ctraddon_closeicon_w8:active {
-	  -moz-image-region: rect(0px, 48px, 16px, 32px);
-	}
-	#ctraddon_closeicon_w10:hover,
-	#ctraddon_closeicon_w10i:hover,
-	#ctraddon_closeicon_w10red:hover {
-	  -moz-image-region: rect(0px, 40px, 20px, 20px);
-	}
-	#ctraddon_closeicon_w10:active,
-	#ctraddon_closeicon_w10i:active,
-	#ctraddon_closeicon_w10red:active {
-	  -moz-image-region: rect(0px, 60px, 20px, 40px);
-	}
-
-	#ctraddon_closeicon_w10 image,
-	#ctraddon_closeicon_w10i image,
-	#ctraddon_closeicon_w10red image {
-	  width: 16px;
-	}
-
-	#ctraddon_closeicon_red,
-	#ctraddon_closeicon_w7,
-	#ctraddon_closeicon_w8,
-	#ctraddon_closeicon_w10,
-	#ctraddon_closeicon_w10i,
-	#ctraddon_closeicon_w10red {
-	  margin-left: -1px;
-	  margin-right: -1px;
-	}
-	
-	/* tab separator settings */
-	#ctraddon_tabsep_def {
-	  -moz-margin-end:0;
-	}
-	#ctraddon_tabsep_black{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/tab-separator.png');
-      -moz-image-region: rect(0px, 3px, 24px, 0px);
-	}
-	#ctraddon_tabsep_white{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/tab-separator-inv.png');
-      -moz-image-region: rect(0px, 3px, 24px, 0px);
-	}
-	#ctraddon_tabsep_black_sol{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/tab-separator_solid.png');
-	  -moz-image-region: rect(0px, 1px, 18px, 0px);
-	}
-	#ctraddon_tabsep_white_sol {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/tab-separator_solid-inv.png');
-	  -moz-image-region: rect(0px, 1px, 18px, 0px);
-	}
-	#ctraddon_tabsep_black_sol2{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/tab-separator_solid.png');
-	  -moz-image-region: rect(0px, 1px, 24px, 0px);
-	}
-	#ctraddon_tabsep_white_sol2 {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/tab-separator_solid-inv.png');
-	  -moz-image-region: rect(0px, 1px, 24px, 0px);
-	}
-	#ctraddon_tabsep_black,
-	#ctraddon_tabsep_white,
-	#ctraddon_tabsep_black_sol,
-	#ctraddon_tabsep_white_sol,
-	#ctraddon_tabsep_black_sol2,
-	#ctraddon_tabsep_white_sol2{
-	  margin-left: -1px;
-	  margin-right: -1px;
-	}
-
-	/**/
-	#ClassicTRoptionsPane[defaultfxtheme="true"] #ctraddon_pw_closeicon,	
-	#ClassicTRoptionsPane[defaultfxtheme="true"] #ctraddon_pw_tabseparator {
-	  background: #dfdfdf;
-	}
-
-	/**/
-	#ctraddon_alt_abicons label,
-	#ctraddon_alt_abicons2 label {
-	  background:url('chrome://classic_theme_restorer/content/images/appbutton-dark.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_backforward label{
-	  background:url('chrome://classic_theme_restorer/content/images/back-forward.png') no-repeat left !important;
-	  padding-left:36px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_hideprivmask label {
-	  background:url('chrome://classic_theme_restorer/content/images/appmenu_private.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_stopreload label {
-	  background:url('chrome://classic_theme_restorer/content/images/stop_mac.png') no-repeat left,
-				 url('chrome://classic_theme_restorer/content/images/reload_mac.png') no-repeat 4% 50% !important;
-	  padding-left:36px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_wincontrols label{
-	  background: -moz-image-rect(url('chrome://classic_theme_restorer/content/images/windowControls.png'),
-					16, 49, 32, 0) no-repeat left !important;
-	  padding-left:52px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_emptyfavicon2 label {
-	  background:url('chrome://classic_theme_restorer/content/images/default_favicon.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_activitythrobber label {
-	  background:url('chrome://classic_theme_restorer/content/images/throbber_notloading.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_hideurelstop label{
-	  background:url('chrome://classic_theme_restorer/content/images/stop_mac.png') no-repeat left,
-				 url('chrome://classic_theme_restorer/content/images/reload_mac.png') no-repeat 4% 50% !important;
-	  padding-left:36px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_hideurlgo label {
-	  background:url('chrome://classic_theme_restorer/content/images/urlgo.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_urlbardropm label{
-	  background:url('chrome://classic_theme_restorer/content/images/pw_urlbar_dropmarker.png') no-repeat left !important;
-	  padding-left:20px !important;
-	}
-	#ctraddon_pw_urlbarpblocked label{
-	  background:url('chrome://classic_theme_restorer/content/images/pw_urlbar_popup_blocked.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_oldsearch label {
-	  background:url('chrome://classic_theme_restorer/content/images/newsearch.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_loopcall label {
-	  background:url('chrome://classic_theme_restorer/content/images/loopcall.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_oldprefs label {
-	  background:url('chrome://classic_theme_restorer/content/images/prefs_incontent.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_alt_newtabp label,
-	#ctraddon_pw_alt_newtabpalt label	{
-	  background: -moz-image-rect(url(chrome://classic_theme_restorer/content/images/newtab_controls.png), 0, 160, 16, 144) no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_bmbutpanelm label,
-	#ctraddon_pw_bmbutnotext label {
-	  background:url('chrome://classic_theme_restorer/content/images/bookmarks.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_skipprintpr label {
-	  background:url('chrome://classic_theme_restorer/content/images/appmenu_print.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_xpinstallui label,
-	#ctraddon_pw_alt_addonsm label {
-	  background:url('chrome://classic_theme_restorer/content/images/appmenu_addons.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_alt_addonsp label,
-	#ctraddon_pw_addonversion label,
-	#ctraddon_pw_am_nowarning label,
-  #ctraddon_pw_colapsesearchaddons label {
-	  background:url('chrome://classic_theme_restorer/content/images/appmenu_addons_lin.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-
-	#ctraddon_pw_noresizerxp label {
-	  background:url('chrome://classic_theme_restorer/content/images/resizer.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_readermode label,
-	#ctraddon_pw_readermode2 label {
-	  background:url('chrome://classic_theme_restorer/content/images/reader-mode.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	#ctraddon_pw_pocket label {
-	  background:url('chrome://classic_theme_restorer/content/images/pocket.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:16px !important;
-	}
-	
-	/* Padlock icons */
-	#ctraddon_pw_padlock_default label{
-	  background: -moz-image-rect(url('chrome://classic_theme_restorer/content/images/padlock_default1.png'),
-				  0, 16, 16, 0) no-repeat left !important;
-	  padding-left:20px !important;
-	}
-	#ctraddon_padlock_list[value="padlock_default"] {
-	 list-style-image:url('chrome://classic_theme_restorer/content/images/padlock_default1.png');
-	 -moz-image-region: rect(0, 16px, 16px, 0);
-	}
-	#ctraddon_pw_padlock_classic label{
-	  background:url('chrome://classic_theme_restorer/content/images/padlock_classic.png') no-repeat left !important;
-	  padding-left:20px !important;
-	}
-	#ctraddon_padlock_list[value="padlock_classic"] {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/padlock_classic.png');
-	}
-	#ctraddon_pw_padlock_modern label{
-	  background:url('chrome://classic_theme_restorer/content/images/padlock_modern.png') no-repeat left !important;
-	  padding-left:20px !important;
-	}
-	#ctraddon_padlock_list[value="padlock_modern"] {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/padlock_modern.png');
-	}
-	#ctraddon_pw_padlock_none label{
-	  padding-left:20px !important;
-	}
-
-	#ctraddon_pw_tabsaudioico label{
-	  background:url('chrome://classic_theme_restorer/content/images/tabaudio.png') no-repeat left !important;
-	  padding-left:20px !important;
-	}
-	
-	/* tab throbber */
-	#ctraddon_closeicon_def {
-	  -moz-margin-end:0;
-	}
-	#ctraddon_pw_tabthrobber_alt {
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/throbber-loading-alt.png');
-	}
-	#ctraddon_pw_tabthrobber_f39{
-	  list-style-image:url('chrome://classic_theme_restorer/content/images/throbber-loading-fx39.png');
-	}
-
-	#ctraddon_pw_tabthrobber_alt,
-	#ctraddon_pw_tabthrobber_f39 {
-	  margin-left: -1px;
-	  margin-right: -1px;
-	}
-
-	/*CTR icons*/
-	#ctraddon_pw_toolsitem label,
-	#ctraddon_pw_appmenuitem label,
-	#ctraddon_pw_contextitem label,
-	#ctraddon_pw_puictrbutton label{
-	  background:url('chrome://classic_theme_restorer/content/images/appmenu_ctr.png') no-repeat left !important;
-	  padding-left:20px !important;
-	  min-height:18px !important;
-	}
-	
-	#ctraddon_pw_toolsitem:-moz-locale-dir(rtl) label,
-	#ctraddon_pw_appmenuitem:-moz-locale-dir(rtl) label,
-	#ctraddon_pw_contextitem:-moz-locale-dir(rtl) label,
-	#ctraddon_pw_puictrbutton:-moz-locale-dir(rtl) label{
-	  background:url('chrome://classic_theme_restorer/content/images/appmenu_ctr.png') no-repeat right !important;
-	  padding-right:20px !important;
-	  min-height:18px !important;
-	}
-	
-	
-}

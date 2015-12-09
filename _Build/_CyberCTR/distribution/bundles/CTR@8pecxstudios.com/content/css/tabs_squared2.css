@@ -124,7 +124,13 @@
 	  margin-top: 0px !important;
 	  margin-bottom: 1px !important;
 	}
-	
+
+	/*.tab-background-start[visuallyselected=true]::after,
+	.tab-background-start[visuallyselected=true]::before,
+	.tab-background-start,
+	.tab-background-end,
+	.tab-background-end[visuallyselected=true]::after,
+	.tab-background-end[visuallyselected=true]::before,*/
 	#tabbrowser-tabs,
 	#TabsToolbar {
 	  min-height: 0px !important;
@@ -173,14 +179,14 @@
 	  border-width: 5px 3px 6px !important;
 	  border-image: url(chrome://classic_theme_restorer/content/images/tab_empty.png) 5 3 6 fill repeat round !important;
 	  border-style: solid !important;
-	}   
+	}
 	
 	.tabs-newtab-button:hover{
 	  border-width: 5px 3px 6px !important;
-	  border-image: url(chrome://classic_theme_restorer/content/images/tab.png) 5 3 6 fill repeat round !important;
+	  border-image: url(chrome://classic_theme_restorer/content/images/taba.png) 5 3 6 fill repeat round !important;
 	  border-style: solid !important;
-	} 
-	
+	}
+
 	.tabbrowser-tab[selected="true"] > .tab-stack > .tab-content	{
       border-image: url("chrome://classic_theme_restorer/content/images/taba.png") 3 3 0 fill repeat stretch !important;
       border-style: solid !important;
@@ -233,13 +239,13 @@
 	  background-image: linear-gradient(rgba(255,255,255,.7), rgba(255,255,255,.5) 50%) !important;
 	}
 
-	@media all and (-moz-windows-glass) {
+	/*@media all and (-moz-windows-glass) {
 		.tabs-newtab-button:-moz-lwtheme,		
 		.tabbrowser-tab:-moz-lwtheme,
 		.tabbrowser-tab[pinned]:-moz-lwtheme {
 		  background-size: calc(100% - 1px) calc(100% - 4px) !important;
 		}
-	}
+	}*/
 	
 	.tabs-newtab-button:-moz-lwtheme,
 	.tabbrowser-tab:not([selected="true"]):-moz-lwtheme {
@@ -260,6 +266,10 @@
 	#navigator-toolbox #nav-bar:-moz-lwtheme{
 	  border-top: 1px solid transparent !important;
 	}
+	
+	/*#TabsToolbar:not(:-moz-lwtheme) {
+	  margin-bottom:0px !important;
+	}*/
 	
 	@media all and (-moz-windows-theme:aero) {
 	  #TabsToolbar{
@@ -314,6 +324,7 @@
 	.tabbrowser-tab:not([selected]):not([afterselected-visible]):not([afterhovered]):not([first-visible-tab]):not(:hover)::before,
 	#tabbrowser-tabs:not([overflow]) > .tabbrowser-tab[last-visible-tab]:not([selected]):not([beforehovered]):not(:hover)::after {
 	  background-image: none !important;
+	  background-color: unset !important;
 	}
 	
 	.tabbrowser-tab:not([pinned]) .tab-close-button{

@@ -4,7 +4,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 #endif
 
-let gSearch = {
+var gSearch = {
   init: function () {
   if(isSearchEnabled){
     document.getElementById("newtab-search-submit")

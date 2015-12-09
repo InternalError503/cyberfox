@@ -478,6 +478,22 @@ var gPrivacyPane = {
                                         "chrome://browser/content/preferences/cookies.xul",
                                         "resizable", null);
   },
+  
+  /**
+   * Displays the available block lists for tracking protection.
+   */
+  showBlockLists: function ()
+  {
+    var bundlePreferences = document.getElementById("bundlePreferences");
+    let brandName = document.getElementById("bundleBrand")
+                            .getString("brandShortName");
+    var params = { brandShortName: brandName,
+                   windowTitle: bundlePreferences.getString("blockliststitle"),
+                   introText: bundlePreferences.getString("blockliststext") };
+    document.documentElement.openWindow("Browser:Blocklist",
+										"chrome://browser/content/preferences/blocklists.xul",
+										"resizable", params);
+  },
 
   // CLEAR PRIVATE DATA
 

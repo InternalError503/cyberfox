@@ -540,12 +540,12 @@ var gCyberfoxCustom = {
 														
 						//Get Latest Browser Version
 						//Unfortunately same origin policy's prevent us using HTTPS here.
-						let url = Services.prefs.getCharPref("app.update.check.url");
-						let request = new XMLHttpRequest();
+						var url = Services.prefs.getCharPref("app.update.check.url");
+						var request = new XMLHttpRequest();
 
 						request.onload = function(aEvent) {
 
-							let text = aEvent.target.responseText;
+							var text = aEvent.target.responseText;
 
 							//Need to check if json is valid, If json not valid don't continue and show error.
 							function IsJsonValid(text) {
@@ -556,8 +556,8 @@ var gCyberfoxCustom = {
 								}
 								return true;
 							}
-							let jsObject;
-							let currentVersion;
+							var jsObject = null;
+							var currentVersion = null;
 							if (!IsJsonValid(text)) { 
 								//Throw error message	
 								console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
