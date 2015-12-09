@@ -16,6 +16,7 @@
 <!ENTITY Ctr_sidebarbutton	"Postranní lišta">
 <!ENTITY Ctr_windowcontrols	"Min/max/zavřít (Fullscreen)">
 <!ENTITY Ctr_rr				"Restartujte &brandShortName;!">
+<!ENTITY Ctr_window			"okno">
 
 <!ENTITY Ctr_cuibuttons		"Tlačítka">
 <!ENTITY Ctr_cuibutnormal	"Normální">
@@ -55,6 +56,7 @@
 <!ENTITY Ctr_tabwidthinfo2	"Šířka panelů (min-width a max-width) je určena doplňkem TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Hodnoty pod 48px působí většinou chyby!">
 <!ENTITY Ctr_square_edges	"Hranaté horní rohy">
+<!ENTITY Ctr_tttitlebar		"Název panelu v &brandShortName; liště aplikace">
 <!ENTITY Ctr_tabinsertion	"Vložit související panel za aktuální (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Obnovit prázdnou faviconu (pokud stránka nemá vlastní)">
 <!ENTITY Ctr_noemptypticon	"Odebrat prázdnou faviconu z připnutého panelu">
@@ -66,7 +68,7 @@
 <!ENTITY Ctr_closetab_4		"Na začátku lišty s panely">
 <!ENTITY Ctr_closetab_5		"Na všech panelech (vynutit)">
 <!ENTITY Ctr_closetab_hfot	"Skrýt pro jeden viditelný panel">
-<!ENTITY Ctr_closei_def		"Defaulní icony">
+<!ENTITY Ctr_closei_def		"Defaultní icony">
 <!ENTITY Ctr_closeonleft	"Alternativní pozice na panelu">
 <!ENTITY Ctr_close_wwltab	"Zavřít okno s posledním viditelným panelem (about:config)">
 
@@ -80,7 +82,8 @@
 <!ENTITY Ctr_appbutton2		"Tlačítko v záhlaví okna [&brandShortName;]">
 <!ENTITY Ctr_appbutton2h	"Tlačítko v záhlaví okna [&brandShortName;] (hidden)">
 <!ENTITY Ctr_appbutton2io	"Tlačítko v záhlaví okna [&brandShortName;] (pouze ikona)">
-<!ENTITY Ctr_paneluibtweak	"Oranžový panel jako tlačítko na liště s panely">
+<!ENTITY Ctr_paneluibtweak	"Oranžový panel jako tlačítko...">
+<!ENTITY Ctr_paneluibtweak2	"...na liště s panely">
 <!ENTITY Ctr_appbuttonc_o	"Oranžové tlačítko (výchozí)">
 <!ENTITY Ctr_appbuttonc_a	"Modré tlačítko (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Černé tlačítko (Nightly)">
@@ -112,8 +115,18 @@
 <!ENTITY Ctr_hide_bf_popup	"Skrýt nabídku historie tlačítek při kliknutí myší">
 <!ENTITY Ctr_bf_space		"Zmenšit mezery mezi tlačítky (pokud lze)">
 <!ENTITY Ctr_noconicons		"Nahradit ikony v kontextové nabídce stránky textem (zpět, vpřed, zastavit, obnovit, přidat do záložek)">
+<!ENTITY Ctr_prefpage		"Stránka nastavení">
+<!ENTITY Ctr_altoptionsd	"Výchozí vzhled">
+<!ENTITY Ctr_altoptionsp	"Alternativní vzhled">
+<!ENTITY Ctr_altoptionsw	"Otevřít stránku nastavení v okně">
+<!ENTITY Ctr_altoptionsww	"Šířka">
+<!ENTITY Ctr_altoptionswh	"Výška">
+<!ENTITY Ctr_altoptionsi	"V simulaci nastavení už není dialogové okno, ale 'okno prohlížeče' s lištami je skryto. Volba 'Použít stávající stránku' přidávající URL stránek, otevřených v současném okně, je dostupná přes 'about:preferences'. Tlačítko 'Možnosti' je nahrazeno novým, aby bylo možné otevírat možnosti v okně.">
+<!ENTITY Ctr_options_rem	"Pamatovat poslední zvolenou kategorii">
 <!ENTITY Ctr_svgfilters		"SVG barvy pro defaultní ikony tlačítek lišty">
 <!ENTITY Ctr_wincontrols	"Přesunutelné ovládací prvky okna v režimu celé obrazovky">
+<!ENTITY Ctr_oldtoplevimg	"'Top level domain' obrázků: klasický vzhled">
+<!ENTITY Ctr_altalertbox	"'Alert box': alternativní vzhled">
 <!ENTITY Ctr_emptyfavicon2	"Nahradit obecnou faviconu (prázdnou tečkovanou) faviconou listu">
 <!ENTITY Ctr_mstatusbar		"Přesunutelný stavový řádek">
 <!ENTITY Ctr_mstatusbars4e	"Stavový řádek je nastaven pomocí rozšíření 'Status-4-Evar'">
@@ -124,7 +137,10 @@
 <!ENTITY Ctr_stoprel1		"Důležité: umístěte tlačítko Obnovit za tlačítko Zastavit!">
 <!ENTITY Ctr_panelmenucol	"Nabídky panelů: alternativní barva pozadí">
 <!ENTITY Ctr_hideprivmask	"Anonymní prohlížení: skrýt indikátor s maskou">
-<!ENTITY Ctr_nbisizedelay	"ms prodlevy před spuštěním (1000 ms = 1 sec)">
+<!ENTITY Ctr_navsmallicons	"Malé ikony">
+<!ENTITY Ctr_navlargeicons	"Velké ikony">
+<!ENTITY Ctr_nbisizedelay0	"Prodlevy před spuštěním">
+<!ENTITY Ctr_nbisizedelay	"ms (1000 ms = 1 sec)">
 <!ENTITY Ctr_findbar		"Lišta vyhledávání">
 <!ENTITY Ctr_findbar_def	"Výchozí umístění">
 <!ENTITY Ctr_findbar_top	"Nahoře">
@@ -138,11 +154,14 @@
 <!ENTITY Ctr_iat_notf_vt	"S výjimkou svislých lišt">
 <!ENTITY Ctr_cpanelmenus	"Nabídky panelů: kompaktní zobrazení (záložky, historie atd.)">
 <!ENTITY Ctr_hidezoomres	"Přiblížit prvky na liště: skrýt tlačítko pro obnovení lupy">
-<!ENTITY Ctr_alt_newtabp	"Nový panel: alternativní vzhled">
+<!ENTITY Ctr_alt_newtabp	"Nový panel (about:newtab): alternativní vzhled">
+<!ENTITY Ctr_ctroldsearch	"Old search (experimental)">
 <!ENTITY Ctr_addonmanager	"Správce rozšíření">
 <!ENTITY Ctr_alt_addonsp	"Stránka rozšíření lišty 'další info': alternativní vzhled">
 <!ENTITY Ctr_alt_addonsm	"Správce rozšíření: alternativní vzhled">
 <!ENTITY Ctr_am_nowarning	"Seznam Správce rozšíření: skrývat varování">
+<!ENTITY Ctr_am_compact		"Správce doplňků: kompaktní vzhled">
+<!ENTITY Ctr_am_compact2	"Kompaktní vzhled +">
 <!ENTITY Ctr_addonversion	"Seznam Správce rozšíření: zobrazit verzi rozšíření">
 <!ENTITY Ctr_xpinstallui	"Správce rozšíření: starý vzhled (předvolba about:config)">
 <!ENTITY Ctr_bmbutpanelm	"Tlačítko menu záložek: panel menu vzhledu">
@@ -153,8 +172,9 @@
 <!ENTITY Ctr_extraurlkeycb	"Otevřít přídavný adresní řádek (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Tlačítko nabídky: skrýt texty u ikon">
 <!ENTITY Ctr_menupopupscr	"Nabídky: zobrazit rolovací lištu místo šipek">
+<!ENTITY Ctr_closegeneral	"Ikony pro zavření">
 
-<!ENTITY Ctr_tabsep_def		"Defaulní oddělovače panelů">
+<!ENTITY Ctr_tabsep_def		"Defaultní oddělovače panelů">
 <!ENTITY Ctr_fxmockup		"&brandShortName; Mockup">
 <!ENTITY Ctr_tabmokcolor	"Bílá barva pro tlačítka panelu (zavřít, nový, skupiny, seznam všech)">
 <!ENTITY Ctr_tabmokcolor2	"Bílá barva a tmavý stín pro text na neaktivních panelech">
@@ -190,19 +210,26 @@
 
 <!ENTITY Ctr_urlbar			"Adresní řádek">
 <!ENTITY Ctr_starinurl		"Tlačítko hvězdičky">
+<!ENTITY Ctr_starinurlinfo	"Skrýt tlačítka menu záložek">
 <!ENTITY Ctr_feedinurl		"Tlačítko kanálu">
 <!ENTITY Ctr_hideurelstop	"Skrýt tlačítka zastavit &amp; obnovit">
 <!ENTITY Ctr_hideurlgo		"Skrýt tlačítko 'přejít'">
+<!ENTITY Ctr_hideurlsrg		"Skrýt tlačítka 'obnovit, zastavit &amp; přejít' oddělovače &amp; mezery">
 <!ENTITY Ctr_urlbardropm	"Přesunout rozevírací šipku na konec řádku">
+<!ENTITY Ctr_altreaderico	"Alternativní ikona 'Readeru'">
 <!ENTITY Ctr_hideprbutton	"Nezobrazovat upozornění při blokování vyskakovacích oken">
+<!ENTITY Ctr_locsearchbw10	"Reduce location bars and search bars height (experimental)">
 <!ENTITY Ctr_urlbar_ib		"Tlačítko identity webu (identity box)">
-<!ENTITY Ctr_verifiedcolors	"Zelený/modrý identity-box pro ověřené stránky">
+<!ENTITY Ctr_ib_nohovcolor	"Nezobrazovat šedou barvu při přejetí myší">
+<!ENTITY Ctr_ib_graycolor	"Šedá barva pro neznámou identitu a stránky chrome">
+<!ENTITY Ctr_verifiedcolors	"Barvy tlačítka pro ověřené stránky, zabezpečené a nezabezpečené připojení">
 <!ENTITY Ctr_faviconurl		"Favicona">
-<!ENTITY Ctr_padlock_hid	"Zámek (skrytý)">
-<!ENTITY Ctr_padlock_def	"Zámek (výchozí)">
-<!ENTITY Ctr_padlock_cla	"Zámek (klasický)">
-<!ENTITY Ctr_padlock_mod	"Zámek (moderní)">
-<!ENTITY Ctr_padlock_ext	"Ikony bezpečnosti">
+<!ENTITY Ctr_padlock		"Zámek">
+<!ENTITY Ctr_padlock_hid	"skrytý">
+<!ENTITY Ctr_padlock_def	"výchozí">
+<!ENTITY Ctr_padlock_cla	"klasický">
+<!ENTITY Ctr_padlock_mod	"moderní">
+<!ENTITY Ctr_padlock_ext	"'&brandShortName;' ikona pro validní chrome stránky">
 <!ENTITY Ctr_icopageinfo	"Klik na ikonu otevře okno 'informace o stránce'">
 
 <!ENTITY Ctr_menubar_items	"Umístění menu">
@@ -234,17 +261,23 @@
 <!ENTITY Ctr_alttabstb2		"V maximalizovaném okně (tabs on top)">
 
 <!ENTITY Ctr_altmenubar		"Přidat barvu pozadí (lišta záhlaví OS)">
-<!ENTITY Ctr_altmenubarpos	"Alternativní umístění (pod lištou záhlaví &brandShortName;)">
+<!ENTITY Ctr_altmenubarpos	"Alternativní umístění">
+<!ENTITY Ctr_altmenubarpos2	"Pod lištou záhlaví &brandShortName;">
 <!ENTITY Ctr_menubarnofog	"Odstranit barevné/zamlžené pozadí (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Barvy 'Blue Aero' pro hlavní lištu a panely">
-<!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color (Windows 10)">
+<!ENTITY Ctr_transpttbw10	"Lišta title/menu/tabs: odstranit barvu pozadí">
+<!ENTITY Ctr_transpttbew10	"Additional tweaks for some OS themes">
+<!ENTITY Ctr_transptcw10	"Skrýt defaultní OS tlačítka min/max/close">
 <!ENTITY Ctr_hidenavbar		"Navigační lišta: skrýt lištu">
+<!ENTITY Ctr_navbarpad		"Přidat místo po stranách">
+<!ENTITY Ctr_navbarpad_l	"Vlevo:">
+<!ENTITY Ctr_navbarpad_r	"Vpravo:">
 <!ENTITY Ctr_nobookbarbg	"Lišta záložek: odstranit barvu pozadí">
 <!ENTITY Ctr_bookbarfs		"Lišta záložek: v celoobrazovkovém módu (fullscreen)">
 <!ENTITY Ctr_nonavbarbg		"Navigační lišta: odstranit barvu pozadí">
 <!ENTITY Ctr_nonavbarbg1	"Nastavením tohoto rozšíření budou ovlivněna nastavení dalších rozšíření.">
-<!ENTITY Ctr_nonavbarbg2	"Budou ovlivněna rozšíření 'The Fox, Only Better' a 'Slim Chrome'.">
+<!ENTITY Ctr_nonavbarbg2	"Budou ovlivněna rozšíření 'Beyond Australis' a 'Slim Chrome'.">
 <!ENTITY Ctr_nonavborder	"Lišta záložek: přidat horní okraj lišty">
 <!ENTITY Ctr_nonavtbborder	"Vrchní lišty: odstranit okraje lišt">
 <!ENTITY Ctr_hidesbclose	"Postranní panely: skrýt zavírací tlačítka">
@@ -280,6 +313,7 @@
 <!ENTITY Ctr_fx34loop		"&brandShortName; 34+ zavedena možnost 'volání a konverzace'. Odškrtnutím předvolby to bude odstraněno.">
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ zaveden nový 'vývojářský vzhled'. Odšrtnutím předvolby se zakáže 'vývojářský vzhled' a jeho tlačítko v režimu přizpůsobení.">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ zavedeno menu 'Možnosti' v panelu. Odškrtnutím předvolby se vrátíte ke starému způsobu 'Nástroje - Možnosti'.">
+<!ENTITY Ctr_fx36prefs2		"Poznámka: Staré okno předvoleb neobsahuje všechny nově přidané předvolby!">
 <!ENTITY Ctr_fx38reader		"&brandShortName; 38+ zaveden nový 'mód čtečky'. Odškrtnutím předvolby se to zruší, včetně ikony v adresním řádku.">
 <!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ zavedena funkce 'Pocket'. Odškrtnutím se funkce zruší a odstraní se tlačítko v liště.">
 <!ENTITY Ctr_fx38pocket2	"Poznámka: Přetažením tlačítka 'Pocket' do 'nastavení lišty' před změnou této předvolby zde, se odstraní vstupy v 'Pocket' z menu záložky a čtečky.">
@@ -290,7 +324,7 @@
 <!ENTITY Ctr_e_readermode	"Mód čtečky">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"Ikona audio na panelech">
-<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Zrušení volby odstraní 'ikonu audio' z panelů.">
+<!ENTITY Ctr_fx42tabsaudico	"Zrušení volby odstraní 'ikonu audio' z panelů.">
 
 
 <!ENTITY Ctr_pw_settings	"Možnosti">
@@ -345,7 +379,6 @@
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
 <!ENTITY ctr_help_features	"Features &amp; Information">
-<!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
 
 <!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
 
@@ -399,3 +432,8 @@
 <!ENTITY movableurlbar.warning0 "Warning: This is a high level feature, If you move the URL-Bar to the panel UI menu or customize window and restart, It will break the browser.">
 <!ENTITY movableurlbar.warning1 "You must restore the URL-Bar to its default position before disabling.">
 <!ENTITY movableurlbar.warning2 "Use this feature with caution and at own risk.">
+
+<!ENTITY Ctr_tabthrobber_usecust.label "Use custom tab throbber">
+<!ENTITY Ctr_tabthrobber_custurlph.label "Throbber image url|path">
+
+<!ENTITY Ctr_animatelwtheme "Animate Animated light-weight themes on startup.">

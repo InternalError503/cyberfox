@@ -28,67 +28,75 @@ classicthemerestorerjs.ctr = {
  
   // initialize custom sheets for tab color settings
   
-  ctabsheet_def:						sheetIO,
-  ctabsheet_act:							sheetIO,
-  ctabsheet_hov:						sheetIO,
-  ctabsheet_pen:						sheetIO,
-  ctabsheet_unr:						sheetIO,
-  cntabsheet_def:						sheetIO,
-  cntabsheet_hov:						sheetIO,
-  tabtxtcsheet_def:					sheetIO,
-  tabtxtcsheet_act:						sheetIO,
-  tabtxtcsheet_hov:					sheetIO,
-  tabtxtcsheet_pen:					sheetIO,
-  tabtxtcsheet_unr:					sheetIO,
-  tabtxtshsheet_def:					sheetIO,
-  tabtxtshsheet_act:					sheetIO,
-  tabtxtshsheet_hov:					sheetIO,
-  tabtxtshsheet_pen:					sheetIO,
-  tabtxtshsheet_unr:					sheetIO,
+  ctabsheet_def: sheetIO,
+  ctabsheet_act: sheetIO,
+  ctabsheet_hov: sheetIO,
+  ctabsheet_pen: sheetIO,
+  ctabsheet_unr: sheetIO,
+  cntabsheet_def: sheetIO,
+  cntabsheet_hov: sheetIO,
+  tabtxtcsheet_def: sheetIO,
+  tabtxtcsheet_act: sheetIO,
+  tabtxtcsheet_hov: sheetIO,
+  tabtxtcsheet_pen: sheetIO,
+  tabtxtcsheet_unr: sheetIO,
+  tabtxtshsheet_def: sheetIO,
+  tabtxtshsheet_act: sheetIO,
+  tabtxtshsheet_hov: sheetIO,
+  tabtxtshsheet_pen: sheetIO,
+  tabtxtshsheet_unr: sheetIO,
   
-  tabboldsheet_def:					sheetIO,
-  tabboldsheet_act:					sheetIO,
-  tabboldsheet_hov:					sheetIO,
-  tabboldsheet_pen:					sheetIO,
-  tabboldsheet_unr:					sheetIO,
-  tabitasheet_def:						sheetIO,
-  tabitasheet_act:						sheetIO,
-  tabitasheet_hov:						sheetIO,
-  tabitasheet_pen:						sheetIO,
-  tabitasheet_unr:						sheetIO,
+  tabboldsheet_def: sheetIO,
+  tabboldsheet_act: sheetIO,
+  tabboldsheet_hov: sheetIO,
+  tabboldsheet_pen: sheetIO,
+  tabboldsheet_unr: sheetIO,
+  tabitasheet_def: sheetIO,
+  tabitasheet_act: sheetIO,
+  tabitasheet_hov: sheetIO,
+  tabitasheet_pen: sheetIO,
+  tabitasheet_unr: sheetIO,
   
-  aerocolors:								sheetIO,
+  aerocolors: sheetIO,
   
-  tabheight:								sheetIO,
+  tabheight: sheetIO,
+
+  navbarpadding: sheetIO,
   
-  appbutton_color:						sheetIO,
+  appbutton_color: sheetIO,
   
-  cuiButtonssheet:						sheetIO,
-  searchbarsheet:						sheetIO,
-  bookmarkbarfontsize:				sheetIO,
-  tabfontsize:								sheetIO,
-  abouthome_bg:						sheetIO,
-  abouthome_bg_strech:			sheetIO,
-  abouthome_custcolor:				sheetIO,
-  abouthome_custbasecolor:		sheetIO,
-  aboutnewtab_custcolor:			sheetIO,
-  hideElements:							sheetIO,
-  aboutnewtab_bg:						sheetIO,
-  aboutnewtab_bg_strech:			sheetIO,
+  cuiButtonssheet: sheetIO,
+  searchbarsheet: sheetIO,
+  bookmarkbarfontsize: sheetIO,
+  tabfontsize: sheetIO,
+  abouthome_bg: sheetIO,
+  abouthome_bg_strech: sheetIO,
+  abouthome_custcolor: sheetIO,
+  abouthome_custbasecolor: sheetIO,
+  aboutnewtab_custcolor: sheetIO,
+  hideElements: sheetIO,
+  aboutnewtab_bg: sheetIO,
+  aboutnewtab_bg_strech: sheetIO,
+  custtabthorbber: sheetIO,
   
-  prefs:										Services.prefs.getBranch("extensions.classicthemerestorer."),
+  prefs:				Services.prefs.getBranch("extensions.classicthemerestorer."),
   
-  fxdefaulttheme:						Services.prefs.getBranch("general.skins.").getCharPref("selectedSkin") == 'classic/1.0',
-  fxdevelopertheme:					false,
-  osstring:									Services.appinfo.OS,
-  appversion:								parseInt(Services.prefs.getBranch("extensions.").getCharPref("lastAppVersion")),
-  stringBundle:							Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file"),
+  fxdefaulttheme:		Services.prefs.getBranch("general.skins.").getCharPref("selectedSkin") == 'classic/1.0',
+  fxdevelopertheme:		false,
+  osstring:				Services.appinfo.OS,
+  appversion:			parseInt(Services.appinfo.version),
+  stringBundle:			Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file"),
   
-  fullscreeduration:					false,
-  moveStarIntoUrlbar:				false,
-  moveFeedIntoUrlbar:				false,
+  fullscreeduration:	false,
+  moveStarIntoUrlbar:	false,
+  moveFeedIntoUrlbar:	false,
+  altnewtabpageOn:		false,
   
-  devthemeinterval:					null,
+  devthemeinterval: 	null,
+  ctrcontentprefswin: 	null,
+ 
+  activityObserver: 	new MutationObserver(function() {}), // define empty, (CTR) global observer
+  activityObserverOn:	false, // activity observer is always disabled, when a window get initialized
 
   init: function() {
 	  
@@ -166,6 +174,21 @@ classicthemerestorerjs.ctr = {
 		if (this.appversion >= 42) document.getElementById("main-window").setAttribute('fx42plus',true);
 	} catch(e){}
 	
+	// add a new global attribute 'fx43plus' -> better parting css between versions
+	try{
+		if (this.appversion >= 43) document.getElementById("main-window").setAttribute('fx43plus',true);
+	} catch(e){}
+	
+	// add a new global attribute 'fx44plus' -> better parting css between versions
+	try{
+		if (this.appversion >= 44) document.getElementById("main-window").setAttribute('fx44plus',true);
+	} catch(e){}
+	
+	// add a new global attribute 'fx45plus' -> better parting css between versions
+	try{
+		if (this.appversion >= 45) document.getElementById("main-window").setAttribute('fx45plus',true);
+	} catch(e){}
+
 	// CTRs appbutton for Windows titlebar
 	this.createTitlebarButton();
 	
@@ -205,7 +228,22 @@ classicthemerestorerjs.ctr = {
 					Services.prefs.setBoolPref("extensions.classicthemerestorer.compatibility.personalmenu", false);
 				}
 			}
-		});	
+		});
+
+		//Animate animated lwtheme's
+		if (Services.prefs.getBoolPref("extensions.classicthemerestorer.animatedlwtthemes")){
+			if (Services.startup.startingUp === false){
+				try{
+					AddonManager.getAddonByID(JSON.parse(Services.prefs.getCharPref("lightweightThemes.usedThemes"))[0].id + "@personas.mozilla.org", 
+						function(addon){
+							if (addon.isActive){
+								addon.userDisabled = true;
+								addon.userDisabled = false;
+							}
+					});
+				}catch(e){}	
+			}
+		}	
 	
 	// style CTRs 'customize-ui' option buttons
 	this.loadUnloadCSS('cui_buttons',true);
@@ -218,6 +256,9 @@ classicthemerestorerjs.ctr = {
 	
 	// prevent developer theme from being enabled in Fx40+
 	this.PreventDevThemeEnabling();
+	
+	// add tab title to browsers titlebar
+	this.tabTitleInBrowsersTitlebar();
 	
 	// prevent accidental location bar removal by using context menu 
 	this.removeContextItemsFromLocationbarContext();
@@ -239,7 +280,7 @@ classicthemerestorerjs.ctr = {
 	PrefListener.prototype.register = function(trigger) {
 	  this._branch.addObserver('', this, false);
 	  if (trigger) {
-		let that = this;
+		var that = this;
 		this._branch.getChildList('', {}).
 		  forEach(function (pref_leaf_name)
 			{ that._callback(that._branch, pref_leaf_name); });
@@ -278,7 +319,7 @@ classicthemerestorerjs.ctr = {
 				branch.setBoolPref("enabled",false);
 
 			
-			if (branch.getBoolPref("enabled") && classicthemerestorerjs.ctr.appversion < 41) {
+			if (branch.getBoolPref("enabled") && classicthemerestorerjs.ctr.appversion < 40) {
 				if (classicthemerestorerjs.ctr.fxdefaulttheme){
 					try{
 				      document.getElementById("main-window").setAttribute('developertheme',true);
@@ -299,7 +340,7 @@ classicthemerestorerjs.ctr = {
 				}
 			}
 			else {
-			  if (classicthemerestorerjs.ctr.fxdefaulttheme && classicthemerestorerjs.ctr.appversion < 41){
+			  if (classicthemerestorerjs.ctr.fxdefaulttheme && classicthemerestorerjs.ctr.appversion < 40){
 				try{
 				  document.getElementById("main-window").setAttribute('developertheme',false);
 				} catch(e){}
@@ -350,7 +391,7 @@ classicthemerestorerjs.ctr = {
 			
 				classicthemerestorerjs.ctr.devthemeinterval = setInterval(function(){
 				  
-				  let selectedThemeID = null;
+				  var selectedThemeID = null;
 				  try {
 					selectedThemeID = Services.prefs.getBranch("lightweightThemes.").getCharPref("selectedThemeID");
 				  } catch (e) {}
@@ -385,7 +426,7 @@ classicthemerestorerjs.ctr = {
 	);
 	
 	ctrSettingsListener_forDevtheme2.register(true);
-	
+
 
 	var ctrSettingsListener = new PrefListener(
 	  "extensions.classicthemerestorer.",
@@ -464,75 +505,44 @@ classicthemerestorerjs.ctr = {
 		  
 		  //start page style
 		  case "abouthome":
-		  
-			if (branch.getCharPref("abouthome") === "dark"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomedark', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomedark', false);}
-			if (branch.getCharPref("abouthome") === "darkalt"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomedarkalt', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomedarkalt', false);}
-			if (branch.getCharPref("abouthome") === "light"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomelight', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomelight', false);}
-			if (branch.getCharPref("abouthome") === "lightalt"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomelightalt', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomelightalt', false);}
-			
-			if (branch.getCharPref("abouthome") === "simplicityblue" ||
-			branch.getCharPref("abouthome") === "simplicityred" ||
-			branch.getCharPref("abouthome") === "simplicitygreen" || 
-			branch.getCharPref("abouthome") === "simplicityyellow" ||
-			branch.getCharPref("abouthome") === "simplicitycustom"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicity', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicity', false);}
-			
-			if (branch.getCharPref("abouthome") === "simplicityblue"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityblue', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityblue', false);}
-			if (branch.getCharPref("abouthome") === "simplicityred"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityred', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityred', false);}
-			if (branch.getCharPref("abouthome") === "simplicitygreen"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicitygreen', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicitygreen', false);}
-			if (branch.getCharPref("abouthome") === "simplicityyellow"){
-				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityyellow', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityyellow', false);}			
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomedark', branch.getCharPref("abouthome") === "dark");				
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomedarkalt', branch.getCharPref("abouthome") === "darkalt");	
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomelight', branch.getCharPref("abouthome") === "light");	
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomelightalt', branch.getCharPref("abouthome") === "lightalt");		  
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityblue', branch.getCharPref("abouthome") === "simplicityblue");
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityred', branch.getCharPref("abouthome") === "simplicityred");
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicitygreen', branch.getCharPref("abouthome") === "simplicitygreen");
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicityyellow', branch.getCharPref("abouthome") === "simplicityyellow");
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomesimplicity', branch.getCharPref("abouthome") === "simplicityblue" ||
+						branch.getCharPref("abouthome") === "simplicityred" ||
+						branch.getCharPref("abouthome") === "simplicitygreen" || 
+						branch.getCharPref("abouthome") === "simplicityyellow" ||
+						branch.getCharPref("abouthome") === "simplicitycustom");					
 		  break;
 		 
 		 //No links on about:home page in cyberfox.
 		case "abouthomenobar":
-			if (branch.getBoolPref("abouthomenobar") === true){
-					classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenobar', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenobar', false);}
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenobar', branch.getBoolPref("abouthomenobar"));	
 		  break;
 		  
 		//No logo on about:home page
 		case "abouthomenologo":		  
-			if (branch.getBoolPref("abouthomenologo") === true){
-					classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenologo', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenologo', false);}
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenologo', branch.getBoolPref("abouthomenologo"));	
 		  break;		  
 		  
 		//No icons on about:home page
 		case "abouthomenoicons":		  
-			if (branch.getBoolPref("abouthomenoicons") === true){
-					classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenoicons', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenoicons', false);}
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenoicons', branch.getBoolPref("abouthomenoicons"));
 		  break;
 		  
 		//No snippets on about:home page
 		case "abouthomenosnippets":		  
-			if (branch.getBoolPref("abouthomenosnippets") === true){
-					classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenosnippets', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenosnippets', false);}
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomenosnippets', branch.getBoolPref("abouthomenosnippets"));
 		  break;
 
 		//Use animations on about:home page
 		case "abouthomeanimate":		  
-			if (branch.getBoolPref("abouthomeanimate") === true){
-					classicthemerestorerjs.ctr.loadUnloadCSS('abouthomeanimate', true);	
-			}else{classicthemerestorerjs.ctr.loadUnloadCSS('abouthomeanimate', false);}
+				classicthemerestorerjs.ctr.loadUnloadCSS('abouthomeanimate', branch.getBoolPref("abouthomeanimate"));
 		  break;			  
 		  
 		  // Tabs
@@ -574,7 +584,7 @@ classicthemerestorerjs.ctr = {
 				classicthemerestorerjs.ctr.loadUnloadCSS("square_edges",true);
 			  }
 			}
-		  
+				  
 		  break;
 		  
 		  case "tabsontop":
@@ -635,27 +645,7 @@ classicthemerestorerjs.ctr = {
 			}
 			else classicthemerestorerjs.ctr.loadUnloadCSS("square_edges",false);
 		  break;
-
-		  // Tabs title in titlebar
-		  case "titleintitlebar":
-			try {
-					if (branch.getBoolPref("titleintitlebar") && 
-						branch.getCharPref("appbutton")!="appbutton_off" &&
-						branch.getCharPref("appbutton")!="appbutton_v1" &&
-						branch.getCharPref("appbutton")!="appbutton_v1wt" &&
-						branch.getCharPref("appbutton")!="appbutton_v2wt2" &&
-						branch.getCharPref("appbutton")!="appbutton_v2io" &&
-						branch.getCharPref("appbutton")!="appbutton_v2io2" &&
-						branch.getCharPref("appbutton")!="appbutton_pm" && 
-						classicthemerestorerjs.ctr.osstring=="WINNT"){
-							classicthemerestorerjs.ctr.loadUnloadCSS("tabs_titlebar",true);
-							console.log("Tabs titles in title-bar is now active!");
-					} else {
-						classicthemerestorerjs.ctr.loadUnloadCSS("tabs_titlebar",false);
-					}	
-				} catch(e){console.log("We are sorry something has gone wrong with Tabs titles in title-bar " + e);}			
-		  break;
-		     		  
+		  
 		  case "ctabheightcb":
 			if (branch.getBoolPref("ctabheightcb")) classicthemerestorerjs.ctr.loadUnloadCSS("ctabheight",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("ctabheight",false);
@@ -703,9 +693,26 @@ classicthemerestorerjs.ctr = {
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w10',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w10i',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w10red',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_gc',false);
 			  
 			if (branch.getCharPref("closeicon")!="closeicon_default"){
 			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("closeicon"),true);
+			}
+
+		  break;
+		  
+		  case "closeicong":
+			
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_red',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w7',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w8',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w10',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w10i',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w10red',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_gc',false);
+			  
+			if (branch.getCharPref("closeicong")!="closeicong_default"){
+			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("closeicong"),true);
 			}
 
 		  break;
@@ -726,13 +733,13 @@ classicthemerestorerjs.ctr = {
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbutton_v2io2',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbutton_v2h',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbutton_pm',false);
-		  classicthemerestorerjs.ctr.fixThatTreeStyleBro();
+		
 			if (branch.getCharPref("appbutton")!="appbutton_off"){
-				  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("appbutton"),true);
-				  classicthemerestorerjs.ctr.fixThatTreeStyleBro();
-				  classicthemerestorerjs.ctr.checkAppbuttonOnNavbar();
+			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("appbutton"),true);
+			  classicthemerestorerjs.ctr.checkAppbuttonOnNavbar();
 			}
-			
+		    classicthemerestorerjs.ctr.fixThatTreeStyleBro();	
+        		
 			if (branch.getCharPref("appbuttonc")=="appbuttonc_custom") classicthemerestorerjs.ctr.loadUnloadCSS("appbuttonc_custom",true);
 		
     if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase()) {
@@ -768,23 +775,24 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  case "appbuttonc":
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_nightly',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_aurora',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_cyan',false);			
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_default',false);		  
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_gray',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_green',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_green_dark',false);			
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_orange',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_orange_dark',false);
-      classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_palemo',false);			
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_purple',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_red',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_red_dark',false);
-			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_salmon',false);			
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_aurora',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_nightly',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_transp',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_palemo',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_red',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_green',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_gray',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_purple',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_white',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_custom',false);
+			
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_cyan',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_default',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_green_dark',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_orange_dark',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_red_dark',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_salmon',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_custom1',false);
 
 			if (branch.getCharPref("appbuttonc")!="off"){
@@ -943,6 +951,13 @@ classicthemerestorerjs.ctr = {
 			}
 		  break;
 		  
+		  case "navbarpad": case "navbarpad_l": case "navbarpad_r": case "navbarmar_l": case "navbarmar_r":
+		    if (branch.getBoolPref("navbarpad")) 
+			  classicthemerestorerjs.ctr.loadUnloadCSS("navbarpad",true);
+		    else
+			  classicthemerestorerjs.ctr.loadUnloadCSS("navbarpad",false);
+		  break;
+
 		  case "backforward":
 			if (branch.getBoolPref("backforward")) {
 			  classicthemerestorerjs.ctr.loadUnloadCSS("backforward",true);
@@ -963,7 +978,7 @@ classicthemerestorerjs.ctr = {
 		  case "nbcompact":
 			if (branch.getBoolPref("nbcompact") && branch.getBoolPref("backforward") && classicthemerestorerjs.ctr.osstring!="Darwin"&& branch.getBoolPref("smallnavbut")==false && classicthemerestorerjs.ctr.fxdefaulttheme==true){
 			  classicthemerestorerjs.ctr.loadUnloadCSS("nbcompact",true);
-			  console.log(branch.getCharPref("nav_txt_ico").indexOf('iconstxt'));
+
 			  if (branch.getCharPref("nav_txt_ico").indexOf('iconstxt')!=-1)
 				branch.setCharPref("nav_txt_ico",'icons');
 			}
@@ -975,6 +990,50 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("noconicons",false);
 		  break;
 		  
+		  case "altoptions":
+			  classicthemerestorerjs.ctr.loadUnloadCSS("options_alt",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("options_alt2",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("options_alt3",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("options_win",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("options_win_alt",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("options_win_ct",false);
+			  classicthemerestorerjs.ctr.closeContentPrefsInWin();
+		
+			if (branch.getCharPref("altoptions")!="options_default"){
+			  if (branch.getCharPref("altoptions")=="options_win" && classicthemerestorerjs.ctr.fxdefaulttheme==true)
+				classicthemerestorerjs.ctr.loadUnloadCSS("options_win",true);
+			  else if (branch.getCharPref("altoptions")=="options_win" && classicthemerestorerjs.ctr.fxdefaulttheme==false)
+				classicthemerestorerjs.ctr.loadUnloadCSS("options_win_ct",true);
+			  else			  
+			    classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("altoptions"),true);	  
+			}
+			
+			if (branch.getCharPref("altoptions")=="options_win" || branch.getCharPref("altoptions")=="options_win_alt") {
+			  classicthemerestorerjs.ctr.loadUnloadCSS('altoptionsmitem',true);
+			} else {
+			  classicthemerestorerjs.ctr.loadUnloadCSS('altoptionsmitem',false);
+			}
+			
+			// for MacOSX: hide items using js instead of css or it won't work
+			if (classicthemerestorerjs.ctr.osstring=="Darwin"){
+				if (branch.getCharPref("altoptions")=="options_win" || branch.getCharPref("altoptions")=="options_win_alt") {
+					setTimeout(function(){
+					  try{
+						document.getElementById("ctraddon_toolsmenu_preferencesOSX").collapsed = false;
+					  } catch(e){}
+					},1000);
+				}
+				else {
+				  setTimeout(function(){
+					try{
+					  document.getElementById("ctraddon_toolsmenu_preferencesOSX").collapsed = true;
+					} catch(e){}
+				  },1000);
+				}
+			}
+
+		  break;
+
 		  case "svgfilters":
 			if (branch.getBoolPref("svgfilters")) classicthemerestorerjs.ctr.loadUnloadCSS("svgfilters",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("svgfilters",false);
@@ -984,20 +1043,36 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("wincontrols")) classicthemerestorerjs.ctr.loadUnloadCSS("wincontrols",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("wincontrols",false);
 		  break;
+
+		  case "altalertbox":
+			if (branch.getBoolPref("altalertbox")
+				&& classicthemerestorerjs.ctr.fxdefaulttheme==true
+				&& classicthemerestorerjs.ctr.appversion >= 44) classicthemerestorerjs.ctr.loadUnloadCSS("altalertbox",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("altalertbox",false);
+		  break;
+
+		  case "oldtoplevimg":
+			if (branch.getBoolPref("oldtoplevimg")) classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",false);
+		  break;
 		  
 		  case "activndicat":
 			if (branch.getBoolPref('activndicat')) {
-			  setTimeout(function(){
+				classicthemerestorerjs.ctr.loadUnloadCSS("navthrobber",true);
+				classicthemerestorerjs.ctr.activityObserverOn = true;
 			    classicthemerestorerjs.ctr.restoreActivityThrobber();
-			  },100);
 			}
-			else
-			  setTimeout(function(){
+			else {
+			  if(classicthemerestorerjs.ctr.activityObserverOn == true){
+				classicthemerestorerjs.ctr.loadUnloadCSS("navthrobber",false);
+				classicthemerestorerjs.ctr.activityObserverOn = false;
+				classicthemerestorerjs.ctr.restoreActivityThrobber();
+			  } else {
 				try{
-				  classicthemerestorerjs.ctr.ctrGetId("ctraddon_navigator-throbber")
-					.parentNode.removeChild(classicthemerestorerjs.ctr.ctrGetId("ctraddon_navigator-throbber"));
-				} catch(e){}
-			  },300);
+				  classicthemerestorerjs.ctr.activityObserver.disconnect();
+				}catch(e){}
+			  }
+			}
 		  break;
 
 		  case "hideprbutton":
@@ -1082,12 +1157,9 @@ classicthemerestorerjs.ctr = {
 						/* Fx 38+ adds reader mode buttons to urlbar icons area. They have to be moved to first position.*/
 						if (classicthemerestorerjs.ctr.appversion >= 38) {
 						  try{
-							var readerMode = document.getElementById("reader-mode-button");
-							if (readerMode &&  typeof(readerMode)  != "undefined" || readerMode  != null){  
-								if(readerMode.parentNode.id=="urlbar-icons") {
-								  urlbaricons.insertBefore(readerMode, urlbaricons.firstChild);
-								  urlbaricons.insertBefore(document.getElementById("readinglist-addremove-button"), urlbaricons.firstChild);
-								}
+							if(document.getElementById("reader-mode-button").parentNode.id=="urlbar-icons") {
+							  urlbaricons.insertBefore(document.getElementById("reader-mode-button"), urlbaricons.firstChild);
+							  urlbaricons.insertBefore(document.getElementById("readinglist-addremove-button"), urlbaricons.firstChild);
 							}
 						  } catch(e){}
 						}
@@ -1145,12 +1217,9 @@ classicthemerestorerjs.ctr = {
 						/* Fx 38+ adds reader mode buttons to urlbar icons area. They have to be moved to first position.*/
 						if (classicthemerestorerjs.ctr.appversion >= 38) {
 						  try{
-							var readerMode = document.getElementById("reader-mode-button");
-							if (readerMode &&  typeof(readerMode)  != "undefined" || readerMode  != null){ 
-								if(readerMode.parentNode.id=="urlbar-icons") {
-								  urlbaricons.insertBefore(readerMode, urlbaricons.firstChild);
-								  urlbaricons.insertBefore(document.getElementById("readinglist-addremove-button"), urlbaricons.firstChild);
-								}
+							if(document.getElementById("reader-mode-button").parentNode.id=="urlbar-icons") {
+							  urlbaricons.insertBefore(document.getElementById("reader-mode-button"), urlbaricons.firstChild);
+							  urlbaricons.insertBefore(document.getElementById("readinglist-addremove-button"), urlbaricons.firstChild);
 							}
 						  } catch(e){}
 						}
@@ -1192,11 +1261,26 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("hideurlgo",false);
 		  break;
 
+		  case "hideurlsrg":
+			if (branch.getBoolPref("hideurlsrg")) classicthemerestorerjs.ctr.loadUnloadCSS("hideurlsrg",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("hideurlsrg",false);
+		  break;
+
 		  case "urlbardropm":
 			if (branch.getBoolPref("urlbardropm")) classicthemerestorerjs.ctr.loadUnloadCSS("urlbardropm",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("urlbardropm",false);
 		  break;
+
+		  case "altreaderico":
+			if (branch.getBoolPref("altreaderico") && classicthemerestorerjs.ctr.fxdefaulttheme==true && classicthemerestorerjs.ctr.appversion >= 40) classicthemerestorerjs.ctr.loadUnloadCSS("altreaderico",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("altreaderico",false);
+		  break;
 		  
+		  case "locsearchbw10":
+			if (branch.getBoolPref("locsearchbw10") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("locsearchbw10",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("locsearchbw10",false);
+		  break;
+
 		  case "combrelstop":
 			if (branch.getBoolPref("combrelstop")) classicthemerestorerjs.ctr.loadUnloadCSS("combrelstop",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("combrelstop",false);
@@ -1564,11 +1648,11 @@ classicthemerestorerjs.ctr = {
 			  },400);
 			} else classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_pen",false);
 			
-			if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("tabfbold_hov"))
+			if(branch.getBoolPref("tabfbold_hov"))
 			  classicthemerestorerjs.ctr.loadUnloadCSS("tabfbold_hov",true);
 			else classicthemerestorerjs.ctr.loadUnloadCSS("tabfbold_hov",false);
 				
-			if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("tabfita_hov"))
+			if(branch.getBoolPref("tabfita_hov"))
 			  classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_hov",true);
 			else classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_hov",false);
 			
@@ -1611,11 +1695,11 @@ classicthemerestorerjs.ctr = {
 			  },400);
 			} else classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_unr",false);
 			
-			if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("tabfbold_hov"))
+			if(branch.getBoolPref("tabfbold_hov"))
 			  classicthemerestorerjs.ctr.loadUnloadCSS("tabfbold_hov",true);
 			else classicthemerestorerjs.ctr.loadUnloadCSS("tabfbold_hov",false);
 				
-			if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("tabfita_hov"))
+			if(branch.getBoolPref("tabfita_hov"))
 			  classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_hov",true);
 			else classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_hov",false);
 
@@ -1636,22 +1720,15 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("altmenubar",false);
 		  break;
 		  
-		  case "altmenubarpos":
-			if (branch.getBoolPref("altmenubarpos")) {
-			  classicthemerestorerjs.ctr.loadUnloadCSS("altmenubarpos",true);
-			  branch.setBoolPref("altmenubarpos2",false);
+		  case "altmbarpos":
+			classicthemerestorerjs.ctr.loadUnloadCSS('altmbarpos1',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('altmbarpos2',false);
+		
+			if (branch.getCharPref("altmbarpos")!="altmbarpos0"){
+			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("altmbarpos"),true);
 			}
-			else classicthemerestorerjs.ctr.loadUnloadCSS("altmenubarpos",false);
 		  break;
-		  
-		  case "altmenubarpos2":
-			if (branch.getBoolPref("altmenubarpos2")) {
-			  classicthemerestorerjs.ctr.loadUnloadCSS("altmenubarpos2",true);
-			  branch.setBoolPref("altmenubarpos",false);
-			}
-			else classicthemerestorerjs.ctr.loadUnloadCSS("altmenubarpos2",false);
-		  break;
-		  
+	  
 		  case "menubarnofog":
 			if (branch.getBoolPref("menubarnofog") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("menubarnofog",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("menubarnofog",false);
@@ -1692,10 +1769,32 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("bookbarfs") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("bookbarfs",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("bookbarfs",false);
 		  break;
-		  
+
 		  case "transpttbw10":
-			if (branch.getBoolPref("transpttbw10") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("transpttbw10",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("transpttbw10",false);
+			if (branch.getBoolPref("transpttbw10") && classicthemerestorerjs.ctr.fxdefaulttheme==true) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("transpttbw10",true);
+			  
+			  if (branch.getBoolPref("transptcw10"))
+				classicthemerestorerjs.ctr.loadUnloadCSS("transptcw10",true);
+
+			  if (branch.getBoolPref("transpttbew10"))
+				classicthemerestorerjs.ctr.loadUnloadCSS("transpttbew10",true);
+			}
+			else {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("transpttbw10",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("transpttbew10",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("transptcw10",false);
+			}
+		  break;
+		  
+		  case "transptcw10":
+			if (branch.getBoolPref("transptcw10") && branch.getBoolPref("transpttbw10") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("transptcw10",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("transptcw10",false);
+		  break;
+		  
+		  case "transpttbew10":
+			if (branch.getBoolPref("transpttbew10") && branch.getBoolPref("transpttbw10") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("transpttbew10",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("transpttbew10",false);
 		  break;
 
 		  case "nonavbarbg":
@@ -1743,6 +1842,8 @@ classicthemerestorerjs.ctr = {
 		  
 			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_black',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_white',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_luna',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_xp',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_black_sol',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_white_sol',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('tabsep_black_sol2',false);
@@ -1787,11 +1888,19 @@ classicthemerestorerjs.ctr = {
 		  case "emptyfavicon":
 			if (branch.getBoolPref("emptyfavicon")) classicthemerestorerjs.ctr.loadUnloadCSS("emptyfavicon",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("emptyfavicon",false);
+			
+			if (branch.getBoolPref("faviconurl")) {classicthemerestorerjs.ctr.favIconinUrlbarCTR();}
 		  break;
 		  
 		  case "emptyfavicon2":
-			if (branch.getBoolPref("emptyfavicon2")) classicthemerestorerjs.ctr.loadUnloadCSS("emptyfavicon2",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("emptyfavicon2",false);
+			if (branch.getBoolPref("emptyfavicon2")) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("emptyfavicon2",true);
+			  if (branch.getBoolPref("emptyfavicon")) { branch.setBoolPref("emptyfavicon",false);}
+			} else {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("emptyfavicon2",false);
+			}
+
+			if (branch.getBoolPref("faviconurl")) {classicthemerestorerjs.ctr.favIconinUrlbarCTR();}
 		  break;
 		  
 		  case "noemptypticon":
@@ -1808,15 +1917,38 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("alt_newtabp")) classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabp",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabp",false);
 		  break;
+		  
+		  case "ctroldsearch":
+			if (branch.getBoolPref("ctroldsearch") && classicthemerestorerjs.ctr.appversion >= 43) classicthemerestorerjs.ctr.loadUnloadCSS("ctroldsearch",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("ctroldsearch",false);
+		  break;
 
 		  case "am_nowarning":
 			if (branch.getBoolPref("am_nowarning")) classicthemerestorerjs.ctr.loadUnloadCSS("am_nowarning",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("am_nowarning",false);
 		  break;
 
+		  case "am_compact":
+			if (branch.getBoolPref("am_compact") && classicthemerestorerjs.ctr.appversion >= 40
+			  && classicthemerestorerjs.ctr.fxdefaulttheme==true) {
+				classicthemerestorerjs.ctr.loadUnloadCSS("am_compact",true);
+				if (branch.getBoolPref("am_compact2"))
+				  classicthemerestorerjs.ctr.loadUnloadCSS("am_compact2",true);
+			}
+			else { 
+			  classicthemerestorerjs.ctr.loadUnloadCSS("am_compact",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("am_compact2",false);
+			}
+		  break;
+
+		  case "am_compact2":
+			if (branch.getBoolPref("am_compact") && branch.getBoolPref("am_compact2") && classicthemerestorerjs.ctr.appversion >= 40
+				&& classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("am_compact2",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("am_compact2",false);
+		  break;
+
 		  case "alt_newtabpalt":
-			if (branch.getBoolPref("alt_newtabpalt")) classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabpalt",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabpalt",false);
+			classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabpalt",branch.getBoolPref("alt_newtabpalt"));
 		  break;
 
 		  case "alt_addonsp":
@@ -1873,7 +2005,17 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("menupopupscr")) classicthemerestorerjs.ctr.loadUnloadCSS("menupopupscr",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("menupopupscr",false);
 		  break;
-		  
+
+		  case "ib_nohovcolor":
+			if (branch.getBoolPref("ib_nohovcolor") && classicthemerestorerjs.ctr.fxdefaulttheme==true && classicthemerestorerjs.ctr.appversion >= 42) classicthemerestorerjs.ctr.loadUnloadCSS("ib_nohovcolor",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("ib_nohovcolor",false);
+		  break;
+
+		  case "ib_graycolor":
+			if (branch.getBoolPref("ib_graycolor") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("ib_graycolor",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("ib_graycolor",false);
+		  break;
+
 		  case "verifiedcolors":
 			if (branch.getBoolPref("verifiedcolors") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("verifiedcolors",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("verifiedcolors",false);
@@ -1899,7 +2041,11 @@ classicthemerestorerjs.ctr = {
 		  
 			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_alt',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_f39',false);
-			
+			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_alt1',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_alt2',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_alt3',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_alt4',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('throbber_alt5',false);			
 			if (branch.getCharPref("tabthrobber")!="throbber_default"){
 			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("tabthrobber"),true);
 			}
@@ -1946,23 +2092,32 @@ classicthemerestorerjs.ctr = {
 				if (newURL=='') newURL='about:newtab';
 				
 				try{
-					var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
-					NewTabURL.override(newURL);
+					if (classicthemerestorerjs.ctr.appversion >= 44) aboutNewTabService.newTabURL = newURL;
+					else  {
+					  var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
+					  NewTabURL.override(newURL);
+					}
 				} catch(e){}
-
 				
-			} else if (classicthemerestorerjs.ctr.appversion >= 41) {
+				classicthemerestorerjs.ctr.altnewtabpageOn = true;
+				
+			} else if (classicthemerestorerjs.ctr.appversion >= 41 && classicthemerestorerjs.ctr.altnewtabpageOn==true) {
 				try{
-				  var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
-				  NewTabURL.reset();
+				  if (classicthemerestorerjs.ctr.appversion >= 44) aboutNewTabService.resetNewTabURL();
+				  else {
+					var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
+					NewTabURL.reset();
+				  }
 				} catch(e){}
+				
+				classicthemerestorerjs.ctr.altnewtabpageOn = false;
 			}
 
 		  break;
 
 		  case "dblclnewtab":
 			
-			if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("dblclnewtab")==true && classicthemerestorerjs.ctr.osstring=="WINNT") {
+			if (branch.getBoolPref("dblclnewtab")==true && classicthemerestorerjs.ctr.osstring=="WINNT") {
 			
 				document.getElementById("TabsToolbar").addEventListener("dblclick", function openNewTabOnDoubleClick(e) {
 				
@@ -1994,41 +2149,67 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  case "hidetbwot":
-			if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwot"))
-		      classicthemerestorerjs.ctr.hideTabsToolbarWithOneTab();
+			if (branch.getBoolPref("hidetbwot")) {
+		      classicthemerestorerjs.ctr.loadUnloadCSS("hidetbwotextra",true);
+			  classicthemerestorerjs.ctr.hideTabsToolbarWithOneTab();
+			} else {
+			 classicthemerestorerjs.ctr.loadUnloadCSS("hidetbwotextra",false);
+			}
 		  break;
 
 		  case "faviconurl": case "padlockex":
-			if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("faviconurl"))
-		      classicthemerestorerjs.ctr.favIconinUrlbarCTR();
+			if (branch.getBoolPref("faviconurl")) classicthemerestorerjs.ctr.favIconinUrlbarCTR();
 		  break;
 		  
 		  case "padlock":
-			if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("faviconurl"))
+			if (branch.getBoolPref("faviconurl"))
 		      classicthemerestorerjs.ctr.favIconinUrlbarCTR();
-			else if (Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref("padlock")!="padlock_default"){
+			else if (branch.getCharPref("padlock")!="padlock_default"){
 
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_default',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_classic',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_amo',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_modern',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_modern2',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_none',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_none',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_classic',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_amo',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_modern',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_modern2',false);
+			
+				switch (branch.getCharPref("padlock")) {
 
-				if (Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref("padlock")=="padlock_none")
-					classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_none",true);
-				if (Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref("padlock")=="padlock_classic")
-					classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_classic",true);
-				if (Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref("padlock")=="padlock_modern")
-					classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_modern",true);
+				  case "padlock_none":
+				  	classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_none",true);	
+				  break;
+				  case "padlock_classic":
+				  	classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_classic",true);	
+				  break;
+				  case "padlock_amo":
+				  	classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_amo",true);	
+				  break;
+				  case "padlock_modern":
+				  	classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_modern",true);	
+				  break;
+				  case "padlock_modern2":
+				  	classicthemerestorerjs.ctr.loadUnloadCSS("padlock2_modern2",true);	
+				  break;
+
+				}
 
 			} else {
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_default',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_classic',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_amo',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_modern',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_modern2',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock_none',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_none',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_classic',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_amo',false);
 				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_modern',false);
+				classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_modern2',false);
 			}
 		  break;
 		  
@@ -2164,101 +2345,61 @@ classicthemerestorerjs.ctr = {
 
 		  case "searchbarwidth": case "customsearchbarwidth":
 			  	try{		  
-					if (branch.getBoolPref("customsearchbarwidth")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("searchbarsheet",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("searchbarsheet",false);
-					}	
+					classicthemerestorerjs.ctr.loadUnloadCSS("searchbarsheet",branch.getBoolPref("customsearchbarwidth"));
 				} catch(e){}			
 		  break;
 		  
 		  case "custbookmarkfontsize": case "cbookmarkfontsize":
-			  	try{		  
-					if (branch.getBoolPref("custbookmarkfontsize")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("bookmarkbarfontsize",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("bookmarkbarfontsize",false);
-					}	
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("bookmarkbarfontsize",branch.getBoolPref("custbookmarkfontsize"));
 				} catch(e){}			
 		  break;
 		  
 		  case "custtabfontsize": case "ctabfontsize":
-			  	try{		  
-					if (branch.getBoolPref("custtabfontsize")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("tabfontsize",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("tabfontsize",false);
-					}	
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("tabfontsize",branch.getBoolPref("custtabfontsize"));
 				} catch(e){}			
 		  break;
 		  
 		  case "abouthomecustombg": case "abouthomecustomurl":
-			  	try{		  
-					if (branch.getBoolPref("abouthomecustombg")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg",false);
-					}	
+			  	try{		  		
+					classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg",branch.getBoolPref("abouthomecustombg"));
 				} catch(e){}			
 		  break;	
 
 		   case "abouthomebgstretch":
-			  	try{		  
-					if (branch.getBoolPref("abouthomebgstretch")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg_strech",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg_strech",false);
-					}	
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_bg_strech",branch.getBoolPref("abouthomebgstretch"));
 				} catch(e){}			
 		  break;
 		  
 		  case "abouthomehighlight": case "abouthomecustomhighlightcolor":
-			  	try{		  
-					if (branch.getBoolPref("abouthomehighlight")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_custcolor",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_custcolor",false);
-					}	
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_custcolor",branch.getBoolPref("abouthomehighlight"));
 				} catch(e){}			
 		  break;
 		  
 		  case "abouthomecustombase": case "abouthomecustombasecolor": 
 			  	try{		  
-					if (branch.getBoolPref("abouthomecustombase")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_custbasecolor",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_custbasecolor",false);
-					}	
+					classicthemerestorerjs.ctr.loadUnloadCSS("abouthome_custbasecolor",branch.getBoolPref("abouthomecustombase"));
 				} catch(e){}			
 		  break;
 		  
 		  case "aboutnewtabcustombase": case "aboutnewtabcustomhighlight": case "aboutnewtabcustombasecolor": case "aboutnewtabcustomhighlightcolor":
-			  	try{		  
-					if (branch.getBoolPref("aboutnewtabcustombase") || branch.getBoolPref("aboutnewtabcustomhighlight")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_custcolor",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_custcolor",false);
-					}
+			  	try{		  		
+					classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_custcolor",branch.getBoolPref("aboutnewtabcustombase") || branch.getBoolPref("aboutnewtabcustomhighlight"));
 				} catch(e){}			
 		  break;
 		  
 		  case "aboutnewtabcustombg": case "aboutnewtabcustomurl":
-			  	try{		  
-					if (branch.getBoolPref("aboutnewtabcustombg")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_bg",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_bg",false);
-					}	
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_bg",branch.getBoolPref("aboutnewtabcustombg"));	
 				} catch(e){}			
 		  break;
 		  
 		   case "aboutnewtabbgstretch":
-			  	try{		  
-					if (branch.getBoolPref("aboutnewtabbgstretch")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_bg_strech",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_bg_strech",false);
-					}	
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("aboutnewtab_bg_strech",branch.getBoolPref("aboutnewtabbgstretch"));
 				} catch(e){}			
 		  break;
 		  
@@ -2279,11 +2420,13 @@ classicthemerestorerjs.ctr = {
 
 		   case "hidexulelements": case "hidexulfilter":
 			  	try{		  
-					if (branch.getBoolPref("hidexulelements")) {				
-							classicthemerestorerjs.ctr.loadUnloadCSS("hideElements",true);
-					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("hideElements",false);
-					}	
+					classicthemerestorerjs.ctr.loadUnloadCSS("hideElements",branch.getBoolPref("hidexulelements"));	
+				} catch(e){}			
+		  break;
+
+		  case "tabthrobberusecust": case "tabthrobbercusturl":
+			  	try{		  			
+					classicthemerestorerjs.ctr.loadUnloadCSS("custtabthorbber",branch.getBoolPref("tabthrobberusecust"));	
 				} catch(e){}			
 		  break;		  
 		  
@@ -2650,6 +2793,26 @@ classicthemerestorerjs.ctr = {
 	   if(addon && addon.isActive) { classicthemerestorerjs.ctr.loadUnloadCSS("spaces_extra",false); }
 	    else { classicthemerestorerjs.ctr.loadUnloadCSS("spaces_extra",true); }
 	});
+	
+	// NoiaButtons
+	var NBListener = {
+	   onEnabled: function(addon) {
+		  if(addon.id == 'NoiaButtons@ArisT2_Noia4dev') { 
+		  
+		    if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("smallnavbut"))
+			  Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("smallnavbut",false);
+
+		  }
+	   }
+	};
+	AddonManager.addAddonListener(NBListener);
+	
+	AddonManager.getAddonByID('NoiaButtons@ArisT2_Noia4dev', function(addon) {
+	  if(addon && addon.isActive) {
+		if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("smallnavbut"))
+		  Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("smallnavbut",false);
+	  }
+	});
 
 	// ShowIP add-on fix
 	setTimeout(function(){
@@ -2841,13 +3004,49 @@ classicthemerestorerjs.ctr = {
 	
 	function faviconInUrlbar(){
 	 
-	 var ppfavicon     = document.getElementById("page-proxy-favicon");
+	 var ppfavicon = "";
+	 
+	 if (classicthemerestorerjs.ctr.appversion >= 45) {
+		try {
+		  ppfavicon = document.getElementById("identity-icon");
+		} catch(e){}
+	 } else {
+		try {
+		  ppfavicon = document.getElementById("page-proxy-favicon");
+		} catch(e){}
+	 }
+	 
 	 var emptyfavicon1 = Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("emptyfavicon");
 	 var emptyfavicon2 = Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("emptyfavicon2");
+	 var extrabrandico = Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("padlockex");
+	 var ppsvalid	   = false; try { ppsvalid  = document.getElementById("urlbar").getAttribute('pageproxystate')=='valid'; } catch(e){}
+	 var ppsinvalid	   = false; try { ppsinvalid = document.getElementById("urlbar").getAttribute('pageproxystate')=='invalid'; } catch(e){}
+	 var ibchromeui	   = false; try { ibchromeui = document.getElementById("identity-box").getAttribute('class')=='chromeUI'; } catch(e){}
+	 var ibukidentity  = false; try { ibukidentity = document.getElementById("identity-box").getAttribute('class')=='unknownIdentity'; } catch(e){}
 	 
 	 if(gBrowser.selectedTab.image) {
 	  try {
 		ppfavicon.setAttribute("src", gBrowser.selectedTab.image);
+	  } catch(e){}
+	 }
+	 else if(emptyfavicon1 && extrabrandico && ppsvalid && ibchromeui){
+	  try {
+		ppfavicon.removeAttribute("src");
+	  } catch(e){}
+	 }
+	 else if(emptyfavicon2 && extrabrandico && ppsvalid && ibchromeui){
+	  try {
+		ppfavicon.removeAttribute("src");
+	  } catch(e){}
+	 }
+	 else if(emptyfavicon1 && ppsinvalid && ibukidentity) {
+	  try {
+		ppfavicon.setAttribute("src", "chrome://classic_theme_restorer/content/images/default_dot_favicon.png");
+	  } catch(e){}
+	 }
+	 else if(emptyfavicon2 && ppsinvalid && ibukidentity) {
+	  try {
+		ppfavicon.setAttribute("src", "chrome://classic_theme_restorer/content/images/default_favicon.png");
 	  } catch(e){}
 	 }
 	 else if(emptyfavicon1) {
@@ -2869,17 +3068,28 @@ classicthemerestorerjs.ctr = {
 
 	classicthemerestorerjs.ctr.loadUnloadCSS('padlock_default',false);
 	classicthemerestorerjs.ctr.loadUnloadCSS('padlock_classic',false);
+	classicthemerestorerjs.ctr.loadUnloadCSS('padlock_amo',false);
 	classicthemerestorerjs.ctr.loadUnloadCSS('padlock_modern',false);
+	classicthemerestorerjs.ctr.loadUnloadCSS('padlock_modern2',false);
+	classicthemerestorerjs.ctr.loadUnloadCSS('padlock_none',false);
 	classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_none',false);
 	classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_classic',false);
 	classicthemerestorerjs.ctr.loadUnloadCSS('padlock2_modern',false);
+	
+	if (classicthemerestorerjs.ctr.prefs.getCharPref("padlock")=="padlock_none" && classicthemerestorerjs.ctr.appversion >= 45)
+		classicthemerestorerjs.ctr.loadUnloadCSS("padlock_none",true);
+	else classicthemerestorerjs.ctr.loadUnloadCSS("padlock_none",false);
 	
 	if (Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref("padlock")!="padlock_none"){
 	  classicthemerestorerjs.ctr.loadUnloadCSS(Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref("padlock"),true);
 	}
 	
-	if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("padlockex")) classicthemerestorerjs.ctr.loadUnloadCSS("padlock_extra",true);
-	  else classicthemerestorerjs.ctr.loadUnloadCSS("padlock_extra",false);
+	if (Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("padlockex")){
+	  classicthemerestorerjs.ctr.loadUnloadCSS("padlock_extra",true);
+	}
+	else {
+	  classicthemerestorerjs.ctr.loadUnloadCSS("padlock_extra",false);
+	}
   
   },
   
@@ -2923,18 +3133,6 @@ classicthemerestorerjs.ctr = {
   // disable preferences which are not usable with third party themes  
   disableSettingsforThemes: function() {
 	
-	/*try {
-	  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
-		this.prefs.setBoolPref('tabcolor_def',false);
-		this.prefs.setBoolPref('tabcolor_act',false);
-		this.prefs.setBoolPref('tabcolor_unr',false);
-		this.prefs.setBoolPref('tabcolor_pen',false);
-		this.prefs.setBoolPref('tabcolor_hov',false);
-		this.prefs.setBoolPref('ntabcolor_def',false);
-		this.prefs.setBoolPref('ntabcolor_hov',false);
-	  }
-	} catch(e) {}*/
-
 	if (!this.fxdefaulttheme) {
 		this.prefs.setBoolPref('tabcolor_def',false);
 		this.prefs.setBoolPref('tabcolor_act',false);
@@ -2991,6 +3189,44 @@ classicthemerestorerjs.ctr = {
 	  } catch(e) {}
 	  
 	  classicthemerestorerjs.ctr.loadUnloadCSS("nodevtheme2",true);
+	}
+  },
+  
+  // add tab title to browsers titlebar
+  tabTitleInBrowsersTitlebar: function(){
+	if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("tttitlebar")==true
+		&& classicthemerestorerjs.ctr.osstring=="WINNT"
+			&& classicthemerestorerjs.ctr.fxdefaulttheme==true) {
+
+	  try {
+
+		var titlebartitle = document.createElement("toolbarbutton");
+		titlebartitle.setAttribute("id", "ctraddon_titlebartitle");
+		titlebartitle.setAttribute("ordinal", "0");
+		titlebartitle.setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+
+		document.getElementById("titlebar-content").appendChild(titlebartitle);
+
+		window.addEventListener("load", function update_title() {
+		   document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+		}, false);
+		window.addEventListener("DOMContentLoaded", function update_title() {
+		  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+		}, false);
+		window.addEventListener("TabOpen", function update_title() {
+		  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+		}, false);
+		window.addEventListener("TabSelect", function update_title() {
+		  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+		}, false);
+		window.addEventListener("TabAttrModified", function update_title() {
+		  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+		}, false);
+
+	  
+	  } catch(e) {}
+	  
+	  classicthemerestorerjs.ctr.loadUnloadCSS("tttitlebar",true);
 	}
   },
   
@@ -3056,38 +3292,66 @@ classicthemerestorerjs.ctr = {
 
   // adds busy attribute to activity throbber
   restoreActivityThrobber: function(){
-
+	
+	// disconnect observer, if it is already running
+	try{
+	  classicthemerestorerjs.ctr.activityObserver.disconnect();
+	}catch(e){}
+	
 	// check, if tab attributes got modified
-	var activityObserver = new MutationObserver(function(mutations) {
+	classicthemerestorerjs.ctr.activityObserver = new MutationObserver(function(mutations) {
 	  mutations.forEach(function(mutation) {
 		ctrActivityThrobber();
 	  });
 	});
-	
-	// needed once after the option gets enabled
-	activityObserver.observe(gBrowser.selectedTab, { attributes: true, attributeFilter: ['busy'] });
+
+	// enable observer
+	if(classicthemerestorerjs.ctr.activityObserverOn==true) {
+	  try{
+		classicthemerestorerjs.ctr.activityObserver.observe(gBrowser.selectedTab, { attributes: true, attributeFilter: ['busy'] });
+	  }catch(e){}
+	}
 	
 	// if tab is busy, add 'busy' attribute to 'ctraddon_navigator-throbber'
 	function ctrActivityThrobber(){
-	  if(gBrowser.selectedTab.hasAttribute('busy')) {
-		try{
-		  if(document.getElementById('ctraddon_navigator-throbber').hasAttribute('busy')==false)
-		    document.getElementById('ctraddon_navigator-throbber').setAttribute('busy','true');
-		}catch(e){}
-	  }
-	  else {
-	    try{
-		  if(document.getElementById('ctraddon_navigator-throbber').hasAttribute('busy'))
-		    document.getElementById('ctraddon_navigator-throbber').removeAttribute('busy');
-		}catch(e){}
-	  }
-	  activityObserver.observe(gBrowser.selectedTab, { attributes: true, attributeFilter: ['busy'] });
+		if(classicthemerestorerjs.ctr.activityObserverOn==true){
+
+		  var navthrobber = null;
+
+		  try{
+		    navthrobber = document.getElementById('ctraddon_navigator-throbber');
+		  }catch(e){}
+		  
+		  if(gBrowser.selectedTab.hasAttribute('busy')) {
+			try{
+			  if(navthrobber!=null) {
+				if(navthrobber.hasAttribute('busy')==false) navthrobber.setAttribute('busy','true');
+			  }
+			}catch(e){}
+		  }
+		  else {
+			try{
+			  if(navthrobber!=null) {
+				if(navthrobber.hasAttribute('busy')) navthrobber.removeAttribute('busy');
+			  }
+			}catch(e){}
+		  }
+		  try{
+		    classicthemerestorerjs.ctr.activityObserver.observe(gBrowser.selectedTab, { attributes: true, attributeFilter: ['busy'] });
+		  }catch(e){}
+		}
 	}
 	
 	// listen to tab changes
-	window.addEventListener('TabSelect', ctrActivityThrobber, false);
-	window.addEventListener('TabOpen', ctrActivityThrobber, false);
-	window.addEventListener('load', ctrActivityThrobber, false);
+	if(classicthemerestorerjs.ctr.activityObserverOn==true){
+	  window.addEventListener('TabSelect', ctrActivityThrobber, false);
+	  window.addEventListener('TabOpen', ctrActivityThrobber, false);
+	  window.addEventListener('load', ctrActivityThrobber, false);
+	} else {
+	  window.removeEventListener('TabSelect', ctrActivityThrobber, false);
+	  window.removeEventListener('TabOpen', ctrActivityThrobber, false);
+	  window.removeEventListener('load', ctrActivityThrobber, false);
+	}
 
   },
   
@@ -3131,11 +3395,11 @@ classicthemerestorerjs.ctr = {
 	}
   
   },
-  
+ 
   /* enable/disable css sheets*/
   loadUnloadCSS: function(which,enable) {
 	
-	const ios = Services.io;
+	var ios = Services.io;
 	
 	switch (which) {
 	
@@ -3299,6 +3563,7 @@ classicthemerestorerjs.ctr = {
 		break;
 	
 		case "square_edges": 			manageCSS("tabssquare_edges.css");  	break;
+		case "tttitlebar": 				manageCSS("tabsttitleintitlebar.css");  break;
 		
 		case "closetab_active": 		manageCSS("closetab_active.css");  		break;
 		case "closetab_none": 			manageCSS("closetab_none.css");  		break;
@@ -3308,12 +3573,21 @@ classicthemerestorerjs.ctr = {
 
 		case "closetabhfl": 			manageCSS("closetab_hideonone.css");  	break;
 		
-		case "closeicon_red": 			manageCSS("close_icon_red.css");  		break;
-		case "closeicon_w7": 			manageCSS("close_icon_w7.css");  		break;
-		case "closeicon_w8": 			manageCSS("close_icon_w8.css");  		break;
-		case "closeicon_w10": 			manageCSS("close_icon_w10.css");  		break;
-		case "closeicon_w10i": 			manageCSS("close_icon_w10i.css");  		break;
-		case "closeicon_w10red": 		manageCSS("close_icon_w10red.css");  	break;
+		case "closeicon_red": 			manageCSS("close_icon_t_red.css");  	break;
+		case "closeicon_w7": 			manageCSS("close_icon_t_w7.css");  		break;
+		case "closeicon_w8": 			manageCSS("close_icon_t_w8.css");  		break;
+		case "closeicon_w10": 			manageCSS("close_icon_t_w10.css");  	break;
+		case "closeicon_w10i": 			manageCSS("close_icon_t_w10i.css");  	break;
+		case "closeicon_w10red": 		manageCSS("close_icon_t_w10red.css");  	break;
+		case "closeicon_gc": 			manageCSS("close_icon_t_gc.css");  		break;
+		
+		case "closeicong_red": 			manageCSS("close_icon_g_red.css");  	break;
+		case "closeicong_w7": 			manageCSS("close_icon_g_w7.css");  		break;
+		case "closeicong_w8": 			manageCSS("close_icon_g_w8.css");  		break;
+		case "closeicong_w10": 			manageCSS("close_icon_g_w10.css");  	break;
+		case "closeicong_w10i": 		manageCSS("close_icon_g_w10i.css");  	break;
+		case "closeicong_w10red": 		manageCSS("close_icon_g_w10red.css");  	break;
+		case "closeicong_gc": 			manageCSS("close_icon_g_gc.css");  		break;
 		
 		case "closeonleft":
 		
@@ -3429,21 +3703,15 @@ classicthemerestorerjs.ctr = {
 			}
 
 		break;
-
-		case "appbuttonc_default":	manageCSS("appbutton_default.css");		break;		
+		
 		case "appbuttonc_orange":	manageCSS("appbutton_orange.css");		break;
-		case "appbuttonc_orange_dark":	manageCSS("appbutton_orange_dark.css");		break;		
 		case "appbuttonc_aurora":	manageCSS("appbutton_aurora.css");		break;
-		case "appbuttonc_cyan":	manageCSS("appbutton_cyan.css");		break;		
 		case "appbuttonc_nightly":	manageCSS("appbutton_nightly.css");		break;
 		case "appbuttonc_transp":	manageCSS("appbutton_transparent.css");	break;
 		case "appbuttonc_palemo":	manageCSS("appbutton_palemoon.css");	break;
 		case "appbuttonc_red":		manageCSS("appbutton_red.css");			break;
-		case "appbuttonc_red_dark":		manageCSS("appbutton_red_dark.css");			break;		
 		case "appbuttonc_green":	manageCSS("appbutton_green.css");		break;
-		case "appbuttonc_green_dark":	manageCSS("appbutton_green_dark.css");		break;		
 		case "appbuttonc_gray":		manageCSS("appbutton_gray.css");		break;
-		case "appbuttonc_salmon":		manageCSS("appbutton_salmon.css");		break;		
 		case "appbuttonc_purple":	manageCSS("appbutton_purple.css");		break;
 		case "appbuttonc_white":	manageCSS("appbutton_white.css");		break;
 
@@ -3459,26 +3727,39 @@ classicthemerestorerjs.ctr = {
 		case "backforward":			manageCSS("back-forward.css");			break;
 		case "nbcompact":			manageCSS("navbar_compact.css");		break;
 		case "noconicons": 			manageCSS("nocontexticons.css");		break;
+		case "options_alt": 		manageCSS("alt_optionspage.css");		break;
+		case "options_alt2": 		manageCSS("alt_optionswindow.css");		break;
+		case "options_alt3": 		manageCSS("alt_optionswindow2.css");	break;
+		case "options_win": 		manageCSS("alt_optionswindow.css");		break;
+		case "options_win_alt": 	manageCSS("alt_optionswindow2.css");	break;
+		case "options_win_ct": 		manageCSS("alt_optionswindow_ct.css");	break;
+		case "altoptionsmitem": 	manageCSS("alt_options_mitem.css");		break;
 		case "svgfilters": 			manageCSS("svgfilters.css");			break;
 		case "iat_notf_vt": 		manageCSS("mode_iat_no_vt.css");		break;
 		case "to_notf_vt": 			manageCSS("mode_to_no_vt.css");			break;
 		case "mbarforceleft": 		manageCSS("menuitems_forceleft.css");	break;
 		case "mbarforceright": 		manageCSS("menuitems_forceright.css");	break;
 		case "wincontrols": 		manageCSS("windowcontrols.css");		break;
+		case "oldtoplevimg": 		manageCSS("old_toplevel_img.css");		break;
+		case "altalertbox": 		manageCSS("alt_alertboxfx44.css");		break;
+		case "navthrobber": 		manageCSS("navthrobber.css");			break;
 		case "hideprbutton": 		manageCSS("hidepagereportbutton.css");	break;
 		case "starinurl":			manageCSS("starinurl.css");				break;
 		case "feedinurl":			manageCSS("feedinurl.css");				break;
 		case "statusbar": 			manageCSS("statusbar.css"); 			break;
 		case "hideurelstop": 		manageCSS("hideurlbarrelstop.css"); 	break;
 		case "hideurlgo": 			manageCSS("hideurlbargo.css"); 			break;
+		case "hideurlsrg": 			manageCSS("hideurlbarrelstopgo.css"); 	break;
 		case "urlbardropm": 		manageCSS("urlbar_dropm.css"); 			break;
+		case "altreaderico": 		manageCSS("alt_reader_icons.css");		break;
+		case "locsearchbw10": 		manageCSS("locationsearchbarw10.css");	break;
 		case "combrelstop":			manageCSS("combrelstop.css");			break;
 		case "panelmenucol": 		manageCSS("panelmenucolor.css");		break;
 		case "panelmenucol2": 		manageCSS("panelmenucolor2.css");		break;
 
 		case "altmenubar": 			manageCSS("menubar.css");				break;
-		case "altmenubarpos": 		manageCSS("menubar_altpos.css");		break;
-		case "altmenubarpos2": 		manageCSS("menubar_altpos2.css");		break;
+		case "altmbarpos1": 		manageCSS("menubar_altpos.css");		break;
+		case "altmbarpos2": 		manageCSS("menubar_altpos2.css");		break;
 		case "menubarnofog": 		manageCSS("menubar_nofog.css");			break;
 		case "menubarfs": 			manageCSS("menubar_infullscreen.css");	break;
 		case "noaddonbarbg": 		manageCSS("noaddonbarbg.css");			break;
@@ -3487,6 +3768,8 @@ classicthemerestorerjs.ctr = {
 		case "nobookbarbg": 		manageCSS("nobookbarbg.css");			break;
 		case "bookbarfs": 			manageCSS("bmbar_infullscreen.css");	break;
 		case "transpttbw10": 		manageCSS("transp_top_tb_w10.css");		break;
+		case "transpttbew10": 		manageCSS("transp_top_tbe_w10.css");	break;
+		case "transptcw10": 		manageCSS("transp_top_c_w10.css");		break;
 		case "nonavbarbg": 			manageCSS("nonavbarbg.css");			break;
 		case "nonavborder": 		manageCSS("nonavborder.css");			break;
 		case "nonavtbborder": 		manageCSS("nonavtbborder.css");			break;
@@ -3499,14 +3782,17 @@ classicthemerestorerjs.ctr = {
 		case "hightabpososx": 		manageCSS("higher_tabs_pos.css");		break;
 		case "alttabstb": 			manageCSS("alttabstoolbar.css");		break;
 		case "alttabstb2": 			manageCSS("alttabstoolbar2.css");		break;
+		case "hidetbwotextra": 		manageCSS("hidetbwot_extra.css");		break;
 		
 		case "emptyfavicon": 		manageCSS("empty_favicon.css");			break;
 		case "emptyfavicon2": 		manageCSS("empty_favicon2.css");		break;
 		case "noemptypticon": 		manageCSS("empty_favicon_pt.css");		break;
 		case "hidezoomres": 		manageCSS("hide_zoomreset.css");		break;
 		case "alt_newtabp": 		manageCSS("alt_newtabpage.css");		break;
+		case "ctroldsearch": 		manageCSS("oldsearch.css");				break;
 		case "am_nowarning":		manageCSS("am_nowarnings.css");			break;
-		case "alt_newtabpalt": 		 manageCSS("alt_newtabpage_alt.css");		break;
+		case "am_compact":			manageCSS("am_compact.css");			break;
+		case "am_compact2":			manageCSS("am_compact2.css");			break;
 		case "alt_addonsp": 		manageCSS("alt_addonspage.css");		break;
 		case "alt_addonsm": 		manageCSS("alt_addonsmanager.css");		break;
 		case "addonversion": 		manageCSS("addonversion.css");			break;
@@ -3516,6 +3802,8 @@ classicthemerestorerjs.ctr = {
 		case "noresizerxp": 		manageCSS("no_resizer_xp.css");			break;
 		case "pmhidelabels": 		manageCSS("panelmenu_nolabels.css");	break;
 		case "menupopupscr": 		manageCSS("menupopupscrollbar.css");	break;
+		case "ib_nohovcolor": 		manageCSS("ib_nohovcolor.css");			break;
+		case "ib_graycolor": 		manageCSS("ib_graycolor.css");			break;
 		case "verifiedcolors": 		manageCSS("verifiedcolors.css");		break;
 		case "hideprivmask": 		manageCSS("hideprivatemask.css");		break;
 		case "bfurlbarfix": 		manageCSS("bf_urlbarfix.css");			break;
@@ -3529,6 +3817,8 @@ classicthemerestorerjs.ctr = {
 		case "invicoaddonbar": 		manageCSS("invicons_addonbar.css");		break;
 		
 		case "tabsep_black": 		manageCSS("tab_sep.css");				break;
+		case "tabsep_luna": 		manageCSS("tab_sep_luna.css");			break;
+		case "tabsep_xp": 			manageCSS("tab_sep_xp.css");			break;
 		case "tabsep_white": 		manageCSS("tab_sep-inv.css");			break;
 		case "tabsep_black_sol": 	manageCSS("tab_sep_solid.css");			break;
 		case "tabsep_white_sol": 	manageCSS("tab_sep_solid-inv.css");		break;
@@ -3541,14 +3831,20 @@ classicthemerestorerjs.ctr = {
 		
 		case "padlock_default": 	manageCSS("padlock_default.css");		break;
 		case "padlock_classic": 	manageCSS("padlock_classic.css");		break;
+		case "padlock_amo": 		manageCSS("padlock_amo.css");			break;
 		case "padlock_modern":		manageCSS("padlock_modern.css");		break;
+		case "padlock_modern2":		manageCSS("padlock_modern2.css");		break;
 		case "padlock_extra":		manageCSS("padlock_extra.css");			break;
+		case "padlock_none":		manageCSS("padlock_none.css");			break;
 		case "padlock2_classic": 	manageCSS("padlock2_classic.css");		break;
+		case "padlock2_amo": 		manageCSS("padlock2_amo.css");			break;
 		case "padlock2_modern":		manageCSS("padlock2_modern.css");		break;
+		case "padlock2_modern2":	manageCSS("padlock2_modern2.css");		break;
 		case "padlock2_none":		manageCSS("padlock2_none.css");			break;
 		
 		case "throbber_alt": 		manageCSS("throbberalt.css");			break;
 		case "throbber_fx39": 		manageCSS("throbberalt2.css");			break;
+		case "throbber_nav": 		manageCSS("throbberalt3.css");			break;
 		case "bmanimation": 		manageCSS("hidebmanimation.css");		break;
 		case "pananimation": 		manageCSS("hidepanelanimation.css");	break;
 		case "cpanelmenus": 		manageCSS("compactpanelmenus.css");		break;
@@ -3565,26 +3861,78 @@ classicthemerestorerjs.ctr = {
 		case "nodevtheme2":			manageCSS("no_devtheme.css");			break;
 		
 		case "spaces_extra": 		manageCSS("spaces_extra.css");			break;
-		case "tree_style_fix": 		manageCSS("tree_style_fix.css");	break;
-		case "tabs_titlebar": 		manageCSS("tabs_titlebar.css");	break;
+
+
+
+ 		case "appbuttonc_default":	manageCSS("cctr/appbutton_default.css");		break;
+		case "appbuttonc_orange_dark":	manageCSS("cctr/appbutton_orange_dark.css");		break;
+		case "appbuttonc_cyan":	manageCSS("cctr/appbutton_cyan.css");		break;
+		case "appbuttonc_red_dark":		manageCSS("cctr/appbutton_red_dark.css");			break;
+		case "appbuttonc_green_dark":	manageCSS("cctr/appbutton_green_dark.css");		break;
+		case "appbuttonc_salmon":		manageCSS("cctr/appbutton_salmon.css");		break;
+
+		case "alt_newtabpalt":
+			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
+				manageCSS("cctr/alt_newtabpage_alt42p.css");
+			}else{
+				manageCSS("cctr/alt_newtabpage_alt.css");
+			}				
+			break;
+		case "tree_style_fix": 		manageCSS("cctr/tree_style_fix.css");	break;
 		
-		case "abouthomedark": 							manageCSS("abouthomedark.css");	break;
-		case "abouthomedarkalt": 							manageCSS("abouthomedarkalt.css");	break;
-		case "abouthomelight": 							manageCSS("abouthomelight.css");	break;
-		case "abouthomelightalt": 							manageCSS("abouthomelightalt.css");	break;
-		case "abouthomesimplicity": 				    manageCSS("abouthomesimplicity.css");	break;	
-		case "abouthomesimplicityblue": 				manageCSS("abouthomesimplicityintel.css");	break;		
-		case "abouthomesimplicityred": 				manageCSS("abouthomesimplicityamd.css");	break;
-		case "abouthomesimplicitygreen": 			manageCSS("abouthomesimplicitylinux.css");	break;
-		case "abouthomesimplicityyellow": 			manageCSS("abouthomesimplicitybeta.css");	break;
-		case "abouthomenobar": 							manageCSS("abouthomenobar.css");	break;		
-		case "abouthomenologo": 						manageCSS("abouthomenologo.css");	break;		
-		case "abouthomenoicons": 						manageCSS("abouthomenoicons.css");	break;	
-		case "abouthomenosnippets": 					manageCSS("abouthomenosnippets.css");	break;
-		case "abouthomeanimate": 						manageCSS("abouthomeanimate.css");	break;
-		case "rndadonssearch": 						manageCSS("rndadonssearch.css"); break;
-		case "rndadonssearch40plus": 						manageCSS("rndadonssearch40plus.css");	break;
-		case "nopocket": 						manageCSS("nopocket.css"); break;
+		case "abouthomedark":
+			if (classicthemerestorerjs.ctr.appversion >= 42)	{	
+				manageCSS("cctr/abouthomedark42p.css");	
+			}else{
+				manageCSS("cctr/abouthomedark.css");
+			}				
+		break;
+		case "abouthomedarkalt":
+			if (classicthemerestorerjs.ctr.appversion >= 42)	{
+				manageCSS("cctr/abouthomedarkalt42p.css");
+			}else{
+				manageCSS("cctr/abouthomedarkalt.css");
+			}				
+		break;
+		case "abouthomelight": 
+			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
+				manageCSS("cctr/abouthomelight42p.css");	
+			}else{
+				manageCSS("cctr/abouthomelight.css");	
+			}
+		break;
+		case "abouthomelightalt": 
+			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
+				manageCSS("cctr/abouthomelightalt42p.css");	
+			}else{
+				manageCSS("cctr/abouthomelightalt.css");
+			}
+		break;
+		case "abouthomesimplicity":
+			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
+				manageCSS("cctr/abouthomesimplicity42p.css");
+			}else{
+				manageCSS("cctr/abouthomesimplicity.css");
+			}				
+		break;	
+		case "abouthomesimplicityblue": 				manageCSS("cctr/abouthomesimplicityintel.css");	break;		
+		case "abouthomesimplicityred": 				manageCSS("cctr/abouthomesimplicityamd.css");	break;
+		case "abouthomesimplicitygreen": 			manageCSS("cctr/abouthomesimplicitylinux.css");	break;
+		case "abouthomesimplicityyellow": 			manageCSS("cctr/abouthomesimplicitybeta.css");	break;
+		case "abouthomenobar": 							manageCSS("cctr/abouthomenobar.css");	break;		
+		case "abouthomenologo": 						manageCSS("cctr/abouthomenologo.css");	break;		
+		case "abouthomenoicons": 						manageCSS("cctr/abouthomenoicons.css");	break;	
+		case "abouthomenosnippets": 					manageCSS("cctr/abouthomenosnippets.css");	break;
+		case "abouthomeanimate": 						manageCSS("cctr/abouthomeanimate.css");	break;
+		case "rndadonssearch": 						manageCSS("cctr/rndadonssearch.css"); break;
+		case "rndadonssearch40plus": 						manageCSS("cctr/rndadonssearch40plus.css");	break;
+		case "nopocket": 						manageCSS("cctr/nopocket.css"); break;
+		
+		case "throbber_alt1": 		manageCSS("cctr/throbberalt_1.css");			break;
+		case "throbber_alt2": 		manageCSS("cctr/throbberalt_2.css");			break;
+		case "throbber_alt3": 		manageCSS("cctr/throbberalt_3.css");			break;
+		case "throbber_alt4": 		manageCSS("cctr/throbberalt_4.css");			break;
+		case "throbber_alt5": 		manageCSS("cctr/throbberalt_5.css");			break;
 		
 		case "thirdpartythemes": 	manageCSS("thirdpartythemes.css");		break;
 		
@@ -3603,6 +3951,19 @@ classicthemerestorerjs.ctr = {
 						}\
 					';
 				}
+				
+				var aero_color_optionsp = '';
+				
+				if (this.prefs.getCharPref("altoptions")=='options_alt' || this.prefs.getCharPref("altoptions")=='options_alt2' || this.prefs.getCharPref("altoptions")=='options_win') {
+					aero_color_optionsp = '\
+					  @-moz-document url(about:preferences),url-prefix(about:preferences){\
+						page, #dialogBox .groupbox-title {\
+						  background: linear-gradient(to bottom right, #edf6ff,#dbeaf9,#edf6ff,#dbeaf9) !important;\
+						}\
+					  }\
+					';
+				}
+				
 				
 				var aero_color_tabs = '';
 				
@@ -3843,6 +4204,7 @@ classicthemerestorerjs.ctr = {
 					}\
 					'+aero_color_tabs+'\
 					'+aero_color_addonsm+'\
+					'+aero_color_optionsp+'\
 				'), null, null);
 			
 				applyNewSheet(this.aerocolors);
@@ -5228,6 +5590,27 @@ classicthemerestorerjs.ctr = {
 
 		break;
 		
+		case "navbarpad":
+			removeOldSheet(this.navbarpadding);
+			
+			if(enable==true && this.prefs.getBoolPref('navbarpad')){
+		
+				this.navbarpadding=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					#main-window:not([customizing]) #nav-bar-customization-target {\
+					  padding-left: '+this.prefs.getIntPref('navbarpad_l')+'px !important;\
+					  padding-right: '+this.prefs.getIntPref('navbarpad_r')+'px !important;\
+					}\
+					#main-window:not([customizing]) #nav-bar {\
+					  margin-left: '+this.prefs.getIntPref('navbarmar_l')+'px !important;\
+					  margin-right: '+this.prefs.getIntPref('navbarmar_r')+'px !important;\
+					}\
+				'), null, null);
+				
+				applyNewSheet(this.navbarpadding);
+			}
+		
+		break;
+		
 		case "cui_buttons":
 		
 			removeOldSheet(this.cuiButtonssheet);
@@ -5475,12 +5858,8 @@ classicthemerestorerjs.ctr = {
 				this.aboutnewtab_bg=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
 					@namespace url(http://www.w3.org/1999/xhtml);\
 					@-moz-document url("about:newtab") {\
-						#newtab-window,\
-						#newtab-scrollbox{\
+						body{\
 							background-image: url('+ this.prefs.getCharPref("aboutnewtabcustomurl") +')!important;\
-						}\
-						#newtab-margin-bottom{\
-							background: transparent!important;\
 						}\
 					}\
 				'), null, null);
@@ -5499,8 +5878,7 @@ classicthemerestorerjs.ctr = {
 				this.aboutnewtab_bg_strech=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
 					@namespace url(http://www.w3.org/1999/xhtml);\
 					@-moz-document url("about:newtab") {\
-						#newtab-window,\
-						#newtab-scrollbox{\
+						body{\
 							background-size: 100% 100%!important;\
 						}\
 					}\
@@ -5511,15 +5889,35 @@ classicthemerestorerjs.ctr = {
 
 		break;
 		
+		case "custtabthorbber":
+
+			removeOldSheet(this.custtabthorbber);
+			
+			if(enable==true && this.prefs.getBoolPref("tabthrobberusecust")){
+	
+				this.custtabthorbber=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
+					@-moz-document url(chrome://browser/content/browser.xul) {\
+						.tab-throbber[progress]{\
+							list-style-image: url('+ this.prefs.getCharPref("tabthrobbercusturl") +')!important;\
+						}\
+					}\
+				'), null, null);
+				
+				applyNewSheet(this.custtabthorbber);
+			}
+
+		break;
+		
 	}
 	
 	// Apply or remove the style sheet files
 	function manageCSS(file) {
 
-		const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
-		const ios = Services.io;
+		var sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+		var ios = Services.io;
 
-		let uri = ios.newURI("chrome://classic_theme_restorer/content/css/" + file,null,null);
+		var uri = ios.newURI("chrome://classic_theme_restorer/content/css/" + file,null,null);
 		
 		try{
 			if (enable) {
@@ -5535,7 +5933,7 @@ classicthemerestorerjs.ctr = {
 	// remove style sheet
 	function removeOldSheet(sheet){
 
-	  const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+	  var sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
 
 		if (sss.sheetRegistered(sheet,sss.AGENT_SHEET)) sss.unregisterSheet(sheet,sss.AGENT_SHEET);
 	}
@@ -5543,7 +5941,7 @@ classicthemerestorerjs.ctr = {
 	// apply style sheet
 	function applyNewSheet(sheet){
 
-	  const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+	  var sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
 
 		try {
 			if (!sss.sheetRegistered(sheet,sss.AGENT_SHEET)) sss.loadAndRegisterSheet(sheet,sss.AGENT_SHEET);
@@ -5592,10 +5990,10 @@ classicthemerestorerjs.ctr = {
   },
   
   openCTRPreferences: function(currentWindow) {
-	  let windows = Services.wm.getEnumerator(null);
-	  let optionsURL = "chrome://classic_theme_restorer/content/options.xul"
+	  var windows = Services.wm.getEnumerator(null);
+	  var optionsURL = "chrome://classic_theme_restorer/content/options.xul"
 		while (windows.hasMoreElements()) {
-		  let win = windows.getNext();
+		  var win = windows.getNext();
 		  if (win.document.documentURI == optionsURL) {
 			win.focus();
 			return;
@@ -5606,7 +6004,7 @@ classicthemerestorerjs.ctr = {
   
   // open prefwindow and specific category
   additionalToolbars: function(){
-	Services.prefs.getBranch("extensions.classicthemerestorer.").setIntPref('pref_actindx',6);
+	Services.prefs.getBranch("extensions.classicthemerestorer.").setIntPref('pref_actindx',9);
 	
 	setTimeout(function(){
 	  classicthemerestorerjs.ctr.openCTRPreferences();
@@ -5617,7 +6015,7 @@ classicthemerestorerjs.ctr = {
   // hides/shows CTRs add-on bar
   toggleCtrAddonBar: function() {
     
-	let ctrAddonBar = document.getElementById("ctraddon_addon-bar");
+	var ctrAddonBar = document.getElementById("ctraddon_addon-bar");
     setToolbarVisibility(ctrAddonBar, ctrAddonBar.collapsed);
   
   },
@@ -5643,6 +6041,32 @@ classicthemerestorerjs.ctr = {
   openInPrWin: function() {
 	if(classicthemerestorerjs.ctr.appversion < 38)
 	  openLinkIn(document.getElementById('placesContext').triggerNode._placesNode.uri, 'window', {private: true});
+  },
+  
+  // open 'about:preferences' in a new small window
+  openContentPrefsInWin: function(which) {
+	 
+	try{classicthemerestorerjs.ctr.ctrcontentprefswin.close();} catch(e){}
+	
+	  var wwidth = 700; // window width
+	  var wheight = 670; // window height
+  
+	  if(classicthemerestorerjs.ctr.prefs.getIntPref("aboutprefsww") != 700)
+		wwidth = classicthemerestorerjs.ctr.prefs.getIntPref("aboutprefsww");
+	  if(classicthemerestorerjs.ctr.prefs.getIntPref("aboutprefswh") != 670)
+		wheight = classicthemerestorerjs.ctr.prefs.getIntPref("aboutprefswh");
+
+	  var w = (screen.availWidth-wwidth)/2;
+	  var h = (screen.availHeight-wheight)/2;
+	  
+	  if(classicthemerestorerjs.ctr.prefs.getCharPref('altoptions')=='options_win' || classicthemerestorerjs.ctr.prefs.getCharPref('altoptions')=='options_win_alt')
+		classicthemerestorerjs.ctr.ctrcontentprefswin = window.open('about:preferences', '', 'width='+wwidth+',height='+wheight+',top='+h+',left='+w+',resizable=yes');
+	  else openPreferences();
+
+  },
+  
+  closeContentPrefsInWin: function() {
+	try{classicthemerestorerjs.ctr.ctrcontentprefswin.close();} catch(e){}
   },
   
   // reset CTRs toolbar configuration
@@ -5771,45 +6195,52 @@ switch (appButtonState){
 		break;
 	
 		case "appbutton_v1": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}		
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 		
 		case "appbutton_v1wt": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}			
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 
 		case "appbutton_v2wt2": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}			
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 		
 		case "appbutton_v2": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}				
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 		
 		case "appbutton_v2io": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}			
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 
 		case "appbutton_v2io2": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}			
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 		
 		case "appbutton_pm": 
-			menutoolbarHasAttribute.setAttribute('autohide', false);		
+			if(classicthemerestorerjs.ctr.osstring!="Linux"){menutoolbarHasAttribute.setAttribute('autohide', false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
+			}			
 			Services.prefs.setCharPref("extensions.classicthemerestorer.tabs", "tabs_default");
-			classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",true);
 		break;
 
 }
@@ -6085,7 +6516,7 @@ switch (appButtonState){
 
       if (!Services.prefs.getBoolPref("extensions.classicthemerestorer.ctrpref.importjson")) {
 
-        let promise = OS.File.read(patterns.path + "\\CTRpreferences.txt", {
+        var promise = OS.File.read(patterns.path + "\\CTRpreferences.txt", {
           encoding: "utf-8"
         });
         promise = promise.then(
@@ -6094,7 +6525,7 @@ switch (appButtonState){
           });
       } else {
 
-        let promise = OS.File.read(patterns.path + "\\CTRpreferences.json", {
+        var promise = OS.File.read(patterns.path + "\\CTRpreferences.json", {
           encoding: "utf-8"
         });
         promise = promise.then(
@@ -6122,7 +6553,7 @@ switch (appButtonState){
         }
 
         if (fp.show() != nsIFilePicker.returnCancel) {
-          let file = fp.file;
+          var file = fp.file;
           if (!Services.prefs.getBoolPref("extensions.classicthemerestorer.ctrpref.importjson")) {
             if (!/\.txt$/.test(file.leafName.toLowerCase()))
               file.leafName += ".txt";
@@ -6154,14 +6585,14 @@ switch (appButtonState){
 
       if (!Services.prefs.getBoolPref("extensions.classicthemerestorer.ctrpref.importjson")) {
 
-        let promise = OS.File.remove(patterns.path + "\\CTRpreferences.txt");
+        var promise = OS.File.remove(patterns.path + "\\CTRpreferences.txt");
         promise = promise.then(
           function onSuccess(data) {
 			  console.log(patterns.path + "\\CTRpreferences.txt was deleted");
             return true;
           });
       } else {
-        let promise = OS.File.remove(patterns.path + "\\CTRpreferences.json");
+        var promise = OS.File.remove(patterns.path + "\\CTRpreferences.json");
         promise = promise.then(
           function onSuccess(data) {
 			  console.log(patterns.path + "\\CTRpreferences.json was deleted");
@@ -6180,14 +6611,6 @@ switch (appButtonState){
   ctrPrefRestart: function(){
 	  Services.prefs.setBoolPref("extensions.classicthemerestorer.ctrpref.lastmodapply", true);
 	  gCyberfoxCustom.restartBrowser();
-  },
-  
-  // hides/shows CTRs add-on bar
-  toggleCtrAddonBar: function() {
-    
-	let ctrAddonBar = document.getElementById("ctraddon_addon-bar");
-    setToolbarVisibility(ctrAddonBar, ctrAddonBar.collapsed);
-  
   },
   
   toggleCtrUrlExtraBar: function() {

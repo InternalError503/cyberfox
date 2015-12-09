@@ -123,7 +123,13 @@
 	  margin-top: 0px !important;
 	  margin-bottom: 1px !important;
 	}
-	
+
+	/*.tab-background-start[visuallyselected=true]::after,
+	.tab-background-start[visuallyselected=true]::before,
+	.tab-background-start,
+	.tab-background-end,
+	.tab-background-end[visuallyselected=true]::after,
+	.tab-background-end[visuallyselected=true]::before,*/
 	#tabbrowser-tabs,
 	#TabsToolbar {
 	  min-height: 0px !important;
@@ -156,6 +162,14 @@
 	  border-width: 5px 3px 6px !important;
 	  border-image: url(chrome://classic_theme_restorer/content/images/tab.png) 5 3 6 fill repeat round !important;
 	  border-style: solid !important;
+	}
+	
+	@media all and (-moz-windows-classic) {
+		.tabs-newtab-button:not(:-moz-lwtheme){
+		  border-width: 5px 3px 6px !important;
+		  border-image: url(chrome://classic_theme_restorer/content/images/taba.png) 5 3 6 fill repeat round !important;
+		  border-style: solid !important;
+		}
 	}
 	
 	.tabs-newtab-button:-moz-lwtheme{
@@ -300,6 +314,7 @@
 	.tabbrowser-tab:not([selected]):not([afterselected-visible]):not([afterhovered]):not([first-visible-tab]):not(:hover)::before,
 	#tabbrowser-tabs:not([overflow]) > .tabbrowser-tab[last-visible-tab]:not([selected]):not([beforehovered]):not(:hover)::after {
 	  background-image: none !important;
+	  background-color: unset !important;
 	}
 	
 	.tabbrowser-tab:not([pinned]) .tab-close-button{

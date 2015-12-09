@@ -11,11 +11,12 @@
 <!ENTITY Ctr_flexspace		"Fleksibelny mjazyrum">
 <!ENTITY Ctr_space			"Mjazyrum">
 <!ENTITY Ctr_separator		"Źěleńska smužka">
-<!ENTITY Ctr_puibseparator	"Źěleńska smužka tłocaškow pólowego menija">
+<!ENTITY Ctr_puibseparator	"Źěleńska smužka za tłocašk głownego menija">
 <!ENTITY Ctr_navthrobber	"Pokazka aktiwity">
 <!ENTITY Ctr_sidebarbutton	"Bócnica">
 <!ENTITY Ctr_windowcontrols	"Min./maks./zacyniś (połna wobrazowka)">
 <!ENTITY Ctr_rr				"Startujśo &brandShortName; znowego!">
+<!ENTITY Ctr_window			"wokno">
 
 <!ENTITY Ctr_cuibuttons		"Tłocaški">
 <!ENTITY Ctr_cuibutnormal	"Normalny">
@@ -54,7 +55,8 @@
 <!ENTITY Ctr_tabwidthinfo	"Maksimalna a minimalna šyrokosć wótwisujotej wót TabMixPlus">
 <!ENTITY Ctr_tabwidthinfo2	"Maksimalna a minimalna šyrokosć wótwisujotej wót TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Gódnoty pód 48px zawinuju zwětšego zmólki w pśedstajenju!">
-<!ENTITY Ctr_square_edges	"Squared top corners">
+<!ENTITY Ctr_square_edges	"Kwadratiske górne rožki">
+<!ENTITY Ctr_tttitlebar		"Rejtarkowy titel w titelowej rědce &brandShortName;">
 <!ENTITY Ctr_tabinsertion	"Pśiswójźbny rejtark za aktualnym rejtarkom zasunuś (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Prozny faworitowy symbol wótnowiś (jolic sedło njepóbitujo žeden)">
 <!ENTITY Ctr_noemptypticon	"Prozny faworitowy symbol z pśipětego rejtarka">
@@ -65,8 +67,8 @@
 <!ENTITY Ctr_closetab_3		"Na kóńcu rejtarkoweje rědki">
 <!ENTITY Ctr_closetab_4		"Na zachopjeńku rejtarkoweje rědki">
 <!ENTITY Ctr_closetab_5		"Na wšych rejtarkach (wunuźony)">
-<!ENTITY Ctr_closetab_hfot	"Za jaden widobny rejtar schowaś">
-<!ENTITY Ctr_closei_def		"Default icons">
+<!ENTITY Ctr_closetab_hfot	"Za jaden widobny rejtark schowaś">
+<!ENTITY Ctr_closei_def		"Standardne symbole">
 <!ENTITY Ctr_closeonleft	"Alternatiwna pozicija na rejtarku">
 <!ENTITY Ctr_close_wwltab	"Wokno ze slědnym widobnym rejtarkom zacyniś (about:config)">
 
@@ -80,7 +82,8 @@
 <!ENTITY Ctr_appbutton2		"Tłocašk na titelowej rědce [&brandShortName;]">
 <!ENTITY Ctr_appbutton2h	"Tłocašk na titelowej rědce (schowany)">
 <!ENTITY Ctr_appbutton2io	"Tłocašk na titelowej rědce [&brandShortName;] (jano symbol)">
-<!ENTITY Ctr_paneluibtweak	"Oranžowy menijowy tłocašk na rejtarkowej rědce">
+<!ENTITY Ctr_paneluibtweak	"Menijowy tłocašk ako nałožeński tłocašk pokazaś,...">
+<!ENTITY Ctr_paneluibtweak2	"...gaž jo na rejtarkowej rědce">
 <!ENTITY Ctr_appbuttonc_o	"Tłocaškowa barwa: Oranžowy (standard)">
 <!ENTITY Ctr_appbuttonc_a	"Tłocaškkowa barwa: Módry (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Tłocaškowa barwa: Carny (Nightly)">
@@ -96,7 +99,7 @@
 <!ENTITY Ctr_appbuttonI1e	"Njejo widobny w titelowej rědce Windows!">
 <!ENTITY Ctr_appbuttonI2	"Tłocaškowe barwy su jano widobne na titelowej rědce a rejtarkowej rědce!">
 <!ENTITY Ctr_appbutmhi		"Wuša pozicija (jolic jo na rejtarkowej rědce)">
-<!ENTITY Ctr_appbautocol	"Set default / Aurora / Nightly color automatically">
+<!ENTITY Ctr_appbautocol	"Barwu wobglědowakowego kanala awtomatiski nastajiś (standard/Aurora/Nightly)">
 <!ENTITY Ctr_appbutbdl		"Ramiki a slězynowe barwy schowaś">
 <!ENTITY Ctr_dblclclosefx	"Dwójne kliknjenje zacynja aktualne wokno">
 <!ENTITY Ctr_appbclmmenus	"Kliknjobne menije w tłocaškowem meniju (Nowy rejtark, Śišćaś...)">
@@ -112,8 +115,18 @@
 <!ENTITY Ctr_hide_bf_popup	"Meni historije pśez tłocenje myškoweje tasty schowaś">
 <!ENTITY Ctr_bf_space		"Rum mjazy tłocaškami reducěrowaś (jolic móžno)">
 <!ENTITY Ctr_noconicons		"Symbole kontekstowego menija boka pśez pomjenjenja wuměniś (slědk, dalej, stoj, znowego, bok ako cytańske znamje składowaś)">
+<!ENTITY Ctr_prefpage		"Bok nastajenjow">
+<!ENTITY Ctr_altoptionsd	"Standardny wenkowny naglěd">
+<!ENTITY Ctr_altoptionsp	"Alternatiwny wenkowny naglěd">
+<!ENTITY Ctr_altoptionsw	"Bok nastajenjow we woknje wócyniś">
+<!ENTITY Ctr_altoptionsww	"Šyrokosć">
+<!ENTITY Ctr_altoptionswh	"Wusokosć">
+<!ENTITY Ctr_altoptionsi	"Simulěrowane wokno nastajenjow wěcej njejo dialog, ale 'wobglědowakowe wokno', źož wšykne symbolowe rědki su schowane. Funkcija 'Aktualny bok wužywaś' pśidawa jano URL bokow, kótarež wócynjaju se w aktualnem woknje, kótarež jo w toś tom paźe 'about:preferences'. Tłocašk symboloweje rědki 'Nastajenja' wuměnja se pśez nowy, aby se nastajenja we woknje wócynili.">
+<!ENTITY Ctr_options_rem	"Kategoriju se spomnjeś, kótaraž jo se ako slědna wubrała">
 <!ENTITY Ctr_svgfilters		"SVG-barwy za symbole tłocaškow symbolowych rědkow">
 <!ENTITY Ctr_wincontrols	"Pśesuwajobne wóźeńske elementy połneje wobrazowki">
+<!ENTITY Ctr_oldtoplevimg	"Wobraze 'nejwušeje domeny': klasiski wenkowny naglěd">
+<!ENTITY Ctr_altalertbox	"'Warnowański kašćik': alternatiwny wenkowny naglěd">
 <!ENTITY Ctr_emptyfavicon2	"Prozny a dypkaty faworitowy symbol pśez łopjenowy symbol wuměniś">
 <!ENTITY Ctr_mstatusbar		"Pśesuwajobny wobcerk statusoweje rědki">
 <!ENTITY Ctr_mstatusbars4e	"Wobcerk statusoweje rědki kontrolěrujo se pśez 'Status-4-Evar'">
@@ -124,7 +137,10 @@
 <!ENTITY Ctr_stoprel1		"Wažny: Tłocašk Znowego za tłocaškom Stoj placěrowaś!">
 <!ENTITY Ctr_panelmenucol	"Pólowe menije: alternatiwna slězynowa barwa">
 <!ENTITY Ctr_hideprivmask	"Priwatny modus: maskowy pokazowaŕ schowaś">
-<!ENTITY Ctr_nbisizedelay	"Wuwjeźeńske wokomuźenje ms (1000 ms = 1 sekunda)">
+<!ENTITY Ctr_navsmallicons	"Małe symbole">
+<!ENTITY Ctr_navlargeicons	"Wjelike symbole">
+<!ENTITY Ctr_nbisizedelay0	"Wuwjeźeńske wokomuźenje">
+<!ENTITY Ctr_nbisizedelay	"ms (1000 ms = 1 sekunda)">
 <!ENTITY Ctr_findbar		"Pytańska rědka">
 <!ENTITY Ctr_findbar_def	"Standardna pozicija">
 <!ENTITY Ctr_findbar_top	"Górjejce">
@@ -136,25 +152,29 @@
 <!ENTITY Ctr_nav_txt_ico3	"Jano tekst pokazaś">
 <!ENTITY Ctr_nav_txt_exp	"Eksperimentelne atributy:">
 <!ENTITY Ctr_iat_notf_vt	"Wertikalne rědki wuzamknuś">
-<!ENTITY Ctr_cpanelmenus	"Kompaktne pólowe menije (cytańske znamjenja, historija atd.)">
+<!ENTITY Ctr_cpanelmenus	"Menijowe wuskokujuce wokna (cytańske znamjenja, historija atd.): kompaktny naglěd">
 <!ENTITY Ctr_hidezoomres	"Skalěrowańske elementy na symbolowej rědce: Tłocašk za slědkstajenje skalěrowanja schowaś">
-<!ENTITY Ctr_alt_newtabp	"Bok nowego rejtarka: alternatiwne wuglědanje">
+<!ENTITY Ctr_alt_newtabp	"Bok nowego rejtarka (about:newtab): alternatiwne wuglědanje">
+<!ENTITY Ctr_ctroldsearch	"Stare pytanje (eksperimentelne)">
 <!ENTITY Ctr_addonmanager	"Zastojnik dodankow">
-<!ENTITY Ctr_alt_addonsp	"Bok 'wěcej info' dodankow: alternatiwny naglěd">
-<!ENTITY Ctr_alt_addonsm	"Zastojnik dodankow: alternatiwny naglěd">
-<!ENTITY Ctr_am_nowarning	"Add-on managers add-on lists: hide warnings">
-<!ENTITY Ctr_addonversion	"Pśeglěd zastojnika dodankow: wersiju dodanka pokazaś">
-<!ENTITY Ctr_xpinstallui	"Add-on manager: old add-on install window (about:config preference)">
-<!ENTITY Ctr_bmbutpanelm	"Tłocašk menija cytańskich znamjenjow: naglěd dialogowego menija">
+<!ENTITY Ctr_alt_addonsp	"'Bok Dalšne info': alternatiwny pórěd">
+<!ENTITY Ctr_alt_addonsm	"Alternatiwny naglěd">
+<!ENTITY Ctr_am_nowarning	"Lisćiny dodankow: Warnowanja schowaś">
+<!ENTITY Ctr_am_compact		"Lisćiny dodankow: kompaktny naglěd">
+<!ENTITY Ctr_am_compact2	"Kompaktny naglěd +">
+<!ENTITY Ctr_addonversion	"Lisćiny dodankow: wersiju dodanka pokazaś">
+<!ENTITY Ctr_xpinstallui	"Stare dodankowe instalěrowańske wokno (nastajenje about:config)">
+<!ENTITY Ctr_bmbutpanelm	"Tłocašk menija cytańskich znamjenjow: naglěd menijowego wuskokujucego wokna">
 <!ENTITY Ctr_bmbutnotext	"Tłocašk menija cytańskich znamjenjow: tekst na rědce cytańskich znamjenjow schowaś">
 <!ENTITY Ctr_skipprintpr	"Śišćarski tłocašk: śišćarski pśeglěd pśeskócyś">
 <!ENTITY Ctr_tbconmenu		"Kontekstowy meni symboloweje rědki: 'do menija pśesunuś', 'ze symboloweje rědki wótpóraś', 'wšykne rejtaki znowego zacytaś/ako cytańske znamje składowaś' a 'rejtark zacyniś anulěrowaś' schowaś">
 <!ENTITY Ctr_noresizerxp	"Pśeměnjak wjelikosći schowaś (Windows XP)">
 <!ENTITY Ctr_extraurlkeycb	"Pśidatne adresowe pólo wócyniś (Cmd/Strg+">
-<!ENTITY Ctr_pmhidelabels	"Pólowy meni: Tekst tłocaškow schowaś">
+<!ENTITY Ctr_pmhidelabels	"Wuskokujuce wokno głownego menija: Tekst tłocaškow schowaś">
 <!ENTITY Ctr_menupopupscr	"Wuskokujuce menije: suwate rědki město suwatych šypkow pokazaś">
+<!ENTITY Ctr_closegeneral	"Powšykne zacynjańske symbole">
 
-<!ENTITY Ctr_tabsep_def		"Default tab separators">
+<!ENTITY Ctr_tabsep_def		"Standardne rejtarkowe źěleńske smužki">
 <!ENTITY Ctr_fxmockup		"Nacerjenje &brandShortName;">
 <!ENTITY Ctr_tabmokcolor	"Běła barwa za rejtarkowe tłocaški (zacyniś, nowy, kupki, wšykne nalicyś)">
 <!ENTITY Ctr_tabmokcolor2	"Běła barwa a śamna wóseń za tekst na njeaktiwnych rejtarkach">
@@ -190,19 +210,26 @@
 
 <!ENTITY Ctr_urlbar			"Adresowe pólo">
 <!ENTITY Ctr_starinurl		"Gwězdowy tłocašk">
+<!ENTITY Ctr_starinurlinfo	"Standardny tłocašk menija Cytańske znamjenja se schowajo">
 <!ENTITY Ctr_feedinurl		"Kanalowy tłocašk">
 <!ENTITY Ctr_hideurelstop	"Tłocaška Stoj a Znowego adresowych rědkow schowaś">
 <!ENTITY Ctr_hideurlgo		"Tłocašk 'Start' schowaś">
+<!ENTITY Ctr_hideurlsrg		"Źěleńske smužki a prozne znamjenja za tłocaški 'Znowego, stoj a Start' schowaś">
 <!ENTITY Ctr_urlbardropm	"Tłocašk na kóńc adresowego póla pśesunuś">
+<!ENTITY Ctr_altreaderico	"Alternatiwne 'cytakowe' symbole">
 <!ENTITY Ctr_hideprbutton	"Zdźěleński symbol schowaś, gaž wuskokujuce wokno se blokěrujo">
+<!ENTITY Ctr_locsearchbw10	"Wusokosć adresowych a pytańskich pólow reducěrowaś (eksperimentelne)">
 <!ENTITY Ctr_urlbar_ib		"Tłocašk sedłoweje identity">
-<!ENTITY Ctr_verifiedcolors	"Zeleny/módry identifikaciski kašćik za wobkšuśone websedła">
+<!ENTITY Ctr_ib_nohovcolor	"Šeru barwu pód kursorom myški njepokazaś">
+<!ENTITY Ctr_ib_graycolor	"Šera barwa za njeznate identitowe boki a boki chrome">
+<!ENTITY Ctr_verifiedcolors	"Tłocaškowe barwy za pśeglědane websedła, wěste a njewěste zwiski">
 <!ENTITY Ctr_faviconurl		"Faworitowy symbol">
-<!ENTITY Ctr_padlock_hid	"Pytkowy symbol (schowany)">
-<!ENTITY Ctr_padlock_def	"Pytkowy symbol (standard)">
-<!ENTITY Ctr_padlock_cla	"Pytkowy symbol (klasiski)">
-<!ENTITY Ctr_padlock_mod	"Pytkowy symbol (moderny)">
-<!ENTITY Ctr_padlock_ext	"Wěstotne symbole">
+<!ENTITY Ctr_padlock		"Pytkowy symbol za wěste zwiski">
+<!ENTITY Ctr_padlock_hid	"schowany">
+<!ENTITY Ctr_padlock_def	"standard">
+<!ENTITY Ctr_padlock_cla	"klasiski">
+<!ENTITY Ctr_padlock_mod	"moderny">
+<!ENTITY Ctr_padlock_ext	"Symbol '&brandShortName;' za płaśiwe boki 'about'">
 <!ENTITY Ctr_icopageinfo	"Kliknjenje na symbol wócynja wokno 'Info wó boku">
 
 <!ENTITY Ctr_menubar_items	"Pozicija menijowych zapiskow">
@@ -222,7 +249,7 @@
 <!ENTITY Ctr_mbarforceright	"Slědny element">
 
 <!ENTITY Ctr_toolbars		"Nastajenja symboloweje rědki">
-<!ENTITY Ctr_dblclnewtab	"Dwójne kliknjenje wócynja 'nowy' rejtark (z pomocu browser.newtab.url)">
+<!ENTITY Ctr_dblclnewtab	"Dwójne kliknjenje wócynja 'nowy' rejtark">
 <!ENTITY Ctr_hidetbwot		"Rejtarkowu rědku z jano jadnym rejtarkom schowaś">
 <!ENTITY Ctr_hidetbwote		"Wokomuźenje pśi startowanju reducěrowaś">
 <!ENTITY Ctr_hidetbwote_i	"To by mógło brachi na rejtarkowej rědce zawinowaś">
@@ -234,18 +261,24 @@
 <!ENTITY Ctr_alttabstb2		"W maksiměrowanem naglěźe (rejtarki górjejce)">
 
 <!ENTITY Ctr_altmenubar		"Slězynowu barwu pśidaś (titelowa rědka źěłowego systema)">
-<!ENTITY Ctr_altmenubarpos	"Alternatiwna pozicija (pód titeloweju rědku &brandShortName;)">
+<!ENTITY Ctr_altmenubarpos	"Alternatiwna pozicija">
+<!ENTITY Ctr_altmenubarpos2	"Pód titeloweju rědku &brandShortName;">
 <!ENTITY Ctr_menubarnofog	"Slězynowu barwu/młu wótpóraś (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Barwy 'Blue Aero' za głowne rědki a rejtarki">
-<!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color (Windows 10)">
-<!ENTITY Ctr_hidenavbar		"Nawigacisku rědku schowaś">
-<!ENTITY Ctr_nobookbarbg	"Rědka cytańskich znamjenjow: slězynowu barwu wótpóraś">
-<!ENTITY Ctr_bookbarfs		"Rědka cytańskich znamjenjow: w modusu połneje wobrazowki">
-<!ENTITY Ctr_nonavbarbg		"Nawigaciska rědka: slězynowu barwu wótpóraś">
+<!ENTITY Ctr_transpttbw10	"Titelowa/menijowa/rejtarkowa rědka: Slězynowu barwu wótpóraś">
+<!ENTITY Ctr_transpttbew10	"Pśidatne pólěpšenja za někotare drastwy źěłowego systema">
+<!ENTITY Ctr_transptcw10	"Standardne tłocaški Miniměrowaś/Maksiměrowaś/Zacyniś schowaś">
+<!ENTITY Ctr_hidenavbar		"Symbolowu rědku schowaś">
+<!ENTITY Ctr_navbarpad		"Pśidatny lěwa a pšawy nutśkowny wótstawk">
+<!ENTITY Ctr_navbarpad_l	"Nalěwo:">
+<!ENTITY Ctr_navbarpad_r	"Napšawo:">
+<!ENTITY Ctr_nobookbarbg	"Slězynowu barwu wótpóraś">
+<!ENTITY Ctr_bookbarfs		"W modusu połneje wobrazowki">
+<!ENTITY Ctr_nonavbarbg		"Slězynowu barwu wótpóraś">
 <!ENTITY Ctr_nonavbarbg1	"Wustatkujo se na pśidatne rědki a druge górne rědki.">
-<!ENTITY Ctr_nonavbarbg2	"Nastajenje ma wustatkowanje na wšykne rědki w pśedstajenju Slim dodanka 'The Fox, Only Better'.">
-<!ENTITY Ctr_nonavborder	"Rědka cytańskich znamjenjow: górny ramik symbolowej rědce pśidaś">
+<!ENTITY Ctr_nonavbarbg2	"Nastajenje ma wustatkowanje na wšykne rědki w pśedstajenju Slim dodanka 'Beyond Australis'.">
+<!ENTITY Ctr_nonavborder	"Górny ramik symbolowej rědce pśidaś">
 <!ENTITY Ctr_nonavtbborder	"Górne symbolowe rědki: ramiki symboloweje rědki wótpóraś">
 <!ENTITY Ctr_hidesbclose	"Bócnice: Tłocašk 'Zacyniś' bócnice schowaś">
 <!ENTITY Ctr_notextshadow	"Symbolowe rědki: seń za tekst symboloweje rědki a rejtarki schowaś">
@@ -257,7 +290,7 @@
 <!ENTITY Ctr_addonbarfs		"W modusu połneje wobrazowki">
 
 <!ENTITY Ctr_animation		"Animacija">
-<!ENTITY Ctr_tabthrobber	"Default loading image">
+<!ENTITY Ctr_tabthrobber	"Standardny zacytowański wobraz">
 <!ENTITY Ctr_bmanimation	"Animacija za 'Cytańske znamje pśidaś">
 <!ENTITY Ctr_pananimation	"Animacija za wócynjanje póla">
 <!ENTITY Ctr_tabanimation	"Animacija za zacynjanje/wócynjanje rejtarka (nastajenje about:config)">
@@ -276,12 +309,13 @@
 <!ENTITY Ctr_nodevtheme		"Zmóžnjenjeju 'wuwijarskeje drastwy' zajźowaś">
 
 <!ENTITY Ctr_experttweaks	"Rozšyrjone">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ jo 'nowy pytański pówjerch' zawjadł. Gaž znjemóžnijośo toś to nastajenje, wótnowijośo 'stary pytański pówjerch'.">
-<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ jo 'telefoněrowańske a konwersaciske' funkcije zawjadł. Gaž znjemóžnijośo toś to nastajenje, se wótpóraju.">
-<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ jo nowu 'wuwijarsku drastwu' zawjadł. Gaž znjemóžnijośo toś te nastajenja, se 'wuwijarska drastwa' a jeje tłocašk w pśiměrjeńskem modusu znjemóžnjatej.">
-<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ jo 'nastajenja w rejtarku' zawjadł. Gaž znjemóžnijośo toś to nastajenje, se stare wokno nastajenjow wótnowijo.">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ jo nowy 'cytański modus' zawjadł. Gaž toś te nastajenja se wótwoliju, znjemóžnijo se a jogo symbol wótpórajo se z adresowego póla.">
-<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ jo funkciju 'Pocket' zawjadł. Gaž toś to nastajenje se wótwolijo, se wóna znjemóžnijo a jeje tłocašk wótpórajo se ze symbolowych rědkow.">
+<!ENTITY Ctr_fx34search		"Gaž znjemóžnijośo toś to nastajenje, wótnowijośo 'stary pytański pówjerch'.">
+<!ENTITY Ctr_fx34loop		"Gaž znjemóžnijośo toś to nastajenje, se wótpóraju.">
+<!ENTITY Ctr_fx35devtheme	"Gaž znjemóžnijośo toś te nastajenja, se 'wuwijarska drastwa' a jeje tłocašk w pśiměrjeńskem modusu znjemóžnjatej.">
+<!ENTITY Ctr_fx36prefs		"Gaž znjemóžnijośo toś to nastajenje, se stare wokno nastajenjow wótnowijo.">
+<!ENTITY Ctr_fx36prefs2		"Glědajśo: Stare wokno nastajenjow njewopśimujo wšykne njedawno pśidane nastajenja wobglědowaka!">
+<!ENTITY Ctr_fx38reader		"Gaž toś te nastajenja se wótwoliju, znjemóžnijo se 'cytański modus' a jogo symbol wótpórajo se z adresowego póla.">
+<!ENTITY Ctr_fx38pocket		"Gaž toś to nastajenje se wótwolijo, funkcija 'Pocket' se znjemóžnijo a jeje tłocašk wótpórajo se ze symbolowych rědkow.">
 <!ENTITY Ctr_fx38pocket2	"Glědajśo: Pśez pśesuwanje tłocaška 'Pocket' do 'pśiměrjeńskego wokna' pśed znjemóžnjanim toś togo nastajenja wótpórajo teke zapiski 'Pocket' w menijoma cytańskich znamjenjow a cytańskego modusa.">
 <!ENTITY Ctr_e_searchui		"Pytański pówjerch">
 <!ENTITY Ctr_e_loop			"Telefoněrowanje a konwersacija">
@@ -289,8 +323,8 @@
 <!ENTITY Ctr_e_prefsui		"Nastajenja w rejtarku">
 <!ENTITY Ctr_e_readermode	"Cytański modus">
 <!ENTITY Ctr_e_pocket		"Pocket">
-<!ENTITY Ctr_e_tabsaudioico	"Audio playing icon on tabs">
-<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Unchecking this preference removes 'audio playing icon' from tabs.">
+<!ENTITY Ctr_e_tabsaudioico	"Symbol za awdiowótgrawanje na rejtarkach">
+<!ENTITY Ctr_fx42tabsaudico	"Gaž znjemóžnijośo toś to nastajenje, wótpórajo se 'symbol za awdiowótgrawanje' z rejtarkow.">
 
 
 <!ENTITY Ctr_pw_settings	"Nastajenja">
@@ -345,7 +379,6 @@
 <!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
 <!ENTITY ctr_Support_forums	"Support Forum">
 <!ENTITY ctr_help_features	"Features &amp; Information">
-<!ENTITY ctr_tabtitleintitlebar	"Add tab title to title-bar">
 
 <!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
 
@@ -399,3 +432,8 @@
 <!ENTITY movableurlbar.warning0 "Warning: This is a high level feature, If you move the URL-Bar to the panel UI menu or customize window and restart, It will break the browser.">
 <!ENTITY movableurlbar.warning1 "You must restore the URL-Bar to its default position before disabling.">
 <!ENTITY movableurlbar.warning2 "Use this feature with caution and at own risk.">
+
+<!ENTITY Ctr_tabthrobber_usecust.label "Use custom tab throbber">
+<!ENTITY Ctr_tabthrobber_custurlph.label "Throbber image url|path">
+
+<!ENTITY Ctr_animatelwtheme "Animate Animated light-weight themes on startup.">

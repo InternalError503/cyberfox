@@ -16,5 +16,5 @@ clearFilter.title=Confirmer l’effacement du filtre.
 clearFilter.msg=Êtes-vous certain de vouloir effacer le filtre ?
 popup_compatibility_title=Des problèmes de compatibilité ont été détectés !
 popup_compatibility_permenu=Voulez-vous activer le mode de compatibilité ? \n Sinon, veuillez désinstaller (CyberCTR) ou (Personal Menu) !
-notification_confirm_clear_title=Please confirm action!
-notification_confirm_clear=Are you sure you want to do this?
+notification_confirm_clear_title=Veuillez confirmer !
+notification_confirm_clear=Êtes-vous certain de vouloir faire cela ?

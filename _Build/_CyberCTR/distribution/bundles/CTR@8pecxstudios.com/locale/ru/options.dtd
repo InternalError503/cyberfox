@@ -15,6 +15,7 @@
 <!ENTITY Ctr_sidebarbutton	"Боковая панель">
 <!ENTITY Ctr_windowcontrols	"Свернуть/развернуть/закрыть (В полноэкранном режиме)">
 <!ENTITY Ctr_rr				"Перезапустите &brandShortName;!">
+<!ENTITY Ctr_window			"окно">
 
 <!ENTITY Ctr_cuibuttons		"Кнопки:">
 <!ENTITY Ctr_cuibutnormal	"Обычные">
@@ -45,7 +46,7 @@
 <!ENTITY Ctr_tabsontopI1	"Добавляет атрибут [tabsontop=true/false] для">
 <!ENTITY Ctr_tabsintitlebar	"Строка заголовка (about:config)">
 <!ENTITY Ctr_tabwidthdef	"(по умолчанию)">
-<!ENTITY Ctr_tabwidthcla	"(классич.)">
+<!ENTITY Ctr_tabwidthcla	"(классическая)">
 <!ENTITY Ctr_tabminheight	"Высота:">
 <!ENTITY Ctr_tabheightinfo	"Низкое значение вызовет сбои в развёрнутом режиме!">
 <!ENTITY Ctr_tabmaxwidth	"Макс. ширина:">
@@ -54,6 +55,7 @@
 <!ENTITY Ctr_tabwidthinfo2	"Минимальная и максимальная ширина вкладок изменяются расширением TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Значения ниже 48px часто приводят к сбоям!">
 <!ENTITY Ctr_square_edges	"Верхние углы без закругления">
+<!ENTITY Ctr_tttitlebar		"Название вкладки в панели вкладок &brandShortName;">
 <!ENTITY Ctr_tabinsertion	"Вставить соответствующую вкладку после текущей вкладки (about:config)">
 <!ENTITY Ctr_emptyfavicon	"Восстановить пустые значки на вкладках">
 <!ENTITY Ctr_noemptypticon	"Удалить пустой значок из прикреплённой вкладки">
@@ -79,7 +81,8 @@
 <!ENTITY Ctr_appbutton2		"в панели заголовка">
 <!ENTITY Ctr_appbutton2h	"в панели заголовка (скрыта)">
 <!ENTITY Ctr_appbutton2io	"в панели заголовка (только значки)">
-<!ENTITY Ctr_paneluibtweak	"Оранжевая кнопка меню на панели вкладок">
+<!ENTITY Ctr_paneluibtweak	"Отображать кнопку основного меню как 'Кнопку приложения'">
+<!ENTITY Ctr_paneluibtweak2	" ">
 <!ENTITY Ctr_appbuttonc_o	"Оранжевая кнопка (по умолчанию)">
 <!ENTITY Ctr_appbuttonc_a	"Синяя кнопка (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Черная кнопка (Nightly)">
@@ -111,8 +114,18 @@
 <!ENTITY Ctr_hide_bf_popup	"Не показывать меню истории при клике мышью">
 <!ENTITY Ctr_bf_space		"По возможности уменьшать промежуток между кнопками">
 <!ENTITY Ctr_noconicons		"Заменить значки в контекстном меню страницы метками (назад, вперёд, остановить, обновить, страница закладок)">
+<!ENTITY Ctr_prefpage		"Страница Настройки">
+<!ENTITY Ctr_altoptionsd	"Вид по умолчанию">
+<!ENTITY Ctr_altoptionsp	"Альтернативный вид">
+<!ENTITY Ctr_altoptionsw	"Открывать страницу «Настройки» в окне">
+<!ENTITY Ctr_altoptionsww	"Ширина">
+<!ENTITY Ctr_altoptionswh	"Высота">
+<!ENTITY Ctr_altoptionsi	"Окно настроек больше не является диалогом – теперь это полноценное 'окно браузера', в котором скрыты все панели инструментов. Опция 'Использовать текущие страницы' добавляет адреса открытых в текущем окне страниц, то есть в данном случае 'about:preferences'. Старая кнопка панели инструментов 'Настройки' заменяется новой, позволяющей открывать соответствующее окно">
+<!ENTITY Ctr_options_rem	"Запомнить последний выбор">
 <!ENTITY Ctr_svgfilters		"Цвета SVG для кнопок панели инструментов">
 <!ENTITY Ctr_wincontrols	"Подвижное управление полноэкранным режимом">
+<!ENTITY Ctr_oldtoplevimg	"Классический вид 'изображений доменов верхнего уровня'">
+<!ENTITY Ctr_altalertbox	"Альтернативный вид 'окна с предупреждением'">
 <!ENTITY Ctr_emptyfavicon2	"Установить общий значок (пустой и пунктирный)">
 <!ENTITY Ctr_mstatusbar		"Подвижная строка состояния">
 <!ENTITY Ctr_mstatusbars4e	"Панель статуса управляется переменной 'Status-4-Evar'">
@@ -123,7 +136,10 @@
 <!ENTITY Ctr_stoprel1		"Кнопка остановки  после остановки заменяется на панели инструментов кнопкой перезагрузки!">
 <!ENTITY Ctr_panelmenucol	"Альтернативный цвет фона для меню панели">
 <!ENTITY Ctr_hideprivmask	"Приватный просмотр: скрыть значок маски">
-<!ENTITY Ctr_nbisizedelay	"мс, задержка выполнения (1000 мс = 1 сек)">
+<!ENTITY Ctr_navsmallicons	"Маленькие значки">
+<!ENTITY Ctr_navlargeicons	"Большие значки">
+<!ENTITY Ctr_nbisizedelay0	"Задержка выполнения">
+<!ENTITY Ctr_nbisizedelay	"мс (1000 мс = 1 сек)">
 <!ENTITY Ctr_findbar		"Панель поиска">
 <!ENTITY Ctr_findbar_def	"Положение по умолчанию">
 <!ENTITY Ctr_findbar_top	"вверху">
@@ -137,11 +153,14 @@
 <!ENTITY Ctr_iat_notf_vt	"Исключить вертикальные панели инструментов">
 <!ENTITY Ctr_cpanelmenus	"Компактная панель меню (закладки, история и т. д.)">
 <!ENTITY Ctr_hidezoomres	"Кнопки масштаба: скрыть сброс масштабирования">
-<!ENTITY Ctr_alt_newtabp	"Страница новой вкладки: альтернативный вид">
+<!ENTITY Ctr_alt_newtabp	"Страница новой вкладки (about:newtab): альтернативный вид">
+<!ENTITY Ctr_ctroldsearch	"Старая форма поиска (экспериментально)">
 <!ENTITY Ctr_addonmanager	"Управление дополнениями">
 <!ENTITY Ctr_alt_addonsp	"Альтернативное представление страницы дополнительной информации о дополнениях">
 <!ENTITY Ctr_alt_addonsm	"Управление дополнениями: альтернативное представление">
 <!ENTITY Ctr_am_nowarning	"Список дополнений в менеджере: скрыть предупреждения">
+<!ENTITY Ctr_am_compact		"Компактный вид списка дополнений">
+<!ENTITY Ctr_am_compact2	"Компактный вид +">
 <!ENTITY Ctr_addonversion	"Отображать версии дополнений на странице 'Управление дополнениями'">
 <!ENTITY Ctr_xpinstallui	"Управление дополнениями: старый стиль окна установки дополнения (настройка в about:config)">
 <!ENTITY Ctr_bmbutpanelm	"Кнопка меню закладок: стиль отображения меню">
@@ -152,6 +171,7 @@
 <!ENTITY Ctr_extraurlkeycb	"Открыть дополнительную адресную строку (Cmd/Ctrl+">
 <!ENTITY Ctr_pmhidelabels	"Панель меню: спрятать надписи на кнопках">
 <!ENTITY Ctr_menupopupscr	"Всплывающие окна меню: показывать полосы прокрутки вместо стрелки прокрутки">
+<!ENTITY Ctr_closegeneral	"Общий вид значков 'Закрыть'">
 
 <!ENTITY Ctr_tabsep_def		"Разделители вкладок по умолчанию">
 <!ENTITY Ctr_fxmockup		"Другие настройки для &brandShortName;">
@@ -189,20 +209,27 @@
 
 <!ENTITY Ctr_urlbar			"Адресная строка">
 <!ENTITY Ctr_starinurl		"Звёздочка в адресной строке">
+<!ENTITY Ctr_starinurlinfo	"По умолчанию кнопка закладок в меню скрывается">
 <!ENTITY Ctr_feedinurl		"Кнопка RSS в адресной строке">
 <!ENTITY Ctr_hideurelstop	"Скрыть кнопку «Остановить и перезагрузить»">
-<!ENTITY Ctr_hideurlgo		"Скрыть кнопку 'Перейти'">
+<!ENTITY Ctr_hideurlgo		"Скрыть кнопку «Перейти»">
+<!ENTITY Ctr_hideurlsrg		"Скрыть промежутки и разделители между кнопками 'перезагрузить', 'остановить' и 'перейти'">
 <!ENTITY Ctr_urlbardropm	"Переместить дропмаркер в конец адресной строки">
+<!ENTITY Ctr_altreaderico	"Альтернативные иконки 'Режима чтения'">
 <!ENTITY Ctr_hideprbutton	"Скрыть значок уведомления, когда блокируется всплывающее окно">
+<!ENTITY Ctr_locsearchbw10	"Уменьшить высоту панелей адреса и поиска (экспериментально)">
 <!ENTITY Ctr_urlbar_ib		"Кнопка подлинности сайта">
-<!ENTITY Ctr_verifiedcolors	"Зелёный и синий индикатор для достоверных сайтов">
+<!ENTITY Ctr_ib_nohovcolor	"Не отображать серый цвет при зависании">
+<!ENTITY Ctr_ib_graycolor	"Серый цвет для сайтов неизвестной подлинности и сайтов chrome">
+<!ENTITY Ctr_verifiedcolors	"Цвета кнопок для проверенных сайтов, надежных и ненадежных соединений">
 <!ENTITY Ctr_faviconurl		"Значок в адресной строке">
+<!ENTITY Ctr_padlock		"Замок">
 <!ENTITY Ctr_padlock_hid	"Скрыть замок">
-<!ENTITY Ctr_padlock_def	"Замок (по умолчанию)">
-<!ENTITY Ctr_padlock_cla	"Замок (классический)">
-<!ENTITY Ctr_padlock_mod	"Замок (модерн)">
-<!ENTITY Ctr_padlock_ext	"Значки безопасности">
-<!ENTITY Ctr_icopageinfo	"Клик по значку открывает окно 'Информация о странице'">
+<!ENTITY Ctr_padlock_def	"по умолчанию">
+<!ENTITY Ctr_padlock_cla	"классический">
+<!ENTITY Ctr_padlock_mod	"модерн">
+<!ENTITY Ctr_padlock_ext	"Иконка '&brandShortName;' для корректных страниц 'about'">
+<!ENTITY Ctr_icopageinfo	"Нажатие на иконку открывает «Информацию о странице»">
 
 <!ENTITY Ctr_menubar_items	"Позиция пунктов меню">
 <!ENTITY Ctr_extrabar		"Дополнительные панели инструментов">
@@ -233,17 +260,23 @@
 <!ENTITY Ctr_alttabstb2		"В развернутом режиме (вкладки сверху)">
 
 <!ENTITY Ctr_altmenubar		"Добавить цвет фона в строку заголовка операционной системы">
-<!ENTITY Ctr_altmenubarpos	"Изменить расположение (ниже строки заголовка &brandShortName;)">
+<!ENTITY Ctr_altmenubarpos	"Изменить расположение">
+<!ENTITY Ctr_altmenubarpos2	"Ниже строки заголовка &brandShortName;">
 <!ENTITY Ctr_menubarnofog	"Удалить туман из фона меню (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Цвета Blue Aero для основных панелей и вкладок">
-<!ENTITY Ctr_transpttbw10	"Панели заголовка/меню/вкладок: убрать цвет фона (Windows 10)">
+<!ENTITY Ctr_transpttbw10	"Панели заголовка/меню/вкладок: убрать цвет фона">
+<!ENTITY Ctr_transpttbew10	"Дополнительные опции для некоторых тем оформления ОС">
+<!ENTITY Ctr_transptcw10	"Скрыть стандартные кнопки ОС (Свернуть, Развернуть, Закрыть)">
 <!ENTITY Ctr_hidenavbar		"Скрыть панель навигации">
+<!ENTITY Ctr_navbarpad		"Дополнительные отступы слева и справа">
+<!ENTITY Ctr_navbarpad_l	"Слева:">
+<!ENTITY Ctr_navbarpad_r	"Справа:">
 <!ENTITY Ctr_nobookbarbg	"Панель закладок: удалить цвет фона">
 <!ENTITY Ctr_bookbarfs		"Панель закладок: в полноэкранном режиме">
 <!ENTITY Ctr_nonavbarbg		"Панель навигации: удалить цвет фона">
 <!ENTITY Ctr_nonavbarbg1	"Параметр влияет на все дополнительные и верхние панели инструментов.">
-<!ENTITY Ctr_nonavbarbg2	"Поддержка всех панелей инструментов в стиле Slim Chrome при использовании расширения 'The Fox, Only Better'.">
+<!ENTITY Ctr_nonavbarbg2	"Поддержка всех панелей инструментов в стиле Slim Chrome при использовании расширения «Beyond Australis».">
 <!ENTITY Ctr_nonavborder	"Панель закладок: добавить верхнюю границу для панели инструментов">
 <!ENTITY Ctr_nonavtbborder	"Популярные панели инструментов: удалить границы панелей инструментов">
 <!ENTITY Ctr_hidesbclose	"Боковые панели: скрыть кнопку «Закрыть» на боковой панели">
@@ -279,6 +312,7 @@
 <!ENTITY Ctr_fx34loop		"&brandShortName; версий 34 и выше добавлен клиент для связи в режиме реального времени. Отключение параметра удаляет эту функцию.">
 <!ENTITY Ctr_fx35devtheme	"&brandShortName; версий 35 и выше введена новая «Тема разработчика». Отключение параметра удаляет её и соответствующую кнопку в режиме «Настройка».">
 <!ENTITY Ctr_fx36prefs		"&brandShortName; версий 36 и выше настройки отображаются в новой вкладке. Если отключить этот параметр, восстанавливается старое окно настроек.">
+<!ENTITY Ctr_fx36prefs2		"Внимание: В старом окне настроек отсутствуют некоторые из недавно добавленных опций!">
 <!ENTITY Ctr_fx38reader		"&brandShortName; версий 38 и выше представлен новый «режим чтения». Отключение этой опции выключает его и убирает иконку с адресной панели.">
 <!ENTITY Ctr_fx38pocket      "В &brandShortName; версий 38.0.5 и выше введена новая функция 'Карман'. Отключение данной настройки отключает эту функцию и удаляет кнопку с панели инструментов.">
 <!ENTITY Ctr_fx38pocket2	"Заметка: Перемещение кнопки 'Pocket' в 'персонализацию палитры' до отключения этой опции также удаляет вхождения 'Pocket' из закладок и меню читателя.">
@@ -289,7 +323,7 @@
 <!ENTITY Ctr_e_readermode	"Режим чтения">
 <!ENTITY Ctr_e_pocket		"Карман">
 <!ENTITY Ctr_e_tabsaudioico	"Значок проигрывания аудио на вкладках">
-<!ENTITY Ctr_fx42tabsaudico	"&brandShortName; 42+: Снимите галочку для удаления с вкладок значка 'проигрывание аудио'.">
+<!ENTITY Ctr_fx42tabsaudico	"Снимите галочку для удаления с вкладок значка 'проигрывание аудио'.">
 
 
 <!ENTITY Ctr_pw_settings	"Настройки">
@@ -344,7 +378,6 @@
 <!ENTITY Ctr_pw_set_preaust		"Оформление Australis">
 <!ENTITY ctr_Support_forums	"Форум поддержки">
 <!ENTITY ctr_help_features	"Информация и возможности">
-<!ENTITY ctr_tabtitleintitlebar	"Добавить название вкладки в заголовок окна">
 
 <!ENTITY Ctr_custtabfontsize.label   "Размер шрифта вкладок: ">
 
@@ -398,3 +431,8 @@
 <!ENTITY movableurlbar.warning0 "Внимание! Это высокоуровневая функция: если переместить адресную строку в панель меню или окно персонализации, а затем перезапустить браузер, возникнут серьезные неполадки в работе браузера.">
 <!ENTITY movableurlbar.warning1 "Перед отключением необходимо вернуть адресную строку на место.">
 <!ENTITY movableurlbar.warning2 "Используйте эту функцию осторожно, на свой страх и риск.">
+
+<!ENTITY Ctr_tabthrobber_usecust.label "Использовать свой индикатор загрузки вкладки">
+<!ENTITY Ctr_tabthrobber_custurlph.label "Ссылка или путь к файлу с изображением индикатора загрузки вкладки">
+
+<!ENTITY Ctr_animatelwtheme "Анимация легких тем оформления при запуске.">
