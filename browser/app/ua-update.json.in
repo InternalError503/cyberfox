@@ -3,8 +3,8 @@
 // Send these sites a custom user-agent. Bugs should be included with an entry.
 // All entries marked with * need incrementing each core update.
 {
-  // Netflix  *
-  "netflix.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0",
+  // Netflix  * (Additional netflix is really being a royal pain with firefox user-agent)
+  "netflix.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0",
   // Battlelog *
   "battlefield.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0",
   // Sourceforge *
