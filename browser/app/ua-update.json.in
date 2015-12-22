@@ -8,5 +8,7 @@
   // Battlelog *
   "battlefield.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0",
   // Sourceforge *
-  "sourceforge.net": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36"
+  "sourceforge.net": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36",
+  // discordapp * (There sites javascript breaks with cyberfox user-agent 1. only allows WOW64 2. can't have the cyberfox slice.
+  "discordapp.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0"
 }
