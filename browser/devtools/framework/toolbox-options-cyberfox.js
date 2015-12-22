@@ -2,9 +2,9 @@
 	
 const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
-let {Services} = Cu.import("resource://gre/modules/Services.jsm");
-let {FileUtils} = Cu.import("resource://gre/modules/FileUtils.jsm");
-let {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
+var {Services} = Cu.import("resource://gre/modules/Services.jsm");
+var {FileUtils} = Cu.import("resource://gre/modules/FileUtils.jsm");
+var {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 
 if (typeof gCustomOptionsPanel == "undefined") {
     var gCustomOptionsPanel = {};
@@ -14,21 +14,10 @@ if (!gCustomOptionsPanel) {
 };
 
 var gCustomOptionsPanel = {
-		panelPopUpOther : "",
-		agentID : "",
-		agentOS : "",
-		agentVersion : "",
-		agentArch: "",
 
     init: function(e) {
 
         try {
-			
-            this.panelPopUpOther = document.getElementById("devtools-agent-options-other");
-            this.agentID = document.getElementById("devtools-agent-menu");
-			this.agentOS = document.getElementById("devtools-agent-os");
-			this.agentVersion = document.getElementById("devtools-agent-version");
-			this.agentArch = document.getElementById("devtools-agent-arch");
 
             //Get, Load and parse agents.json	
             var jsonFile = FileUtils.getFile("CurProcD", ["agents.json"]);
@@ -53,7 +42,7 @@ var gCustomOptionsPanel = {
 
                 if (!gCustomOptionsPanel.IsJsonValid(jsonContent)) {
                     //Need to throw error message and disable agentID if not valid json.
-                    this.agentID.disabled = true;
+                    document.getElementById("devtools-agent-menu").disabled = true;
                     console.log("Were sorry but something has gone wrong while trying to parse agents.json (json is not valid!)");
                     return;
                 } else {
@@ -75,10 +64,10 @@ var gCustomOptionsPanel = {
 
             });
             //Only if known in list will it show only in current panel session, all other cases select user-agent item is set.
-            this.agentID.label = window.navigator.userAgent;
+            document.getElementById("devtools-agent-menu").label = window.navigator.userAgent;
 
-            this.panelPopUpOther.value = "";
-            this.panelPopUpOther.value = window.navigator.userAgent;
+           document.getElementById("devtools-agent-options-other").value = "";
+           document.getElementById("devtools-agent-options-other").value = window.navigator.userAgent;
 
 
         } catch (e) {
@@ -107,9 +96,9 @@ var gCustomOptionsPanel = {
 
     itemSelectedChanged: function() {
         try {
-            Services.prefs.setCharPref("general.useragent.override", this.agentID.value);
-            this.panelPopUpOther.value = this.agentID.value;
-			if(this.agentID.label === "Cyberfox (Configurable)" || this.agentID.label === "Firefox (Configurable)"){
+            Services.prefs.setCharPref("general.useragent.override", document.getElementById("devtools-agent-menu").value);
+            document.getElementById("devtools-agent-options-other").value = document.getElementById("devtools-agent-menu").value;
+			if(document.getElementById("devtools-agent-menu").label === "Cyberfox (Configurable)" || document.getElementById("devtools-agent-menu").label === "Firefox (Configurable)"){
 				document.getElementById("configurableAgent").hidden = false;
 			}else{
 				document.getElementById("configurableAgent").hidden = true;
@@ -123,17 +112,17 @@ var gCustomOptionsPanel = {
 	
     configurableAgentChanged: function() {
         try {
-			switch (this.agentID.label) {
+			switch (document.getElementById("devtools-agent-menu").label) {
 				case "Cyberfox (Configurable)":
-					var newAgent = "Mozilla/5.0 (Windows NT "+this.agentOS.value+"; "+this.agentArch.value+" rv:"+this.agentVersion.value+") Gecko/20100101 Firefox/"+this.agentVersion.value+" Cyberfox/"+this.agentVersion.value;
+					var newAgent = "Mozilla/5.0 (Windows NT "+document.getElementById("devtools-agent-os").value+"; "+document.getElementById("devtools-agent-arch").value+" rv:"+document.getElementById("devtools-agent-version").value+") Gecko/20100101 Firefox/"+document.getElementById("devtools-agent-version").value+" Cyberfox/"+document.getElementById("devtools-agent-version").value;
 					Services.prefs.setCharPref("general.useragent.override", newAgent);
-					this.panelPopUpOther.value = newAgent;
+					document.getElementById("devtools-agent-options-other").value = newAgent;
 				break;
 				
 				case "Firefox (Configurable)":
-					var newAgent = "Mozilla/5.0 (Windows NT "+this.agentOS.value+"; "+this.agentArch.value+" rv:"+this.agentVersion.value+") Gecko/20100101 Firefox/"+this.agentVersion.value;
+					var newAgent = "Mozilla/5.0 (Windows NT "+document.getElementById("devtools-agent-os").value+"; "+document.getElementById("devtools-agent-arch").value+" rv:"+document.getElementById("devtools-agent-version").value+") Gecko/20100101 Firefox/"+document.getElementById("devtools-agent-version").value;
 					Services.prefs.setCharPref("general.useragent.override", newAgent);
-					this.panelPopUpOther.value = newAgent;
+					document.getElementById("devtools-agent-options-other").value = newAgent;
 				break;
 				
 			}
@@ -148,8 +137,8 @@ var gCustomOptionsPanel = {
     restoreDefaultUserAgent: function() {
         try {
             Services.prefs.clearUserPref("general.useragent.override");
-            this.panelPopUpOther.value = "";
-            this.panelPopUpOther.value = window.navigator.userAgent;
+            document.getElementById("devtools-agent-options-other").value = "";
+            document.getElementById("devtools-agent-options-other").value = window.navigator.userAgent;
             this.hideOtherUserAgent();
         } catch (e) {
             //Catch any nasty errors and output to dialogue and console
@@ -159,7 +148,7 @@ var gCustomOptionsPanel = {
 
     applyOtherUserAgent: function() {
         try {
-            Services.prefs.setCharPref("general.useragent.override", panelPopUpOther.value);
+            Services.prefs.setCharPref("general.useragent.override", document.getElementById("devtools-agent-options-other").value);
             this.hideOtherUserAgent();
         } catch (e) {
             //Catch any nasty errors and output to dialogue and console
