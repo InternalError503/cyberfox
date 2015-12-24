@@ -1821,6 +1821,11 @@ pref("media.gmp-eme-adobe.enabled", false);
 pref("browser.eme.ui.enabled", false);
 pref("media.gmp.trial-create.enabled", false);
 
+pref("media.youtube-ua.override", true);
+pref("media.youtube-ua.override.from", "43");
+pref("media.youtube-ua.override.to", "42");
+
+
 // Play with different values of the decay time and get telemetry,
 // 0 means to randomize (and persist) the experiment value in users' profiles,
 // -1 means no experiment is run and we use the preferred value for frecency (6h)
