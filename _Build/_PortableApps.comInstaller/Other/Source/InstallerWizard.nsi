@@ -20,9 +20,9 @@
 ;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 !define APPNAME "PortableApps.com Installer"
-!define VER "3.0.19.0"
+!define VER "3.0.20.0"
 !define WEBSITE "PortableApps.com/Installer"
-!define FRIENDLYVER "3.0.19"
+!define FRIENDLYVER "3.0.20"
 !define PORTABLEAPPS.COMFORMATVERSION "3.0"
 
 ;=== Program Details

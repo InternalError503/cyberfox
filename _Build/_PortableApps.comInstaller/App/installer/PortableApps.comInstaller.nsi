@@ -24,8 +24,8 @@
 ;as published at PortableApps.com/development. It may also be used with commercial
 ;software by contacting PortableApps.com.
 
-!define PORTABLEAPPSINSTALLERVERSION "3.0.19.0"
-!define PORTABLEAPPS.COMFORMATVERSION "3.0.19"
+!define PORTABLEAPPSINSTALLERVERSION "3.0.20.0"
+!define PORTABLEAPPS.COMFORMATVERSION "3.0.20"
 
 !if ${__FILE__} == "PortableApps.comInstallerPlugin.nsi"
 	!include PortableApps.comInstallerPluginConfig.nsh
