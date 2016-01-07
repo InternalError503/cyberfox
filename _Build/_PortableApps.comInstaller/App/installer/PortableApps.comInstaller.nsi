@@ -394,7 +394,7 @@ Function .onInit
 			${IfNot} ${Errors}
 				StrCpy $INSTDIR "$0${APPID}_Copy_$1"
 			${Else}
-				StrCpy $INSTDIR "$0${APPID}"
+				StrCpy $INSTDIR "$0"
 			${EndIf}
 		!endif
 
