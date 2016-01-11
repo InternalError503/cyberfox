@@ -394,7 +394,14 @@ Function .onInit
 			${IfNot} ${Errors}
 				StrCpy $INSTDIR "$0${APPID}_Copy_$1"
 			${Else}
-				StrCpy $INSTDIR "$0"
+				${If} ${FileExists} `$0\PortableApps.com\PortableAppsPlatform.exe`
+					FindProcDLL::FindProc "PortableAppsPlatform.exe"
+						${If} $R0 == 1
+							StrCpy $INSTDIR "$0${APPID}"
+						${EndIf}	
+				${Else}
+					StrCpy $INSTDIR "$0"
+				${EndIf}	
 			${EndIf}
 		!endif
 
