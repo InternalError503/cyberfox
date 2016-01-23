@@ -6,18 +6,62 @@ Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: st
 Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
+;Generate Windows default programs information x86.
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "Cyberfox delivers safe, easy web browsing. A familiar user interface, enhanced security features including protection from online identity theft, and integrated search let you get the most out of the web."; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities"; ValueType: string; ValueName: "ApplicationIcon"; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities"; ValueType: string; ValueName: "ApplicationName"; ValueData: "{#MyAppName}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".htm"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".html"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".shtml"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".xht"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".xhtml"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: "StartMenuInternet"; ValueData: "{#MyAppExeName}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\URLAssociations"; ValueType: string; ValueName: "ftp"; ValueData: "CyberfoxURL"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\URLAssociations"; ValueType: string; ValueName: "http"; ValueData: "CyberfoxURL"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\URLAssociations"; ValueType: string; ValueName: "https"; ValueData: "CyberfoxURL"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: string; ValueName: "HideIconsCommand"; ValueData: "{app}\uninstall\helper.exe /HideShortcuts"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: string; ValueName: "ShowIconsCommand"; ValueData: "{app}\uninstall\helper.exe /ShowShortcuts"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: string; ValueName: "ReinstallCommand"; ValueData: "{app}\uninstall\helper.exe /SetAsDefaultAppGlobal"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: dword; ValueName: "IconsVisible"; ValueData: "$00000000"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties";ValueType: string;  ValueData: "{#MyAppName} &Options"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties\command"; ValueType: string;  ValueData: "{app}\{#MyAppExeName}  -preferences"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName} &Safe Mode"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName}  -safe-mode"; Flags: uninsdeletekey
 #elif Arch == "amd64"
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
+;Generate Windows default programs information x64.
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "Cyberfox delivers safe, easy web browsing. A familiar user interface, enhanced security features including protection from online identity theft, and integrated search let you get the most out of the web."; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities"; ValueType: string; ValueName: "ApplicationIcon"; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities"; ValueType: string; ValueName: "ApplicationName"; ValueData: "{#MyAppName}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".htm"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".html"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".shtml"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".xht"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".xhtml"; ValueData: "CyberfoxHTML"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: string; ValueName: "StartMenuInternet"; ValueData: "{#MyAppExeName}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\URLAssociations"; ValueType: string; ValueName: "ftp"; ValueData: "CyberfoxURL"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\URLAssociations"; ValueType: string; ValueName: "http"; ValueData: "CyberfoxURL"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\URLAssociations"; ValueType: string; ValueName: "https"; ValueData: "CyberfoxURL"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: string; ValueName: "HideIconsCommand"; ValueData: "{app}\uninstall\helper.exe /HideShortcuts"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: string; ValueName: "ShowIconsCommand"; ValueData: "{app}\uninstall\helper.exe /ShowShortcuts"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: string; ValueName: "ReinstallCommand"; ValueData: "{app}\uninstall\helper.exe /SetAsDefaultAppGlobal"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: dword; ValueName: "IconsVisible"; ValueData: "$00000000"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties";ValueType: string;  ValueData: "{#MyAppName} &Options"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties\command"; ValueType: string;  ValueData: "{app}\{#MyAppExeName}  -preferences"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName} &Safe Mode"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName}  -safe-mode"; Flags: uninsdeletekey
 #endif
 Root: "HKCR"; Subkey: "{#MyAppName}HTML"; ValueType: none; Flags: dontcreatekey uninsdeletekey
 Root: "HKCR"; Subkey: "{#MyAppName}URL"; ValueType: none; Flags: dontcreatekey uninsdeletekey
-Root: "HKLM"; Subkey: "SOFTWARE\Clients\StartMenuInternet\{#MyAppExeName}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
-#if Arch == "amd64"
-Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\Clients\StartMenuInternet\{#MyAppExeName}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
-#endif
 Root: "HKCU"; Subkey: "SOFTWARE\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
 #endif

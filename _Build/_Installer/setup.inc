@@ -17,6 +17,11 @@ AppName={#MyAppName}
 #endif
 #endif
 #define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\"+SetupSetting("AppId")+"_is1"
+#if Arch == "i368"
+#define RegPath "SOFTWARE\Clients\StartMenuInternet"
+#else
+#define RegPath "SOFTWARE\Wow6432Node\Clients\StartMenuInternet"
+#endif
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
