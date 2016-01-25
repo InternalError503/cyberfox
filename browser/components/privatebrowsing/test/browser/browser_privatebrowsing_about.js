@@ -46,12 +46,12 @@ function* testLinkOpensUrl({ win, tab, elementId, expectedUrl }) {
  */
 add_task(function* test_links() {
   // Use full version and change the remote URLs to prevent network access.
-  Services.prefs.setCharPref("app.support.baseURL", "https://example.com/");
+  Services.prefs.setCharPref("app.helpdoc.baseURI", "https://example.com/");
   Services.prefs.setCharPref("privacy.trackingprotection.introURL",
                              "https://example.com/tour");
   registerCleanupFunction(function () {
     Services.prefs.clearUserPref("privacy.trackingprotection.introURL");
-    Services.prefs.clearUserPref("app.support.baseURL");
+    Services.prefs.clearUserPref("app.helpdoc.baseURI");
   });
 
   let { win, tab } = yield openAboutPrivateBrowsing();

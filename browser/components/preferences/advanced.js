@@ -9,7 +9,6 @@ Components.utils.import("resource://gre/modules/ctypes.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/LoadContextInfo.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/BrowserUtils.jsm");
 Components.utils.import("resource://gre/modules/AppConstants.jsm");
 
 var gAdvancedPane = {
@@ -31,12 +30,7 @@ var gAdvancedPane = {
 		Services.prefs.setBoolPref("app.update.autocheck", false);
 		Services.prefs.setBoolPref("app.update.check.enabled", false);		
 	}
-	
-    //If windows vista disable & hide Hardware acceleration.
-    if (AppConstants.platform == "win" && !AppConstants.isPlatformAndVersionAtLeast("win", "6.0")) {
-		  document.getElementById('allowHWAccel').hidden=true;	
-	}
-  
+
     var extraArgs = window.arguments[1];
     if (extraArgs && extraArgs["advancedTab"]){
       advancedPrefs.selectedTab = document.getElementById(extraArgs["advancedTab"]);
@@ -352,7 +346,9 @@ var gAdvancedPane = {
       ])
     };
 
-    actualSizeLabel.textContent = prefStrBundle.getString("actualDiskCacheSizeCalculated");
+    try{
+        actualSizeLabel.textContent = prefStrBundle.getString("actualDiskCacheSizeCalculated");
+    } catch (e) {}
 
     try {
       var cacheService =
@@ -559,7 +555,7 @@ var gAdvancedPane = {
     var list = document.getElementById("offlineAppsList");
     var item = list.selectedItem;
     var origin = item.getAttribute("origin");
-    var principal = BrowserUtils.principalFromOrigin(origin);
+    var principal = Services.scriptSecurityManager.createCodebasePrincipalFromOrigin(origin);
 
     var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                             .getService(Components.interfaces.nsIPromptService);

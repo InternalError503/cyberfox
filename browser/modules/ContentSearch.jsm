@@ -15,9 +15,6 @@ Cu.import("resource://gre/modules/Promise.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
-  "resource://gre/modules/AppConstants.jsm");
-
 XPCOMUtils.defineLazyModuleGetter(this, "FormHistory",
   "resource://gre/modules/FormHistory.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
@@ -59,6 +56,8 @@ const MAX_SUGGESTIONS = 6;
  *     data: the entry, a string
  *   Search
  *     Performs a search.
+ *     Any GetSuggestions messages in the queue from the same target will be
+ *     cancelled.
  *     data: { engineName, searchString, healthReportKey, searchPurpose }
  *   SetCurrentEngine
  *     Sets the current engine.
@@ -84,6 +83,10 @@ const MAX_SUGGESTIONS = 6;
  *   Suggestions
  *     Sent in reply to GetSuggestions.
  *     data: see _onMessageGetSuggestions
+ *   SuggestionsCancelled
+ *     Sent in reply to GetSuggestions when pending GetSuggestions events are
+ *     cancelled.
+ *     data: null
  */
 
 this.ContentSearch = {
@@ -101,6 +104,10 @@ this.ContentSearch = {
   // Resolved when we finish shutting down.
   _destroyedPromise: null,
 
+  // The current controller and browser in _onMessageGetSuggestions.  Allows
+  // fetch cancellation from _cancelSuggestions.
+  _currentSuggestion: null,
+
   init: function () {
     Cc["@mozilla.org/globalmessagemanager;1"].
       getService(Ci.nsIMessageListenerManager).
@@ -117,7 +124,7 @@ this.ContentSearch = {
     }
     this._searchSuggestionUIStrings = {};
     let searchBundle = Services.strings.createBundle("chrome://browser/locale/search.properties");
-    let stringNames = ["searchHeader", "searchPlaceholder", "searchForKeywordsWith",
+    let stringNames = ["searchHeader", "searchPlaceholder", "searchForSomethingWith",
                        "searchWithHeader", "searchSettings"];
     for (let name of stringNames) {
       this._searchSuggestionUIStrings[name] = searchBundle.GetStringFromName(name);
@@ -168,6 +175,12 @@ this.ContentSearch = {
     };
     msg.target.addEventListener("SwapDocShells", msg, true);
 
+    // Search requests cause cancellation of all Suggestion requests from the
+    // same browser.
+    if (msg.data.type == "Search") {
+      this._cancelSuggestions(msg);
+    }
+
     this._eventQueue.push({
       type: "Message",
       data: msg,
@@ -209,6 +222,27 @@ this.ContentSearch = {
         this._processEventQueue();
       }
     }.bind(this));
+  },
+
+  _cancelSuggestions: function (msg) {
+    let cancelled = false;
+    // cancel active suggestion request
+    if (this._currentSuggestion && this._currentSuggestion.target == msg.target) {
+      this._currentSuggestion.controller.stop();
+      cancelled = true;
+    }
+    // cancel queued suggestion requests
+    for (let i = 0; i < this._eventQueue.length; i++) {
+      let m = this._eventQueue[i].data;
+      if (msg.target == m.target && m.data.type == "GetSuggestions") {
+        this._eventQueue.splice(i, 1);
+        cancelled = true;
+        i--;
+      }
+    }
+    if (cancelled) {
+      this._reply(msg, "SuggestionsCancelled");
+    }
   },
 
   _onMessage: Task.async(function* (msg) {
@@ -269,10 +303,6 @@ this.ContentSearch = {
       };
       win.openUILinkIn(submission.uri.spec, where, params);
     }
-	if (AppConstants.MOZ_SERVICES_HEALTHREPORT) {
-    win.BrowserSearch.recordSearchInHealthReport(engine, data.healthReportKey,
-                                                 data.selection || null);
-  }
     return Promise.resolve();
   },
 
@@ -307,7 +337,14 @@ this.ContentSearch = {
     let priv = PrivateBrowsingUtils.isBrowserPrivate(msg.target);
     // fetch() rejects its promise if there's a pending request, but since we
     // process our event queue serially, there's never a pending request.
+    this._currentSuggestion = { controller: controller, target: msg.target };
     let suggestions = yield controller.fetch(data.searchString, priv, engine);
+    this._currentSuggestion = null;
+
+    // suggestions will be null if the request was cancelled
+    if (!suggestions) {
+      return;
+    }
 
     // Keep the form history result so RemoveFormHistoryEntry can remove entries
     // from it.  Keeping only one result isn't foolproof because the client may

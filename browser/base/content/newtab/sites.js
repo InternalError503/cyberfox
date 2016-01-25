@@ -127,9 +127,14 @@ Site.prototype = {
     let link = this._querySelector(".newtab-link");
     link.setAttribute("title", tooltip);
     link.setAttribute("href", url);
-    this._querySelector(".newtab-title").textContent = title;
     this.node.setAttribute("type", this.link.type);
 
+    let titleNode = this._querySelector(".newtab-title");
+    titleNode.textContent = title;
+    if (this.link.titleBgColor) {
+      titleNode.style.backgroundColor = this.link.titleBgColor;
+    }
+	
     if (this.isPinned())
       this._updateAttributes(true);
     // Capture the page if the thumbnail is missing, which will cause page.js

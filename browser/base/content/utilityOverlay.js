@@ -189,6 +189,7 @@ function whereToOpenLink( e, ignoreButton, ignoreAlt )
  *   skipTabAnimation     (boolean)
  *   allowPinnedTabHostChange (boolean)
  *   allowPopups          (boolean)
+ *   userContextId        (unsigned int)
  */
 function openUILinkIn(url, where, aAllowThirdPartyFixup, aPostData, aReferrerURI) {
   var params;
@@ -232,6 +233,8 @@ function openLinkIn(url, where, params) {
   var aAllowPinnedTabHostChange = !!params.allowPinnedTabHostChange;
   var aNoReferrer           = params.noReferrer;
   var aAllowPopups          = !!params.allowPopups;
+  var aUserContextId        = params.userContextId;
+  var aIndicateErrorPageLoad = params.indicateErrorPageLoad;
 
   if (where == "save") {
     if (!aInitiatingDoc) {
@@ -351,6 +354,9 @@ function openLinkIn(url, where, params) {
     if (aAllowPopups) {
       flags |= Ci.nsIWebNavigation.LOAD_FLAGS_ALLOW_POPUPS;
     }
+    if (aIndicateErrorPageLoad) {
+      flags |= Ci.nsIWebNavigation.LOAD_FLAGS_ERROR_LOAD_CHANGES_RV;
+    }
 
     w.gBrowser.loadURIWithFlags(url, {
       flags: flags,
@@ -373,7 +379,8 @@ function openLinkIn(url, where, params) {
       relatedToCurrent: aRelatedToCurrent,
       skipAnimation: aSkipTabAnimation,
       allowMixedContent: aAllowMixedContent,
-      noReferrer: aNoReferrer
+      noReferrer: aNoReferrer,
+      userContextId: aUserContextId
     });
     break;
   }

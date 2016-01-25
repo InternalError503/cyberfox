@@ -31,6 +31,7 @@
 #PanelUI-popup #PanelUI-contents:empty::before {
   content: "";
   background-image: url(chrome://browser/skin/customizableui/8pecx-bw.png);
+  background-size: 64px 64px;
   display: block;
   width: 64px;
   height: 64px;
@@ -38,6 +39,10 @@
   transition: transform 1s ease-out;
   animation: cyberfoxMoveX 3.05s linear 0s infinite alternate,
              cyberfoxMoveY 3.4s linear 0s infinite alternate;
+}
+
+#PanelUI-popup #PanelUI-contents:not(:hover):empty::before {
+  filter: grayscale(100%);
 }
 
 #PanelUI-popup #PanelUI-contents:active:empty::before {
@@ -57,17 +62,9 @@
              cyberfoxRotate 1s linear 0s infinite normal;
 }
 
-#PanelUI-popup #PanelUI-contents:empty:hover::before {
-  background-image: url(chrome://browser/skin/customizableui/8pecx.png);
-}
-
 @media (min-resolution: 2dppx) {
   #PanelUI-popup #PanelUI-contents:empty::before {
     background-image: url(chrome://browser/skin/customizableui/8pecx-bw@2x.png);
-    background-size: 64px 64px;
-  }
-  #PanelUI-popup #PanelUI-contents:empty:hover::before {
-    background-image: url(chrome://browser/skin/customizableui/8pecx@2x.png);
   }
 }
 

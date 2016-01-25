@@ -52,15 +52,35 @@ var gSearchPane = {
 
     this._initAutocomplete();
 
-    let urlbarSuggests = document.getElementById("urlBarSuggestion");
-    urlbarSuggests.hidden = !Services.prefs.getBoolPref("browser.urlbar.unifiedcomplete");
+    let suggestsPref =
+      document.getElementById("browser.search.suggest.enabled");
+    suggestsPref.addEventListener("change", () => {
+      this.updateSuggestsCheckbox();
+    });
+    this.updateSuggestsCheckbox();
+  },
 
-    let suggestsPref = document.getElementById("browser.search.suggest.enabled")
-    let updateSuggestsCheckbox = () => {
-      urlbarSuggests.disabled = !suggestsPref.value;
+  updateSuggestsCheckbox() {
+    let urlbarSuggests = document.getElementById("urlBarSuggestion");
+    urlbarSuggests.hidden =
+      !Services.prefs.getBoolPref("browser.urlbar.unifiedcomplete");
+
+    let suggestsPref =
+      document.getElementById("browser.search.suggest.enabled");
+    let permanentPB =
+      Services.prefs.getBoolPref("browser.privatebrowsing.autostart");
+    urlbarSuggests.disabled = !suggestsPref.value || permanentPB;
+
+    let urlbarSuggestsPref =
+      document.getElementById("browser.urlbar.suggest.searches");
+    urlbarSuggests.checked = urlbarSuggestsPref.value;
+    if (urlbarSuggests.disabled) {
+      urlbarSuggests.checked = false;
     }
-    suggestsPref.addEventListener("change", updateSuggestsCheckbox);
-    updateSuggestsCheckbox();
+
+    let permanentPBLabel =
+      document.getElementById("urlBarSuggestionPermanentPBLabel");
+    permanentPBLabel.hidden = urlbarSuggests.hidden || !permanentPB;
   },
 
   buildDefaultEngineDropDown: function() {
@@ -87,8 +107,7 @@ var gSearchPane = {
       let item = list.appendItem(e.name);
       item.setAttribute("class", "menuitem-iconic searchengine-menuitem menuitem-with-favicon");
       if (e.iconURI) {
-        let uri = PlacesUtils.getImageURLForResolution(window, e.iconURI.spec);
-        item.setAttribute("image", uri);
+        item.setAttribute("image", e.iconURI.spec);
       }
       item.engine = e;
       if (e.name == currentEngine)
@@ -173,7 +192,7 @@ var gSearchPane = {
 
       // Check for duplicates in changes we haven't committed yet
       let engines = gEngineView._engineStore.engines;
-      for each (let engine in engines) {
+      for (let engine of engines) {
         if (engine.alias == aNewKeyword &&
             engine.name != aEngine.name) {
           eduplicate = true;
@@ -312,7 +331,7 @@ function EngineStore() {
   }
 
   // check if we need to disable the restore defaults button
-  var someHidden = this._defaultEngines.some(function (e) e.hidden);
+  var someHidden = this._defaultEngines.some(e => e.hidden);
   gSearchPane.showRestoreDefaults(someHidden);
 }
 EngineStore.prototype = {
@@ -333,11 +352,7 @@ EngineStore.prototype = {
   },
 
   _getEngineByName: function ES_getEngineByName(aName) {
-    for each (var engine in this._engines)
-      if (engine.name == aName)
-        return engine;
-
-    return null;
+    return this._engines.find(engine => engine.name == aName);
   },
 
   _cloneEngine: function ES_cloneEngine(aEngine) {
@@ -488,8 +503,7 @@ EngineView.prototype = {
 
   getImageSrc: function(index, column) {
     if (column.id == "engineName" && this._engineStore.engines[index].iconURI) {
-      let uri = this._engineStore.engines[index].iconURI.spec;
-      return PlacesUtils.getImageURLForResolution(window, uri);
+      return this._engineStore.engines[index].iconURI.spec;
     }
     return "";
   },

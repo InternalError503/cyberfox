@@ -61,6 +61,40 @@
 
     <stringbundle id="bundlePreferences" src="chrome://browser/locale/preferences/preferences.properties"/>
 
+<groupbox id="notificationsGroup">
+  <caption><label>&notificationsPolicy.label;</label></caption>
+  <grid>
+    <columns>
+      <column flex="1"/>
+      <column/>
+    </columns>
+    <rows>
+      <row id="notificationsPolicyRow" align="center">
+        <hbox align="start">
+          <label id="notificationsPolicy">&notificationsPolicyDesc3.label;</label>
+          <label id="notificationsPolicyLearnMore"
+                 class="text-link"
+                 value="&notificationsPolicyLearnMore.label;"/>
+        </hbox>
+        <hbox pack="end">
+          <button id="notificationsPolicyButton" label="&notificationsPolicyButton.label;"
+				  oncommand="gContentPane.showNotificationExceptions();"
+                  accesskey="&notificationsPolicyButton.accesskey;"/>
+        </hbox>
+      </row>
+      <row id="notificationsDoNotDisturbRow" hidden="true">
+        <vbox align="start">
+          <checkbox id="notificationsDoNotDisturb" label="&notificationsDoNotDisturb.label;"
+                    accesskey="&notificationsDoNotDisturb.accesskey;"/>
+          <label id="notificationsDoNotDisturbDetails"
+                 class="indent"
+                 value="&notificationsDoNotDisturbDetails.value;"/>
+        </vbox>
+      </row>
+    </rows>
+  </grid>
+</groupbox>	
+	
     <!-- various checkboxes, font-fu -->
     <groupbox id="miscGroup">
       <grid id="contentGrid">
@@ -211,11 +245,13 @@
                         label="&translateWebPages.label;." accesskey="&translateWebPages.accesskey;"
                         onsyncfrompreference="return gContentPane.updateButtons('translateButton',
                                               'browser.translation.detectLanguage');"/>
+             <hbox id="bingAttribution" hidden="true">								  
               <label>&translation.options.attribution.beforeLogo;</label>
               <image id="translationAttributionImage" aria-label="Microsoft Translator"
                      onclick="gContentPane.openTranslationProviderAttribution()"
                      src="chrome://browser/content/microsoft-translator-attribution.png"/>
               <label>&translation.options.attribution.afterLogo;</label>
+             </hbox>
             </hbox>
             <button id="translateButton" label="&translateExceptions.label;"
                     oncommand="gContentPane.showTranslationExceptions();"

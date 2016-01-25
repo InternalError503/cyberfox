@@ -60,6 +60,10 @@
                   hidden="true"
                   accesskey="&showURLBarSuggestions.accesskey;"
                   preference="browser.urlbar.suggest.searches"/>
+        <hbox id="urlBarSuggestionPermanentPBLabel"
+              align="center" class="indent">
+          <label flex="1">&urlBarSuggestionsPermanentPB.label;</label>
+        </hbox>
       </hbox>
       <checkbox id="redirectSearchCheckbox"
                 label="&redirectWindowsSearch.label;"

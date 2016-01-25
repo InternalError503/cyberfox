@@ -6,7 +6,6 @@
 Components.utils.import("resource://gre/modules/DownloadUtils.jsm");
 Components.utils.import("resource://gre/modules/LoadContextInfo.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/BrowserUtils.jsm");
 Components.utils.import("resource://gre/modules/AppConstants.jsm");
 
 var gAdvancedPane = {
@@ -35,11 +34,6 @@ var gAdvancedPane = {
 		Services.prefs.setBoolPref("app.update.check.enabled", false);		
 	}	
 
-    //If windows vista disable & hide Hardware acceleration.
-  if (AppConstants.platform == "win" && !AppConstants.isPlatformAndVersionAtLeast("win", "6.0")) {
-		  document.getElementById('allowHWAccel').hidden=true;	
-	}
-	
     var preference = document.getElementById("browser.preferences.advanced.selectedTabIndex");
     if (preference.value !== null)
         advancedPrefs.selectedIndex = preference.value;
@@ -591,7 +585,7 @@ var gAdvancedPane = {
     var list = document.getElementById("offlineAppsList");
     var item = list.selectedItem;
     var origin = item.getAttribute("origin");
-    var principal = BrowserUtils.principalFromOrigin(origin);
+    var principal = Services.scriptSecurityManager.createCodebasePrincipalFromOrigin(origin);
 
     var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                             .getService(Components.interfaces.nsIPromptService);

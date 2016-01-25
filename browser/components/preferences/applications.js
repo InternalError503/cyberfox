@@ -409,7 +409,7 @@ HandlerInfoWrapper.prototype = {
     var disabledPluginTypes = this._getDisabledPluginTypes();
 
     var type = this.type;
-    disabledPluginTypes = disabledPluginTypes.filter(function(v) v != type);
+    disabledPluginTypes = disabledPluginTypes.filter(v => v != type);
 
     this._prefSvc.setCharPref(PREF_DISABLED_PLUGIN_TYPES,
                               disabledPluginTypes.join(","));
@@ -601,7 +601,7 @@ FeedHandlerInfo.prototype = {
 
     // Add the registered web handlers.  There can be any number of these.
     var webHandlers = this._converterSvc.getContentHandlers(this.type);
-    for each (let webHandler in webHandlers)
+    for (let webHandler of webHandlers)
       this._possibleApplicationHandlers.appendElement(webHandler, false);
 
     return this._possibleApplicationHandlers;
@@ -753,7 +753,7 @@ FeedHandlerInfo.prototype = {
   // the only thing we need to store is the removal of possible handlers
   // XXX Should we hold off on making the changes until this method gets called?
   store: function() {
-    for each (let app in this._possibleApplicationHandlers._removed) {
+    for (let app of this._possibleApplicationHandlers._removed) {
       if (app instanceof Ci.nsILocalHandlerApp) {
         let pref = this.element(PREF_FEED_SELECTED_APP);
         var preferredAppFile = pref.value;
@@ -1183,7 +1183,7 @@ var gApplicationsPane = {
     if (this._filter.value)
       visibleTypes = visibleTypes.filter(this._matchesFilter, this);
 
-    for each (let visibleType in visibleTypes) {
+    for (let visibleType of visibleTypes) {
       let item = document.createElement("richlistitem");
       item.setAttribute("type", visibleType.type);
       item.setAttribute("typeDescription", this._describeType(visibleType));
@@ -1541,7 +1541,7 @@ var gApplicationsPane = {
       case Ci.nsIHandlerInfo.useHelperApp:
         if (preferredApp)
           menu.selectedItem = 
-            possibleAppMenuItems.filter(function(v) v.handlerApp.equals(preferredApp))[0];
+            possibleAppMenuItems.filter(v => v.handlerApp.equals(preferredApp))[0];
         break;
       case kActionUsePlugin:
         menu.selectedItem = pluginMenuItem;

@@ -2,6 +2,19 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+XPCOMUtils.defineLazyGetter(this, "AlertsServiceDND", function () {
+  try {
+    let alertsService = Components.classes["@mozilla.org/alerts-service;1"]
+                          .getService(Components.interfaces.nsIAlertsService)
+                          .QueryInterface(Components.interfaces.nsIAlertsDoNotDisturb);
+    // This will throw if manualDoNotDisturb isn't implemented.
+    alertsService.manualDoNotDisturb;
+    return alertsService;
+  } catch (ex) {
+    return undefined;
+  }
+});
 
 var gContentPane = {
   init: function ()
@@ -12,13 +25,35 @@ var gContentPane = {
     if (menulist.selectedIndex == -1) {
       menulist.value = FontBuilder.readFontSelection(menulist);
     }
-
+	
     // Show translation preferences if we may:
     const prefName = "browser.translation.ui.show";
     if (Services.prefs.getBoolPref(prefName)) {
       let row = document.getElementById("translationBox");
       row.removeAttribute("hidden");
+      // Showing attribution only for Bing Translator.
+      Components.utils.import("resource:///modules/translation/Translation.jsm");
+      if (Translation.translationEngine == "bing") {
+        document.getElementById("bingAttribution").removeAttribute("hidden");
+      }
     }
+
+    let doNotDisturbAlertsEnabled = false;
+    if (AlertsServiceDND) {
+      let notificationsDoNotDisturbRow =
+        document.getElementById("notificationsDoNotDisturbRow");
+      notificationsDoNotDisturbRow.removeAttribute("hidden");
+      if (AlertsServiceDND.manualDoNotDisturb) {
+        let notificationsDoNotDisturb =
+          document.getElementById("notificationsDoNotDisturb");
+        notificationsDoNotDisturb.setAttribute("checked", true);
+      }
+    }
+
+    let notificationInfoURL =
+      Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "push";
+    document.getElementById("notificationsPolicyLearnMore").setAttribute("href",
+                                                                         notificationInfoURL);
 
     let drmInfoURL =
       Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "drm-content";
@@ -89,6 +124,25 @@ var gContentPane = {
    * javascript.enabled
    * - true if JavaScript is enabled, false otherwise
    */
+ 
+  // NOTIFICATIONS
+
+  /**
+   * Displays the notifications exceptions dialog where specific site notification
+   * preferences can be set.
+   */
+  showNotificationExceptions()
+  {
+    let bundlePreferences = document.getElementById("bundlePreferences");
+    let params = { permissionType: "desktop-notification" };
+    params.windowTitle = bundlePreferences.getString("notificationspermissionstitle");
+    params.introText = bundlePreferences.getString("notificationspermissionstext4");
+
+   document.documentElement.openWindow("Browser:Permissions", 
+					"chrome://browser/content/preferences/permissions.xul",
+                    "resizable=yes", params);
+  },
+
 
   // POP-UPS
 
@@ -100,7 +154,8 @@ var gContentPane = {
   showPopupExceptions: function ()
   {
     var bundlePreferences = document.getElementById("bundlePreferences");
-    var params = { blockVisible: false, sessionVisible: false, allowVisible: true, prefilledHost: "", permissionType: "popup" };
+    var params = { blockVisible: false, sessionVisible: false, allowVisible: true,
+                   prefilledHost: "", permissionType: "popup" }
     params.windowTitle = bundlePreferences.getString("popuppermissionstitle");
     params.introText = bundlePreferences.getString("popuppermissionstext");
     document.documentElement.openWindow("Browser:Permissions",
@@ -286,5 +341,10 @@ var gContentPane = {
   {
     Components.utils.import("resource:///modules/translation/Translation.jsm");
     Translation.openProviderAttribution();
+  },
+
+  toggleDoNotDisturbNotifications: function (event)
+  {
+    AlertsServiceDND.manualDoNotDisturb = event.target.checked;
   }
 };
