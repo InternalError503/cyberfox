@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 1.7
+# Version: 1.8
 # Release channel linux
 
 #!/bin/bash
@@ -64,7 +64,7 @@ select yn in "Yes" "No"; do
 	  if [ -d "cyberfox" ]; then
 	      changeDirectory "cyberfox"
 	    echo "Auto purge uncommited untracked changes"
-	      git checkout -- .
+	      git reset --hard
 	    echo "Cloning latest cyberfox source files"
 	      git pull
 			setIdentity
@@ -126,7 +126,7 @@ select yn in "Yes" "No"; do
     case $yn in
         Yes )
 	  if [ -d $WORKDIR/obj64/dist/bin ]; then
-	    	changeDirectory "cyberfox"
+	    	changeDirectory "$WORKDIR/cyberfox"
 	    ./mach package
 	  else
 	    echo "Unable to package cyberfox $WORKDIR/obj64/dist/bin does not exist!"

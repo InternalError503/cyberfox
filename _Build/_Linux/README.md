@@ -118,11 +118,11 @@ IDENTITY_BRANDING_INTEL=
 
 Here is a quick build script for cyberfox on Linux that will expand over time, This will allow you to automate most of the manual tasks mentioned above.
 
-Script version: *1.7*
+Script version: *1.8*
 
 ```bash
 # Cyberfox quick build script
-# Version: 1.7
+# Version: 1.8
 # Release channel linux
 
 #!/bin/bash
@@ -187,7 +187,7 @@ select yn in "Yes" "No"; do
 	  if [ -d "cyberfox" ]; then
 	      changeDirectory "cyberfox"
 	    echo "Auto purge uncommited untracked changes"
-	      git checkout -- .
+	      git reset --hard
 	    echo "Cloning latest cyberfox source files"
 	      git pull
 			setIdentity
@@ -249,7 +249,7 @@ select yn in "Yes" "No"; do
     case $yn in
         Yes )
 	  if [ -d $WORKDIR/obj64/dist/bin ]; then
-	    	changeDirectory "cyberfox"
+	    	changeDirectory "$WORKDIR/cyberfox"
 	    ./mach package
 	  else
 	    echo "Unable to package cyberfox $WORKDIR/obj64/dist/bin does not exist!"
@@ -340,6 +340,7 @@ To use the script just open the terminal then supply the path to it for example
 ~/Desktop/build_cyberfox.sh
 ```
 
-Note: Don't edit build_cyberfox.sh on windows as windows adds \r or \r\n to line endings to assimilate carriage returns this will just cause error messages in the script or cause it not to work.
+Note: Don't edit build_cyberfox.sh on windows as windows adds \r or \r\n to line endings to assimilate carriage returns this will just cause error messages in the script or cause it not to work
+unless using a good text editor i.e notepad++.
 
 If bundle_cyberctr.sh is in the root folder where build_cyberfox.sh is then it will offer to repackage the build with CyberCTR addon.

@@ -1,5 +1,5 @@
 # Get latest CyberCTR package
-# Version: 1.1
+# Version: 1.2
 
 #!/bin/bash
 
@@ -8,6 +8,9 @@ WORKDIR=~/Documents
 
 # Set repository url.
 GITURI=https://github.com/InternalError503/CyberCTR.git
+
+# Get and set base path.
+Dir=$(cd "$(dirname "$0")" && pwd)
 
 # Check for git installation.
 function checkGIT(){
@@ -93,6 +96,7 @@ echo "Do you wish to package cyberfox archive now?"
 select yn in "Yes" "No"; do
     case $yn in
         Yes )
+    cp -r $Dir/README.txt $WORKDIR/obj64/dist/
 	  changeDirectory "$WORKDIR/obj64/dist"
 	  # Get the current filename with browser version!
 	  filename=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
@@ -102,7 +106,7 @@ select yn in "Yes" "No"; do
 	      rm -f $filename
 	    fi
 	  echo "Now re-packaging cyberfox into $filename!"
-	  tar cvfj $filename Cyberfox; 
+	  tar cvfj $filename Cyberfox README.txt; 
         break;;
         No ) exit;;
     esac
