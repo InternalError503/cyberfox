@@ -25,7 +25,6 @@ ac_add_options --enable-optimize
 ac_add_options --enable-jemalloc
 ac_add_options --enable-release
 ac_add_options --enable-gio
-ac_add_options --enable-stdcxx-compat
 ac_add_options --with-pthreads
 ac_add_options --enable-strip
 ac_add_options --enable-install-strip
@@ -53,6 +52,5 @@ ac_add_options --disable-mochitest
 ac_add_options --disable-mochitests
 ac_add_options --disable-accessibility
 ac_add_options --disable-parental-controls
-#ac_add_options --disable-logging
 ac_add_options --disable-gnomevfs
 ac_add_options --disable-elf-hack 
