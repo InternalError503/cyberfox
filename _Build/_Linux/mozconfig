@@ -1,5 +1,8 @@
 . $topsrcdir/browser/config/mozconfig
 
+export LDFLAGS="-static-libstdc++"
+export EXTRA_DSO_LDFLAGS="-lgcov -static-libstdc++"
+
 #Host computer options
 ac_add_options --enable-application=browser
 ac_add_options --target=x86_64-pc-linux-gnu
@@ -21,13 +24,14 @@ mk_add_options MOZILLA_DIR=@TOPSRCDIR@
 
 
 #Enable wanted features
-ac_add_options --enable-optimize
+ac_add_options --enable-optimize="-g -O -freorder-blocks"
 ac_add_options --enable-jemalloc
 ac_add_options --enable-release
 ac_add_options --enable-gio
 ac_add_options --with-pthreads
 ac_add_options --enable-strip
-ac_add_options --enable-install-strip
+ac_add_options --enable-gstreamer=1.0
+ac_add_options --disable-install-strip
 
 #Disable unwanted features
 ac_add_options --disable-pay
