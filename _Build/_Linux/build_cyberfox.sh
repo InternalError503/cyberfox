@@ -1,6 +1,6 @@
 # Cyberfox quick build script
-# Version: 1.8
-# Release channel linux
+# Version: 1.9
+# Release, Beta channels linux
 
 #!/bin/bash
 
@@ -21,10 +21,34 @@ function checkGIT(){
 
 # Set linux branding identity color.
 function setIdentity(){
+	if [ "$1" == "Release" ]; then
 	    echo "Setting branding identity to linux"
 	    sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox/build/defines.sh
 	    sed -i "s/\(IDENTITY_BRANDING_LINUX *= *\).*/\11/" $WORKDIR/cyberfox/build/defines.sh
 	    echo "Setting branding identity complete!"
+	elif [ "$1" == "Beta" ]; then
+	    echo "Setting branding identity to Beta"
+	    sed -i "s/\(IDENTITY_BRANDING_INTEL *= *\).*/\1/" $WORKDIR/cyberfox-beta/build/defines.sh
+	    sed -i "s/\(IDENTITY_BRANDING_BETA *= *\).*/\11/" $WORKDIR/cyberfox-beta/build/defines.sh
+	    echo "Setting branding identity complete!"
+	else
+			echo "Sorry, Failed to process that!"
+			exit 1		
+	fi;
+}
+
+# Set on linux Simplicity Linux as default.
+function setHomeStyle(){
+	if [ "$1" == "Release" ]; then
+      echo "Setting about:home default to (Simplicity linux)"
+      sed -i 's|\("extensions.classicthemerestorer.abouthome",\) "\(.*\)"|\1 "simplicitygreen"|' $WORKDIR/CyberCTR/distribution/bundles/CTR@8pecxstudios.com/defaults/preferences/options.js
+	elif [ "$1" == "Beta" ]; then
+      echo "Setting about:home default to (Simplicity Beta)"
+     sed -i 's|\("extensions.classicthemerestorer.abouthome",\) "\(.*\)"|\1 "simplicityyellow"|' $WORKDIR/CyberCTR/distribution/bundles/CTR@8pecxstudios.com/defaults/preferences/options.js      		
+	else
+			echo "Sorry, Failed to process that!"
+			exit 1		
+	fi;
 }
 
 # Set chmod permissons.
@@ -49,7 +73,34 @@ function changeDirectory(){
 WORKDIR=~/Documents
 
 # Set repository url.
-GITURI=https://github.com/InternalError503/cyberfox.git
+# Set identity.
+# Set local repository direcorty name.
+GITURI=""
+IDENTITY=""
+LDIR=""
+
+  echo "What package do you wish to build?"
+  select answer in "Release" "Beta" "Quit"; do
+      case $answer in
+	  "Release" )	  
+		    GITURI=https://github.com/InternalError503/cyberfox.git
+		    IDENTITY="Release"
+		    LDIR="cyberfox"
+			break;;  
+	  "Beta" )
+			GITURI=https://github.com/InternalError503/cyberfox-beta.git
+			IDENTITY="Beta"
+			LDIR="cyberfox-beta"
+			break;;
+	  "Quit" )
+			exit 0
+		break;;
+		*)
+			echo "Sorry, I don't understand your answer!"
+			exit 1
+		break;;
+      esac
+  done
 
 # Get and set base path.
 Dir=$(cd "$(dirname "$0")" && pwd)
@@ -58,34 +109,42 @@ checkGIT
 cd $WORKDIR
 
 echo "Do you wish to setup or update cyberfox source repository now?"
-select yn in "Yes" "No"; do
+select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )	  
-	  if [ -d "cyberfox" ]; then
-	      changeDirectory "cyberfox"
+	  if [ -d "$LDIR" ]; then
+	      changeDirectory $LDIR
 	    echo "Auto purge uncommited untracked changes"
 	      git reset --hard
 	    echo "Cloning latest cyberfox source files"
 	      git pull
-			setIdentity
+			setIdentity $IDENTITY
 	      changeDirectory ".."
-	      	setPerms "cyberfox"
-	      changeDirectory "cyberfox"
+	      	setPerms $LDIR
+	      changeDirectory $LDIR
 	  else
-	    echo "Downloading cyberfox source repository"
+	  	if [ ! -z "$GITURI" ]; then
+	    echo "Downloading $LDIR source repository"
 	    git clone $GITURI
-	      	setPerms "cyberfox"
-	    echo "mozconfig does not exist copying pre-configured to cyberfox root"
-	    cp -r $WORKDIR/cyberfox/_Build/_Linux/mozconfig $WORKDIR/cyberfox/
-			setIdentity
-	      changeDirectory "cyberfox"
+	      	setPerms $LDIR
+	    echo "mozconfig does not exist copying pre-configured to $LDIR root"
+	    cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
+			setIdentity $IDENTITY
+	      changeDirectory $LDIR
+	  else
+	  		echo "Sorry, I don't understand your answer!"
+			exit 1
+	    fi;
 	  fi; break;;
         No ) break;;
+	  "Quit" )
+			exit 0
+		break;;
     esac
 done
 
-echo "Do you wish to build cyberfox now?"
-select yn in "Yes" "No"; do
+echo "Do you wish to build $LDIR now?"
+select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes ) 
 	  if [ -d $WORKDIR/obj64 ]; then
@@ -97,51 +156,129 @@ select yn in "Yes" "No"; do
 		  esac
 	      done
 	  fi
-	  if [ -f $WORKDIR/cyberfox/mozconfig ]; then
-	      	changeDirectory "$WORKDIR/cyberfox"
+	  if [ -f $WORKDIR/$LDIR/mozconfig ]; then
+	      	changeDirectory "$WORKDIR/$LDIR"
 		./mach build
 	  else
-		 echo "Were sorry but we can't build cyberfox the mozconfig is missing!" && exit
+		 echo "Were sorry but we can't build $LDIR the mozconfig is missing!" && exit
 	  fi; break;;       
         No ) break;;
+	  "Quit" )
+			exit 0
+		break;;
     esac
 done
 
-echo "Do you wish to test cyberfox now?"
-select yn in "Yes" "No"; do
+echo "Do you wish to test $LDIR now?"
+select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
 	  if [ -d $WORKDIR/obj64/dist/bin ]; then
-	      	changeDirectory "cyberfox"
+	      	changeDirectory $LDIR
 	      ./mach run
 	  else
-	      echo "Unable to start cyberfox $WORKDIR/obj64/dist/bin does not exist!"
+	      echo "Unable to start $LDIR $WORKDIR/obj64/dist/bin does not exist!"
 	  fi; break;;
         No ) break;;
+	  "Quit" )
+			exit 0
+		break;;
     esac
 done
 
-echo "Do you wish to package cyberfox now?"
-select yn in "Yes" "No"; do
+echo "Do you wish to package $LDIR now?"
+select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
 	  if [ -d $WORKDIR/obj64/dist/bin ]; then
-	    	changeDirectory "$WORKDIR/cyberfox"
+	    	changeDirectory "$WORKDIR/$LDIR"
 	    ./mach package
 	  else
-	    echo "Unable to package cyberfox $WORKDIR/obj64/dist/bin does not exist!"
+	    echo "Unable to package $LDIR $WORKDIR/obj64/dist/bin does not exist!"
 	  fi; break;;  
         No ) break;;
+	  "Quit" )
+			exit 0
+		break;;
     esac
 done
 
-if [ -f $Dir/bundle_cyberctr.sh ]; then
-  echo "Do you wish to package CyberCTR into cyberfox now?"
+
+### CyberCTR Packaging ############################################
+
+echo "Do you wish to package CyberCTR into $LDIR now?"
   select yn in "Yes" "No"; do
-      case $yn in
-	  Yes )	  
-	    $Dir/bundle_cyberctr.sh; break;;  
-	  No ) break;;
-      esac
-  done
-fi
+    case $yn in
+		Yes ) break;;  
+		No ) 
+		echo "Good bye!"
+		exit 0
+		break;;
+    esac
+done
+
+cd $WORKDIR
+
+echo "Do you wish to setup or update CyberCTR source repository now?"
+select yn in "Yes" "No" "Quit"; do
+    case $yn in
+        Yes )
+        if [ -d "CyberCTR" ]; then
+          echo "Auto purge uncommited untracked changes"
+          changeDirectory "CyberCTR"
+          git checkout -- .
+          echo "Cloning latest CyberCTR source files"
+          git pull
+          changeDirectory ".."
+          setHomeStyle $IDENTITY
+          setPerms "CyberCTR"
+        else
+          echo "Downloading CyberCTR source repository"
+          git clone "https://github.com/InternalError503/CyberCTR.git"
+          setHomeStyle $IDENTITY
+          setPerms "CyberCTR"
+        fi; break;;
+        No ) break;;
+	  "Quit" )
+			exit 0
+		break;;
+    esac
+done
+
+echo "Do you wish to transfer CyberCTR into obj64/dist/Cyberfox now?"
+select yn in "Yes" "No" "Quit"; do
+    case $yn in
+        Yes )
+	  if [ -d "$WORKDIR/obj64/dist/Cyberfox/distribution" ]; then
+	    echo "Existing distribution folder found!, removing it now!"
+	    rm -rv $WORKDIR/obj64/dist/Cyberfox/distribution
+	  fi
+	  echo "Now transfering CyberCTR to Cyberfox folder"
+	  cp -r CyberCTR/distribution/ $WORKDIR/obj64/dist/Cyberfox; 
+        break;;
+        No ) exit;;
+	  "Quit" )
+			exit 0
+		break;;
+    esac
+done
+
+echo "Do you wish to package Cyberfox archive now?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes )
+    cp -r $Dir/README.txt $WORKDIR/obj64/dist/
+	  changeDirectory "$WORKDIR/obj64/dist"
+	  # Get the current filename with browser version!
+	  filename=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
+	  
+	    if [ -f $filename ]; then
+	      echo "Found $filename removing file!"
+	      rm -f $filename
+	    fi
+	  echo "Now re-packaging Cyberfox into $filename!"
+	  tar cvfj $filename Cyberfox README.txt; 
+        break;;
+        No ) exit;;
+    esac
+done
