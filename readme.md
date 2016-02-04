@@ -1,3 +1,0 @@
-Cyberfox Beta
-==========
-
