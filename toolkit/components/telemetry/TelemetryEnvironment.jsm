@@ -153,7 +153,6 @@ const DEFAULT_ENVIRONMENT_PREFS = new Map([
   ["services.sync.serverURL", {what: RECORD_PREF_STATE}],
   ["security.mixed_content.block_active_content", {what: RECORD_PREF_VALUE}],
   ["security.mixed_content.block_display_content", {what: RECORD_PREF_VALUE}],
-  ["xpinstall.signatures.required", {what: RECORD_PREF_VALUE}],
 ]);
 
 const LOGGER_NAME = "Toolkit.Telemetry";

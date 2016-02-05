@@ -91,8 +91,6 @@ const PREF_XPI_ENABLED                = "xpinstall.enabled";
 const PREF_XPI_WHITELIST_REQUIRED     = "xpinstall.whitelist.required";
 const PREF_XPI_DIRECT_WHITELISTED     = "xpinstall.whitelist.directRequest";
 const PREF_XPI_FILE_WHITELISTED       = "xpinstall.whitelist.fileRequest";
-// xpinstall.signatures.required only supported in dev builds
-const PREF_XPI_SIGNATURES_REQUIRED    = "xpinstall.signatures.required";
 const PREF_XPI_SIGNATURES_DEV_ROOT    = "xpinstall.signatures.dev-root";
 const PREF_XPI_PERMISSIONS_BRANCH     = "xpinstall.";
 const PREF_XPI_UNPACK                 = "extensions.alwaysUnpack";
@@ -236,7 +234,7 @@ const SIGNED_TYPES = new Set([
 function mustSign(aType) {
   if (!SIGNED_TYPES.has(aType))
     return false;
-  return REQUIRE_SIGNING || Preferences.get(PREF_XPI_SIGNATURES_REQUIRED, false);
+  return false;
 }
 
 
@@ -2590,8 +2588,6 @@ this.XPIProvider = {
 
       Services.prefs.addObserver(PREF_EM_MIN_COMPAT_APP_VERSION, this, false);
       Services.prefs.addObserver(PREF_EM_MIN_COMPAT_PLATFORM_VERSION, this, false);
-      if (!REQUIRE_SIGNING)
-        Services.prefs.addObserver(PREF_XPI_SIGNATURES_REQUIRED, this, false);
       Services.obs.addObserver(this, NOTIFICATION_FLUSH_PERMISSIONS, false);
       if (Cu.isModuleLoaded("resource://devtools/client/framework/ToolboxProcess.jsm")) {
         // If BrowserToolboxProcess is already loaded, set the boolean to true
@@ -4087,9 +4083,6 @@ this.XPIProvider = {
       case PREF_EM_MIN_COMPAT_PLATFORM_VERSION:
         this.minCompatiblePlatformVersion = Preferences.get(PREF_EM_MIN_COMPAT_PLATFORM_VERSION,
                                                             null);
-        this.updateAddonAppDisabledStates();
-        break;
-      case PREF_XPI_SIGNATURES_REQUIRED:
         this.updateAddonAppDisabledStates();
         break;
       }
@@ -7983,11 +7976,7 @@ Object.defineProperty(this, "REQUIRE_SIGNING", {
   configurable: false,
   enumerable: false,
   writable: false,
-#ifdef MOZ_REQUIRE_SIGNING
-  value: true,
-#else
   value: false,
-#endif
 });
 
 var addonTypes = [
