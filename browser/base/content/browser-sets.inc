@@ -198,10 +198,6 @@
                  type="checkbox" autocheck="false"
                  command="Tools:DevToolbar"
                  key="key_devToolbar"/>
-    <broadcaster id="devtoolsMenuBroadcaster_webide"
-                 label="&webide.label;"
-                 command="Tools:WebIDE"
-                 key="key_webide"/>
     <broadcaster id="devtoolsMenuBroadcaster_BrowserToolbox"
                  label="&browserToolboxMenu.label;"
                  key="key_browserToolbox"

@@ -27,7 +27,7 @@ pref("devtools.appmanager.lastTab", "help");
 pref("devtools.appmanager.manifestEditor.enabled", true);
 
 // Enable DevTools WebIDE by default
-pref("devtools.webide.enabled", true);
+pref("devtools.webide.enabled", false);
 
 // Toolbox preferences
 pref("devtools.toolbox.footer.height", 250);
