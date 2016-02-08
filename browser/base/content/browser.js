@@ -7680,7 +7680,13 @@ var TabContextMenu = {
     let unpinnedTabs = gBrowser.visibleTabs.length - gBrowser._numPinnedTabs;
     document.getElementById("context_closeOtherTabs").disabled = unpinnedTabs <= 1;
     document.getElementById("context_closeOtherTabs").hidden = this.contextTab.pinned;
-
+	
+    // Hide "Bookmark This Page" for a pinned tab.  Update its state if visible.
+    let contextBookmarkPage = document.getElementById("context_bookmarkThisPage");
+    contextBookmarkPage.hidden = this.contextTab.pinned;
+    if (!contextBookmarkPage.hidden)
+      BookmarkingUI.onCurrentPageContextPopupShowing();
+	
     // Hide "Bookmark All Tabs" for a pinned tab.  Update its state if visible.
     let bookmarkAllTabs = document.getElementById("context_bookmarkAllTabs");
     bookmarkAllTabs.hidden = this.contextTab.pinned;
