@@ -1,6 +1,6 @@
 @echo off
 :top
-title XPI Language Unpacker Version: 2.0.3
+title XPI Language Unpacker Version: 2.0.4
 ECHO.
 ECHO.###########################################################
 ECHO.#                                                         #
@@ -106,9 +106,6 @@ goto :exit
 
 :extract
 for /f %%f in ('dir /b "%DestinPath%"') do %SevenZip% x "%DestinPath%\%%f\%%f" -o"%DestinPath%\%%f\"
-goto :cleanup
-
-:cleanup
 for /f %%f in ('dir /b "%DestinPath%"') do del "%DestinPath%\%%f\%%f"
 goto :package
 
@@ -144,6 +141,8 @@ for /f %%f in ('dir /b "%DestinPath%"') do %SevenZip% a -tzip "%DestinPath%\%%f\
 ::----
 if not exist "%OutputPath%" mkdir "%OutputPath%"
 for /f %%f in ('dir /b "%DestinPath%"') do copy /y "%DestinPath%\%%f\%%f" "%OutputPath%\"
+::----
+for /f %%f in ('dir /b "%DestinPath%"') do del "%DestinPath%\%%f\%%f"
 
 :exit
 cls

@@ -46,7 +46,7 @@ function test() {
 
   function testOnWindow(aIsPrivate, aCallback) {
     whenNewWindowLoaded({private: aIsPrivate}, function(win) {
-      executeSoon(function() aCallback(win));
+      executeSoon(() => aCallback(win));
     });
   }
 

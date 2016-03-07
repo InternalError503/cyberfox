@@ -6,13 +6,13 @@
   // Netflix  * (Additional netflix is really being a royal pain with firefox user-agent)
   "netflix.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0",
   // Battlelog *
-  "battlefield.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0",
+  "battlefield.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0",
   // Sourceforge *
-  "sourceforge.net": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36",
+  "sourceforge.net": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36",
   // discordapp * (There sites javascript breaks with cyberfox user-agent 1. only allows WOW64 2. can't have the cyberfox slice.
-  "discordapp.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0",
+  "discordapp.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0",
   //Chase does not like cyberfox user-agent to save the users using the dev-tools UAO were adding it here.
-  "chase.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0",
+  "chase.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0",
   //Amazon.com prime/instant video appears to not like cyberfox user-agent for now we can force silverlight because html5 video requires DRM
-  "amazon.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0"
+  "amazon.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0"
 }

@@ -1,5 +1,5 @@
 @echo Off
-title Build Cyberfox Portable V1.8
+title Build Cyberfox Portable V1.9
 ECHO.
 (set /P Version=
 )<Version\Version.txt
@@ -40,12 +40,6 @@ mkdir "%BuildFolderPathIntel%App\Cyberfox"
 @echo on
 call _Func_GenDirHash.bat "intel86"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel86" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
-@echo off
-mkdir "%BuildFolderPathIntel%App\Cyberfox\distribution"
-@echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathIntel%App\Cyberfox\distribution"
-@echo off
-@echo on
 %NSISCompiler% %Argos% "%BuildFolderPathIntel%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log"
 @echo off
 echo. Build Intel 86 bit portable package complete!
@@ -63,12 +57,6 @@ mkdir "%BuildFolderPathAmd%App\Cyberfox"
 @echo on
 call _Func_GenDirHash.bat "amd86"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd86" "%BuildFolderPathAmd%App\Cyberfox"
-@echo off
-mkdir "%BuildFolderPathAmd%App\Cyberfox\distribution"
-@echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathAmd%App\Cyberfox\distribution"
-@echo off
-@echo on
 %NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log"
 @echo off
 echo. Build Amd 86 bit portable package complete!
@@ -96,12 +84,6 @@ mkdir "%BuildFolderPathIntel%App\Cyberfox"
 @echo on
 call _Func_GenDirHash.bat "intel64"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel64" "%BuildFolderPathIntel%App\Cyberfox"
-@echo off
-mkdir "%BuildFolderPathIntel%App\Cyberfox\distribution"
-@echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathIntel%App\Cyberfox\distribution"
-@echo off
-@echo on
 %NSISCompiler% %Argos% "%BuildFolderPathIntel%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log"
 @echo off
 echo. Build Intel 64 bit portable package complete!
@@ -121,12 +103,6 @@ mkdir "%BuildFolderPathAmd%App\Cyberfox"
 @echo on
 call _Func_GenDirHash.bat "amd64"
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd64" "%BuildFolderPathAmd%App\Cyberfox"
-@echo off
-mkdir "%BuildFolderPathAmd%App\Cyberfox\distribution"
-@echo on
-xcopy /e /v "%BuildFolderPath%_CyberCTR\distribution" "%BuildFolderPathAmd%App\Cyberfox\distribution"
-@echo off
-@echo on
 %NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" 
 @echo off
 echo. Build Amd 64 bit portable package complete!

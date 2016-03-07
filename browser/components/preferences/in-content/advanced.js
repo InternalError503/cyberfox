@@ -6,7 +6,6 @@
 Components.utils.import("resource://gre/modules/DownloadUtils.jsm");
 Components.utils.import("resource://gre/modules/LoadContextInfo.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/AppConstants.jsm");
 
 var gAdvancedPane = {
   _inited: false,
@@ -51,9 +50,6 @@ var gAdvancedPane = {
 #ifdef MOZ_CRASHREPORTER
     this.initSubmitCrashes();
 #endif
-#ifdef MOZ_TELEMETRY_REPORTING
-    this.initTelemetry();
-#endif	
 #ifdef MOZ_SERVICES_HEALTHREPORT
     this.initSubmitHealthReport();
 #endif

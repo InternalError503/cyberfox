@@ -21,10 +21,6 @@ pref("app.update.available", false);
 
 //Disable default browser.
 pref("browser.shell.checkDefaultBrowser", false);
-//Disable auto check browser version (Linux is not officially supported and Linux builds may run different version numbers as a update may not be applicable to Linux only windows.)
-//pref("app.update.autocheck", false);
-//Disable the OpenH264 plug-in support in the addon manager.
-pref("media.gmp-gmpopenh264.provider.enabled", false);
 
 // Number of usages of the web console or scratchpad.
 // If this is less than 5, then pasting code into the web console or scratchpad is disabled

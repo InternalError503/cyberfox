@@ -11,7 +11,7 @@ if CONFIG['OS_ARCH'] == 'WINNT' and CONFIG['MOZ_ASAN']:
 else:
     GeckoProgram(CONFIG['MOZ_APP_NAME'], msvcrt='static')
 
-JS_PREFERENCE_FILES += [
+JS_PREFERENCE_PP_FILES += [
     'profile/firefox.js',
 ]
 
@@ -20,21 +20,14 @@ SOURCES += [
 ]
 
 FINAL_TARGET_FILES += ['blocklist.xml']
-
-##if MOZ_AGENTS
 FINAL_TARGET_FILES += ['agents.json']
-##endif
-
 FINAL_TARGET_FILES.defaults.profile += ['profile/prefs.js']
 FINAL_TARGET_FILES.defaults += ['permissions']
 
 DEFINES['APP_VERSION'] = CONFIG['MOZ_APP_VERSION']
 
-GENERATED_INCLUDES += [
-    '/build',
-]
-
 LOCAL_INCLUDES += [
+    '!/build',
     '/toolkit/xre',
     '/xpcom/base',
     '/xpcom/build',
@@ -83,6 +76,6 @@ if CONFIG['GNU_CXX']:
     CXXFLAGS += ['-Wshadow']
 
 # User-agent override.
-DIST_FILES += [
+FINAL_TARGET_PP_FILES += [
   'ua-update.json.in',
 ]

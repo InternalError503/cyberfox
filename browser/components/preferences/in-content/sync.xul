@@ -36,7 +36,9 @@
       hidden="true"
       data-category="paneSync">
   <image class="header-icon"/>
-  <label class="header-name">&paneSync.title;</label>
+  <label class="header-name" flex="1">&paneSync.title;</label>
+  <button class="help-button"
+          aria-label="&helpButton.label;"/>
 </hbox>
 
 <vbox id="syncStatusMessage-container" data-category="paneSync" hidden="true">

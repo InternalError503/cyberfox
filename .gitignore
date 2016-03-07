@@ -86,8 +86,3 @@ testing/talos/bin/
 testing/talos/include/
 testing/talos/lib/
 testing/talos/talos/page_load_test/tp5n/
-
-#######
-/browser/branding/cyberfox-intel*/
-/browser/branding/cyberfox-amd*/
-/browser/branding/cyberfox-beta*/

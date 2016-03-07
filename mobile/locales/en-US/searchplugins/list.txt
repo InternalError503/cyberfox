@@ -1,14 +1,14 @@
 amazondotcom
 bing
-duckdckgo
+duckduckgo
 eBay
 google
 ixquick
-Privatelee
+privatelee
 startpage
 twitter
 unbubbleeu
 wikipedia
 yahoo
-youtube
 yandex
+youtube

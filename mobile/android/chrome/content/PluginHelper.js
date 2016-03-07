@@ -204,7 +204,6 @@ var PluginHelper = {
       case "PluginNotFound": {
         // On devices where we don't support Flash, there will be a
         // "Learn More..." link in the missing plugin error message.
-        // Set Help Link mobile-flash-unsupported
         let learnMoreLink = doc.getAnonymousElementByAttribute(plugin, "class", "unsupportedLearnMoreLink");
         let learnMoreUrl = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
         learnMoreUrl += "mobile-flash-unsupported";

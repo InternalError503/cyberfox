@@ -19,8 +19,8 @@
 !define Channel "unofficial"
 
 # The installer's certificate name and issuer expected by the stub installer
-!define CertNameDownload   "Mozilla Corporation"
-!define CertIssuerDownload "DigiCert SHA2 Assured ID Code Signing CA"
+!define CertNameDownload   ""
+!define CertIssuerDownload ""
 
 # Dialog units are used so the UI displays correctly with the system's DPI
 # settings.

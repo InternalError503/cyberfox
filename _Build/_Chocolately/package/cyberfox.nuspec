@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>cyberfox</id>
+    <version>44.0.2</version>
+    <title>Cyberfox</title>
+    <authors>8pecxstudios, toady</authors>
+    <owners>8pecxstudios, toady</owners>
+    <licenseUrl>https://www.mozilla.org/MPL/2.0/</licenseUrl>
+    <projectUrl>http://cyberfox.8pecxstudios.com/</projectUrl>
+    <iconUrl>https://cdn.rawgit.com/InternalError503/cyberfox/master/browser/branding/official/default256.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Cyberfox is a Mozilla-based Internet browser designed to take advantage of 64-bit architecture but a 32-bit version is also available. The application provides a higher performance when navigating your favorite pages.
+
+Compatible With Windows 7 x64, Windows 8/8.x OS. ( Windows XP Unsupported, Windows Vista x64 Unsupported).</description>
+    <summary>Cyberfox is designed by 8pecxstudios, Taking over where Mozilla left off, Working to make a fast and reliable, x64-bit web browser accessible to all.</summary>
+    <packageSourceUrl>https://github.com/InternalError503/cyberfox/archive/master.zip</packageSourceUrl>
+    <releaseNotes>https://cyberfox.8pecxstudios.com#selection</releaseNotes>
+    <projectSourceUrl>https://github.com/InternalError503/cyberfox</projectSourceUrl>
+    <docsUrl>https://8pecxstudios.com/Forums/viewforum.php?f=8</docsUrl>
+    <mailingListUrl>https://cyberfox.8pecxstudios.com/contact-us</mailingListUrl>
+    <bugTrackerUrl>https://8pecxstudios.com/Forums/viewforum.php?f=5</bugTrackerUrl>
+    <copyright />
+    <tags>Cyberfox web browser mozilla firefox x64 admin</tags>
+  </metadata>
+</package>

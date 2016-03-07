@@ -221,6 +221,7 @@ begin
 	end
 end;
 //Make sure to remove distribution folder on uninstall, Get user input if they want to delete profile data.
+//Keep distribution folder clean up for next few releases of 45* to ensure clean up.
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 	begin
 		if CurUninstallStep = usPostUninstall then

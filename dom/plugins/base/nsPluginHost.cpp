@@ -173,9 +173,9 @@ static const char kDirectoryServiceContractID[] = "@mozilla.org/file/directory_s
 #define kPluginRegistryFilename NS_LITERAL_CSTRING("pluginreg.dat")
 
 #ifdef PLUGIN_LOGGING
-PRLogModuleInfo* nsPluginLogging::gNPNLog = nullptr;
-PRLogModuleInfo* nsPluginLogging::gNPPLog = nullptr;
-PRLogModuleInfo* nsPluginLogging::gPluginLog = nullptr;
+LazyLogModule nsPluginLogging::gNPNLog(NPN_LOG_NAME);
+LazyLogModule nsPluginLogging::gNPPLog(NPP_LOG_NAME);
+LazyLogModule nsPluginLogging::gPluginLog(PLUGIN_LOG_NAME);
 #endif
 
 // #defines for plugin cache and prefs
@@ -320,10 +320,6 @@ nsPluginHost::nsPluginHost()
   }
 
 #ifdef PLUGIN_LOGGING
-  nsPluginLogging::gNPNLog = PR_NewLogModule(NPN_LOG_NAME);
-  nsPluginLogging::gNPPLog = PR_NewLogModule(NPP_LOG_NAME);
-  nsPluginLogging::gPluginLog = PR_NewLogModule(PLUGIN_LOG_NAME);
-
   MOZ_LOG(nsPluginLogging::gNPNLog, PLUGIN_LOG_ALWAYS,("NPN Logging Active!\n"));
   MOZ_LOG(nsPluginLogging::gPluginLog, PLUGIN_LOG_ALWAYS,("General Plugin Logging Active! (nsPluginHost::ctor)\n"));
   MOZ_LOG(nsPluginLogging::gNPPLog, PLUGIN_LOG_ALWAYS,("NPP Logging Active!\n"));
@@ -1370,6 +1366,7 @@ nsresult nsPluginHost::EnsurePluginLoaded(nsPluginTag* aPluginTag)
 nsresult
 nsPluginHost::GetPluginForContentProcess(uint32_t aPluginId, nsNPAPIPlugin** aPlugin)
 {
+  PROFILER_LABEL_FUNC(js::ProfileEntry::Category::OTHER);
   MOZ_ASSERT(XRE_IsParentProcess());
 
   // If plugins haven't been scanned yet, do so now
@@ -2197,9 +2194,6 @@ nsresult nsPluginHost::ScanPluginsDirectory(nsIFile *pluginsDir,
 
       pluginTag = new nsPluginTag(&info, fileModTime, fromExtension);
       pluginFile.FreePluginInfo(info);
-      if (!pluginTag)
-        return NS_ERROR_OUT_OF_MEMORY;
-
       pluginTag->mLibrary = library;
       uint32_t state;
       rv = pluginTag->GetBlocklistState(&state);
@@ -2388,24 +2382,30 @@ nsPluginHost::FindPluginsInContent(bool aCreatePluginList, bool* aPluginsChanged
   MOZ_ASSERT(XRE_IsContentProcess());
 
   dom::ContentChild* cp = dom::ContentChild::GetSingleton();
+  nsresult rv;
   nsTArray<PluginTag> plugins;
   uint32_t parentEpoch;
-  if (!cp->SendFindPlugins(ChromeEpochForContent(), &plugins, &parentEpoch)) {
+  if (!cp->SendFindPlugins(ChromeEpochForContent(), &rv, &plugins, &parentEpoch) ||
+      NS_FAILED(rv)) {
     return NS_ERROR_NOT_AVAILABLE;
   }
 
   if (parentEpoch != ChromeEpochForContent()) {
-    SetChromeEpochForContent(parentEpoch);
     *aPluginsChanged = true;
     if (!aCreatePluginList) {
       return NS_OK;
     }
 
+    // Don't do this if aCreatePluginList is false. Otherwise, when we actually
+    // want to create the list, we'll come back here and do nothing.
+    SetChromeEpochForContent(parentEpoch);
+
     for (size_t i = 0; i < plugins.Length(); i++) {
       PluginTag& tag = plugins[i];
 
       // Don't add the same plugin again.
-      if (PluginWithId(tag.id())) {
+      if (nsPluginTag* existing = PluginWithId(tag.id())) {
+        UpdateInMemoryPluginInfo(existing);
         continue;
       }
 
@@ -2604,7 +2604,7 @@ nsresult nsPluginHost::FindPlugins(bool aCreatePluginList, bool * aPluginsChange
   return NS_OK;
 }
 
-bool
+nsresult
 mozilla::plugins::FindPluginsForContent(uint32_t aPluginEpoch,
                                         nsTArray<PluginTag>* aPlugins,
                                         uint32_t* aNewPluginEpoch)
@@ -2612,11 +2612,10 @@ mozilla::plugins::FindPluginsForContent(uint32_t aPluginEpoch,
   MOZ_ASSERT(XRE_IsParentProcess());
 
   RefPtr<nsPluginHost> host = nsPluginHost::GetInst();
-  host->FindPluginsForContent(aPluginEpoch, aPlugins, aNewPluginEpoch);
-  return true;
+  return host->FindPluginsForContent(aPluginEpoch, aPlugins, aNewPluginEpoch);
 }
 
-void
+nsresult
 nsPluginHost::FindPluginsForContent(uint32_t aPluginEpoch,
                                     nsTArray<PluginTag>* aPlugins,
                                     uint32_t* aNewPluginEpoch)
@@ -2624,11 +2623,14 @@ nsPluginHost::FindPluginsForContent(uint32_t aPluginEpoch,
   MOZ_ASSERT(XRE_IsParentProcess());
 
   // Load plugins so that the epoch is correct.
-  LoadPlugins();
+  nsresult rv = LoadPlugins();
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
 
   *aNewPluginEpoch = ChromeEpoch();
   if (aPluginEpoch == ChromeEpoch()) {
-    return;
+    return NS_OK;
   }
 
   nsTArray<nsCOMPtr<nsIInternalPluginTag>> plugins;
@@ -2663,16 +2665,12 @@ nsPluginHost::FindPluginsForContent(uint32_t aPluginEpoch,
                                       tag->mLastModifiedTime,
                                       tag->IsFromExtension()));
   }
+  return NS_OK;
 }
 
-// This function is not relevant for fake plugins.
 void
-nsPluginHost::UpdatePluginInfo(nsPluginTag* aPluginTag)
+nsPluginHost::UpdateInMemoryPluginInfo(nsPluginTag* aPluginTag)
 {
-  MOZ_ASSERT(XRE_IsParentProcess());
-
-  ReadPluginInfo();
-  WritePluginInfo();
   NS_ITERATIVE_UNREF_LIST(RefPtr<nsPluginTag>, mCachedPlugins, mNext);
   NS_ITERATIVE_UNREF_LIST(RefPtr<nsInvalidPluginTag>, mInvalidPlugins, mNext);
 
@@ -2701,6 +2699,20 @@ nsPluginHost::UpdatePluginInfo(nsPluginTag* aPluginTag)
     mozilla::services::GetObserverService();
   if (obsService)
     obsService->NotifyObservers(nullptr, "plugin-info-updated", nullptr);
+}
+
+// This function is not relevant for fake plugins.
+void
+nsPluginHost::UpdatePluginInfo(nsPluginTag* aPluginTag)
+{
+  MOZ_ASSERT(XRE_IsParentProcess());
+
+  ReadPluginInfo();
+  WritePluginInfo();
+
+  IncrementChromeEpoch();
+
+  UpdateInMemoryPluginInfo(aPluginTag);
 }
 
 /* static */ bool
@@ -3212,6 +3224,7 @@ nsPluginHost::ReadPluginInfo()
 
     MOZ_LOG(nsPluginLogging::gPluginLog, PLUGIN_LOG_BASIC,
       ("LoadCachedPluginsInfo : Loading Cached plugininfo for %s\n", tag->FileName().get()));
+
     tag->mNext = mCachedPlugins;
     mCachedPlugins = tag;
   }
@@ -3279,8 +3292,6 @@ nsPluginHost::EnsurePrivateDirServiceProvider()
   if (!mPrivateDirServiceProvider) {
     nsresult rv;
     mPrivateDirServiceProvider = new nsPluginDirServiceProvider();
-    if (!mPrivateDirServiceProvider)
-      return NS_ERROR_OUT_OF_MEMORY;
     nsCOMPtr<nsIDirectoryService> dirService(do_GetService(kDirectoryServiceContractID, &rv));
     if (NS_FAILED(rv))
       return rv;
@@ -3348,6 +3359,7 @@ nsresult nsPluginHost::NewPluginURLStream(const nsString& aURL,
                      nsIContentPolicy::TYPE_OBJECT_SUBREQUEST,
                      nullptr,  // aLoadGroup
                      listenerPeer,
+                     nsIRequest::LOAD_NORMAL | nsIChannel::LOAD_CLASSIFY_URI |
                      nsIChannel::LOAD_BYPASS_SERVICE_WORKER);
   NS_ENSURE_SUCCESS(rv, rv);
 
@@ -3471,6 +3483,7 @@ nsPluginHost::AddHeadersToChannel(const char *aHeadersData,
 nsresult
 nsPluginHost::StopPluginInstance(nsNPAPIPluginInstance* aInstance)
 {
+  PROFILER_LABEL_FUNC(js::ProfileEntry::Category::OTHER);
   if (PluginDestructionGuard::DelayDestroy(aInstance)) {
     return NS_OK;
   }

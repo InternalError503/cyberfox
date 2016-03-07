@@ -187,7 +187,11 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  { "libmfxsw64.dll", ALL_VERSIONS },
 	  { "qsv.dll", ALL_VERSIONS }, 
 	  { "rtvcvfw32.dll", ALL_VERSIONS },
-	  { "rtvcvfw64.dll", ALL_VERSIONS },	  
+	  { "rtvcvfw64.dll", ALL_VERSIONS },
+
+	  // bug - Ubisoft game launcher overlay can appear on cyberfox when opening links making the GUI inaccessible.
+	  { "overlay.dll", ALL_VERSIONS },
+	  { "overlay64.dll", ALL_VERSIONS }, 	  
 	  
 	  //Ask toolbar
 	  { "genericasktoolbar.dll", ALL_VERSIONS },

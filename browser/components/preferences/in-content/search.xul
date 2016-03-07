@@ -28,7 +28,9 @@
           hidden="true"
           data-category="paneSearch">
       <image class="header-icon"/>
-      <label class="header-name">&paneSearch.title;</label>
+      <label class="header-name" flex="1">&paneSearch.title;</label>
+      <button class="help-button"
+              aria-label="&helpButton.label;"/>
     </hbox>
 
     <!-- Default Search Engine -->

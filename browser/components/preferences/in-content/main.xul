@@ -125,7 +125,9 @@
       hidden="true"
       data-category="paneGeneral">
   <image class="header-icon"/>
-  <label class="header-name">&paneGeneral.title;</label>
+  <label class="header-name" flex="1">&paneGeneral.title;</label>
+  <button class="help-button"
+          aria-label="&helpButton.label;"/>
 </hbox>
 
 <!-- Startup -->

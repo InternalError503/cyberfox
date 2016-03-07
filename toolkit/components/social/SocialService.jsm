@@ -572,7 +572,7 @@ this.SocialService = {
         aAddonInstaller.install();
       },
     };
-   //Set Help Link Social API
+
     let options = {
                     learnMoreURL: Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "social-api",
                   };
@@ -1153,7 +1153,7 @@ AddonWrapper.prototype = {
     return this.manifest.name;
   },
   get version() {
-    return this.manifest.version ? this.manifest.version : "";
+    return this.manifest.version ? this.manifest.version.toString() : "";
   },
 
   get iconURL() {

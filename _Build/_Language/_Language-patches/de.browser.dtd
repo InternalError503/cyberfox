@@ -50,8 +50,8 @@
 <!-- End Purge RAM browser tweak -->
 
 <!-- Restart Browser Tweak -->
-<!ENTITY restartBrowser.label "Browser neu starten">
-<!ENTITY restartBrowserButton.label "Browser neu starten">
+<!ENTITY restartBrowser.label "browser nu herstarten">
+<!ENTITY restartBrowserButton.label "browser nu herstarten">
 <!ENTITY turnOnRestart.label "Menüpunkt 'Browser neu starten' anzeigen.">
 <!ENTITY cleanFastRestartCache.label "Leere Schnellstart-Cache bei Browser Neustart.">
 <!ENTITY restartOptions.label "Neustart Optionen">

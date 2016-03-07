@@ -82,6 +82,7 @@ DEFAULTS = dict(
         'extensions.checkCompatibility': False,
         'extensions.enabledScopes': 5,
         'extensions.update.notifyUser': False,
+        'xpinstall.signatures.required': False,
         'hangmonitor.timeout': 0,
         'network.proxy.http': 'localhost',
         'network.proxy.http_port': 80,

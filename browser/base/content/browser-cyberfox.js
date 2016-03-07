@@ -14,6 +14,7 @@ var gCyberfoxCustom = {
     //Note: We are using pre-existing strings for the message to reduce edits to language packs.
     RestartMsg: Services.strings.createBundle("chrome://browser/locale/browser.properties"),
     Branding: Services.strings.createBundle("chrome://branding/locale/brand.properties").GetStringFromName("brandShortName"),
+    UplodateLocal: Services.strings.createBundle("chrome://browser/locale/cyberfox.properties"),
 	  urlArray: {url:[]},
 	  DownloadsWindow: null,
 
@@ -474,11 +475,11 @@ var gCyberfoxCustom = {
 			
         //Clear any previous set urls
         Services.prefs.clearUserPref("app.update.url.manual");
-			
+		
 			//Set notification bar button.
 			var button = [];
 			button = [{
-				label: "View",
+				label: this.UplodateLocal.GetStringFromName("update.notification.button"),
 				accessKey: "v",
 				callback: function() { openUILinkIn(Services.prefs.getCharPref("app.update.url.manual"), 'tab'); }
 			}];				
@@ -487,14 +488,15 @@ var gCyberfoxCustom = {
 				if(Services.prefs.getBoolPref("app.update.notification-new")){
 						if(AppConstants.platform == "win"){
 							Cc['@mozilla.org/alerts-service;1'].getService(Ci.nsIAlertsService)
-							.showAlertNotification('chrome://branding/content/icon48.png', "Cyberfox Update", "New cyberfox update available!", false,  '',  null, '');
+							.showAlertNotification('chrome://branding/content/icon48.png', this.UplodateLocal.formatStringFromName("update.notification.new.title", [this.Branding], 1), 
+								this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding], 1), false,  '',  null, '');
 						}else if(AppConstants.platform == "linux"){
 							var nb = gBrowser.getNotificationBox();
 							var iupdateNotification = nb.getNotificationWithValue('cyberfoxupdate');	
 							if (iupdateNotification) {
 								return;
 							}else{
-								nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
+								nb.appendNotification(this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding], 1), 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
 							}
 						}
 					}else{
@@ -503,7 +505,7 @@ var gCyberfoxCustom = {
 						if (iupdateNotification) {
 							return;
 						}else{
-							nb.appendNotification("New Cyberfox update available!", 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
+							nb.appendNotification(this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding], 1), 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
 						}						
 					}
 				} catch(e) {

@@ -17,7 +17,7 @@ var gVersion = Services.appinfo.version;
 var gBlocklistURL = Services.urlFormatter.formatURLPref("extensions.blocklist.detailsURL");
 var gPluginURL = Services.urlFormatter.formatURLPref("plugins.update.url");
 var gDate = new Date(2010, 7, 16);
-let infoURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
+var infoURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
 
 const EXPECTED_ADDONS = 13;
 

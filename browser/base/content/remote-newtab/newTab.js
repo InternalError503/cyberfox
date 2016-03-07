@@ -29,17 +29,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "Services",
   function handleCommand(command, data) {
     let commandHandled = true;
     switch (command) {
-    case "NewTab:UpdateTelemetryProbe":
-      /**
-       * Update a given Telemetry histogram
-       *
-       * @param {String} data.probe
-       *        Probe name to update
-       * @param {Number} data.value
-       *        Value to update histogram by
-       */
-      Services.telemetry.getHistogramById(data.probe).add(data.value);
-      break;
     case "NewTab:Register":
       registerEvent(data.type);
       break;
@@ -103,7 +92,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "Services",
     let isPrivate = PrivateBrowsingUtils.isContentWindowPrivate(window);
     let state = {
       enabled: prefs.getBoolPref("browser.newtabpage.enabled"),
-      enhanced: prefs.getBoolPref("browser.newtabpage.enhanced"),
       rows: prefs.getIntPref("browser.newtabpage.rows"),
       columns: prefs.getIntPref("browser.newtabpage.columns"),
       introShown: prefs.getBoolPref("browser.newtabpage.introShown"),

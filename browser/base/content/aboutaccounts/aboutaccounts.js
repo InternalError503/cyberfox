@@ -127,10 +127,11 @@ var wrapper = {
       url += (url.includes("?") ? "&" : "?") + urlParamStr;
     }
     this.url = url;
-    // Set the iframe's location with loadURI/LOAD_FLAGS_BYPASS_HISTORY to
-    // avoid having a new history entry being added.
+    // Set the iframe's location with loadURI/LOAD_FLAGS_REPLACE_HISTORY to
+    // avoid having a new history entry being added. REPLACE_HISTORY is used
+    // to replace the current entry, which is `about:blank`.
     let webNav = iframe.frameLoader.docShell.QueryInterface(Ci.nsIWebNavigation);
-    webNav.loadURI(url, Ci.nsIWebNavigation.LOAD_FLAGS_BYPASS_HISTORY, null, null, null);
+    webNav.loadURI(url, Ci.nsIWebNavigation.LOAD_FLAGS_REPLACE_HISTORY, null, null, null);
   },
 
   retry: function () {
@@ -319,7 +320,6 @@ function handleOldSync() {
     .QueryInterface(Ci.nsIInterfaceRequestor)
     .getInterface(Ci.nsIDOMWindow)
     .QueryInterface(Ci.nsIDOMChromeWindow);
-  //Set Help Link Old Sync
   let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "old-sync";
   chromeWin.switchToTabHavingURI(url, true);
 }

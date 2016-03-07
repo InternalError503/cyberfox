@@ -90,6 +90,9 @@ XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
 XPCOMUtils.defineLazyModuleGetter(this, "RecentWindow",
                                   "resource:///modules/RecentWindow.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "TabGroupsMigrator",
+                                  "resource:///modules/TabGroupsMigrator.jsm");
+
 XPCOMUtils.defineLazyModuleGetter(this, "Task",
                                   "resource://gre/modules/Task.jsm");
 
@@ -136,11 +139,11 @@ XPCOMUtils.defineLazyModuleGetter(this, "UpdateUtils",
                                   "resource://gre/modules/UpdateUtils.jsm");
 #endif
 
+XPCOMUtils.defineLazyModuleGetter(this, "TabCrashHandler",
+                                  "resource:///modules/ContentCrashHandlers.jsm");
 #ifdef MOZ_CRASHREPORTER
-XPCOMUtils.defineLazyModuleGetter(this, "TabCrashReporter",
-                                  "resource:///modules/ContentCrashReporters.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PluginCrashReporter",
-                                  "resource:///modules/ContentCrashReporters.jsm");
+                                  "resource:///modules/ContentCrashHandlers.jsm");
 #endif
 
 XPCOMUtils.defineLazyGetter(this, "ShellService", function() {
@@ -179,9 +182,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "LightweightThemeManager",
 
 XPCOMUtils.defineLazyModuleGetter(this, "ExtensionManagement",
                                   "resource://gre/modules/ExtensionManagement.jsm");
-
-XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
-                                  "resource://gre/modules/AppConstants.jsm");
 
 XPCOMUtils.defineLazyServiceGetter(this, "WindowsUIUtils",
                                    "@mozilla.org/windows-ui-utils;1", "nsIWindowsUIUtils");
@@ -262,7 +262,6 @@ BrowserGlue.prototype = {
     Services.prefs.savePrefFile(null);
   },
 
-#ifdef MOZ_SERVICES_SYNC
   _setSyncAutoconnectDelay: function BG__setSyncAutoconnectDelay() {
     // Assume that a non-zero value for services.sync.autoconnectDelay should override
     if (Services.prefs.prefHasUserValue("services.sync.autoconnectDelay")) {
@@ -284,7 +283,6 @@ BrowserGlue.prototype = {
     Cu.import("resource://services-sync/main.js");
     Weave.Service.scheduler.delayedAutoConnect(delay);
   },
-#endif
 
   // nsIObserver implementation
   observe: function BG_observe(subject, topic, data) {
@@ -329,14 +327,12 @@ BrowserGlue.prototype = {
         this._setPrefToSaveSession();
         break;
 #endif
-#ifdef MOZ_SERVICES_SYNC
       case "weave:service:ready":
         this._setSyncAutoconnectDelay();
         break;
       case "weave:engine:clients:display-uri":
         this._onDisplaySyncURI(subject);
         break;
-#endif
       case "session-save":
         this._setPrefToSaveSession(true);
         subject.QueryInterface(Ci.nsISupportsPRBool);
@@ -498,9 +494,6 @@ BrowserGlue.prototype = {
           }
         });
         break;
-      case "test-initialize-sanitizer":
-        this._sanitizer.onStartup();
-        break;
     }
   },
 
@@ -529,10 +522,8 @@ BrowserGlue.prototype = {
     os.addObserver(this, "browser-lastwindow-close-requested", false);
     os.addObserver(this, "browser-lastwindow-close-granted", false);
 #endif
-#ifdef MOZ_SERVICES_SYNC
     os.addObserver(this, "weave:service:ready", false);
     os.addObserver(this, "weave:engine:clients:display-uri", false);
-#endif
     os.addObserver(this, "session-save", false);
     os.addObserver(this, "places-init-complete", false);
     this._isPlacesInitObserver = true;
@@ -561,6 +552,9 @@ BrowserGlue.prototype = {
     ExtensionManagement.registerScript("chrome://browser/content/ext-windows.js");
     ExtensionManagement.registerScript("chrome://browser/content/ext-bookmarks.js");
 
+    ExtensionManagement.registerSchema("chrome://browser/content/schemas/tabs.json");
+    ExtensionManagement.registerSchema("chrome://browser/content/schemas/windows.json");
+
     this._flashHangCount = 0;
     this._firstWindowReady = new Promise(resolve => this._firstWindowLoaded = resolve);
   },
@@ -580,10 +574,8 @@ BrowserGlue.prototype = {
     os.removeObserver(this, "browser-lastwindow-close-requested");
     os.removeObserver(this, "browser-lastwindow-close-granted");
 #endif
-#ifdef MOZ_SERVICES_SYNC
     os.removeObserver(this, "weave:service:ready");
     os.removeObserver(this, "weave:engine:clients:display-uri");
-#endif
     os.removeObserver(this, "session-save");
     if (this._bookmarksBackupIdleTime) {
       this._idleService.removeIdleObserver(this, this._bookmarksBackupIdleTime);
@@ -625,6 +617,15 @@ BrowserGlue.prototype = {
     this._sanitizer.onStartup();
     // check if we're in safe mode
     if (Services.appinfo.inSafeMode) {
+      // See https://bugzilla.mozilla.org/show_bug.cgi?id=1231112#c7 . We need to
+      // register the observer early if we have to migrate tab groups
+      let currentUIVersion = 0;
+      try {
+        currentUIVersion = Services.prefs.getIntPref("browser.migration.version");
+      } catch(ex) {}
+      if (currentUIVersion < 35) {
+        this._maybeMigrateTabGroups();
+      }
       Services.ww.openWindow(null, "chrome://browser/content/safeMode.xul",
                              "_blank", "chrome,centerscreen,modal,resizable=no", null);
     }
@@ -685,8 +686,8 @@ BrowserGlue.prototype = {
     });
 #endif
 
+    TabCrashHandler.init();
 #ifdef MOZ_CRASHREPORTER
-    TabCrashReporter.init();
     PluginCrashReporter.init();
 #endif
 
@@ -863,7 +864,7 @@ BrowserGlue.prototype = {
     CustomizationTabPreloader.uninit();
     WebappManager.uninit();
 
-    if(!AppConstants.RELEASE_BUILD) {
+    if (!AppConstants.RELEASE_BUILD) {
       RemoteAboutNewTab.uninit();
     }
     AboutNewTab.uninit();
@@ -927,36 +928,24 @@ BrowserGlue.prototype = {
 
     // For any add-ons that were installed disabled and can be enabled offer
     // them to the user.
-    let changedIDs = AddonManager.getStartupChanges(AddonManager.STARTUP_CHANGE_INSTALLED);
-    if (changedIDs.length > 0) {
-      let win = RecentWindow.getMostRecentBrowserWindow();
-      AddonManager.getAddonsByIDs(changedIDs, function(aAddons) {
-        aAddons.forEach(function(aAddon) {
-          // If the add-on isn't user disabled or can't be enabled then skip it.
-          if (!aAddon.userDisabled || !(aAddon.permissions & AddonManager.PERM_CAN_ENABLE))
-            return;
-
-          win.openUILinkIn("about:newaddon?id=" + aAddon.id, "tab");
-        })
-      });
-    }
-    //We are not including this.
-    let signingRequired = false;
-
-    if (signingRequired) {
-      let disabledAddons = AddonManager.getStartupChanges(AddonManager.STARTUP_CHANGE_DISABLED);
-      AddonManager.getAddonsByIDs(disabledAddons, (addons) => {
-        for (let addon of addons) {
-          if (addon.type == "experiment")
-            continue;
-
-          if (addon.signedState <= AddonManager.SIGNEDSTATE_MISSING) {
-            this._notifyUnsignedAddonsDisabled();
-            break;
-          }
+    let win = RecentWindow.getMostRecentBrowserWindow();
+    AddonManager.getAllAddons(addons => {
+      for (let addon of addons) {
+        // If this add-on has already seen (or seen is undefined for non-XPI
+        // add-ons) then skip it.
+        if (addon.seen !== false) {
+          continue;
         }
-      });
-    }
+
+        // If this add-on cannot be enabled (either already enabled or
+        // appDisabled) then skip it.
+        if (!(addon.permissions & AddonManager.PERM_CAN_ENABLE)) {
+          continue;
+        }
+
+        win.openUILinkIn("about:newaddon?id=" + addon.id, "tab");
+      }
+    });
 
     // Perform default browser checking.
     if (ShellService) {
@@ -964,6 +953,15 @@ BrowserGlue.prototype = {
       let shouldCheck = false;
 #else
       let shouldCheck = ShellService.shouldCheckDefaultBrowser;
+#endif
+      let promptCount = 0;
+#ifndef RELEASE_BUILD
+      promptCount =
+        Services.prefs.getIntPref("browser.shell.defaultBrowserCheckCount");
+      let skipDefaultBrowserCheck =
+        Services.prefs.getBoolPref("browser.shell.skipDefaultBrowserCheck");
+#else
+      let skipDefaultBrowserCheck = false;
 #endif
       let willRecoverSession = false;
       try {
@@ -988,33 +986,44 @@ BrowserGlue.prototype = {
         Services.prefs.setCharPref("browser.shell.mostRecentDateSetAsDefault", now);
       }
 
-      if (shouldCheck && !isDefault && !willRecoverSession) {
+      let willPrompt = shouldCheck && !isDefault && !willRecoverSession;
+
+      // Skip the "Set Default Browser" check during first-run or after the
+      // browser has been run a few times.
+      if (willPrompt) {
+        if (skipDefaultBrowserCheck) {
+          Services.prefs.setBoolPref("browser.shell.skipDefaultBrowserCheck", false);
+          willPrompt = false;
+        } else {
+          promptCount++;
+        }
+        if (promptCount > 3) {
+          willPrompt = false;
+        }
+      }
+
+#ifndef RELEASE_BUILD
+      if (willPrompt) {
+        Services.prefs.setIntPref("browser.shell.defaultBrowserCheckCount",
+                                  promptCount);
+      }
+#endif
+
+      if (willPrompt) {
         Services.tm.mainThread.dispatch(function() {
           DefaultBrowserCheck.prompt(RecentWindow.getMostRecentBrowserWindow());
         }.bind(this), Ci.nsIThread.DISPATCH_NORMAL);
       }
     }
 
-    if (this._mayNeedToWarnAboutTabGroups) {
-      let haveTabGroups = false;
-      let wins = Services.wm.getEnumerator("navigator:browser");
-      while (wins.hasMoreElements()) {
-        let win = wins.getNext();
-        if (win.TabView._tabBrowserHasHiddenTabs() && win.TabView.firstUseExperienced) {
-          haveTabGroups = true;
-          break;
-        }
-      }
-      if (haveTabGroups) {
-        this._showTabGroupsDeprecationNotification();
-      }
+    if (AppConstants.E10S_TESTING_ONLY) {
+      E10SUINotification.checkStatus();
     }
-
-#ifdef E10S_TESTING_ONLY
-    E10SUINotification.checkStatus();
-#else
-    E10SAccessibilityCheck.init();
-#endif
+    if (AppConstants.platform == "win") {
+      // Handles prompting to inform about incompatibilites when accessibility
+      // and e10s are active together.
+      E10SAccessibilityCheck.init();
+    }
   },
 
 #ifdef MOZ_DEV_EDITION
@@ -1050,25 +1059,12 @@ BrowserGlue.prototype = {
   },
 #endif
 
-  _showTabGroupsDeprecationNotification() {
-    let brandShortName = gBrandBundle.GetStringFromName("brandShortName");
-    let text = gBrowserBundle.formatStringFromName("tabgroups.deprecationwarning.description",
-                                                   [brandShortName], 1);
-    let learnMore = gBrowserBundle.GetStringFromName("tabgroups.deprecationwarning.learnMore.label");
-    let learnMoreKey = gBrowserBundle.GetStringFromName("tabgroups.deprecationwarning.learnMore.accesskey");
-
-    let win = RecentWindow.getMostRecentBrowserWindow();
-    let notifyBox = win.document.getElementById("high-priority-global-notificationbox");
-    let button = {
-      label: learnMore,
-      accessKey: learnMoreKey,
-      callback: function(aNotificationBar, aButton) {
-        win.openUILinkIn("https://support.mozilla.org/kb/tab-groups-removal", "tab");
-      },
+  _maybeMigrateTabGroups() {
+    let migrationObserver = (stateAsSupportsString, topic) => {
+      Services.obs.removeObserver(migrationObserver, "sessionstore-state-read");
+      TabGroupsMigrator.migrate(stateAsSupportsString);
     };
-
-    notifyBox.appendNotification(text, "tabgroups-removal-notification", null,
-                                 notifyBox.PRIORITY_WARNING_MEDIUM, [button]);
+    Services.obs.addObserver(migrationObserver, "sessionstore-state-read", false);
   },
 
   _onQuitRequest: function BG__onQuitRequest(aCancelQuit, aQuitType) {
@@ -1508,6 +1504,7 @@ BrowserGlue.prototype = {
    * - export bookmarks as HTML, if so configured.
    */
   _onPlacesShutdown: function BG__onPlacesShutdown() {
+    this._sanitizer.onShutdown();
     PageThumbs.uninit();
 
     if (this._bookmarksBackupIdleTime) {
@@ -1572,22 +1569,16 @@ BrowserGlue.prototype = {
   },
 
   _migrateUI: function BG__migrateUI() {
-    const UI_VERSION = 34;
+    const UI_VERSION = 36;
     const BROWSER_DOCURL = "chrome://browser/content/browser.xul";
     let currentUIVersion = 0;
-
-    let xulStore = Cc["@mozilla.org/xul/xulstore;1"].getService(Ci.nsIXULStore);
-
-    // Unconditionally remove this for Fx44 so we don't interfere with the UI version
-    xulStore.removeValue("chrome://passwordmgr/content/passwordManager.xul",
-                         "passwordCol",
-                         "hidden");
-
     try {
       currentUIVersion = Services.prefs.getIntPref("browser.migration.version");
     } catch(ex) {}
     if (currentUIVersion >= UI_VERSION)
       return;
+
+    let xulStore = Cc["@mozilla.org/xul/xulstore;1"].getService(Ci.nsIXULStore);
 
     if (currentUIVersion < 2) {
       // This code adds the customizable bookmarks button.
@@ -1923,9 +1914,15 @@ BrowserGlue.prototype = {
       this._notifyNotificationsUpgrade().catch(Cu.reportError);
     }
 
-    if (currentUIVersion < 34) {
-      // We'll do something once windows are open:
-      this._mayNeedToWarnAboutTabGroups = true;
+    // Only do this outside of safe mode, because in safe mode we do this earlier.
+    if (currentUIVersion < 35 && !Services.appinfo.inSafeMode) {
+      this._maybeMigrateTabGroups();
+    }
+
+    if (currentUIVersion < 36) {
+      xulStore.removeValue("chrome://passwordmgr/content/passwordManager.xul",
+                           "passwordCol",
+                           "hidden");
     }
 
     // Update the migration version.
@@ -2139,7 +2136,6 @@ BrowserGlue.prototype = {
     chromeWindow.openPreferences(...args);
   },
 
-#ifdef MOZ_SERVICES_SYNC
   /**
    * Called as an observer when Sync's "display URI" notification is fired.
    *
@@ -2161,7 +2157,6 @@ BrowserGlue.prototype = {
       Cu.reportError("Error displaying tab received by Sync: " + ex);
     }
   },
-#endif
 
   _handleFlashHang: function() {
     ++this._flashHangCount;
@@ -2729,44 +2724,37 @@ var DefaultBrowserCheck = {
 
 #ifdef E10S_TESTING_ONLY
 var E10SUINotification = {
-  // Increase this number each time we want to roll out an
-  // e10s testing period to Nightly users.
-  CURRENT_NOTICE_COUNT: 4,
   CURRENT_PROMPT_PREF: "browser.displayedE10SPrompt.1",
   PREVIOUS_PROMPT_PREF: "browser.displayedE10SPrompt",
 
-  checkStatus: function() {
-    let skipE10sChecks = false;
+  get forcedOn() {
     try {
-      let updateChannel = UpdateUtils.UpdateChannel;
-      let channelAuthorized = updateChannel == "nightly" || updateChannel == "aurora";
+      return Services.prefs.getBoolPref("browser.tabs.remote.force-enable");
+    } catch (e) {}
+    return false;
+  },
 
-      skipE10sChecks = !channelAuthorized ||
-                       Services.prefs.getBoolPref("browser.tabs.remote.disabled-for-a11y");
-    } catch(e) {}
+  get a11yRecentlyRan() {
+    try {
+      if (Services.prefs.getBoolPref("accessibility.loadedInLastSession")) {
+        return true;
+      }
+    } catch (e) {}
+    try {
+      Services.prefs.getBoolPref("accessibility.lastLoadDate");
+      return true;
+    } catch (e) {}
+    return false;
+  },
 
-    if (skipE10sChecks) {
+  checkStatus: function() {
+    let updateChannel = UpdateUtils.UpdateChannel;
+    let channelAuthorized = updateChannel == "nightly" || updateChannel == "aurora";
+    if (!channelAuthorized) {
       return;
     }
 
-    if (Services.appinfo.browserTabsRemoteAutostart) {
-      let notice = 0;
-      try {
-        notice = Services.prefs.getIntPref("browser.displayedE10SNotice");
-      } catch(e) {}
-      let activationNoticeShown = notice >= this.CURRENT_NOTICE_COUNT;
-
-      if (!activationNoticeShown) {
-        this._showE10sActivatedNotice();
-      }
-
-      // e10s doesn't work with accessibility, so we prompt to disable
-      // e10s if a11y is enabled, now or in the future.
-      Services.obs.addObserver(this, "a11y-init-or-shutdown", true);
-      if (Services.appinfo.accessibilityIsBlacklistedForE10S) {
-        this._showE10sAccessibilityWarning();
-      }
-    } else {
+    if (!Services.appinfo.browserTabsRemoteAutostart) {
       let displayFeedbackRequest = false;
       try {
         displayFeedbackRequest = Services.prefs.getBoolPref("browser.requestE10sFeedback");
@@ -2778,10 +2766,6 @@ var E10SUINotification = {
           return;
         }
 
-        // The user has just voluntarily disabled e10s. Subtract one from displayedE10SNotice
-        // so that the next time e10s is activated (either by the user or forced by us), they
-        // can see the notice again.
-        Services.prefs.setIntPref("browser.displayedE10SNotice", this.CURRENT_NOTICE_COUNT - 1);
         Services.prefs.clearUserPref("browser.requestE10sFeedback");
 
         let url = Services.urlFormatter.formatURLPref("app.feedback.baseURL");
@@ -2791,11 +2775,15 @@ var E10SUINotification = {
         return;
       }
 
+      // If accessibility recently ran, don't prompt about trying out e10s
+      if (this.a11yRecentlyRan) {
+        return;
+      }
+
       let e10sPromptShownCount = 0;
       try {
         e10sPromptShownCount = Services.prefs.getIntPref(this.CURRENT_PROMPT_PREF);
       } catch(e) {}
-      e10sPromptShownCount = 5;
 
       let isHardwareAccelerated = true;
       // Linux and Windows are currently ok, mac not so much.
@@ -2825,40 +2813,6 @@ var E10SUINotification = {
   },
 
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
-
-  observe: function(subject, topic, data) {
-    if (topic == "a11y-init-or-shutdown"
-        && data == "1" &&
-        Services.appinfo.accessibilityIsBlacklistedForE10S) {
-      this._showE10sAccessibilityWarning();
-    }
-  },
-
-  _showE10sActivatedNotice: function() {
-    let win = RecentWindow.getMostRecentBrowserWindow();
-    if (!win)
-      return;
-
-    Services.prefs.setIntPref("browser.displayedE10SNotice", this.CURRENT_NOTICE_COUNT);
-
-    let nb = win.document.getElementById("high-priority-global-notificationbox");
-    let message = win.gNavigatorBundle.getFormattedString(
-                    "e10s.postActivationInfobar.message",
-                    [gBrandBundle.GetStringFromName("brandShortName")]
-                  );
-    let buttons = [
-      {
-        label: win.gNavigatorBundle.getString("e10s.postActivationInfobar.learnMore.label"),
-        accessKey: win.gNavigatorBundle.getString("e10s.postActivationInfobar.learnMore.accesskey"),
-        callback: function () {
-          win.openUILinkIn("https://wiki.mozilla.org/Electrolysis", "tab");
-        }
-      }
-    ];
-    nb.appendNotification(message, "e10s-activated-noticed",
-                          null, nb.PRIORITY_WARNING_MEDIUM, buttons);
-
-  },
 
   _showE10SPrompt: function BG__showE10SPrompt() {
     let win = RecentWindow.getMostRecentBrowserWindow();
@@ -2914,153 +2868,117 @@ var E10SUINotification = {
       highlightLabel.setAttribute("value", highlight);
       doorhangerExtraContent.appendChild(highlightLabel);
     }
+  }
+};
+#endif // E10S_TESTING_ONLY
+
+var E10SAccessibilityCheck = {
+  init: function() {
+    Services.obs.addObserver(this, "a11y-init-or-shutdown", true);
+    Services.obs.addObserver(this, "quit-application-granted", true);
+  },
+
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
+
+  get forcedOn() {
+    try {
+      return Services.prefs.getBoolPref("browser.tabs.remote.force-enable");
+    } catch (e) {}
+    return false;
+  },
+
+  observe: function(subject, topic, data) {
+    switch (topic) {
+      case "quit-application-granted":
+        // Tag the profile with a11y load state. We use this in nsAppRunner
+        // checks on the next start.
+        Services.prefs.setBoolPref("accessibility.loadedInLastSession",
+                                   Services.appinfo.accessibilityEnabled);
+        break;
+      case "a11y-init-or-shutdown":
+        if (data == "1") {
+          // Update this so users can check this while still running
+          Services.prefs.setBoolPref("accessibility.loadedInLastSession", true);
+          this._showE10sAccessibilityWarning();
+        }
+        break;
+    }
   },
 
   _warnedAboutAccessibility: false,
 
   _showE10sAccessibilityWarning: function() {
-    try {
-      if (!Services.prefs.getBoolPref("browser.tabs.remote.disabled-for-a11y")) {
-        // Only return if the pref exists and was set to false, but not
-        // if the pref didn't exist (which will throw).
-        return;
-      }
-    } catch (e) { }
+    // We don't prompt about a11y incompat if e10s is off.
+    if (!Services.appinfo.browserTabsRemoteAutostart) {
+      return;
+    }
 
-    Services.prefs.setBoolPref("browser.tabs.remote.disabled-for-a11y", true);
+    // If the user set the forced pref and it's true, ignore a11y init.
+    // If the pref doesn't exist or if it's false, prompt.
+    if (this.forcedOn) {
+      return;
+    }
 
+    // Only prompt once per session
     if (this._warnedAboutAccessibility) {
       return;
     }
     this._warnedAboutAccessibility = true;
 
     let win = RecentWindow.getMostRecentBrowserWindow();
+    let browser = win.gBrowser.selectedBrowser;
     if (!win) {
-      // Just restart immediately.
-      Services.startup.quit(Services.startup.eAttemptQuit | Services.startup.eRestart);
+      Services.console.logStringMessage("Accessibility support is partially disabled due to compatibility issues with new features.");
       return;
     }
 
-    let browser = win.gBrowser.selectedBrowser;
-
+    // We disable a11y for content and prompt on the chrome side letting
+    // a11y users know they need to disable e10s and restart.
     let promptMessage = win.gNavigatorBundle.getFormattedString(
-                          "e10s.accessibilityNotice.mainMessage",
+                          "e10s.accessibilityNotice.mainMessage2",
                           [gBrandBundle.GetStringFromName("brandShortName")]
                         );
-    let mainAction = {
-      label: win.gNavigatorBundle.getString("e10s.accessibilityNotice.disableAndRestart.label"),
-      accessKey: win.gNavigatorBundle.getString("e10s.accessibilityNotice.disableAndRestart.accesskey"),
-      callback: function () {
-        // Restart the app
-        let cancelQuit = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
-        Services.obs.notifyObservers(cancelQuit, "quit-application-requested", "restart");
-        if (cancelQuit.data)
-          return; // somebody canceled our quit request
-        Services.startup.quit(Services.startup.eAttemptQuit | Services.startup.eRestart);
+    let notification;
+    let restartCallback  = function() {
+      let cancelQuit = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
+      Services.obs.notifyObservers(cancelQuit, "quit-application-requested", "restart");
+      if (cancelQuit.data) {
+        return; // somebody canceled our quit request
       }
-    };
-    let secondaryActions = [
-      {
-        label: win.gNavigatorBundle.getString("e10s.accessibilityNotice.dontDisable.label"),
-        accessKey: win.gNavigatorBundle.getString("e10s.accessibilityNotice.dontDisable.accesskey"),
-        callback: function () {
-          Services.prefs.setBoolPref("browser.tabs.remote.disabled-for-a11y", false);
-        }
-      }
-    ];
-    let options = {
-      popupIconURL: "chrome://browser/skin/e10s-64@2x.png",
-      learnMoreURL: "https://wiki.mozilla.org/Electrolysis",
-      persistWhileVisible: true
-    };
-
-    win.PopupNotifications.show(browser, "a11y_enabled_with_e10s", promptMessage, null, mainAction, secondaryActions, options);
-  },
-};
-
-#else // E10S_TESTING_ONLY
-
-var E10SAccessibilityCheck = {
-  init: function() {
-    Services.obs.addObserver(this, "a11y-init-or-shutdown", true);
-    if (Services.appinfo.accessibilityEnabled) {
-      this._showE10sAccessibilityWarning();
-    }
-  },
-
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
-
-  observe: function(subject, topic, data) {
-    if (topic == "a11y-init-or-shutdown"
-        && data == "1") {
-      this._showE10sAccessibilityWarning();
-    }
-  },
-
-  _warnedAboutAccessibility: false,
-
-  _showE10sAccessibilityWarning: function() {
-    try {
-      if (!Services.prefs.getBoolPref("browser.tabs.remote.disabled-for-a11y")) {
-        // Only return if the pref exists and was set to false, but not
-        // if the pref didn't exist (which will throw).
-        return;
-      }
-    } catch (e) { }
-
-    Services.prefs.setBoolPref("browser.tabs.remote.disabled-for-a11y", true);
-
-    if (this._warnedAboutAccessibility ||
-        !Services.appinfo.browserTabsRemoteAutostart) {
-      return;
-    }
-    this._warnedAboutAccessibility = true;
-
-    let win = RecentWindow.getMostRecentBrowserWindow();
-    if (!win) {
-      // Just restart immediately.
+      // Restart the browser
       Services.startup.quit(Services.startup.eAttemptQuit | Services.startup.eRestart);
-      return;
-    }
-
-    let browser = win.gBrowser.selectedBrowser;
-
-    let promptMessage = win.gNavigatorBundle.getFormattedString(
-                          "e10s.accessibilityNotice.mainMessage",
-                          [gBrandBundle.GetStringFromName("brandShortName")]
-                        );
-    let mainAction = {
-      label: win.gNavigatorBundle.getString("e10s.accessibilityNotice.disableAndRestart.label"),
-      accessKey: win.gNavigatorBundle.getString("e10s.accessibilityNotice.disableAndRestart.accesskey"),
-      callback: function () {
-        // Restart the app
-        let cancelQuit = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
-        Services.obs.notifyObservers(cancelQuit, "quit-application-requested", "restart");
-        if (cancelQuit.data)
-          return; // somebody canceled our quit request
-        Services.startup.quit(Services.startup.eAttemptQuit | Services.startup.eRestart);
-      }
     };
-    let secondaryActions = [
-      {
-        label: win.gNavigatorBundle.getString("e10s.accessibilityNotice.dontDisable.label"),
-        accessKey: win.gNavigatorBundle.getString("e10s.accessibilityNotice.dontDisable.accesskey"),
-        callback: function () {
-          Services.prefs.setBoolPref("browser.tabs.remote.disabled-for-a11y", false);
-        }
-      }
-    ];
+    // main option: an Ok button, keeps running with content accessibility disabled
+    let mainAction = {
+      label: win.gNavigatorBundle.getString("e10s.accessibilityNotice.acceptButton.label"),
+      accessKey: win.gNavigatorBundle.getString("e10s.accessibilityNotice.acceptButton.accesskey"),
+      callback: function () {
+        // If the user invoked the button option remove the notification,
+        // otherwise keep the alert icon around in the address bar.
+        notification.remove();
+      },
+      dismiss: true
+    };
+    // secondary option: a restart now button. When we restart e10s will be disabled due to
+    // accessibility having been loaded in the previous session.
+    let secondaryActions = [{
+      label: win.gNavigatorBundle.getString("e10s.accessibilityNotice.enableAndRestart.label"),
+      accessKey: win.gNavigatorBundle.getString("e10s.accessibilityNotice.enableAndRestart.accesskey"),
+      callback: restartCallback,
+    }];
     let options = {
       popupIconURL: "chrome://browser/skin/e10s-64@2x.png",
-      learnMoreURL: "https://wiki.mozilla.org/Electrolysis",
-      persistWhileVisible: true
+      learnMoreURL: "https://support.mozilla.org/kb/accessibility-and-ppt",
+      persistWhileVisible: true,
+      hideNotNow: true,
     };
 
-    win.PopupNotifications.show(browser, "a11y_enabled_with_e10s", promptMessage, null, mainAction, secondaryActions, options);
+    notification =
+      win.PopupNotifications.show(browser, "a11y_enabled_with_e10s",
+                                  promptMessage, null, mainAction,
+                                  secondaryActions, options);
   },
 };
-
-#endif // E10S_TESTING_ONLY
 
 var components = [BrowserGlue, ContentPermissionPrompt, AboutNewTabService];
 this.NSGetFactory = XPCOMUtils.generateNSGetFactory(components);

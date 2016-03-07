@@ -2,9 +2,10 @@ app.config
 setup.inc
 languages.inc
 messages.inc
-customMessages.64.inc
+customMessages.inc
 tasks.inc
 files.inc
+installDelete.inc
 icons.inc
 registry.registry
 code.inc

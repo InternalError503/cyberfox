@@ -39,9 +39,6 @@
   --in-content-secondary-button-background: #fbfbfb;
   --in-content-table-border-dark-color: #d1d1d1;
   --in-content-table-header-background: #0095dd;
-  --in-content-help-button-background: #ffcb00;
-  --in-content-help-button-background-hover: #f4c200;
-  --in-content-help-button-background-active: #eaba00;
 }
 
 html|html,
@@ -49,7 +46,7 @@ xul|page,
 xul|window {
   font: message-box;
   -moz-appearance: none;
-   background-image: var(--in-content-page-background);
+  background-color: var(--in-content-page-background);
   color: var(--in-content-page-color);
 }
 
@@ -148,6 +145,8 @@ xul|tab {
   color: var(--in-content-tab-color);
   background-image: var(--in-content-page-background);
   border-width: 0;
+  /* !important overrides tabbox.css RTL and visuallyselected rules */
+  border-radius: 0 !important;
   transition: background-color 50ms ease 0s;
 }
 
@@ -259,23 +258,27 @@ xul|button[type="menu"] > xul|*.button-box > xul|*.button-menu-dropmarker {
 }
 
 xul|*.help-button {
-  min-width: 30px;
-  border-radius: 2px;
-  border: 1px solid var(--in-content-box-border-color);
-  background-color: var(--in-content-help-button-background);
+  min-width: 16px;
+  -moz-margin-end: 0;
+  border-width: 0;
   background-image: none;
+  background-color: transparent;
   box-shadow: none;
-  list-style-image: url("chrome://global/skin/in-content/help-glyph.svg");
+  list-style-image: url("chrome://global/skin/in-content/help-glyph.svg#help");
 }
 
 xul|*.help-button:not([disabled="true"]):hover {
-  background-color: var(--in-content-help-button-background-hover);
   background-image: none;
+  /* Override default button background */
+  background-color: transparent;
+  list-style-image: url("chrome://global/skin/in-content/help-glyph.svg#help-hover");
 }
 
 xul|*.help-button:not([disabled="true"]):hover:active {
-  background-color: var(--in-content-help-button-background-active);
   background-image: none;
+  /* Override default button background */
+  background-color: transparent;
+  list-style-image: url("chrome://global/skin/in-content/help-glyph.svg#help-pressed");
 }
 
 xul|*.close-icon > xul|*.button-box,
@@ -287,8 +290,8 @@ xul|*.help-button > xul|*.button-box {
 }
 
 xul|*.help-button > xul|*.button-box > xul|*.button-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 xul|*.help-button > xul|*.button-box > xul|*.button-text {
@@ -644,6 +647,7 @@ xul|*.radio-label-box {
   -moz-margin-end: 4px; /* add the 4px end-margin of other elements */
   margin-bottom: 15px;
   padding-bottom: 15px;
+  -moz-box-align: baseline;
 }
 
 *|*.header-name {
