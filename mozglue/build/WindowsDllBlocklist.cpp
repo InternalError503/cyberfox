@@ -191,7 +191,11 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 
 	  // bug - Ubisoft game launcher overlay can appear on cyberfox when opening links making the GUI inaccessible.
 	  { "overlay.dll", ALL_VERSIONS },
-	  { "overlay64.dll", ALL_VERSIONS }, 	  
+	  { "overlay64.dll", ALL_VERSIONS }, 	
+	  
+	  // bug - Steam game overlay can appear on cyberfox when opening links making the GUI inaccessible or visual glitches.
+	  { "gameoverlayrenderer.dll", ALL_VERSIONS },
+	  { "gameoverlayrenderer64.dll", ALL_VERSIONS }, 
 	  
 	  //Ask toolbar
 	  { "genericasktoolbar.dll", ALL_VERSIONS },
