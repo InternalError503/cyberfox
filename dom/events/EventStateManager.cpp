@@ -285,6 +285,7 @@ TimeStamp EventStateManager::sHandlingInputStart;
 
 EventStateManager::WheelPrefs*
   EventStateManager::WheelPrefs::sInstance = nullptr;
+bool EventStateManager::WheelPrefs::sWheelEventsEnabledOnPlugins = true;
 EventStateManager::DeltaAccumulator*
   EventStateManager::DeltaAccumulator::sInstance = nullptr;
 
@@ -2370,6 +2371,11 @@ EventStateManager::ComputeScrollTarget(nsIFrame* aTargetFrame,
                                        WidgetWheelEvent* aEvent,
                                        ComputeScrollTargetOptions aOptions)
 {
+  if ((aOptions & INCLUDE_PLUGIN_AS_TARGET) &&
+      !WheelPrefs::WheelEventsEnabledOnPlugins()) {
+    aOptions = RemovePluginFromTarget(aOptions);
+  }
+
   if (aOptions & PREFER_MOUSE_WHEEL_TRANSACTION) {
     // If the user recently scrolled with the mousewheel, then they probably
     // want to scroll the same view as before instead of the view under the
@@ -5511,6 +5517,9 @@ EventStateManager::WheelPrefs::WheelPrefs()
 {
   Reset();
   Preferences::RegisterCallback(OnPrefChanged, "mousewheel.", nullptr);
+  Preferences::AddBoolVarCache(&sWheelEventsEnabledOnPlugins,
+                               "plugin.mousewheel.enabled",
+                               true);
 }
 
 EventStateManager::WheelPrefs::~WheelPrefs()
@@ -5728,6 +5737,16 @@ EventStateManager::WheelPrefs::GetUserPrefsForEvent(WidgetWheelEvent* aEvent,
 
   *aOutMultiplierX = mMultiplierX[index];
   *aOutMultiplierY = mMultiplierY[index];
+}
+
+// static
+bool
+EventStateManager::WheelPrefs::WheelEventsEnabledOnPlugins()
+{
+  if (!sInstance) {
+    GetInstance(); // initializing sWheelEventsEnabledOnPlugins
+  }
+  return sWheelEventsEnabledOnPlugins;
 }
 
 bool
