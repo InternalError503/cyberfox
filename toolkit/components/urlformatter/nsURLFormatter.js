@@ -114,7 +114,7 @@ nsURLFormatterService.prototype = {
     OS_VERSION:       function() { return this.OSVersion; },
     CHANNEL:          () => UpdateUtils.UpdateChannel,
     MOZILLA_API_KEY:  () => "7e40f68c-7938-4c5d-9f95-e61647c213eb",
-    GOOGLE_API_KEY:   () => "AIzaSyD-s-mXL4mBzF7KMRkhTCIbG2RKnRGXzJc",
+    GOOGLE_API_KEY:   () => "AIzaSyD_Drzahe4dBzGCZ9ArvowCvrPx_yFrlCM",
     GOOGLE_OAUTH_API_CLIENTID:() => "147935343582-jfl0e0psc7kh1mut1nftb7de0f1h0ro0.apps.googleusercontent.com",
     GOOGLE_OAUTH_API_KEY:     () => "KtHCFCc09ltCyJCjCwH7ZJwG",
     BING_API_CLIENTID:() => "@MOZ_BING_API_CLIENTID@",
