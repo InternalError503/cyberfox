@@ -169,11 +169,17 @@
 <!ENTITY turnoffcontextabout.label "コンテキスト メニュー項目 [about:config] を有効にする">
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "メニュー項目 [about:config] を有効にする">
-<!-- one click search Tweak -->
-<!ENTITY turnoffoneclicksearch.label "ワンクリック検索を有効にする">
 
-<!-- Loop Toggle Tweak -->
+<!-- Plugin Settings Tweak -->
+<!ENTITY browserplugins.label "Browser Plugins">
+<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
+<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+
+<!-- System Addons Tweak -->
+<!ENTITY systemaddons.label "System Addons">
+<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
 <!ENTITY enablehellochat.label "Hello 通話を有効にする">
+<!ENTITY enablepocket.label "Enable pocket.">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "ブラウザ再起動が必要です">

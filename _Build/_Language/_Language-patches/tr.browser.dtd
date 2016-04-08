@@ -169,11 +169,17 @@
 <!ENTITY turnoffcontextabout.label "Turn on about:config context menu item.">
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Turn on about:config menu item.">
-<!-- one click search Tweak -->
-<!ENTITY turnoffoneclicksearch.label "Turn on one click search.">
 
-<!-- Loop Toggle Tweak -->
+<!-- Plugin Settings Tweak -->
+<!ENTITY browserplugins.label "Browser Plugins">
+<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
+<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+
+<!-- System Addons Tweak -->
+<!ENTITY systemaddons.label "System Addons">
+<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
 <!ENTITY enablehellochat.label "Enable hello chat.">
+<!ENTITY enablepocket.label "Enable pocket.">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Browser Restart Required.">

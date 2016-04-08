@@ -50,8 +50,8 @@
 <!-- End Purge RAM browser tweak -->
 
 <!-- Restart Browser Tweak -->
-<!ENTITY restartBrowser.label "browser nu herstarten">
-<!ENTITY restartBrowserButton.label "browser nu herstarten">
+<!ENTITY restartBrowser.label "Browser neu starten">
+<!ENTITY restartBrowserButton.label "Browser neu starten">
 <!ENTITY turnOnRestart.label "Menüpunkt 'Browser neu starten' anzeigen.">
 <!ENTITY cleanFastRestartCache.label "Leere Schnellstart-Cache bei Browser Neustart.">
 <!ENTITY restartOptions.label "Neustart Optionen">
@@ -169,11 +169,17 @@
 <!ENTITY turnoffcontextabout.label "Kontextmenüpunkt 'about:config' anzeigen.">
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Menüpunkt 'about:config' anzeigen.">
-<!-- one click search Tweak -->
-<!ENTITY turnoffoneclicksearch.label "Ein-Klick Suche verwenden.">
 
-<!-- Loop Toggle Tweak -->
+<!-- Plugin Settings Tweak -->
+<!ENTITY browserplugins.label "Browser Plugins">
+<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
+<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+
+<!-- System Addons Tweak -->
+<!ENTITY systemaddons.label "System Addons">
+<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
 <!ENTITY enablehellochat.label "Aktiviere 'hello' Chat.">
+<!ENTITY enablepocket.label "Enable pocket.">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Browser Neustart benötigt.">

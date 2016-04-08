@@ -169,11 +169,17 @@
 <!ENTITY turnoffcontextabout.label "Включить доступ к about:config в контекстном меню.">
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Включить доступ к about:config в меню.">
-<!-- one click search Tweak -->
-<!ENTITY turnoffoneclicksearch.label "Включить поиск по одному щелчку мыши.">
 
-<!-- Loop Toggle Tweak -->
+<!-- Plugin Settings Tweak -->
+<!ENTITY browserplugins.label "Browser Plugins">
+<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
+<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+
+<!-- System Addons Tweak -->
+<!ENTITY systemaddons.label "System Addons">
+<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
 <!ENTITY enablehellochat.label "Включить чат hello">
+<!ENTITY enablepocket.label "Enable pocket.">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Требуется перезапуск браузера">
