@@ -80,6 +80,3 @@ WizardImageFile={#PackageBranding}\WizModernImage.bmp
 WizardSmallImageFile={#PackageBranding}\WizModernSmallImage.bmp
 OutputDir={#PackageOutPutPath}
 MinVersion=0,6.0sp2
-#if PackageType == "amd86" || PackageType == "amd64" || PackageType == "intel86" || PackageType == "intel64"
-InfoBeforeFile={content}\setupFiles\changelog.rtf
-#endif

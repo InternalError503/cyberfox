@@ -6,12 +6,6 @@ set ISSCompiler="%BuildFolderPath%_ISCompiler\compil32"
 set zip=%~DP0_7ZipPortable\App\7-Zip\7z.exe
 echo. 
 ::----
-echo.Updating Changelog.rtf
-timeout 2 >nul
-::---- 
-if exist "%BuildFolderPath%_Changelog\changelog.rtf" copy /y "%BuildFolderPath%_Changelog\changelog.rtf" "%BuildFolderPath%_Installer\{content}\setupFiles"
-timeout 2 >nul
-::---- 
 echo.Building cyberfox installer packages!
 timeout 2 >nul
 ::---- 
