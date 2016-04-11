@@ -181,18 +181,19 @@ procedure CurStepChanged(CurStep: TSetupStep);
 
 end;
 //Check if install exists of not disable clean install check-box
+//Note when changing task ordering to update array order below for clean install checkbox.
 procedure CurPageChanged(CurPageID: Integer);
 	begin
 		if CurPageID = wpSelectTasks then
 	begin
 		if not RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then 
 			begin
-				WizardForm.TasksList.Checked[1] := False;
-				WizardForm.TasksList.ItemEnabled[0] := False;
-				WizardForm.TasksList.ItemEnabled[1] := False;
+				WizardForm.TasksList.Checked[3] := False;
+				WizardForm.TasksList.ItemEnabled[2] := False;
+				WizardForm.TasksList.ItemEnabled[3] := False;
 		end
 		else begin
-				WizardForm.TasksList.Checked[1] := False;
+				WizardForm.TasksList.Checked[3] := False;
 		end;
 	end;
 end;	
