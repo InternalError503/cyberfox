@@ -315,7 +315,6 @@
         <image class="fxaSyncIllustration"/>
       </vbox>
     </hbox>
-    <spacer class="separator"/>
     <groupbox>
       <caption>
         <label accesskey="&syncDeviceName.accesskey;"

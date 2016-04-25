@@ -36,4 +36,9 @@
 	  list-style-image: url("chrome://classic_theme_restorer/content/images/cctr/download-summary.png")!important;
 	   -moz-image-region: rect(0px, 32px, 32px,  0px) !important;
 	}
+	
+	#nav-bar #tbar_javascript[cui-areatype="toolbar"] {
+	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
+	  -moz-image-region: rect(0px, 512px, 32px, 480px) !important;
+	}
 }

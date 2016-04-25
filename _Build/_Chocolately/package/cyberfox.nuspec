@@ -8,7 +8,7 @@
     <owners>8pecxstudios, toady</owners>
     <licenseUrl>https://www.mozilla.org/MPL/2.0/</licenseUrl>
     <projectUrl>http://cyberfox.8pecxstudios.com/</projectUrl>
-    <iconUrl>https://cdn.rawgit.com/InternalError503/cyberfox/master/browser/branding/official/default256.png</iconUrl>
+    <iconUrl>https://cdn.rawgit.com/InternalError503/cyberfox/master/browser/branding/official-intel/default256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Cyberfox is a Mozilla-based Internet browser designed to take advantage of 64-bit architecture but a 32-bit version is also available. The application provides a higher performance when navigating your favorite pages.
 

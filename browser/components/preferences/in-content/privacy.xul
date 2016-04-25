@@ -44,6 +44,9 @@
   <preference id="pref.privacy.disable_button.change_blocklist"
               name="pref.privacy.disable_button.change_blocklist"
               type="bool"/>
+  <preference id="pref.privacy.disable_button.tracking_protection_exceptions"
+              name="pref.privacy.disable_button.tracking_protection_exceptions"
+              type="bool"/>
 
   <!-- Location Bar -->
   <preference id="browser.urlbar.autocomplete.enabled"
@@ -101,51 +104,59 @@
 </hbox>
 
 <!-- Tracking -->
-<groupbox id="trackingGroup" data-category="panePrivacy" hidden="true" align="start">
-  <caption><label>&tracking.label;</label></caption>
+<groupbox id="trackingGroup" data-category="panePrivacy" hidden="true">
   <vbox id="trackingprotectionbox" hidden="true">
-    <hbox align="center">
-      <checkbox id="trackingProtection"
-                preference="privacy.trackingprotection.enabled"
-                accesskey="&trackingProtection5.accesskey;"
-                label="&trackingProtection5.label;" />
-    </hbox>
-    <hbox align="center"
-          class="indent">
-      <label id="trackingProtectionLearnMore"
-             class="text-link"
-             value="&trackingProtectionLearnMore.label;"/>
+    <hbox align="start">
+      <vbox>
+        <caption><label>&trackingProtectionHeader.label;
+          <label id="trackingProtectionLearnMore" class="text-link"
+                 value="&trackingProtectionLearnMore.label;"/>
+        </label></caption>
+        <radiogroup id="trackingProtectionRadioGroup">
+          <radio value="always"
+                 label="&trackingProtectionAlways.label;"
+                 accesskey="&trackingProtectionAlways.accesskey;"/>
+          <radio value="private"
+                 label="&trackingProtectionPrivate.label;"
+                 accesskey="&trackingProtectionPrivate.accesskey;"/>
+          <radio value="never"
+                 label="&trackingProtectionNever.label;"
+                 accesskey="&trackingProtectionNever.accesskey;"/>
+        </radiogroup>
+      </vbox>
+      <spacer flex="1" />
+      <vbox>
+        <button id="trackingProtectionExceptions"
+                label="&trackingProtectionExceptions.label;"
+                accesskey="&trackingProtectionExceptions.accesskey;"
+                preference="pref.privacy.disable_button.tracking_protection_exceptions"/>
+        <button id="changeBlockList"
+                label="&changeBlockList.label;"
+                accesskey="&changeBlockList.accesskey;"
+                preference="pref.privacy.disable_button.change_blocklist"/>
+      </vbox>
     </hbox>
   </vbox>
   <vbox id="trackingprotectionpbmbox">
+    <caption><label>&tracking.label;</label></caption>
     <hbox align="center">
       <checkbox id="trackingProtectionPBM"
                 preference="privacy.trackingprotection.pbmode.enabled"
                 accesskey="&trackingProtectionPBM5.accesskey;"
                 label="&trackingProtectionPBM5.label;" />
-      <button id="changeBlockList"
-              label="&changeBlockList.label;" accesskey="&changeBlockList.accesskey;"
-              preference="pref.privacy.disable_button.change_blocklist"/>
       <label id="trackingProtectionPBMLearnMore"
              class="text-link"
              value="&trackingProtectionPBMLearnMore.label;"/>
+      <spacer flex="1" />
+      <button id="changeBlockListPBM"
+              label="&changeBlockList.label;" accesskey="&changeBlockList.accesskey;"
+              preference="pref.privacy.disable_button.change_blocklist"/>
     </hbox>
   </vbox>
   <vbox>
-    <hbox align="center">
-      <checkbox id="privacyDoNotTrackCheckbox"
-                label="&dntTrackingNotOkay4.label;"
-                accesskey="&dntTrackingNotOkay4.accesskey;"
-                preference="privacy.donottrackheader.enabled"/>
-    </hbox>
-    <hbox align="center"
-          class="indent">
-      <label id="doNotTrackInfo"
-             class="text-link"
-             href="https://www.mozilla.org/dnt">
-        &doNotTrackInfo.label;
-      </label>
-    </hbox>
+    <description>&doNotTrack.pre.label;<html:a
+    class="inline-link" id="doNotTrackSettings" href="#"
+    >&doNotTrack.settings.label;</html:a>&doNotTrack.post.label;</description>
   </vbox>
 </groupbox>
 <hbox id="georefoptions"  data-category="panePrivacy" hidden="true">
@@ -184,7 +195,7 @@
               <checkbox id="media.peerconnection.enabled" label="&webrtcp2preference.label;"
                       preference="media.peerconnection.enabled"/>
 		</vbox>
-		<label class="text-link" href="https://bugzilla.mozilla.org/show_bug.cgi?id=959893" value="&doNotTrackInfo.label;"/>		
+		<label class="text-link" href="https://bugzilla.mozilla.org/show_bug.cgi?id=959893" value="&trackingProtectionLearnMore.label;"/>		
 		</groupbox>		
 	</hbox>	
 

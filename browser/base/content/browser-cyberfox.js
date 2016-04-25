@@ -255,51 +255,6 @@ var gCyberfoxCustom = {
 
             }, false);
 
-        document.getElementById("bookmarksMenuPopup")
-            .addEventListener("popupshowing", function(e) {
-
-                try {
-
-                    //Pocket
-                    if (Services.prefs.getBoolPref("browser.pocket.enabled")) {
-                        gCyberfoxCustom._ElementState("menu_pocket", false);
-						gCyberfoxCustom._ElementState("menu_pocketSeparator", false);
-                    } else {
-                        gCyberfoxCustom._ElementState("menu_pocket", true);
-						gCyberfoxCustom._ElementState("menu_pocketSeparator", true);
-                    }
-
-                } catch (e) {
-                    //Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'browser.pocket.enabled' " + e);
-                }
-
-            }, false);
-			
-		var nav = document.getElementById("nav-bar");	
-		if (nav &&  typeof(nav)  != "undefined" || nav  != null){
-			var BMB_Book = document.getElementById("BMB_bookmarksPopup");
-				if (BMB_Book &&  typeof(BMB_Book)  != "undefined" || BMB_Book  != null){
-				document.getElementById("BMB_bookmarksPopup")
-					.addEventListener("popupshowing", function(e) {
-						try {
-							//Pocket
-							if (Services.prefs.getBoolPref("browser.pocket.enabled")) {
-								gCyberfoxCustom._ElementState("BMB_pocket", false);
-								gCyberfoxCustom._ElementState("BMB_pocketSeparator", false);
-							} else {
-								gCyberfoxCustom._ElementState("BMB_pocket", true);
-								gCyberfoxCustom._ElementState("BMB_pocketSeparator", true);
-							}
-
-						} catch (e) {
-							//Catch any nasty errors and output to console
-							console.log("Were sorry but something has gone wrong with 'browser.pocket.enabled' " + e);
-						}
-
-					}, false);
-			}	
-		}
 		
         document.getElementById("menu_ToolsPopup")
             .addEventListener("popupshowing", function(e) {

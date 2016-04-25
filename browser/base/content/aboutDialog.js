@@ -7,57 +7,64 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/AppConstants.jsm");
 
 //Setup Localised Messages.
-var _locMSG = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
+var aboutDialogLocal = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
 
-const PREF_EM_HOTFIX_ID = "extensions.hotfix.id";
+function init(aEvent)
+{
+  if (aEvent.target != document)
+    return;
 
-function init(aEvent) {
-        if (aEvent.target != document)
-            return;
+  try {
+    var distroId = Services.prefs.getCharPref("distribution.id");
+    if (distroId) {
+      var distroVersion = Services.prefs.getCharPref("distribution.version");
 
-        try {
-            var distroId = Services.prefs.getCharPref("distribution.id");
-            if (distroId) {
-                var distroVersion = Services.prefs.getCharPref("distribution.version");
+      var distroIdField = document.getElementById("distributionId");
+      distroIdField.value = distroId + " - " + distroVersion;
+      distroIdField.style.display = "block";
 
-                var distroIdField = document.getElementById("distributionId");
-                distroIdField.value = distroId + " - " + distroVersion;
-                distroIdField.style.display = "block";
+      try {
+        // This is in its own try catch due to bug 895473 and bug 900925.
+        var distroAbout = Services.prefs.getComplexValue("distribution.about",
+          Ci.nsISupportsString);
+        var distroField = document.getElementById("distribution");
+        distroField.value = distroAbout;
+        distroField.style.display = "block";
+      }
+      catch (ex) {
+        // Pref is unset
+        Cu.reportError(ex);
+      }
+    }
+  }
+  catch (e) {
+    // Pref is unset
+  }
 
-                try {
-                    // This is in its own try catch due to bug 895473 and bug 900925.
-                    var distroAbout = Services.prefs.getComplexValue("distribution.about",
-                        Ci.nsISupportsString);
-                    var distroField = document.getElementById("distribution");
-                    distroField.value = distroAbout;
-                    distroField.style.display = "block";
-                } catch (ex) {
-                    // Pref is unset
-                    Cu.reportError(ex);
-                }
-            }
-        } catch (e) {
-            // Pref is unset
-        }
+  // Include the build ID and display warning if this is an "a#" (nightly or aurora) build
+  var version = Services.appinfo.version;
+  if (/a\d+$/.test(version)) {
+    var buildID = Services.appinfo.appBuildID;
+    var buildDate = buildID.slice(0,4) + "-" + buildID.slice(4,6) + "-" + buildID.slice(6,8);
+    document.getElementById("version").textContent += " (" + buildDate + ")";
+    document.getElementById("communityDesc").hidden = true;
+  }
 
-        // Include the build ID and display warning if this is an "a#" (nightly or aurora) build
-        var version = Services.appinfo.version;
-        if (/a\d+$/.test(version)) {
-            var buildID = Services.appinfo.appBuildID;
-            var buildDate = buildID.slice(0, 4) + "-" + buildID.slice(4, 6) + "-" + buildID.slice(6, 8);
-            document.getElementById("version").textContent += " (" + buildDate + ")";
-            document.getElementById("communityDesc").hidden = true;
-        }
-
+  if (AppConstants.platform == "macosx") {
+    // it may not be sized at this point, and we need its width to calculate its position
+    window.sizeToContent();
+    window.moveTo((screen.availWidth / 2) - (window.outerWidth / 2), screen.availHeight / 5);
+  }
+  
         function ElementState(element, state) {
 
             if (!typeof true || !typeof false) {
                 return;
             }
             document.getElementById(element).hidden = state;
-
         }
 
         ElementState("update-button-checkNow", true);
@@ -78,7 +85,6 @@ function init(aEvent) {
             document.getElementById("version").textContent += " beta";
         }
 
-
         if (Services.prefs.getBoolPref("app.update.autocheck")) {
 
             //Set manual update url from -firefox-branding.js so update in one location is uniform across all references.
@@ -90,10 +96,7 @@ function init(aEvent) {
                 Cu.reportError(ex);
             }
 
-            //feature prototype
-
             try {
-
                 //Set Global to disable update checks entirely 
                 if (Services.prefs.getBoolPref("app.update.check.enabled")) {
 			
@@ -118,7 +121,6 @@ function init(aEvent) {
                             }
                             return true;
                         }
-
 
                         var jsObject;
                         var currentVersion;
@@ -153,8 +155,7 @@ function init(aEvent) {
                                 ElementState("update-button-checking", true);
                                 ElementState("update-button-download", false);
                                 break;
-
-
+								
                             case true:
                                 ElementState("update-button-checking-throbber", true);
                                 ElementState("update-button-checking", true);
@@ -163,19 +164,12 @@ function init(aEvent) {
                                 //set the browsers core version in-case "app.update.url.manual" is not changed from a browser update or switched versions.
                                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));
                                 break;
-
-
-
                         }
-
-
                     };
 
-
                     request.ontimeout = function(aEvent) {
-
                         //Log return failed check message for request time-out!
-                        console.log(_locMSG.GetStringFromName("updateCheckErrorTitle") + " " + _locMSG.GetStringFromName("updateCheckError"));
+                        console.log(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateCheckError"));
                         ElementState("update-button-checkNow", true);
                         ElementState("update-button-checking-throbber", true);
                         ElementState("update-button-checking", true);
@@ -189,7 +183,7 @@ function init(aEvent) {
                         switch (aEvent.target.status) {
                             case 0:
                                 //Log return failed request message for status 0 unsent
-                                console.log(_locMSG.GetStringFromName("updateCheckErrorTitle") + " " + _locMSG.GetStringFromName("updateRequestError"));break;
+                                console.log(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateRequestError"));break;
                             case 1: console.log("Error Status: " + aEvent.target.status);break;
                             case 2:console.log("Error Status: " + aEvent.target.status);break;
                             case 3:console.log("Error Status: " + aEvent.target.status);break;
@@ -205,12 +199,12 @@ function init(aEvent) {
                     };
 
                     //Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
-                    request.timeout = 5000;
+                    request.timeout = 6000;
                     request.open("GET", url, true);
                     request.setRequestHeader("Content-Type", "application/json");
                     request.send(null);
 
-            }, 2500);
+            }, 2700);
 				}
 
             } catch (eve) {

@@ -480,7 +480,9 @@ html|a:hover:active,
 
 /* Hide the actual checkbox */
 html|input[type="checkbox"] {
-  visibility: hidden;
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
   position: absolute;
 }
 
@@ -538,14 +540,6 @@ html|input[type="checkbox"]:disabled + html|label {
 xul|*.checkbox-label-box {
   -moz-margin-start: -1px; /* negative margin for the transparent border */
   -moz-padding-start: 0;
-}
-
-@media (min-resolution: 2dppx) {
-  xul|*.checkbox-check[checked] {
-    background-size: 12px 12px, auto;
-    background-image: url("chrome://global/skin/in-content/check@2x.png"),
-                      linear-gradient(#fff, rgba(255,255,255,0.8)) !important;
-  }
 }
 
 xul|richlistitem > xul|*.checkbox-check {

@@ -334,6 +334,14 @@ var gPrivacyPane = {
 
       this._shouldPromptForRestart = true;
   },
+  /**
+   * Displays the Do Not Track settings dialog.
+   */
+  showDoNotTrackSettings() {
+      document.documentElement.openWindow(null,
+                    "chrome://browser/content/preferences/donottrack.xul",
+                    "resizable",null);
+  },
 
   // HISTORY
 

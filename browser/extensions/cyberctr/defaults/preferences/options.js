@@ -60,7 +60,7 @@ pref("extensions.classicthemerestorer.ctroldsearch",false);
 pref("extensions.classicthemerestorer.ctroldsearchc",false);
 pref("extensions.classicthemerestorer.osearch_meoit",false);
 pref("extensions.classicthemerestorer.osearch_dm",false);
-pref("extensions.classicthemerestorer.addonversion",false);
+//pref("extensions.classicthemerestorer.addonversion",true);
 pref("extensions.classicthemerestorer.alt_addonsm",false);
 pref("extensions.classicthemerestorer.am_nowarning",false);
 pref("extensions.classicthemerestorer.am_compact",false);
@@ -116,11 +116,14 @@ pref("extensions.classicthemerestorer.hideprbutton",false);
 pref("extensions.classicthemerestorer.urlbardropm",false);
 pref("extensions.classicthemerestorer.urlbardropm2",false);
 pref("extensions.classicthemerestorer.altreaderico",false);
+pref("extensions.classicthemerestorer.altautocompl",false);
 
 pref("extensions.classicthemerestorer.ib_nohovcolor",false);
 pref("extensions.classicthemerestorer.ib_graycolor",false);
 pref("extensions.classicthemerestorer.verifiedcolors",false);
 pref("extensions.classicthemerestorer.ibinfoico",false);
+pref("extensions.classicthemerestorer.ibinfoico2",false);
+pref("extensions.classicthemerestorer.iblabels",false);
 pref("extensions.classicthemerestorer.faviconurl",false);
 pref("extensions.classicthemerestorer.padlock","padlock_default");
 pref("extensions.classicthemerestorer.padlockex",true);
@@ -170,6 +173,7 @@ pref("extensions.classicthemerestorer.menubarnofog",false);
 
 pref("extensions.classicthemerestorer.closeabarbut",false);
 pref("extensions.classicthemerestorer.highaddonsbar",false);
+pref("extensions.classicthemerestorer.lessaddonsbar",false);
 pref("extensions.classicthemerestorer.addonbarfs",false);
 pref("extensions.classicthemerestorer.noaddonbarbg",false);
 
@@ -189,6 +193,7 @@ pref("extensions.classicthemerestorer.tabthrobber","throbber_default");
 pref("extensions.classicthemerestorer.bmanimation",true);
 pref("extensions.classicthemerestorer.pananimation",true);
 pref("extensions.classicthemerestorer.fsaduration",true);
+pref("extensions.classicthemerestorer.html5warning",true);
 
 // CTR area
 pref("extensions.classicthemerestorer.toolsitem",true);
@@ -269,11 +274,14 @@ pref("extensions.classicthemerestorer.tabc_hov_unl",false);
 pref("extensions.classicthemerestorer.optionsrem",true);
 pref("extensions.classicthemerestorer.aboutprefs",'category-general');
 pref("extensions.classicthemerestorer.aboutprefsInd",0);
-pref("extensions.classicthemerestorer.aboutprefsww",700);
+pref("extensions.classicthemerestorer.aboutprefsww",850);
 pref("extensions.classicthemerestorer.aboutprefswh",670);
 
 // first run/reset preference
 pref("extensions.classicthemerestorer.ctrreset",true);
+
+// other
+pref("extensions.classicthemerestorer.cstatextlb",false);
 
 /*CyberCTR customization settings*/
 
@@ -339,7 +347,7 @@ pref("extensions.classicthemerestorer.loadcustomcss", false);
 pref("extensions.classicthemerestorer.customcssurl", "");
 
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.5.1");
+pref("extensions.classicthemerestorer.version", "1.5.2");
 
 //CyberCTR Pre-set Configuration
 pref("extensions.classicthemerestorer.ctrpref.firstrun", true);

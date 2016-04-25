@@ -22,6 +22,11 @@
   <preference id="accessibility.blockautorefresh"
               name="accessibility.blockautorefresh"
               type="bool"/>
+#ifdef XP_WIN
+  <preference id="ui.osk.enabled"
+              name="ui.osk.enabled"
+              type="bool"/>
+#endif
 
   <preference id="general.autoScroll"
               name="general.autoScroll"
@@ -101,6 +106,17 @@
  	  <preference id="app.update.startup.check" 
 						   name="app.update.startup.check" 
 						   type="bool"/>
+ 	  <preference id="extensions.pocket.enabled" 
+						   name="extensions.pocket.enabled" 
+						   type="bool"/>
+#ifdef XP_WIN
+ 	  <preference id="plugin.allowed_whitelist.enabled" 
+						   name="plugin.allowed_whitelist.enabled" 
+						   type="bool"/>
+ 	  <preference id="plugin.java_allowed" 
+						   name="plugin.java_allowed" 
+						   type="bool"/>
+#endif
 <!-- Cyberfeatures -->
    			  
 #ifdef MOZ_TELEMETRY_REPORTING
@@ -211,6 +227,13 @@
       <groupbox id="accessibilityGroup" align="start">
         <caption><label>&accessibility.label;</label></caption>
 
+#ifdef XP_WIN
+        <checkbox id="useOnScreenKeyboard"
+                  hidden="true"
+                  label="&useOnScreenKeyboard.label;"
+                  accesskey="&useOnScreenKeyboard.accesskey;"
+                  preference="ui.osk.enabled"/>
+#endif
         <checkbox id="useCursorNavigation"
                   label="&useCursorNavigation.label;"
                   accesskey="&useCursorNavigation.accesskey;"
@@ -237,7 +260,7 @@
                   accesskey="&useSmoothScrolling.accesskey;"
                   preference="general.smoothScroll"/>
         <checkbox id="allowHWAccel"
-                  label="&allowHWAccel.label;"
+                  label="&allowHWAccel.label; (&restartRequiredMSG.label;)"
                   accesskey="&allowHWAccel.accesskey;"
                   preference="layers.acceleration.disabled"/>
         <checkbox id="checkSpelling"
@@ -481,10 +504,31 @@
 			<groupbox id="alternateOptionsGeneral" orient="vertical">
 				<caption label="&cyberfoxOptions.label;"/>				          	              	
 					<checkbox id="browser.preferences.inContent" label="&incontent.label;"
-							preference="browser.preferences.inContent"/>
- 					<checkbox id="loop.enabled" label="&enablehellochat.label;"
+							preference="browser.preferences.inContent"/>						
+			</groupbox>
+			
+#ifdef XP_WIN			
+			<!-- Plugin Settings -->
+			<groupbox id="alternateOptionsPlugins" orient="vertical">
+				<caption label="&browserplugins.label;"/>				          	              	
+					<checkbox id="plugin.allowed_whitelist.enabled" label="&browserpluginswhitelist.label; (&restartRequiredMSG.label;)"
+							preference="plugin.allowed_whitelist.enabled"
+							tooltiptext="&restartRequiredMSG.label;"/>
+					<checkbox id="plugin.java_allowed" label="&browserpluginsjavaenabled.label;  (&restartRequiredMSG.label;)"
+							preference="plugin.java_allowed"
+							tooltiptext="&restartRequiredMSG.label;"/>							
+			</groupbox>
+#endif
+	
+			<!-- System Addons -->
+			<groupbox id="alternateOptionsSystem" orient="vertical">
+				<caption label="&systemaddons.label;"/>
+				<label>&systemaddonsmsg.label;</label>
+ 					<checkbox id="loop.enabled" label="&enablehellochat.label; (&restartRequiredMSG.label;)"
 							preference="loop.enabled" 
-							tooltiptext="&restartRequiredMSG.label;" />								
+							tooltiptext="&restartRequiredMSG.label;" />	
+ 					<checkbox id="extensions.pocket.enabled" label="&enablepocket.label;"
+							preference="extensions.pocket.enabled" />
 			</groupbox>
 			
 			<!-- Update Settings -->

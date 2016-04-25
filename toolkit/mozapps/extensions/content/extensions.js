@@ -15,6 +15,9 @@ Cu.import("resource://gre/modules/DownloadUtils.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/addons/AddonRepository.jsm");
 
+const CONSTANTS = {};
+Cu.import("resource://gre/modules/addons/AddonConstants.jsm", CONSTANTS);
+
 XPCOMUtils.defineLazyModuleGetter(this, "PluralForm",
                                   "resource://gre/modules/PluralForm.jsm");
 
@@ -22,10 +25,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "PluralForm",
 //We are not including this.
 const SIGNING_REQUIRED = false;
 
-XPCOMUtils.defineLazyGetter(this, "BrowserToolboxProcess", function() {
-  return Cu.import("resource://devtools/client/framework/ToolboxProcess.jsm", {}).
-         BrowserToolboxProcess;
-});
 XPCOMUtils.defineLazyModuleGetter(this, "Experiments",
   "resource:///modules/experiments/Experiments.jsm");
 
@@ -37,8 +36,6 @@ const PREF_GETADDONS_CACHE_ENABLED = "extensions.getAddons.cache.enabled";
 const PREF_GETADDONS_CACHE_ID_ENABLED = "extensions.%ID%.getAddons.cache.enabled";
 const PREF_UI_TYPE_HIDDEN = "extensions.ui.%TYPE%.hidden";
 const PREF_UI_LASTCATEGORY = "extensions.ui.lastCategory";
-const PREF_ADDON_DEBUGGING_ENABLED = "devtools.chrome.enabled";
-const PREF_REMOTE_DEBUGGING_ENABLED = "devtools.debugger.remote-enabled";
 
 const LOADING_MSG_DELAY = 100;
 
@@ -162,9 +159,6 @@ function initialize(event) {
   }
 
   gViewController.loadInitialView(view);
-
-  Services.prefs.addObserver(PREF_ADDON_DEBUGGING_ENABLED, debuggingPrefChanged, false);
-  Services.prefs.addObserver(PREF_REMOTE_DEBUGGING_ENABLED, debuggingPrefChanged, false);
 }
 
 function notifyInitialized() {
@@ -185,8 +179,6 @@ function shutdown() {
   gEventManager.shutdown();
   gViewController.shutdown();
   Services.obs.removeObserver(sendEMPong, "EM-ping");
-  Services.prefs.removeObserver(PREF_ADDON_DEBUGGING_ENABLED, debuggingPrefChanged);
-  Services.prefs.removeObserver(PREF_REMOTE_DEBUGGING_ENABLED, debuggingPrefChanged);
 }
 
 function sendEMPong(aSubject, aTopic, aData) {
@@ -210,8 +202,6 @@ function isCorrectlySigned(aAddon) {
   if (aAddon.scope == AddonManager.SCOPE_TEMPORARY)
       return true;
   if (aAddon.signedState <= AddonManager.SIGNEDSTATE_MISSING)
-    return false;
-  if (aAddon.foreignInstall && aAddon.signedState < AddonManager.SIGNEDSTATE_SIGNED)
     return false;
   return true;
 }
@@ -1075,20 +1065,6 @@ var gViewController = {
       }
     },
 
-    cmd_debugItem: {
-      doCommand: function(aAddon) {
-        BrowserToolboxProcess.init({ addonID: aAddon.id });
-      },
-
-      isEnabled: function(aAddon) {
-        let debuggerEnabled = Services.prefs.
-                              getBoolPref(PREF_ADDON_DEBUGGING_ENABLED);
-        let remoteEnabled = Services.prefs.
-                            getBoolPref(PREF_REMOTE_DEBUGGING_ENABLED);
-        return aAddon && aAddon.isDebuggable && debuggerEnabled && remoteEnabled;
-      }
-    },
-
     cmd_showItemPreferences: {
       isEnabled: function(aAddon) {
         if (!aAddon ||
@@ -1301,6 +1277,18 @@ var gViewController = {
 
         buildNextInstall();
       }
+    },
+
+    cmd_debugAddons: {
+      isEnabled: function() {
+        return true;
+      },
+      doCommand: function() {
+        let mainWindow = getMainWindow();
+        if ("switchToTabHavingURI" in mainWindow) {
+          mainWindow.switchToTabHavingURI("about:debugging#addons", true);
+        }
+      },
     },
 
     cmd_cancelOperation: {
@@ -3714,12 +3702,6 @@ var gUpdatesView = {
       this.updateAvailableCount();
   }
 };
-
-function debuggingPrefChanged() {
-  gViewController.updateState();
-  gViewController.updateCommands();
-  gViewController.notifyViewChanged();
-}
 
 var gDragDrop = {
   onDragOver: function(aEvent) {

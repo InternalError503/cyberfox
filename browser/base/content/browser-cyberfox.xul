@@ -44,6 +44,11 @@
 									  tooltiptext="&browserConsoleCmd.label;"  
 									  label="&browserConsoleCmd.label;" 
 									  oncommand="HUDService.toggleBrowserConsole();"/>
+        <toolbarbutton id="tbar_javascript" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"							  
+									  tooltiptext="&togglescriptintab.label;"  
+									  label="&togglescriptintab.label;" 
+									  oncommand="gCyberfoxCustom.toggleTabJavascript();"/>
     </toolbarpalette>
     <panel id="PanelUI-footer-inner">
         <toolbarbutton id="panelUI_menu_restartBrowser"

@@ -62,7 +62,6 @@
 <!ENTITY Ctr_emptytfavico_n	"Aucun">
 <!ENTITY Ctr_emptytfavico_g	"Générique">
 <!ENTITY Ctr_noemptypticon	"Enlever les favicons vides des onglets épinglés">
-<!ENTITY Ctr_e10stab_notd	"Onglets E10s : enlever le soulignage">
 <!ENTITY Ctr_closetab_0		"Bouton de fermeture">
 <!ENTITY Ctr_closetab_1		"Onglet actif uniquement">
 <!ENTITY Ctr_closetab_2		"Aucun">
@@ -130,6 +129,7 @@
 <!ENTITY Ctr_options_rem	"Se rappeler de la dernière catégorie choisie">
 <!ENTITY Ctr_svgfilters		"Couleurs SVG pour les icônes par défaut de la barre d’outils">
 <!ENTITY Ctr_wincontrols	"Mode plein écran : boutons déplaçables">
+<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"Images du domaine de 1er niveau : présentation classique">
 <!ENTITY Ctr_altalertbox	"Boîtes d’alerte: autre présentation">
 <!ENTITY Ctr_emptygfavico	"Remplacer le favicon générique">
@@ -238,6 +238,7 @@
 <!ENTITY Ctr_urlbardropm	"Placer le dropmarker en dernier">
 <!ENTITY Ctr_urlbardropm2	"Dropmarker toujours visible">
 <!ENTITY Ctr_altreaderico	"Autres icônes du « lecteur »">
+<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Masquer l’icône de notification quand un popup est bloqué">
 <!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Réduire la hauteur de la barre d’adresse et la barre de recherche (expérimental)">
@@ -246,6 +247,8 @@
 <!ENTITY Ctr_ib_graycolor	"Arrière-plan gris pour les pages dont l’identité est inconnue et celles du chrome">
 <!ENTITY Ctr_verifiedcolors	"Couleurs de bouton pour les sites certifiés sécurisés, les connexions sécurisées et non sécurisées">
 <!ENTITY Ctr_ibinfoico		"Remplacer l’icône « i » par celle du globe">
+<!ENTITY Ctr_ibinfoico2		"Hide 'i'-icon (if possible)">
+<!ENTITY Ctr_iblabels		"Hide labels">
 <!ENTITY Ctr_faviconurl		"Afficher le favicon du site dans la barre d’adresse">
 <!ENTITY Ctr_padlock		"Cadenas pour les connexions sécurisées">
 <!ENTITY Ctr_padlock_hid	" masqué">
@@ -253,7 +256,7 @@
 <!ENTITY Ctr_padlock_cla	"classique ">
 <!ENTITY Ctr_padlock_mod	"moderne">
 <!ENTITY Ctr_padlock_ext	"Icône « &brandShortName; » pour les pages « about » valides">
-<!ENTITY Ctr_icopageinfo	"Cliquer sur l’icône pour afficher la fenêtre d’informations de la page">
+<!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"Largeurs personnalisées pour la barre d’adresse et la barre de recherche">
 <!ENTITY Ctr_searchbar		"Barre de recherche">
 <!ENTITY Ctr_lbsugresi		"Afficher le plus de résultats possible dans les suggestions contextuelles (sans ascenseur)">
@@ -314,6 +317,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Masquer le bouton de fermeture">
 <!ENTITY Ctr_highaddonsbar	"Augmenter la hauteur">
+<!ENTITY Ctr_lessaddonsbar	"Decrease height">
 <!ENTITY Ctr_addonbarfs		"En mode plein écran">
 
 <!ENTITY Ctr_animation		"Animation">

@@ -111,10 +111,6 @@
                 label="&saveLinkCmd.label;"
                 accesskey="&saveLinkCmd.accesskey;"
                 oncommand="gContextMenu.saveLink();"/>
-      <menuitem id="context-savelinktopocket"
-                label="&saveLinkToPocketCmd.label;"
-                accesskey="&saveLinkToPocketCmd.accesskey;"
-                oncommand="gContextMenu.saveLinkToPocket();"/>
       <menu id="context-marklinkMenu" label="&social.marklinkMenu.label;"
             accesskey="&social.marklinkMenu.accesskey;">
         <menupopup/>
@@ -303,10 +299,6 @@
                 label="&savePageCmd.label;"
                 accesskey="&savePageCmd.accesskey2;"
                 oncommand="gContextMenu.savePageAs();"/>
-      <menuitem id="context-pocket"
-                label="&saveToPocketCmd.label;"
-                accesskey="&saveToPocketCmd.accesskey;"
-                oncommand="gContextMenu.savePageToPocket();"/>
       <menu id="context-markpageMenu" label="&social.markpageMenu.label;"
             accesskey="&social.markpageMenu.accesskey;">
         <menupopup/>

@@ -1,6 +1,10 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+"use strict";
+/* globals waitForExplicitFinish, executeSoon, finish, whenNewWindowLoaded, ok */
+/* globals is */
+/* exported test */
 
 function test() {
   //initialization
@@ -11,7 +15,7 @@ function test() {
   let mode;
 
   function doTest(aIsPrivateMode, aWindow, aCallback) {
-    openNewTab(aWindow, function () {
+    openNewTab(aWindow, function() {
       if (aIsPrivateMode) {
         mode = "per window private browsing";
         newTabURL = "about:privatebrowsing";
@@ -25,21 +29,21 @@ function test() {
         "URL of NewTab should be " + newTabURL + " in " + mode +  " mode");
       // Set the custom newtab url
       Services.prefs.setCharPref(newTabPrefName, testURL);
-      ok(Services.prefs.prefHasUserValue(newTabPrefName), "Custom newtab url is set");
+      is(Services.prefs.prefHasUserValue(newTabPrefName), "Custom newtab url is set");
 
       // Open a newtab after setting the custom newtab url
-      openNewTab(aWindow, function () {
+      openNewTab(aWindow, function() {
         is(aWindow.gBrowser.selectedBrowser.currentURI.spec, testURL,
            "URL of NewTab should be the custom url");
 
         // clear the custom url preference
         Services.prefs.clearUserPref(newTabPrefName);
-        ok(!Services.prefs.prefHasUserValue(newTabPrefName), "No custom newtab url is set");
+        is(!Services.prefs.prefHasUserValue(newTabPrefName), "No custom newtab url is set");
 
         aWindow.gBrowser.removeTab(aWindow.gBrowser.selectedTab);
         aWindow.gBrowser.removeTab(aWindow.gBrowser.selectedTab);
         aWindow.close();
-        aCallback()
+        aCallback();
       });
     });
   }
@@ -71,7 +75,7 @@ function openNewTab(aWindow, aCallback) {
   aWindow.BrowserOpenTab();
 
   let browser = aWindow.gBrowser.selectedBrowser;
-  if (browser.contentDocument.readyState == "complete") {
+  if (browser.contentDocument.readyState === "complete") {
     executeSoon(aCallback);
     return;
   }

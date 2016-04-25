@@ -218,7 +218,7 @@
 
 #identity-popup[connection=chrome] #identity-popup-securityView,
 #identity-popup[connection=chrome] #identity-popup-security-content {
-  background-image: url(chrome://branding/content/icon48.png);
+  background-image: url(chrome://branding/content/identity-icons-brand48.svg);
 }
 
 #identity-popup[connection^=secure] #identity-popup-securityView,

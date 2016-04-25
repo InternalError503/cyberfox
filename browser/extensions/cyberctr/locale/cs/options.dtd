@@ -62,7 +62,6 @@
 <!ENTITY Ctr_emptytfavico_n	"None">
 <!ENTITY Ctr_emptytfavico_g	"Generic">
 <!ENTITY Ctr_noemptypticon	"Odebrat prázdnou faviconu z připnutého panelu">
-<!ENTITY Ctr_e10stab_notd	"E10s tabs: zrušit podtržení">
 <!ENTITY Ctr_closetab_0		"Zavřít panel">
 <!ENTITY Ctr_closetab_1		"Pouze na aktivním panelu">
 <!ENTITY Ctr_closetab_2		"Nikde">
@@ -130,6 +129,7 @@
 <!ENTITY Ctr_options_rem	"Pamatovat poslední zvolenou kategorii">
 <!ENTITY Ctr_svgfilters		"SVG barvy pro defaultní ikony tlačítek lišty">
 <!ENTITY Ctr_wincontrols	"Přesunutelné ovládací prvky okna v režimu celé obrazovky">
+<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"'Top level domain' obrázků: klasický vzhled">
 <!ENTITY Ctr_altalertbox	"'Alert box': alternativní vzhled">
 <!ENTITY Ctr_emptygfavico	"Replace generic favicon">
@@ -238,6 +238,7 @@
 <!ENTITY Ctr_urlbardropm	"Přesunout šipku na poslední pozici vpravo">
 <!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
 <!ENTITY Ctr_altreaderico	"Alternativní ikona 'Readeru'">
+<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Nezobrazovat upozornění při blokování vyskakovacích oken">
 <!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Snížit výšku adresního řádku a vyhledávače (experimentální)">
@@ -246,6 +247,8 @@
 <!ENTITY Ctr_ib_graycolor	"Šedá barva pro neznámou identitu a stránky chrome">
 <!ENTITY Ctr_verifiedcolors	"Barvy tlačítka pro ověřené stránky, zabezpečené a nezabezpečené připojení">
 <!ENTITY Ctr_ibinfoico		"Replace 'i'-icon with globe icon">
+<!ENTITY Ctr_ibinfoico2		"Hide 'i'-icon (if possible)">
+<!ENTITY Ctr_iblabels		"Hide labels">
 <!ENTITY Ctr_faviconurl		"Favicona">
 <!ENTITY Ctr_padlock		"Zámek">
 <!ENTITY Ctr_padlock_hid	"skrytý">
@@ -253,7 +256,7 @@
 <!ENTITY Ctr_padlock_cla	"klasický">
 <!ENTITY Ctr_padlock_mod	"moderní">
 <!ENTITY Ctr_padlock_ext	"'&brandShortName;' ikona pro validní chrome stránky">
-<!ENTITY Ctr_icopageinfo	"Klik na ikonu otevře okno 'informace o stránce'">
+<!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"Volitelná šířka pro adresní řádek a vyhledávač">
 <!ENTITY Ctr_searchbar		"Vyhledávač">
 <!ENTITY Ctr_lbsugresi		"Zobrazit počet možných návrhů (bez posuvníku)">
@@ -314,6 +317,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Skrýt tlačítko zavření lišty doplňků">
 <!ENTITY Ctr_highaddonsbar	"Zvětšit výšku">
+<!ENTITY Ctr_lessaddonsbar	"Decrease height">
 <!ENTITY Ctr_addonbarfs		"V celoobrazovkovém módu (fullscreen)">
 
 <!ENTITY Ctr_animation		"Animace">

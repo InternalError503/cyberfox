@@ -61,7 +61,6 @@
 <!ENTITY Ctr_emptytfavico_n	"Немає">
 <!ENTITY Ctr_emptytfavico_g	"Типовий">
 <!ENTITY Ctr_noemptypticon	"Прибрати порожній значок адреси з прикріпленої вкладки">
-<!ENTITY Ctr_e10stab_notd	"E10s вкладки: видалити підкреслення">
 <!ENTITY Ctr_closetab_0		"Кнопка закриття вкладки">
 <!ENTITY Ctr_closetab_1		"тільки на активній вкладці">
 <!ENTITY Ctr_closetab_2		"ніде">
@@ -129,6 +128,7 @@
 <!ENTITY Ctr_options_rem	"Пам’ятати останню обрану категорію">
 <!ENTITY Ctr_svgfilters		"SVG кольори для типових іконок кнопок панелі інструментів">
 <!ENTITY Ctr_wincontrols	"Рухоме управління повноекранним режимом">
+<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"Зображення «домену верхнього рівня»: класичний вигляд">
 <!ENTITY Ctr_altalertbox	"«Вікно попереджень»: альтернативний вигляд">
 <!ENTITY Ctr_emptygfavico	"Замінити типову іконку сайту">
@@ -176,8 +176,8 @@
 <!ENTITY Ctr_addonversion	"Список додатків у Менеджері додатків: показати версію додатка">
 <!ENTITY Ctr_xpinstallui	"Менеджер додатків: старе вікно встановлення додатків (about:config preference)">
 <!ENTITY Ctr_bmbutton		"Кнопка меню закладок">
-<!ENTITY Ctr_hiderecentbm	"Bookmarks popup: hide recently added bookmarks">
-<!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_hiderecentbm	"Спливаюче вікно закладок: приховати недавно додані закладки">
+<!ENTITY Ctr_hideeditbm		"Зірка закладок: приховати спливаюче вікно (якщо сторінка не закладена)">
 <!ENTITY Ctr_bmbutpanelm	"Спливаюче вікно: вигляд меню панелі">
 <!ENTITY Ctr_bmbunsortbm	"Спливаюче вікно: субменю «несортованих закладок»">
 <!ENTITY Ctr_bmbunsortbm2	"Меню над закладками">
@@ -237,14 +237,17 @@
 <!ENTITY Ctr_urlbardropm	"Рухати позначку випадного списку в останню можливу позицію">
 <!ENTITY Ctr_urlbardropm2	"Зробити позначку випадного списку завжди видимою">
 <!ENTITY Ctr_altreaderico	"Альтернативні іконки «Читача»">
+<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Приховати інфо кнопку «спливаюче вікно блоковано»">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_urlbar_uc		"Вимкнути функцію «автозаповнення» (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Зменшити висоту панелей рядку адреси та пошуку (експериментальне)">
 <!ENTITY Ctr_urlbar_ib		"Індикатори справжності панелі рядку адреси">
 <!ENTITY Ctr_ib_nohovcolor	"Не показувати сірий колір при наведенні миші">
 <!ENTITY Ctr_ib_graycolor	"Сірий колір для неопізнаних та «жовтих» сторінок">
 <!ENTITY Ctr_verifiedcolors	"Кольори кнопок для перевірених вебсайтів, захищених і незахищених з’єднань">
 <!ENTITY Ctr_ibinfoico		"Поміняти «i»-іконку на глобальну іконку">
+<!ENTITY Ctr_ibinfoico2		"Приховати «i»-іконку (якщо можливо)">
+<!ENTITY Ctr_iblabels		"Приховати написи">
 <!ENTITY Ctr_faviconurl		"Значок сайту">
 <!ENTITY Ctr_padlock		"Замок">
 <!ENTITY Ctr_padlock_hid	"прихований">
@@ -252,7 +255,7 @@
 <!ENTITY Ctr_padlock_cla	"класичний">
 <!ENTITY Ctr_padlock_mod	"сучасний">
 <!ENTITY Ctr_padlock_ext	"Іконка «&brandShortName;» для дійсних «Про...» сторінок">
-<!ENTITY Ctr_icopageinfo	"Клік на іконку відкриває інформаційне вікно">
+<!ENTITY Ctr_icopageinfo	"Іконка сайту, глобальна та «i» іконки: «клік» відкриває «вікно інформації про сторінку»">
 <!ENTITY Ctr_lbsbsize		"Налаштовувана ширина для панелей рядку адреси та пошуку">
 <!ENTITY Ctr_searchbar		"Панель пошуку">
 <!ENTITY Ctr_lbsugresi		"Відображати так багато результатів пропозицій у спливаючому вікні, як це можливо (без прокручування)">
@@ -313,6 +316,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Приховати кнопку закривання панелі додатків">
 <!ENTITY Ctr_highaddonsbar	"Збільшити висоту">
+<!ENTITY Ctr_lessaddonsbar	"Зменшити висоту">
 <!ENTITY Ctr_addonbarfs		"У повноекранному режимі">
 
 <!ENTITY Ctr_animation		"Анімація">

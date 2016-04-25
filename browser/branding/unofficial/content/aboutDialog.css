@@ -32,10 +32,10 @@
 }
 
 #updateDeck > hbox > label:not([class="text-link"]) {
-  color: #00adee;
+  color: #999999;
 }
 .text-link, .bottom-link{
-  color: #00adee;
+  color: #999999;
 }
 .text-link:hover, .bottom-link:hover{
   color: #EFEFEF;

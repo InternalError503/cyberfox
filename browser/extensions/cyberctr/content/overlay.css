@@ -443,12 +443,15 @@
 	
 	/* hide bookmark menus items */
 	#ctraddon_BMB_viewBookmarksToolbar,
-	#ctraddon_BMB_viewBookmarksToolbar + menuseparator,
+	#ctraddon_BMB_viewBookmarksToolbar + menuseparator {
+	  visibility: collapse;
+	}
+
 	#ctraddon_BMB_unsortedBookmarks_m,
 	#ctraddon_BMB_unsortedBookmarks_m2,
 	#ctraddon_BMB_unsortedBookmarks_mm,
 	#ctraddon_BMB_unsortedBookmarks_mm2 {
-	  visibility: collapse;
+	  display:none;
 	}
 	
 	/* fix ui tour popup position for ctrs panel ui button */
@@ -607,4 +610,25 @@
 	#nav-bar[mode="full"] #downloads-button stack {
 	  margin-left: 30px !important;
 	  margin-right: 30px !important;
+	}
+	
+	/* Auto Form add-ons icon sizes*/
+	toolbarbutton[id^="af_button"] .toolbarbutton-icon {
+	  width: 18px !important;
+	  max-width: 18px !important;
+	}
+	
+	/* fix FireIE add-ons location bar icon */
+	#urlbar #fireie-urlbar-switch image,
+	#urlbar #fireie-urlbar-switch label,
+	#urlbar #fireie-urlbar-switch {
+	  -moz-appearance: none !important;
+	  border: unset !important;
+	  box-shadow: unset !important;
+	  padding: unset !important;
+	  margin: unset !important;
+	}
+	
+	#appmenu_webDeveloper {
+	  display: none;
 	}

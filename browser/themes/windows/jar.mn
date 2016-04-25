@@ -235,11 +235,6 @@ browser.jar:
 #endif
 
 # Add Files For Cyberfox
-#Browser preferences
-  skin/classic/browser/preferences/in-content/icons.png       (../shared/incontentprefs/icons.png)
-  skin/classic/browser/preferences/in-content/icons@2x.png    (../shared/incontentprefs/icons@2x.png)
-  skin/classic/browser/preferences/in-content/check.png       (../shared/incontentprefs/check.png)
-  skin/classic/browser/preferences/in-content/check@2x.png    (../shared/incontentprefs/check@2x.png)
 #Whimsy replacement
   skin/classic/browser/customizableui/8pecx.png  (../shared/customizableui/8pecx.png)
   skin/classic/browser/customizableui/8pecx@2x.png  (../shared/customizableui/8pecx@2x.png)

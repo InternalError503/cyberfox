@@ -15,5 +15,6 @@ browser.jar:
   content/branding/icon32.png                    (../default32.png)
   content/branding/icon128.png                   (../mozicon128.png)
   content/branding/identity-icons-brand.svg      (identity-icons-brand.svg)
+  content/branding/identity-icons-brand48.svg      (identity-icons-brand48.svg)
   content/branding/silhouette-40.png             (silhouette-40.png)
   content/branding/aboutDialog.css               (aboutDialog.css)

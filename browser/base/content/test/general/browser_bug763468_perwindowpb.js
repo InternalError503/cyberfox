@@ -1,6 +1,13 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+"use strict";
+
+/* globals
+  waitForExplicitFinish, whenNewWindowLoaded, whenNewTabLoaded,
+  executeSoon, registerCleanupFunction, finish, is
+*/
+/* exported test */
 
 // This test makes sure that opening a new tab in private browsing mode opens about:privatebrowsing
 function test() {
@@ -13,7 +20,7 @@ function test() {
   let mode;
 
   function doTest(aIsPrivateMode, aWindow, aCallback) {
-    whenNewTabLoaded(aWindow, function () {
+    whenNewTabLoaded(aWindow, function() {
       if (aIsPrivateMode) {
         mode = "per window private browsing";
         newTabURL = "about:privatebrowsing";
@@ -26,7 +33,7 @@ function test() {
         "URL of NewTab should be " + newTabURL + " in " + mode +  " mode");
 
       aWindow.gBrowser.removeTab(aWindow.gBrowser.selectedTab);
-      aCallback()
+      aCallback();
     });
   };
 
@@ -40,7 +47,7 @@ function test() {
     });
   };
 
-   // this function is called after calling finish() on the test.
+  // this function is called after calling finish() on the test.
   registerCleanupFunction(function() {
     windowsToClose.forEach(function(aWin) {
       aWin.close();

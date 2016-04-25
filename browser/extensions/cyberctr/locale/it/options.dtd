@@ -61,7 +61,6 @@
 <!ENTITY Ctr_emptytfavico_n	"Nessuna">
 <!ENTITY Ctr_emptytfavico_g	"Generica">
 <!ENTITY Ctr_noemptypticon	"Rimuovi la favicon vuota dalla scheda bloccata">
-<!ENTITY Ctr_e10stab_notd	"Schede E10s: rimuovi la sottolineatura">
 <!ENTITY Ctr_closetab_0		"Pulsante di chiusura">
 <!ENTITY Ctr_closetab_1		"Nella scheda attiva">
 <!ENTITY Ctr_closetab_2		"Nessun pulsante di chiusura schede">
@@ -129,6 +128,7 @@
 <!ENTITY Ctr_options_rem	"Ricorda l'ultima categoria selezionata">
 <!ENTITY Ctr_svgfilters		"Colori SVG per le icone dei pulsanti della barra strumenti">
 <!ENTITY Ctr_wincontrols	"Angoli finestra mobili in modalità schermo intero">
+<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"Immagini 'Top level domain': aspetto classico">
 <!ENTITY Ctr_altalertbox	"'Alert box': aspetto alternativo">
 <!ENTITY Ctr_emptygfavico	"Sostituisci la favicon generica">
@@ -223,7 +223,7 @@
 <!ENTITY Ctr_ntabhov		"Nuova scheda al passaggio del mouse">
 <!ENTITY Ctr_bold			"Grassetto">
 <!ENTITY Ctr_italic			"Corsivo">
-<!ENTITY Ctr_notabhov		"Le impostazioni attivate prevalgono sulle impostazioni 'al volo'">
+<!ENTITY Ctr_notabhov		"Le impostazioni attivate prevalgono su quelle del passaggio del mouse">
 <!ENTITY Ctr_tabc_act_tb	"Colore di sfondo delle barre degli strumenti">
 
 <!ENTITY Ctr_urlbar			"Barra degli indirizzi">
@@ -237,14 +237,17 @@
 <!ENTITY Ctr_urlbardropm	"Sposta il dropmarker nella posizione più lontana possibile">
 <!ENTITY Ctr_urlbardropm2	"Dropmarker sempre visibile">
 <!ENTITY Ctr_altreaderico	"Icone alternative della modalità di lettura">
+<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Nascondi l’icona di notifica quando un popup viene bloccato">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_urlbar_uc		"Disattiva il completamento automatico (preferenza in about:config)">
 <!ENTITY Ctr_locsearchbw10	"Riduci l'altezza delle barre degli indirizzi e di ricerca (sperimentale)">
 <!ENTITY Ctr_urlbar_ib		"Pulsante delle connessioni sicure (riquadro di verifica)">
 <!ENTITY Ctr_ib_nohovcolor	"Non mostrare il colore grigio al passaggio del mouse">
 <!ENTITY Ctr_ib_graycolor	"Colore grigio per le identità sconosciute e le pagine chrome">
 <!ENTITY Ctr_verifiedcolors	"Pulsanti colorati per le connessioni ai siti verificati, sicuri e non sicuri">
 <!ENTITY Ctr_ibinfoico		"Sostituisci l'icona 'i' con l'icona globo">
+<!ENTITY Ctr_ibinfoico2		"Nascondi l'icona 'i' (se possibile)">
+<!ENTITY Ctr_iblabels		"Nascondi le etichette">
 <!ENTITY Ctr_faviconurl		"Favicon nella barra degli indirizzi">
 <!ENTITY Ctr_padlock		"Lucchetto connessioni sicure">
 <!ENTITY Ctr_padlock_hid	"nascosto">
@@ -252,7 +255,7 @@
 <!ENTITY Ctr_padlock_cla	"classico">
 <!ENTITY Ctr_padlock_mod	"moderno">
 <!ENTITY Ctr_padlock_ext	"Icona di '&brandShortName;' per le pagine 'about' valide">
-<!ENTITY Ctr_icopageinfo	"Cliccando sull’icona vengono visualizzate le 'Informazioni sulla pagina'">
+<!ENTITY Ctr_icopageinfo	"Favicon/icona a globo/'i': il 'clic' apre la finestra 'Informazioni pagina'">
 <!ENTITY Ctr_lbsbsize		"Larghezza personalizzata per la barra degli indirizzi e di ricerca">
 <!ENTITY Ctr_searchbar		"Barra di ricerca">
 <!ENTITY Ctr_lbsugresi		"Mostra il maggior numero possibile di suggerimenti (senza barra di scorrimento)">
@@ -313,6 +316,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Barra dei componenti aggiuntivi: nascondi il pulsante di chiusura">
 <!ENTITY Ctr_highaddonsbar	"Aumenta l’altezza">
+<!ENTITY Ctr_lessaddonsbar	"Decrease height">
 <!ENTITY Ctr_addonbarfs		"In modalità tutto schermo">
 
 <!ENTITY Ctr_animation		"Icone animate">

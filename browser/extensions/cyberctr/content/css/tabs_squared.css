@@ -44,7 +44,7 @@
 	.tab-background-start[visuallyselected=true]:-moz-lwtheme::before,
 	.tab-background-end[visuallyselected=true]:-moz-lwtheme::before,
 	.tabbrowser-tab:hover > .tab-stack > .tab-background:not([visuallyselected=true]),
-	.tabbrowser-tab[pinned][titlechanged]:not([visuallyselected="true"]) > .tab-stack > .tab-content,
+	/*.tabbrowser-tab[pinned][titlechanged]:not([visuallyselected="true"]) > .tab-stack > .tab-content,*/
 	#tabbrowser-tabs::before {
 	  background-image: none !important;
 	}
@@ -124,12 +124,6 @@
 	  margin-bottom: 1px !important;
 	}
 
-	/*.tab-background-start[visuallyselected=true]::after,
-	.tab-background-start[visuallyselected=true]::before,
-	.tab-background-start,
-	.tab-background-end,
-	.tab-background-end[visuallyselected=true]::after,
-	.tab-background-end[visuallyselected=true]::before,*/
 	#tabbrowser-tabs,
 	#TabsToolbar {
 	  min-height: 0px !important;
@@ -242,7 +236,14 @@
 	.tabs-newtab-button:-moz-lwtheme-darktext {
       background-image: linear-gradient(hsla(0,0%,60%,.5), hsla(0,0%,45%,.5) 80%) !important;
 	}
-
+	
+	/* titlechanged pinned tabs */
+	.tabbrowser-tab[pinned][titlechanged]:not([selected="true"])  .tab-content{
+	  background: unset !important;
+	}
+	.tabbrowser-tab[pinned][titlechanged]:not([selected="true"]){
+	  background-size: 100% 100% !important;
+	}
 	.tabbrowser-tab[pinned][titlechanged]:not([selected="true"]) {
 	  background-image: radial-gradient(circle farthest-corner at 50% 3px, rgba(255,255,255,1) 3%, rgba(186,221,251,.75) 40%, rgba(127,179,255,.5) 80%, rgba(127,179,255,.25)) !important;
 	}
@@ -280,10 +281,7 @@
       background-size: calc(100% - 0px) calc(100% - 4px) !important;
 	}
 	
-	/* trick to use code for win8+*/
-	@media all and (-moz-windows-compositor) {
-	@media not all and (-moz-os-version: windows-vista){
-	@media not all and (-moz-os-version: windows-win7){
+	@media (-moz-os-version: windows-win8){
 		#TabsToolbar[tabsontop="false"] .tabbrowser-tab[pinned] {
 		  background-size: calc(100% - 0px) calc(100% - 4px) !important;
 		}
@@ -291,7 +289,7 @@
 		  border-image: url("chrome://classic_theme_restorer/content/images/taba.png") 3 3 0 fill repeat stretch !important;
 		  border-style: solid !important;
 		}
-	}}}
+	}
 	
 	#main-window[tabsontop="false"] #navigator-toolbox #TabsToolbar #tabbrowser-tabs .tabbrowser-tab[pinned],
 	#main-window[tabsontop="false"] #navigator-toolbox #TabsToolbar #tabbrowser-tabs[overflow] .tabbrowser-tab[pinned] {
@@ -351,6 +349,20 @@
 	/* pinned tabs fix (Fx38+) */
 	#main-window[fx38plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab .tab-content[pinned] {
 	  -moz-padding-end: 0px !important;
+	}
+	
+	/* pinned tabs fix (Fx45+) */
+	#main-window[fx45plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab .tab-content[pinned] {
+	  -moz-padding-end: 0px !important;
+	  -moz-padding-start: 0px !important;
+	}
+	#main-window[fx45plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab[pinned] .tab-throbber,
+	#main-window[fx45plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab[pinned] .tab-icon-image{
+	  -moz-margin-start:5px !important;
+	  -moz-margin-end: 0px !important;
+	}
+	#main-window[fx45plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab[pinned] label{
+	  display:none!important;
 	}
 
 	/* remove ridiculous clipping */

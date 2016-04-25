@@ -18,13 +18,7 @@ var gMainPane = {
     this._pane = document.getElementById("paneMain");
 
 #ifdef HAVE_SHELL_SERVICE
-	//Because this is cyberfox beta we don't want users setting it as default web browser to prevent affecting there current setup. 
-	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){
-		document.getElementById("alwaysCheckDefault").hidden = true;
-		document.getElementById("setDefaultPane").hidden = true;
-	}else{	
     this.updateSetDefaultBrowser();
-  }
 #ifdef XP_WIN
     // In Windows 8 we launch the control panel since it's the only
     // way to get all file type association prefs. So we don't know
@@ -629,7 +623,6 @@ var gMainPane = {
    */
   setDefaultBrowser: function()
   {
-  	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){return;}
     let shellSvc = getShellService();
     if (!shellSvc)
       return;

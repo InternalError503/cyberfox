@@ -113,6 +113,7 @@
 		<preference id="ctraddon_urlbardropm"	name="extensions.classicthemerestorer.urlbardropm"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_urlbardropm2"	name="extensions.classicthemerestorer.urlbardropm2"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_altreaderico"	name="extensions.classicthemerestorer.altreaderico"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_altautocompl"	name="extensions.classicthemerestorer.altautocompl"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_locsearchbw10"	name="extensions.classicthemerestorer.locsearchbw10" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_combrelstop"	name="extensions.classicthemerestorer.combrelstop"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_panelmenucol"	name="extensions.classicthemerestorer.panelmenucol"	type="bool"		instantApply="true"/>
@@ -121,6 +122,8 @@
 		<preference id="ctraddon_ib_graycolor"	name="extensions.classicthemerestorer.ib_graycolor" type="bool"		instantApply="true"/>
 		<preference id="ctraddon_verifiedcolors" name="extensions.classicthemerestorer.verifiedcolors" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_ibinfoico"		name="extensions.classicthemerestorer.ibinfoico"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_ibinfoico2"	name="extensions.classicthemerestorer.ibinfoico2"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_iblabels"		name="extensions.classicthemerestorer.iblabels"		type="bool"		instantApply="true"/>
 		<preference id="ctraddon_findbar"		name="extensions.classicthemerestorer.findbar"		type="string"	instantApply="true"/>
 		<preference id="ctraddon_nav_txt_ico"	name="extensions.classicthemerestorer.nav_txt_ico" 	type="string"	instantApply="true"/>
 		<preference id="ctraddon_iat_notf_vt"	name="extensions.classicthemerestorer.iat_notf_vt"	type="bool"		instantApply="true"/>
@@ -192,6 +195,7 @@
 		<preference id="ctraddon_tabc_act_tb"	name="extensions.classicthemerestorer.tabc_act_tb"	 type="bool"	instantApply="true"/>
 
 		<preference id="ctraddon_highaddonsbar"	name="extensions.classicthemerestorer.highaddonsbar" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_lessaddonsbar"	name="extensions.classicthemerestorer.lessaddonsbar" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_addonbarfs"	name="extensions.classicthemerestorer.addonbarfs"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_hightabpososx"	name="extensions.classicthemerestorer.hightabpososx" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_altmenubar"	name="extensions.classicthemerestorer.altmenubar" 	 type="bool"	instantApply="true"/>
@@ -280,6 +284,7 @@
 		<preference id="ctraddon_dlanimate"		name="browser.download.animateNotifications"		type="bool"		instantApply="true"/>
 		<preference id="ctraddon_fsanimation"	name="browser.fullscreen.animate"					type="bool"		instantApply="true"/>
 		<preference id="ctraddon_fsaduration"	name="extensions.classicthemerestorer.fsaduration"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_html5warning"	name="extensions.classicthemerestorer.html5warning"	type="bool"		instantApply="true"/>
 
 		<preference id="ctraddon_closeabarbut"	name="extensions.classicthemerestorer.closeabarbut"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_toolsitem"		name="extensions.classicthemerestorer.toolsitem"	type="bool"		instantApply="true"/>
@@ -956,6 +961,7 @@
 		<description class="ctraddonsuboption">&Ctr_stoprel1;</description>
 
 		<checkbox label="&Ctr_wincontrols;"		preference="ctraddon_wincontrols" id="ctraddon_wincontrols"/>
+		<checkbox label="&Ctr_html5warning;"	preference="ctraddon_html5warning" id="ctraddon_pw_html5warning"/>
 
 		<description class="ctraddon_font1">&Ctr_emptygfavico;</description>
 		<radiogroup preference="ctraddon_emptyfavico_g" id="ctraddon_pw_emptyfavico_g" orient="horizontal" value="">
@@ -1193,8 +1199,9 @@
 		<hbox class="ctraddonsuboption"  id="ctraddon_pw_aboutprefswsize" align="center">
 		  <label value="&Ctr_altoptionsww; "/>
 		  <textbox size="4" maxlength="4" preference="ctraddon_aboutprefsww" type="number" min="0" max="1200"/>
-		  <label value="&Ctr_altoptionswh; "/>
+		  <label value="px  -  &Ctr_altoptionswh; "/>
 		  <textbox size="4" maxlength="4" preference="ctraddon_aboutprefswh" type="number" min="0" max="1200"/>
+		  <label value="px"/>
 		</hbox>
 		
 		<description id="ctraddon_pw_altoptionsi">&Ctr_altoptionsi;</description>
@@ -1248,6 +1255,7 @@
 		<checkbox label="&Ctr_urlbardropm2;" preference="ctraddon_urlbardropm2"  id="ctraddon_pw_urlbardropm2"/>
 		<checkbox label="&Ctr_altreaderico;" preference="ctraddon_altreaderico"  id="ctraddon_pw_altreaderico"/>
 		<checkbox label="&Ctr_hideprbutton;" preference="ctraddon_hideprbutton" id="ctraddon_pw_urlbarpblocked"/>
+		<checkbox label="&Ctr_altautocompl;" preference="ctraddon_altautocompl"  id="ctraddon_pw_altautocompl" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
 		<checkbox label="&Ctr_urlbar_uc;" preference="ctraddon_urlbar_uc" id="ctraddon_pw_urlbar_uc"/>
 		<checkbox label="&Ctr_extraurlkeycb;&openCmd.commandkey; &amp; Alt+&urlbar.accesskey; [Windows/Linux])"	preference="ctraddon_extraurlkeycb" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
 		<checkbox label="&Ctr_locsearchbw10;" preference="ctraddon_locsearchbw10"  id="ctraddon_pw_locsearchbw10"/>
@@ -1286,11 +1294,13 @@
 
 		<checkbox label="&Ctr_faviconurl;"		preference="ctraddon_faviconurl" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwFaviconextra(true);} else {classicthemerestorerjso.ctr.ctrpwFaviconextra(false);} classicthemerestorerjso.ctr.needsBrowserRestart()"/>
 		<checkbox label="&Ctr_padlock_ext;"		preference="ctraddon_padlockex" id="ctraddon_padlock_extra"/>
-		<checkbox label="&Ctr_icopageinfo;"		preference="ctraddon_icopageinfo"/>
+		<checkbox label="&Ctr_icopageinfo;"		preference="ctraddon_icopageinfo" id="ctraddon_pw_icopageinfo"/>
+		<checkbox label="&Ctr_ibinfoico;"		preference="ctraddon_ibinfoico" id="ctraddon_pw_ibinfoico"/>
+		<checkbox label="&Ctr_ibinfoico2;"		preference="ctraddon_ibinfoico2" id="ctraddon_pw_ibinfoico2"/>
+		<checkbox label="&Ctr_iblabels;"		preference="ctraddon_iblabels" id="ctraddon_pw_iblabels"/>
 		<checkbox label="&Ctr_ib_nohovcolor;"	preference="ctraddon_ib_nohovcolor" id="ctraddon_pw_ib_nohovcolor"/>
 		<checkbox label="&Ctr_ib_graycolor;"	preference="ctraddon_ib_graycolor" id="ctraddon_pw_ib_graycolor"/>
 		<checkbox label="&Ctr_verifiedcolors;"	preference="ctraddon_verifiedcolors" id="ctraddon_pw_verifiedcolors"/>
-		<checkbox label="&Ctr_ibinfoico;"		preference="ctraddon_ibinfoico" id="ctraddon_pw_ibinfoico"/>
 		
 		<description class="ctraddon_font1"></description>
 		<description class="ctraddon_font1">&Ctr_padlock;</description>
@@ -1408,13 +1418,17 @@
 
 	  <groupbox id="ctraddon_pw_bookmarksbargroup">
 	    <caption  label="&Ctr_bookbar;" class="ctraddon_topic"/>
-		<checkbox label="&Ctr_bookbarfs;"	 			 preference="ctraddon_bookbarfs" id="ctraddon_pw_bookbarfs"/>
+		<checkbox label="&Ctr_bookbarfs;" preference="ctraddon_bookbarfs" id="ctraddon_pw_bookbarfs"/>
 	  </groupbox>
 
 	  <groupbox>
 	    <caption  label="&Ctr_addonbar;" class="ctraddon_topic"/>
 		<checkbox label="&Ctr_addonbarfs;"		preference="ctraddon_addonbarfs"/>
-		<checkbox label="&Ctr_highaddonsbar;"	preference="ctraddon_highaddonsbar"/>
+		<hbox>
+		  <checkbox label="&Ctr_highaddonsbar;"	preference="ctraddon_highaddonsbar"/>
+		  <checkbox label="&Ctr_lessaddonsbar;"	preference="ctraddon_lessaddonsbar"/>
+		  <spacer flex="1"/>
+		</hbox>
 	  </groupbox>
 
 	  <groupbox>

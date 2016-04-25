@@ -61,7 +61,6 @@
 <!ENTITY Ctr_emptytfavico_n	"Brak">
 <!ENTITY Ctr_emptytfavico_g	"Standardowa">
 <!ENTITY Ctr_noemptypticon	"Usuń pustą ikonę ulubionych z przypiętej karty">
-<!ENTITY Ctr_e10stab_notd	"Karty E10s: usuń podkreślenie">
 <!ENTITY Ctr_closetab_0		"Przycisk zamknięcia karty">
 <!ENTITY Ctr_closetab_1		"Tylko na aktywnej karcie">
 <!ENTITY Ctr_closetab_2		"Nigdzie">
@@ -117,7 +116,7 @@
 <!ENTITY Ctr_backforward	"Ruchomy przycisk wstecz-do przodu">
 <!ENTITY Ctr_nbcompact		"Zmniejsz wysokość paska nawigacji">
 <!ENTITY Ctr_hide_bf_popup	"Ukryj menu podręczne historii po naciśnięciu przycisku myszki">
-<!ENTITY Ctr_bf_space		"Zmniejsz odstęp pomiędzy przyciskami (jeżeli możliwe)">
+<!ENTITY Ctr_bf_space		"Zmniejsz odstęp pomiędzy przyciskami (jeśli to możliwe)">
 <!ENTITY Ctr_noconicons		"Menu kontekstowe strony: zastąp ikony etykietami (Wstecz, Do przodu...)">
 <!ENTITY Ctr_prefpage		"Strona (okno) opcji">
 <!ENTITY Ctr_altoptionsd	"Domyślny wygląd">
@@ -129,6 +128,7 @@
 <!ENTITY Ctr_options_rem	"Pamiętaj ostatnio wybraną kategorię">
 <!ENTITY Ctr_svgfilters		"Kolory SVG ikon przycisków domyślnego paska narzędzi">
 <!ENTITY Ctr_wincontrols	"Ruchome kontrolki okna pełnego ekranu">
+<!ENTITY Ctr_html5warning	"Ostrzeżenie o pełnym ekranie HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Obrazy 'domeny najwyższego poziomu': klasyczny wygląd">
 <!ENTITY Ctr_altalertbox	"'Pole powiadomień': alternatywny wygląd">
 <!ENTITY Ctr_emptygfavico	"Zamień standardową ikonę ulubionych">
@@ -177,7 +177,7 @@
 <!ENTITY Ctr_xpinstallui	"Stare okno instalacji dodatku (ustawienie about:config)">
 <!ENTITY Ctr_bmbutton		"Przycisk menu zakładek">
 <!ENTITY Ctr_hiderecentbm	"Menu podręczne zakładek: ukryj ostatnio dodane zakładki">
-<!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_hideeditbm		"Gwiazdka zakładek: ukryj menu podręczne (jeżeli zakładka nie jest dodana do strony)">
 <!ENTITY Ctr_bmbutpanelm	"Menu podręczne: wygląd menu panelu">
 <!ENTITY Ctr_bmbunsortbm	"Menu podręczne: podmenu 'nieposortowanych zakładek'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu ponad zakładkami">
@@ -237,14 +237,17 @@
 <!ENTITY Ctr_urlbardropm	"Przenieś znacznik rozwinięcia na ostatnią możliwą pozycję">
 <!ENTITY Ctr_urlbardropm2	"Ustaw znacznik rozwinięcia jako zawsze widoczny">
 <!ENTITY Ctr_altreaderico	"Alternatywne ikony 'Popraw czytelność'">
+<!ENTITY Ctr_altautocompl	"Alternatywne 'menu podręczne autouzupełniania' (eksperymentalne)">
 <!ENTITY Ctr_hideprbutton	"Ukryj ikonę powiadomienia, gdy wyskakujące okno zostanie zablokowane">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_urlbar_uc		"Wyłącz funkcję 'Ujednolicone autouzupełnianie' (ustawienie about:config)">
 <!ENTITY Ctr_locsearchbw10	"Zredukuj wysokość paska adresu i wyszukiwania (eksperymentalne)">
 <!ENTITY Ctr_urlbar_ib		"Przycisk tożsamości witryny (pole tożsamości)">
 <!ENTITY Ctr_ib_nohovcolor	"Nie pokazuj szarego koloru po najechaniu">
 <!ENTITY Ctr_ib_graycolor	"Szary kolor dla nieznanej tożsamości oraz stron 'chrome'">
 <!ENTITY Ctr_verifiedcolors	"Kolory przycisków zweryfikowanych stron, połączeń bezpiecznych oraz niebezpiecznych">
 <!ENTITY Ctr_ibinfoico		"Zamień ikonę 'i' na ikonę globu">
+<!ENTITY Ctr_ibinfoico2		"Ukryj ikonę 'i' (jeśli to możliwe)">
+<!ENTITY Ctr_iblabels		"Ukryj etykiety">
 <!ENTITY Ctr_faviconurl		"Ikona ulubionych: ikona bieżącej strony">
 <!ENTITY Ctr_padlock		"Ikona kłódki dla bezpiecznych połączeń">
 <!ENTITY Ctr_padlock_hid	"Ukryta">
@@ -252,7 +255,7 @@
 <!ENTITY Ctr_padlock_cla	"Klasyczna">
 <!ENTITY Ctr_padlock_mod	"Nowoczesna">
 <!ENTITY Ctr_padlock_ext	"Ikona programu '&brandShortName;' dla ważnych stron 'about'">
-<!ENTITY Ctr_icopageinfo	"Kliknięcie ikony otwiera okno 'informacji o stronie'">
+<!ENTITY Ctr_icopageinfo	"Ikona ulubionych/globu/'i': 'kliknięcie' otwiera 'okno informacji o stronie'">
 <!ENTITY Ctr_lbsbsize		"Niestandardowa szerokość paska adresu i paska wyszukiwania">
 <!ENTITY Ctr_searchbar		"Pasek wyszukiwania">
 <!ENTITY Ctr_lbsugresi		"Wyświetl tak dużo wyników w menu podręcznym z sugestiami, jak to tylko możliwe (bez paska przewijania)">
@@ -282,7 +285,7 @@
 <!ENTITY Ctr_hidetbwote2	"Zachowaj pasek tytułu (karty na górze)">
 <!ENTITY Ctr_notabfog		"Usuń mgłę tła (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Usuń kolor tła (Windows AeroGlass/8)">
-<!ENTITY Ctr_hightabpos		"Zredukuj przestrzeń powyżej paska narzędzi (jeżeli możliwe)">
+<!ENTITY Ctr_hightabpos		"Zredukuj przestrzeń powyżej paska narzędzi (jeśli to możliwe)">
 <!ENTITY Ctr_alttabstb		"Alternatywny kolor tła">
 <!ENTITY Ctr_alttabstb2		"W trybie zmaksymalizowanym (karty na górze)">
 
@@ -313,6 +316,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Pasek dodatków: usuń przycisk zamknięcia">
 <!ENTITY Ctr_highaddonsbar	"Zwiększ wysokość">
+<!ENTITY Ctr_lessaddonsbar	"Zmniejsz wysokość">
 <!ENTITY Ctr_addonbarfs		"W trybie pełnoekranowym">
 
 <!ENTITY Ctr_animation		"Animacje">
@@ -330,7 +334,7 @@
 <!ENTITY Ctr_puictrbutton	"Przycisk w menu głównego panelu">
 
 <!ENTITY Ctr_otherctroptns	"Inne ustawienia">
-<!ENTITY Ctr_cuibotbuttons	"Dodatkowe przyciski w trybie 'dostosowywania'">
+<!ENTITY Ctr_cuibotbuttons	"Dodatkowe przyciski w trybie 'Dostosuj'">
 <!ENTITY Ctr_nodevtheme		"Zapobiegaj włączeniu 'Motywu Edycji Deweloperskiej'">
 
 <!ENTITY Ctr_experttweaks	"Zaawansowane">
@@ -341,7 +345,7 @@
 <!ENTITY Ctr_fx36prefs2		"Uwaga: stare okno opcji nie zawiera wszystkich ostatnio dodanych ustawień przeglądarki!">
 <!ENTITY Ctr_fx38reader		"Odznaczenie tych ustawienia wyłącza funkcję 'Popraw czytelność' oraz usuwa jej ikonę z paska adresu.">
 <!ENTITY Ctr_fx38pocket		"Odznaczenie tego ustawienia wyłącza funkcję 'Pocket' oraz usuwa jej ikonę z pasków narzędzi.">
-<!ENTITY Ctr_fx38pocket2	"Uwaga: przesunięcie przycisku 'Pocket' do 'palety dostosowywania' przed zablokowaniem tego ustawienia usunie także elementy 'Pocket' w zakładkach i menu poprawy czytelności.">
+<!ENTITY Ctr_fx38pocket2	"Uwaga: przesunięcie przycisku Pocket do strefy 'Dodatkowe funkcje i opcje' w trybie 'Dostosuj' przed wyłączeniem tego ustawienia usunie z menu podręcznych Zakładki oraz Popraw czytelność wszystkie elementy związane z Pocket.">
 <!ENTITY Ctr_e_searchui		"Wygląd wyszukiwania">
 <!ENTITY Ctr_e_loop			"Dzwonienie i konwersacja / Loop">
 <!ENTITY Ctr_e_deved		"Motyw Edycji Deweloperskiej">

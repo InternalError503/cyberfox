@@ -61,7 +61,6 @@
 <!ENTITY Ctr_emptytfavico_n	"Нет">
 <!ENTITY Ctr_emptytfavico_g	"Стандартная">
 <!ENTITY Ctr_noemptypticon	"Удалить пустой значок из прикреплённой вкладки">
-<!ENTITY Ctr_e10stab_notd	"Вкладки E10s: удалить подчёркивание">
 <!ENTITY Ctr_closetab_0		"Кнопка закрытия вкладки">
 <!ENTITY Ctr_closetab_1		"на активной вкладке">
 <!ENTITY Ctr_closetab_2		"нигде">
@@ -129,6 +128,7 @@
 <!ENTITY Ctr_options_rem	"Запомнить последний выбор">
 <!ENTITY Ctr_svgfilters		"Цвета SVG для кнопок панели инструментов">
 <!ENTITY Ctr_wincontrols	"Подвижное управление полноэкранным режимом">
+<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"Классический вид 'изображений доменов верхнего уровня'">
 <!ENTITY Ctr_altalertbox	"Альтернативный вид 'окна с предупреждением'">
 <!ENTITY Ctr_emptygfavico	"Заменять пустые значки избранного">
@@ -177,7 +177,7 @@
 <!ENTITY Ctr_xpinstallui	"Управление дополнениями: старый стиль окна установки дополнения (настройка в about:config)">
 <!ENTITY Ctr_bmbutton		"Кнопка меню закладок">
 <!ENTITY Ctr_hiderecentbm	"Всплывающее меню: скрывать недавно добавленные закладки">
-<!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_hideeditbm		"Звездочка закладок: скрыть всплытие (если страница не в закладках)">
 <!ENTITY Ctr_bmbutpanelm	"Всплывающее меню: вид панели меню">
 <!ENTITY Ctr_bmbunsortbm	"Всплывающее меню: подменю 'несортированные закладки'">
 <!ENTITY Ctr_bmbunsortbm2	"Меню над закладками">
@@ -237,14 +237,17 @@
 <!ENTITY Ctr_urlbardropm	"Перемещать маркер на последнюю возможную позицию">
 <!ENTITY Ctr_urlbardropm2	"Сделать маркер видимым постоянно">
 <!ENTITY Ctr_altreaderico	"Альтернативные иконки 'Режима чтения'">
+<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Скрыть значок уведомления, когда блокируется всплывающее окно">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_urlbar_uc		"Отключить возможность 'Унифицированное автозавершение' (настройка about:config)">
 <!ENTITY Ctr_locsearchbw10	"Уменьшить высоту панелей адреса и поиска (экспериментально)">
 <!ENTITY Ctr_urlbar_ib		"Кнопка подлинности сайта">
 <!ENTITY Ctr_ib_nohovcolor	"Не отображать серый цвет при зависании">
 <!ENTITY Ctr_ib_graycolor	"Серый цвет для сайтов неизвестной подлинности и сайтов chrome">
 <!ENTITY Ctr_verifiedcolors	"Цвета кнопок для проверенных сайтов, надежных и ненадежных соединений">
 <!ENTITY Ctr_ibinfoico		"Заменить значок 'i' значком 'глобуса'">
+<!ENTITY Ctr_ibinfoico2		"Скрыть значок 'i' (по возможности)">
+<!ENTITY Ctr_iblabels		"Скрыть метки">
 <!ENTITY Ctr_faviconurl		"Значок в адресной строке">
 <!ENTITY Ctr_padlock		"Замок">
 <!ENTITY Ctr_padlock_hid	"Скрыть замок">
@@ -252,7 +255,7 @@
 <!ENTITY Ctr_padlock_cla	"классический">
 <!ENTITY Ctr_padlock_mod	"модерн">
 <!ENTITY Ctr_padlock_ext	"Иконка '&brandShortName;' для корректных страниц 'about'">
-<!ENTITY Ctr_icopageinfo	"Нажатие на иконку открывает «Информацию о странице»">
+<!ENTITY Ctr_icopageinfo	"Значок Избранного/глобуса/'i': клик открывает окно 'информация о странице'">
 <!ENTITY Ctr_lbsbsize		"Настройка ширины панелей адреса и поиска">
 <!ENTITY Ctr_searchbar		"Панель поиска">
 <!ENTITY Ctr_lbsugresi		"Отображать максимально возможное количество результатов в подсказках (без прокрутки)">
@@ -313,6 +316,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Скрыть кнопку закрытия">
 <!ENTITY Ctr_highaddonsbar	"Увеличить высоту">
+<!ENTITY Ctr_lessaddonsbar	"Уменьшить высоту">
 <!ENTITY Ctr_addonbarfs		"В полноэкранном режиме">
 
 <!ENTITY Ctr_animation		"Анимация">

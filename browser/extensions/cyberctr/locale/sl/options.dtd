@@ -12,7 +12,7 @@
 <!ENTITY Ctr_separator		"Ločilo">
 <!ENTITY Ctr_puibseparator	"Ločilo (za ploščasti meni)">
 <!ENTITY Ctr_navthrobber	"Kazalnik dejavnosti">
-<!ENTITY Ctr_sidebarbutton	"(Stranska vrstica)">
+<!ENTITY Ctr_sidebarbutton	"(stranska vrstica)">
 <!ENTITY Ctr_windowcontrols	"Skrči/Razpni/Zapri (celozaslonski način)">
 <!ENTITY Ctr_rr				"Zahtevan je ponovni zagon!">
 <!ENTITY Ctr_window			"okno">
@@ -55,13 +55,12 @@
 <!ENTITY Ctr_tabwidthinfo2	"Širino zavihkov nadzira TabUtilities">
 <!ENTITY Ctr_tabwidthinfo3	"Vrednosti pod 48 sl. točk bodo v večini premerov povzročile napake!">
 <!ENTITY Ctr_square_edges	"Kvadratasti zgornji koti">
-<!ENTITY Ctr_tttitlebar		"Naziv zavihka v nazivni vrstici &brandShortName;">
-<!ENTITY Ctr_tabinsertion	"Vstavi odprti zavihek poleg trenutnega (možnost about:config)">
+<!ENTITY Ctr_tttitlebar		"Naziv zavihka v nazivni vrstici &brandShortName;a">
+<!ENTITY Ctr_tabinsertion	"Vstavi odprt zavihek poleg trenutnega (možnost about:config)">
 <!ENTITY Ctr_emptytfavico	"Prikaži zaznamko (če je stran ne dobavi)">
 <!ENTITY Ctr_emptytfavico_n	"Brez">
 <!ENTITY Ctr_emptytfavico_g	"Splošno">
 <!ENTITY Ctr_noemptypticon	"Odstrani prazno zaznamko iz pripetih zavihkov">
-<!ENTITY Ctr_e10stab_notd	"Zavihki E10s: odstrani podčrtanje">
 <!ENTITY Ctr_closetab_0		"Gumb Zapri zavihek">
 <!ENTITY Ctr_closetab_1		"Samo na dejavnem zavihku">
 <!ENTITY Ctr_closetab_2		"Nikjer">
@@ -125,10 +124,11 @@
 <!ENTITY Ctr_altoptionsw	"Odpri stran z možnostmi v oknu">
 <!ENTITY Ctr_altoptionsww	"Širina">
 <!ENTITY Ctr_altoptionswh	"Višina">
-<!ENTITY Ctr_altoptionsi	"Simulirano okno možnosti ni več pogovorno okno, ampak 'okno brskalnika' s skritimi orodnimi vrsticami. Značilnost 'Uporabi trenutno stran' samo doda v trenutnem oknu odprte url-je strani, ki je v tem primeru samo 'about:preferences'. Gumb orodne vrstice 'možnosti' se nadomesti z novim, da se lahko možnosti odprejo v oknu.">
+<!ENTITY Ctr_altoptionsi	"Simulirano okno možnosti ni več pogovorno okno, ampak 'okno brskalnika' s skritimi orodnimi vrsticami. Značilnost 'Uporabi trenutno stran' samo doda v trenutnem oknu odprte URL-je strani, ki je v tem primeru samo 'about:preferences'. Gumb orodne vrstice 'možnosti' se nadomesti z novim, da se lahko možnosti odprejo v oknu.">
 <!ENTITY Ctr_options_rem	"Zapomni si nazadnje izbrano kategorijo">
 <!ENTITY Ctr_svgfilters		"Barve SVG za privzete ikone gumbov orodne vrstice">
 <!ENTITY Ctr_wincontrols	"Premakljive nadzorne tipke celozaslonskega okna">
+<!ENTITY Ctr_html5warning	"Celozaslonsko opozorilo HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Slike 'vrhnje domene': klasični videz">
 <!ENTITY Ctr_altalertbox	"'Okno opozorila': nadomestni videz">
 <!ENTITY Ctr_emptygfavico	"Nadomesti splošno zaznamko">
@@ -167,7 +167,7 @@
 <!ENTITY Ctr_addonmanager	"Upravitelj dodatkov">
 <!ENTITY Ctr_alt_addonsp	"Stran dodatkov 'Več': nadomestni videz">
 <!ENTITY Ctr_alt_addonsm	"Nadomestni videz">
-<!ENTITY Ctr_am_nowarning	"Seznami dodatkov Upravitelja dodatkov: skrij opozorila">
+<!ENTITY Ctr_am_nowarning	"Seznami dodatkov: skrij opozorila">
 <!ENTITY Ctr_am_compact		"Seznami dodatkov: strnjen pogled">
 <!ENTITY Ctr_am_compact2	"Strnjen pogled +">
 <!ENTITY Ctr_am_highlight	"Seznami dodatkov: poudari vnos ob prehodu z miško">
@@ -177,12 +177,12 @@
 <!ENTITY Ctr_xpinstallui	"Staro okno za namestitev dodatkov (možnost about:config)">
 <!ENTITY Ctr_bmbutton		"Gumb menija zaznamkov">
 <!ENTITY Ctr_hiderecentbm	"Pojavno okno zaznamkov: skrij nedavno dodane zaznamke">
-<!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_hideeditbm		"Zvezdica za zaznamke: skrij pojavno okno (če stran ni dodana med zaznamke)">
 <!ENTITY Ctr_bmbutpanelm	"Pojavna okna: videz ploščastega menija">
-<!ENTITY Ctr_bmbunsortbm	"Pojavna okna: podmeni 'nerazvrščeni zaznamki'">
+<!ENTITY Ctr_bmbunsortbm	"Pojavna okna: podmeni 'Nerazvrščeni zaznamki'">
 <!ENTITY Ctr_bmbunsortbm2	"Meni nad zaznamki">
 <!ENTITY Ctr_bmbviewbmtb	"Pojavna okna: prikaži 'Orodno vrstico pogledov'">
-<!ENTITY Ctr_bmbnounsort	"Pojavna okna: skrij 'nerazvrščeni zaznamki'">
+<!ENTITY Ctr_bmbnounsort	"Pojavna okna: skrij 'Nerazvrščeni zaznamki'">
 <!ENTITY Ctr_bmbutnotext	"Skrij oznako na vrstici zaznamkov">
 <!ENTITY Ctr_skipprintpr	"Gumb Natisni: preskoči predogled tiskanja">
 <!ENTITY Ctr_tbconmenu		"Vsebinski meni orodne vrstice: skrij 'Premakni v meni', 'Odstrani iz orodne vrstice', 'Ponovno naloži vse zavihke', 'Dodaj vse zavihke med zaznamke' in 'Ponovno odpri zavihek'">
@@ -198,8 +198,8 @@
 <!ENTITY Ctr_tabmokcolor2	"Bela barva in temna senca besedila nedejavnih zavihkov">
 <!ENTITY Ctr_tabmokcolor4	"Bela barva pikčaste prazne zaznamke zavihka">
 
-<!ENTITY Ctr_navthrobber1	"Klik na kazalnik dejavnosti odpre naslednji url v novem zavihku:">
-<!ENTITY Ctr_navthrobber2	"Dodajte url ali pustite prazno">
+<!ENTITY Ctr_navthrobber1	"Klik na kazalnik dejavnosti odpre naslednji URL v novem zavihku:">
+<!ENTITY Ctr_navthrobber2	"Dodajte URL ali pustite prazno">
 <!ENTITY Ctr_anewtaburl		"URL strani novega zavihka">
 <!ENTITY Ctr_anewtaburlcb	"URL strani novega zavihka po meri (privzeto: 'about:newtab')">
 
@@ -234,17 +234,20 @@
 <!ENTITY Ctr_hideurelstop2	"Vedno prikaži gumb 'Pojdi'">
 <!ENTITY Ctr_hideurlgo		"Skrij gumb 'Pojdi'">
 <!ENTITY Ctr_hideurlsrg		"Skrij ločila in presledke gumbov 'Ponovno naloži, Ustavi in Pojdi'">
-<!ENTITY Ctr_urlbardropm	"Premakni spustno oznako na zadnji možni položaj">
+<!ENTITY Ctr_urlbardropm	"Premakni spustno puščico na zadnji možni položaj">
 <!ENTITY Ctr_urlbardropm2	"Naj bo spustna puščica vedno vidna">
 <!ENTITY Ctr_altreaderico	"Nadomestne ikone 'Bralnika'">
+<!ENTITY Ctr_altautocompl	"Nadomestni 'pojavni meni samodokončavanja' (preskusno)">
 <!ENTITY Ctr_hideprbutton	"Skrij ikono obvestil ob blokiranju pojavnega okna">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_urlbar_uc		"Onemogoči značilnost 'Poenotenega samodokončavanja' (možnost about:config)">
 <!ENTITY Ctr_locsearchbw10	"Zmanjšaj višino naslovne in iskalne vrstice (preskusno)">
 <!ENTITY Ctr_urlbar_ib		"Gumb identitete strani (polje identitete)">
 <!ENTITY Ctr_ib_nohovcolor	"Ob prehodu ne prikaži sive barve">
 <!ENTITY Ctr_ib_graycolor	"Siva barva za neznano identiteto in strani chrome">
 <!ENTITY Ctr_verifiedcolors	"Barve gumbov za preverjene strani, varne in nezanesljive povezave">
 <!ENTITY Ctr_ibinfoico		"Nadomesti ikono 'i'z ikono sveta">
+<!ENTITY Ctr_ibinfoico2		"Skrij ikono 'i' (če je možno)">
+<!ENTITY Ctr_iblabels		"Skrij oznake">
 <!ENTITY Ctr_faviconurl		"Zaznamka: ikona trenutne spletne strani">
 <!ENTITY Ctr_padlock		"Ikona ključavnice za varne povezave">
 <!ENTITY Ctr_padlock_hid	"skrita">
@@ -252,7 +255,7 @@
 <!ENTITY Ctr_padlock_cla	"klasična">
 <!ENTITY Ctr_padlock_mod	"sodobna">
 <!ENTITY Ctr_padlock_ext	"Ikona '&brandShortName;' za veljavne strani 'about'">
-<!ENTITY Ctr_icopageinfo	"Klik na ikono odpre okno 'Podatkov o strani'">
+<!ENTITY Ctr_icopageinfo	"Ikona zaznamke/sveta/'i': 'klik' odpre 'okno s podatki o strani'">
 <!ENTITY Ctr_lbsbsize		"Prilagodljiva širina naslovne in iskalne vrstice">
 <!ENTITY Ctr_searchbar		"Iskalna vrstica">
 <!ENTITY Ctr_lbsugresi		"Prikaži največje možno število predlogov v pojavnem oknu (brez drsnika)">
@@ -301,7 +304,7 @@
 <!ENTITY Ctr_navbarpad_r	"Desno:">
 <!ENTITY Ctr_nobookbarbg	"Orodna vrstica zaznamkov: odstrani barvo ozadja">
 <!ENTITY Ctr_bookbarfs		"Orodna vrstica zaznamkov: v celozaslonskem načinu">
-<!ENTITY Ctr_nonavbarbg		"Orodna vrstica za krmarjenje: odstrani barvo ozadja">
+<!ENTITY Ctr_nonavbarbg		"Odstrani barvo ozadja">
 <!ENTITY Ctr_nonavbarbg1	"To vpliva na dodatne orodne vrstice tega dodatka in druge orodne vrstice na vrhu.">
 <!ENTITY Ctr_nonavbarbg2	"To vpliva na vse orodne vrstice izbire Slim Chrome dodatka 'Beyond Australis'.">
 <!ENTITY Ctr_nonavborder	"Orodna vrstica zaznamkov: dodaj zgornjo obrobo orodni vrstici">
@@ -313,6 +316,7 @@
 
 <!ENTITY Ctr_closeabarbut	"Skrij gumb Zapri vrstice dodatkov">
 <!ENTITY Ctr_highaddonsbar	"Povečaj višino">
+<!ENTITY Ctr_lessaddonsbar	"Zmanjšaj višino">
 <!ENTITY Ctr_addonbarfs		"V celozaslonskem načinu">
 
 <!ENTITY Ctr_animation		"Animacija">

@@ -3,6 +3,7 @@ bing
 duckduckgo
 eBay
 google
+google-nocodes
 ixquick
 privatelee
 startpage

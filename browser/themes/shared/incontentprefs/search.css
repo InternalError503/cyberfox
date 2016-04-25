@@ -19,20 +19,6 @@
   margin: .5em 0;
 }
 
-#engineList treechildren::-moz-tree-image(engineShown, checked) {
-  /* Unfortunately check.svg can't be used in XUL trees. */
-  list-style-image: url("check.png");
-  -moz-margin-start: 5px;
-  width: 12px;
-  height: 12px;
-}
-
-@media (min-resolution: 2dppx) {
-  #engineList treechildren::-moz-tree-image(engineShown, checked) {
-    list-style-image: url("check@2x.png");
-  }
-}
-
 #engineList treechildren::-moz-tree-image(engineName) {
   -moz-margin-end: 10px;
   -moz-margin-start: 1px;

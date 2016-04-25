@@ -70,78 +70,36 @@ treecol {
   visibility: collapse;
 }
 
-.category-icon {
-  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.png");
-}
-
 #category-general > .category-icon {
-  -moz-image-region: rect(0, 24px, 24px, 0);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#general");
 }
 
 #category-search > .category-icon {
-  -moz-image-region: rect(0, 194px, 24px, 168px);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#search");
 }
 
 #category-content > .category-icon {
-  -moz-image-region: rect(0, 48px, 24px, 24px);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#content");
 }
 
 #category-application > .category-icon {
-  -moz-image-region: rect(0, 72px, 24px, 48px);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#applications");
 }
 
 #category-privacy > .category-icon {
-  -moz-image-region: rect(0, 96px, 24px, 72px);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#privacy");
 }
 
 #category-security > .category-icon {
-  -moz-image-region: rect(0, 120px, 24px, 96px);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#security");
 }
 
 #category-sync > .category-icon {
-  -moz-image-region: rect(0, 144px, 24px, 120px);
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#sync");
 }
 
 #category-advanced > .category-icon {
-  -moz-image-region: rect(0, 168px, 24px, 144px);
-}
-
-@media (min-resolution: 2dppx) {
-  .category-icon {
-    list-style-image: url("chrome://browser/skin/preferences/in-content/icons@2x.png");
-  }
-
-  #category-general > .category-icon {
-    -moz-image-region: rect(0, 48px, 48px, 0);
-  }
-
-  #category-search > .category-icon {
-    -moz-image-region: rect(0, 384px, 48px, 336px);
-  }
-
-  #category-content > .category-icon {
-    -moz-image-region: rect(0, 96px, 48px, 48px);
-  }
-
-  #category-application > .category-icon {
-    -moz-image-region: rect(0, 144px, 48px, 96px);
-  }
-
-  #category-privacy > .category-icon {
-    -moz-image-region: rect(0, 192px, 48px, 144px);
-  }
-
-  #category-security > .category-icon {
-    -moz-image-region: rect(0, 240px, 48px, 192px);
-  }
-
-  #category-sync > .category-icon {
-    -moz-image-region: rect(0, 288px, 48px, 240px);
-  }
-
-  #category-advanced > .category-icon {
-    -moz-image-region: rect(0, 336px, 48px, 288px);
-  }
+  list-style-image: url("chrome://browser/skin/preferences/in-content/icons.svg#advanced");
 }
 
 @media (max-width: 800px) {
@@ -271,11 +229,12 @@ treecol {
 
 /* Privacy pane */
 
-#doNotTrackInfo,
+.doNotTrackLearnMore,
 #trackingProtectionPBMLearnMore,
 #trackingProtectionLearnMore {
   -moz-margin-start: 1.5em !important;
   margin-top: 0;
+  font-weight: normal;
 }
 
 /* Collapse the non-active vboxes in decks to use only the height the
@@ -422,28 +381,6 @@ description > html|a {
 }
 
 /**
- * Sync migration
- */
-#sync-migrate-upgrade-description {
-  /* description elts need a min-width to wrap correctly - bug 630864? */
-  min-width: 100px
-}
-
-#sync-migration {
-  border: 1px solid rgba(0, 0, 0, 0.32);
-  background-color: InfoBackground;
-  color: InfoText;
-  text-shadow: none;
-  margin: 5px 0 0 0;
-  animation: fadein 3000ms;
-}
-
-@keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/**
  * Sync
  */
 
@@ -514,46 +451,6 @@ description > html|a {
 
 #syncStatusMessage[message-type="migration"] {
   background-color: #FF9500;
-}
-
-#sync-migration-buttons-deck {
-  visibility: collapse;
-}
-
-#learnMoreLink {
-  margin: 0;
-  color: #FBFBFB;
-  text-decoration: underline;
-}
-
-#syncStatusMessage[message-type="migration"] #sync-migration-buttons-deck {
-  visibility: visible;
-}
-
-#sync-migration-buttons-deck {
-  margin-top: 20px;
-}
-
-#sync-migration-buttons-deck button {
-  margin: 0 10px 0 0;
-  border: 0;
-  border-radius: 2px;
-}
-
-#sync-migrate-upgrade,
-#sync-migrate-resend {
-  background-color: #0095DD;
-  color: #FBFBFB;
-}
-
-#sync-migrate-upgrade:hover,
-#sync-migrate-resend:hover {
-  background-color: #008ACB;
-}
-
-#sync-migrate-upgrade:hover:active,
-#sync-migrate-resend:hover:active {
-  background-color: #006B9D;
 }
 
 #syncStatusMessageWrapper {

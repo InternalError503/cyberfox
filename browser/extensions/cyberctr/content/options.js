@@ -440,6 +440,9 @@ classicthemerestorerjso.ctr = {
 
 	if (this.appversion < 45) {
 	  document.getElementById('ctraddon_pw_ibinfoico').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_ibinfoico2').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_iblabels').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_html5warning').style.visibility = 'collapse';
 	}
 
 	if (this.appversion < 47) {
@@ -447,7 +450,10 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_hideeditbm').style.visibility = 'collapse';
 	}
 	
-
+	if (this.appversion < 48) {
+	  document.getElementById('ctraddon_pw_altautocompl').style.visibility = 'collapse';
+	}
+	
 	function PrefListener(branch_name, callback) {
 	  // Keeping a reference to the observed preference branch or it will get
 	  // garbage collected.
@@ -922,6 +928,7 @@ classicthemerestorerjso.ctr = {
   ctrpwFaviconextra: function(which) {
 	if(which==true) which=false; else which=true;
 	document.getElementById('ctraddon_padlock_extra').disabled = which;
+	document.getElementById('ctraddon_pw_ibinfoico2').disabled = !which;
   },
   
   ctrpwBFextra: function(which) {
@@ -1061,7 +1068,7 @@ classicthemerestorerjso.ctr = {
     document.getElementById('ctraddon_pw_hideurelstop2').disabled = which;
 	document.getElementById('ctraddon_pw_hideurelstop2').style.visibility = itemvis;
   },
-  
+ 
   ctrpwCtrOldSearch: function(which) {
 	var itemvis = 'collapse';
 	

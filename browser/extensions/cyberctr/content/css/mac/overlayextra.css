@@ -97,7 +97,7 @@
 	  }
 
 	  #main-window[defaultfxtheme="true"] #ctraddon_forward-button:hover:active:not([disabled="true"]),
-	    #main-window[defaultfxtheme="true"] #ctraddon_go-button:hover:active:not([disabled="true"]){
+	  #main-window[defaultfxtheme="true"] #ctraddon_go-button:hover:active:not([disabled="true"]){
 		-moz-image-region: rect(36px, 144px, 72px, 108px) !important;
 	  }
 	  
@@ -137,7 +137,7 @@
 	  }
 		
 	  #main-window[defaultfxtheme="true"] #ctraddon_restart-button {
-		list-style-image: url("chrome://classic_theme_restorer/content/images/ctrrestart2x.png");
+		list-style-image: url("chrome://classic_theme_restorer/content/images/ctrrestart@2x.png");
 	  }
 
 	  #main-window[defaultfxtheme="true"] :-moz-any(#ctraddon_back-button, #ctraddon_forward-button, #ctraddon_bookmarks-menu-toolbar-button, #ctraddon_bookmarks-button, #ctraddon_history-button,#ctraddon_history-menu-toolbar-button, #ctraddon_reload-button, #ctraddon_stop-button,#ctraddon_ctr-button,#ctraddon_go-button,#ctraddon_preferences-button,#ctraddon_restart-button) > .toolbarbutton-icon {
@@ -267,6 +267,14 @@
 	  background-repeat: no-repeat;
 	}
 	
+	#main-window[defaultfxtheme="true"] #ctraddon_addon-bar toolbarbutton[type="menu-button"] > toolbarbutton,
+	#main-window[defaultfxtheme="true"] #ctraddon_addon-bar toolbarbutton[type="menu-button"] > dropmarker {
+	  -moz-appearance: none !important;
+	  border-style: none !important;
+	  background: none !important;
+	  box-shadow: none !important;
+	}
+	
 	/* Hide Windows OS window controls*/
 	#main-window toolbar #ctraddon_window-controls,
 	#ctraddon_window-controls,
@@ -279,4 +287,9 @@
 	#main-window .ctraddon_linuxonly,
 	#main-window .ctraddon_windowsonly{
 	  visibility: collapse !important;
+	}
+	
+	/* adust webdeveloper menu inside appmenu popup */
+	#appmenu-popup #webDeveloperMenu:not(.menu-iconic) > label {
+	  -moz-padding-start: 22px !important;
 	}

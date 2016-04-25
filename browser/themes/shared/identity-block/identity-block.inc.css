@@ -5,6 +5,7 @@
 %endif
 
 #identity-box {
+  --identity-box-hover-background-color: rgb(231,230,230);
   --identity-box-selected-background-color: rgb(231,230,230);
   --identity-box-verified-color: hsl(92,100%,30%);
 %ifdef IDENTITY_BRANDING_BETA
@@ -12,13 +13,13 @@
 %elif IDENTITY_BRANDING_AMD
 	--identity-box-chrome-color: rgb(236,24,24);
 %elif IDENTITY_BRANDING_LINUX
-	--identity-box-chrome-color: rgb(3,81,1);
+	--identity-box-chrome-color: rgb(15,209,1);
 %elif IDENTITY_BRANDING_LINUX_BETA
 	--identity-box-chrome-color: rgb(25,198,121);
 %elif IDENTITY_BRANDING_INTEL
 	--identity-box-chrome-color: rgb(24,147,236);
 %else
-	--identity-box-chrome-color: rgb(229,115,0);
+	--identity-box-chrome-color: rgb(153,153,153);
 %endif
 
   border-inline-end: 1px solid var(--urlbar-separator-color);

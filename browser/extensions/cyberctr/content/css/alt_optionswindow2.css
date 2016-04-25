@@ -328,6 +328,25 @@
 		
 	}
 	
+	@media all and (-moz-windows-theme:aero) {
+		
+	  @media (-moz-os-version: windows-win7) {
+		
+		checkbox .checkbox-check,
+		radio .radio-check,
+		checkbox image,
+		radio image {
+		  width: 10px !important;
+		}
+		
+		checkbox label,
+		radio label {
+		  -moz-margin-start: -4px !important;
+		}
+	  }
+		
+	}
+	
 	/* content */
 	#categories .box-inherit {
 	  -moz-box-orient: horizontal !important;
@@ -391,6 +410,12 @@
 	groupbox {
 	  margin-top: 0 !important;
 	  margin-bottom: 0 !important;
+	}
+	
+	#offlineAppsList > * {
+	  min-width: unset !important;
+	  width: auto !important;
+	  max-width: 550px !important;
 	}
 	
 	/* advanced category tabs */
@@ -612,4 +637,35 @@
 	#FontsDialog checkbox label {
 	  -moz-margin-start: -4px !important;
 	}
+}
+
+@media all and (-moz-windows-theme:aero) {
+	
+  @media (-moz-os-version: windows-win7) {
+	
+	*[subdialog="true"] checkbox .checkbox-check,
+	*[subdialog="true"] radio .radio-check,
+	*[subdialog="true"] checkbox image,
+	*[subdialog="true"] radio image {
+	  width: 10px !important;
+	}
+	
+	*[subdialog="true"] checkbox label,
+	*[subdialog="true"] radio label {
+	  -moz-margin-start: -4px !important;
+	}
+
+	#FontsDialog checkbox image {
+	  min-width: 10px !important;
+	  min-height: 10px !important;
+	  width: 10px !important;
+	  height: 10px !important;
+	}
+	
+	#FontsDialog checkbox label {
+	  -moz-margin-start: -4px !important;
+	}
+
+  }
+	
 }

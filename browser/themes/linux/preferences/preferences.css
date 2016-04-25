@@ -110,6 +110,20 @@ label.small {
   margin: 0px 3px 6px 3px !important;
 }
 
+#blocklistsTree treechildren::-moz-tree-image(selectionCol, checked) {
+  list-style-image: url("chrome://global/skin/in-content/check.svg#check");
+  width: 21px;
+  height: 21px;
+}
+
+#blocklistsTree treechildren::-moz-tree-image(selectionCol, checked, selected) {
+  list-style-image: url("chrome://global/skin/in-content/check.svg#check-inverted");
+}
+
+#blocklistsTree treechildren::-moz-tree-row {
+  min-height: 36px;
+}
+
 /* Cookies Manager */
 #cookiesChildren::-moz-tree-image(domainCol) {
   width: 16px;

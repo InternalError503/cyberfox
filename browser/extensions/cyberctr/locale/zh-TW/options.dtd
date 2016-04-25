@@ -61,7 +61,6 @@
 <!ENTITY Ctr_emptytfavico_n	"None">
 <!ENTITY Ctr_emptytfavico_g	"Generic">
 <!ENTITY Ctr_noemptypticon	"從釘選分頁移除空圖示">
-<!ENTITY Ctr_e10stab_notd	"e10s 分頁: 移除底線">
 <!ENTITY Ctr_closetab_0		"關閉按鈕">
 <!ENTITY Ctr_closetab_1		"僅在目前的分頁顯示關閉按鈕">
 <!ENTITY Ctr_closetab_2		"不顯示關閉按鈕">
@@ -129,6 +128,7 @@
 <!ENTITY Ctr_options_rem	"記住上次選擇的選項分頁">
 <!ENTITY Ctr_svgfilters		"改變預設工具列按鈕圖示顏色">
 <!ENTITY Ctr_wincontrols	"可移動的全螢幕視窗控制項">
+<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"「頂層網域」圖示: 經典外觀">
 <!ENTITY Ctr_altalertbox	"「警示方塊」: 換個外觀">
 <!ENTITY Ctr_emptygfavico	"Replace generic favicon">
@@ -237,6 +237,7 @@
 <!ENTITY Ctr_urlbardropm	"將下拉式三角按鈕儘可能地移動到網址列最末端">
 <!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
 <!ENTITY Ctr_altreaderico	"換個「閱讀模式」圖示">
+<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"當彈出型廣告視窗被封鎖時，不顯示通知圖示">
 <!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"減少網址列和搜尋列高度 (實驗性)">
@@ -245,6 +246,8 @@
 <!ENTITY Ctr_ib_graycolor	"Gray color for unknown identity and chrome pages">
 <!ENTITY Ctr_verifiedcolors	"Button colors for verified websites, secure and not secure connections">
 <!ENTITY Ctr_ibinfoico		"Replace 'i'-icon with globe icon">
+<!ENTITY Ctr_ibinfoico2		"Hide 'i'-icon (if possible)">
+<!ENTITY Ctr_iblabels		"Hide labels">
 <!ENTITY Ctr_faviconurl		"網址列顯示網站圖示">
 <!ENTITY Ctr_padlock		"鎖頭">
 <!ENTITY Ctr_padlock_hid	"隱藏">
@@ -252,7 +255,7 @@
 <!ENTITY Ctr_padlock_cla	"經典風格">
 <!ENTITY Ctr_padlock_mod	"現代風格">
 <!ENTITY Ctr_padlock_ext	"在有效的「about:」頁面顯示「&brandShortName;」圖示">
-<!ENTITY Ctr_icopageinfo	"按下圖示，則開啟「頁面資訊」視窗">
+<!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"自訂網址列與搜尋列的寬度">
 <!ENTITY Ctr_searchbar		"搜尋列">
 <!ENTITY Ctr_lbsugresi		"儘可能地顯示更多搜尋建議 (在不出現捲軸的情況下)">
@@ -313,6 +316,7 @@
 
 <!ENTITY Ctr_closeabarbut	"隱藏附加元件關閉按鈕">
 <!ENTITY Ctr_highaddonsbar	"增加附加元件列高度">
+<!ENTITY Ctr_lessaddonsbar	"Decrease height">
 <!ENTITY Ctr_addonbarfs		"全螢幕模式下懸停顯示">
 
 <!ENTITY Ctr_animation		"動畫">
