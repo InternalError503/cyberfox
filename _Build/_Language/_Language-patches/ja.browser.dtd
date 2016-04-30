@@ -171,15 +171,15 @@
 <!ENTITY turnoffmenuabout.label "メニュー項目 [about:config] を有効にする">
 
 <!-- Plugin Settings Tweak -->
-<!ENTITY browserplugins.label "Browser Plugins">
-<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
-<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+<!ENTITY browserplugins.label "ブラウザ プラグイン">
+<!ENTITY browserpluginswhitelist.label "プラグインのホワイトリストを有効にする">
+<!ENTITY browserpluginsjavaenabled.label "Java ブラウザ プラグインを有効にする">
 
 <!-- System Addons Tweak -->
-<!ENTITY systemaddons.label "System Addons">
-<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
+<!ENTITY systemaddons.label "システム アドオン">
+<!ENTITY systemaddonsmsg.label "システム アドオンがインストールされている場合は切り替え可能です。">
 <!ENTITY enablehellochat.label "Hello 通話を有効にする">
-<!ENTITY enablepocket.label "Enable pocket.">
+<!ENTITY enablepocket.label "Pocket を有効にする">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "ブラウザ再起動が必要です">
@@ -210,4 +210,3 @@
 <!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
 <!ENTITY abouthome.addons.label "Addons">
 <!ENTITY abouthome.addons.url "https://addons.mozilla.org/ja/firefox/">
-

@@ -47,18 +47,18 @@
 <!ENTITY mixedContentBlocked.helplink "Learn more">
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Очистить кэш памяти">
-<!ENTITY turnOnCleanRam.label "Включить опцию очистки кэша памяти.">
+<!ENTITY turnOnCleanRam.label "Включить опцию очистки кэша памяти">
 <!-- End Purge RAM browser tweak -->
 
 <!-- Restart Browser Tweak -->
 <!ENTITY restartBrowser.label "Перезапуск браузера">
 <!ENTITY restartBrowserButton.label "Перезапуск браузера">
-<!ENTITY turnOnRestart.label "Включить опцию перезапуска браузера.">
-<!ENTITY cleanFastRestartCache.label "Очистить кэш быстрого запуска при перезапуске браузера.">
+<!ENTITY turnOnRestart.label "Включить опцию перезапуска браузера">
+<!ENTITY cleanFastRestartCache.label "Очистить кэш быстрого запуска при перезапуске браузера">
 <!ENTITY restartOptions.label "Опции перезапуска">
-<!ENTITY restart_paneluibtn.label "Добавить кнопку на пользовательскую панель.">
-<!ENTITY restart_panelbtnsmall.label "Маленькая кнопка на пользовательской панели.">
-<!ENTITY restart_reqconfirmation.label "Запрашивать подтверждение перезапуска.">
+<!ENTITY restart_paneluibtn.label "Добавить кнопку на пользовательскую панель">
+<!ENTITY restart_panelbtnsmall.label "Маленькая кнопка на пользовательской панели">
+<!ENTITY restart_reqconfirmation.label "Запрашивать подтверждение перезапуска">
 <!-- End Restart Browser Tweak -->
 
 <!ENTITY FeaturesTabLabel "Возможности">
@@ -66,7 +66,7 @@
 <!ENTITY menuFeaturesTab.label "Контекстные меню">
 
 <!-- Clone Current Tab Tweak -->
-<!ENTITY turnonclone.label "Включить опцию клонирования вкладки.">
+<!ENTITY turnonclone.label "Включить опцию клонирования вкладки">
 <!ENTITY cloneCurrentTab.label "Клонировать вкладку">
 <!ENTITY cloneInNewWindow.label "Клонировать в новом окне">
 <!-- End Clone Current Tab Tweak -->
@@ -74,13 +74,13 @@
 <!-- Features Tab Tweak -->
 <!ENTITY warnOnQuit.label "Предупреждение о закрытии окна">
 <!ENTITY newtabsoptions.label "Опции новой вкладки">
-<!ENTITY newtabenabled.label "Разрешить страницу быстрого доступа.">
-<!ENTITY newtabpreload.label "Разрешить предзагрузку страницы быстрого доступа.">
-<!ENTITY newtabsearch.label "Включить поиск на странице новой вкладки. (Обновите страницу)">
+<!ENTITY newtabenabled.label "Разрешить страницу быстрого доступа">
+<!ENTITY newtabpreload.label "Разрешить предзагрузку страницы быстрого доступа">
+<!ENTITY newtabsearch.label "Включить поиск на странице новой вкладки (обновите страницу)">
 <!ENTITY newtabpage.label "Страница быстрого доступа:">
-<!ENTITY newtabthumbnail.label "Отключить создание миниатюр на странице новой вкладки.">
+<!ENTITY newtabthumbnail.label "Отключить создание миниатюр на странице новой вкладки">
 <!ENTITY aboutnewtab.pageTitle "About:NewTab">
-<!ENTITY incontent.label "Показывать настройки в виде вкладки.">
+<!ENTITY incontent.label "Показывать настройки в виде вкладки">
 <!-- End Features Tab Tweak -->
 
 <!-- Tabs Features -->
@@ -150,36 +150,36 @@
 <!-- Update check options -->
 <!ENTITY updateoptions.label "Настройки обновления &brandShortName;">
 <!ENTITY updateautocheck.label "Автоматически проверять обновления в окне 'О &brandShortName;'">
-<!ENTITY updatestartupcheck.label "Автоматически проверять наличие обновлений при запуске &brandShortName;.">
-<!ENTITY updatecheckenabled.label "Разрешить проверку обновлений.">
+<!ENTITY updatestartupcheck.label "Автоматически проверять наличие обновлений при запуске &brandShortName;">
+<!ENTITY updatecheckenabled.label "Разрешить проверку обновлений">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Копировать адрес страницы">
-<!ENTITY copyTabURLOptions.label "Включить опцию копирования адреса страницы.">
+<!ENTITY copyTabURLOptions.label "Включить опцию копирования адреса страницы">
 <!ENTITY copyAllTabUrls.label "Копировать URL всех вкладок в буфер обмена">
 <!ENTITY copyAllTabUrlsOptions.label "Включить опцию копирования URL всех вкладок">
 
 <!-- Classic Context Menu Tweak -->
-<!ENTITY contextNavigationClassic.label "Использовать классическое контекстное меню.">
+<!ENTITY contextNavigationClassic.label "Использовать классическое контекстное меню">
 
 <!-- Email Link Context Menu Tweak -->
-<!ENTITY turnoffemaillink.label "Включить в контекстном меню опцию отправки ссылки по электронной почте.">
+<!ENTITY turnoffemaillink.label "Включить в контекстном меню опцию отправки ссылки по электронной почте">
 
 <!-- about:config Context Menu Tweak -->
-<!ENTITY turnoffcontextabout.label "Включить доступ к about:config в контекстном меню.">
+<!ENTITY turnoffcontextabout.label "Включить доступ к about:config в контекстном меню">
 <!-- about:config Menu Tweak -->
-<!ENTITY turnoffmenuabout.label "Включить доступ к about:config в меню.">
+<!ENTITY turnoffmenuabout.label "Включить доступ к about:config в меню">
 
 <!-- Plugin Settings Tweak -->
-<!ENTITY browserplugins.label "Browser Plugins">
-<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
-<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+<!ENTITY browserplugins.label "Плагины браузера">
+<!ENTITY browserpluginswhitelist.label "Разрешить белый список плагинов">
+<!ENTITY browserpluginsjavaenabled.label "Включить плагин Java">
 
 <!-- System Addons Tweak -->
-<!ENTITY systemaddons.label "System Addons">
-<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
+<!ENTITY systemaddons.label "Системные дополнения">
+<!ENTITY systemaddonsmsg.label "Здесь Вы можете разрешить или запретить установку интересующих системных дополнений:">
 <!ENTITY enablehellochat.label "Включить чат hello">
-<!ENTITY enablepocket.label "Enable pocket.">
+<!ENTITY enablepocket.label "Включить Pocket">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Требуется перезапуск браузера">
