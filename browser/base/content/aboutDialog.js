@@ -200,7 +200,7 @@ function init(aEvent)
 
                     //Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
                     request.timeout = 6000;
-                    request.open("GET", url, true);
+                    request.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
                     request.setRequestHeader("Content-Type", "application/json");
                     request.send(null);
 

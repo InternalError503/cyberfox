@@ -554,7 +554,7 @@ var gCyberfoxCustom = {
 						};
 
 						request.timeout = Services.prefs.getIntPref("app.update.startup-timeout");
-						request.open("GET", url, true);
+						request.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
 						request.setRequestHeader("Content-Type", "application/json");
 						request.send(null);
 						
