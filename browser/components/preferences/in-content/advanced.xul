@@ -506,8 +506,8 @@
 					<checkbox id="browser.preferences.inContent" label="&incontent.label;"
 							preference="browser.preferences.inContent"/>						
 			</groupbox>
+#ifdef XP_WIN
 			
-#ifdef XP_WIN			
 			<!-- Plugin Settings -->
 			<groupbox id="alternateOptionsPlugins" orient="vertical">
 				<caption label="&browserplugins.label;"/>				          	              	
@@ -518,6 +518,7 @@
 							preference="plugin.java_allowed"
 							tooltiptext="&restartRequiredMSG.label;"/>							
 			</groupbox>
+			
 #endif
 	
 			<!-- System Addons -->
