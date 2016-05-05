@@ -1,6 +1,7 @@
 #if PackageType == "amd86" || PackageType == "amd64" || PackageType == "intel86" || PackageType == "intel64"
 [Registry]
 #if Arch == "i368"
+Root: "HKLM"; Subkey: "SOFTWARE\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "SOFTWARE\\Clients\\StartMenuInternet\\{#MyAppExeNameUC}\\Capabilities"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
 Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "SOFTWARE\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
@@ -27,14 +28,15 @@ Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: str
 Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: dword; ValueName: "IconsVisible"; ValueData: "$00000000"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties";ValueType: string;  ValueData: "{#MyAppName} &Options"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties\command"; ValueType: string;  ValueData: """{app}\{#MyAppExeName}""  -preferences"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties\command"; ValueType: string;  ValueData: """{app}\{#MyAppExeName}"" -preferences"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName} &Safe Mode"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}""  -safe-mode"; Flags: uninsdeletekey
+Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -safe-mode"; Flags: uninsdeletekey
 
 ;Temp fix for https://8pecxstudios.com/Forums/viewtopic.php?f=5&t=1343
 Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: none; ValueName: "StartMenuInternet"; Flags: dontcreatekey deletevalue uninsdeletekey
 
 #elif Arch == "amd64"
+Root: "HKLM64"; Subkey: "SOFTWARE\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "SOFTWARE\\Clients\\StartMenuInternet\\{#MyAppExeNameUC}\\Capabilities"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "SOFTWARE\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
@@ -61,9 +63,9 @@ Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: s
 Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\InstallInfo"; ValueType: dword; ValueName: "IconsVisible"; ValueData: "$00000000"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties";ValueType: string;  ValueData: "{#MyAppName} &Options"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties\command"; ValueType: string;  ValueData: """{app}\{#MyAppExeName}""  -preferences"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\properties\command"; ValueType: string;  ValueData: """{app}\{#MyAppExeName}"" -preferences"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName} &Safe Mode"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}""  -safe-mode"; Flags: uninsdeletekey
+Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -safe-mode"; Flags: uninsdeletekey
 
 ;Temp fix for https://8pecxstudios.com/Forums/viewtopic.php?f=5&t=1343
 Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\Capabilities\FileAssociations"; ValueType: none; ValueName: "StartMenuInternet"; Flags: dontcreatekey deletevalue uninsdeletekey
