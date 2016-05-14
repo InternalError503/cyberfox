@@ -347,7 +347,7 @@ pref("extensions.classicthemerestorer.loadcustomcss", false);
 pref("extensions.classicthemerestorer.customcssurl", "");
 
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.5.2");
+pref("extensions.classicthemerestorer.version", "1.5.3");
 
 //CyberCTR Pre-set Configuration
 pref("extensions.classicthemerestorer.ctrpref.firstrun", true);
