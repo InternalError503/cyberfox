@@ -202,13 +202,31 @@
           this.invalidate();
 		  
 		  var width = 300;
-		  
-		  try{
-			width = document.getElementById("urlbar").getBoundingClientRect().width;
-		  } catch(e){}
 
+		  try{
+			width = Math.round(document.getElementById("urlbar").getBoundingClientRect().width);
+		  } catch(e){}
+		  
 		  this.setAttribute("width", width);
+		  
+		  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("urlresults")) {
+		  
+		    var height = 400;
 			
+			// urlbars bottom position
+			var urlbbotpos = document.getElementById("urlbar").boxObject.screenY + document.getElementById("urlbar").boxObject.height;
+
+			try{
+			  if(document.getElementById("main-window").hasAttribute("inFullscreen"))
+			    height = screen.height - urlbbotpos - 3;
+			  else
+			    height = screen.availHeight - urlbbotpos - 3;
+			} catch(e){}
+			
+			this.removeAttribute("height");
+			this.setAttribute("maxheight", height);
+		  }
+
           this.openPopup(aElement, "after_start", 0, -1, false, false);
         ]]></body>
       </method>
@@ -216,7 +234,7 @@
       <method name="_updateFooterVisibility">
         <body>
           <![CDATA[
-          this.footer.collapsed = this._matchCount == 0;
+            this.footer.collapsed = this._matchCount == 0;
           ]]>
         </body>
       </method>

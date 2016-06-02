@@ -10,8 +10,7 @@
 	
 <Url type="text/html" method="POST" template="https://www.startpage.com/do/search">
 	   <Param name="query" value="{searchTerms}"/>
-	   <Param name="language" value="english"/>
-	   <Param name="cat" value="web"/>	   
+	   <Param name="language" value="english"/>	   
 </Url>
 
 <moz:SearchForm>https://startpage.com/</moz:SearchForm>

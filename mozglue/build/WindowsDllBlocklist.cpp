@@ -206,6 +206,10 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 	  { "gameoverlayrenderer.dll", ALL_VERSIONS },
 	  { "gameoverlayrenderer64.dll", ALL_VERSIONS }, 
 	  
+	  //Check Start8 is not causing browser hangs, Ether way should not be hooking the browser.
+	  { "start8_32.dll", ALL_VERSIONS },
+	  { "start8_64.dll", ALL_VERSIONS }, 
+	  
 	  //Ask toolbar
 	  { "genericasktoolbar.dll", ALL_VERSIONS },
 	  { "asksbar.dll", ALL_VERSIONS }, 

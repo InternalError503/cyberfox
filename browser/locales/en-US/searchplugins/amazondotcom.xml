@@ -11,7 +11,5 @@
 <Url type="text/html" method="GET" template="https://www.amazon.com/exec/obidos/external-search/" rel="searchform">
   <Param name="field-keywords" value="{searchTerms}"/>
   <Param name="mode" value="blended"/>
-  <Param name="tag" value="mozilla-20"/>
-  <Param name="sourceid" value="Mozilla-search"/>
 </Url>
 </SearchPlugin>

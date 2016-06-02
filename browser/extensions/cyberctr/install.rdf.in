@@ -11,7 +11,7 @@
 	<Description rdf:about="urn:mozilla:install-manifest">
 		<em:id>CTR@8pecxstudios.com</em:id>
 		<em:name>CyberCTR</em:name>
-		<em:version>1.5.3</em:version>
+		<em:version>1.5.4</em:version>
 		<em:type>2</em:type>
 		<em:multiprocessCompatible>true</em:multiprocessCompatible>
 
@@ -39,12 +39,15 @@
 		<em:translator>Γιώργος Μαλαμάς (el) - Greek</em:translator>
 		<em:translator>strel (es) - Spanish</em:translator>
 		<em:translator>Maidur (et) - Estonian</em:translator>
+		<em:translator>Zefling (fr) - French</em:translator>
 		<em:translator>David V. (fr) - French</em:translator>
 		<em:translator>goofy (fr) - French</em:translator>
-		<em:translator>Michel Gagnon (fr) - French</em:translator>	
+		<em:translator>Michel Gagnon (fr) - French</em:translator>
+		<em:translator>BlackJack (fr) - French</em:translator>
 		<em:translator>milupo (hsb) - Upper Sorbian</em:translator>
 		<em:translator>gialloporpora (it) - Italian</em:translator>
 		<em:translator>Styb (it) - Italian</em:translator>
+		<em:translator>mm_k (ja) - Japanese</em:translator>
 		<em:translator>ma2moto (ja) - Japanese</em:translator>
 		<em:translator>momdo (ja) - Japanese</em:translator>
 		<em:translator>Mrere (pl) - Polish</em:translator>

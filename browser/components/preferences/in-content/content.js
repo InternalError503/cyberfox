@@ -294,7 +294,7 @@ var gContentPane = {
   /**
    * Displays the fonts dialog, where web page font names and sizes can be
    * configured.
-   */  
+   */
   configureFonts: function ()
   {
     gSubDialog.open("chrome://browser/content/preferences/fonts.xul", "resizable=no");

@@ -109,6 +109,9 @@
  	  <preference id="plugin.java_allowed" 
 						   name="plugin.java_allowed" 
 						   type="bool"/>
+ 	  <preference id="plugins.disabled" 
+						   name="plugins.disabled" 
+						   type="bool"/>
 #endif
       <!-- Data Choices tab -->
 
@@ -193,6 +196,13 @@
           <groupbox id="accessibilityGroup" align="start">
             <caption label="&accessibility.label;"/>
 
+#ifdef XP_WIN
+        <checkbox id="useOnScreenKeyboard"
+                  hidden="true"
+                  label="&useOnScreenKeyboard.label;"
+                  accesskey="&useOnScreenKeyboard.accesskey;"
+                  preference="ui.osk.enabled"/>
+#endif
             <checkbox id="useCursorNavigation"
                       label="&useCursorNavigation.label;"
                       accesskey="&useCursorNavigation.accesskey;"
@@ -475,7 +485,10 @@
 			
 			<!-- Plugin Settings -->
 			<groupbox id="alternateOptionsPlugins" orient="vertical">
-				<caption label="&browserplugins.label;"/>				          	              	
+				<caption label="&browserplugins.label;"/>
+					<checkbox id="plugins.disabled" label="&browserpluginsdisabled.label; (&restartRequiredMSG.label;)"
+							preference="plugins.disabled"
+							tooltiptext="&restartRequiredMSG.label;"/>				          	              	
 					<checkbox id="plugin.allowed_whitelist.enabled" label="&browserpluginswhitelist.label; (&restartRequiredMSG.label;)"
 							preference="plugin.allowed_whitelist.enabled"
 							tooltiptext="&restartRequiredMSG.label;"/>

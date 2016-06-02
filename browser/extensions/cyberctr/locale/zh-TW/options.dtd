@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"彈性空間">
 <!ENTITY Ctr_space			"空白">
 <!ENTITY Ctr_separator		"分隔線">
-<!ENTITY Ctr_puibseparator	"面板按鈕分隔線">
 <!ENTITY Ctr_navthrobber	"進度指示器">
 <!ENTITY Ctr_sidebarbutton	"側邊欄">
 <!ENTITY Ctr_windowcontrols	"最小化/最大化/關閉 (全螢幕)">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui				"介面">
 <!ENTITY Ctr_nbiconsize0	"設定瀏覽工具列屬性">
 <!ENTITY Ctr_smallnavbut	"在瀏覽工具列使用小圖示按鈕">
-<!ENTITY Ctr_bfurlbarfix	"當「回到上一頁按鈕可移動」和「小圖示按鈕」模式下，修正網址列圓角半徑">
 <!ENTITY Ctr_backforward	"使「回到上一頁按鈕」可移動">
 <!ENTITY Ctr_nbcompact		"減少瀏覽工具列高度">
 <!ENTITY Ctr_hide_bf_popup	"當滑鼠長按時，不顯示分頁歷史瀏覽選單">
@@ -128,6 +126,10 @@
 <!ENTITY Ctr_options_rem	"記住上次選擇的選項分頁">
 <!ENTITY Ctr_svgfilters		"改變預設工具列按鈕圖示顏色">
 <!ENTITY Ctr_wincontrols	"可移動的全螢幕視窗控制項">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"「頂層網域」圖示: 經典外觀">
 <!ENTITY Ctr_altalertbox	"「警示方塊」: 換個外觀">
@@ -135,7 +137,7 @@
 <!ENTITY Ctr_mstatusbar		"使狀態列可移動">
 <!ENTITY Ctr_mstatusbars4e	"狀態列由 Status-4-Evar 控制">
 <!ENTITY Ctr_mstatusbartpp	"狀態列由 The Puzzle Piece 控制">
-<!ENTITY Ctr_mstatusbarpzt	"狀態列由 Puzzle Toolbars 控制">
+<!ENTITY Ctr_mstatusbarpzt	"狀態列由 Puzzle Bars 控制">
 <!ENTITY Ctr_mstatusbarabr	"狀態列由 The Addon Bar (Restored) 控制">
 <!ENTITY Ctr_combrelstop	"合併停止與重新載入按鈕">
 <!ENTITY Ctr_stoprel1		"工具列: 將重新載入按鈕放在停止按鈕之後!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"緊湊的面板選單(書籤、歷史等等.)">
 <!ENTITY Ctr_hidezoomres	"當縮放控制按鈕置於工具列上時，隱藏工具列上的縮放重設按鈕">
 <!ENTITY Ctr_alt_newtabp	"新分頁(九宮頁面) (about:newtab): 換個外觀">
+<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_search_ui		"Search">
 <!ENTITY Ctr_ctroldsearch	"傳統搜尋列">
 <!ENTITY Ctr_ctroldsearchc	"搜尋後清除搜尋列">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Open search in new tab (about:config preference)">
 <!ENTITY Ctr_osearch_meoit	"Middle-clicks: search in new 'foreground tab'">
+<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Small dropmarker">
 <!ENTITY Ctr_addonmanager	"附加元件管理員">
 <!ENTITY Ctr_alt_addonsp	"「更多資訊」頁面: 換個項目順序">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"彈出式書籤選單: 書籤選單使用和面板選單同風格的外觀">
 <!ENTITY Ctr_bmbunsortbm	"彈出式書籤選單: 「未排序書籤」項目附加子選單">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"彈出式書籤選單: 顯示「檢視書籤工具列」項目">
 <!ENTITY Ctr_bmbnounsort	"彈出式書籤選單: 隱藏「未排序書籤」項目">
 <!ENTITY Ctr_bmbutnotext	"當此按鈕位於書籤列時，隱藏按鈕文字標籤">
@@ -237,9 +245,7 @@
 <!ENTITY Ctr_urlbardropm	"將下拉式三角按鈕儘可能地移動到網址列最末端">
 <!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
 <!ENTITY Ctr_altreaderico	"換個「閱讀模式」圖示">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"當彈出型廣告視窗被封鎖時，不顯示通知圖示">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"減少網址列和搜尋列高度 (實驗性)">
 <!ENTITY Ctr_urlbar_ib		"網站識別鈕 (身份區塊)">
 <!ENTITY Ctr_ib_nohovcolor	"懸停時，不著上灰色底">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"自訂網址列與搜尋列的寬度">
 <!ENTITY Ctr_searchbar		"搜尋列">
-<!ENTITY Ctr_lbsugresi		"儘可能地顯示更多搜尋建議 (在不出現捲軸的情況下)">
-<!ENTITY Ctr_lbsugres		"搜尋建議數目 (about:config » browser.urlbar.maxRichResults)">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
+<!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_lbsugres		"Number of results (about:config » browser.urlbar.maxRichResults)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"選單列併入">
 <!ENTITY Ctr_extrabar		"新增工具列">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"移除背景色彩/模糊 (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"將主工具列和分頁著上天藍色(Aero Blue)">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"標題列/選單列/分頁列: 移除背景色彩">
 <!ENTITY Ctr_transpttbew10	"對一些 OS 佈景的附加調整">
 <!ENTITY Ctr_transptcw10	"隱藏作業系統預設的 最小化/最大化/關閉 按鈕">
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"Go">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"B">

@@ -258,7 +258,7 @@ var gPluginHandler = {
         }
       }
       else {
-        url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "clicktoplay";
+        url = Services.urlFormatter.formatURLPref("plugins.clickToActivateInfo.url");
       }
       pluginInfo.detailsLink = url;
 

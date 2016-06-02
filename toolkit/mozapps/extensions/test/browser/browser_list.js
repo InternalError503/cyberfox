@@ -18,7 +18,7 @@ var gVersion = Services.appinfo.version;
 var gBlocklistURL = Services.urlFormatter.formatURLPref("extensions.blocklist.detailsURL");
 var gPluginURL = Services.urlFormatter.formatURLPref("plugins.update.url");
 var gDate = new Date(2010, 7, 16);
-var infoURL = Services.urlFormatter.formatURLPref("app.support.baseURL") + "unsigned-addons";
+var infoURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
 
 const EXPECTED_ADDONS = 13;
 
@@ -786,7 +786,7 @@ add_task(function*() {
 add_task(function*() {
   info("Enabling lightweight theme");
   LightweightThemeManager.currentTheme = gLWTheme;
-  
+
   gManagerWindow.loadView("addons://list/theme");
   yield new Promise(resolve => wait_for_view_load(gManagerWindow, resolve));
 

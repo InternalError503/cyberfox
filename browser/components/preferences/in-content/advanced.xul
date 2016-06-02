@@ -116,6 +116,9 @@
  	  <preference id="plugin.java_allowed" 
 						   name="plugin.java_allowed" 
 						   type="bool"/>
+ 	  <preference id="plugins.disabled" 
+						   name="plugins.disabled" 
+						   type="bool"/>
 #endif
 <!-- Cyberfeatures -->
    			  
@@ -510,7 +513,10 @@
 			
 			<!-- Plugin Settings -->
 			<groupbox id="alternateOptionsPlugins" orient="vertical">
-				<caption label="&browserplugins.label;"/>				          	              	
+				<caption label="&browserplugins.label;"/>
+					<checkbox id="plugins.disabled" label="&browserpluginsdisabled.label; (&restartRequiredMSG.label;)"
+							preference="plugins.disabled"
+							tooltiptext="&restartRequiredMSG.label;"/>				
 					<checkbox id="plugin.allowed_whitelist.enabled" label="&browserpluginswhitelist.label; (&restartRequiredMSG.label;)"
 							preference="plugin.allowed_whitelist.enabled"
 							tooltiptext="&restartRequiredMSG.label;"/>

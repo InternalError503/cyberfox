@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"可伸缩空白">
 <!ENTITY Ctr_space			"空白">
 <!ENTITY Ctr_separator		"分隔符">
-<!ENTITY Ctr_puibseparator	"面板按钮分隔符">
 <!ENTITY Ctr_navthrobber	"活动指示器">
 <!ENTITY Ctr_sidebarbutton	"侧边栏">
 <!ENTITY Ctr_windowcontrols	"最小化/最大化/关闭 (全屏)">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui				"常规界面">
 <!ENTITY Ctr_nbiconsize0	"导航工具栏“iconsize”属性">
 <!ENTITY Ctr_smallnavbut	"在导航工具栏上使用小图标">
-<!ENTITY Ctr_bfurlbarfix	"修复地址栏圆弧半径">
 <!ENTITY Ctr_backforward	"使「后退」按钮可以移动">
 <!ENTITY Ctr_nbcompact		"降低导航工具栏高度">
 <!ENTITY Ctr_hide_bf_popup	"鼠标按下时隐藏历史菜单">
@@ -128,6 +126,10 @@
 <!ENTITY Ctr_options_rem	"记住最后选中的分类">
 <!ENTITY Ctr_svgfilters		"默认工具栏图标使用的SVG颜色">
 <!ENTITY Ctr_wincontrols	"全屏窗口控制按钮可以移动">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 全屏警告">
 <!ENTITY Ctr_oldtoplevimg	"“顶级域名”图片: 经典外观">
 <!ENTITY Ctr_altalertbox	"“提示框”: 备选的外观">
@@ -135,7 +137,7 @@
 <!ENTITY Ctr_mstatusbar		"使状态栏面板可以移动">
 <!ENTITY Ctr_mstatusbars4e	"状态栏面板由“Status-4-Evar”所控制">
 <!ENTITY Ctr_mstatusbartpp	"状态栏面板由“ThePuzzlePiece”所控制">
-<!ENTITY Ctr_mstatusbarpzt	"状态栏面板由“Puzzle Toolbars”所控制">
+<!ENTITY Ctr_mstatusbarpzt	"状态栏面板由“Puzzle Bars”所控制">
 <!ENTITY Ctr_mstatusbarabr	"状态栏面板由“The Addon Bar (Restored)”所控制">
 <!ENTITY Ctr_combrelstop	"在工具栏上合并停止和重新载入按钮">
 <!ENTITY Ctr_stoprel1		"重要: 将重新载入按钮放在停止按钮后面!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"面板菜单: 更紧凑的视图 (书签、历史等等)">
 <!ENTITY Ctr_hidezoomres	"当缩放控制按钮在工具栏上时: 隐藏重置缩放按钮">
 <!ENTITY Ctr_alt_newtabp	"新标签页页面 (about:newtab): 备选的外观">
+<!ENTITY Ctr_nosnippets		"开始页面 (about:home): 隐藏片断">
+<!ENTITY Ctr_search_ui		"搜索">
 <!ENTITY Ctr_ctroldsearch	"旧式搜索">
 <!ENTITY Ctr_ctroldsearchc	"搜索后清除搜索框">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"在新标签页中搜索 (about:config 选项)">
 <!ENTITY Ctr_osearch_meoit	"中键点击: 在新的“前台标签页”中搜索">
+<!ENTITY Ctr_osearch_iwidth	"自动调整弹出框宽度">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"较小的下拉按钮">
 <!ENTITY Ctr_addonmanager	"附加组件管理器">
 <!ENTITY Ctr_alt_addonsp	"附加组件“更多”页面: 备选的外观">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"弹出式菜单: 面板式菜单外观">
 <!ENTITY Ctr_bmbunsortbm	"弹出式菜单: “未分类书签”子菜单">
 <!ENTITY Ctr_bmbunsortbm2	"菜单在书签之上">
+<!ENTITY Ctr_bmbviewbmsb	"弹出式菜单: 显示“查看侧边栏”">
 <!ENTITY Ctr_bmbviewbmtb	"弹出式菜单: 显示“查看工具栏”">
 <!ENTITY Ctr_bmbnounsort	"弹出式菜单: 隐藏“未分类书签”">
 <!ENTITY Ctr_bmbutnotext	"隐藏书签工具栏上的文本标签">
@@ -237,9 +245,7 @@
 <!ENTITY Ctr_urlbardropm	"尽可能移动下拉按钮到最后的位置">
 <!ENTITY Ctr_urlbardropm2	"下拉按钮总是可见">
 <!ENTITY Ctr_altreaderico	"备选的 “阅读模式” 图标">
-<!ENTITY Ctr_altautocompl	"备选的 “自动完成弹出框” (实验性)">
 <!ENTITY Ctr_hideprbutton	"当弹出窗口被阻止时隐藏通知图标">
-<!ENTITY Ctr_urlbar_uc		"禁用 “统一自动完成” 功能 (about:config 选项)">
 <!ENTITY Ctr_locsearchbw10	"减小地址栏与搜索栏高度(实验性)">
 <!ENTITY Ctr_urlbar_ib		"网站身份标识按钮 (身份标识框)">
 <!ENTITY Ctr_ib_nohovcolor	"鼠标悬停时不显示灰色">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"网站图标/地球/“i”图标: “点击” 打开 “页面信息窗口”">
 <!ENTITY Ctr_lbsbsize		"自定义地址栏和搜索栏的宽度">
 <!ENTITY Ctr_searchbar		"搜索栏">
-<!ENTITY Ctr_lbsugresi		"尽可能在建议弹出框中多显示结果 (不带滚动条)">
-<!ENTITY Ctr_lbsugres		"建议弹出框中的结果个数(about:config 选项)">
+<!ENTITY Ctr_autocomplete	"自动完成弹出框">
+<!ENTITY Ctr_altautocompl	"备选的外观(实验性)">
+<!ENTITY Ctr_urlbar_uc		"禁用 “统一自动完成” 功能 (about:config 选项)">
+<!ENTITY Ctr_lbsugresi		"禁用高度限制">
+<!ENTITY Ctr_lbsugres		"结果数量 (about:config 选项)">
+<!ENTITY Ctr_lbsbradius		"自定义地址栏与搜索栏边框弧度">
 
 <!ENTITY Ctr_menubar_items	"菜单项目位置">
 <!ENTITY Ctr_extrabar		"附加工具栏">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"移除背景颜色/模糊 (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"主工具栏和标签页使用蓝色 Aero 颜色">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"标题/菜单/标签页工具栏: 移除背景颜色">
 <!ENTITY Ctr_transpttbew10	"为部分操作系统主题应用额外调整">
 <!ENTITY Ctr_transptcw10	"隐藏系统默认的 最小化/最大化/关闭 按钮">
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"转到">
 <!ENTITY Ctr_menu_restart.label			"重启">
 <!ENTITY Ctr_restartapp					"在应用菜单和文件菜单中显示 “重启”">
+
+<!ENTITY Ctr_openInCurrentTab			"在当前标签页打开输入">
+<!ENTITY Ctr_openInNewTab				"在新标签页打开输入">
+<!ENTITY Ctr_openInNewWindow			"在新窗口打开输入">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"B">

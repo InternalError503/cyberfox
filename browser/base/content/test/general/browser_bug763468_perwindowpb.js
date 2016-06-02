@@ -35,7 +35,7 @@ function test() {
       aWindow.gBrowser.removeTab(aWindow.gBrowser.selectedTab);
       aCallback();
     });
-  };
+  }
 
   function testOnWindow(aOptions, aCallback) {
     whenNewWindowLoaded(aOptions, function(aWin) {
@@ -45,7 +45,7 @@ function test() {
       // call whenNewWindowLoaded() instead of testOnWindow() on your test.
       executeSoon(() => aCallback(aWin));
     });
-  };
+  }
 
   // this function is called after calling finish() on the test.
   registerCleanupFunction(function() {

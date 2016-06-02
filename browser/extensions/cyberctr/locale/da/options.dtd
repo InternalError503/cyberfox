@@ -11,7 +11,6 @@
 <!ENTITY Ctr_flexspace		"Fleksibelt mellemrum">
 <!ENTITY Ctr_space			"Mellemrum">
 <!ENTITY Ctr_separator		"Separator">
-<!ENTITY Ctr_puibseparator	"Separator (til hovedpanelmenu-knap)">
 <!ENTITY Ctr_navthrobber	"Aktivitetsindikator">
 <!ENTITY Ctr_sidebarbutton	"(Sidepanel)">
 <!ENTITY Ctr_windowcontrols	"Minimere/maksimere/luk (Fuldskærm)">
@@ -113,7 +112,6 @@
 <!ENTITY Ctr_ui				"Brugerfladen generelt">
 <!ENTITY Ctr_nbiconsize0	"Navigationslinje attribut 'iconsize'">
 <!ENTITY Ctr_smallnavbut	"Små knapper på navigationslinjen">
-<!ENTITY Ctr_bfurlbarfix	"Ret adresselinje border-radius">
 <!ENTITY Ctr_backforward	"Flytbare tilbage/frem-knapper">
 <!ENTITY Ctr_nbcompact		"Reducér navigationslinjernes højde">
 <!ENTITY Ctr_hide_bf_popup	"Skjul knapperne historik popupmenu når der trykkes på musen">
@@ -129,6 +127,10 @@
 <!ENTITY Ctr_options_rem	"Husk seneste valgte kategori">
 <!ENTITY Ctr_svgfilters		"SVG-farver til standard værktøjslinje knap ikoner">
 <!ENTITY Ctr_wincontrols	"Flytbar fuldskærmsvindue kontrolelementer">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"'Top level domæne'-billeder: klassisk udseende">
 <!ENTITY Ctr_altalertbox	"'Alert-boks': alternativt udseende">
@@ -136,7 +138,7 @@
 <!ENTITY Ctr_mstatusbar		"Flytbare statuspanel">
 <!ENTITY Ctr_mstatusbars4e	"Statuslinje-panel styres af 'Status-4-Evar'">
 <!ENTITY Ctr_mstatusbartpp	"Statuslinje-panel styres af 'ThePuzzlePiece'">
-<!ENTITY Ctr_mstatusbarpzt	"Statuslinje-panel styres af 'Puzzle Toolbars'">
+<!ENTITY Ctr_mstatusbarpzt	"Statuslinje-panel styres af 'Puzzle Bars'">
 <!ENTITY Ctr_mstatusbarabr	"Statuslinje-panel styres af 'The Addon Bar (Restored)'">
 <!ENTITY Ctr_combrelstop	"Stop &amp; genindlæs: kombinér knapper på værktøjslinje">
 <!ENTITY Ctr_stoprel1		"Vigtigt: placér genindlæs efter stop!">
@@ -160,10 +162,15 @@
 <!ENTITY Ctr_cpanelmenus	"Panelmenu-popups: kompakt visning (bogmærker, historik, osv.): kompakt visning">
 <!ENTITY Ctr_hidezoomres	"Zoom-knapper på værktøjslinje: skjul zoom-nulstil-knapper">
 <!ENTITY Ctr_alt_newtabp	"Nyt faneblad-side (about:newtab): alternativt udseende">
+<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_search_ui		"Search">
 <!ENTITY Ctr_ctroldsearch	"Gamle søgning">
 <!ENTITY Ctr_ctroldsearchc	"Ryd søgeboks efter søgning">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Åbn søgning i nyt faneblad (about:config-indstilling)">
 <!ENTITY Ctr_osearch_meoit	"Mellemklik: søg i nyt 'forgrundsfaneblad'">
+<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Lille rullepil">
 <!ENTITY Ctr_addonmanager	"Tilføjelseshåndtering">
 <!ENTITY Ctr_alt_addonsp	"'Mere info'-side: alternativ rækkefølge">
@@ -182,6 +189,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Popup: panelmenu udseende">
 <!ENTITY Ctr_bmbunsortbm	"Popup: 'usorterede bogmærker'-undermenu">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"Popup: vis 'Vis værktøjslinje'">
 <!ENTITY Ctr_bmbnounsort	"Popup: skjul 'usorterede bogmærker'">
 <!ENTITY Ctr_bmbutnotext	"Skjul etiket på bogmærkelinje">
@@ -238,9 +246,7 @@
 <!ENTITY Ctr_urlbardropm	"Flyt rullemenu-pilen til den sidst mulige position">
 <!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
 <!ENTITY Ctr_altreaderico	"Alternative 'Læser'-ikoner">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Skjul notifikationsikonet når en popup blokeres">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Reducér adresselinjers og søgelinjers højde (eksperimentel)">
 <!ENTITY Ctr_urlbar_ib		"Knappen Identitet for websted (Identitet boks)">
 <!ENTITY Ctr_ib_nohovcolor	"Vis ikke grå farve når der peges på">
@@ -259,8 +265,12 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"Brugerdefineret brede for adresselinje og søgelinje">
 <!ENTITY Ctr_searchbar		"Søgelinje">
-<!ENTITY Ctr_lbsugresi		"Vis så mange resultater som muligt i forslag-popup (uden rullepanel)">
-<!ENTITY Ctr_lbsugres		"Antal resultater i forslag-popup (about:config-indstilling)">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
+<!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"Placering af menupunkter">
 <!ENTITY Ctr_extrabar		"Yderligere værktøjslinjer">
@@ -296,6 +306,7 @@
 <!ENTITY Ctr_menubarnofog	"Fjern baggrundsfarve/tåge (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Blå Aero-farver til værktøjslinjer (og faneblade)">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Titel-/menu-/fanebladsværktøjslinje: fjern baggrundsfarve">
 <!ENTITY Ctr_transpttbew10	"Yderligere tweaks til nogle OS-temaer">
 <!ENTITY Ctr_transptcw10	"Skjul standard OS min/maks/luk-knapper">
@@ -377,6 +388,10 @@
 <!ENTITY goCmd.label					"Gå">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"T">

@@ -9,7 +9,6 @@
 <Url type="text/html" method="GET" template="https://www.amazon.com/gp/aw/s">
   <Param name="k" value="{searchTerms}"/>
   <Param name="sourceid" value="Mozilla-search"/>
-  <Param name="tag" value="mozilla-20"/>
 </Url>
 <SearchForm>https://www.amazon.com/</SearchForm>
 </SearchPlugin>

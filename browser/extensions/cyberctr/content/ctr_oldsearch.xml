@@ -309,17 +309,19 @@
               popup.removeChild(items[i]);
           }
 		  
-		  var width = 100;
+		  var searchtextbox = document.getAnonymousElementByAttribute(document.getElementById("searchbar"), "anonid", "searchbar-textbox");
+		  var isRTL = getComputedStyle(searchtextbox, "").direction == "rtl";
+		  var outerRect = searchtextbox.getBoundingClientRect();
+		  var innerRect = searchtextbox.inputField.getBoundingClientRect();
 		  
-		  try{
-			width = document.getElementById("searchbar").getBoundingClientRect().width-3;
-		  } catch(e){}
+		  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("osearch_iwidth")) {
+			  var width = 100;
 		  
-		  if(Services.appinfo.OS=="Darwin")
-			width = width-6;
+			  width = isRTL ? Math.round(outerRect.left - outerRect.right) : Math.round(outerRect.right - outerRect.left);
 
-          popup.setAttribute("width", width);
+			  popup.setAttribute("width", width > 100 ? width : 100);
 
+		  }
 
           var addengines = gBrowser.selectedBrowser.engines;
 		  	  
@@ -482,6 +484,10 @@
 		  // clear input after search
 		  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("ctroldsearchc"))
 		    textBox.value="";
+			
+		  // revent to default engine after search
+		  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("ctroldsearchr"))
+			this.currentEngine = this.engines[0];
         ]]></body>
       </method>
 
@@ -696,32 +702,33 @@
             popup.showImageColumn = this.showImageColumn;
 
             document.popupNode = null;
-
+			
+			var isRTL = getComputedStyle(this, "").direction == "rtl";
             var outerRect = this.getBoundingClientRect();
             var innerRect = this.inputField.getBoundingClientRect();
+		
+			if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("osearch_iwidth")) {
 			
-			var width = 100;
-			var xOffset = -35;
-		  
-			try{
-			  width = document.getElementById("searchbar").getBoundingClientRect().width-3;
-			} catch(e){}
-			
-			if(Services.appinfo.OS=="Darwin") {
-			  width = width-6;
-			  xOffset = -36;
-			} else if (Services.appinfo.OS!="Darwin" && Services.appinfo.OS!="WINNT") {
-			  width = width-2;
-			  xOffset = -36;
-			} else if (Services.appinfo.OS=="WINNT" && navigator.oscpu == "Windows NT 10.0") {
-			  xOffset = -36;
-			  width = width+1;
+				var width = 100;
+				
+				width = isRTL ? Math.round(outerRect.left - outerRect.right) : Math.round(outerRect.right - outerRect.left);
+
+				if(Services.appinfo.OS=="Darwin") {
+				  width = width - 1; // MacOSX
+				}
+				
+				popup.setAttribute("width", width > 100 ? width : 100);
+
+			} else {
+				if (isRTL) {
+				  var width = innerRect.right - outerRect.left;
+				} else {
+				  var width = outerRect.right - innerRect.left;
+				}
+				popup.setAttribute("width", width > 100 ? width : 100);
 			}
 
-            popup.setAttribute("width", width);
-
-            var yOffset = outerRect.bottom - innerRect.bottom;
-            popup.openPopup(this.inputField, "after_start", xOffset, yOffset, false, false);
+            popup.openPopup(this, "after_start", 0, 0, false, false);
           }
         ]]></body>
       </method>

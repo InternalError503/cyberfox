@@ -6,7 +6,7 @@
 
 var gSearch = {
   init: function () {
-  if(isSearchEnabled){
+  if (isSearchEnabled){
     document.getElementById("newtab-search-submit")
             .addEventListener("click", e => this._contentSearchController.search(e));
     let textbox = document.getElementById("newtab-search-text");

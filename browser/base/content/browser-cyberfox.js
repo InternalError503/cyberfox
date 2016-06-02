@@ -52,7 +52,7 @@ var gCyberfoxCustom = {
         try {
 
             if (gURLBar.value) {
-                gBrowser.selectedTab = openUILinkIn(gURLBar.value, type);
+                gBrowser.selectedTab = openUILinkIn(gURLBar.value, type, { relatedToCurrent: true });
             }
 
         } catch (type) {

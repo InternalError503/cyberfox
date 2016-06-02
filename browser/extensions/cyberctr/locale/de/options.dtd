@@ -11,7 +11,6 @@
 <!ENTITY Ctr_flexspace		"Flexibler Zwischenraum">
 <!ENTITY Ctr_space			"Zwischenraum">
 <!ENTITY Ctr_separator		"Trennlinie">
-<!ENTITY Ctr_puibseparator	"Trennlinie für die Menüschaltfläche">
 <!ENTITY Ctr_navthrobber	"Aktivitätsanzeige">
 <!ENTITY Ctr_sidebarbutton	"Seitenleiste">
 <!ENTITY Ctr_windowcontrols	"Kontrollelemente (Vollbild)">
@@ -45,7 +44,7 @@
 <!ENTITY Ctr_tabsontop3		"Tabs unten (v2) --- '[tabsontop=false]'-Attribut gesetzt">
 <!ENTITY Ctr_tabsontopW1	"v2 ist nur für einige Add-ons und vollständige Themen sinnvoll!">
 <!ENTITY Ctr_tabsontopI1	"[tabsontop=true/false]-Attribut wird gesetzt für">
-<!ENTITY Ctr_tabsintitlebar	"&brandShortName;-Titelleiste (about:config-Einstellung)">
+<!ENTITY Ctr_tabsintitlebar	"Verwende &brandShortName;-Titelleiste anstatt der Betriebssystem-Titelleiste (about:config-Einstellung)">
 <!ENTITY Ctr_tabwidthdef	"(Standard)">
 <!ENTITY Ctr_tabwidthcla	"(klassisch)">
 <!ENTITY Ctr_tabminheight	"Höhe:">
@@ -113,7 +112,6 @@
 <!ENTITY Ctr_ui				"Oberfläche">
 <!ENTITY Ctr_nbiconsize0	"Attribut für Symbolgröße: 'iconsize'">
 <!ENTITY Ctr_smallnavbut	"Kleine Schaltflächen auf der Navigations-Symbolleiste">
-<!ENTITY Ctr_bfurlbarfix 	"Radius der Adressleistenränder korrigieren">
 <!ENTITY Ctr_backforward	"Verschiebbare Zurück-Vor-Schaltfläche">
 <!ENTITY Ctr_nbcompact		"Höhe der Navigations-Symbolleiste reduzieren">
 <!ENTITY Ctr_hide_bf_popup	"Chronik-Aufklappmenü bei gedrückter Maustaste verstecken">
@@ -129,6 +127,10 @@
 <!ENTITY Ctr_options_rem	"Zuletzt besuchte Kategorie speichern">
 <!ENTITY Ctr_svgfilters		"SVG-Farben für Symbole von 'Standard-Schaltflächen'">
 <!ENTITY Ctr_wincontrols	"Verschiebbare Fenster-Schaltflächen im Vollbildmodus">
+<!ENTITY Ctr_puibuttonsep	"Menüschaltfläche">
+<!ENTITY Ctr_puibut_no_sep	"Trennlinie ausblenden">
+<!ENTITY Ctr_puibut_l_sep	"Trennlinie links">
+<!ENTITY Ctr_puibut_r_sep	"Trennlinie rechts">
 <!ENTITY Ctr_html5warning	"HTML5 Vollbildwarnung">
 <!ENTITY Ctr_oldtoplevimg	"Bilder oberster Ebene (Top-Level-Domain): klassische Darstellung">
 <!ENTITY Ctr_altalertbox	"'Benachrichtigungs-Box': alternative Darstellung">
@@ -136,7 +138,7 @@
 <!ENTITY Ctr_mstatusbar		"Statusbereich: sichtbar und verschiebbar">
 <!ENTITY Ctr_mstatusbars4e	"Statusbereich wird von 'Status-4-Evar' kontrolliert">
 <!ENTITY Ctr_mstatusbartpp	"Statusbereich wird von 'ThePuzzlePiece' kontrolliert">
-<!ENTITY Ctr_mstatusbarpzt	"Statusbereich wird von 'Puzzle Toolbars' kontrolliert">
+<!ENTITY Ctr_mstatusbarpzt	"Statusbereich wird von 'Puzzle Bars' kontrolliert">
 <!ENTITY Ctr_mstatusbarabr	"Statusbereich wird von 'The Addon Bar (Restored)' kontrolliert">
 <!ENTITY Ctr_combrelstop	"'Stopp' &amp; 'Neu laden': Leistenschaltflächen kombinieren">
 <!ENTITY Ctr_stoprel1		"Reihenfolge beachten: 'Stopp' muss vor 'Neu laden' sein!">
@@ -160,10 +162,15 @@
 <!ENTITY Ctr_cpanelmenus	"Kompakte 'Panel-Aufklappmenüs' (Lesezeichen, Chronik etc.)">
 <!ENTITY Ctr_hidezoomres	"Zoom-Schaltflächen auf Leisten: 'Normalgröße'-Schaltfläche verstecken">
 <!ENTITY Ctr_alt_newtabp	"Seite 'Neuer Tab' (about:newtab): alternative Darstellung">
-<!ENTITY Ctr_ctroldsearch	"Alte 'Suche'">
+<!ENTITY Ctr_nosnippets		"Startseite (about:home): Snippets verstecken">
+<!ENTITY Ctr_search_ui		"Suche">
+<!ENTITY Ctr_ctroldsearch	"Alte Suche">
 <!ENTITY Ctr_ctroldsearchc	"Eingabefeld nach der Suche leeren">
+<!ENTITY Ctr_ctroldsearchr	"Nach der Suche zur Standardsuchmaschine wechseln">
 <!ENTITY Ctr_search_oit		"Suche in neuem Tab öffnen (about:config-Einstellung)">
 <!ENTITY Ctr_osearch_meoit	"Mittelklick: Suche im Vordergrund-Tab öffnen">
+<!ENTITY Ctr_osearch_iwidth	"Popupbreite automatisch der Suchfeldbreite anpassen">
+<!ENTITY Ctr_osearch_cwidth	"Eigene Breite für Such-Pop-ups">
 <!ENTITY Ctr_osearch_dm		"Kleinere Aufklapp-Schaltfläche">
 <!ENTITY Ctr_addonmanager	"Add-ons-Manager">
 <!ENTITY Ctr_alt_addonsp	"'Mehr Details'-Seite: Alternative Anordnung">
@@ -182,6 +189,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Aufklappmenü: 'Panel'-Darstellung">
 <!ENTITY Ctr_bmbunsortbm	"Aufklappmenü: 'Unsortierte Lesezeichen'-Menü anzeigen">
 <!ENTITY Ctr_bmbunsortbm2	"Menü über den Lesezeichen">
+<!ENTITY Ctr_bmbviewbmsb	"Aufklappmenü: 'Lesezeichen-Seitenleiste' anzeigen">
 <!ENTITY Ctr_bmbviewbmtb	"Aufklappmenü: 'Lesezeichen-Symbolleiste' anzeigen">
 <!ENTITY Ctr_bmbnounsort	"Aufklappmenü: 'Unsortierte Lesezeichen' verstecken">
 <!ENTITY Ctr_bmbutnotext	"Text auch auf der Lesezeichen-Symbolleiste verstecken">
@@ -238,13 +246,11 @@
 <!ENTITY Ctr_urlbardropm	"Aufklapp-Schaltfläche an die letztmögliche Position verschieben">
 <!ENTITY Ctr_urlbardropm2	"Aufklapp-Schaltfläche immer anzeigen">
 <!ENTITY Ctr_altreaderico	"Alternatives Symbol für die 'Lesemodus'-Schaltfläche">
-<!ENTITY Ctr_altautocompl	"Alternatives 'Autovervollständigungs'-Pop-up (experimentell)">
 <!ENTITY Ctr_hideprbutton	"'Infosymbol' verstecken (wenn ein Pop-up-Fenster blockiert wurde)">
-<!ENTITY Ctr_urlbar_uc		"'Vereinigte Autovervollständigung' deaktivieren (about:config-Einstellung)">
 <!ENTITY Ctr_locsearchbw10	"Höhe der Adress- und Suchleiste reduzieren (experimentell)">
 <!ENTITY Ctr_urlbar_ib		"Schaltfläche zur Webseitenidentität">
 <!ENTITY Ctr_ib_nohovcolor	"Graue Farbe beim 'Hovern' nicht anzeigen">
-<!ENTITY Ctr_ib_graycolor	"Graue Farbe für 'Chrome'-Seiten und Seiten mit unbekannter Identität">
+<!ENTITY Ctr_ib_graycolor	"Graue Farbe für 'about:'-Seiten und Seiten mit unbekannter Identität">
 <!ENTITY Ctr_verifiedcolors	"Farbig bei verifizierten Webseiten, sicheren und unsicheren Verbindungen">
 <!ENTITY Ctr_ibinfoico		"'i'-Symbol durch Globus-Symbol ersetzen">
 <!ENTITY Ctr_ibinfoico2		"'i'-Symbol verstecken (falls möglich)">
@@ -257,10 +263,14 @@
 <!ENTITY Ctr_padlock_mod	"modern">
 <!ENTITY Ctr_padlock_ext	"'&brandShortName;'-Symbol für gültige 'about:'-Seiten">
 <!ENTITY Ctr_icopageinfo	"Globus-/Lesezeichen-/'i'-Symbol: 'Seiteninfo'-Fenster per Klick öffnen">
-<!ENTITY Ctr_lbsbsize		"Benutzerdefinierte Breite für die Adressleiste und die Suchleiste">
+<!ENTITY Ctr_lbsbsize		"Benutzerdefinierte Breite für Adressleiste und Suchleiste">
 <!ENTITY Ctr_searchbar		"Suchleiste">
-<!ENTITY Ctr_lbsugresi		"Vorschläge im Aufklappmenü ohne Bildlaufleiste anzeigen (falls möglich)">
-<!ENTITY Ctr_lbsugres		"Anzahl der Vorschläge im Aufklappmenü (about:config-Einstellung)">
+<!ENTITY Ctr_autocomplete	"Autovervollständigungs-Pop-up">
+<!ENTITY Ctr_altautocompl	"Alternative Darstellung (experimentell)">
+<!ENTITY Ctr_urlbar_uc		"'Vereinigte Autovervollständigung' deaktivieren (about:config-Einstellung)">
+<!ENTITY Ctr_lbsugresi		"Höhenlimit deaktivieren">
+<!ENTITY Ctr_lbsugres		"Anzahl der Vorschläge (about:config-Einstellung)">
+<!ENTITY Ctr_lbsbradius		"Benutzerdefinierte Krümmung für Adressleisten- und Suchleistenränder">
 
 <!ENTITY Ctr_menubar_items	"Position der Menüeinträge">
 <!ENTITY Ctr_extrabar		"Extraleisten">
@@ -296,6 +306,7 @@
 <!ENTITY Ctr_menubarnofog	"Hintergrundfarbe/-nebel entfernen (Windows Aero Glass / Windows 8)">
 
 <!ENTITY Ctr_aerocolors		"Blaue 'Aero'-Farben für Leisten (und Tabs)">
+<!ENTITY Ctr_aerocolorsg	"Grau-blaue 'Aero'-Farben">
 <!ENTITY Ctr_transpttbw10	"Titel-/Menü-/Tableiste: Hintergrundfarbe entfernen">
 <!ENTITY Ctr_transpttbew10	"Weitere Anpassungen für einige OS-Themen">
 <!ENTITY Ctr_transptcw10	"Standardschaltflächen 'Minimieren/Maximieren/Schließen' verstecken">
@@ -368,7 +379,7 @@
 
 <!ENTITY Ctr_special_font	"Hintergrundfarbeinstellungen sind nur für das Standard-Thema vorhanden!">
 <!ENTITY Ctr_special_info	"Einige Optionen haben nur in bestimmten Fällen sichtbare Auswirkungen!">
-<!ENTITY Ctr_special_info2	"Diese Einstellungen sind für das Standard-Thema und funktionieren evtl. nicht mit allen Themen!">
+<!ENTITY Ctr_special_info2	"Vollständiges 'Thema' erkannt! Einige Einstellungen funktionieren nicht mit Themen!">
 <!ENTITY Ctr_support		"Hilfe-Forum">
 <!ENTITY Ctr_newversion		"Neue Version?">
 
@@ -377,6 +388,10 @@
 <!ENTITY goCmd.label					"Los">
 <!ENTITY Ctr_menu_restart.label			"Neustarten">
 <!ENTITY Ctr_restartapp					"'Neustarten'-Eintrag im '&brandShortName;'- und 'Datei-Menü'">
+
+<!ENTITY Ctr_openInCurrentTab			"Eingabe im aktuellen Tab öffen">
+<!ENTITY Ctr_openInNewTab				"Eingabe im neuen Tab öffen">
+<!ENTITY Ctr_openInNewWindow			"Eingabe im neuen Fenster öffen">
 
 <!-- Seitenkontextmenüschlüssel: individuell für jede Lokalisierung -->
 <!ENTITY backCmd.accesskey				"Z">

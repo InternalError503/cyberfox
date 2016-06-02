@@ -83,11 +83,17 @@
 		<preference id="ctraddon_backforward"	name="extensions.classicthemerestorer.backforward"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_noconicons"	name="extensions.classicthemerestorer.noconicons"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_alt_newtabp"	name="extensions.classicthemerestorer.alt_newtabp"	 type="bool"	instantApply="true"/>
+		<!--<preference id="ctraddon_nosnippets"	name="extensions.classicthemerestorer.nosnippets"	 type="bool"	instantApply="true"/>-->
 		<preference id="ctraddon_ctroldsearch"	name="extensions.classicthemerestorer.ctroldsearch"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_ctroldsearchc"	name="extensions.classicthemerestorer.ctroldsearchc" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_ctroldsearchr"	name="extensions.classicthemerestorer.ctroldsearchr" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_osearch_dm"	name="extensions.classicthemerestorer.osearch_dm"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_osearch_meoit"	name="extensions.classicthemerestorer.osearch_meoit" type="bool"	instantApply="true"/>
-    <!--<preference id="ctraddon_addonversion"	name="extensions.classicthemerestorer.addonversion"	 type="bool"	instantApply="true"/>-->
+		<preference id="ctraddon_osearch_iwidth" name="extensions.classicthemerestorer.osearch_iwidth" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_osearch_cwidth" name="extensions.classicthemerestorer.osearch_cwidth" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_os_spsize_minw" name="extensions.classicthemerestorer.os_spsize_minw" type="int"	instantApply="true"/>
+		<preference id="ctraddon_os_spsize_maxw" name="extensions.classicthemerestorer.os_spsize_maxw" type="int"	instantApply="true"/>
+		<!--<preference id="ctraddon_addonversion"	name="extensions.classicthemerestorer.addonversion"	 type="bool"	instantApply="true"/>-->
 		<preference id="ctraddon_am_nowarning"	name="extensions.classicthemerestorer.am_nowarning"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_am_compact"	name="extensions.classicthemerestorer.am_compact"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_am_compact2"	name="extensions.classicthemerestorer.am_compact2"	 type="bool"	instantApply="true"/>
@@ -99,10 +105,12 @@
 		<preference id="ctraddon_altoptions"	name="extensions.classicthemerestorer.altoptions"	type="string"	instantApply="true"/>
 		<preference id="ctraddon_svgfilters"	name="extensions.classicthemerestorer.svgfilters"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_wincontrols"	name="extensions.classicthemerestorer.wincontrols"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_puibuttonsep"	name="extensions.classicthemerestorer.puibuttonsep"	type="string"	instantApply="true"/>
 		<preference id="ctraddon_oldtoplevimg"	name="extensions.classicthemerestorer.oldtoplevimg"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_altalertbox"	name="extensions.classicthemerestorer.altalertbox"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_hideprbutton"	name="extensions.classicthemerestorer.hideprbutton"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_extraurlkeycb"	name="extensions.classicthemerestorer.extraurlkeycb" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_extraurltarget" name="extensions.classicthemerestorer.extraurltarget" type="string" instantApply="true"/>
 		<preference id="ctraddon_starinurl"		name="extensions.classicthemerestorer.starinurl"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_feedinurl"		name="extensions.classicthemerestorer.feedinurl"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_statusbar"		name="extensions.classicthemerestorer.statusbar"	type="bool"		instantApply="true"/>
@@ -128,13 +136,19 @@
 		<preference id="ctraddon_nav_txt_ico"	name="extensions.classicthemerestorer.nav_txt_ico" 	type="string"	instantApply="true"/>
 		<preference id="ctraddon_iat_notf_vt"	name="extensions.classicthemerestorer.iat_notf_vt"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_closeicong"	name="extensions.classicthemerestorer.closeicong"	type="string"	instantApply="true"/>
+		<preference id="ctraddon_urlresults"	name="extensions.classicthemerestorer.urlresults"	type="bool"		instantApply="true"/>
 		
 		<preference id="ctraddon_lbsbsize"		name="extensions.classicthemerestorer.lbsbsize"		type="bool"		instantApply="true"/>
 		<preference id="ctraddon_lbsize_minw"	name="extensions.classicthemerestorer.lbsize_minw" 	type="int"		instantApply="true"/>
 		<preference id="ctraddon_lbsize_maxw"	name="extensions.classicthemerestorer.lbsize_maxw" 	type="int"		instantApply="true"/>
 		<preference id="ctraddon_sbsize_minw"	name="extensions.classicthemerestorer.sbsize_minw" 	type="int"		instantApply="true"/>
 		<preference id="ctraddon_sbsize_maxw"	name="extensions.classicthemerestorer.sbsize_maxw" 	type="int"		instantApply="true"/>
-		<preference id="ctraddon_urlresults"	name="extensions.classicthemerestorer.urlresults" type="bool"		instantApply="true"/>
+		<preference id="ctraddon_lbsbradius"	name="extensions.classicthemerestorer.lbsbradius"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_lbradius_left"	name="extensions.classicthemerestorer.lbradius_left" type="int"		instantApply="true"/>
+		<preference id="ctraddon_lbradius_right"	name="extensions.classicthemerestorer.lbradius_right" type="int"		instantApply="true"/>
+		<preference id="ctraddon_sbradius_left"	name="extensions.classicthemerestorer.sbradius_left" type="int"		instantApply="true"/>
+		<preference id="ctraddon_sbradius_right"	name="extensions.classicthemerestorer.sbradius_right" type="int"		instantApply="true"/>
+		
 
 		<preference id="ctraddon_ctab1"			name="extensions.classicthemerestorer.ctab1"		type="string"	instantApply="true"/>
 		<preference id="ctraddon_ctab2"			name="extensions.classicthemerestorer.ctab2"		type="string"	instantApply="true"/>
@@ -218,7 +232,6 @@
 		<preference id="ctraddon_alttabstb2"	name="extensions.classicthemerestorer.alttabstb2" 	 type="bool"	instantApply="true"/>
 		
 		<preference id="ctraddon_cpanelmenus"	name="extensions.classicthemerestorer.cpanelmenus"	 type="bool"	instantApply="true"/>
-		<preference id="ctraddon_bfurlbarfix"	name="extensions.classicthemerestorer.bfurlbarfix"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bf_space"		name="extensions.classicthemerestorer.bf_space"	 	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_emptyfavico_t"	name="extensions.classicthemerestorer.emptyfavico_t" type="string"	instantApply="true"/>
 		<preference id="ctraddon_emptyfavico_g"	name="extensions.classicthemerestorer.emptyfavico_g" type="string"	instantApply="true"/>
@@ -229,6 +242,7 @@
 		<preference id="ctraddon_bmbutpanelm"	name="extensions.classicthemerestorer.bmbutpanelm"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bmbunsortbm"	name="extensions.classicthemerestorer.bmbunsortbm"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bmbunsortbm2"	name="extensions.classicthemerestorer.bmbunsortbm2"	 type="bool"	instantApply="true"/>
+		<preference id="ctraddon_bmbviewbmsb"	name="extensions.classicthemerestorer.bmbviewbmsb"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bmbviewbmtb"	name="extensions.classicthemerestorer.bmbviewbmtb"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bmbnounsort"	name="extensions.classicthemerestorer.bmbnounsort"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_bmbutnotext"	name="extensions.classicthemerestorer.bmbutnotext"	 type="bool"	instantApply="true"/>
@@ -253,6 +267,7 @@
 		<preference id="ctraddon_tabseparator"	name="extensions.classicthemerestorer.tabseparator"  type="string"	instantApply="true"/>
 		
 		<preference id="ctraddon_aerocolors"	name="extensions.classicthemerestorer.aerocolors"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_aerocolorsg"	name="extensions.classicthemerestorer.aerocolorsg"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_transpttbw10"	name="extensions.classicthemerestorer.transpttbw10"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_transpttbew10"	name="extensions.classicthemerestorer.transpttbew10" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_transptcw10"	name="extensions.classicthemerestorer.transptcw10"	type="bool"		instantApply="true"/>
@@ -368,6 +383,8 @@
 	  <radio class="ctraddontab" value="ctraddon_addonmngrbox"	label="&Ctr_addonmanager;"/>
 	  <radio class="ctraddontab" value="ctraddon_locationbbox"	label="&Ctr_urlbar; (1)"/>
 	  <radio class="ctraddontab" value="ctraddon_locationbbox2"	label="&Ctr_urlbar; (2)"/>
+	  <radio class="ctraddontab" value="ctraddon_locationbbox3"	label="&Ctr_urlbar; / &Ctr_searchbar;"/>
+	  <radio class="ctraddontab" value="ctraddon_searchuibox"	label="&Ctr_searchbar;"/>
 	  <radio class="ctraddontab" value="ctraddon_toolbarsbox"	label="&Ctr_toolbars; (1)"/>
 	  <radio class="ctraddontab" value="ctraddon_toolbarsbox2"	label="&Ctr_toolbars; (2)"/>
 	  <radio class="ctraddontab" value="ctraddon_toolbarsbox3"	label="&Ctr_toolbars; (3)"/>
@@ -488,7 +505,7 @@
 		
 		<hbox align="center">
 		  <checkbox label="&Ctr_tabminheight;"	preference="ctraddon_ctabheightcb" id="ctraddon_pw_tab_ctabheightcb"/>
-		  <textbox size="2" maxlength="2" preference="ctraddon_ctabheight" type="number" min="18" max="50" id="ctraddon_pw_tab_ctabheight"/>
+		  <textbox size="2" maxlength="3" preference="ctraddon_ctabheight" type="number" min="18" max="250" id="ctraddon_pw_tab_ctabheight"/>
 		  <label value="px"/>
 		</hbox>
 		<description id="ctraddon_pw_tabheightinfo" class="ctraddon_topic">&Ctr_tabheightinfo;</description>
@@ -542,6 +559,7 @@
 			<radio value="closeicon_default" label="&Ctr_closei_def;" id="ctraddon_closeicon_def"/>
 			<radio value="closeicon_red"	label=""	id="ctraddon_closeicon_red"/>
 			<radio value="closeicon_w7"		label=""	id="ctraddon_closeicon_w7"/>
+			<radio value="closeicon_w7v2"	label=""	id="ctraddon_closeicon_w7v2"/>
 			<radio value="closeicon_w8"		label=""	id="ctraddon_closeicon_w8"/>
 			<radio value="closeicon_w10"	label=""	id="ctraddon_closeicon_w10"/>
 			<radio value="closeicon_w10i"	label=""	id="ctraddon_closeicon_w10i"/>
@@ -935,15 +953,8 @@
 	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_generaluibox">
 	  <groupbox>
 		<caption  label="&Ctr_ui;" class="ctraddon_topic"/>
-		<checkbox label="&Ctr_ctroldsearch;"	preference="ctraddon_ctroldsearch" id="ctraddon_pw_ctroldsearch" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwCtrOldSearch(true);} else {classicthemerestorerjso.ctr.ctrpwCtrOldSearch(false);}"/>
-		<checkbox label="&Ctr_osearch_dm;"		preference="ctraddon_osearch_dm" id="ctraddon_pw_osearch_dm"  class="ctraddonsuboption ctraddon_winmaconly"/>
-		<checkbox label="&Ctr_ctroldsearchc;"	preference="ctraddon_ctroldsearchc" id="ctraddon_pw_ctroldsearchc"  class="ctraddonsuboption"/>
-		<checkbox label="&Ctr_search_oit;"		preference="ctraddon_search_oit" id="ctraddon_pw_search_oit"  class="ctraddonsuboption"/>
-		<checkbox label="&Ctr_osearch_meoit;"	preference="ctraddon_osearch_meoit" id="ctraddon_pw_osearch_meoit"  class="ctraddonsuboption"/>
-
-		<checkbox label="&Ctr_smallnavbut;"		preference="ctraddon_smallnavbut" oncommand="if(this.checked) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',true);classicthemerestorerjso.ctr.ctrpwSNextra(false);} else if(classicthemerestorerjso.ctr.prefs.getBoolPref('backforward')==false) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',false);} else{classicthemerestorerjso.ctr.ctrpwSNextra(true);}" id="ctraddon_pw_smallnavbut"/>
-		<checkbox label="&Ctr_bfurlbarfix;"		preference="ctraddon_bfurlbarfix" id="ctraddon_pw_bfurlbarfix" class="ctraddonsuboption"/>
-		<checkbox label="&Ctr_backforward;"		preference="ctraddon_backforward"  id="ctraddon_pw_backforward" oncommand="if(this.checked) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',true);classicthemerestorerjso.ctr.ctrpwBFextra(true);} else if(classicthemerestorerjso.ctr.prefs.getBoolPref('smallnavbut')==false) {classicthemerestorerjso.ctr.prefs.setBoolPref('bfurlbarfix',false);classicthemerestorerjso.ctr.ctrpwBFextra(false);} else {classicthemerestorerjso.ctr.ctrpwBFextra(false);}"/>
+		<checkbox label="&Ctr_smallnavbut;"		preference="ctraddon_smallnavbut" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwSNextra(false);} else if(classicthemerestorerjso.ctr.prefs.getBoolPref('backforward')) {classicthemerestorerjso.ctr.ctrpwSNextra(true);}" id="ctraddon_pw_smallnavbut"/>
+		<checkbox label="&Ctr_backforward;"		preference="ctraddon_backforward"  id="ctraddon_pw_backforward" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwBFextra(true);} else if(classicthemerestorerjso.ctr.prefs.getBoolPref('smallnavbut')==false) {classicthemerestorerjso.ctr.ctrpwBFextra(false);} else {classicthemerestorerjso.ctr.ctrpwBFextra(false);}"/>
 		<checkbox label="&Ctr_bf_space;"		preference="ctraddon_bf_space" id="ctraddon_pw_bf_space" class="ctraddonsuboption"/>
 		<checkbox label="&Ctr_hide_bf_popup;"	preference="ctraddon_hide_bf_popup" id="ctraddon_pw_hide_bf_popup" class="ctraddonsuboption"/>
 		<checkbox label="&Ctr_nbcompact;"		preference="ctraddon_nbcompact" id="ctraddon_pw_nbcompact" class="ctraddonsuboption"/>
@@ -955,12 +966,24 @@
 		<description class="ctraddon_topic ctraddonsuboption" id="ctraddon_pw_statusbar_abr_info">&Ctr_mstatusbarabr;</description>
 		
 		<checkbox label="&Ctr_noconicons;"		preference="ctraddon_noconicons" id="ctraddon_pw_noconicons"/>
-		<!--<checkbox label="&Ctr_alt_newtabp;"		preference="ctraddon_alt_newtabp" id="ctraddon_pw_alt_newtabp"/>-->
+		<!--<checkbox label="&Ctr_alt_newtabp;"		preference="ctraddon_alt_newtabp" id="ctraddon_pw_alt_newtabp"/>
+		<checkbox label="&Ctr_nosnippets;"		preference="ctraddon_nosnippets" id="ctraddon_pw_nosnippets"/>-->
 		<checkbox label="&Ctr_svgfilters;"		preference="ctraddon_svgfilters" id="ctraddon_pw_svgfilters"/>
 		<checkbox label="&Ctr_combrelstop;"		preference="ctraddon_combrelstop" id="ctraddon_pw_stopreload"/>
 		<description class="ctraddonsuboption">&Ctr_stoprel1;</description>
 
 		<checkbox label="&Ctr_wincontrols;"		preference="ctraddon_wincontrols" id="ctraddon_wincontrols"/>
+		
+		<hbox align="center" flex="1" id="ctraddon_pw_puibutsep">
+		  <description>&Ctr_puibuttonsep;</description>
+		  <menulist preference="ctraddon_puibuttonsep" id="ctraddon_puibuttonsep_list">
+			<menupopup>
+				<menuitem value="puib_nosep"	label="&Ctr_puibut_no_sep;"/>
+				<menuitem value="puib_leftsep"	label="&Ctr_puibut_l_sep;"/>
+				<menuitem value="puib_rightsep"	label="&Ctr_puibut_r_sep;"/>
+			</menupopup>
+		  </menulist>
+		</hbox>
 		<checkbox label="&Ctr_html5warning;"	preference="ctraddon_html5warning" id="ctraddon_pw_html5warning"/>
 
 		<description class="ctraddon_font1">&Ctr_emptygfavico;</description>
@@ -1021,6 +1044,7 @@
 		<checkbox label="&Ctr_bmbutpanelm;"		preference="ctraddon_bmbutpanelm" id="ctraddon_pw_bmbutpanelm"/>
 		<checkbox label="&Ctr_bmbunsortbm;"		preference="ctraddon_bmbunsortbm" id="ctraddon_pw_bmbunsortbm" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwUnsortBM(true);} else {classicthemerestorerjso.ctr.ctrpwUnsortBM(false);}"/>
 		<checkbox label="&Ctr_bmbunsortbm2;"	preference="ctraddon_bmbunsortbm2" id="ctraddon_pw_bmbunsortbm2" class="ctraddonsuboption"/>
+		<checkbox label="&Ctr_bmbviewbmsb;"		preference="ctraddon_bmbviewbmsb" id="ctraddon_pw_bmbviewbmsb"/>
 		<checkbox label="&Ctr_bmbviewbmtb;"		preference="ctraddon_bmbviewbmtb" id="ctraddon_pw_bmbviewbmtb"/>
 		<checkbox label="&Ctr_bmbnounsort;"		preference="ctraddon_bmbnounsort" id="ctraddon_pw_bmbnounsort"/>
 		<checkbox label="&Ctr_bmbutnotext;"		preference="ctraddon_bmbutnotext" id="ctraddon_pw_bmbutnotext"/>
@@ -1030,6 +1054,7 @@
 			<radio value="closeicong_default" label="&Ctr_closei_def;" id="ctraddon_closeicong_def"/>
 			<radio value="closeicong_red"	  label=""	id="ctraddon_closeicong_red"/>
 			<radio value="closeicong_w7"	  label=""	id="ctraddon_closeicong_w7"/>
+			<radio value="closeicong_w7v2"	  label=""	id="ctraddon_closeicong_w7v2"/>
 			<radio value="closeicong_w8"	  label=""	id="ctraddon_closeicong_w8"/>
 			<radio value="closeicong_w10"	  label=""	id="ctraddon_closeicong_w10"/>
 			<radio value="closeicong_w10i"	  label=""	id="ctraddon_closeicong_w10i"/>
@@ -1255,34 +1280,16 @@
 		<checkbox label="&Ctr_urlbardropm2;" preference="ctraddon_urlbardropm2"  id="ctraddon_pw_urlbardropm2"/>
 		<checkbox label="&Ctr_altreaderico;" preference="ctraddon_altreaderico"  id="ctraddon_pw_altreaderico"/>
 		<checkbox label="&Ctr_hideprbutton;" preference="ctraddon_hideprbutton" id="ctraddon_pw_urlbarpblocked"/>
-		<checkbox label="&Ctr_altautocompl;" preference="ctraddon_altautocompl"  id="ctraddon_pw_altautocompl" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
-		<checkbox label="&Ctr_urlbar_uc;" preference="ctraddon_urlbar_uc" id="ctraddon_pw_urlbar_uc"/>
-		<checkbox label="&Ctr_extraurlkeycb;&openCmd.commandkey; &amp; Alt+&urlbar.accesskey; [Windows/Linux])"	preference="ctraddon_extraurlkeycb" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
-		<checkbox label="&Ctr_locsearchbw10;" preference="ctraddon_locsearchbw10"  id="ctraddon_pw_locsearchbw10"/>
-		<checkbox label="&Ctr_lbsbsize;" preference="ctraddon_lbsbsize" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwLocationSearchbarSize(true);} else {classicthemerestorerjso.ctr.ctrpwLocationSearchbarSize(false);}"/>
-		<description id="ctraddon_lbsbsizelabel1" class="ctraddonsuboption ctraddon_font1">&Ctr_urlbar;</description>
-		<hbox class="ctraddonsuboption"  id="ctraddon_pw_lbsbsize_lb" align="center">
-		  <label value="&Ctr_tabminwidth; "/>
-		  <textbox size="4" maxlength="4" preference="ctraddon_lbsize_minw" type="number" min="0" max="4000"/>
-		  <label value="px  -  &Ctr_tabmaxwidth; "/>
-		  <textbox size="4" maxlength="4" preference="ctraddon_lbsize_maxw" type="number" min="0" max="4000"/>
-		  <label value="px"/>
+		<checkbox label="&Ctr_extraurlkeycb;&openCmd.commandkey; &amp; Alt+&urlbar.accesskey; [Windows/Linux])"	preference="ctraddon_extraurlkeycb" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwExtraUrlbar(true);} else {classicthemerestorerjso.ctr.ctrpwExtraUrlbar(false);} classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<hbox class="ctraddonsuboption">
+		  <menulist preference="ctraddon_extraurltarget" id="ctraddon_extraurltarget_list">
+			<menupopup>
+				<menuitem value="current" label="&Ctr_openInCurrentTab;"/>
+				<menuitem value="tab"	  label="&Ctr_openInNewTab;"/>
+				<menuitem value="window"  label="&Ctr_openInNewWindow;"/>
+			</menupopup>
+		  </menulist>
 		</hbox>
-		<description id="ctraddon_lbsbsizelabel2" class="ctraddonsuboption ctraddon_font1">&Ctr_searchbar;</description>
-		<hbox class="ctraddonsuboption"  id="ctraddon_pw_lbsbsize_sb" align="center">
-		  <label value="&Ctr_tabminwidth; "/>
-		  <textbox size="4" maxlength="4" preference="ctraddon_sbsize_minw" type="number" min="0" max="4000"/>
-		  <label value="px  -  &Ctr_tabmaxwidth; "/>
-		  <textbox size="4" maxlength="4" preference="ctraddon_sbsize_maxw" type="number" min="0" max="4000"/>
-		  <label value="px"/>
-		</hbox>
-		<checkbox label="&Ctr_lbsugresi;" preference="ctraddon_urlresults"  id="ctraddon_pw_urlresults"/>
-		<description id="ctraddon_lbsugres" class="ctraddon_font1">&Ctr_lbsugres;</description>
-		<hbox id="ctraddon_pw_lbsugresbox" align="center">
-		  <textbox size="4" maxlength="4" preference="ctraddon_urlresultsl" type="number" min="0"/>
-		  <label value=" 12 &Ctr_tabwidthdef;"/>
-		</hbox>
-
 	  </groupbox>
 
 	</box>
@@ -1305,14 +1312,101 @@
 		<description class="ctraddon_font1"></description>
 		<description class="ctraddon_font1">&Ctr_padlock;</description>
 		<radiogroup preference="ctraddon_padlock" id="ctraddon_padlock_radio" orient="horizontal" value="">
-			<radio value="padlock_default"	label="&Ctr_padlock_def;"	id="ctraddon_pw_padlock_default"/>
-			<radio value="padlock_classic"	label="&Ctr_padlock_cla;"	id="ctraddon_pw_padlock_classic"/>
-			<radio value="padlock_amo"		label=" "	id="ctraddon_pw_padlock_amo"/>
-			<radio value="padlock_modern"	label="&Ctr_padlock_mod;"	id="ctraddon_pw_padlock_modern"/>
-			<radio value="padlock_modern2"	label=" "	id="ctraddon_pw_padlock_modern2"/>
 			<radio value="padlock_none"		label="&Ctr_padlock_hid;"	id="ctraddon_pw_padlock_none"/>
+			<radio value="padlock_default"	label="&Ctr_tabwidthdef;"	id="ctraddon_pw_padlock_default"/>
+			<radio value="padlock_classic"	label=" "	id="ctraddon_pw_padlock_classic"/>
+			<radio value="padlock_amo"		label=" "	id="ctraddon_pw_padlock_amo"/>
+			<radio value="padlock_modern"	label=" "	id="ctraddon_pw_padlock_modern"/>
+			<radio value="padlock_modern2"	label=" "	id="ctraddon_pw_padlock_modern2"/>
 		</radiogroup>
 
+	  </groupbox>
+	  
+	  <groupbox>
+
+	    <caption  label="&Ctr_autocomplete;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_altautocompl;" preference="ctraddon_altautocompl"  id="ctraddon_pw_altautocompl" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<checkbox label="&Ctr_urlbar_uc;" preference="ctraddon_urlbar_uc" id="ctraddon_pw_urlbar_uc"/>
+		<checkbox label="&Ctr_lbsugresi;" preference="ctraddon_urlresults"  id="ctraddon_pw_urlresults"/>
+		<description id="ctraddon_lbsugres" class="ctraddon_font1">&Ctr_lbsugres;</description>
+		<hbox id="ctraddon_pw_lbsugresbox" align="center">
+		  <textbox size="4" maxlength="4" preference="ctraddon_urlresultsl" type="number" min="0" onchange="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		  <label value=" 12 &Ctr_tabwidthdef; / 10 (&brandShortName; 48+)"/>
+		</hbox>
+
+	  </groupbox>
+
+	</box>
+
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_locationbbox3">
+	  
+	  <groupbox>
+	    <caption  label="&Ctr_urlbar; / &Ctr_searchbar;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_locsearchbw10;" preference="ctraddon_locsearchbw10"  id="ctraddon_pw_locsearchbw10"/>
+		<checkbox label="&Ctr_lbsbsize;" preference="ctraddon_lbsbsize" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwLocationSearchbarSize(true);} else {classicthemerestorerjso.ctr.ctrpwLocationSearchbarSize(false);}"/>
+		<description id="ctraddon_lbsbsizelabel1" class="ctraddonsuboption ctraddon_font1">&Ctr_urlbar;</description>
+		<hbox class="ctraddonsuboption"  id="ctraddon_pw_lbsbsize_lb" align="center">
+		  <label value="&Ctr_tabminwidth; "/>
+		  <textbox size="4" maxlength="4" preference="ctraddon_lbsize_minw" type="number" min="0" max="4000" id="ctraddon_lbsize_minw"/>
+		  <label value="px  -  &Ctr_tabmaxwidth; "/>
+		  <textbox size="4" maxlength="4" preference="ctraddon_lbsize_maxw" type="number" min="0" max="4000" id="ctraddon_lbsize_maxw"/>
+		  <label value="px"/>
+		</hbox>
+		<description id="ctraddon_lbsbsizelabel2" class="ctraddonsuboption ctraddon_font1">&Ctr_searchbar;</description>
+		<hbox class="ctraddonsuboption"  id="ctraddon_pw_lbsbsize_sb" align="center">
+		  <label value="&Ctr_tabminwidth; "/>
+		  <textbox size="4" maxlength="4" preference="ctraddon_sbsize_minw" type="number" min="0" max="4000" id="ctraddon_sbsize_minw"/>
+		  <label value="px  -  &Ctr_tabmaxwidth; "/>
+		  <textbox size="4" maxlength="4" preference="ctraddon_sbsize_maxw" type="number" min="0" max="4000" id="ctraddon_sbsize_maxw"/>
+		  <label value="px"/>
+		</hbox>
+		
+		<checkbox label="&Ctr_lbsbradius;" preference="ctraddon_lbsbradius" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwLocationSearchbarRadius(true);} else {classicthemerestorerjso.ctr.ctrpwLocationSearchbarRadius(false);}"/>
+		<description id="ctraddon_lbsbradiuslabel1" class="ctraddonsuboption ctraddon_font1">&Ctr_urlbar;</description>
+		<hbox class="ctraddonsuboption"  id="ctraddon_pw_lbsbradius_lb" align="center">
+		  <label value="&Ctr_navbarpad_l; "/>
+		  <textbox size="2" maxlength="2" preference="ctraddon_lbradius_left" type="number" min="0" max="20" id="ctraddon_lbradius_left"/>
+		  <label value="px  -  &Ctr_navbarpad_r; "/>
+		  <textbox size="2" maxlength="2" preference="ctraddon_lbradius_right" type="number" min="0" max="20" id="ctraddon_lbradius_right"/>
+		  <label value="px"/>
+		</hbox>
+		<description id="ctraddon_lbsbradiuslabel2" class="ctraddonsuboption ctraddon_font1">&Ctr_searchbar;</description>
+		<hbox class="ctraddonsuboption"  id="ctraddon_pw_lbsbradius_sb" align="center">
+		  <label value="&Ctr_navbarpad_l; "/>
+		  <textbox size="2" maxlength="2" preference="ctraddon_sbradius_left" type="number" min="0" max="20" id="ctraddon_sbradius_left"/>
+		  <label value="px  -  &Ctr_navbarpad_r; "/>
+		  <textbox size="2" maxlength="2" preference="ctraddon_sbradius_right" type="number" min="0" max="20" id="ctraddon_sbradius_right"/>
+		  <label value="px"/>
+		</hbox>
+	  </groupbox>
+
+	</box>
+	
+	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_searchuibox">
+	  <groupbox>
+	    <caption  label="&Ctr_searchbar;" class="ctraddon_topic"/>
+		<checkbox label="&Ctr_ctroldsearch;"	preference="ctraddon_ctroldsearch" id="ctraddon_pw_ctroldsearch" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwCtrOldSearch(true);} else {classicthemerestorerjso.ctr.ctrpwCtrOldSearch(false);}"/>
+		<checkbox label="&Ctr_osearch_dm;"		preference="ctraddon_osearch_dm" id="ctraddon_pw_osearch_dm" class="ctraddon_winmaconly"/>
+		<checkbox label="&Ctr_ctroldsearchc;"	preference="ctraddon_ctroldsearchc" id="ctraddon_pw_ctroldsearchc"/>
+		<checkbox label="&Ctr_ctroldsearchr;"	preference="ctraddon_ctroldsearchr" id="ctraddon_pw_ctroldsearchr"/>
+		<checkbox label="&Ctr_osearch_meoit;"	preference="ctraddon_osearch_meoit" id="ctraddon_pw_osearch_meoit"/>
+		<checkbox label="&Ctr_search_oit;"		preference="ctraddon_search_oit" id="ctraddon_pw_search_oit" />
+		<checkbox label="&Ctr_osearch_iwidth;"	preference="ctraddon_osearch_iwidth" id="ctraddon_pw_osearch_iwidth"/>
+		<checkbox label="&Ctr_osearch_cwidth;" preference="ctraddon_osearch_cwidth" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwSearchPopupSize(true);} else {classicthemerestorerjso.ctr.ctrpwSearchPopupSize(false);}"/>
+		<hbox class="ctraddonsuboption"  id="ctraddon_pw_os_spsize_box" align="center">
+		  <label value="&Ctr_tabminwidth; "/>
+		  <textbox size="4" maxlength="4" preference="ctraddon_os_spsize_minw" type="number" min="0" max="4000" id="ctraddon_os_spsize_minw"/>
+		  <label value="px  -  &Ctr_tabmaxwidth; "/>
+		  <textbox size="4" maxlength="4" preference="ctraddon_os_spsize_maxw" type="number" min="0" max="4000" id="ctraddon_os_spsize_maxw"/>
+		  <label value="px"/>
+		</hbox>
+	  </groupbox>
+	  
+	  <groupbox>
+		<hbox>
+		  <image src="chrome://classic_theme_restorer/content/images/oldsearch.png"/>
+		  <label value=""/>
+		</hbox>
 	  </groupbox>
 
 	</box>
@@ -1476,7 +1570,8 @@
 
 	  <groupbox>
 	    <caption  label="&Ctr_toolbars;" class="ctraddon_topic"/>
-		<checkbox label="&Ctr_aerocolors;"				 preference="ctraddon_aerocolors" id="ctraddon_pw_aerocolors"/>
+		<checkbox label="&Ctr_aerocolors;"				 preference="ctraddon_aerocolors" id="ctraddon_pw_aerocolors" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwAeroColors(true);} else {classicthemerestorerjso.ctr.ctrpwAeroColors(false);}"/>
+		<checkbox label="&Ctr_aerocolorsg;"				 preference="ctraddon_aerocolorsg" id="ctraddon_pw_aerocolorsg" class="ctraddonsuboption"/>
 		<checkbox label="&Ctr_notextshadow;"			 preference="ctraddon_notextshadow"/>
 		<checkbox label="&Ctr_transpttbw10;"			 preference="ctraddon_transpttbw10" id="ctraddon_pw_transpttbw10" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwTranspTbW10(true);} else {classicthemerestorerjso.ctr.ctrpwTranspTbW10(false);}"/>
 		<checkbox label="&Ctr_transptcw10;"			 	 preference="ctraddon_transptcw10" id="ctraddon_pw_transptcw10" class="ctraddonsuboption"/>
@@ -1607,11 +1702,11 @@
 		<menuitem label="&Ctr_pw_set_predef;" id="ctr_pw_settings_classic"	oncommand="classicthemerestorerjso.ctr.classicCTRpreferences();" class="menuitem-iconic"/>
 		<menuitem label="&Ctr_pw_set_preaust;" id="ctr_pw_settings_austral"	oncommand="classicthemerestorerjso.ctr.australisCTRpreferences();" class="menuitem-iconic"/>
 		<menuseparator/>
-		<menuitem label="&Ctr_pw_set_export; (txt)" id="ctr_pw_settings_export"	oncommand="classicthemerestorerjso.ctr.exportCTRpreferences();" class="menuitem-iconic"/>
-		<menuitem label="&Ctr_pw_set_import; (txt)" id="ctr_pw_settings_import"	oncommand="classicthemerestorerjso.ctr.importCTRpreferences();" class="menuitem-iconic"/>
+		<menuitem label="&Ctr_pw_set_export; (txt)" id="ctr_pw_settings_export"	oncommand="classicthemerestorerjso.ctr.ExportPreferences('txt');" class="menuitem-iconic"/>
+		<menuitem label="&Ctr_pw_set_import; (txt)" id="ctr_pw_settings_import"	oncommand="classicthemerestorerjso.ctr.ImportPreferences('txt');" class="menuitem-iconic"/>
 		<menuseparator/>
-		<menuitem label="&Ctr_pw_set_export; (JSON)" id="ctr_pw_settings_export_json"	oncommand="classicthemerestorerjso.ctr.exportCTRpreferencesJSON();" class="menuitem-iconic"/>
-		<menuitem label="&Ctr_pw_set_import; (JSON)" id="ctr_pw_settings_import_json"	oncommand="classicthemerestorerjso.ctr.importCTRpreferencesJSON();" class="menuitem-iconic"/>
+		<menuitem label="&Ctr_pw_set_export; (JSON)" id="ctr_pw_settings_export_json"	oncommand="classicthemerestorerjso.ctr.ExportPreferences('json');" class="menuitem-iconic"/>
+		<menuitem label="&Ctr_pw_set_import; (JSON)" id="ctr_pw_settings_import_json"	oncommand="classicthemerestorerjso.ctr.ImportPreferences('json');" class="menuitem-iconic"/>
 		<menuseparator/>
 		<menuitem label="&Ctr_pw_set_syncon;"	id="ctr_pw_settings_sync_on"	oncommand="classicthemerestorerjso.ctr.enableSyncCTRprefs();" class="menuitem-iconic"/>
 		<menuitem label="&Ctr_pw_set_syncoff;"	id="ctr_pw_settings_sync_off"	oncommand="classicthemerestorerjso.ctr.disableSyncCTRprefs();" class="menuitem-iconic"/>

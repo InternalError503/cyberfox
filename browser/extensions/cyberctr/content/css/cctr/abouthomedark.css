@@ -21,7 +21,7 @@
         width: 100%;
         height: 100%;
         background-color: #222 !important;
-        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/noise.png") !important;
+        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/noise.png");
     }
     input,
     button {
@@ -142,70 +142,51 @@
         background-position: center center!important;
         background-repeat: no-repeat;
     }
-    #searchForm {
+	#searchIconAndTextContainer {
         width: 480px;
         display: -moz-box;
     }
-    #searchLogoContainer {
-        z-index: -2000;
-        display: -moz-box;
-        -moz-box-align: center;
-        padding-top: 2px;
-        -moz-padding-end: 8px;
-    }
-    #searchLogoContainer[hidden] {
-        display: none;
-    }
-    #searchEngineLogo {
-        display: inline-block;
-        height: 28px;
-        width: 70px;
-        min-width: 70px;
+    #searchIconAndTextContainer {
+		display: -moz-box;
+		height: 36px;
+		position: relative;
     }
     #searchIcon {
-        border: 1px solid transparent !important;
-        -moz-margin-end: 5px;
-        height: 38px;
-        width: 38px;
-        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/magnifier_dark.png") !important;
-        background-color: transparent;
-        background-size: 26px;
-        background-position: center center;
-        background-repeat: no-repeat;
+		border: 1px transparent;
+		padding: 0;
+		margin: 0;
+		width: 36px;
+		height: 36px;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/magnifier_dark.png") center center no-repeat !important;
+		position: absolute;
     }
-    #searchIcon[active],
-    #searchIcon:hover {
-        background-color: #222 !important;
-        border: 1px solid #111 !important;
-        border-radius: 2.5px;
-    }
-    html[searchUIConfiguration="oldsearchui"] #searchIcon {
-        display: none;
-    }
-    html:not([searchUIConfiguration="oldsearchui"]) #searchText::-moz-placeholder {
-        color: transparent;
-    }
-    html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
-        display: none;
-    }
+
     #searchText {
+		margin-left: 0;
         -moz-box-flex: 1;
-        padding: 6px 8px;
+        padding-top: 6px;
+		padding-bottom: 6px;
+		padding-left: 34px;
+		padding-right: 8px;
         color: var(--main-text-color)!important;
         background-color: #333 !important;
         background-image: -moz-linear-gradient(rgb(37, 38, 40), rgb(37, 38, 40) 95%, rgb(25, 25, 25)) !important;
         box-shadow: 1px 3px 3px hsla(0, 0%, 0%, .100) inset, 1px 3px 3px hsla(0, 0%, 0%, .100) inset !important;
         border: 1px solid #111 !important;
-        /* border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2);*/
-        /*box-shadow: 0 1px 0 hsla(210,65%,9%,.02) inset,
-				  0 0 2px hsla(210,65%,9%,.1) inset,
-				  0 1px 0 hsla(0,0%,100%,.2);*/
-        
-        border-radius: 2.5px 0 0 2.5px;
+        border-radius: 2px 0 0 2px;
     }
     #searchText:-moz-dir(rtl) {
         border-radius: 0 2.5px 2.5px 0;
     }
+	#searchText[aria-expanded="true"] {
+	  border-radius: 2px 0 0 0;
+	}
+
+	#searchText[aria-expanded="true"]:-moz-dir(rtl) {
+	  border-radius: 0 2px 0 0;
+	}
+
+	#searchText[keepfocus],
     #searchSubmit,
     #searchText:focus,
     #searchText[autofocus] {
@@ -214,38 +195,40 @@
     #searchSubmit {
         -moz-margin-start: -1px;
         color: var(--main-text-color)!important;
-        background: linear-gradient(hsla(0, 0%, 100%, .8), hsla(0, 0%, 100%, .1)) padding-box !important;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/search-arrow-go.svg#search-arrow-go-inverted") center center no-repeat, -moz-linear-gradient(rgb(37, 38, 40) 25%, rgb(37, 38, 40) 50%, rgb(25, 25, 25) 75%) padding-box !important;
         padding: 0 9px;
         border: 1px solid !important;
         background-color: #333 !important;
         border-color: hsla(210, 54%, 20%, .15) hsla(210, 54%, 20%, .17) hsla(210, 54%, 20%, .2) !important;
-        background-image: url(chrome://classic_theme_restorer/content/images/abouthome/noise.png), -moz-linear-gradient(rgb(37, 38, 40) 25%, rgb(37, 38, 40) 50%, rgb(25, 25, 25) 75%) !important;
         border: 1px solid #111 !important;
         border-radius: 0 2.5px 2.5px 0;
         box-shadow: 0pt 1px 0pt rgba(55, 55, 55, 0.1) !important;
         cursor: pointer;
         transition-property: background-color, border-color, box-shadow;
         transition-duration: 150ms;
+		width: 50px;
     }
     #searchSubmit:-moz-dir(rtl) {
-        border-radius: 2.5px 0 0 2.5px;
+        border-radius: 2px 0 0 2px;
     }
     #searchText:focus + #searchSubmit,
+	#searchText[keepfocus] + #searchSubmit,
     #searchText + #searchSubmit:hover,
     #searchText[autofocus] + #searchSubmit {
-        /*border-color: -moz-linear-gradient(#4cb1ff, #1793e5) !important;*/
+        /* border-color: -moz-linear-gradient(#4cb1ff, #1793e5) !important;*/
         
         background-image: url(chrome://classic_theme_restorer/content/images/abouthome/noise.png) !important;
         color: var(--main-text-color)!important;
     }
     #searchText:focus + #searchSubmit,
+	#searchText[keepfocus] + #searchSubmit,
     #searchText[autofocus] + #searchSubmit {
-        background-image: url(chrome://classic_theme_restorer/content/images/abouthome/noise.png), -moz-linear-gradient(#333, #222) !important;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/search-arrow-go.svg#search-arrow-go-inverted") center center no-repeat, -moz-linear-gradient(#333, #222) !important;
         border: 1px solid !important;
         border-color: var(--main-highlight-color)!important;
     }
     #searchText + #searchSubmit:hover {
-        background-image: -moz-linear-gradient(rgb(37, 38, 40) 15%, rgb(37, 38, 40) 40%, rgb(25, 25, 25) 65%) !important;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/search-arrow-go.svg#search-arrow-go-inverted") center center no-repeat, -moz-linear-gradient(rgb(37, 38, 40) 15%, rgb(37, 38, 40) 40%, rgb(25, 25, 25) 65%) !important;
         color: var(--main-highlight-color)!important;
         -moz-transition: .1s ease-in;
     }
@@ -264,9 +247,9 @@
     #rightsSnippet {
         display: block;
         min-height: 38px;
-        background: 30px center no-repeat;
+        background: 0px center no-repeat;
         padding: 6px 0;
-        -moz-padding-start: 79px;
+        -moz-padding-start: 49px;
     }
     #rightsSnippet[hidden] {
         display: none;
@@ -274,7 +257,7 @@
     #defaultSnippet1:-moz-dir(rtl),
     #defaultSnippet2:-moz-dir(rtl),
     #rightsSnippet:-moz-dir(rtl) {
-        background-position: right 30px center;
+        background-position: right 0px center;
     }
     #defaultSnippet1 {
         background-image: url("chrome://browser/content/abouthome/snippet1.png");
@@ -476,9 +459,6 @@
     @media not all and (max-resolution: 1dppx) {
         #brandLogo {
             background-image: url("chrome://branding/content/about-logo@2x.png");
-        }
-        #searchIcon {
-            background-image: url("chrome://classic_theme_restorer/content/images/abouthome/magnifier_dark@2px.png")!important;
         }
         #defaultSnippet1,
         #defaultSnippet2,

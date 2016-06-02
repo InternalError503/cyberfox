@@ -12,11 +12,6 @@
     
   <Url type="text/html" method="get" template="https://duckduckgo.com/">
     <Param name="q" value="{searchTerms}"/>
-    <MozParam name="t" condition="purpose" purpose="contextmenu" value="ffcm"/>
-    <MozParam name="t" condition="purpose" purpose="keyword"     value="ffab"/>
-    <MozParam name="t" condition="purpose" purpose="searchbar"   value="ffsb"/>
-    <MozParam name="t" condition="purpose" purpose="homepage"    value="ffhp"/>
-    <MozParam name="t" condition="purpose" purpose="newtab"      value="ffnt"/>
   </Url>
   <Url type="application/x-suggestions+json" template="https://ac.duckduckgo.com/ac/">
     <Param name="q" value="{searchTerms}"/>

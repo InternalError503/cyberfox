@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"Espaço Flexível">
 <!ENTITY Ctr_space			"Espaço">
 <!ENTITY Ctr_separator		"Separador">
-<!ENTITY Ctr_puibseparator	"Separador do Botão do Painel da Interface do Usuário">
 <!ENTITY Ctr_navthrobber	"Indicador de Atividade">
 <!ENTITY Ctr_sidebarbutton	"Barra Lateral">
 <!ENTITY Ctr_windowcontrols	"Mínimo/Máximo/Fechar (Tela Cheia)">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui				"Interface do Usuário Geral">
 <!ENTITY Ctr_nbiconsize0	"Definir os Atributos da Barra de Navegação">
 <!ENTITY Ctr_smallnavbut	"Botões Pequenos na Barra de Navegação">
-<!ENTITY Ctr_bfurlbarfix	"Corrigir a Borda-Alcance das Barras de URLs">
 <!ENTITY Ctr_backforward	"Botão Móvel Voltar-Avançar">
 <!ENTITY Ctr_nbcompact		"Reduzir a Altura das Barras de Ferramentas de Navegação">
 <!ENTITY Ctr_hide_bf_popup	"Ocultar o Menu Histórico ao Pressionar o Mouse">
@@ -128,6 +126,10 @@
 <!ENTITY Ctr_options_rem	"Remember last selected category">
 <!ENTITY Ctr_svgfilters		"Cores SVG para os Ícones dos Botões da Barra de Ferramentas Padrão">
 <!ENTITY Ctr_wincontrols	"Controles Móveis da Janela em Tela Cheia">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"'Top level domain' images: classic appearance">
 <!ENTITY Ctr_altalertbox	"'Alert box': alternative appearance">
@@ -135,7 +137,7 @@
 <!ENTITY Ctr_mstatusbar		"Painel da Barra de Status Móvel">
 <!ENTITY Ctr_mstatusbars4e	"O Painel da Barra de Status é Controlado Pelo 'Status-4-Evar'">
 <!ENTITY Ctr_mstatusbartpp	"O Painel da Barra de Status é Controlado Pelo 'ThePuzzlePiece'">
-<!ENTITY Ctr_mstatusbarpzt	"O Painel da Barra de Status é Controlado Pelo 'Puzzle Toolbars'">
+<!ENTITY Ctr_mstatusbarpzt	"O Painel da Barra de Status é Controlado Pelo 'Puzzle Bars'">
 <!ENTITY Ctr_mstatusbarabr	"O Painel da Barra de Status é Controlado Pelo 'The Addon Bar (Restaurado)'">
 <!ENTITY Ctr_combrelstop	"Combinar os Botões Parar e Recarregar">
 <!ENTITY Ctr_stoprel1		"Barra de Ferramentas: Colocar o Botão Recarregar Depois do Botão Parar!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"Menus do Painel Compacto (Favoritos, Histórico, etc.)">
 <!ENTITY Ctr_hidezoomres	"Controles de Ampliação na Barra de Ferramentas: Ocultar o Botão Redefinir Ampliação">
 <!ENTITY Ctr_alt_newtabp	"Página Nova Aba (about:newtab): Aparência Alternativa">
+<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_search_ui		"Search">
 <!ENTITY Ctr_ctroldsearch	"Old search">
 <!ENTITY Ctr_ctroldsearchc	"Clear searchbox after search">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Open search in new tab (about:config preference)">
 <!ENTITY Ctr_osearch_meoit	"Middle-clicks: search in new 'foreground tab'">
+<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Small dropmarker">
 <!ENTITY Ctr_addonmanager	"Add-on manager">
 <!ENTITY Ctr_alt_addonsp	"'More info' page: alternative order">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Popup: panel menu appearance">
 <!ENTITY Ctr_bmbunsortbm	"Popup: 'unsorted bookmarks' menu">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"Popup: show 'View Toolbar'">
 <!ENTITY Ctr_bmbnounsort	"Popup: hide 'unsorted bookmarks'">
 <!ENTITY Ctr_bmbutnotext	"Hide label on bookmarks bar">
@@ -237,9 +245,7 @@
 <!ENTITY Ctr_urlbardropm	"Move dropmarker to the last possible position">
 <!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
 <!ENTITY Ctr_altreaderico	"Alternative 'Reader' icons">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Ocultar o Ícone de Notificação Quando um Pop-up Ficar Bloqueado">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Reduce location bars and search bars height (experimental)">
 <!ENTITY Ctr_urlbar_ib		"Botão de Identidade do Site (Caixa de Identidade)">
 <!ENTITY Ctr_ib_nohovcolor	"Do not show gray color when hovered">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"Custom width for location bar and search bar">
 <!ENTITY Ctr_searchbar		"Search bar">
-<!ENTITY Ctr_lbsugresi		"Display as many results in suggestions popup as possible (without scrollbar)">
-<!ENTITY Ctr_lbsugres		"Number of results in suggestions popup (about:config preference)">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
+<!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"Posição dos Ítens do Menu">
 <!ENTITY Ctr_extrabar		"Barras de Ferramentas Adicionais">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"Remover a Cor/Névoa do Fundo (Windows AeroGlass/Win8)">
 
 <!ENTITY Ctr_aerocolors		"Cores Azul Aero para Barras de Ferramentas Principais e Abas">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color">
 <!ENTITY Ctr_transpttbew10	"Additional tweaks for some OS themes">
 <!ENTITY Ctr_transptcw10	"Hide default OS min/max/close buttons">
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"Go">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"V">

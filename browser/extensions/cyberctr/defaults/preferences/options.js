@@ -33,7 +33,6 @@ pref("extensions.classicthemerestorer.cappbutc2",'#383838');
 
 //General UI
 pref("extensions.classicthemerestorer.smallnavbut",false);
-pref("extensions.classicthemerestorer.bfurlbarfix",false);
 pref("extensions.classicthemerestorer.bf_space",false);
 pref("extensions.classicthemerestorer.backforward",false);
 pref("extensions.classicthemerestorer.hide_bf_popup",false);
@@ -49,6 +48,7 @@ pref("extensions.classicthemerestorer.findbar","findbar_default");
 pref("extensions.classicthemerestorer.nav_txt_ico","icons");
 pref("extensions.classicthemerestorer.iat_notf_vt",false);
 pref("extensions.classicthemerestorer.wincontrols",false);
+pref("extensions.classicthemerestorer.puibuttonsep",'puib_nosep');
 pref("extensions.classicthemerestorer.oldtoplevimg",false);
 pref("extensions.classicthemerestorer.altalertbox",false);
 pref("extensions.classicthemerestorer.emptyfavico_g",'emptyfavico_g_def');
@@ -56,10 +56,16 @@ pref("extensions.classicthemerestorer.panelmenucol",false);
 pref("extensions.classicthemerestorer.cpanelmenus",false);
 pref("extensions.classicthemerestorer.hidezoomres",false);
 pref("extensions.classicthemerestorer.alt_newtabp",false);
+//pref("extensions.classicthemerestorer.nosnippets",false);
 pref("extensions.classicthemerestorer.ctroldsearch",false);
 pref("extensions.classicthemerestorer.ctroldsearchc",false);
+pref("extensions.classicthemerestorer.ctroldsearchr",false);
 pref("extensions.classicthemerestorer.osearch_meoit",false);
 pref("extensions.classicthemerestorer.osearch_dm",false);
+pref("extensions.classicthemerestorer.osearch_iwidth",true);
+pref("extensions.classicthemerestorer.osearch_cwidth",false);
+pref("extensions.classicthemerestorer.os_spsize_minw",200);
+pref("extensions.classicthemerestorer.os_spsize_maxw",200);
 //pref("extensions.classicthemerestorer.addonversion",true);
 pref("extensions.classicthemerestorer.alt_addonsm",false);
 pref("extensions.classicthemerestorer.am_nowarning",false);
@@ -75,6 +81,7 @@ pref("extensions.classicthemerestorer.bmbutpanelm",false);
 pref("extensions.classicthemerestorer.bmbunsortbm",false);
 pref("extensions.classicthemerestorer.bmbunsortbm2",true);
 pref("extensions.classicthemerestorer.bmbviewbmtb",false);
+pref("extensions.classicthemerestorer.bmbviewbmsb",false);
 pref("extensions.classicthemerestorer.bmbnounsort",false);
 pref("extensions.classicthemerestorer.bmbutnotext",false);
 pref("extensions.classicthemerestorer.skipprintpr",false);
@@ -130,6 +137,7 @@ pref("extensions.classicthemerestorer.padlockex",true);
 pref("extensions.classicthemerestorer.icopageinfo",false);
 
 pref("extensions.classicthemerestorer.extraurlkeycb",false);
+pref("extensions.classicthemerestorer.extraurltarget",'tab');
 pref("extensions.classicthemerestorer.locsearchbw10",false);
 
 pref("extensions.classicthemerestorer.lbsbsize",false);
@@ -137,9 +145,15 @@ pref("extensions.classicthemerestorer.lbsize_minw",200);
 pref("extensions.classicthemerestorer.lbsize_maxw",4000);
 pref("extensions.classicthemerestorer.sbsize_minw",200);
 pref("extensions.classicthemerestorer.sbsize_maxw",4000);
+pref("extensions.classicthemerestorer.lbsbradius",false);
+pref("extensions.classicthemerestorer.lbradius_left",0);
+pref("extensions.classicthemerestorer.lbradius_right",0);
+pref("extensions.classicthemerestorer.sbradius_left",0);
+pref("extensions.classicthemerestorer.sbradius_right",0);
 
 // Toolbar settings
 pref("extensions.classicthemerestorer.aerocolors",false);
+pref("extensions.classicthemerestorer.aerocolorsg",false);
 pref("extensions.classicthemerestorer.transpttbw10",false);
 pref("extensions.classicthemerestorer.transpttbew10",false);
 pref("extensions.classicthemerestorer.transptcw10",false);
@@ -322,7 +336,7 @@ pref("extensions.classicthemerestorer.abouthomecustomhighlightcolor", "#fe634a")
 pref("extensions.classicthemerestorer.abouthomecustombase", false);
 pref("extensions.classicthemerestorer.abouthomecustombasecolor", "#fff");
 pref("extensions.classicthemerestorer.abouthomeanimate", false);
-pref("extensions.classicthemerestorer.abouthomebgstretch", true);
+pref("extensions.classicthemerestorer.abouthomebgstretch", false);
 
 //Custom search-bar width
 pref("extensions.classicthemerestorer.customsearchbarwidth", false);
@@ -347,7 +361,7 @@ pref("extensions.classicthemerestorer.loadcustomcss", false);
 pref("extensions.classicthemerestorer.customcssurl", "");
 
 //CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.5.3");
+pref("extensions.classicthemerestorer.version", "1.5.4");
 
 //CyberCTR Pre-set Configuration
 pref("extensions.classicthemerestorer.ctrpref.firstrun", true);

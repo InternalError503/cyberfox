@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"Muutuv tühimik">
 <!ENTITY Ctr_space			"Tühimik">
 <!ENTITY Ctr_separator		"Eraldaja">
-<!ENTITY Ctr_puibseparator	"Eraldaja (paneelimenüü jaoks)">
 <!ENTITY Ctr_navthrobber	"Aktiivsuse näidik">
 <!ENTITY Ctr_sidebarbutton	"(Külgriba)">
 <!ENTITY Ctr_windowcontrols	"Min/max/sulge (Täisekraan)">
@@ -44,7 +43,7 @@
 <!ENTITY Ctr_tabsontop3		"Kaardid pole kõige peal (v2) --- atribuut [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 on ainult mõnede lisade ja täielike välimuste jaoks!">
 <!ENTITY Ctr_tabsontopI1	"Atribuut [tabsontop=true/false] lisatakse nendele:">
-<!ENTITY Ctr_tabsintitlebar	"&brandShortName;i tiitliriba (about:config eelistus)">
+<!ENTITY Ctr_tabsintitlebar	"Opsüsteemi tiitliriba asemel kasuta &brandShortName;i tiitliriba (about:config eelistus)">
 <!ENTITY Ctr_tabwidthdef	"(vaikimisi)">
 <!ENTITY Ctr_tabwidthcla	"(klassikaline)">
 <!ENTITY Ctr_tabminheight	"Kõrgus:">
@@ -70,7 +69,7 @@
 <!ENTITY Ctr_closetab_hfot	"Peida, kui näha on ainult üks kaart">
 <!ENTITY Ctr_closei_def		"Vaikimisi ikoonid">
 <!ENTITY Ctr_closeonleft	"Alternatiivne asukoht kaardil">
-<!ENTITY Ctr_closetabbig	"Suurem ikoon (20x20px)">
+<!ENTITY Ctr_closetabbig	"Suurem ikoon (20x20 px)">
 <!ENTITY Ctr_close_wwltab	"Viimase nähtava kaardi sulgemisel sulge kogu aken (about:config eelistus)">
 
 <!ENTITY Ctr_hctpinfotab	"Mõned kaardi variatsioonid ei ühildu lisaga 'Hide Caption Titlebar Plus'.">
@@ -80,9 +79,9 @@
 <!ENTITY Ctr_appbutton0		"Nupp keelatud">
 <!ENTITY Ctr_appbutton1		"Nupp tööriistaribal">
 <!ENTITY Ctr_appbutton1wt	"Nupp tööriistaribal (ainult tekst)">
-<!ENTITY Ctr_appbutton2		"Nupp [&brandShortName;]i tiitliribal">
-<!ENTITY Ctr_appbutton2h	"Nupp [&brandShortName;]i tiitliribal (peidetud)">
-<!ENTITY Ctr_appbutton2io	"Nupp [&brandShortName;]i tiitliribal (ainult ikoon)">
+<!ENTITY Ctr_appbutton2		"Nupp &brandShortName;i tiitliribal">
+<!ENTITY Ctr_appbutton2h	"Nupp &brandShortName;i tiitliribal (peidetud)">
+<!ENTITY Ctr_appbutton2io	"Nupp &brandShortName;i tiitliribal (ainult ikoon)">
 <!ENTITY Ctr_paneluibtweak	"Kasuta menüünupu jaoks &brandShortName;i nupu välimust...">
 <!ENTITY Ctr_paneluibtweak2	"Kasuta menüünupu jaoks &brandShortName;i nupu välimust (ainult ikoon)...">
 <!ENTITY Ctr_paneluibtweak3	"...kui see asub kaartide ribal">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui				"Kasutajaliides: üldised sätted">
 <!ENTITY Ctr_nbiconsize0	"Aadressiriba atribuut 'iconsize'">
 <!ENTITY Ctr_smallnavbut	"Väiksed nupud aadressiribal">
-<!ENTITY Ctr_bfurlbarfix	"Paranda aadressiriba piirjoonte raadiust">
 <!ENTITY Ctr_backforward	"Liigutatavad tagasi-edasi nupud">
 <!ENTITY Ctr_nbcompact		"Vähenda aadressiriba kõrgust">
 <!ENTITY Ctr_hide_bf_popup	"Hiirega klõpsates peida nupu ajaloo hüpikmenüü">
@@ -124,10 +122,14 @@
 <!ENTITY Ctr_altoptionsw	"Ava sätete leht aknas">
 <!ENTITY Ctr_altoptionsww	"Laius">
 <!ENTITY Ctr_altoptionswh	"Kõrgus">
-<!ENTITY Ctr_altoptionsi	"Simuleeritud sätete aken ei ole enam dialoogiaken, vaid peidetud tööriistaribadega 'brauseri aken'. Säte 'Kasuta aktiivset veebilehte' lisab avalehtede hulka ainult aktiivses aknas avatud lehtede aadressid, mis on antud juhul ainult 'about:preferences'. Nupp 'Sätted' tööriistaribal asendatakse uuega, et saaks sätted avada aknas.">
+<!ENTITY Ctr_altoptionsi	"Simuleeritud sätete aken ei ole enam dialoogiaken, vaid peidetud tööriistaribadega 'brauseri aken'. Säte 'Kasuta aktiivset veebilehte' lisab avalehtede hulka ainult aktiivses aknas avatud lehtede aadressid, mis on antud juhul ainult 'about:preferences'. Sätete nupp tööriistaribal asendatakse uuega, et sätteid saaks aknas avada.">
 <!ENTITY Ctr_options_rem	"Jäta meelde viimati valitud kategooria">
 <!ENTITY Ctr_svgfilters		"Kasuta vaikimisi tööriistariba nuppude jaoks SVG-värve">
 <!ENTITY Ctr_wincontrols	"Liigutatavad akna juhtelemendid täisekraani režiimis">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 täisekraani hoiatus">
 <!ENTITY Ctr_oldtoplevimg	"'Tippdomeeni' pildid: klassikaline välimus">
 <!ENTITY Ctr_altalertbox	"'Teavituskast': alternatiivne välimus">
@@ -135,7 +137,7 @@
 <!ENTITY Ctr_mstatusbar		"Liigutatav olekupaneel">
 <!ENTITY Ctr_mstatusbars4e	"Olekuriba paneeli kontrollib 'Status-4-Evar'">
 <!ENTITY Ctr_mstatusbartpp	"Olekuriba paneeli kontrollib 'ThePuzzlePiece'">
-<!ENTITY Ctr_mstatusbarpzt	"Olekuriba paneeli kontrollib 'Puzzle Toolbars'">
+<!ENTITY Ctr_mstatusbarpzt	"Olekuriba paneeli kontrollib 'Puzzle Bars'">
 <!ENTITY Ctr_mstatusbarabr	"Olekuriba paneeli kontrollib 'The Addon Bar (Restored)'">
 <!ENTITY Ctr_combrelstop	"Peatamine &amp; uuestilaadimine: ühenda nupud tööriistaribal">
 <!ENTITY Ctr_stoprel1		"Tähtis: paiguta uuestilaadimise nupp peatamise nupu järele!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"Paneelimenüüd (järjehoidjad, ajalugu jms.): kompaktne vaade">
 <!ENTITY Ctr_hidezoomres	"Suurendamise juhtnupud tööriistaribal: peida suurendamise lähtestamise nupp">
 <!ENTITY Ctr_alt_newtabp	"Uue kaardi leht (about:newtab): alternatiivne välimus">
+<!ENTITY Ctr_nosnippets		"Avaleht (about:home): peida katked">
+<!ENTITY Ctr_search_ui		"Otsing">
 <!ENTITY Ctr_ctroldsearch	"Vana otsing">
 <!ENTITY Ctr_ctroldsearchc	"Pärast otsingu teostamist tühjenda otsingukast">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Ava otsingutulemuste leht uuel kaardil (about:config eelistus)">
 <!ENTITY Ctr_osearch_meoit	"Hiire keskmise nupuga klõpsamine: otsi uuel esiplaanil oleval kaardil">
+<!ENTITY Ctr_osearch_iwidth	"Automaatselt kohanda hüpiku laiust">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Väike rippmenüü avamise nupp">
 <!ENTITY Ctr_addonmanager	"Lisade haldur">
 <!ENTITY Ctr_alt_addonsp	"'Rohkem teavet' leht: alternatiivne järjestus">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Menüühüpik: paneelimenüü välimus">
 <!ENTITY Ctr_bmbunsortbm	"Menüühüpik: alammenüü 'Sortimata järjehoidjad'">
 <!ENTITY Ctr_bmbunsortbm2	"Menüü järjehoidjate kohal">
+<!ENTITY Ctr_bmbviewbmsb	"Menüühüpik: näita kirjet 'Kuva järjehoidjate külgriba'">
 <!ENTITY Ctr_bmbviewbmtb	"Menüühüpik: näita kirjet 'Kuva järjehoidjariba'">
 <!ENTITY Ctr_bmbnounsort	"Menüühüpik: peida kirje 'sortimata järjehoidjad'">
 <!ENTITY Ctr_bmbutnotext	"Peida järjehoidjate ribal sildid">
@@ -237,13 +245,11 @@
 <!ENTITY Ctr_urlbardropm	"Liiguta rippmenüü avamise nupp võimalikult lõppu">
 <!ENTITY Ctr_urlbardropm2	"Tee rippmenüü avamise nupp alati nähtavaks">
 <!ENTITY Ctr_altreaderico	"Alternatiivsed 'Lugemisvaate' ikoonid">
-<!ENTITY Ctr_altautocompl	"Alternatiivne aadressiriba automaatlõpetamise hüpik (katsejärgus)">
 <!ENTITY Ctr_hideprbutton	"Peida blokeeritud hüpikakende teavitusikoon">
-<!ENTITY Ctr_urlbar_uc		"Keela ühendatud automaatlõpetamise funktsioon 'Unified autocomplete' (about:config eelistus)">
 <!ENTITY Ctr_locsearchbw10	"Vähenda aadressiriba ja otsinguriba kõrgust (katsejärgus)">
 <!ENTITY Ctr_urlbar_ib		"Saidi identiteedi nupp (identiteedi kast)">
 <!ENTITY Ctr_ib_nohovcolor	"Hiirekursoriga ikooni peale minnes ära näita halli taustavärvi">
-<!ENTITY Ctr_ib_graycolor	"Hall värvus tundmatu identiteedi ja chrome-lehtede jaoks">
+<!ENTITY Ctr_ib_graycolor	"Hall värvus tundmatu identiteedi ja 'about:'-lehtede korral">
 <!ENTITY Ctr_verifiedcolors	"Verifitseeritud veebisaitide ning turvaliste ja ebaturvaliste ühenduste nupuvärvid">
 <!ENTITY Ctr_ibinfoico		"Asenda 'i'-ikoon gloobuse ikooniga">
 <!ENTITY Ctr_ibinfoico2		"Peida 'i'-ikoon (kui võimalik)">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"Lehe/gloobuse/'i'-ikoon: nendel klõpsamine avab akna 'veebilehe teave'">
 <!ENTITY Ctr_lbsbsize		"Aadressiriba ja otsinguriba kohandatud laius">
 <!ENTITY Ctr_searchbar		"Otsinguriba">
-<!ENTITY Ctr_lbsugresi		"Näita soovituste menüüs võimalikult palju tulemusi (ilma kerimisriba näitamata)">
-<!ENTITY Ctr_lbsugres		"Soovituste hüpikul kuvatavate tulemuste arv (about:config eelistus)">
+<!ENTITY Ctr_autocomplete	"Automaatlõpetamise hüpik">
+<!ENTITY Ctr_altautocompl	"Alternatiivne välimus (katsejärgus)">
+<!ENTITY Ctr_urlbar_uc		"Keela ühtse automaatlõpetamise funktsioon 'unified autocomplete' (about:config eelistus)">
+<!ENTITY Ctr_lbsugresi		"Keela kõrguse piirang">
+<!ENTITY Ctr_lbsugres		"Tulemuste arv (about:config eelistus)">
+<!ENTITY Ctr_lbsbradius		"Aadressiriba ja otsinguriba piirjoonte kohandatud ümarus">
 
 <!ENTITY Ctr_menubar_items	"Menüükirjete asukoht">
 <!ENTITY Ctr_extrabar		"Lisa-tööriistaribad">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"Eemalda taustavärv/-udu (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Sinised Aero värvid tööriistaribadel (ja kaartidel)">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Tiitli-/menüü-/kaartide riba: eemalda taustavärv">
 <!ENTITY Ctr_transpttbew10	"Lisapisiparandused mõne OS teema jaoks">
 <!ENTITY Ctr_transptcw10	"Peida vaikimisi op-süsteemi min/max/sulge nupud">
@@ -335,7 +346,7 @@
 
 <!ENTITY Ctr_otherctroptns	"Muud sätted">
 <!ENTITY Ctr_cuibotbuttons	"Lisanupud menüüde ja tööriistaribade kohandamise režiimis">
-<!ENTITY Ctr_nodevtheme		"Ära luba 'Arendaja väljalaske välimust' sisse lülitada">
+<!ENTITY Ctr_nodevtheme		"Ära luba arendaja väljalaske välimust sisse lülitada">
 
 <!ENTITY Ctr_experttweaks	"Täpsemad">
 <!ENTITY Ctr_fx34search		"Sellelt eelistuselt märke eemaldamine eemaldab 'uue otsingu välimuse' ja taastab vanema.">
@@ -367,7 +378,7 @@
 
 <!ENTITY Ctr_special_font	"Taustavärvi sätted on ainult vaikimisi välimuse jaoks!">
 <!ENTITY Ctr_special_info	"Mõned sätted ei pruugi alati nähtavaid muudatusi pakkuda">
-<!ENTITY Ctr_special_info2	"Sätted on mõeldud &brandShortName;i vaikimisi välimuse jaoks ja ei pruugi kõigi kolmandate osapoolte välimustega töötada!">
+<!ENTITY Ctr_special_info2	"Tuvastati kolmanda osapoole välimus! Mõned sätted ei tööta kolmandate osapoolte välimustega!">
 <!ENTITY Ctr_support		"Kasutajatoe foorum">
 <!ENTITY Ctr_newversion		"Uus versioon?">
 
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"Mine">
 <!ENTITY Ctr_menu_restart.label			"Taaskäivita">
 <!ENTITY Ctr_restartapp					"'Taaskäivita' &brandShortName;i nupu menüüs ja menüüs Fail">
+
+<!ENTITY Ctr_openInCurrentTab			"Ava sisestused praegusel kaardil">
+<!ENTITY Ctr_openInNewTab				"Ava sisestused uuel kaardil">
+<!ENTITY Ctr_openInNewWindow			"Ava sisestused uues aknas">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"T">

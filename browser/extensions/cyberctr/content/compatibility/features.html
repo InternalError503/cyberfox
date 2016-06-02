@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="uk-notouch" lang="en-us" dir="ltr">
  <head>
-<!-- Last updated 12.7.2015 --> 
+<!-- Last updated 13.5.2016 --> 
   <meta charset="utf-8" />
   <title id="windowtitle">CyberCTR Features</title>
 	<link rel="icon" 
@@ -115,6 +115,13 @@
 			<li>Change highlight color of about:newtab page elements</li>
 			<li>Change default text color of about:newtab page text and grid color.</li>
 			<li>Set custom font size for bookmark-bar tool-bar (Range 2px - 30px)</li>
+			<li>Set custom font size for tab text (Range 2px - 30px)</li>
+			<li>Custom background for about:newtab page.</li>
+			<li>Stretch about:newtab custom background image to window.</li>
+			<li>5 more default tab throbbers to select from.</li>
+			<li>Use custom tab throbbers (Use custom tab throbber image)</li>
+			<li>Animate animated lightweight themes on browser start-up</li>
+			<li>Users can load custom CSS with CyberCTR custom css</li>
 		</ul>		
 <p>Plus many under the hood changes and many more visual changes to come.</p>					
 	<h2>Main features (on options window)</h2>
@@ -124,17 +131,28 @@
     <li>Tabs not on top + [tabsontop="false/true"] attribute</li>
     <li>Tabs height settings</li>
     <li>Tabs min/max-width settings</li>
+	<li>Tab title in Firefox titlebar</li>
+	<li>Tab loading animations</li>
     <li>Tab close on all tabs, active tab, toolbars start/end</li>
-    <li>Custom colors for tab backgrounds, text and text shadow</li>
+	<li>Double click on tabs toolbar opens a 'new' tab <span class="uk-text-success">[Windows only]</span></li>
+	<li>Hide tabs toolbar with one visible tab</li>
+	<li>Custom colors for tab backgrounds, text and text shadow</li>
+	<li>Custom tab separators</li>
     <li>Application button on toolbars</li>
     <li>Application button on titlebar <span class="uk-text-success">[Windows only]</span></li>
     <li>Own title for application button on titlebar <span class="uk-text-success">[Windows only]</span></li>
     <li>Predefined/custom application button colors</li>
     <li>Small navigation toolbar buttons</li>
     <li>Movable back-forward button</li>
-    <li>Star button in location bar</li>
+	<li>Alternative appearance for about:preferences page</li>
+	<li>Open 'about:preferences' page in a window (simulates preference window)</li>
+	<li>Alternative about:add-ons (add-ons manager) appearance (Firefox 40+)</li>
+	<li>Activity indicator (throbber) on toolbars</li>
+    <li>Bookmarks-star button in location bar</li>
     <li>Rss-Feed button in location bar</li>
+	<li>Old Search ui for Firefox 43+</li>
     <li>Movable status-bar panel</li>
+	<li>Additional location bar</li>
     <li>Combine stop & reload buttons</li>
     <li>Hide location bars stop & reload buttons</li>
     <li>Hide private browsing mask</li>
@@ -152,82 +170,93 @@
     <li>AeroBlue toolbar colors for Windows 8/Classic, Linux, MacOSX</li>
     <li>Hide navigation toolbar</li>
     <li>Inverted (white) toolbar button icons</li>
-    <li>Double click on tabs toolbar opens a 'new' tab <span class="uk-text-success">[Windows only]</span></li>
-    <li>Hide tabs toolbar with one visible tab</li>
     <li>Toolbar settings to alter colors, sizes, borders</li>
-    <li>Disable some ui animations</li>
-    <li>Switch between old and new search</li>
+    <li>Disable some ui animations</li>	
+	<li>Force some toolbars to appear in fullscreen mode</li>
+	<li>Remove title/menu/tabs toolbars background for Windows 10</li>
+	<li>Disable browsers Loop (chat), Reader &amp; Pocket features</li>
 </ul>
 
 <h2>Features (not on options window)</h2>
 <ul class="uk-list">
+	<li>about:preferences keeps last selected category/tab</li>
     <li>Enable/disable 'Add-on Bar' (toolbar context menu)</li>
     <li>Toggle 'Add-on Bar' using 'Ctrl + /' btw. 'Cmd + /'</li>
     <li>Enable/disable 'Additional Toolbar' (toolbar context menu)</li>
     <li>Spaces, Flexible spaces, Separators</li>
-    <li>Activity indicator on toolbars</li>
-    <li>Bookmarks menu & sidebar buttons</li>
-    <li>History menu & sidebar buttons</li>
-    <li>Additional movable reload & stop buttons</li>
+    <li>Bookmarks menu &amp; sidebar buttons</li>
+    <li>History menu &amp; sidebar buttons</li>
+    <li>Additional movable reload &amp; stop buttons</li>
     <li>Movable urlbar container</li>
     <li>Movable (Firefox main) menu button</li>
     <li>Movable alltabs-button, webrtc-status-button, social-share-button</li>
 </ul>
 
-<h4>Squared tabs</h4>
+<h4 class="uk-text-bold">Squared tabs</h4>
 <p>Default 'curved tabs' can be optionally replaced with classic 'squared tabs'.
 Tabs on MacOSX look more like Windows tabs with MacOSX colors on purpose.</p>
 
-<h4>Curved alternative tabs</h4>
+<h4 class="uk-text-bold">Curved alternative tabs</h4>
 <p>All tabs are curved and use colours known from squared tabs.</p>
 
-<h4>Tabs 'not' on top</h4>
+<h4 class="uk-text-bold">Tabs 'not' on top</h4>
 <p>Simulates 'tabs.onTop=false' setting and moves tabs below navigation toolbar. On MacOSX tabs also get a 'reversed appearance'.</p>
 
 <h3>Application button / application menu settings</h3>
 
-<h4>Application button on [Firefox] titlebar <span class="uk-text-success">[Windows only]</span></h4>
+<h5 class="uk-text-bold">Application button on [Firefox] titlebar <span class="uk-text-success">[Windows only]</span></h5>
 <p>The titlebar button is fixed on titlebars left side like on Firefox since version 4.0. It is enabled by default on Windows systems.</p>
 
-<h4>Application button on toolbars</h4>
+<h5 class="uk-text-bold">Application button on toolbars</h5>
 <p>The button can also be used on toolbars and appears like a default toolbar button.</p>
 
-<h4>Application button colours</h4>
+<h5 class="uk-text-bold">Application button colours</h5>
 <p>On tabs toolbar and titlebar application button can be orange, blue (Aurora), black (Nightly), red, green and gray in normal browsing mode and purple in private browsing mode like on previous Firefox versions.</p>
 
-<h4>Note</h4>
-<p>The new appmenu is not an exact copy of the old one, but looks as original as possible. The 'splitmenu' is not yet restored, menuitems and submenus are placed in a row. The appmenu also misses some menuitems, which can not be duplicated.</p>
+<p><span class="uk-text-warning">Note:</span> The new appmenu is not an exact copy of the old one, but looks as original as possible. The 'splitmenu' is not yet restored, menuitems and submenus are placed in a row. The appmenu also misses some menuitems, which can not be duplicated.</p>
 
-<h4>Small navigation toolbar buttons</h4>
+<h4 class="uk-text-bold">Small navigation toolbar buttons</h4>
 <p>Navigation toolbar buttons get alternative margins and paddings to simulate old 'small icon view'.</p>
 
-<h4>Hide 'Navigation Toolbar'</h4>
+<h4 class="uk-text-bold">Hide 'Navigation Toolbar'</h4>
 <p>Hiding navigation toolbar might be interesting after all items got moved to other toolbars.</p>
 
-<h4>'Add-on Bar'</h4>
+<h4 class="uk-text-bold">'Add-on Bar'</h4>
 <p>A toolbar at the bottom of the window. All movable buttons and items can be placed on it. Add-on bar can be enabled/disabled using toolbars context menu (right-click on a toolbar) or using 'Ctrl + /' (Windows/Linux) btw. 'Cmd + /' (MacOSX).</p>
 
-<h4>'Additional Toolbar'</h4>
+<h4 class="uk-text-bold">'Additional Toolbar'</h4>
 <p>A toolbar between navigation toolbar and bookmarks toolbar. It can be enabled/disabled using toolbars context menu (right-click on a toolbar).</p>
 
-<h4>Icons + text / text only mode</h4>
+<h4 class="uk-text-bold">Icons + text / text only mode</h4>
 <p>Simulates old modes where text was displayed below toolbar buttons or button icons got hidden.</p>
 
-<h4>Bookmarks menu button</h4>
+<h4 class="uk-text-bold">Bookmarks menu button</h4>
 <p>A default 'menu button' which opens the 'classic' bookmarks menu. Moved to bookmarks toolbar it also shows its label.</p>
 
-<h4>Bookmarks and history sidebar buttons</h4>
+<h4 class="uk-text-bold">Bookmarks and history sidebar buttons</h4>
 <p>Buttons which toggle bookmarks and history sidebar.</p>
 
-<h4>Back-forward, reload and stop buttons</h4>
+<h4 class="uk-text-bold">Back-forward, reload and stop buttons</h4>
 <p>Browsers default buttons got merged with urlbar and cannot be moved to different toolbar positions or to different toolbars. CTR adds duplicates of these buttons to the customization palette.</p>
 
-<h4>Combined reload-stop button</h4>
+<h4 class="uk-text-bold">Combined reload-stop button</h4>
 <p>Place reload button AFTER stop button and enable the corresponding option on CTRs preference window. Hovering the option on preference window to get extra information.
 Toolbar: [something]...[stop-button][reload-button]...[something]</p>
 
-<h4>Spaces, flexible spaces ans separators</h4>
+<h4 class="uk-text-bold">Spaces, flexible spaces ans separators</h4>
 <p>These toolbar items appear in customizing mode and can be moved to toolbars like on previous Firefox versions.</p>
+
+<h4 class="uk-text-bold">Windows - Linux - MacOSX</h4>
+<p>This add-on was tested on Windows 7 (AeroBasic, AeroGlass, Classic) &amp; 8(.1) &amp; 10 &amp; XP (Classic, Luna-Blue/Silver/Olive, Zune, Royale), Linux Mint KDE, Ubuntu and MacOSX 10.8/10.9/10.10/10.11. On other Systems or non OS-default themes tab colors may look wrong. Bookmarks, history, stop, reload, back and forward toolbar buttons use default OS icons (Firefox Windows icons on Windows systems, Firefox Mac icons on MacOSX and Firefox Linux icons on Linux systems).</p>
+
+<h4 class="uk-text-danger uk-text-bold">Info, known 'issues', 'glitches', problems</h4>
+<p><span class="uk-text-danger uk-text-bold">(1)</span> Application menus 'cut', 'copy' and 'paste' buttons do not always work like they should.</p>
+<p><span class="uk-text-danger uk-text-bold">(2)</span> Switching between AeroGlass and AeroBasic on Windows 7/Vista can change application buttons position, if the menubar is disabled. Maximizing/restoring browsers main window or restarting Firefox resolves the problem. This glitch is caused by Microsoft Windows and titlebars behavior and not by this add-on.</p>
+<p><span class="uk-text-danger uk-text-bold">(3)</span> Entering and leaving customizing mode 'disables' right-click menu items for bookmarks inside bookmarks menu button. A restart resolves this issue.</p>
+<p><span class="uk-text-danger uk-text-bold">(4)</span> Tab colors on MacOSX fit to current ui instead of using Firefox 28 colors. This is intended and not a bug.</p>
+<p><span class="uk-text-danger uk-text-bold">(5)</span> It is strongly recommended to remove Foxtab and Shareaholic before installing Firefox 29 or newer, because both add-ons break Firefox ui in Fx29+. Using Foxtab and/or Shareaholic with CTR causes even more errors, because CTR allows to move/remove more items than the default Firefox does.
+If one of these add-ons has corrupted the ui, the add-ons manager has to be accessed via menubar (right-click on a toolbar -> select menubar, Tools -> add-ons) and Shareaholic and Foxtab have to be uninstalled and CTR has to be disabled. After a browser restart, CTR can be enabled again. After another restart "restore defaults" in customizing mode has to be hit once.</p>
+
 <span class="uk-text-primary">Quoted from <a href="https://addons.mozilla.org/en-US/firefox/addon/classicthemerestorer#addon-description" 
 																			 target="_blank"
 																			 title="Classic Theme Restorer by Aris" ><i class="uk-icon-external-link"></i> original addons page</a><!-- Last Updated 4/7/2015 --></span>

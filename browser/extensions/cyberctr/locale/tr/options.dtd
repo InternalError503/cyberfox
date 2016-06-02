@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"Esnek Boşluk">
 <!ENTITY Ctr_space			"Boşluk">
 <!ENTITY Ctr_separator		"Ayraç">
-<!ENTITY Ctr_puibseparator	"Panel arayüzü ayraç butonu">
 <!ENTITY Ctr_navthrobber	"Etkinlik Göstergesi">
 <!ENTITY Ctr_sidebarbutton	"(Kenar Çubuğu)">
 <!ENTITY Ctr_windowcontrols	"Min/max/kapat (Tam ekran)">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui				"Genel Arayüz">
 <!ENTITY Ctr_nbiconsize0	"Gezinti çubuğu niteliklerini ayarla:">
 <!ENTITY Ctr_smallnavbut	"Gezinti çubuğunda küçük butonlar">
-<!ENTITY Ctr_bfurlbarfix	"URL çubuğu çapını ve sınırlarını düzelt">
 <!ENTITY Ctr_backforward	"Hareketli İleri-Geri butonları">
 <!ENTITY Ctr_nbcompact		"Gezinti araç çubuğu yüksekliğini azalt">
 <!ENTITY Ctr_hide_bf_popup	"Geçmiş menüsü butonunu gizlemek için Fare tuşuna basın">
@@ -128,6 +126,10 @@
 <!ENTITY Ctr_options_rem	"Remember last selected category">
 <!ENTITY Ctr_svgfilters		"Araç çubuğu düğmeleri için SVG renkleri kullan">
 <!ENTITY Ctr_wincontrols	"Hareketli tam ekran penceresi kontrolleri">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"'Top level domain' images: classic appearance">
 <!ENTITY Ctr_altalertbox	"'Alert box': alternative appearance">
@@ -135,7 +137,7 @@
 <!ENTITY Ctr_mstatusbar		"Hareketli durum çubuğu paneli">
 <!ENTITY Ctr_mstatusbars4e	"Durum çubuğu paneli 'Status-4-Evar' tarafından kontrol edilir">
 <!ENTITY Ctr_mstatusbartpp	"Durum çubuğu paneli 'ThePuzzlePiece' tarafından kontrol edilir">
-<!ENTITY Ctr_mstatusbarpzt	"Durum çubuğu paneli 'Puzzle Toolbars' tarafından kontrol edilir">
+<!ENTITY Ctr_mstatusbarpzt	"Durum çubuğu paneli 'Puzzle Bars' tarafından kontrol edilir">
 <!ENTITY Ctr_mstatusbarabr	"Durum çubuğu paneli 'The Addon Bar (Restored)' tarafından kontrol edilir">
 <!ENTITY Ctr_combrelstop	"Dur &amp; yenile butonlarını birleştir">
 <!ENTITY Ctr_stoprel1		"Önemli: yenile butonunu dur butonundan sonra yerleştir!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"Panel menu: tümleşik görünüm (yerimleri, geçmiş vb.)">
 <!ENTITY Ctr_hidezoomres	"Araç çubuğunda zoom kontrolü: zoom-reset butonu gizle">
 <!ENTITY Ctr_alt_newtabp	"Yeni sekme sayfası (about:newtab): alternatif görünüm">
+<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_search_ui		"Search">
 <!ENTITY Ctr_ctroldsearch	"Old search">
 <!ENTITY Ctr_ctroldsearchc	"Clear searchbox after search">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Open search in new tab (about:config preference)">
 <!ENTITY Ctr_osearch_meoit	"Middle-clicks: search in new 'foreground tab'">
+<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Small dropmarker">
 <!ENTITY Ctr_addonmanager	"Add-on manager">
 <!ENTITY Ctr_alt_addonsp	"Eklentiler için 'daha fazla bilgi' sayfası: alternatif görünüm">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Popup: panel menu görünümü">
 <!ENTITY Ctr_bmbunsortbm	"Popup: 'unsorted bookmarks' menu">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"Popup: show 'View Toolbar'">
 <!ENTITY Ctr_bmbnounsort	"Popup: hide 'unsorted bookmarks'">
 <!ENTITY Ctr_bmbutnotext	"Bar üzerinde etiketi gizle">
@@ -237,9 +245,7 @@
 <!ENTITY Ctr_urlbardropm	"Move dropmarker to the last possible position">
 <!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
 <!ENTITY Ctr_altreaderico	"Alternative 'Reader' icons">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Popup engellendiğinde beliren uyarıyı gizle">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Reduce location bars and search bars height (experimental)">
 <!ENTITY Ctr_urlbar_ib		"Site Kimlik Düğmesi (kimlik kutusu)">
 <!ENTITY Ctr_ib_nohovcolor	"Do not show gray color when hovered">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"Custom width for location bar and search bar">
 <!ENTITY Ctr_searchbar		"Search bar">
-<!ENTITY Ctr_lbsugresi		"Display as many results in suggestions popup as possible (without scrollbar)">
-<!ENTITY Ctr_lbsugres		"Number of results in suggestions popup (about:config preference)">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
+<!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature (about:config preference)">
+<!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"Menu öge pozisyonu">
 <!ENTITY Ctr_extrabar		"Ek Araç Çubuğu">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"Arkaplan bulanıklığı/rengi kaldır (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Araç çubukları için Mavi Aero renkleri (ve sekmelere)">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Title/menu/tabs toolbar: remove background color">
 <!ENTITY Ctr_transpttbew10	"Additional tweaks for some OS themes">
 <!ENTITY Ctr_transptcw10	"Hide default OS min/max/close buttons">
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"Go">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"i">

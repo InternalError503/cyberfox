@@ -98,51 +98,32 @@
         background-position: center center;
         background-repeat: no-repeat;
     }
-    #searchForm,
-    #snippets {
-        width: 470px;
-    }
-    #searchForm {
+	#searchIconAndTextContainer {
+        width: 480px;
         display: -moz-box;
     }
-    #searchLogoContainer {
-        display: none!important;
-    }
-    #searchLogoContainer[hidden] {
-        display: none;
-    }
-    #searchEngineLogo {
-        display: inline-block;
-        height: 28px;
-        width: 70px;
-        min-width: 70px;
+    #searchIconAndTextContainer {
+		display: -moz-box;
+		height: 36px;
+		position: relative;
     }
     #searchIcon {
         border: 1px solid transparent;
-        -moz-margin-end: 5px;
-        height: 38px;
-        width: 38px;
-        background-image: url("chrome://browser/skin/magnifier.png") !important;
-        background-size: 26px;
+		padding: 0;
+		margin: 0;
+		width: 36px;
+		height: 36px;
+        background-image: url("chrome://browser/skin/magnifier.png") center center no-repeat !important;
+    position: absolute;
     }
-    #searchIcon[active],
-    #searchIcon:hover {
-        background-color: transparent!important;
-        border-color: var(--main-highlight-color)!important;
-        border-radius: 2.5px;
-    }
-    html[searchUIConfiguration="oldsearchui"] #searchIcon {
-        display: none;
-    }
-    html:not([searchUIConfiguration="oldsearchui"]) #searchText::-moz-placeholder {
-        color: transparent;
-    }
-    html:not([searchUIConfiguration="oldsearchui"]) #searchLogoContainer {
-        display: none;
-    }
+
     #searchText {
+		margin-left: 0;
         -moz-box-flex: 1;
-        padding: 6px 8px;
+        padding-top: 6px;
+		padding-bottom: 6px;
+		padding-left: 34px;
+		padding-right: 8px;
         background: #1a1a1a padding-box!important;
         border: 1px solid;
         border-color: var(--main-text-color)!important;
@@ -157,6 +138,16 @@
     #searchText:-moz-dir(rtl) {
         border-radius: 0 2.5px 2.5px 0;
     }
+	#searchText[aria-expanded="true"] {
+	  border-radius: 2px 0 0 0;
+	}
+
+	#searchText[aria-expanded="true"]:-moz-dir(rtl) {
+	  border-radius: 0 2px 0 0;
+	}
+
+	#searchText[keepfocus],
+    #searchSubmit,
     #searchText:focus,
     #searchText[autofocus] {
         background: #2d2d2d!important;
@@ -164,7 +155,7 @@
     }
     #searchSubmit {
         -moz-margin-start: -1px;
-        background: #1d1d1d!important;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/search-arrow-go.svg#search-arrow-go-inverted") center center no-repeat, #1d1d1d !important;
         padding: 0 9px;
         border: 1px solid var(--main-text-color)!important;
         border-radius: 0 2.5px 2.5px 0;
@@ -172,11 +163,13 @@
         color: var(--main-text-color)!important;
         cursor: pointer;
         transition-duration: 150ms;
+		width: 50px;
     }
     #searchSubmit:-moz-dir(rtl) {
         border-radius: 2.5px 0 0 2.5px;
     }
     #searchText:focus + #searchSubmit,
+	#searchText[keepfocus] + #searchSubmit,
     #searchText + #searchSubmit:hover,
     #searchText[autofocus] + #searchSubmit {
         background: #2d2d2d!important;
@@ -185,26 +178,29 @@
         color: var(--main-highlight-color)!important;
     }
     #searchText:focus + #searchSubmit,
+	#searchText[keepfocus] + #searchSubmit,
     #searchText[autofocus] + #searchSubmit {
-        background-image: #333!important;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/search-arrow-go.svg#search-arrow-go-inverted") center center no-repeat, #333 !important;
         box-shadow: 0 1px 0 hsla(0, 0%, 100%, .2) inset, 0 0 0 1px hsla(0, 0%, 100%, .1) inset, 0 1px 0 hsla(210, 54%, 20%, .03);
     }
     #searchText + #searchSubmit:hover {
-        background-image: #222!important;
+        background: url("chrome://classic_theme_restorer/content/images/abouthome/search-arrow-go.svg#search-arrow-go-inverted") center center no-repeat, #222 !important;
         box-shadow: 0 1px 0 hsla(0, 0%, 100%, .2) inset, 0 0 0 1px hsla(0, 0%, 100%, .1) inset, 0 1px 0 hsla(210, 54%, 20%, .03), 0 0 4px hsla(206, 100%, 20%, .2);
     }
     #searchText + #searchSubmit:hover:active {
         box-shadow: 0 1px 1px hsla(211, 79%, 6%, .1) inset, 0 0 1px hsla(211, 79%, 6%, .2) inset;
         transition-duration: 0ms;
     }
+    /* Add snippets support for users who use cyberCTR in firefox */
+    
     #defaultSnippet1,
     #defaultSnippet2,
     #rightsSnippet {
         display: block;
         min-height: 38px;
-        background: 30px center no-repeat;
+        background: 0px center no-repeat;
         padding: 6px 0;
-        -moz-padding-start: 79px;
+        -moz-padding-start: 49px;
     }
     #rightsSnippet[hidden] {
         display: none;
@@ -212,7 +208,7 @@
     #defaultSnippet1:-moz-dir(rtl),
     #defaultSnippet2:-moz-dir(rtl),
     #rightsSnippet:-moz-dir(rtl) {
-        background-position: right 30px center;
+        background-position: right 0px center;
     }
     #defaultSnippet1 {
         background-image: url("chrome://browser/content/abouthome/snippet1.png");

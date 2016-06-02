@@ -75,8 +75,7 @@ class TestSafeBrowsingWarningPages(FirefoxTestCase):
         with self.marionette.using_context('chrome'):
             url = self.marionette.execute_script("""
               Components.utils.import("resource://gre/modules/Services.jsm");
-              return Services.urlFormatter.formatURLPref("app.support.baseURL")
-                                                         + "phishing-malware";
+              return Services.urlFormatter.formatURLPref("browser.safebrowsing.warning.infoURL");
             """)
 
         button = self.marionette.find_element(By.ID, "reportButton")

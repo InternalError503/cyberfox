@@ -62,6 +62,8 @@ classicthemerestorerjs.ctr = {
   tabheight: sheetIO,
 
   locsearchbarsize: sheetIO,
+  locsearchbarradius:	sheetIO,
+  searchpopupwidth:	sheetIO,
 
   navbarpadding: sheetIO,
   
@@ -110,10 +112,13 @@ classicthemerestorerjs.ctr = {
 	  Services.prefs.clearUserPref("extensions.classicthemerestorer.movableurlbar");
 	} catch(e){}
 	
-	// remove default panel ui button in favour of CTRs movable duplicate
-	try{
-		document.getElementById("PanelUI-button").removeChild(document.getElementById("PanelUI-menu-button"));
-	} catch(e){}
+	// move default non-movable PanelUI-button/PanelUI-menu-button into a movable container
+	window.addEventListener("DOMContentLoaded", function toggleNavBarSwitch(event){
+	  window.removeEventListener("DOMContentLoaded", toggleNavBarSwitch, false);
+	    try{
+		  document.getElementById("ctraddon_panelui-button").insertBefore(document.getElementById("PanelUI-button"),null);
+	    }catch(e){}
+	},false);
 
 	// adds a new global attribute 'defaultfxtheme' -> better parting css for default and non-default themes
 	try{
@@ -149,6 +154,8 @@ classicthemerestorerjs.ctr = {
 	try{if (this.appversion >= 44) document.getElementById("main-window").setAttribute('fx44plus',true);} catch(e){}
 	try{if (this.appversion >= 45) document.getElementById("main-window").setAttribute('fx45plus',true);} catch(e){}
 	try{if (this.appversion >= 46) document.getElementById("main-window").setAttribute('fx46plus',true);} catch(e){}
+	try{if (this.appversion >= 47) document.getElementById("main-window").setAttribute('fx47plus',true);} catch(e){}
+	try{if (this.appversion >= 48) document.getElementById("main-window").setAttribute('fx48plus',true);} catch(e){}
 
 	// add CTR version number to '#main-window' node, so other add-ons/themes can easier distinguish between versions
 	AddonManager.getAddonByID('ClassicThemeRestorer@ArisT2Noia4dev', function(addon) {
@@ -230,6 +237,9 @@ classicthemerestorerjs.ctr = {
 	
 	// move 'Tools' menus dev tools into application buttons popup 
 	this.moveDevtoolsmenu();
+	
+	// prevent browser from disablning CTRs reload button for no reason
+	this.preventReloaddisabling();
 	
 	// CTR Preferences listener
 	function PrefListener(branch_name, callback) {
@@ -410,7 +420,6 @@ classicthemerestorerjs.ctr = {
 				// move CTRs items on 'first run' or 'reset' onto toolbars
 				CustomizableUI.addWidgetToArea("ctraddon_back-forward-button", CustomizableUI.AREA_NAVBAR);
 				CustomizableUI.addWidgetToArea("ctraddon_appbutton", CustomizableUI.AREA_NAVBAR);
-				CustomizableUI.addWidgetToArea("ctraddon_puib_separator", CustomizableUI.AREA_NAVBAR);
 				CustomizableUI.addWidgetToArea("ctraddon_panelui-button", CustomizableUI.AREA_NAVBAR);
 				if (classicthemerestorerjs.ctr.osstring=="WINNT") CustomizableUI.addWidgetToArea("ctraddon_window-controls", CustomizableUI.AREA_NAVBAR);
 				
@@ -657,6 +666,7 @@ classicthemerestorerjs.ctr = {
 			
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_red',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w7',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w7v2',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w8',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w10',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicon_w10i',false);
@@ -673,6 +683,7 @@ classicthemerestorerjs.ctr = {
 			
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_red',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w7',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w7v2',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w8',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w10',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('closeicong_w10i',false);
@@ -826,7 +837,7 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  /*Aero Colors*/
-		  case "aerocolors":
+		  case "aerocolors": case "aerocolorsg":
 		 
 			var devtheme=false;
 
@@ -955,6 +966,13 @@ classicthemerestorerjs.ctr = {
 			  classicthemerestorerjs.ctr.loadUnloadCSS("lbsbsize",false);
 		  break;
 		  
+		  case "lbsbradius": case "lbradius_left": case "lbradius_right": case "sbradius_left": case "sbradius_right":
+		    if (branch.getBoolPref("lbsbradius")) 
+			  classicthemerestorerjs.ctr.loadUnloadCSS("lbsbradius",true);
+		    else
+			  classicthemerestorerjs.ctr.loadUnloadCSS("lbsbradius",false);
+		  break;
+		  
 		  case "urlresults":
 			if (branch.getBoolPref("urlresults")) classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",false);
@@ -1046,6 +1064,16 @@ classicthemerestorerjs.ctr = {
 		  case "wincontrols":
 			if (branch.getBoolPref("wincontrols")) classicthemerestorerjs.ctr.loadUnloadCSS("wincontrols",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("wincontrols",false);
+		  break;
+		  
+		  case "puibuttonsep":
+			classicthemerestorerjs.ctr.loadUnloadCSS('puib_leftsep',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('puib_rightsep',false);
+		
+			if (branch.getCharPref("puibuttonsep")!="puib_nosep"){
+			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("puibuttonsep"),true);
+			}
+
 		  break;
 
 		  case "altalertbox":
@@ -1917,11 +1945,6 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("closeabarbut",false);
 		  break;
 
-		  case "bfurlbarfix":
-			if (branch.getBoolPref("bfurlbarfix") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("bfurlbarfix",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("bfurlbarfix",false);
-		  break;
-
 		  case "bf_space":
 			if (branch.getBoolPref("bf_space") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("bf_space",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("bf_space",false);
@@ -1969,6 +1992,11 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("alt_newtabp")) classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabp",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("alt_newtabp",false);
 		  break;
+
+		  case "nosnippets":
+			if (branch.getBoolPref("nosnippets")) classicthemerestorerjs.ctr.loadUnloadCSS("nosnippets",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("nosnippets",false);
+		  break;
 		  
 		  case "ctroldsearch":
 			if (branch.getBoolPref("ctroldsearch") && classicthemerestorerjs.ctr.appversion >= 43) {
@@ -1985,6 +2013,18 @@ classicthemerestorerjs.ctr = {
 			classicthemerestorerjs.ctr.loadUnloadCSS('cui_buttons',true);
 		  break;
 		  
+		  case "osearch_iwidth":
+			if (branch.getBoolPref("osearch_iwidth")) classicthemerestorerjs.ctr.loadUnloadCSS("osearch_iwidth",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("osearch_iwidth",false);
+		  break;
+		  
+		  case "osearch_cwidth": case "os_spsize_minw": case "os_spsize_maxw":
+		    if (branch.getBoolPref("osearch_cwidth")) 
+			  classicthemerestorerjs.ctr.loadUnloadCSS("osearch_cwidth",true);
+		    else
+			  classicthemerestorerjs.ctr.loadUnloadCSS("osearch_cwidth",false);
+		  break;
+
 		  case "osearch_dm":
 			if (branch.getBoolPref("osearch_dm") && branch.getBoolPref("ctroldsearch") &&
 				classicthemerestorerjs.ctr.appversion >= 43) classicthemerestorerjs.ctr.loadUnloadCSS("osearch_dm",true);
@@ -2143,22 +2183,23 @@ classicthemerestorerjs.ctr = {
 		  case "hideeditbm":
 		    if(classicthemerestorerjs.ctr.appversion >= 47) {
 				if (branch.getBoolPref("hideeditbm")) {
-					var editBookmark_popup = document.getElementById('editBookmarkPanel');
 
 					document.getElementById("bookmarks-menu-button").addEventListener("click", function(e) {
+											
+						document.getElementById('editBookmarkPanel').style.visibility = 'hidden';
 						
-						editBookmark_popup.addEventListener("popupshown", function(){
+						document.getElementById('editBookmarkPanel').addEventListener("popupshown", function(){
 							
-						  if (document.getElementById('bookmarks-menu-button').getAttribute('notification')) {
+						  if (document.getElementById('bookmarks-menu-button').hasAttribute('notification')) {
 							StarUI.panel.hidePopup();
 							StarUI.quitEditMode();
-							editBookmark_popup.removeAttribute('panelopen');
-							editBookmark_popup.removeAttribute('animate');
+							document.getElementById('editBookmarkPanel').removeAttribute('panelopen');
+							document.getElementById('editBookmarkPanel').removeAttribute('animate');
 
 							if(e.target.localName == "toolbarbutton" && e.originalTarget.getAttribute("anonid") == "button"){
 								e.originalTarget.removeAttribute('open');
 							}
-						  }
+						  } else document.getElementById('editBookmarkPanel').style.visibility = 'visible';
 
 						}, false);
 
@@ -2192,6 +2233,11 @@ classicthemerestorerjs.ctr = {
 			  classicthemerestorerjs.ctr.loadUnloadCSS("bmbunsortbm",false);
 			  classicthemerestorerjs.ctr.loadUnloadCSS("bmbunsortbm2",false);
 			}
+		  break;
+
+		  case "bmbviewbmsb":
+			if (branch.getBoolPref("bmbviewbmsb")) classicthemerestorerjs.ctr.loadUnloadCSS("bmbviewbmsb",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("bmbviewbmsb",false);
 		  break;
 		  
 		  case "bmbviewbmtb":
@@ -2362,22 +2408,16 @@ classicthemerestorerjs.ctr = {
 				if (newURL=='') newURL='about:newtab';
 				
 				try{
-					if (classicthemerestorerjs.ctr.appversion >= 44) aboutNewTabService.newTabURL = newURL;
-					else  {
-					  var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
-					  NewTabURL.override(newURL);
-					}
+				  var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
+				  NewTabURL.override(newURL);
 				} catch(e){}
 
 				classicthemerestorerjs.ctr.altnewtabpageOn = true;
 				
 			} else if (classicthemerestorerjs.ctr.appversion >= 41 && classicthemerestorerjs.ctr.altnewtabpageOn==true) {
 				try{
-				  if (classicthemerestorerjs.ctr.appversion >= 44) aboutNewTabService.resetNewTabURL();
-				  else {
-					var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
-					NewTabURL.reset();
-				  }
+				  var {NewTabURL} = Cu.import("resource:///modules/NewTabURL.jsm", {});
+				  NewTabURL.reset();
 				} catch(e){}
 				
 				classicthemerestorerjs.ctr.altnewtabpageOn = false;
@@ -2702,14 +2742,9 @@ classicthemerestorerjs.ctr = {
 		  case "colapsesearchaddons":
 			  	try{		  
 					if (branch.getBoolPref("colapsesearchaddons")) {				
-						if (classicthemerestorerjs.ctr.appversion >= 40) {
-							classicthemerestorerjs.ctr.loadUnloadCSS("rndadonssearch40plus",true);
-						} else {	
-							classicthemerestorerjs.ctr.loadUnloadCSS("rndadonssearch",true);
-						}	
+							classicthemerestorerjs.ctr.loadUnloadCSS("colapsesearchaddons",true);
 					}else{
-						classicthemerestorerjs.ctr.loadUnloadCSS("rndadonssearch",false);
-						classicthemerestorerjs.ctr.loadUnloadCSS("rndadonssearch40plus",false);
+						classicthemerestorerjs.ctr.loadUnloadCSS("colapsesearchaddons",false);
 					}	
 				} catch(e){}			
 		  break;
@@ -2909,9 +2944,7 @@ classicthemerestorerjs.ctr = {
 	// Remove current windows preference listeners once the window gets closed
 	// to prevent memory leaks and other issues in a multi window environment.
 	window.addEventListener("unload", function unregisterCTRListeners(event){
-		
-		//console.log("unregistered!"); // log stuff for testing
-		
+	
 		ctrSettingsListener.unregister();
 		ctrSettingsListener_forCTB.unregister();
 		ctrSettingsListener_forTabSettings.unregister();
@@ -3146,7 +3179,7 @@ classicthemerestorerjs.ctr = {
 	// NoiaButtons
 	var NBListener = {
 	   onEnabled: function(addon) {
-		  if(addon.id == 'NoiaButtons@ArisT2_Noia4dev') { 
+		  if(addon.id == 'NoiaButtons@ArisT2_Noia4dev') {
 		  
 		    if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("smallnavbut"))
 			  Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("smallnavbut",false);
@@ -3208,6 +3241,17 @@ classicthemerestorerjs.ctr = {
 	     try{
 		   document.getElementById("main-window").setAttribute('colorfultabs',true);
 		 } catch(e){}
+		 
+	   }
+	  });
+	},300);
+	
+	// Searchbar autoresizer add-on
+	setTimeout(function(){
+	  AddonManager.getAddonByID('{655397ca-4766-496b-b7a8-3a5b176ee4c2}', function(addon) {
+	   if(addon && addon.isActive) {
+	     
+	      Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref('osearch_iwidth',false);
 		 
 	   }
 	  });
@@ -3693,6 +3737,28 @@ classicthemerestorerjs.ctr = {
 	},500);
   },
   
+  // prevent browser from disablning CTRs reload button for no reason
+  preventReloaddisabling: function(){
+	window.addEventListener("DOMContentLoaded", function preventRelDis(event){
+	  window.removeEventListener("DOMContentLoaded", preventRelDis, false);
+
+	  setTimeout(function(){
+		var observer = new MutationObserver(function(mutations) {
+		  mutations.forEach(function(mutation) {
+			try {
+				if(document.querySelector('#ctraddon_reload-button').hasAttribute('disabled'))
+				  document.querySelector('#ctraddon_reload-button').removeAttribute('disabled');
+			} catch(e){}
+		  });    
+		});
+		
+		try {
+		  observer.observe(document.querySelector('#ctraddon_reload-button'), { attributes: true, attributeFilter: ['disabled'] });
+		} catch(e){}
+	  },1000);
+	},false);
+  },
+  
   // tab width stuff
   updateTabWidth: function() {
   	window.addEventListener("DOMWindowCreated", function load(event){
@@ -4009,6 +4075,7 @@ classicthemerestorerjs.ctr = {
 		
 		case "closeicon_red": 			manageCSS("close_icon_t_red.css");  	break;
 		case "closeicon_w7": 			manageCSS("close_icon_t_w7.css");  		break;
+		case "closeicon_w7v2": 			manageCSS("close_icon_t_w7v2.css");  	break;
 		case "closeicon_w8": 			manageCSS("close_icon_t_w8.css");  		break;
 		case "closeicon_w10": 			manageCSS("close_icon_t_w10.css");  	break;
 		case "closeicon_w10i": 			manageCSS("close_icon_t_w10i.css");  	break;
@@ -4017,6 +4084,7 @@ classicthemerestorerjs.ctr = {
 		
 		case "closeicong_red": 			manageCSS("close_icon_g_red.css");  	break;
 		case "closeicong_w7": 			manageCSS("close_icon_g_w7.css");  		break;
+		case "closeicong_w7v2": 		manageCSS("close_icon_g_w7v2.css");  	break;
 		case "closeicong_w8": 			manageCSS("close_icon_g_w8.css");  		break;
 		case "closeicong_w10": 			manageCSS("close_icon_g_w10.css");  	break;
 		case "closeicong_w10i": 		manageCSS("close_icon_g_w10i.css");  	break;
@@ -4178,6 +4246,8 @@ classicthemerestorerjs.ctr = {
 		case "mbarforceleft": 		manageCSS("menuitems_forceleft.css");	break;
 		case "mbarforceright": 		manageCSS("menuitems_forceright.css");	break;
 		case "wincontrols": 		manageCSS("windowcontrols.css");		break;
+		case "puib_leftsep": 		manageCSS("puibutton_leftsep.css");		break;
+		case "puib_rightsep": 		manageCSS("puibutton_rightsep.css");	break;
 		case "oldtoplevimg": 		manageCSS("old_toplevel_img.css");		break;
 		case "altalertbox": 		manageCSS("alt_alertboxfx44.css");		break;
 		case "navthrobber": 		manageCSS("navthrobber.css");			break;
@@ -4238,7 +4308,9 @@ classicthemerestorerjs.ctr = {
 		case "noemptypticon": 		manageCSS("empty_favicon_pt.css");		break;
 		case "hidezoomres": 		manageCSS("hide_zoomreset.css");		break;
 		case "alt_newtabp": 		manageCSS("alt_newtabpage.css");		break;
+		case "nosnippets": 			manageCSS("nosnippets.css");			break;
 		case "ctroldsearch": 		manageCSS("oldsearch.css");				break;
+		case "osearch_iwidth": 		manageCSS("oldsearch_iwidth.css");		break;
 		case "osearch_dm": 			manageCSS("oldsearch_dm.css");			break;
 		case "am_nowarning":		manageCSS("am_nowarnings.css");			break;
 		case "am_compact":			manageCSS("am_compact.css");			break;
@@ -4258,6 +4330,7 @@ classicthemerestorerjs.ctr = {
 		case "bmbutpanelm": 		manageCSS("bmbut_pmenu.css");			break;
 		case "bmbunsortbm": 		manageCSS("bmbut_unsortedbookm.css");	break;
 		case "bmbunsortbm2": 		manageCSS("bmbut_unsortedbookm2.css");	break;
+		case "bmbviewbmsb": 		manageCSS("bmbut_bmbviewbmsb.css");		break;
 		case "bmbviewbmtb": 		manageCSS("bmbut_bmbviewbmtb.css");		break;
 		case "bmbnounsort": 		manageCSS("bmbut_bmbnounsort.css");		break;
 		case "bmbutnotext": 		manageCSS("bmbut_no_label.css");		break;
@@ -4272,7 +4345,6 @@ classicthemerestorerjs.ctr = {
 		case "ibinfoico2": 			manageCSS("hide_ibinfoico2.css");		break;
 		case "iblabels": 			manageCSS("hide_iblabels.css");			break;
 		case "hideprivmask": 		manageCSS("hideprivatemask.css");		break;
-		case "bfurlbarfix": 		manageCSS("bf_urlbarfix.css");			break;
 		case "bf_space": 			manageCSS("bf_space.css");				break;
 	
 		case "invicomenubar": 		manageCSS("invicons_menubar.css");		break;
@@ -4338,48 +4410,24 @@ classicthemerestorerjs.ctr = {
 		case "appbuttonc_salmon":		manageCSS("cctr/appbutton_salmon.css");		break;
 
 		case "alt_newtabpalt":
-			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
-				manageCSS("cctr/alt_newtabpage_alt42p.css");
-			}else{
-				manageCSS("cctr/alt_newtabpage_alt.css");
-			}				
+				manageCSS("cctr/alt_newtabpage_alt.css");			
 			break;
 		case "tree_style_fix": 		manageCSS("cctr/tree_style_fix.css");	break;
 		
 		case "abouthomedark":
-			if (classicthemerestorerjs.ctr.appversion >= 42)	{	
-				manageCSS("cctr/abouthomedark42p.css");	
-			}else{
-				manageCSS("cctr/abouthomedark.css");
-			}				
+				manageCSS("cctr/abouthomedark.css");				
 		break;
 		case "abouthomedarkalt":
-			if (classicthemerestorerjs.ctr.appversion >= 42)	{
-				manageCSS("cctr/abouthomedarkalt42p.css");
-			}else{
-				manageCSS("cctr/abouthomedarkalt.css");
-			}				
+				manageCSS("cctr/abouthomedarkalt.css");			
 		break;
 		case "abouthomelight": 
-			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
-				manageCSS("cctr/abouthomelight42p.css");	
-			}else{
-				manageCSS("cctr/abouthomelight.css");	
-			}
+			  manageCSS("cctr/abouthomelight.css");
 		break;
 		case "abouthomelightalt": 
-			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
-				manageCSS("cctr/abouthomelightalt42p.css");	
-			}else{
 				manageCSS("cctr/abouthomelightalt.css");
-			}
 		break;
 		case "abouthomesimplicity":
-			if (classicthemerestorerjs.ctr.appversion >= 42)	{		
-				manageCSS("cctr/abouthomesimplicity42p.css");
-			}else{
-				manageCSS("cctr/abouthomesimplicity.css");
-			}				
+				manageCSS("cctr/abouthomesimplicity.css");				
 		break;	
 		case "abouthomesimplicityblue": 				manageCSS("cctr/abouthomesimplicityintel.css");	break;		
 		case "abouthomesimplicityred": 				manageCSS("cctr/abouthomesimplicityamd.css");	break;
@@ -4390,8 +4438,7 @@ classicthemerestorerjs.ctr = {
 		case "abouthomenoicons": 						manageCSS("cctr/abouthomenoicons.css");	break;	
 		case "abouthomenosnippets": 					manageCSS("cctr/abouthomenosnippets.css");	break;
 		case "abouthomeanimate": 						manageCSS("cctr/abouthomeanimate.css");	break;
-		case "rndadonssearch": 						manageCSS("cctr/rndadonssearch.css"); break;
-		case "rndadonssearch40plus": 						manageCSS("cctr/rndadonssearch40plus.css");	break;
+		case "colapsesearchaddons": 						manageCSS("cctr/colapsesearchaddons.css"); break;
 		case "nopocket": 						manageCSS("cctr/nopocket.css"); break;
 		
 		case "throbber_alt1": 		manageCSS("cctr/throbberalt_1.css");			break;
@@ -4410,13 +4457,18 @@ classicthemerestorerjs.ctr = {
 			removeOldSheet(this.aerocolors);
 			
 			if(enable==true) {
+				
+				var main_ab_color = '#dbeaf9';
+				
+				if (this.prefs.getBoolPref("aerocolorsg"))
+				  main_ab_color = '#cfdbec';
 			
 				var aero_color_addonsm = '';
 				
 				if (this.prefs.getBoolPref("alt_addonsm")) {
 					aero_color_addonsm = '\
 						#addons-page {\
-						  background: linear-gradient(to bottom right, #edf6ff,#dbeaf9,#edf6ff,#dbeaf9) !important;\
+						  background: linear-gradient(to bottom right, #edf6ff,'+main_ab_color+',#edf6ff,'+main_ab_color+') !important;\
 						}\
 					';
 				}
@@ -4427,7 +4479,7 @@ classicthemerestorerjs.ctr = {
 					aero_color_optionsp = '\
 					  @-moz-document url(about:preferences),url-prefix(about:preferences){\
 						page, #dialogBox .groupbox-title {\
-						  background: linear-gradient(to bottom right, #edf6ff,#dbeaf9,#edf6ff,#dbeaf9) !important;\
+						  background: linear-gradient(to bottom right, #edf6ff,'+main_ab_color+',#edf6ff,'+main_ab_color+') !important;\
 						}\
 					  }\
 					';
@@ -4625,7 +4677,7 @@ classicthemerestorerjs.ctr = {
 					@-moz-document url(chrome://browser/content/browser.xul) {\
 						/* Toolbars */\
 						#main-window[defaultfxtheme="true"] :not(#theFoxOnlyBetter-slimChrome-toolbars) > #nav-bar:not(:-moz-lwtheme){\
-						  background-image: linear-gradient(#eaf2fb,#dbeaf9) !important;\
+						  background-image: linear-gradient(#eaf2fb,'+main_ab_color+') !important;\
 						  box-shadow:unset !important;\
 						}\
 						#main-window[defaultfxtheme="true"][tabsontop="false"] #TabsToolbar:not(:-moz-lwtheme),\
@@ -4633,18 +4685,18 @@ classicthemerestorerjs.ctr = {
 						#main-window[defaultfxtheme="true"] #theFoxOnlyBetter-slimChrome-container > *:not(#theFoxOnlyBetter-slimChrome-toolbars-bottom):not(:-moz-lwtheme),\
 						#main-window[defaultfxtheme="true"] #ctraddon_urlextrabar:not(:-moz-lwtheme){\
 						  background-image:unset !important;\
-						  background-color:#dbeaf9 !important;\
+						  background-color:'+main_ab_color+' !important;\
 						}\
 						@media all and (-moz-windows-classic) {\
 						  #main-window[defaultfxtheme="true"]:not([tabsintitlebar]) #navigator-toolbox:not(:-moz-lwtheme),\
 						  #main-window[defaultfxtheme="true"]:not([tabsintitlebar])[tabsontop="false"] #toolbar-menubar:not(:-moz-lwtheme){\
 							-moz-appearance: none !important;\
 							background-image:unset !important;\
-							background-color:#dbeaf9 !important;\
+							background-color:'+main_ab_color+' !important;\
 						  }\
 						}\
 						#main-window[defaultfxtheme="true"] #theFoxOnlyBetter-slimChrome-slimmer:not([collapsed]) ~ #theFoxOnlyBetter-slimChrome-container > *:not(#theFoxOnlyBetter-slimChrome-toolbars-bottom):not(:-moz-lwtheme){\
-						  background-image: linear-gradient(#eaf2fb 0px, #dbeaf9 36px, #dbeaf9) !important;\
+						  background-image: linear-gradient(#eaf2fb 0px, '+main_ab_color+' 36px, '+main_ab_color+') !important;\
 						}\
 						#main-window[defaultfxtheme="true"] #theFoxOnlyBetter-slimChrome-slimmer:not([collapsed]) {\
 						  background: #eaf2fb !important;\
@@ -6407,6 +6459,58 @@ classicthemerestorerjs.ctr = {
 		
 		break;
 		
+		case "lbsbradius":
+			removeOldSheet(this.locsearchbarradius);
+			
+			if(enable==true && this.prefs.getBoolPref('lbsbradius')){
+		
+				var locborraiusextra_l='';
+				var locborraiusextra_r='';
+				
+				if (this.prefs.getIntPref('lbradius_left')!=0) {
+				  locborraiusextra_l='\
+				    #urlbar:-moz-locale-dir(ltr) #notification-popup-box:not([hidden="true"]),\
+					#urlbar:-moz-locale-dir(ltr) #notification-popup-box[hidden="true"] + box{\
+					  border-top-left-radius: '+this.prefs.getIntPref('lbradius_left')+'px !important;\
+					  border-bottom-left-radius: '+this.prefs.getIntPref('lbradius_left')+'px !important;\
+					}\
+				  ';
+				}
+				
+				if (this.prefs.getIntPref('lbradius_right')!=0) {
+				  locborraiusextra_r='\
+					#urlbar:-moz-locale-dir(rtl) #notification-popup-box:not([hidden="true"]),\
+					#urlbar:-moz-locale-dir(rtl) #notification-popup-box[hidden="true"] + box{\
+					  border-top-right-radius: '+this.prefs.getIntPref('lbradius_right')+'px !important;\
+					  border-bottom-right-radius: '+this.prefs.getIntPref('lbradius_right')+'px !important;\
+					}\
+				  ';
+				}
+				
+				this.locsearchbarradius=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					#urlbar,\
+					#urlbar .autocomplete-textbox-container {\
+					  border-top-left-radius: '+this.prefs.getIntPref('lbradius_left')+'px !important;\
+					  border-bottom-left-radius: '+this.prefs.getIntPref('lbradius_left')+'px !important;\
+					  border-top-right-radius: '+this.prefs.getIntPref('lbradius_right')+'px !important;\
+					  border-bottom-right-radius: '+this.prefs.getIntPref('lbradius_right')+'px !important;\
+					}\
+					.searchbar-textbox,\
+					.searchbar-textbox .autocomplete-textbox-container{\
+					  border-top-left-radius: '+this.prefs.getIntPref('sbradius_left')+'px !important;\
+					  border-bottom-left-radius: '+this.prefs.getIntPref('sbradius_left')+'px !important;\
+					  border-top-right-radius: '+this.prefs.getIntPref('sbradius_right')+'px !important;\
+					  border-bottom-right-radius: '+this.prefs.getIntPref('sbradius_right')+'px !important;\
+					}\
+					'+locborraiusextra_l+'\
+					'+locborraiusextra_r+'\
+				'), null, null);
+				
+				applyNewSheet(this.locsearchbarradius);
+			}
+		
+		break;
+		
 		case "navbarpad":
 			removeOldSheet(this.navbarpadding);
 			
@@ -6424,6 +6528,24 @@ classicthemerestorerjs.ctr = {
 				'), null, null);
 				
 				applyNewSheet(this.navbarpadding);
+			}
+		
+		break;
+		
+		case "osearch_cwidth":
+			removeOldSheet(this.searchpopupwidth);
+			
+			if(enable==true && this.prefs.getBoolPref('osearch_cwidth')){			
+				
+				this.searchpopupwidth=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					#PopupAutoComplete[autocompleteinput="searchbar"],\
+					#searchbar .searchbar-popup {\
+					  min-width: '+this.prefs.getIntPref('os_spsize_minw')+'px !important;\
+					  max-width: '+this.prefs.getIntPref('os_spsize_maxw')+'px !important;\
+					}\
+				'), null, null);
+				
+				applyNewSheet(this.searchpopupwidth);
 			}
 		
 		break;
@@ -6551,7 +6673,8 @@ classicthemerestorerjs.ctr = {
 				this.abouthome_bg=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
 					@namespace url(http://www.w3.org/1999/xhtml);\
 					@-moz-document url("about:home") {\
-						html{\
+						html,\
+						body{\
 							background-image: url('+ this.prefs.getCharPref("abouthomecustomurl") +')!important;\
 						}\
 					}\
@@ -6571,7 +6694,8 @@ classicthemerestorerjs.ctr = {
 				this.abouthome_bg_strech=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
 					@namespace url(http://www.w3.org/1999/xhtml);\
 					@-moz-document url("about:home") {\
-						html{\
+						html,\
+						body{\
 							background-size: 100% 100%!important;\
 						}\
 					}\
@@ -6864,7 +6988,7 @@ classicthemerestorerjs.ctr = {
   
   // open prefwindow and specific category
   additionalToolbars: function(){
-	Services.prefs.getBranch("extensions.classicthemerestorer.").setIntPref('pref_actindx',11);
+	Services.prefs.getBranch("extensions.classicthemerestorer.").setIntPref('pref_actindx',13);
 	
 	setTimeout(function(){
 	  classicthemerestorerjs.ctr.openCTRPreferences();
@@ -6945,7 +7069,6 @@ classicthemerestorerjs.ctr = {
 	  try{
 		CustomizableUI.addWidgetToArea("ctraddon_back-forward-button", CustomizableUI.AREA_NAVBAR);
 		CustomizableUI.addWidgetToArea("ctraddon_appbutton", CustomizableUI.AREA_NAVBAR);
-		CustomizableUI.addWidgetToArea("ctraddon_puib_separator", CustomizableUI.AREA_NAVBAR);
 		CustomizableUI.addWidgetToArea("ctraddon_panelui-button", CustomizableUI.AREA_NAVBAR);
 		if (classicthemerestorerjs.ctr.osstring=="WINNT") CustomizableUI.addWidgetToArea("ctraddon_window-controls", CustomizableUI.AREA_NAVBAR);
 		CustomizableUI.addWidgetToArea("ctraddon_bookmarks-menu-toolbar-button", CustomizableUI.AREA_BOOKMARKS);
@@ -7496,9 +7619,15 @@ switch (appButtonState){
   
   openUrlFromUrlExtraBar: function() {
     try{
-		delayedOpenTab(document.getElementById('ctraddon_extraurlbar_tb').value, null, null, null, true);
+		if(classicthemerestorerjs.ctr.prefs.getCharPref('extraurltarget')=="current")
+		  openUILinkIn(document.getElementById('ctraddon_extraurlbar_tb').value,"current", true, null, null);
+		else if(classicthemerestorerjs.ctr.prefs.getCharPref('extraurltarget')=="window")
+		  openUILinkIn(document.getElementById('ctraddon_extraurlbar_tb').value,"window", true, null, null);
+		else
+		  openUILinkIn(document.getElementById('ctraddon_extraurlbar_tb').value,"tab", true, null, null);
+		
 		document.getElementById('ctraddon_urlextrabar').setAttribute('collapsed',true);
-	} catch(e){}
+	} catch(e){}		
   },
   
   togglePersonalBarItem: function() {

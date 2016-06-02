@@ -62,6 +62,12 @@ pref("extensions.blocklist.url", "https://blocklist.addons.mozilla.org/blocklist
 pref("extensions.blocklist.detailsURL", "https://www.mozilla.org/%LOCALE%/blocklist/");
 pref("extensions.blocklist.itemURL", "https://blocklist.addons.mozilla.org/%LOCALE%/firefox/blocked/%blockID%");
 
+// Kinto blocklist preferences
+pref("services.kinto.base", "https://firefox.settings.services.mozilla.com/v1");
+pref("services.kinto.bucket", "blocklists");
+pref("services.kinto.onecrl.collection", "certificates");
+pref("services.kinto.onecrl.checked", 0);
+
 pref("extensions.update.autoUpdateDefault", true);
 
 pref("extensions.hotfix.id", "firefox-hotfix@mozilla.org");
@@ -518,8 +524,6 @@ pref("privacy.sanitize.sanitizeOnShutdown", false);
 
 pref("privacy.sanitize.migrateFx3Prefs",    false);
 
-pref("privacy.sanitize.migrateClearSavedPwdsOnExit", false);
-
 pref("privacy.panicButton.enabled",         true);
 
 pref("network.proxy.share_proxy_settings",  false); // use the same proxy settings for all protocols
@@ -641,17 +645,17 @@ pref("plugin.defaultXpi.state", 2);
 
 // Flash is enabled by default, and Java is click-to-activate by default on
 // all channels.
-pref("plugin.state.flash", 2);
+pref("plugin.state.flash", 1);
 pref("plugin.state.java", 1);
 
 // Whitelist Requests
 
 // Unity player, bug 979849
 #ifdef XP_WIN
-pref("plugin.state.npunity3d", 2);
+pref("plugin.state.npunity3d", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.unity web player", 2);
+pref("plugin.state.unity web player", 1);
 #endif
 
 // Cisco Jabber SDK, bug 980133
@@ -669,21 +673,21 @@ pref("plugin.state.npmcafeemss", 2);
 
 // Cisco VGConnect for directv.com, bug 981403 & bug 1051772
 #ifdef XP_WIN
-pref("plugin.state.npplayerplugin", 2);
+pref("plugin.state.npplayerplugin", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.playerplugin", 2);
-pref("plugin.state.playerplugin.dtv", 2);
-pref("plugin.state.playerplugin.ciscodrm", 2);
-pref("plugin.state.playerplugin.charter", 2);
+pref("plugin.state.playerplugin", 1);
+pref("plugin.state.playerplugin.dtv", 1);
+pref("plugin.state.playerplugin.ciscodrm", 1);
+pref("plugin.state.playerplugin.charter", 1);
 #endif
 
 // Cisco Jabber Client, bug 981905
 #ifdef XP_WIN
-pref("plugin.state.npchip", 2);
+pref("plugin.state.npchip", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.cisco jabber guest plug-in", 2);
+pref("plugin.state.cisco jabber guest plug-in", 1);
 #endif
 
 // Estonian ID-card plugin, bug 982045
@@ -699,10 +703,10 @@ pref("plugin.state.npesteid-firefox-plugin", 2);
 
 // coupons.com, bug 984441
 #ifdef XP_WIN
-pref("plugin.state.npmozcouponprinter", 2);
+pref("plugin.state.npmozcouponprinter", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.couponprinter-firefox_v", 2);
+pref("plugin.state.couponprinter-firefox_v", 1);
 #endif
 
 // Nexus Personal BankID, bug 987056
@@ -734,40 +738,40 @@ pref("plugin.state.npatgpc", 2);
 
 // Skype, bug 990067
 #ifdef XP_WIN
-pref("plugin.state.npskypewebplugin", 2);
+pref("plugin.state.npskypewebplugin", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.skypewebplugin", 2);
+pref("plugin.state.skypewebplugin", 1);
 #endif
 
 // Facebook video calling, bug 990068
 #ifdef XP_WIN
-pref("plugin.state.npfacebookvideocalling", 2);
+pref("plugin.state.npfacebookvideocalling", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.facebookvideocalling", 2);
+pref("plugin.state.facebookvideocalling", 1);
 #endif
 
 // MS Office Lync plugin, bug 990069
 #ifdef XP_WIN
-pref("plugin.state.npmeetingjoinpluginoc", 2);
+pref("plugin.state.npmeetingjoinpluginoc", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.lwaplugin", 2);
+pref("plugin.state.lwaplugin", 1);
 #endif
 
 // VidyoWeb, bug 990286
 #ifdef XP_WIN
-pref("plugin.state.npvidyoweb", 2);
+pref("plugin.state.npvidyoweb", 1);
 #endif
 #ifdef XP_MACOSX
-pref("plugin.state.npvidyoweb", 2);
-pref("plugin.state.vidyoweb", 2);
+pref("plugin.state.npvidyoweb", 1);
+pref("plugin.state.vidyoweb", 1);
 #endif
 
 // McAfee Virtual Technician, bug 981503
 #ifdef XP_WIN
-pref("plugin.state.npmvtplugin", 2);
+pref("plugin.state.npmvtplugin", 1);
 #endif
 
 // Verimatrix ViewRightWeb, bug 989872
@@ -826,10 +830,12 @@ pref("plugin.state.iprint", 2);
 #endif
 
 #ifdef XP_WIN
+// Toggle all browser plugins
+pref("plugins.disabled", false);
 // Toggle plugin whitelist (Flash, Silverlight)
 pref("plugin.allowed_whitelist.enabled", false);
 // Toggle Java plugin allowed state regardless of whitelist.
-pref("plugin.java_allowed", true);
+pref("plugin.java_allowed", false);
 #endif
 
 pref("browser.preferences.animateFadeIn", true);
@@ -947,6 +953,10 @@ pref("browser.safebrowsing.downloads.enabled", true);
 pref("browser.safebrowsing.downloads.remote.enabled", true);
 pref("browser.safebrowsing.downloads.remote.timeout_ms", 10000);
 pref("browser.safebrowsing.downloads.remote.url", "https://sb-ssl.google.com/safebrowsing/clientreport/download?key=%GOOGLE_API_KEY%");
+pref("browser.safebrowsing.downloads.remote.block_dangerous",            true);
+pref("browser.safebrowsing.downloads.remote.block_dangerous_host",       true);
+pref("browser.safebrowsing.downloads.remote.block_potentially_unwanted", false);
+pref("browser.safebrowsing.downloads.remote.block_uncommon",             false);
 pref("browser.safebrowsing.debug", false);
 
 pref("browser.safebrowsing.id", "navclient-auto-ffox");
@@ -1173,10 +1183,6 @@ pref("security.sandbox.content.level", 2);
 pref("security.sandbox.content.level", 0);
 #endif
 
-// ID (a UUID when set by gecko) that is used as a per profile suffix to a low
-// integrity temp directory.
-pref("security.sandbox.content.tempDirSuffix", "");
-
 #if defined(MOZ_STACKWALKING)
 // This controls the depth of stack trace that is logged when Windows sandbox
 // logging is turned on.  This is only currently available for the content
@@ -1197,6 +1203,15 @@ pref("security.sandbox.windows.log.stackTraceDepth", 0);
 // process is killed when all windows are closed, so a change will take effect
 // when the 1st window is opened.
 pref("security.sandbox.content.level", 1);
+#endif
+
+#if defined(XP_MACOSX) || defined(XP_WIN)
+#if defined(MOZ_SANDBOX) && defined(MOZ_CONTENT_SANDBOX)
+// ID (a UUID when set by gecko) that is used to form the name of a
+// sandbox-writable temporary directory to be used by content processes
+// when a temporary writable file is required in a level 1 sandbox.
+pref("security.sandbox.content.tempDirSuffix", "");
+#endif
 #endif
 
 // This pref governs whether we attempt to work around problems caused by
@@ -1289,14 +1304,15 @@ pref("services.sync.prefs.sync.security.OCSP.require", true);
 pref("services.sync.prefs.sync.security.default_personal_cert", true);
 pref("services.sync.prefs.sync.security.tls.version.min", true);
 pref("services.sync.prefs.sync.security.tls.version.max", true);
+pref("services.sync.prefs.sync.services.sync.syncedTabs.showRemoteIcons", true);
 pref("services.sync.prefs.sync.signon.rememberSignons", true);
 pref("services.sync.prefs.sync.spellchecker.dictionary", true);
 
-#ifdef NIGHTLY_BUILD
-pref("services.sync.syncedTabsUIRefresh", true);
-#else
-pref("services.sync.syncedTabsUIRefresh", false);
-#endif
+// A preference that controls whether we should show the icon for a remote tab.
+// This pref has no UI but exists because some people may be concerned that
+// fetching these icons to show remote tabs may leak information about that
+// user's tabs and bookmarks. Note this pref is also synced.
+pref("services.sync.syncedTabs.showRemoteIcons", true);
 
 // Developer edition preferences
 #ifdef MOZ_DEV_EDITION
@@ -1332,6 +1348,9 @@ pref("browser.newtabpage.columns", 5);
 // activates the remote-hosted newtab page
 pref("browser.newtabpage.remote", false);
 
+// Toggles endpoints allowed for remote newtab communications
+pref("browser.newtabpage.remote.mode", "production");
+
 // Enable the DOM fullscreen API.
 pref("full-screen-api.enabled", true);
 
@@ -1352,11 +1371,6 @@ pref("pdfjs.firstRun", true);
 pref("pdfjs.previousHandler.preferredAction", 0);
 pref("pdfjs.previousHandler.alwaysAskBeforeHandling", false);
 
-// Shumway is only bundled in Nightly.
-#ifdef NIGHTLY_BUILD
-pref("shumway.disabled", true);
-#endif
-
 // The maximum amount of decoded image data we'll willingly keep around (we
 // might keep around more than this, but we'll try to get down to this value).
 // (This is intentionally on the high side; see bug 746055.)
@@ -1373,8 +1387,6 @@ pref("social.sidebar.unload_timeout_ms", 10000);
 // is true. Pref'd off for release while usage testing is done through beta.
 pref("social.share.activationPanelEnabled", true);
 pref("social.shareDirectory", "https://activations.cdn.mozilla.net/sharePanel.html");
-
-pref("dom.identity.enabled", false);
 
 // Block insecure active content on https pages
 pref("security.mixed_content.block_active_content", true);
@@ -1451,7 +1463,7 @@ pref("identity.fxaccounts.remote.webchannel.uri", "https://accounts.firefox.com/
 // The URL we take the user to when they opt to "manage" their Firefox Account.
 // Note that this will always need to be in the same TLD as the
 // "identity.fxaccounts.remote.signup.uri" pref.
-pref("identity.fxaccounts.settings.uri", "https://accounts.firefox.com/settings");
+pref("identity.fxaccounts.settings.uri", "https://accounts.firefox.com/settings?service=sync&context=fx_desktop_v3");
 
 // The remote URL of the FxA Profile Server
 pref("identity.fxaccounts.remote.profile.uri", "https://profile.accounts.firefox.com/v1");
@@ -1501,10 +1513,16 @@ pref("media.gmp.decoder.h264", 2);
 // decode H.264.
 pref("media.gmp.trial-create.enabled", true);
 
-// Encrypted media extensions. (Disabled)
+#if defined(MOZ_ADOBE_EME) || defined(MOZ_WIDEVINE_EME)
+pref("browser.eme.ui.enabled", true);
+#endif
+
 #ifdef MOZ_ADOBE_EME
-pref("browser.eme.ui.enabled", false);
 pref("media.gmp-eme-adobe.enabled", false);
+#endif
+
+#ifdef MOZ_WIDEVINE_EME
+pref("media.gmp-widevinecdm.enabled", false);
 #endif
 
 // Play with different values of the decay time and get telemetry,
@@ -1522,8 +1540,6 @@ pref("browser.translation.engine", "bing");
 // Telemetry settings.
 // Determines if Telemetry pings can be archived locally.
 pref("toolkit.telemetry.archive.enabled", false);
-// Whether we enable opt-out Telemetry for a sample of the release population.
-pref("toolkit.telemetry.optoutSample", true);
 
 // Telemetry experiments settings.
 pref("experiments.enabled", false);
@@ -1579,6 +1595,9 @@ pref("browser.defaultbrowser.notificationbar", false);
 // the hang monitor.
 pref("dom.ipc.cpow.timeout", 500);
 
+// Causes access on unsafe CPOWs from browser code to throw by default.
+pref("dom.ipc.cpows.forbid-unsafe-from-browser", true);
+
 // Enable e10s hang monitoring (slow script checking and plugin hang
 // detection).
 pref("dom.ipc.processHangMonitor", true);
@@ -1602,7 +1621,6 @@ pref("reader.errors.includeURLs", true);
 pref("view_source.tab", true);
 
 pref("dom.serviceWorkers.enabled", true);
-pref("dom.serviceWorkers.interception.enabled", true);
 pref("dom.serviceWorkers.openWindow.enabled", true);
 pref("dom.webnotifications.serviceworker.enabled", true);
 
@@ -1623,6 +1641,9 @@ pref("media.webspeech.synth.enabled", true);
 pref("browser.esedbreader.loglevel", "Error");
 
 pref("browser.laterrun.enabled", false);
+
+// Enable browser frames for use on desktop.  Only exposed to chrome callers.
+pref("dom.mozBrowserFramesEnabled", true);
 
 pref("extensions.pocket.enabled", true);
 
@@ -1686,7 +1707,7 @@ pref("app.learn.more.baseURI", "https://support.mozilla.org/%LOCALE%/kb/private-
 pref("app.feedback.baseURL", "https://8pecxstudios.com/Forums/viewforum.php?f=9");
 
 //Add SafeBrowsing Warning URL.
-pref("browser.safebrowsing.warning.infoURL", "https://www.mozilla.org/%LOCALE%/Firefox/phishing-protection/");
+pref("browser.safebrowsing.warning.infoURL", "https://support.mozilla.org/en-US/kb/how-does-phishing-and-malware-protection-work");
 
 //Add information Url for click to play
 pref("plugins.clickToActivateInfo.url", "https://support.mozilla.org/1/Firefox/%VERSION%/%OS%/%LOCALE%/clicktoplay"); 

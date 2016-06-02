@@ -297,7 +297,7 @@ var gAdvancedPane = {
 #endif
   },
 
-#ifdef MOZ_SERVICES_HEALTHREPORT
+#ifdef MOZ_TELEMETRY_REPORTING
   /**
    * Initialize the health report service reference and checkbox.
    */
@@ -366,7 +366,7 @@ var gAdvancedPane = {
       onNetworkCacheDiskConsumption: function(consumption) {
         var size = DownloadUtils.convertByteUnits(consumption);
         try{
-            actualSizeLabel.value = prefStrBundle.getFormattedString("actualDiskCacheSize", size);
+            actualSizeLabel.textContent = prefStrBundle.getFormattedString("actualDiskCacheSize", size);
         } catch (e) {}
       },
 
@@ -376,7 +376,9 @@ var gAdvancedPane = {
       ])
     };
 
-    actualSizeLabel.textContent = prefStrBundle.getString("actualDiskCacheSizeCalculated");
+    try{
+        actualSizeLabel.textContent = prefStrBundle.getString("actualDiskCacheSizeCalculated");
+    } catch (e) {}
 
     try {
       var cacheService =
@@ -503,18 +505,22 @@ var gAdvancedPane = {
   },
 
   // XXX: duplicated in browser.js
-  _getOfflineAppUsage: function (perm, groups)
-  {
-    var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
-                       getService(Components.interfaces.nsIApplicationCacheService);
-    var ios = Components.classes["@mozilla.org/network/io-service;1"].
-              getService(Components.interfaces.nsIIOService);
+  _getOfflineAppUsage(perm, groups) {
+    let cacheService = Cc["@mozilla.org/network/application-cache-service;1"].
+                       getService(Ci.nsIApplicationCacheService);
+    if (!groups) {
+      try {
+        groups = cacheService.getGroups();
+      } catch (ex) {
+        return 0;
+      }
+    }
 
-    var usage = 0;
-    for (var i = 0; i < groups.length; i++) {
-      var uri = ios.newURI(groups[i], null, null);
+    let usage = 0;
+    for (let group of groups) {
+      let uri = Services.io.newURI(group, null, null);
       if (perm.matchesURI(uri, true)) {
-        var cache = cacheService.getActiveCache(groups[i]);
+        let cache = cacheService.getActiveCache(group);
         usage += cache.usage;
       }
     }

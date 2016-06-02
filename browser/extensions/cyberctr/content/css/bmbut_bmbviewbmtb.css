@@ -2,7 +2,9 @@
 
 @-moz-document url(chrome://browser/content/browser.xul) {
 
-	#ctraddon_BMB_viewBookmarksToolbar,
+	#ctraddon_BMB_viewBookmarksToolbar{
+	  display: block !important;
+	}
 	#ctraddon_BMB_viewBookmarksToolbar + menuseparator{
 	  visibility: visible !important;
 	}

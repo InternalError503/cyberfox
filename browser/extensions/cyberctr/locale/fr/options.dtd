@@ -11,7 +11,6 @@
 <!ENTITY Ctr_flexspace		"Espace flexible">
 <!ENTITY Ctr_space			"Espace">
 <!ENTITY Ctr_separator		"Séparateur">
-<!ENTITY Ctr_puibseparator	"Séparateur du bouton menu">
 <!ENTITY Ctr_navthrobber	"Indicateur d’activité">
 <!ENTITY Ctr_sidebarbutton	"(panneau latéral)">
 <!ENTITY Ctr_windowcontrols	"Réduire/Restaurer/Fermer (plein écran)">
@@ -113,7 +112,6 @@
 <!ENTITY Ctr_ui				"Interface générale">
 <!ENTITY Ctr_nbiconsize0	"Taille des icônes dans la barre de navigation">
 <!ENTITY Ctr_smallnavbut	"Petits boutons sur la barre de navigation">
-<!ENTITY Ctr_bfurlbarfix 	"Corriger le rayon de courbure de la barre d’adresse">
 <!ENTITY Ctr_backforward	"Boutons avancer/reculer déplaçables">
 <!ENTITY Ctr_nbcompact		"Diminuer la hauteur des barres de navigation">
 <!ENTITY Ctr_hide_bf_popup	"Masquer le menu historique lors du clic droit">
@@ -129,6 +127,10 @@
 <!ENTITY Ctr_options_rem	"Se rappeler de la dernière catégorie choisie">
 <!ENTITY Ctr_svgfilters		"Couleurs SVG pour les icônes par défaut de la barre d’outils">
 <!ENTITY Ctr_wincontrols	"Mode plein écran : boutons déplaçables">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"Images du domaine de 1er niveau : présentation classique">
 <!ENTITY Ctr_altalertbox	"Boîtes d’alerte: autre présentation">
@@ -136,7 +138,7 @@
 <!ENTITY Ctr_mstatusbar		"Barre d’état déplaçable">
 <!ENTITY Ctr_mstatusbars4e	"Configuration de la barre d’état régie par « Status-4-Evar »">
 <!ENTITY Ctr_mstatusbartpp	"Configuration de la barre d’état régie par « ThePuzzlePiece »">
-<!ENTITY Ctr_mstatusbarpzt	"Configuration de la barre d’état régie par « Puzzle Toolbars »">
+<!ENTITY Ctr_mstatusbarpzt	"Configuration de la barre d’état régie par « Puzzle Bars »">
 <!ENTITY Ctr_mstatusbarabr	"Configuration de la barre d’état régie par « The Addon Bar (Restored) »">
 <!ENTITY Ctr_combrelstop 	"Combiner les boutons « stop-actualiser »">
 <!ENTITY Ctr_stoprel1		"Barres d’outils : placer le bouton actualiser après le bouton stop">
@@ -144,7 +146,7 @@
 <!ENTITY Ctr_hideprivmask	"Navigation privée : masquer l’icône « masque »">
 <!ENTITY Ctr_navsmallicons	"Petites icônes">
 <!ENTITY Ctr_navlargeicons	"Grandes icônes">
-<!ENTITY Ctr_nbisizedelay0	"Délai avant l’activation (au démarrage du navigateur)">
+<!ENTITY Ctr_nbisizedelay0	"">
 <!ENTITY Ctr_nbisizedelay	"ms (1000 ms = 1 s)">
 <!ENTITY Ctr_findbar		"Position de la barre de recherche">
 <!ENTITY Ctr_findbar_def	"En bas (par défaut)">
@@ -160,10 +162,15 @@
 <!ENTITY Ctr_cpanelmenus	"Compacter les éléments du panneau latéral (marque-pages, historique, etc.)">
 <!ENTITY Ctr_hidezoomres	"Boutons de zoom sur une barre d’outils : Masquer « Réinitialiser le niveau de zoom »">
 <!ENTITY Ctr_alt_newtabp	"Page Nouvel onglet (about:newtab) : autre aspect">
+<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_search_ui		"Barre de recherche">
 <!ENTITY Ctr_ctroldsearch	"Ancienne barre de recherche">
 <!ENTITY Ctr_ctroldsearchc	"Effacer le champ de la boîte de recherche après une recherche">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Ouvrir la recherche dans un nouvel onglet (préférence about:config)">
 <!ENTITY Ctr_osearch_meoit	"Clic central : recherche dans un nouvel onglet au premier plan">
+<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Petite « dropmarker »">
 <!ENTITY Ctr_addonmanager	"Gestionnaire de modules complémentaires">
 <!ENTITY Ctr_alt_addonsp	"Page « Plus de détails » des modules : autre aspect">
@@ -182,6 +189,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Popup : apparence Panneau menu">
 <!ENTITY Ctr_bmbunsortbm	"Popup : sous menu des « marque-pages non triés »">
 <!ENTITY Ctr_bmbunsortbm2	"Menu au-dessus des marque-pages">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"Popup : afficher « Voir la barre d’outils »">
 <!ENTITY Ctr_bmbnounsort	"Popup : cacher les « marque-pages non triés »">
 <!ENTITY Ctr_bmbutnotext	"Masquer « Marque-pages » sur la barre personnelle">
@@ -238,9 +246,7 @@
 <!ENTITY Ctr_urlbardropm	"Placer le dropmarker en dernier">
 <!ENTITY Ctr_urlbardropm2	"Dropmarker toujours visible">
 <!ENTITY Ctr_altreaderico	"Autres icônes du « lecteur »">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Masquer l’icône de notification quand un popup est bloqué">
-<!ENTITY Ctr_urlbar_uc		"Disable 'Unified autocomplete' feature (about:config preference)">
 <!ENTITY Ctr_locsearchbw10	"Réduire la hauteur de la barre d’adresse et la barre de recherche (expérimental)">
 <!ENTITY Ctr_urlbar_ib		"Bouton d’identité du site">
 <!ENTITY Ctr_ib_nohovcolor	"Ne pas afficher d’arrière-plan gris au survol">
@@ -259,8 +265,12 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
 <!ENTITY Ctr_lbsbsize		"Largeurs personnalisées pour la barre d’adresse et la barre de recherche">
 <!ENTITY Ctr_searchbar		"Barre de recherche">
-<!ENTITY Ctr_lbsugresi		"Afficher le plus de résultats possible dans les suggestions contextuelles (sans ascenseur)">
-<!ENTITY Ctr_lbsugres		"Nombre de résultats dans les suggestions contextuelles (préf. about:config)">
+<!ENTITY Ctr_urlbar_uc		"Désactiver la fonctionnalité « Autocomplétion unifiée » (paramètre about:config)">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
+<!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"Position de la barre de menus">
 <!ENTITY Ctr_extrabar		"Barres d’outils supplémentaires">
@@ -296,6 +306,7 @@
 <!ENTITY Ctr_menubarnofog	"Enlever l’effet de flou/l’arrière-plan des éléments (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Couleur aero bleue pour les barres d’outils (et les onglets)">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Titre, barre de menus et barre d’onglets : supprimer la couleur d’arrière-plan">
 <!ENTITY Ctr_transpttbew10	"Réglages supplémentaires pour certains thèmes">
 <!ENTITY Ctr_transptcw10	"Masquer les boutons par défaut min/max/fermeture">
@@ -377,6 +388,10 @@
 <!ENTITY goCmd.label					"Aller à">
 <!ENTITY Ctr_menu_restart.label			"Redémarrer">
 <!ENTITY Ctr_restartapp					"« Redémarrer » dans le menu &brandShortName; et le menu Fichier">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"d">

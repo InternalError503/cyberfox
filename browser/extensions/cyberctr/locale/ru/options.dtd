@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"Растягивающийся интервал">
 <!ENTITY Ctr_space			"Интервал">
 <!ENTITY Ctr_separator		"Разделитель">
-<!ENTITY Ctr_puibseparator	"Разделитель (кнопка меню)">
 <!ENTITY Ctr_navthrobber	"Индикатор активности">
 <!ENTITY Ctr_sidebarbutton	"Боковая панель">
 <!ENTITY Ctr_windowcontrols	"Свернуть/развернуть/закрыть (В полноэкранном режиме)">
@@ -70,7 +69,7 @@
 <!ENTITY Ctr_closetab_hfot	"Скрыть для одной вкладки">
 <!ENTITY Ctr_closei_def		"Стандартный значок 'Закрыть'">
 <!ENTITY Ctr_closeonleft	"Альтернативная позиция на вкладке">
-<!ENTITY Ctr_closetabbig	"Увеличенный значок (20x20px)">
+<!ENTITY Ctr_closetabbig	"Увеличенный значок (20x20 пикс.)">
 <!ENTITY Ctr_close_wwltab	"Закрыть окно при закрытии последней вкладки (настройка about:config)">
 
 <!ENTITY Ctr_hctpinfotab	"Некоторые виды оформления вкладок несовместимы с расширением 'Hide Caption Titlebar Plus'.">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui			"Основной интерфейс">
 <!ENTITY Ctr_nbiconsize0	"Размер значков панели навигации: small - малый, large - большой">
 <!ENTITY Ctr_smallnavbut	"Малые кнопки на панели навигации">
-<!ENTITY Ctr_bfurlbarfix	"Радиус углов строки адреса: 2px (Win) / 2.5px (Mac)">
 <!ENTITY Ctr_backforward	"Подвижная кнопка «назад-вперед»">
 <!ENTITY Ctr_nbcompact		"Уменьшить высоту панели навигации">
 <!ENTITY Ctr_hide_bf_popup	"Не показывать меню истории при клике мышью">
@@ -128,14 +126,18 @@
 <!ENTITY Ctr_options_rem	"Запомнить последний выбор">
 <!ENTITY Ctr_svgfilters		"Цвета SVG для кнопок панели инструментов">
 <!ENTITY Ctr_wincontrols	"Подвижное управление полноэкранным режимом">
-<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
+<!ENTITY Ctr_puibuttonsep	"Разделитель кнопки меню">
+<!ENTITY Ctr_puibut_no_sep	"Скрыть">
+<!ENTITY Ctr_puibut_l_sep	"Слева">
+<!ENTITY Ctr_puibut_r_sep	"Справа">
+<!ENTITY Ctr_html5warning	"HTML5 предупреждение полноэкранного режима">
 <!ENTITY Ctr_oldtoplevimg	"Классический вид 'изображений доменов верхнего уровня'">
 <!ENTITY Ctr_altalertbox	"Альтернативный вид 'окна с предупреждением'">
 <!ENTITY Ctr_emptygfavico	"Заменять пустые значки избранного">
 <!ENTITY Ctr_mstatusbar		"Подвижная строка состояния">
 <!ENTITY Ctr_mstatusbars4e	"Панель статуса управляется переменной 'Status-4-Evar'">
 <!ENTITY Ctr_mstatusbartpp	"Панель статуса управляется переменной 'ThePuzzlePiece'">
-<!ENTITY Ctr_mstatusbarpzt	"Панель статуса управляется переменной 'Puzzle Toolbars'">
+<!ENTITY Ctr_mstatusbarpzt	"Панель статуса управляется переменной 'Puzzle Bars'">
 <!ENTITY Ctr_mstatusbarabr	"Панель статуса управляется переменной 'The Addon Bar (Restored)'">
 <!ENTITY Ctr_combrelstop	"Совместить кнопки «Остановить» и «Перезагрузить»">
 <!ENTITY Ctr_stoprel1		"Кнопка остановки  после остановки заменяется на панели инструментов кнопкой перезагрузки!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"Компактная панель меню (закладки, история и т.д.)">
 <!ENTITY Ctr_hidezoomres	"Кнопки масштаба: скрыть сброс масштабирования">
 <!ENTITY Ctr_alt_newtabp	"Страница новой вкладки (about:newtab): альтернативный вид">
+<!ENTITY Ctr_nosnippets		"Стартовая страница (about:home): скрыть сниппеты">
+<!ENTITY Ctr_search_ui		"Поиск">
 <!ENTITY Ctr_ctroldsearch	"Старая форма поиска">
 <!ENTITY Ctr_ctroldsearchc	"Очистить форму после поиска">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Открывать поиск в ноовй вкладке (опция about:config)">
 <!ENTITY Ctr_osearch_meoit	"Клик средней кнопкой: поиск в новой активной вкладке">
+<!ENTITY Ctr_osearch_iwidth	"Автоматически подгонять ширину всплывающего меню">
+<!ENTITY Ctr_osearch_cwidth	"Пользовательская ширина всплывающего меню">
 <!ENTITY Ctr_osearch_dm		"Маленький маркер">
 <!ENTITY Ctr_addonmanager	"Управление дополнениями">
 <!ENTITY Ctr_alt_addonsp	"Альтернативное представление страницы дополнительной информации о дополнениях">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Всплывающее меню: вид панели меню">
 <!ENTITY Ctr_bmbunsortbm	"Всплывающее меню: подменю 'несортированные закладки'">
 <!ENTITY Ctr_bmbunsortbm2	"Меню над закладками">
+<!ENTITY Ctr_bmbviewbmsb	"Всплывающее меню: показывать 'Просмотр Боковой панели'">
 <!ENTITY Ctr_bmbviewbmtb	"Всплывающее меню: показывать 'Просмотр Панели инструментов'">
 <!ENTITY Ctr_bmbnounsort	"Всплывающее меню: скрыть 'несортированные закладки'">
 <!ENTITY Ctr_bmbutnotext	"Скрыть текст на панели закладок">
@@ -237,9 +245,7 @@
 <!ENTITY Ctr_urlbardropm	"Перемещать маркер на последнюю возможную позицию">
 <!ENTITY Ctr_urlbardropm2	"Сделать маркер видимым постоянно">
 <!ENTITY Ctr_altreaderico	"Альтернативные иконки 'Режима чтения'">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Скрыть значок уведомления, когда блокируется всплывающее окно">
-<!ENTITY Ctr_urlbar_uc		"Отключить возможность 'Унифицированное автозавершение' (настройка about:config)">
 <!ENTITY Ctr_locsearchbw10	"Уменьшить высоту панелей адреса и поиска (экспериментально)">
 <!ENTITY Ctr_urlbar_ib		"Кнопка подлинности сайта">
 <!ENTITY Ctr_ib_nohovcolor	"Не отображать серый цвет при зависании">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"Значок Избранного/глобуса/'i': клик открывает окно 'информация о странице'">
 <!ENTITY Ctr_lbsbsize		"Настройка ширины панелей адреса и поиска">
 <!ENTITY Ctr_searchbar		"Панель поиска">
+<!ENTITY Ctr_autocomplete	"Автозавершение">
+<!ENTITY Ctr_altautocompl	"Альтернативный внешний вид (экспериментально)">
+<!ENTITY Ctr_urlbar_uc		"Отключить функцию «автозаполнение» (настройка about:config)">
 <!ENTITY Ctr_lbsugresi		"Отображать максимально возможное количество результатов в подсказках (без прокрутки)">
 <!ENTITY Ctr_lbsugres		"Количество всплывающих результатов (настройка about:config)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"Позиция пунктов меню">
 <!ENTITY Ctr_extrabar		"Дополнительные панели инструментов">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"Удалить туман из фона меню (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Цвета Blue Aero для основных панелей и вкладок">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Панели заголовка/меню/вкладок: убрать цвет фона">
 <!ENTITY Ctr_transpttbew10	"Дополнительные опции для некоторых тем оформления ОС">
 <!ENTITY Ctr_transptcw10	"Скрыть стандартные кнопки ОС (Свернуть, Развернуть, Закрыть)">
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"Перейти">
 <!ENTITY Ctr_menu_restart.label			"Перезапуск">
 <!ENTITY Ctr_restartapp					"'Перезапуск' в меню приложения/файл">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"Н">

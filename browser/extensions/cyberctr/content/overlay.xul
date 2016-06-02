@@ -51,8 +51,8 @@
 	  <vbox id="customization-palette-container">
 		 <hbox id="ctraddon_cuibuttonsbox" ordinal="1000" collapsed="true">
 			<button label="&Ctr_cuibuttons;" id="ctraddon_cuibuttons_main" class="ctraddon_cuibutlabel customizationmode-button"/>
-			<button label="&Ctr_cuibutnormal;" id="ctraddon_cui-smallnavbut-button1" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',false);classicthemerestorerjs.ctr.prefs.setBoolPref('bfurlbarfix',false);"/>
-			<button label="&Ctr_cuibutsmall;" id="ctraddon_cui-smallnavbut-button2" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',true);classicthemerestorerjs.ctr.prefs.setBoolPref('bfurlbarfix',true);"/>
+			<button label="&Ctr_cuibutnormal;" id="ctraddon_cui-smallnavbut-button1" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',false);"/>
+			<button label="&Ctr_cuibutsmall;" id="ctraddon_cui-smallnavbut-button2" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.prefs.setBoolPref('smallnavbut',true);"/>
 			<button label="&Ctr_cuimode;" class="ctraddon_cuibutlabel customizationmode-button"/>
 			<button label="&Ctr_cuiico;" id="ctraddon_cui-icons-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'icons');"/>
 			<button label="&Ctr_cuiicotxt;" id="ctraddon_cui-iconstext-button" class="customizationmode-button" oncommand="classicthemerestorerjs.ctr.cuiPrefChangeString('nav_txt_ico', 'iconstxt');"/>
@@ -91,7 +91,7 @@
 				 hidden="true"
 				 defaultset="PanelUI-menu-button">
 		  <!-- ### move PanelUI-menu-button dummy here to prevent glitches with CTRs movable button -->
-          <toolbarbutton id="PanelUI-menu-button" removable="false" collapsed="true"/>
+          <toolbarbutton id="PanelUI-menu-button" removable="false" collapsed="false"/>
 		</toolbar>
 	</vbox>
 	
@@ -134,6 +134,8 @@
 	<menuitem id="context-bookmarkpage" label="&bookmarkThisPageCmd.label;" accesskey="&bookmarkPageCmd2.accesskey;"/>
 	
 	<menuitem id="menu_preferences" oncommand="classicthemerestorerjs.ctr.openContentPrefsInWin();"/>
+	
+	<!--panel id="UITourTooltip" targetName="home-button" consumeoutsideclicks="true"/-->
 	
 	<!--<menupopup id="menu_FilePopup">
 	  <menuitem id="ctraddon_restart-menu"
@@ -737,6 +739,12 @@
 											   new HistoryMenu(event);"
 							 tooltip="bhTooltip"
 							 popupsinherittooltip="true">
+					<menuitem id="ctraddon_history_viewHistorySidebar"
+								type="checkbox"
+								oncommand="SidebarUI.toggle('viewHistorySidebar');"
+								label="&appMenuHistory.viewSidebar.label;">
+						<observes element="viewHistorySidebar" attribute="checked"/>
+					</menuitem>
 					<menuitem id="ctraddon_history_showAllHistory"
 							  label="&showAllHistoryCmd2.label;"
 							  key="showAllHistoryKb"
@@ -796,6 +804,12 @@
                    onclick="BookmarksEventHandler.onClick(event, this.parentNode._placesView);"
                    onpopupshowing="if (!this.parentNode._placesView) {new PlacesMenu(event, 'place:folder=BOOKMARKS_MENU');} classicthemerestorerjs.ctr.togglePersonalBarItem();"
                    tooltip="bhTooltip" popupsinherittooltip="true">
+          <menuitem id="ctraddon_BMB_viewBookmarksSidebar"
+                    type="checkbox"
+                    oncommand="SidebarUI.toggle('viewBookmarksSidebar');"
+                    label="&viewBookmarksSidebar2.label;">
+			<observes element="viewBookmarksSidebar" attribute="checked"/>
+		  </menuitem>
           <menuitem id="ctraddon_BMB_viewBookmarksToolbar"
                     toolbarId="PersonalToolbar"
                     type="checkbox"
@@ -896,25 +910,16 @@
                      tooltiptext="&historyButton.label; &Ctr_sidebarbutton;"/>
 					 
 					 
-	  <!--### creates a duplicated movable PanelUI button ###-->
+	  <!--### creates a duplicated movable PanelUI button container ###-->
 	  <toolbaritem id="ctraddon_panelui-button"
                    class="chromeclass-toolbar-additional"
                    removable="true"
 				   overflows="false"
                    title="&brandShortName;">
-        <toolbarbutton id="PanelUI-menu-button"
-                       class="toolbarbutton-1 badged-button"
-                       label="&brandShortName;"
-                       tooltiptext="&appmenu.tooltip;"/>
       </toolbaritem>
 
-	  <!--### extra separator for panel ui button ###-->
-	  <toolbaritem id="ctraddon_puib_separator"
-                   title="&Ctr_puibseparator;"
-                   customizableui-areatype="toolbar"
-				   overflows="false"
-                   removable="true"/>
-				   
+
+	  <!--### navigation throbber / animation button ###-->			   
 	  <toolbaritem id="ctraddon_navigator-throbber"
                    title="&Ctr_navthrobber;"
                    customizableui-areatype="toolbar"

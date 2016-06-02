@@ -10,7 +10,6 @@
 <!ENTITY Ctr_flexspace		"Spazio flessibile">
 <!ENTITY Ctr_space			"Spazio">
 <!ENTITY Ctr_separator		"Separatore">
-<!ENTITY Ctr_puibseparator	"Separatore (per il pannello del pulsante menu)">
 <!ENTITY Ctr_navthrobber	"Indicatore attività">
 <!ENTITY Ctr_sidebarbutton	"Barra laterale">
 <!ENTITY Ctr_windowcontrols	"Pulsanti controllo finestra (A tutto schermo)">
@@ -112,7 +111,6 @@
 <!ENTITY Ctr_ui				"Interfaccia base">
 <!ENTITY Ctr_nbiconsize0	"Imposta attributo alla barra di navigazione">
 <!ENTITY Ctr_smallnavbut	"Pulsanti piccoli nella barra di navigazione">
-<!ENTITY Ctr_bfurlbarfix	"Correggi la curvatura della barra degli indirizzi ">
 <!ENTITY Ctr_backforward	"Pulsanti Indietro/Avanti mobili">
 <!ENTITY Ctr_nbcompact		"Riduci l’altezza delle barre di navigazione">
 <!ENTITY Ctr_hide_bf_popup	"Nascondi la cronologia dei pulsanti Avanti/Indietro">
@@ -128,6 +126,10 @@
 <!ENTITY Ctr_options_rem	"Ricorda l'ultima categoria selezionata">
 <!ENTITY Ctr_svgfilters		"Colori SVG per le icone dei pulsanti della barra strumenti">
 <!ENTITY Ctr_wincontrols	"Angoli finestra mobili in modalità schermo intero">
+<!ENTITY Ctr_puibuttonsep	"Menu button separator">
+<!ENTITY Ctr_puibut_no_sep	"Hidden">
+<!ENTITY Ctr_puibut_l_sep	"Left">
+<!ENTITY Ctr_puibut_r_sep	"Right">
 <!ENTITY Ctr_html5warning	"HTML5 full screen warning">
 <!ENTITY Ctr_oldtoplevimg	"Immagini 'Top level domain': aspetto classico">
 <!ENTITY Ctr_altalertbox	"'Alert box': aspetto alternativo">
@@ -135,7 +137,7 @@
 <!ENTITY Ctr_mstatusbar		"Barra di stato mobile">
 <!ENTITY Ctr_mstatusbars4e	"La barra di stato è gestita da 'Status-4-Evar'">
 <!ENTITY Ctr_mstatusbartpp	"La barra di stato è gestita da 'ThePuzzlePiece'">
-<!ENTITY Ctr_mstatusbarpzt	"La barra di stato è gestita da 'Puzzle Toolbars'">
+<!ENTITY Ctr_mstatusbarpzt	"La barra di stato è gestita da 'Puzzle Bars'">
 <!ENTITY Ctr_mstatusbarabr	"La barra di stato è gestita da 'The Addon Bar (Restored)'">
 <!ENTITY Ctr_combrelstop	"Unisci i pulsanti Stop e Ricarica">
 <!ENTITY Ctr_stoprel1		"Importante: disporre il pulsante Ricarica a destra del pulsante Stop!">
@@ -159,10 +161,15 @@
 <!ENTITY Ctr_cpanelmenus	"Pannello menu unificato (Segnalibri, Cronologia, ecc.)">
 <!ENTITY Ctr_hidezoomres	"Nascondi il pulsante per ripristinare il livello di zoom dalla barra degli strumenti">
 <!ENTITY Ctr_alt_newtabp	"Nuova scheda (about:newtab): aspetto alternativo">
+<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_search_ui		"Search">
 <!ENTITY Ctr_ctroldsearch	"Ricerca vecchio stile">
 <!ENTITY Ctr_ctroldsearchc	"Pulisci la casella di ricerca dopo aver effettuato la ricerca">
+<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
 <!ENTITY Ctr_search_oit		"Apri la ricerca in una nuova scheda (preferenza in  about:config)">
 <!ENTITY Ctr_osearch_meoit	"Clic sul tasto centrale: ricerca in una nuova scheda attiva">
+<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
+<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
 <!ENTITY Ctr_osearch_dm		"Freccia verso il basso piccola">
 <!ENTITY Ctr_addonmanager	"Gestione componenti aggiuntivi">
 <!ENTITY Ctr_alt_addonsp	"Pagina 'Altro' dei componenti aggiuntivi: aspetto alternativo">
@@ -181,6 +188,7 @@
 <!ENTITY Ctr_bmbutpanelm	"Aspetto del menu a pannello">
 <!ENTITY Ctr_bmbunsortbm	"Menu dei 'Segnalibri non catalogati'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"Mostra 'Visualizza barra dei segnalibri'">
 <!ENTITY Ctr_bmbnounsort	"Nascondi 'Segnalibri non catalogati'">
 <!ENTITY Ctr_bmbutnotext	"Nascondi etichetta della barra dei segnalibri">
@@ -237,9 +245,7 @@
 <!ENTITY Ctr_urlbardropm	"Sposta il dropmarker nella posizione più lontana possibile">
 <!ENTITY Ctr_urlbardropm2	"Dropmarker sempre visibile">
 <!ENTITY Ctr_altreaderico	"Icone alternative della modalità di lettura">
-<!ENTITY Ctr_altautocompl	"Alternative 'autocomplete popup' (experimental)">
 <!ENTITY Ctr_hideprbutton	"Nascondi l’icona di notifica quando un popup viene bloccato">
-<!ENTITY Ctr_urlbar_uc		"Disattiva il completamento automatico (preferenza in about:config)">
 <!ENTITY Ctr_locsearchbw10	"Riduci l'altezza delle barre degli indirizzi e di ricerca (sperimentale)">
 <!ENTITY Ctr_urlbar_ib		"Pulsante delle connessioni sicure (riquadro di verifica)">
 <!ENTITY Ctr_ib_nohovcolor	"Non mostrare il colore grigio al passaggio del mouse">
@@ -258,8 +264,12 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/icona a globo/'i': il 'clic' apre la finestra 'Informazioni pagina'">
 <!ENTITY Ctr_lbsbsize		"Larghezza personalizzata per la barra degli indirizzi e di ricerca">
 <!ENTITY Ctr_searchbar		"Barra di ricerca">
-<!ENTITY Ctr_lbsugresi		"Mostra il maggior numero possibile di suggerimenti (senza barra di scorrimento)">
-<!ENTITY Ctr_lbsugres		"Numero di risultati nei suggerimenti a comparsa (preferenza in about:config)">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
+<!ENTITY Ctr_urlbar_uc		"Disattiva il completamento automatico (preferenza in about:config)">
+<!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
+<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
 <!ENTITY Ctr_menubar_items	"Posizione delle voci del menu">
 <!ENTITY Ctr_extrabar		"Barre degli strumenti aggiuntive">
@@ -295,6 +305,7 @@
 <!ENTITY Ctr_menubarnofog	"Elimina l’effetto nebbia o il colore di sfondo (Windows AeroGlass e Windows 8)">
 
 <!ENTITY Ctr_aerocolors		"Colori Blu Aero per le barre degli strumenti e le schede">
+<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
 <!ENTITY Ctr_transpttbw10	"Barre del titolo/menu/schede: rimuovi il colore di sfondo">
 <!ENTITY Ctr_transpttbew10	"Modifiche aggiuntive per alcuni temi del SO">
 <!ENTITY Ctr_transptcw10	"Nascondi i pulsanti di controllo finestra di sistema">
@@ -376,6 +387,10 @@
 <!ENTITY goCmd.label					"Vai">
 <!ENTITY Ctr_menu_restart.label			"Riavvia">
 <!ENTITY Ctr_restartapp					"'Riavvia' nel menu del Pulsante &brandShortName; e nel menu File">
+
+<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
+<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
+<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "I">

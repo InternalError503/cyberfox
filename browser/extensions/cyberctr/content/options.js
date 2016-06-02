@@ -86,7 +86,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_abhigher').disabled = true;
 		document.getElementById('ctraddon_pw_smallnavbut').disabled = true;
 		document.getElementById('ctraddon_pw_iconsbig').disabled = true;
-		document.getElementById('ctraddon_pw_bfurlbarfix').disabled = true;
 		document.getElementById('ctraddon_pw_altmenubar').disabled = true;
 		document.getElementById('ctraddon_pw_menubarnofog').disabled = true;
 		document.getElementById('ctraddon_pw_tabmokcolor').disabled = true;
@@ -127,7 +126,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_ccol_act_b1').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_ccol_act_b2').style.visibility = 'collapse';
 
-		document.getElementById('ctraddon_pw_bfurlbarfix').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_altmenubar').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_menubarnofog').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabmokcolor').style.visibility = 'collapse';
@@ -257,7 +255,7 @@ classicthemerestorerjso.ctr = {
 	  }
 	});
 	
-	// Status4Evar, The Puzzle Piece, Puzzle Toolbars and The Addon Bar Restored
+	// 'Status4Evar', 'Puzzle Bars' and 'The Addon Bar Restored'
 	// override CTRs mov. status bar panel, so CTRs option gets disabled 
 	document.getElementById('ctraddon_pw_statusbar_s4e_info').style.visibility = 'collapse';
 	document.getElementById('ctraddon_pw_statusbar_tpp_info').style.visibility = 'collapse';
@@ -604,26 +602,20 @@ classicthemerestorerjso.ctr = {
 					document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = false;
 					document.getElementById('ctraddon_ctabouthomecusthltcp').disabled = false;
 				}
-				//Disable custom background image on Light|dark theme styles.
-				if (branch.getCharPref("abouthome") === "dark" || 
-					branch.getCharPref("abouthome") === "darkalt" ||
-					branch.getCharPref("abouthome") === "light" ||
+				
+				
+				//Custom background image on lightalt|darkalt theme styles have bg image streched.
+				if (branch.getCharPref("abouthome") === "darkalt" ||
 					branch.getCharPref("abouthome") === "lightalt"){
-					document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
-					document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
-					document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
 					document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;
-					branch.setBoolPref("abouthomecustombg", false);
-
 				}else{
-					document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
-					document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
-					document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
 					document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
 				}
+
 				if (branch.getCharPref("abouthome") === "simplicitycustom"){
 					document.getElementById('noicons').disabled = true;
 				}
+							
 			break;
 
 			case "abouthomecustomurl":
@@ -705,9 +697,13 @@ classicthemerestorerjso.ctr = {
 	this.ctrpwTranspTbW10(this.prefs.getBoolPref("transpttbw10"));
 	this.ctrpwNavBarPadding(this.prefs.getBoolPref("navbarpad"));
 	this.ctrpwLocationSearchbarSize(this.prefs.getBoolPref("lbsbsize"));
+	this.ctrpwLocationSearchbarRadius(this.prefs.getBoolPref("lbsbradius"));
 	this.ctrpwCompactAddonList(this.prefs.getBoolPref("am_compact"));
 	this.ctrpwUnsortBM(this.prefs.getBoolPref("bmbunsortbm"));
 	this.ctrpwHideUrlStopRel(this.prefs.getBoolPref("hideurelstop"));
+	this.ctrpwExtraUrlbar(this.prefs.getBoolPref("extraurlkeycb"));
+	this.ctrpwSearchPopupSize(this.prefs.getBoolPref("osearch_cwidth"));
+	this.ctrpwAeroColors(this.prefs.getBoolPref("aerocolors"));
 	
 	var closetab_value = this.prefs.getCharPref("closetab");
   
@@ -766,24 +762,15 @@ classicthemerestorerjso.ctr = {
 		if (this.prefs.getCharPref("abouthome") === "simplicitycustom"){
 			document.getElementById('noicons').disabled = true;
 		}	
-	
-		//Disable custom background image on Light|dark theme styles.
-		if (this.prefs.getCharPref("abouthome") === "dark" || 
-			this.prefs.getCharPref("abouthome") === "darkalt" ||
-			this.prefs.getCharPref("abouthome") === "light" ||
+
+		//Custom background image on lightalt|darkalt theme styles have bg image streched.
+		if (this.prefs.getCharPref("abouthome") === "darkalt" ||
 			this.prefs.getCharPref("abouthome") === "lightalt"){
-			document.getElementById('ctraddon_ctabouthome_custbg').disabled = true;
-			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = true;
-			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = true;
-			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;			
-			this.prefs.setBoolPref("abouthomecustombg", false);
+			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = true;
 			
 		}else{
-			document.getElementById('ctraddon_ctabouthome_custbg').disabled = false;
-			document.getElementById('ctraddon_ctabouthome_custbgl').disabled = false;
-			document.getElementById('ctraddon_ctabouthome_bg_urlbox').disabled = false;
 			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
-		}
+		}	
 
 		//Disable custom highlight colors on default theme in firefox.	
 		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && this.prefs.getCharPref("abouthome") === "default") {
@@ -1023,11 +1010,28 @@ classicthemerestorerjso.ctr = {
 	}
 	
     document.getElementById('ctraddon_pw_lbsbsize_lb').disabled = which;
-	document.getElementById('ctraddon_pw_lbsbsize_lb').style.visibility = itemvis;
     document.getElementById('ctraddon_pw_lbsbsize_sb').disabled = which;
-	document.getElementById('ctraddon_pw_lbsbsize_sb').style.visibility = itemvis;
-	document.getElementById('ctraddon_lbsbsizelabel1').style.visibility = itemvis;
-	document.getElementById('ctraddon_lbsbsizelabel2').style.visibility = itemvis;
+	document.getElementById('ctraddon_lbsize_minw').disabled = which;
+	document.getElementById('ctraddon_lbsize_maxw').disabled = which;
+	document.getElementById('ctraddon_sbsize_minw').disabled = which;
+	document.getElementById('ctraddon_sbsize_maxw').disabled = which;
+  },
+  
+  ctrpwLocationSearchbarRadius: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_lbsbradius_lb').disabled = which;
+    document.getElementById('ctraddon_pw_lbsbradius_sb').disabled = which;
+	document.getElementById('ctraddon_lbradius_left').disabled = which;
+	document.getElementById('ctraddon_lbradius_right').disabled = which;
+	document.getElementById('ctraddon_sbradius_left').disabled = which;
+	document.getElementById('ctraddon_sbradius_right').disabled = which;
   },
   
   ctrpwCompactAddonList: function(which) {
@@ -1068,6 +1072,45 @@ classicthemerestorerjso.ctr = {
     document.getElementById('ctraddon_pw_hideurelstop2').disabled = which;
 	document.getElementById('ctraddon_pw_hideurelstop2').style.visibility = itemvis;
   },
+  
+  ctrpwExtraUrlbar: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_extraurltarget_list').disabled = which;
+	document.getElementById('ctraddon_extraurltarget_list').style.visibility = itemvis;
+  },
+  
+  ctrpwSearchPopupSize: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_os_spsize_box').disabled = which;
+	document.getElementById('ctraddon_pw_os_spsize_box').style.visibility = itemvis;
+  },
+  
+  ctrpwAeroColors: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_aerocolorsg').disabled = which;
+	document.getElementById('ctraddon_pw_aerocolorsg').style.visibility = itemvis;
+  },
  
   ctrpwCtrOldSearch: function(which) {
 	var itemvis = 'collapse';
@@ -1079,13 +1122,11 @@ classicthemerestorerjso.ctr = {
 	}
 	
     document.getElementById('ctraddon_pw_ctroldsearchc').disabled = which;
-	document.getElementById('ctraddon_pw_ctroldsearchc').style.visibility = itemvis;
+	document.getElementById('ctraddon_pw_ctroldsearchr').disabled = which;
     document.getElementById('ctraddon_pw_osearch_dm').disabled = which;
-	document.getElementById('ctraddon_pw_osearch_dm').style.visibility = itemvis;
-    document.getElementById('ctraddon_pw_search_oit').disabled = which;
-	document.getElementById('ctraddon_pw_search_oit').style.visibility = itemvis;
+    document.getElementById('ctraddon_pw_osearch_iwidth').disabled = which;
     document.getElementById('ctraddon_pw_osearch_meoit').disabled = which;
-	document.getElementById('ctraddon_pw_osearch_meoit').style.visibility = itemvis;
+	document.getElementById('ctraddon_pw_osearch_iwidth').disabled = which;
 	
   },
  
@@ -1471,219 +1512,182 @@ classicthemerestorerjso.ctr = {
 	} catch(e) {}
   },
 
-  /* export CTR settings Text */
-  exportCTRpreferences: function() {
-	  
-	  
-	var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
-
-	var preferenceArray = [];
-		 
-	// Add filter header
-	preferenceArray.push("CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers");	
-
-	// Filter preference type and return its value.
-	function prefValue(pref){
-
-	  switch (Services.prefs.getPrefType(pref)){
-		case 32:	return Services.prefs.getCharPref(pref);	break;
-		case 64:	return Services.prefs.getIntPref(pref);		break;
-		case 128:	return Services.prefs.getBoolPref(pref);	break;	
-	  }
-
-	}	
-	
-	//Filter preference type and return its filter value.	
-	function prefType(pref){
-
-	  switch (Services.prefs.getPrefType(pref)){
-		case 32:	return ":";	break;
-		case 64:	return "~";	break;
-		case 128:	return "=";	break;	
-	  }
-
-	}
-
-	for (var i=0; i < preflist.length; i++) {
-
-	  try {
-		// Run Blacklist filter. Exclude all preferences we don't want to export/import.
-		var index = preflist.indexOf(this.blacklist[i]);
-
-		if (index > -1) {
-		  preflist.splice(index, 1);
-		}
-
-		// Filter extensions.classicthemerestorer.*
-		var sliceNdice = preflist[i].replace("extensions.classicthemerestorer.", "");
-		
-		// Populate array	
-		preferenceArray.push(
-		  sliceNdice+prefType(preflist[i])+prefValue(preflist[i]) 
-		);
-
-	  } catch(e) {
-		// Report errors to console
-		Cu.reportError(e);
-	  }
-
-	}	  
-	  
-	// Use new less bulky export for text.
-	classicthemerestorerjso.ctr.saveToFile(preferenceArray, "txt");
-  
-	return true;
-  },
-  
-  /* import CTR settings */
-  importCTRpreferences: function() {
- 
-	var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
-  
-	var pattern = classicthemerestorerjso.ctr.loadFromFile("txt");
-
-	if (!pattern) return false;
-	   
-	if(pattern[0]!="CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers") {
-	  alert(stringBundle.GetStringFromName("import.error"));
-	  return false;
-	}
-
-	var i, prefName, prefValue;
-	   
-	for (i=1; i<pattern.length; i++){
-	  var index1 = pattern[i].indexOf("="); // for finding booleans
-	  var index2 = pattern[i].indexOf(":"); // for finding strings
-	  var index3 = pattern[i].indexOf("~"); // for finding integers
-
-	  if (index2 > 0){ // find string
-		 prefName  = pattern[i].substring(0,index2);
-		 prefValue = pattern[i].substring(index2+1,pattern[i].length);
-		 
-		 this.prefs.setCharPref(''+prefName+'',''+prefValue+'');
-	  }
-	  else if (index1 > 0){ // find boolean
-		 prefName  = pattern[i].substring(0,index1);
-		 prefValue = pattern[i].substring(index1+1,pattern[i].length);
-		 
-		 // if prefValue string is "true" -> true, else -> false
-		 this.prefs.setBoolPref(''+prefName+'',(prefValue === 'true'));
-	  }
-	  else if (index3 > 0){ // find integer
-		 prefName  = pattern[i].substring(0,index3);
-		 prefValue = pattern[i].substring(index3+1,pattern[i].length);
-		 
-		 this.prefs.setIntPref(''+prefName+'',prefValue);
-	  }
-	}
-
-	this.needsBrowserRestart();
-	
-	return true;
-  },
-  
-  /* import CTR settings JSON*/
-  importCTRpreferencesJSON: function() {
- 
-	var parjson = classicthemerestorerjso.ctr.loadFromFile("json");
-
-	if (!parjson) return false;
-	
-	function setPrefValue(pref, val){
-
-	  switch (Services.prefs.getPrefType(pref)){
-		case 32:	return Services.prefs.setCharPref(pref, val);	break;
-		case 64:	return Services.prefs.setIntPref(pref, val);	break;
-		case 128:	return Services.prefs.setBoolPref(pref, val);	break;	
-	  }
-
-	}
-			
-	for (var i=0; i<parjson.length; i++) {					  
-	  try {
-
-		if(parjson[i].preference.match(/extensions.classicthemerestorer./g)){
-			//To import previously generated preference export.
-			setPrefValue(parjson[i].preference, parjson[i].value);
-		} else{
-			setPrefValue('extensions.classicthemerestorer.' + parjson[i].preference, parjson[i].value);
-		}
-
-	  } catch(e) {
-		// Report errors to console
-		Cu.reportError(e);
-	  }
-	}	
-
-	this.needsBrowserRestart();
-	
-	return true;
-  },
-  
-  /* export CTR settings JSON */
-  exportCTRpreferencesJSON: function() {
-
-	var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
-
-	var preferenceArray = {
-	  preference: [],
-	  value: []
-	};
-
-
-	function prefValue(pref){
-
-	  switch (Services.prefs.getPrefType(pref)){
-		case 32:	return Services.prefs.getCharPref(pref);	break;
-		case 64:	return Services.prefs.getIntPref(pref);		break;
-		case 128:	return Services.prefs.getBoolPref(pref);	break;	
-	  }
-
-	}
-
-	for (var i=0; i < preflist.length; i++) {
-
-	  try {
-		// 'Blacklist' filter. Exclude all preferences we don't want to export/import.
-		var index = preflist.indexOf(this.blacklist[i]);
-
-		if (index > -1) {
-		  preflist.splice(index, 1);
-		}
-
-		preferenceArray.preference.push({
-		  "preference" : preflist[i].replace("extensions.classicthemerestorer.", ""),
-		  "value" : prefValue(preflist[i])
-		});
-
-	  } catch(e) {
-		// Report errors to console
-		Cu.reportError(e);
-	  }
-
-	}
-
-	classicthemerestorerjso.ctr.saveToFile(preferenceArray, "json");
-
-	return true;
-
-  }, 
-  
 	// Need to check if json is valid. If json not valid. don't continue and show error.
-	IsJsonValid: function (aData) {
-	  try { 
-			JSON.parse(aData); 
-		}catch (e) { 
-			return false; 
+	IsJsonValid: function(aData) {
+        try {
+            JSON.parse(aData);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    },
+
+	/* Export CTR preferences Text|Json */
+    ExportPreferences: function(aPattern) {
+			
+			if (!aPattern == "txt" || !aPattern == "json") return false;
+		
+        var preferenceList = Services.prefs.getChildList("extensions.classicthemerestorer.");
+        var preferenceArray = null;
+
+        if (aPattern == "txt") {
+            preferenceArray = [];
+            // Add filter header.
+            preferenceArray.push("CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers");
+        }
+
+        if (aPattern == "json") {
+            preferenceArray = {
+                preference: [],
+                value: []
+            };
+        }
+        // Filter preference type and return its value.
+        function _prefValue(pref) {
+            switch (Services.prefs.getPrefType(pref)) {
+                case 32:return Services.prefs.getCharPref(pref);break;
+                case 64:return Services.prefs.getIntPref(pref);break;
+                case 128:return Services.prefs.getBoolPref(pref);break;
+            }
+        }
+
+        //Filter preference type and return its filter value.	
+        function _prefType(pref) {
+            switch (Services.prefs.getPrefType(pref)) {
+                case 32:return ":";break;
+                case 64:return "~";break;
+                case 128:return "=";break;
+            }
+        }
+
+
+        for (var i = 0; i < preferenceList.length; i++) {
+            try {
+                // Run Blacklist filter. Exclude all preferences we don't want to export/import.
+                var index = preferenceList.indexOf(this.blacklist[i]);
+
+                if (index > -1) {
+                    preferenceList.splice(index, 1);
+                }
+
+                if (aPattern == "txt") {
+                    // Filter extensions.classicthemerestorer.*
+                    var sliceNdice = preferenceList[i].replace("extensions.classicthemerestorer.", "");
+
+                    // Populate array	
+                    preferenceArray.push(
+                        sliceNdice + _prefType(preferenceList[i]) + _prefValue(preferenceList[i])
+                    );
+                }
+
+                if (aPattern == "json") {
+                    preferenceArray.preference.push({
+                        "preference": preferenceList[i].replace("extensions.classicthemerestorer.", ""),
+                        "value": _prefValue(preferenceList[i])
+                    });
+                }
+
+            } catch (e) {
+                // Report errors to console
+                Cu.reportError(e);
+            }
+        }
+        // Use new less bulky export for text.
+        classicthemerestorerjso.ctr.saveToFile(preferenceArray, aPattern);
+        //Clear preferenceArray after export.
+        preferenceArray = [];
+        return true;
+    },
+	
+	/* Import CTR preferences Text|Json */
+	ImportPreferences: function(aPattern) {
+		
+		if (!aPattern == "txt" || !aPattern == "json") return false;
+		
+		var stringBundle = Services.strings.createBundle("chrome://classic_theme_restorer/locale/messages.file");
+		var pattern = null;
+		
+		if (aPattern == "txt") {
+			pattern = classicthemerestorerjso.ctr.loadFromFile("txt");
 		}
-	  return true;
-	},	
-  
+		
+		if (aPattern == "json") {
+			pattern = classicthemerestorerjso.ctr.loadFromFile("json");
+		}		
+		
+		if (!pattern) return false;
+		   
+		if(pattern[0]!="CTR_Preferences__DO_NOT_EDIT__'='->booleans__':'->strings__'~'->integers" && aPattern == "txt") {
+		  alert(stringBundle.GetStringFromName("import.error"));
+		  return false;
+		}
+
+		function _setPrefValue(pref, val){
+
+		  switch (Services.prefs.getPrefType(pref)){
+			case 32:	return Services.prefs.setCharPref(pref, val);	break;
+			case 64:	return Services.prefs.setIntPref(pref, val);	break;
+			case 128:	return Services.prefs.setBoolPref(pref, val);	break;	
+		  }
+
+		}
+		
+		if (aPattern == "txt") {
+			var i, prefName, prefValue;
+			   
+			for (i=1; i<pattern.length; i++){
+			  var index1 = pattern[i].indexOf("="); // for finding booleans
+			  var index2 = pattern[i].indexOf(":"); // for finding strings
+			  var index3 = pattern[i].indexOf("~"); // for finding integers
+
+			  if (index2 > 0){ // find string
+				 prefName  = pattern[i].substring(0,index2);
+				 prefValue = pattern[i].substring(index2+1,pattern[i].length);
+				 
+				 this.prefs.setCharPref(''+prefName+'',''+prefValue+'');
+			  }
+			  else if (index1 > 0){ // find boolean
+				 prefName  = pattern[i].substring(0,index1);
+				 prefValue = pattern[i].substring(index1+1,pattern[i].length);
+				 
+				 // if prefValue string is "true" -> true, else -> false
+				 this.prefs.setBoolPref(''+prefName+'',(prefValue === 'true'));
+			  }
+			  else if (index3 > 0){ // find integer
+				 prefName  = pattern[i].substring(0,index3);
+				 prefValue = pattern[i].substring(index3+1,pattern[i].length);
+				 
+				 this.prefs.setIntPref(''+prefName+'',prefValue);
+			  }
+			}
+		}
+		
+		if (aPattern == "json") {
+			for (var i=0; i<pattern.length; i++) {					  
+			  try {
+
+				if(pattern[i].preference.match(/extensions.classicthemerestorer./g)){
+					//To import previously generated preference export.
+					_setPrefValue(pattern[i].preference, pattern[i].value);
+				} else{
+					_setPrefValue('extensions.classicthemerestorer.' + pattern[i].preference, pattern[i].value);
+				}
+
+			  } catch(e) {
+				// Report errors to console
+				Cu.reportError(e);
+			  }
+			}
+		}
+		
+		this.needsBrowserRestart();		
+		return true;
+	},
+	
 	saveToFile: function(aPattern, aType) {
 		try{
-			if (aType === "txt" || aType === "json") {} else {
-			  return false;
-			}
+			
+			if (!aType === "txt" || !aType === "json" || aPattern.length === 0) return false;
 
 			const nsIFilePicker = Ci.nsIFilePicker;
 			var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);

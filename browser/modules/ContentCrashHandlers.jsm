@@ -246,7 +246,7 @@ this.TabCrashHandler = {
 
     let dumpID = this.getDumpID(browser);
     if (!dumpID) {
-      message.target.sendAsyncMessge("SetCrashReportAvailable", {
+      message.target.sendAsyncMessage("SetCrashReportAvailable", {
         hasReport: false,
       });
       return;
@@ -264,7 +264,7 @@ this.TabCrashHandler = {
     message.target.sendAsyncMessage("SetCrashReportAvailable", data);
   },
 
-  onAboutTabCrashedUnload: function() {
+  onAboutTabCrashedUnload(message) {
     if (!this._crashedTabCount) {
       Cu.reportError("Can not decrement crashed tab count to below 0");
       return;

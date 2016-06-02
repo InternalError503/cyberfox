@@ -12,7 +12,6 @@
 <Url type="application/x-suggestions+json" method="GET" template="http://autosug.ebay.com/autosug">
   <Param name="sId" value="0" />
   <Param name="kwd" value="{searchTerms}" />
-  <Param name="fmt" value="osr" />
 </Url>
 <Url type="text/html" method="GET" template="http://rover.ebay.com/rover/1/711-47294-18009-3/4" resultdomain="ebay.com">
   <Param name="mfe"  value="search" />
