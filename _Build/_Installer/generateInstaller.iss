@@ -6,6 +6,7 @@
 #include "tasks.inc"
 #include "files.inc"
 #include "installDelete.inc"
+#include "uninstallDelete.inc"
 #include "icons.inc"
 #include "registry.registry"
 #include "code.inc"

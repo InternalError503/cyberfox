@@ -172,6 +172,7 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Плагины браузера">
+<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
 <!ENTITY browserpluginswhitelist.label "Разрешить белый список плагинов">
 <!ENTITY browserpluginsjavaenabled.label "Включить плагин Java">
 

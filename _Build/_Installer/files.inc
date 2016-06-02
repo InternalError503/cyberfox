@@ -42,7 +42,7 @@ Source: "{content}\browser\{#PackageType}\browser\ua-update.json"; DestDir: "{ap
 Source: "{content}\browser\{#PackageType}\browser\components\browsercomps.dll"; DestDir: "{app}\browser\components"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\components\components.manifest"; DestDir: "{app}\browser\components"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\extensions\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi"; DestDir: "{app}\browser\extensions"; Flags: ignoreversion
-Source: "{content}\browser\{#PackageType}\browser\features\CTR@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: cyberctr; Flags: promptifolder replacesameversio
+Source: "{content}\browser\{#PackageType}\browser\features\CTR@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: cyberctr; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\features\loop@mozilla.org.xpi"; DestDir: "{app}\browser\features"; Tasks: loop; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\features\firefox@getpocket.com.xpi"; DestDir: "{app}\browser\features"; Tasks: pocket; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\defaults\pref\channel-prefs.js"; DestDir: "{app}\defaults\pref"; Flags: ignoreversion

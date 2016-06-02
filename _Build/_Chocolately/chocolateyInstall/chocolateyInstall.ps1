@@ -1,9 +1,14 @@
 ﻿$packageName = 'cyberfox'
 $installerType = 'exe'
 $version = '__VERSION__'
-$url = "https://download.8pecxstudios.com/latest/Cyberfox-${version}.en-US.win32.intel.exe"
-$url64 = "https://download.8pecxstudios.com/latest/Cyberfox-${version}.en-US.win64-x86_64.intel.exe"
+$url = "https://8pecxstudios.com/download/latest/Cyberfox-${version}.en-US.win32.intel.exe"
+$url64 = "https://8pecxstudios.com/download/latest/Cyberfox-${version}.en-US.win64-x86_64.intel.exe"
 $silentArgs = '/VERYSILENT'
 $validExitCodes = @(0) 
+$is64bit = (Get-ProcessorBits) -eq 64
 
-Install-ChocolateyPackage "$packageName" "$installerType" "$silentArgs" "$url" "$url64"  -validExitCodes $validExitCodes
+if ($is64bit) {
+	Install-ChocolateyPackage "$packageName" "$installerType" "$silentArgs" "$url" "$url64"  -validExitCodes $validExitCodes
+} else {
+	Install-ChocolateyPackage "$packageName" "$installerType" "$silentArgs" "$url"  -validExitCodes $validExitCodes
+}

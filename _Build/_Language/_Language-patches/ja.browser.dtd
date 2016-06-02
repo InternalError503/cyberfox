@@ -172,6 +172,7 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "ブラウザ プラグイン">
+<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
 <!ENTITY browserpluginswhitelist.label "プラグインのホワイトリストを有効にする">
 <!ENTITY browserpluginsjavaenabled.label "Java ブラウザ プラグインを有効にする">
 
