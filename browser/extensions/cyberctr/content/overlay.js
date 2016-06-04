@@ -7603,6 +7603,7 @@ switch (appButtonState){
 		  
 		  setTimeout(function(){
 			document.getElementById('ctraddon_extraurlbar_tb').focus();
+			document.getElementById('ctraddon_extraurlbar_tb').select();
 		  },100);
 		  
 		}
@@ -7612,6 +7613,7 @@ switch (appButtonState){
 		else {
 		  setTimeout(function(){
 			document.getElementById('ctraddon_extraurlbar_tb').focus();
+			document.getElementById('ctraddon_extraurlbar_tb').select();
 		  },100);
 		}
 	} catch(e){}

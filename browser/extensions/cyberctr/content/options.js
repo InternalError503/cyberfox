@@ -1083,7 +1083,6 @@ classicthemerestorerjso.ctr = {
 	}
 	
     document.getElementById('ctraddon_extraurltarget_list').disabled = which;
-	document.getElementById('ctraddon_extraurltarget_list').style.visibility = itemvis;
   },
   
   ctrpwSearchPopupSize: function(which) {
@@ -1095,8 +1094,8 @@ classicthemerestorerjso.ctr = {
 	  which=true; itemvis = 'collapse';
 	}
 	
-    document.getElementById('ctraddon_pw_os_spsize_box').disabled = which;
-	document.getElementById('ctraddon_pw_os_spsize_box').style.visibility = itemvis;
+	document.getElementById('ctraddon_os_spsize_minw').disabled = which;
+	document.getElementById('ctraddon_os_spsize_maxw').disabled = which;
   },
   
   ctrpwAeroColors: function(which) {
@@ -1126,7 +1125,14 @@ classicthemerestorerjso.ctr = {
     document.getElementById('ctraddon_pw_osearch_dm').disabled = which;
     document.getElementById('ctraddon_pw_osearch_iwidth').disabled = which;
     document.getElementById('ctraddon_pw_osearch_meoit').disabled = which;
-	document.getElementById('ctraddon_pw_osearch_iwidth').disabled = which;
+	document.getElementById('ctraddon_pw_osearch_cwidth').disabled = which;
+	if(this.prefs.getBoolPref("osearch_cwidth") && which == false) {
+	  document.getElementById('ctraddon_os_spsize_minw').disabled = false;
+	  document.getElementById('ctraddon_os_spsize_maxw').disabled = false;
+	} else {
+	  document.getElementById('ctraddon_os_spsize_minw').disabled = true;
+	  document.getElementById('ctraddon_os_spsize_maxw').disabled = true;
+	}
 	
   },
  
@@ -1372,11 +1378,11 @@ classicthemerestorerjso.ctr = {
   currentAboutPrefs: function(which) {
 	
 	if(which=="options_win" || which=="options_win_alt") {
-	  document.getElementById('ctraddon_pw_aboutprefswsize').style.visibility = 'visible';
-	  document.getElementById('ctraddon_pw_altoptionsi').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_aboutprefswsizew').disabled = false;
+	  document.getElementById('ctraddon_pw_aboutprefswsizeh').disabled = false;
 	} else {
-	  document.getElementById('ctraddon_pw_aboutprefswsize').style.visibility = 'collapse';
-	  document.getElementById('ctraddon_pw_altoptionsi').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_aboutprefswsizew').disabled = true;
+	  document.getElementById('ctraddon_pw_aboutprefswsizeh').disabled = true;
 	}
   },
   
@@ -1551,7 +1557,7 @@ classicthemerestorerjso.ctr = {
             }
         }
 
-        //Filter preference type and return its filter value.	
+        // Filter preference type and return its filter value.	
         function _prefType(pref) {
             switch (Services.prefs.getPrefType(pref)) {
                 case 32:return ":";break;
@@ -1559,6 +1565,7 @@ classicthemerestorerjso.ctr = {
                 case 128:return "=";break;
             }
         }
+
 
 
         for (var i = 0; i < preferenceList.length; i++) {
@@ -1581,6 +1588,7 @@ classicthemerestorerjso.ctr = {
                 }
 
                 if (aPattern == "json") {
+					// Populate array
                     preferenceArray.preference.push({
                         "preference": preferenceList[i].replace("extensions.classicthemerestorer.", ""),
                         "value": _prefValue(preferenceList[i])
@@ -1594,7 +1602,7 @@ classicthemerestorerjso.ctr = {
         }
         // Use new less bulky export for text.
         classicthemerestorerjso.ctr.saveToFile(preferenceArray, aPattern);
-        //Clear preferenceArray after export.
+        // Clear preferenceArray after export.
         preferenceArray = [];
         return true;
     },
@@ -1629,6 +1637,7 @@ classicthemerestorerjso.ctr = {
 			case 64:	return Services.prefs.setIntPref(pref, val);	break;
 			case 128:	return Services.prefs.setBoolPref(pref, val);	break;	
 		  }
+
 
 		}
 		
@@ -1667,7 +1676,7 @@ classicthemerestorerjso.ctr = {
 			  try {
 
 				if(pattern[i].preference.match(/extensions.classicthemerestorer./g)){
-					//To import previously generated preference export.
+					// To import previously generated preference export.
 					_setPrefValue(pattern[i].preference, pattern[i].value);
 				} else{
 					_setPrefValue('extensions.classicthemerestorer.' + pattern[i].preference, pattern[i].value);

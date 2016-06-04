@@ -127,11 +127,11 @@
 <!ENTITY Ctr_options_rem	"Se rappeler de la dernière catégorie choisie">
 <!ENTITY Ctr_svgfilters		"Couleurs SVG pour les icônes par défaut de la barre d’outils">
 <!ENTITY Ctr_wincontrols	"Mode plein écran : boutons déplaçables">
-<!ENTITY Ctr_puibuttonsep	"Menu button separator">
-<!ENTITY Ctr_puibut_no_sep	"Hidden">
-<!ENTITY Ctr_puibut_l_sep	"Left">
-<!ENTITY Ctr_puibut_r_sep	"Right">
-<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
+<!ENTITY Ctr_puibuttonsep	"Séparateur du bouton de menu :">
+<!ENTITY Ctr_puibut_no_sep	"Masqué">
+<!ENTITY Ctr_puibut_l_sep	"À gauche">
+<!ENTITY Ctr_puibut_r_sep	"À droite">
+<!ENTITY Ctr_html5warning	"Afficher l'avertissement de passage en plein écran pour les vidéos HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Images du domaine de 1er niveau : présentation classique">
 <!ENTITY Ctr_altalertbox	"Boîtes d’alerte: autre présentation">
 <!ENTITY Ctr_emptygfavico	"Remplacer le favicon générique">
@@ -162,15 +162,15 @@
 <!ENTITY Ctr_cpanelmenus	"Compacter les éléments du panneau latéral (marque-pages, historique, etc.)">
 <!ENTITY Ctr_hidezoomres	"Boutons de zoom sur une barre d’outils : Masquer « Réinitialiser le niveau de zoom »">
 <!ENTITY Ctr_alt_newtabp	"Page Nouvel onglet (about:newtab) : autre aspect">
-<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
+<!ENTITY Ctr_nosnippets		"Page de démarrage par défaut (about:home) : masquer les astuces">
 <!ENTITY Ctr_search_ui		"Barre de recherche">
 <!ENTITY Ctr_ctroldsearch	"Ancienne barre de recherche">
 <!ENTITY Ctr_ctroldsearchc	"Effacer le champ de la boîte de recherche après une recherche">
-<!ENTITY Ctr_ctroldsearchr	"Revert to default search engine after search">
+<!ENTITY Ctr_ctroldsearchr	"Revenir au moteur de recherche par défaut après une recherche">
 <!ENTITY Ctr_search_oit		"Ouvrir la recherche dans un nouvel onglet (préférence about:config)">
 <!ENTITY Ctr_osearch_meoit	"Clic central : recherche dans un nouvel onglet au premier plan">
-<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
-<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
+<!ENTITY Ctr_osearch_iwidth	"Ajuster automatiquement la largeur de la fenêtre surgissante">
+<!ENTITY Ctr_osearch_cwidth	"Largeur personnalisée pour la fenêtre surgissante">
 <!ENTITY Ctr_osearch_dm		"Petite « dropmarker »">
 <!ENTITY Ctr_addonmanager	"Gestionnaire de modules complémentaires">
 <!ENTITY Ctr_alt_addonsp	"Page « Plus de détails » des modules : autre aspect">
@@ -306,7 +306,7 @@
 <!ENTITY Ctr_menubarnofog	"Enlever l’effet de flou/l’arrière-plan des éléments (Windows AeroGlass / Win8)">
 
 <!ENTITY Ctr_aerocolors		"Couleur aero bleue pour les barres d’outils (et les onglets)">
-<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
+<!ENTITY Ctr_aerocolorsg	"Utiliser des couleurs Aero bleues/grises">
 <!ENTITY Ctr_transpttbw10	"Titre, barre de menus et barre d’onglets : supprimer la couleur d’arrière-plan">
 <!ENTITY Ctr_transpttbew10	"Réglages supplémentaires pour certains thèmes">
 <!ENTITY Ctr_transptcw10	"Masquer les boutons par défaut min/max/fermeture">
