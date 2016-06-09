@@ -56,8 +56,8 @@
 <!ENTITY turnOnRestart.label "Включить опцию перезапуска браузера">
 <!ENTITY cleanFastRestartCache.label "Очистить кэш быстрого запуска при перезапуске браузера">
 <!ENTITY restartOptions.label "Опции перезапуска">
-<!ENTITY restart_paneluibtn.label "Добавить кнопку на пользовательскую панель">
-<!ENTITY restart_panelbtnsmall.label "Маленькая кнопка на пользовательской панели">
+<!ENTITY restart_paneluibtn.label "Добавить кнопку на панель инструментов пользователя">
+<!ENTITY restart_panelbtnsmall.label "Маленькая кнопка на панели инструментов пользователя">
 <!ENTITY restart_reqconfirmation.label "Запрашивать подтверждение перезапуска">
 <!-- End Restart Browser Tweak -->
 
@@ -172,7 +172,7 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Плагины браузера">
-<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
+<!ENTITY browserpluginsdisabled.label "Отключить плагины браузера (отключаются все плагины)">
 <!ENTITY browserpluginswhitelist.label "Разрешить белый список плагинов">
 <!ENTITY browserpluginsjavaenabled.label "Включить плагин Java">
 
