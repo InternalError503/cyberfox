@@ -632,7 +632,7 @@ pref("accessibility.typeaheadfind.flashBar", 1);
 // Tracks when accessibility is loaded into the previous session.
 pref("accessibility.loadedInLastSession", false);
 
-pref("plugins.update.url", "https://www.mozilla.org/%LOCALE%/plugincheck/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=plugincheck-update");
+pref("plugins.update.url", "https://www.mozilla.org/%LOCALE%/plugincheck/");
 pref("plugins.update.notifyUser", false);
 
 pref("plugins.click_to_play", true);
@@ -1745,6 +1745,9 @@ pref("app.update.startup-delay", 6000);
 
 //Set startup check timeout (5 Seconds)
 pref("app.update.startup-timeout", 5000);
+
+//Set startup last update check.
+pref("app.update.startup.lastcheck", "");
 
 //set bool pref for copy tab url enabled
 pref("browser.tabs.copyurl", true);
