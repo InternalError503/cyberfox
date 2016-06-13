@@ -1495,9 +1495,9 @@ pref("identity.fxaccounts.migrateToDevEdition", false);
 pref("ui.key.menuAccessKeyFocuses", true);
 #endif
 
-// Encrypted media extensions. (Disabled)
-pref("media.eme.enabled", false);
-pref("media.eme.apiVisible", false);
+// Encrypted media extensions. (Enabled due to video playback issues on socialmedia)
+pref("media.eme.enabled", true);
+pref("media.eme.apiVisible", true);
 
 // Decode using Gecko Media Plugins in <video>, if a system decoder is not
 // availble and the preferred GMP is available.
