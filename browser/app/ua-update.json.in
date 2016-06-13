@@ -3,8 +3,6 @@
 // Send these sites a custom user-agent. Bugs should be included with an entry.
 // All entries marked with * need incrementing each core update.
 {
-  // Netflix  * (Additional netflix is really being a royal pain with firefox user-agent)
-  "netflix.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0",
   // Battlelog *
   "battlefield.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0",
   // discordapp * (There sites javascript breaks with cyberfox user-agent 1. only allows WOW64 2. can't have the cyberfox slice.
