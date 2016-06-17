@@ -645,7 +645,7 @@ pref("plugin.defaultXpi.state", 2);
 
 // Flash is enabled by default, and Java is click-to-activate by default on
 // all channels.
-pref("plugin.state.flash", 1);
+pref("plugin.state.flash", 2);
 pref("plugin.state.java", 1);
 
 // Whitelist Requests
