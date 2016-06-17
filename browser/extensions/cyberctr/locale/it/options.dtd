@@ -43,7 +43,7 @@
 <!ENTITY Ctr_tabsontop3		"Schede in basso (v2) --- attivata [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"La versione v2 è solo per alcuni componenti aggiuntivi e temi completi!">
 <!ENTITY Ctr_tabsontopI1	"Aggiunge l’attributo [tabsontop=true/false] a">
-<!ENTITY Ctr_tabsintitlebar	"Schede nella barra del titolo (about:config)">
+<!ENTITY Ctr_tabsintitlebar	"Schede nella barra del titolo">
 <!ENTITY Ctr_tabwidthdef	"(predefinita)">
 <!ENTITY Ctr_tabwidthcla	"(stile classico)">
 <!ENTITY Ctr_tabminheight	"Altezza:">
@@ -55,7 +55,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Valori inferiori a 48px provocheranno anomalie nella maggior parte dei casi!">
 <!ENTITY Ctr_square_edges	"Angoli superiori spigolosi">
 <!ENTITY Ctr_tttitlebar		"Titolo scheda nella barra del titolo di &brandShortName;">
-<!ENTITY Ctr_tabinsertion	"Inserisci la scheda relativa dopo la scheda corrente (about:config)">
+<!ENTITY Ctr_tabinsertion	"Inserisci la scheda correlata dopo la scheda corrente">
 <!ENTITY Ctr_emptytfavico	"Mostra favicon (quando un sito ne è privo)">
 <!ENTITY Ctr_emptytfavico_n	"Nessuna">
 <!ENTITY Ctr_emptytfavico_g	"Generica">
@@ -70,10 +70,11 @@
 <!ENTITY Ctr_closei_def		"Icone predefinite">
 <!ENTITY Ctr_closeonleft	"Posizione alternativa sulla scheda">
 <!ENTITY Ctr_closetabbig	"Icona più grande (20x20 px)">
-<!ENTITY Ctr_close_wwltab	"Chiudendo l’ultima scheda chiudi la finestra (about:config)">
+<!ENTITY Ctr_close_wwltab	"Chiudendo l’ultima scheda chiudi la finestra">
 
 <!ENTITY Ctr_hctpinfotab	"Alcune modifiche alle schede non sono compatibili con il componente aggiuntivo 'Hide Caption Titlebar Plus'.">
 <!ENTITY Ctr_hctpinfoab		"Il pulsante nella barra del titolo non è compatibile con il componente aggiuntivo 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_tobainfotab	"Il componente aggiuntivo 'Tabs on Bottom' non è compatibile con '&Ctr_title;' e deve essere disattivato. Usa invece le impostazioni disponibili in '&Ctr_cuitabsnontop;'!">
 
 <!ENTITY Ctr_appbutton		"Pulsante &brandShortName;">
 <!ENTITY Ctr_appbutton0		"Nessun pulsante">
@@ -126,13 +127,13 @@
 <!ENTITY Ctr_options_rem	"Ricorda l'ultima categoria selezionata">
 <!ENTITY Ctr_svgfilters		"Colori SVG per le icone dei pulsanti della barra strumenti">
 <!ENTITY Ctr_wincontrols	"Angoli finestra mobili in modalità schermo intero">
-<!ENTITY Ctr_puibuttonsep	"Menu button separator">
-<!ENTITY Ctr_puibut_no_sep	"Hidden">
-<!ENTITY Ctr_puibut_l_sep	"Left">
-<!ENTITY Ctr_puibut_r_sep	"Right">
-<!ENTITY Ctr_html5warning	"HTML5 full screen warning">
-<!ENTITY Ctr_oldtoplevimg	"Immagini 'Top level domain': aspetto classico">
-<!ENTITY Ctr_altalertbox	"'Alert box': aspetto alternativo">
+<!ENTITY Ctr_puibuttonsep	"Separatore del pulsante Menu">
+<!ENTITY Ctr_puibut_no_sep	"Nascosto">
+<!ENTITY Ctr_puibut_l_sep	"Sinistra">
+<!ENTITY Ctr_puibut_r_sep	"Destra">
+<!ENTITY Ctr_html5warning	"Avviso per HTML5 a tutto schermo">
+<!ENTITY Ctr_oldtoplevimg	"Immagini dei domini di livello superiore: aspetto classico">
+<!ENTITY Ctr_altalertbox	"Avvisi di notifiche: aspetto alternativo">
 <!ENTITY Ctr_emptygfavico	"Sostituisci la favicon generica">
 <!ENTITY Ctr_mstatusbar		"Barra di stato mobile">
 <!ENTITY Ctr_mstatusbars4e	"La barra di stato è gestita da 'Status-4-Evar'">
@@ -161,15 +162,15 @@
 <!ENTITY Ctr_cpanelmenus	"Pannello menu unificato (Segnalibri, Cronologia, ecc.)">
 <!ENTITY Ctr_hidezoomres	"Nascondi il pulsante per ripristinare il livello di zoom dalla barra degli strumenti">
 <!ENTITY Ctr_alt_newtabp	"Nuova scheda (about:newtab): aspetto alternativo">
-<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
-<!ENTITY Ctr_search_ui		"Search">
+<!ENTITY Ctr_nosnippets		"Pagina iniziale (about:home): nascondi gli snippet">
+<!ENTITY Ctr_search_ui		"Ricerca">
 <!ENTITY Ctr_ctroldsearch	"Ricerca vecchio stile">
 <!ENTITY Ctr_ctroldsearchc	"Pulisci la casella di ricerca dopo aver effettuato la ricerca">
-<!ENTITY Ctr_ctroldsearchr	"Revert to first search engine in list after search">
-<!ENTITY Ctr_search_oit		"Apri la ricerca in una nuova scheda (preferenza in  about:config)">
+<!ENTITY Ctr_ctroldsearchr	"Ripristina il primo motore di ricerca dell'elenco dopo aver effettuato la ricerca">
+<!ENTITY Ctr_search_oit		"Apri la ricerca in una nuova scheda">
 <!ENTITY Ctr_osearch_meoit	"Clic sul tasto centrale: ricerca in una nuova scheda attiva">
-<!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
-<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
+<!ENTITY Ctr_osearch_iwidth	"Regola automaticamente la larghezza del menu a discesa">
+<!ENTITY Ctr_osearch_cwidth	"Larghezza personalizzata per i risultati di ricerca">
 <!ENTITY Ctr_osearch_dm		"Freccia verso il basso piccola">
 <!ENTITY Ctr_addonmanager	"Gestione componenti aggiuntivi">
 <!ENTITY Ctr_alt_addonsp	"Pagina 'Altro' dei componenti aggiuntivi: aspetto alternativo">
@@ -181,15 +182,15 @@
 <!ENTITY Ctr_am_buticons	"Elenco dei componenti: sostituisci il testo dei pulsanti con le icone">
 <!ENTITY Ctr_am_hovshowb	"Elenco dei componenti: mostra i pulsanti soltanto al passaggio del mouse">
 <!ENTITY Ctr_addonversion	"Informazioni sui componenti: mostra versione del componente aggiuntivo">
-<!ENTITY Ctr_xpinstallui	"Stile classico per la finestra di installazione dei componenti aggiuntivi (preferenza in about:config)">
+<!ENTITY Ctr_xpinstallui	"Stile classico per la finestra di installazione dei componenti aggiuntivi">
 <!ENTITY Ctr_bmbutton		"Menu del pulsante segnalibri">
 <!ENTITY Ctr_hiderecentbm	"Popup segnalibri: nascondi i segnalibri aggiunti di recente">
-<!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_hideeditbm		"Stella dei segnalibri: nascondi popup (se la pagina non è nei segnalibri)">
 <!ENTITY Ctr_bmbutpanelm	"Aspetto del menu a pannello">
 <!ENTITY Ctr_bmbunsortbm	"Menu dei 'Segnalibri non catalogati'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
-<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
-<!ENTITY Ctr_bmbviewbmtb	"Mostra 'Visualizza barra dei segnalibri'">
+<!ENTITY Ctr_bmbviewbmsb	"Mostra 'Visualizza barra laterale segnalibri'">
+<!ENTITY Ctr_bmbviewbmtb	"Mostra 'Visualizza Barra dei segnalibri'">
 <!ENTITY Ctr_bmbnounsort	"Nascondi 'Segnalibri non catalogati'">
 <!ENTITY Ctr_bmbutnotext	"Nascondi etichetta della barra dei segnalibri">
 <!ENTITY Ctr_skipprintpr	"Pulsante stampa: salta l’anteprima di stampa">
@@ -261,15 +262,16 @@
 <!ENTITY Ctr_padlock_cla	"classico">
 <!ENTITY Ctr_padlock_mod	"moderno">
 <!ENTITY Ctr_padlock_ext	"Icona di '&brandShortName;' per le pagine 'about' valide">
-<!ENTITY Ctr_icopageinfo	"Favicon/icona a globo/'i': il 'clic' apre la finestra 'Informazioni pagina'">
+<!ENTITY Ctr_icopageinfo	"Favicon/icona 'i'/globo: il 'clic' apre la finestra 'Informazioni pagina'">
 <!ENTITY Ctr_lbsbsize		"Larghezza personalizzata per la barra degli indirizzi e di ricerca">
 <!ENTITY Ctr_searchbar		"Barra di ricerca">
-<!ENTITY Ctr_autocomplete	"Autocomplete popup">
-<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
-<!ENTITY Ctr_urlbar_uc		"Disattiva il completamento automatico (preferenza in about:config)">
-<!ENTITY Ctr_lbsugresi		"Disable height limit">
-<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
-<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
+<!ENTITY Ctr_autocomplete	"Completamento automatico">
+<!ENTITY Ctr_altautocompl	"Aspetto alternativo">
+<!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_urlbar_uc		"Disattiva il completamento automatico">
+<!ENTITY Ctr_lbsugresi		"Disattiva il limite di altezza">
+<!ENTITY Ctr_lbsugres		"Numero di risultati">
+<!ENTITY Ctr_lbsbradius		"Arrotondamento personalizzato della barra degli indirizzi e di ricerca">
 
 <!ENTITY Ctr_menubar_items	"Posizione delle voci del menu">
 <!ENTITY Ctr_extrabar		"Barre degli strumenti aggiuntive">
@@ -295,7 +297,8 @@
 <!ENTITY Ctr_hidetbwote2	"Mantieni la barra del titolo (schede in alto)">
 <!ENTITY Ctr_notabfog		"Disattiva l’effetto nebbia (Windows AeroGlass e Win8)">
 <!ENTITY Ctr_notabbg		"Rimuovi colore di sfondo (Windows AeroGlass e Win8)">
-<!ENTITY Ctr_hightabpos		"Quando possibile, riduci lo spazio sopra le barre ">
+<!ENTITY Ctr_hightabpos		"Quando possibile, riduci lo spazio sopra le barre">
+<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
 <!ENTITY Ctr_alttabstb		"Colore di sfondo alternativo">
 <!ENTITY Ctr_alttabstb2		"Finestra ingrandita (schede in alto)">
 
@@ -305,7 +308,7 @@
 <!ENTITY Ctr_menubarnofog	"Elimina l’effetto nebbia o il colore di sfondo (Windows AeroGlass e Windows 8)">
 
 <!ENTITY Ctr_aerocolors		"Colori Blu Aero per le barre degli strumenti e le schede">
-<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
+<!ENTITY Ctr_aerocolorsg	"Colori Aero grigio-blu">
 <!ENTITY Ctr_transpttbw10	"Barre del titolo/menu/schede: rimuovi il colore di sfondo">
 <!ENTITY Ctr_transpttbew10	"Modifiche aggiuntive per alcuni temi del SO">
 <!ENTITY Ctr_transptcw10	"Nascondi i pulsanti di controllo finestra di sistema">
@@ -327,17 +330,17 @@
 
 <!ENTITY Ctr_closeabarbut	"Barra dei componenti aggiuntivi: nascondi il pulsante di chiusura">
 <!ENTITY Ctr_highaddonsbar	"Aumenta l’altezza">
-<!ENTITY Ctr_lessaddonsbar	"Decrease height">
+<!ENTITY Ctr_lessaddonsbar	"Diminuisci l'altezza">
 <!ENTITY Ctr_addonbarfs		"In modalità tutto schermo">
 
 <!ENTITY Ctr_animation		"Icone animate">
 <!ENTITY Ctr_tabthrobber	"Immagine di caricamento predefinita">
 <!ENTITY Ctr_bmanimation	"Icona animata all’aggiunta di un segnalibro">
 <!ENTITY Ctr_pananimation	"Icona animata all’apertura di un pannello">
-<!ENTITY Ctr_tabanimation	"Icona animata all’apertura o alla chiusura di una scheda (about:config)">
-<!ENTITY Ctr_dlanimation	"Icona animata avviso download (about:config)">
-<!ENTITY Ctr_fsanimation	"Icona animata all’attivazione della modalità 'A tutto schermo' (about:config)">
-<!ENTITY Ctr_fsaduration	"Icona animata per la modalità 'A tutto schermo' degli elementi HTML5 (about:config)">
+<!ENTITY Ctr_tabanimation	"Icona animata all’apertura o alla chiusura di una scheda">
+<!ENTITY Ctr_dlanimation	"Icona animata di avviso download">
+<!ENTITY Ctr_fsanimation	"Icona animata all’attivazione della modalità 'A tutto schermo'">
+<!ENTITY Ctr_fsaduration	"Icona animata per la modalità 'A tutto schermo' degli elementi HTML5">
 
 <!ENTITY Ctr_toolsitem		"Aggiungi collegamento nel menu Strumenti">
 <!ENTITY Ctr_appmenuitem	"Aggiungi collegamento nel menu del Pulsante &brandShortName;">
@@ -388,9 +391,9 @@
 <!ENTITY Ctr_menu_restart.label			"Riavvia">
 <!ENTITY Ctr_restartapp					"'Riavvia' nel menu del Pulsante &brandShortName; e nel menu File">
 
-<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
-<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
-<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
+<!ENTITY Ctr_openInCurrentTab			"Apri l'indirizzo nella scheda corrente">
+<!ENTITY Ctr_openInNewTab				"Apri l'indirizzo in una nuova scheda">
+<!ENTITY Ctr_openInNewWindow			"Apri l'indirizzo in una nuova finestra">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey            "I">
@@ -406,7 +409,7 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (Default)">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (Default)">
 <!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">

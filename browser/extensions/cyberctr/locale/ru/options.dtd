@@ -43,7 +43,7 @@
 <!ENTITY Ctr_tabsontop3		"Вкладки не вверху (v2) --- [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 работает только с некоторыми дополнениями и полными темами!">
 <!ENTITY Ctr_tabsontopI1	"Добавляет атрибут [tabsontop=true/false] для">
-<!ENTITY Ctr_tabsintitlebar	"Строка заголовка (about:config)">
+<!ENTITY Ctr_tabsintitlebar	"Строка заголовка">
 <!ENTITY Ctr_tabwidthdef	"(по умолчанию)">
 <!ENTITY Ctr_tabwidthcla	"(классическая)">
 <!ENTITY Ctr_tabminheight	"Высота:">
@@ -55,7 +55,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Значения ниже 48px часто приводят к сбоям!">
 <!ENTITY Ctr_square_edges	"Верхние углы без закругления">
 <!ENTITY Ctr_tttitlebar		"Название вкладки в панели вкладок &brandShortName;">
-<!ENTITY Ctr_tabinsertion	"Открывать связанную вкладку после текущей вкладки (настройка about:config)">
+<!ENTITY Ctr_tabinsertion	"Открывать связанную вкладку после текущей вкладки">
 <!ENTITY Ctr_emptytfavico	"Показывать фавиконку (если отсутствует)">
 <!ENTITY Ctr_emptytfavico_n	"Нет">
 <!ENTITY Ctr_emptytfavico_g	"Стандартная">
@@ -70,12 +70,13 @@
 <!ENTITY Ctr_closei_def		"Стандартный значок 'Закрыть'">
 <!ENTITY Ctr_closeonleft	"Альтернативная позиция на вкладке">
 <!ENTITY Ctr_closetabbig	"Увеличенный значок (20x20 пикс.)">
-<!ENTITY Ctr_close_wwltab	"Закрыть окно при закрытии последней вкладки (настройка about:config)">
+<!ENTITY Ctr_close_wwltab	"Закрыть окно при закрытии последней вкладки">
 
-<!ENTITY Ctr_hctpinfotab	"Некоторые виды оформления вкладок несовместимы с расширением 'Hide Caption Titlebar Plus'.">
-<!ENTITY Ctr_hctpinfoab		"Кнопка на панели заголовка несовместима с расширением 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_hctpinfotab	"Некоторые виды оформления вкладок не совместимы с расширением 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_hctpinfoab		"Кнопка на панели заголовка не совместима с расширением 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_tobainfotab	"Дополнение 'Tabs on Bottom' не совместимо с '&Ctr_title;' и должно быть отключено. Используйте настройки '&Ctr_cuitabsnontop;'!">
 
-<!ENTITY Ctr_appbutton		"Кнопка приложения">
+<!ENTITY Ctr_appbutton		"Кнопка &brandShortName;">
 <!ENTITY Ctr_appbutton0		"отключена">
 <!ENTITY Ctr_appbutton1		"в панели инструментов">
 <!ENTITY Ctr_appbutton1wt	"в панели инструментов (только текст)">
@@ -87,11 +88,11 @@
 <!ENTITY Ctr_paneluibtweak3	"...на панели вкладок">
 <!ENTITY Ctr_appbuttonc_o	"Оранжевая кнопка (Firefox)">
 <!ENTITY Ctr_appbuttonc_a	"Синяя кнопка (Aurora)">
-<!ENTITY Ctr_appbuttonc_n	"Черная кнопка (Nightly)">
+<!ENTITY Ctr_appbuttonc_n	"Чёрная кнопка (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Прозрачная кнопка">
 <!ENTITY Ctr_appbuttonc_p	"Голубая кнопка (Palemoon)">
 <!ENTITY Ctr_appbuttonc_r	"Красная кнопка">
-<!ENTITY Ctr_appbuttonc_g	"Зеленая кнопка">
+<!ENTITY Ctr_appbuttonc_g	"Зелёная кнопка">
 <!ENTITY Ctr_appbuttonc_gr	"Серая кнопка">
 <!ENTITY Ctr_appbuttonc_pu	"Фиолетовая кнопка">
 <!ENTITY Ctr_appbuttonc_wh	"Белая кнопка">
@@ -165,8 +166,8 @@
 <!ENTITY Ctr_search_ui		"Поиск">
 <!ENTITY Ctr_ctroldsearch	"Старая форма поиска">
 <!ENTITY Ctr_ctroldsearchc	"Очистить форму после поиска">
-<!ENTITY Ctr_ctroldsearchr	"Revert to first search engine in list after search">
-<!ENTITY Ctr_search_oit		"Открывать поиск в ноовй вкладке (опция about:config)">
+<!ENTITY Ctr_ctroldsearchr	"По окончании поиска переключаться на первую в списке поисковую систему">
+<!ENTITY Ctr_search_oit		"Открывать поиск в новой вкладке">
 <!ENTITY Ctr_osearch_meoit	"Клик средней кнопкой: поиск в новой активной вкладке">
 <!ENTITY Ctr_osearch_iwidth	"Автоматически подгонять ширину всплывающего меню">
 <!ENTITY Ctr_osearch_cwidth	"Пользовательская ширина всплывающего меню">
@@ -181,7 +182,7 @@
 <!ENTITY Ctr_am_buticons	"Список дополнений: заменить текстовые метки значками">
 <!ENTITY Ctr_am_hovshowb	"Список дополнений: показывать кнопки только при наведении">
 <!ENTITY Ctr_addonversion	"Отображать версии дополнений на странице 'Управление дополнениями'">
-<!ENTITY Ctr_xpinstallui	"Управление дополнениями: старый стиль окна установки дополнения (настройка в about:config)">
+<!ENTITY Ctr_xpinstallui	"Управление дополнениями: старый стиль окна установки дополнения">
 <!ENTITY Ctr_bmbutton		"Кнопка меню закладок">
 <!ENTITY Ctr_hiderecentbm	"Всплывающее меню: скрывать недавно добавленные закладки">
 <!ENTITY Ctr_hideeditbm		"Звездочка закладок: скрыть всплытие (если страница не в закладках)">
@@ -265,11 +266,12 @@
 <!ENTITY Ctr_lbsbsize		"Настройка ширины панелей адреса и поиска">
 <!ENTITY Ctr_searchbar		"Панель поиска">
 <!ENTITY Ctr_autocomplete	"Автозавершение">
-<!ENTITY Ctr_altautocompl	"Альтернативный внешний вид (экспериментально)">
-<!ENTITY Ctr_urlbar_uc		"Отключить функцию «автозаполнение» (настройка about:config)">
+<!ENTITY Ctr_altautocompl	"Альтернативный внешний вид">
+<!ENTITY Ctr_autocompl_it	"Удалить пункты «Искать в...» и «Посетить» (при наличии)">
+<!ENTITY Ctr_urlbar_uc		"Отключить функцию «автозаполнение»">
 <!ENTITY Ctr_lbsugresi		"Отображать максимально возможное количество результатов в подсказках (без прокрутки)">
-<!ENTITY Ctr_lbsugres		"Количество всплывающих результатов (настройка about:config)">
-<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
+<!ENTITY Ctr_lbsugres		"Количество всплывающих результатов">
+<!ENTITY Ctr_lbsbradius		"Задать радиус границ панелей адреса и поиска">
 
 <!ENTITY Ctr_menubar_items	"Позиция пунктов меню">
 <!ENTITY Ctr_extrabar		"Дополнительные панели инструментов">
@@ -296,6 +298,7 @@
 <!ENTITY Ctr_notabfog		"Отключить затуманивание фона панели вкладок (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Удалить цвет фона (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Уменьшить пространство над панелями инструментов (если возможно)">
+<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
 <!ENTITY Ctr_alttabstb		"Заменить цвет фона">
 <!ENTITY Ctr_alttabstb2		"В развернутом режиме (вкладки сверху)">
 
@@ -334,10 +337,10 @@
 <!ENTITY Ctr_tabthrobber	"Стандартное изображение загрузки">
 <!ENTITY Ctr_bmanimation	"Анимация создания закладок">
 <!ENTITY Ctr_pananimation	"Анимация открытия панели">
-<!ENTITY Ctr_tabanimation	"Анимация открытия и закрытия вкладок (about:config)">
-<!ENTITY Ctr_dlanimation	"Анимация «Загрузка завершена» (about:config)">
-<!ENTITY Ctr_fsanimation	"Полноэкранная анимация (настройка в about:config)">
-<!ENTITY Ctr_fsaduration	"Полноэкранная анимация для контента HTML5 (настройка в about:config)">
+<!ENTITY Ctr_tabanimation	"Анимация открытия и закрытия вкладок">
+<!ENTITY Ctr_dlanimation	"Анимация «Загрузка завершена»">
+<!ENTITY Ctr_fsanimation	"Полноэкранная анимация">
+<!ENTITY Ctr_fsaduration	"Полноэкранная анимация для контента HTML5">
 
 <!ENTITY Ctr_toolsitem		"Пункт в меню инструментов">
 <!ENTITY Ctr_appmenuitem	"Пункт в меню кнопки приложения">
@@ -406,7 +409,7 @@
 
 <!-- Extra CyberCTR Additions -->
  
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; (по умолчанию)">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox (по умолчанию)">
 <!ENTITY Ctr_appbuttonc_s	"Оранжево-розовая кнопка">
 
 <!ENTITY Ctr_alt_newtabpalt	"Стиль представления страницы новой вкладки">

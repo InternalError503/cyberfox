@@ -3,7 +3,6 @@
   %overlayDTD;
 <!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
 
-
 <!ENTITY Ctr_title			"Personnaliser &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Barre des modules">
@@ -44,7 +43,7 @@
 <!ENTITY Ctr_tabsontop3		"Onglets position basse (v2) --- réglage [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 n’est valable uniquement que pour certains modules et les thèmes complets !">
 <!ENTITY Ctr_tabsontopI1	"L’attribut [tabsontop=true/false] est assigné à">
-<!ENTITY Ctr_tabsintitlebar	"Barre de titre &brandShortName; (about:config)">
+<!ENTITY Ctr_tabsintitlebar	"Barre de titre &brandShortName;">
 <!ENTITY Ctr_tabwidthdef	"(défaut)">
 <!ENTITY Ctr_tabwidthcla	"(classique)">
 <!ENTITY Ctr_tabminheight	"Hauteur :">
@@ -56,7 +55,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Les valeurs en dessous de 48px causent souvent des problèmes.">
 <!ENTITY Ctr_square_edges	"Équarrir les coins supérieurs">
 <!ENTITY Ctr_tttitlebar		"Titre de l’onglet dans la barre titre de &brandShortName;">
-<!ENTITY Ctr_tabinsertion	"Placer l’onglet apparenté après l’onglet courant (about:config)">
+<!ENTITY Ctr_tabinsertion	"Placer l’onglet apparenté après l’onglet courant">
 <!ENTITY Ctr_emptytfavico	"Afficher une favicon (si le site n’en a pas)">
 <!ENTITY Ctr_emptytfavico_n	"Aucun">
 <!ENTITY Ctr_emptytfavico_g	"Générique">
@@ -71,10 +70,11 @@
 <!ENTITY Ctr_closei_def		"Icônes par défaut">
 <!ENTITY Ctr_closeonleft	"À l’autre extrémité de l’onglet">
 <!ENTITY Ctr_closetabbig	"Îcône plus grosse (20 × 20px)">
-<!ENTITY Ctr_close_wwltab	"Fermer la fenêtre à la fermeture du dernier onglet (about:config)">
+<!ENTITY Ctr_close_wwltab	"Fermer la fenêtre à la fermeture du dernier onglet">
 
 <!ENTITY Ctr_hctpinfotab	"Certains styles d’onglets sont incompatibles avec le module « Hide Caption Titlebar Plus ».">
 <!ENTITY Ctr_hctpinfoab		"Le bouton sur la barre de titre est incompatible avec le module « Hide Caption Titlebar Plus ».">
+<!ENTITY Ctr_tobainfotab	"The add-on 'Tabs on Bottom' is not compatible with '&Ctr_title;' and should be disabled. Use available '&Ctr_cuitabsnontop;' settings instead!">
 
 <!ENTITY Ctr_appbutton		"Bouton &brandShortName;">
 <!ENTITY Ctr_appbutton0		"Bouton désactivé">
@@ -167,7 +167,7 @@
 <!ENTITY Ctr_ctroldsearch	"Ancienne barre de recherche">
 <!ENTITY Ctr_ctroldsearchc	"Effacer le champ de la boîte de recherche après une recherche">
 <!ENTITY Ctr_ctroldsearchr	"Revenir au moteur de recherche par défaut après une recherche">
-<!ENTITY Ctr_search_oit		"Ouvrir la recherche dans un nouvel onglet (préférence about:config)">
+<!ENTITY Ctr_search_oit		"Ouvrir la recherche dans un nouvel onglet">
 <!ENTITY Ctr_osearch_meoit	"Clic central : recherche dans un nouvel onglet au premier plan">
 <!ENTITY Ctr_osearch_iwidth	"Ajuster automatiquement la largeur de la fenêtre surgissante">
 <!ENTITY Ctr_osearch_cwidth	"Largeur personnalisée pour la fenêtre surgissante">
@@ -185,11 +185,11 @@
 <!ENTITY Ctr_xpinstallui	"Ancienne fenêtre d’installation de modules (préf. about:config)">
 <!ENTITY Ctr_bmbutton		"Bouton marque-pages">
 <!ENTITY Ctr_hiderecentbm	"Popup marque-pages : masquer le groupe « marqués récemment »">
-<!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
-<!ENTITY Ctr_bmbutpanelm	"Popup : apparence Panneau menu">
+<!ENTITY Ctr_hideeditbm		"Étoile des marque-pages : masquer le menu déroulant (si la page n'a pas été marquée)">
+<!ENTITY Ctr_bmbutpanelm	"Menu déroulant : apparence de menu de type « panneau »">
 <!ENTITY Ctr_bmbunsortbm	"Popup : sous menu des « marque-pages non triés »">
 <!ENTITY Ctr_bmbunsortbm2	"Menu au-dessus des marque-pages">
-<!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Sidebar'">
+<!ENTITY Ctr_bmbviewbmsb	"Menu déroulant : afficher « Afficher panneau des marque-pages »">
 <!ENTITY Ctr_bmbviewbmtb	"Popup : afficher « Voir la barre d’outils »">
 <!ENTITY Ctr_bmbnounsort	"Popup : cacher les « marque-pages non triés »">
 <!ENTITY Ctr_bmbutnotext	"Masquer « Marque-pages » sur la barre personnelle">
@@ -262,15 +262,16 @@
 <!ENTITY Ctr_padlock_cla	"classique ">
 <!ENTITY Ctr_padlock_mod	"moderne">
 <!ENTITY Ctr_padlock_ext	"Icône « &brandShortName; » pour les pages « about » valides">
-<!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
+<!ENTITY Ctr_icopageinfo	"Favicon/globe/icône « i » : ouvrir la fenêtre « Informations sur la page » en cliquant sur l'icône">
 <!ENTITY Ctr_lbsbsize		"Largeurs personnalisées pour la barre d’adresse et la barre de recherche">
 <!ENTITY Ctr_searchbar		"Barre de recherche">
-<!ENTITY Ctr_urlbar_uc		"Désactiver la fonctionnalité « Autocomplétion unifiée » (paramètre about:config)">
-<!ENTITY Ctr_autocomplete	"Autocomplete popup">
-<!ENTITY Ctr_altautocompl	"Alternative appearance (experimental)">
-<!ENTITY Ctr_lbsugresi		"Disable height limit">
-<!ENTITY Ctr_lbsugres		"Number of results (about:config preference)">
-<!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
+<!ENTITY Ctr_urlbar_uc		"Désactiver la fonctionnalité « Autocomplétion unifiée »">
+<!ENTITY Ctr_autocomplete	"Fenêtre surgissante d'autocomplétion">
+<!ENTITY Ctr_altautocompl	"Apparence alternative">
+<!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_lbsugresi		"Désactiver la limite de hauteur">
+<!ENTITY Ctr_lbsugres		"Nombre de résultats :">
+<!ENTITY Ctr_lbsbradius		"Rayon de bordure personnalisé pour la barre d'adresse et la barre de recherche">
 
 <!ENTITY Ctr_menubar_items	"Position de la barre de menus">
 <!ENTITY Ctr_extrabar		"Barres d’outils supplémentaires">
@@ -297,6 +298,7 @@
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Réduire l’espace en haut (si possible)">
+<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
 <!ENTITY Ctr_alttabstb		"Arrière-plan d’une autre couleur">
 <!ENTITY Ctr_alttabstb2		"En mode maximisé (onglets en haut)">
 
@@ -328,17 +330,17 @@
 
 <!ENTITY Ctr_closeabarbut	"Masquer le bouton de fermeture">
 <!ENTITY Ctr_highaddonsbar	"Augmenter la hauteur">
-<!ENTITY Ctr_lessaddonsbar	"Decrease height">
+<!ENTITY Ctr_lessaddonsbar	"Réduire la hauteur">
 <!ENTITY Ctr_addonbarfs		"En mode plein écran">
 
 <!ENTITY Ctr_animation		"Animation">
 <!ENTITY Ctr_tabthrobber	"Img. de charg. défaut">
 <!ENTITY Ctr_bmanimation	"Animation à l’ajout de marque-pages">
 <!ENTITY Ctr_pananimation	"Animation à l’ouverture des panneaux">
-<!ENTITY Ctr_tabanimation	"Animation à l’ouverture et à la fermeture des onglets (préf. about:config)">
-<!ENTITY Ctr_dlanimation	"Animation de « Téléchargement » (préf. about:config)">
-<!ENTITY Ctr_fsanimation	"Animation au passage en plein écran (préf. about:config)">
-<!ENTITY Ctr_fsaduration	"Animation au passage en plein écran pour le contenu HTML5 (préf. about:config)">
+<!ENTITY Ctr_tabanimation	"Animation à l’ouverture et à la fermeture des onglets">
+<!ENTITY Ctr_dlanimation	"Animation de « Téléchargement »">
+<!ENTITY Ctr_fsanimation	"Animation au passage en plein écran">
+<!ENTITY Ctr_fsaduration	"Animation au passage en plein écran pour le contenu HTML5">
 
 <!ENTITY Ctr_toolsitem		"« Personnaliser &brandShortName; » dans le menu outils">
 <!ENTITY Ctr_appmenuitem	"« Personnaliser &brandShortName; » dans le menu d’applications">
@@ -349,7 +351,7 @@
 <!ENTITY Ctr_cuibotbuttons	"Boutons supplémentaires en mode personnalisation">
 <!ENTITY Ctr_nodevtheme		"Empêcher l’application du théme développeur">
 
-<!ENTITY Ctr_experttweaks	"Expert">
+<!ENTITY Ctr_experttweaks	"Avancé">
 <!ENTITY Ctr_fx34search		"Si ce paramètre est décoché, l’ancienne barre de recherche est activée.">
 <!ENTITY Ctr_fx34loop		"Si ce paramètre est décoché, les fonctions d’appels et de conversations sont désactivées.">
 <!ENTITY Ctr_fx35devtheme	"Si ce paramètre est décoché, le thème développeur est desactivé.">
@@ -389,9 +391,9 @@
 <!ENTITY Ctr_menu_restart.label			"Redémarrer">
 <!ENTITY Ctr_restartapp					"« Redémarrer » dans le menu &brandShortName; et le menu Fichier">
 
-<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
-<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
-<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
+<!ENTITY Ctr_openInCurrentTab			"Ouvrir les entrées dans l'onglet actuel">
+<!ENTITY Ctr_openInNewTab				"Ouvrir les entrées dans un nouvel onglet">
+<!ENTITY Ctr_openInNewWindow			"Ouvrir les entrées dans une nouvelle fenêtre">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"d">
@@ -410,7 +412,7 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d				"Bouton &brandShortName; (par défaut)">
+<!ENTITY Ctr_appbuttonc_d				"Bouton Cyberfox (par défaut)">
 <!ENTITY Ctr_appbuttonc_s				"Bouton saumon">
 
 <!ENTITY Ctr_alt_newtabpalt					"Page Nouvel onglet : aspect personnalisé">

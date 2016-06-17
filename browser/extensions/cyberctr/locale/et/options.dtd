@@ -43,7 +43,7 @@
 <!ENTITY Ctr_tabsontop3		"Kaardid pole kõige peal (v2) --- atribuut [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 on ainult mõnede lisade ja täielike välimuste jaoks!">
 <!ENTITY Ctr_tabsontopI1	"Atribuut [tabsontop=true/false] lisatakse nendele:">
-<!ENTITY Ctr_tabsintitlebar	"Opsüsteemi tiitliriba asemel kasuta &brandShortName;i tiitliriba (about:config eelistus)">
+<!ENTITY Ctr_tabsintitlebar	"Opsüsteemi tiitliriba asemel kasuta &brandShortName;i tiitliriba">
 <!ENTITY Ctr_tabwidthdef	"(vaikimisi)">
 <!ENTITY Ctr_tabwidthcla	"(klassikaline)">
 <!ENTITY Ctr_tabminheight	"Kõrgus:">
@@ -55,7 +55,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Väiksemad väärtused kui 48px põhjustavad enamusel juhtudel vigu!">
 <!ENTITY Ctr_square_edges	"Kandilised ülemised nurgad">
 <!ENTITY Ctr_tttitlebar		"Kaardi pealkiri &brandShortName;i tiitliribal">
-<!ENTITY Ctr_tabinsertion	"Pane seotud kaardid praeguse järele (about:config eelistus)">
+<!ENTITY Ctr_tabinsertion	"Pane seotud kaardid praeguse järele">
 <!ENTITY Ctr_emptytfavico	"Näita lehe ikooni (kui sait seda ei paku)">
 <!ENTITY Ctr_emptytfavico_n	"Pole">
 <!ENTITY Ctr_emptytfavico_g	"Üldine">
@@ -70,10 +70,11 @@
 <!ENTITY Ctr_closei_def		"Vaikimisi ikoonid">
 <!ENTITY Ctr_closeonleft	"Alternatiivne asukoht kaardil">
 <!ENTITY Ctr_closetabbig	"Suurem ikoon (20x20 px)">
-<!ENTITY Ctr_close_wwltab	"Viimase nähtava kaardi sulgemisel sulge kogu aken (about:config eelistus)">
+<!ENTITY Ctr_close_wwltab	"Viimase nähtava kaardi sulgemisel sulge kogu aken">
 
 <!ENTITY Ctr_hctpinfotab	"Mõned kaardi variatsioonid ei ühildu lisaga 'Hide Caption Titlebar Plus'.">
 <!ENTITY Ctr_hctpinfoab		"Nupp tiitliribal ei ühildu lisaga 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_tobainfotab	"Lisa 'Tabs on Bottom' ei ühildu lisaga '&Ctr_title;' ja see tuleks keelata. Kasuta hoopis olemasolevaid '&Ctr_cuitabsnontop;' sätteid!">
 
 <!ENTITY Ctr_appbutton		"&brandShortName;i nupp">
 <!ENTITY Ctr_appbutton0		"Nupp keelatud">
@@ -131,7 +132,7 @@
 <!ENTITY Ctr_puibut_l_sep	"Vasakul">
 <!ENTITY Ctr_puibut_r_sep	"Paremal">
 <!ENTITY Ctr_html5warning	"HTML5 täisekraani hoiatus">
-<!ENTITY Ctr_oldtoplevimg	"'Tippdomeeni' pildid: klassikaline välimus">
+<!ENTITY Ctr_oldtoplevimg	"Klassikaline pildi välimus valgel taustal">
 <!ENTITY Ctr_altalertbox	"'Teavituskast': alternatiivne välimus">
 <!ENTITY Ctr_emptygfavico	"Asenda üldine lehe ikoon">
 <!ENTITY Ctr_mstatusbar		"Liigutatav olekupaneel">
@@ -166,7 +167,7 @@
 <!ENTITY Ctr_ctroldsearch	"Vana otsing">
 <!ENTITY Ctr_ctroldsearchc	"Pärast otsingu teostamist tühjenda otsingukast">
 <!ENTITY Ctr_ctroldsearchr	"Pärast otsingu teostamist taasta vaikimisi otsingumootor">
-<!ENTITY Ctr_search_oit		"Ava otsingutulemuste leht uuel kaardil (about:config eelistus)">
+<!ENTITY Ctr_search_oit		"Ava otsingutulemuste leht uuel kaardil">
 <!ENTITY Ctr_osearch_meoit	"Hiire keskmise nupuga klõpsamine: otsi uuel esiplaanil oleval kaardil">
 <!ENTITY Ctr_osearch_iwidth	"Automaatselt kohanda hüpiku laiust">
 <!ENTITY Ctr_osearch_cwidth	"Otsingu hüpikute kohandatud laius">
@@ -181,7 +182,7 @@
 <!ENTITY Ctr_am_buticons	"Laienduste loendid: asenda nuppude tekst ikoonidega">
 <!ENTITY Ctr_am_hovshowb	"Laienduste loendid: näita nuppe ainult hiirega peale minnes">
 <!ENTITY Ctr_addonversion	"Laienduste loendid: näita lisade versiooni">
-<!ENTITY Ctr_xpinstallui	"Vana lisade paigaldamise aken (about:config eelistus)">
+<!ENTITY Ctr_xpinstallui	"Vana lisade paigaldamise aken">
 <!ENTITY Ctr_bmbutton		"Järjehoidjate menüü nupp">
 <!ENTITY Ctr_hiderecentbm	"Järjehoidjate hüpik: Peida viimati lisatud järjehoidjad">
 <!ENTITY Ctr_hideeditbm		"Järjehoidjate täht: peida hüpik (kui leht pole järjehoidjates)">
@@ -265,10 +266,11 @@
 <!ENTITY Ctr_lbsbsize		"Aadressiriba ja otsinguriba kohandatud laius">
 <!ENTITY Ctr_searchbar		"Otsinguriba">
 <!ENTITY Ctr_autocomplete	"Automaatlõpetamise hüpik">
-<!ENTITY Ctr_altautocompl	"Alternatiivne välimus (katsejärgus)">
-<!ENTITY Ctr_urlbar_uc		"Keela ühtse automaatlõpetamise funktsioon 'unified autocomplete' (about:config eelistus)">
+<!ENTITY Ctr_altautocompl	"Alternatiivne välimus">
+<!ENTITY Ctr_autocompl_it	"Eemalda kirjed 'Otsi otsingumootoriga...' ja 'Külasta' (kui on)">
+<!ENTITY Ctr_urlbar_uc		"Keela ühtse automaatlõpetamise funktsioon 'unified autocomplete'">
 <!ENTITY Ctr_lbsugresi		"Keela kõrguse piirang">
-<!ENTITY Ctr_lbsugres		"Tulemuste arv (about:config eelistus)">
+<!ENTITY Ctr_lbsugres		"Tulemuste arv">
 <!ENTITY Ctr_lbsbradius		"Aadressiriba ja otsinguriba piirjoonte kohandatud ümarus">
 
 <!ENTITY Ctr_menubar_items	"Menüükirjete asukoht">
@@ -296,6 +298,7 @@
 <!ENTITY Ctr_notabfog		"Eemalda taustaudu (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Eemalda taustavärv (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Vähenda tööriistariba kohal olevat tühja ruumi (kui võimalik)">
+<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
 <!ENTITY Ctr_alttabstb		"Alternatiivne taustavärv">
 <!ENTITY Ctr_alttabstb2		"Maksimeeritud režiimis (kaardid peal)">
 
@@ -320,7 +323,7 @@
 <!ENTITY Ctr_nonavbarbg2	"Mõjutab kõiki laienduse 'Beyond Australis' Slim Chrome'i tööriistaribasid.">
 <!ENTITY Ctr_nonavborder	"Lisa ribale ülemine piirjoon">
 <!ENTITY Ctr_nonavtbborder	"Ülemised tööriistaribad: eemalda tööriistariba piirjooned">
-<!ENTITY Ctr_hidesbclose	"Külgribad: peida külgriba sulgemise nupp">
+<!ENTITY Ctr_hidesbclose	"Külgribad: peida sulgemise nupp">
 <!ENTITY Ctr_notextshadow	"Tööriistaribad: peida tööriistariba teksti ja kaardi teksti vari">
 <!ENTITY Ctr_chevronfix		"Aadressiriba: peida topeltnool ('Rohkem tööriistu') tööriistariba lõpus">
 <!ENTITY Ctr_tbsep_winc		"Ülemised tööriistaribad: lisa-tööriistariba eraldajad">
@@ -334,10 +337,10 @@
 <!ENTITY Ctr_tabthrobber	"Vaikimisi laadimise kujutis">
 <!ENTITY Ctr_bmanimation	"Järjehoidjatega töötamise animatsioon">
 <!ENTITY Ctr_pananimation	"Paneeli avamise animatsioon">
-<!ENTITY Ctr_tabanimation	"Kaardi sulgemise/avamise animatsioon (about:config eelistus)">
-<!ENTITY Ctr_dlanimation	"'Allalaadimise teavituse' animatsioon (about:config eelistus)">
-<!ENTITY Ctr_fsanimation	"Täisekraani animatsioonid (about:config eelistus)">
-<!ENTITY Ctr_fsaduration	"HTML5-sisu animatsioonid täisekraani režiimis (about:config eelistus)">
+<!ENTITY Ctr_tabanimation	"Kaardi sulgemise/avamise animatsioon">
+<!ENTITY Ctr_dlanimation	"'Allalaadimise teavituse' animatsioon">
+<!ENTITY Ctr_fsanimation	"Täisekraani animatsioonid">
+<!ENTITY Ctr_fsaduration	"HTML5-sisu animatsioonid täisekraani režiimis">
 
 <!ENTITY Ctr_toolsitem		"Menüükirje tööriistade menüüs">
 <!ENTITY Ctr_appmenuitem	"Menüükirje &brandShortName;i nupu menüüs">
@@ -358,7 +361,7 @@
 <!ENTITY Ctr_fx38pocket		"Sellelt eelistuselt märke eemaldamine keelab 'Pocket' funktsiooni ja eemaldab selle nupu tööriistaribadelt.">
 <!ENTITY Ctr_fx38pocket2	"Märkus: Enne selle eelistuse keelamist 'Pocket'-nupu 'kohandamise aknasse' liigutamine eemaldab järjehoidjate ja lugemisnimekirja menüüdest ka kõik funktsiooniga 'Pocket' seotud kirjed.">
 <!ENTITY Ctr_e_searchui		"Otsingu välimus">
-<!ENTITY Ctr_e_loop			"Helistamine ja vestlus / Loop">
+<!ENTITY Ctr_e_loop			"Hello / Helistamine ja vestlus / Loop">
 <!ENTITY Ctr_e_deved		"Arendaja väljalaske välimus">
 <!ENTITY Ctr_e_prefsui		"Eelistused kaardil">
 <!ENTITY Ctr_e_readermode	"Lugemisvaade">
@@ -386,7 +389,7 @@
 <!ENTITY appMenuGettingStarted.label	"Alustamine">
 <!ENTITY goCmd.label					"Mine">
 <!ENTITY Ctr_menu_restart.label			"Taaskäivita">
-<!ENTITY Ctr_restartapp					"'Taaskäivita' &brandShortName;i nupu menüüs ja menüüs Fail">
+<!ENTITY Ctr_restartapp					"Näita &brandShortName;i nupu menüüs ja menüüs Fail kirjet 'Taaskäivita'">
 
 <!ENTITY Ctr_openInCurrentTab			"Ava sisestused praegusel kaardil">
 <!ENTITY Ctr_openInNewTab				"Ava sisestused uuel kaardil">
@@ -407,7 +410,7 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (default)">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
 <!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">

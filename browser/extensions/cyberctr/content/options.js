@@ -204,6 +204,9 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_hctpinfotab').style.visibility = 'collapse';
 	document.getElementById('ctraddon_hctpinfoab').style.visibility = 'collapse';
 	
+	// 'Tabs on bottom' add-ons
+	document.getElementById('ctraddon_tobinfotab').style.visibility = 'collapse';
+	
 	//Custom search bar width
 	if (this.prefs.getBoolPref("customsearchbarwidth")){
 		document.getElementById('ctraddon_searchbarwidth').disabled = false;
@@ -347,6 +350,47 @@ classicthemerestorerjso.ctr = {
 	   }
 	};
 	AddonManager.addAddonListener(HCTPListener);
+	
+	// 'Tabs on bottom' add-on extra info
+	AddonManager.getAddonByID('tabsonbottom@piro.sakura.ne.jp', function(addon) {
+	  if(addon && addon.isActive) {
+		document.getElementById('ctraddon_tobinfotab').style.visibility = 'visible';
+	  }
+	});
+	var TOB1Listener = {
+	   onEnabled: function(addon) {
+		  if(addon.id == 'tabsonbottom@piro.sakura.ne.jp') {
+			document.getElementById('ctraddon_tobinfotab').style.visibility = 'visible';
+		  }
+	   },
+	   onDisabled: function(addon) {
+		  if(addon.id == 'tabsonbottom@piro.sakura.ne.jp') {
+			document.getElementById('ctraddon_tobinfotab').style.visibility = 'collapse';
+		  }
+	   }
+	};
+	AddonManager.addAddonListener(TOB1Listener);
+	
+	// 'Tabs on bottom (Australis)' add-on extra info
+	AddonManager.getAddonByID('jid1-OesGFwaQGIBASw@jetpack', function(addon) {
+	  if(addon && addon.isActive) {
+		document.getElementById('ctraddon_tobinfotab').style.visibility = 'visible';
+	  }
+	});
+	var TOB2Listener = {
+	   onEnabled: function(addon) {
+		  if(addon.id == 'jid1-OesGFwaQGIBASw@jetpack') {
+			document.getElementById('ctraddon_tobinfotab').style.visibility = 'visible';
+		  }
+	   },
+	   onDisabled: function(addon) {
+		  if(addon.id == 'jid1-OesGFwaQGIBASw@jetpack') {
+			document.getElementById('ctraddon_tobinfotab').style.visibility = 'collapse';
+		  }
+	   }
+	};
+	AddonManager.addAddonListener(TOB2Listener);
+
 	//Personal menu
 	AddonManager.getAddonByID('CompactMenuCE@Merci.chao', function(addon) {
 		if(addon && addon.isActive) { 
@@ -425,6 +469,7 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_lbsugres').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_lbsugresbox').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_urlbar_uc').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_urlbar_uc_desc').style.visibility = 'collapse';
 	}
 
 	if (this.appversion >= 43) {
@@ -442,6 +487,15 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_iblabels').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_html5warning').style.visibility = 'collapse';
 	}
+	
+	if (this.appversion < 46) {
+	  document.getElementById('ctraddon_pw_pocket2').style.visibility = 'collapse';
+	}
+
+	if (this.appversion >= 46) {
+	  document.getElementById('ctraddon_pw_pocket_descr').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_pocket').style.visibility = 'collapse';
+	}
 
 	if (this.appversion < 47) {
 	  document.getElementById('ctraddon_pw_hiderecentbm').style.visibility = 'collapse';
@@ -450,6 +504,12 @@ classicthemerestorerjso.ctr = {
 	
 	if (this.appversion < 48) {
 	  document.getElementById('ctraddon_pw_altautocompl').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_autocompl_it').style.visibility = 'collapse';
+	}
+
+	if (this.appversion >= 49) {
+	  document.getElementById('ctraddon_pw_urlbar_uc').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_urlbar_uc_desc').style.visibility = 'collapse';
 	}
 	
 	function PrefListener(branch_name, callback) {
@@ -619,8 +679,8 @@ classicthemerestorerjso.ctr = {
 			break;
 
 			case "abouthomecustomurl":
-				//Disable custom highlight colors on default theme in firefox.	
-				if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && 
+				//Disable custom highlight colors on default theme in firefox\Other.	
+				if (Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase() && 
 					branch.getCharPref("abouthome") === "default") {
 						document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
 						document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
@@ -698,12 +758,13 @@ classicthemerestorerjso.ctr = {
 	this.ctrpwNavBarPadding(this.prefs.getBoolPref("navbarpad"));
 	this.ctrpwLocationSearchbarSize(this.prefs.getBoolPref("lbsbsize"));
 	this.ctrpwLocationSearchbarRadius(this.prefs.getBoolPref("lbsbradius"));
-	this.ctrpwCompactAddonList(this.prefs.getBoolPref("am_compact"));
+	if (this.fxdefaulttheme) this.ctrpwCompactAddonList(this.prefs.getBoolPref("am_compact"));
 	this.ctrpwUnsortBM(this.prefs.getBoolPref("bmbunsortbm"));
 	this.ctrpwHideUrlStopRel(this.prefs.getBoolPref("hideurelstop"));
 	this.ctrpwExtraUrlbar(this.prefs.getBoolPref("extraurlkeycb"));
 	this.ctrpwSearchPopupSize(this.prefs.getBoolPref("osearch_cwidth"));
 	this.ctrpwAeroColors(this.prefs.getBoolPref("aerocolors"));
+	this.ctrpwAutoCompleteHeight(this.prefs.getBoolPref("urlresults"));
 	
 	var closetab_value = this.prefs.getCharPref("closetab");
   
@@ -730,8 +791,8 @@ classicthemerestorerjso.ctr = {
 			document.getElementById('ctraddon_pw_noconicons').disabled = false;
 		}
 
-		//Hide no links start page check-box in firefox.	
-		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase()) {
+		//Hide no links start page check-box in firefox\other.	
+		if (Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase()) {
 			document.getElementById('nolinks').hidden = true;
 		}	
 
@@ -772,8 +833,8 @@ classicthemerestorerjso.ctr = {
 			document.getElementById('ctraddon_ctabouthome_custbgstretch').disabled = false;
 		}	
 
-		//Disable custom highlight colors on default theme in firefox.	
-		if (Services.appinfo.name.toLowerCase() === "Firefox".toLowerCase() && this.prefs.getCharPref("abouthome") === "default") {
+		//Disable custom highlight colors on default theme in firefox\other.	
+		if (Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase() && this.prefs.getCharPref("abouthome") === "default") {
 				document.getElementById('ctraddon_ctabouthomecusthltck').disabled = true;
 				document.getElementById('ctraddon_ctabouthomecusthltlb').disabled = true;
 				document.getElementById('ctraddon_ctabouthomecusthlttb').disabled = true;
@@ -1109,6 +1170,18 @@ classicthemerestorerjso.ctr = {
 	
     document.getElementById('ctraddon_pw_aerocolorsg').disabled = which;
 	document.getElementById('ctraddon_pw_aerocolorsg').style.visibility = itemvis;
+  },
+  
+  ctrpwAutoCompleteHeight: function(which) {
+	var itemvis = 'collapse';
+	
+    if(which==true) {
+	  which=false; itemvis = 'visible';
+	} else {
+	  which=true; itemvis = 'collapse';
+	}
+	
+    document.getElementById('ctraddon_pw_autocompl_it').disabled = which;
   },
  
   ctrpwCtrOldSearch: function(which) {
@@ -1466,6 +1539,8 @@ classicthemerestorerjso.ctr = {
 	if(this.appversion >= 43) { 
 	  this.prefs.setBoolPref("oldsearch",true);
 	}
+	if(this.appversion >= 48)
+	  this.prefs.setBoolPref("altautocompl",true);
 	
 	setTimeout(function(){
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("starinurl",true);

@@ -36,6 +36,7 @@
 		<preference id="ctraddon_readermode"	name="reader.parse-on-load.enabled"					type="bool"		instantApply="true"/>
 		<preference id="ctraddon_readermode2"	name="browser.readinglist.enabled"					type="bool"		instantApply="true"/>
 		<preference id="ctraddon_pocket"		name="browser.pocket.enabled"						type="bool"		instantApply="true"/>
+		<preference id="ctraddon_pocket2"		name="extensions.pocket.enabled"					type="bool"		instantApply="true"/>
 		<preference id="ctraddon_nodevtheme2"	name="extensions.classicthemerestorer.nodevtheme2"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_tabinsertion"	name="browser.tabs.insertRelatedAfterCurrent"		type="bool"		instantApply="true"/>
 		<preference id="ctraddon_e10stabs"		name="browser.tabs.remote.autostart"				type="bool"		instantApply="true"/>
@@ -122,6 +123,7 @@
 		<preference id="ctraddon_urlbardropm2"	name="extensions.classicthemerestorer.urlbardropm2"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_altreaderico"	name="extensions.classicthemerestorer.altreaderico"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_altautocompl"	name="extensions.classicthemerestorer.altautocompl"	type="bool"		instantApply="true"/>
+		<preference id="ctraddon_autocompl_it"	name="extensions.classicthemerestorer.autocompl_it"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_locsearchbw10"	name="extensions.classicthemerestorer.locsearchbw10" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_combrelstop"	name="extensions.classicthemerestorer.combrelstop"	type="bool"		instantApply="true"/>
 		<preference id="ctraddon_panelmenucol"	name="extensions.classicthemerestorer.panelmenucol"	type="bool"		instantApply="true"/>
@@ -145,9 +147,9 @@
 		<preference id="ctraddon_sbsize_maxw"	name="extensions.classicthemerestorer.sbsize_maxw" 	type="int"		instantApply="true"/>
 		<preference id="ctraddon_lbsbradius"	name="extensions.classicthemerestorer.lbsbradius"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_lbradius_left"	name="extensions.classicthemerestorer.lbradius_left" type="int"		instantApply="true"/>
-		<preference id="ctraddon_lbradius_right"	name="extensions.classicthemerestorer.lbradius_right" type="int"		instantApply="true"/>
+		<preference id="ctraddon_lbradius_right" name="extensions.classicthemerestorer.lbradius_right" type="int"	instantApply="true"/>
 		<preference id="ctraddon_sbradius_left"	name="extensions.classicthemerestorer.sbradius_left" type="int"		instantApply="true"/>
-		<preference id="ctraddon_sbradius_right"	name="extensions.classicthemerestorer.sbradius_right" type="int"		instantApply="true"/>
+		<preference id="ctraddon_sbradius_right" name="extensions.classicthemerestorer.sbradius_right" type="int"	instantApply="true"/>
 		
 
 		<preference id="ctraddon_ctab1"			name="extensions.classicthemerestorer.ctab1"		type="string"	instantApply="true"/>
@@ -212,6 +214,7 @@
 		<preference id="ctraddon_lessaddonsbar"	name="extensions.classicthemerestorer.lessaddonsbar" type="bool"	instantApply="true"/>
 		<preference id="ctraddon_addonbarfs"	name="extensions.classicthemerestorer.addonbarfs"	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_hightabpososx"	name="extensions.classicthemerestorer.hightabpososx" type="bool"	instantApply="true"/>
+		<preference id="ctraddon_showalltabsb"	name="extensions.classicthemerestorer.showalltabsb"  type="bool"	instantApply="true"/>
 		<preference id="ctraddon_altmenubar"	name="extensions.classicthemerestorer.altmenubar" 	 type="bool"	instantApply="true"/>
 		<preference id="ctraddon_altmbarpos"	name="extensions.classicthemerestorer.altmbarpos"	 type="string"	instantApply="true"/>
 		<preference id="ctraddon_menubarnofog"	name="extensions.classicthemerestorer.menubarnofog"  type="bool"	instantApply="true"/>
@@ -407,6 +410,7 @@
 		<description id="ctraddon_pw_tabforminfo" class="ctraddon_topic">&Ctr_tabforminfo;</description>
 		<description id="ctraddon_coltabsinfo" class="ctraddon_topic">&Ctr_coltabsinfo;</description>
 		<description id="ctraddon_hctpinfotab" class="ctraddon_topic">&Ctr_hctpinfotab;</description>
+		<description id="ctraddon_tobinfotab" class="ctraddon_topic">&Ctr_tobainfotab;</description>
 
 		<menulist preference="ctraddon_tabs" id="ctraddon_pw_tabmenulist">
 			<menupopup>
@@ -516,8 +520,10 @@
 
 	    <caption  label="&Ctr_tabstoolbar;" class="ctraddon_topic"/>
 		<checkbox label="&Ctr_tabinsertion;" preference="ctraddon_tabinsertion" id="ctraddon_pw_tab_tabinsertion"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; browser.tabs.insertRelatedAfterCurrent</description>
 		<checkbox label="&Ctr_dblclnewtab;"	preference="ctraddon_dblclnewtab" class="ctraddon_windowsonly"/>
 		<checkbox label="&Ctr_hightabpos;"	preference="ctraddon_hightabpososx" id="ctraddon_pw_hightabpososx"/>
+		<checkbox label="&Ctr_showalltabsb;" preference="ctraddon_showalltabsb" id="ctraddon_pw_showalltabsb"/>
 		<checkbox label="&Ctr_hidetbwot;"	preference="ctraddon_hidetbwot" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwHidetbwotExtra(true);} else {classicthemerestorerjso.ctr.ctrpwHidetbwotExtra(false);} classicthemerestorerjso.ctr.needsBrowserRestart();"/>
 		<checkbox label="&Ctr_hidetbwote;"	preference="ctraddon_hidetbwote" class="ctraddonsuboption" id="ctraddon_pw_hidetbwote"/>
 		<description id="ctraddon_pw_hidetbwote_winc" class="ctraddonsuboption2 ctraddon_windowsonly">&Ctr_hidetbwote_i;</description>
@@ -845,6 +851,7 @@
 	<box class="ctraddontabpanel" orient="vertical" id="ctraddon_appbuttonbox">
 
 	  <hbox><checkbox label="&Ctr_tabsintitlebar;"	preference="ctraddon_tabsintitlebar" id="ctraddon_tabs_in_titlebar" tooltiptext="browser.tabs.drawInTitlebar"/></hbox>
+	  <description class="ctraddonsuboption">about:config &gt;&gt; browser.tabs.drawInTitlebar</description>
 
 	  <groupbox>
 		<caption  label="&Ctr_appbutton;" class="ctraddon_topic" id="ctraddon_pw_appbuttonname"/>
@@ -864,6 +871,8 @@
 				<menuitem value="appbutton_pm2"	  label="&Ctr_paneluibtweak;"		oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_pm2',true)" id="ctraddon_pw_appbutton_pm2"/>
 				<menuitem value="appbutton_pm" 	  label="&Ctr_paneluibtweak2;"		oncommand="classicthemerestorerjso.ctr.ctrpwAppbuttonextra('appbutton_pm',true)" id="ctraddon_pw_appbutton_pm"/>
 				<label value="&Ctr_paneluibtweak3;"/>
+				<label value=" "/>
+				<description class="ctraddon_font1">&Ctr_tabsontopW1;</description>
 				<label value=" "/>
 				<description class="ctraddon_font1">&Ctr_appbuttonI1;</description>
 			</menupopup>
@@ -974,7 +983,7 @@
 
 		<checkbox label="&Ctr_wincontrols;"		preference="ctraddon_wincontrols" id="ctraddon_wincontrols"/>
 		
-		<hbox align="center" flex="1" id="ctraddon_pw_puibutsep">
+		<hbox align="center" id="ctraddon_pw_puibutsep">
 		  <description>&Ctr_puibuttonsep;</description>
 		  <menulist preference="ctraddon_puibuttonsep" id="ctraddon_puibuttonsep_list">
 			<menupopup>
@@ -985,6 +994,7 @@
 		  </menulist>
 		</hbox>
 		<checkbox label="&Ctr_html5warning;"	preference="ctraddon_html5warning" id="ctraddon_pw_html5warning"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; full-screen-api.warning.*</description>
 
 		<description class="ctraddon_font1">&Ctr_emptygfavico;</description>
 		<radiogroup preference="ctraddon_emptyfavico_g" id="ctraddon_pw_emptyfavico_g" orient="horizontal" value="">
@@ -1252,6 +1262,7 @@
 		<checkbox label="&Ctr_am_highlight;"	preference="ctraddon_am_highlight" id="ctraddon_pw_am_highlight"/>
 		<checkbox label="&Ctr_alt_addonsp;"		preference="ctraddon_alt_addonsp" id="ctraddon_pw_alt_addonsp"/>
 		<checkbox label="&Ctr_xpinstallui;"		preference="ctraddon_xpinstallui" id="ctraddon_pw_xpinstallui"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; xpinstall.customConfirmationUI</description>
 	  </groupbox>
 	  
 	  <groupbox>
@@ -1327,8 +1338,12 @@
 	    <caption  label="&Ctr_autocomplete;" class="ctraddon_topic"/>
 		<checkbox label="&Ctr_altautocompl;" preference="ctraddon_altautocompl"  id="ctraddon_pw_altautocompl" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
 		<checkbox label="&Ctr_urlbar_uc;" preference="ctraddon_urlbar_uc" id="ctraddon_pw_urlbar_uc"/>
-		<checkbox label="&Ctr_lbsugresi;" preference="ctraddon_urlresults"  id="ctraddon_pw_urlresults"/>
+		<description class="ctraddonsuboption" id="ctraddon_pw_urlbar_uc_desc">about:config &gt;&gt; browser.urlbar.unifiedcomplete</description>
+		<checkbox label="&Ctr_lbsugresi;" preference="ctraddon_urlresults" id="ctraddon_pw_urlresults" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwAutoCompleteHeight(true);} else {classicthemerestorerjso.ctr.ctrpwAutoCompleteHeight(false);}"/>
+		<checkbox label="&Ctr_autocompl_it;" preference="ctraddon_autocompl_it" id="ctraddon_pw_autocompl_it"/>
+		
 		<description id="ctraddon_lbsugres" class="ctraddon_font1">&Ctr_lbsugres;</description>
+		<description>about:config &gt;&gt; browser.urlbar.maxRichResults</description>
 		<hbox id="ctraddon_pw_lbsugresbox" align="center">
 		  <textbox size="4" maxlength="4" preference="ctraddon_urlresultsl" type="number" min="0" onchange="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
 		  <label value=" 12 &Ctr_tabwidthdef; / 10 (&brandShortName; 48+)"/>
@@ -1387,6 +1402,7 @@
 	    <caption  label="&Ctr_searchbar;" class="ctraddon_topic"/>
 		<checkbox label="&Ctr_ctroldsearch;"	preference="ctraddon_ctroldsearch" id="ctraddon_pw_ctroldsearch" oncommand="if(this.checked) {classicthemerestorerjso.ctr.ctrpwCtrOldSearch(true);} else {classicthemerestorerjso.ctr.ctrpwCtrOldSearch(false);}"/>
 		<checkbox label="&Ctr_search_oit;"		preference="ctraddon_search_oit" id="ctraddon_pw_search_oit" />
+		<description class="ctraddonsuboption">about:config &gt;&gt; browser.search.openintab</description>
 		<checkbox label="&Ctr_osearch_dm;"		preference="ctraddon_osearch_dm" id="ctraddon_pw_osearch_dm" class="ctraddon_winmaconly"/>
 		<checkbox label="&Ctr_ctroldsearchc;"	preference="ctraddon_ctroldsearchc" id="ctraddon_pw_ctroldsearchc"/>
 		<checkbox label="&Ctr_ctroldsearchr;"	preference="ctraddon_ctroldsearchr" id="ctraddon_pw_ctroldsearchr"/>
@@ -1645,8 +1661,9 @@
 	  <groupbox id="ctraddon_pw_pocketgb">
 		<caption  label="&Ctr_e_pocket;" class="ctraddon_topic"/>
 		<checkbox label="about:config &gt;&gt; browser.pocket.enabled" preference="ctraddon_pocket" id="ctraddon_pw_pocket" oncommand="classicthemerestorerjso.ctr.needsBrowserRestart()"/>
+		<checkbox label="about:config &gt;&gt; extensions.pocket.enabled" preference="ctraddon_pocket2" id="ctraddon_pw_pocket2"/>
 		<description class="ctraddonsuboption acprefdesc">&Ctr_fx38pocket;</description>
-		<description class="ctraddonsuboption acprefdesc">&Ctr_fx38pocket2;</description>
+		<description id="ctraddon_pw_pocket_descr" class="ctraddonsuboption acprefdesc">&Ctr_fx38pocket2;</description>
 	  </groupbox>
 
 	  <groupbox id="ctraddon_pw_tabsaudioicogb">
@@ -1663,10 +1680,14 @@
 		<caption  label="&Ctr_animation;" class="ctraddon_topic"/>
 		<checkbox label="&Ctr_bmanimation;"		preference="ctraddon_bmanimation" id="ctraddon_pw_bmanimation"/>
 		<checkbox label="&Ctr_pananimation;"	preference="ctraddon_pananimation" id="ctraddon_pw_pananimation"/>
-		<checkbox label="&Ctr_tabanimation;"	preference="ctraddon_tabsanimate" tooltiptext="browser.tabs.animate"/>
-		<checkbox label="&Ctr_dlanimation;"		preference="ctraddon_dlanimate" tooltiptext="browser.download.animateNotifications"/>
+		<checkbox label="&Ctr_tabanimation;"	preference="ctraddon_tabsanimate"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; browser.tabs.animate</description>
+		<checkbox label="&Ctr_dlanimation;"		preference="ctraddon_dlanimate"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; browser.download.animateNotifications</description>
 		<checkbox label="&Ctr_fsanimation;"		preference="ctraddon_fsanimation" id="ctraddon_pw_fsanimation"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; browser.fullscreen.animate</description>
 		<checkbox label="&Ctr_fsaduration;"		preference="ctraddon_fsaduration" id="ctraddon_pw_fsaduration"/>
+		<description class="ctraddonsuboption">about:config &gt;&gt; full-screen-api.transition-duration.*</description>
 	  </groupbox>
 	  
 	  <groupbox>

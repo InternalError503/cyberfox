@@ -43,7 +43,7 @@
 <!ENTITY Ctr_tabsontop3		"Вкладки не нагорі (v2) --- встановлено [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 - тільки для деяких додатків і повних тем!">
 <!ENTITY Ctr_tabsontopI1	"Додає атрибут [tabsontop=true/false] для">
-<!ENTITY Ctr_tabsintitlebar	"Панель заголовку &brandShortName; (about:config preference)">
+<!ENTITY Ctr_tabsintitlebar	"Панель заголовку &brandShortName;">
 <!ENTITY Ctr_tabwidthdef	"(типово)">
 <!ENTITY Ctr_tabwidthcla	"(класичний)">
 <!ENTITY Ctr_tabminheight	"Висота:">
@@ -55,7 +55,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Значення нижче 48пікс викличе збої в більшості випадків!">
 <!ENTITY Ctr_square_edges	"Квадратні верхні кути">
 <!ENTITY Ctr_tttitlebar		"Заголовок вкладки на панелі заголовку &brandShortName;">
-<!ENTITY Ctr_tabinsertion	"Вставити відповідну вкладку після поточної вкладки (about:config)">
+<!ENTITY Ctr_tabinsertion	"Вставити відповідну вкладку після поточної вкладки">
 <!ENTITY Ctr_emptytfavico	"Показувати іконку сайту (якщо сайт не пропонує його)">
 <!ENTITY Ctr_emptytfavico_n	"Немає">
 <!ENTITY Ctr_emptytfavico_g	"Типовий">
@@ -70,10 +70,11 @@
 <!ENTITY Ctr_closei_def		"Типові іконки">
 <!ENTITY Ctr_closeonleft	"Альтернативна позиція на вкладці">
 <!ENTITY Ctr_closetabbig	"Велика іконка (20x20 пікс)">
-<!ENTITY Ctr_close_wwltab	"Закрити вікно з останньою видимою вкладкою (about:config)">
+<!ENTITY Ctr_close_wwltab	"Закрити вікно з останньою видимою вкладкою">
 
 <!ENTITY Ctr_hctpinfotab	"Деякі різновиди вкладок не сумісні з додатком Hide Caption Titlebar Plus.">
 <!ENTITY Ctr_hctpinfoab		"Кнопка на панелі заголовку не сумісна з додатком Hide Caption Titlebar Plus.">
+<!ENTITY Ctr_tobainfotab	"The add-on 'Tabs on Bottom' is not compatible with '&Ctr_title;' and should be disabled. Use available '&Ctr_cuitabsnontop;' settings instead!">
 
 <!ENTITY Ctr_appbutton		"Кнопка програми">
 <!ENTITY Ctr_appbutton0		"Кнопка вимкнена">
@@ -122,14 +123,14 @@
 <!ENTITY Ctr_altoptionsw	"Відкрити сторінку налаштувань у новому вікні">
 <!ENTITY Ctr_altoptionsww	"Ширина">
 <!ENTITY Ctr_altoptionswh	"Висота">
-<!ENTITY Ctr_altoptionsi	"Вікно змодельованих параметрів не є більше діалогом, але 'вікно браузера' з усіма панелями інструментів приховані. Функція 'Використовувати поточну сторінку' тільки додає URL-адреси сторінок, відкритих в поточному вікні, які є тільки «about:preferences» в цьому випадку. Кнопка 'Параметри' панелі інструментів замінюється на нову, щоб бути в змозі відкрити параметри у вікні.">
+<!ENTITY Ctr_altoptionsi	"Вікно змодельованих параметрів не є більше діалогом, але «вікно браузера» з усіма панелями інструментів приховані. Функція «Використовувати поточну сторінку» тільки додає URL-адреси сторінок, відкритих в поточному вікні, які є тільки «about:preferences» в цьому випадку. Кнопка «Параметри» панелі інструментів замінюється на нову, щоб бути в змозі відкрити параметри у вікні.">
 <!ENTITY Ctr_options_rem	"Пам’ятати останню обрану категорію">
 <!ENTITY Ctr_svgfilters		"SVG кольори для типових іконок кнопок панелі інструментів">
 <!ENTITY Ctr_wincontrols	"Рухоме управління повноекранним режимом">
-<!ENTITY Ctr_puibuttonsep	"Menu button separator">
-<!ENTITY Ctr_puibut_no_sep	"Hidden">
-<!ENTITY Ctr_puibut_l_sep	"Left">
-<!ENTITY Ctr_puibut_r_sep	"Right">
+<!ENTITY Ctr_puibuttonsep	"Розділювач кнопки меню">
+<!ENTITY Ctr_puibut_no_sep	"Прихований">
+<!ENTITY Ctr_puibut_l_sep	"Зліва">
+<!ENTITY Ctr_puibut_r_sep	"Зправа">
 <!ENTITY Ctr_html5warning	"HTML5 повноекранне попередження">
 <!ENTITY Ctr_oldtoplevimg	"Зображення «домену верхнього рівня»: класичний вигляд">
 <!ENTITY Ctr_altalertbox	"«Вікно попереджень»: альтернативний вигляд">
@@ -165,11 +166,11 @@
 <!ENTITY Ctr_search_ui		"Пошук">
 <!ENTITY Ctr_ctroldsearch	"Старий пошук">
 <!ENTITY Ctr_ctroldsearchc	"Очистити пошукове поле після пошуку">
-<!ENTITY Ctr_ctroldsearchr	"Revert to first search engine in list after search">
-<!ENTITY Ctr_search_oit		"Відкрити пошук у новій вкладці (about:config preference)">
+<!ENTITY Ctr_ctroldsearchr	"Відкотити до першої пошукової системи в списку після пошуку">
+<!ENTITY Ctr_search_oit		"Відкрити пошук у новій вкладці">
 <!ENTITY Ctr_osearch_meoit	"Середні-кліки: пошук в новій «передньоплановій вкладці»">
 <!ENTITY Ctr_osearch_iwidth	"Автоматично налаштовувати ширину спливаючого вікна">
-<!ENTITY Ctr_osearch_cwidth	"Custom width for search popups">
+<!ENTITY Ctr_osearch_cwidth	"Налаштовувана ширина для пошукових спливаючих вікон">
 <!ENTITY Ctr_osearch_dm		"Мала позначка випадного списку">
 <!ENTITY Ctr_addonmanager	"Менеджер додатків">
 <!ENTITY Ctr_alt_addonsp	"Сторінка «Детальніше» в Додатках: альтернативний вигляд">
@@ -181,7 +182,7 @@
 <!ENTITY Ctr_am_buticons	"Список додатків: замінити написи на кнопках іконками">
 <!ENTITY Ctr_am_hovshowb	"Список додатків: показувати кнопки тільки при наведенні миші">
 <!ENTITY Ctr_addonversion	"Список додатків у Менеджері додатків: показати версію додатка">
-<!ENTITY Ctr_xpinstallui	"Менеджер додатків: старе вікно встановлення додатків (about:config preference)">
+<!ENTITY Ctr_xpinstallui	"Менеджер додатків: старе вікно встановлення додатків">
 <!ENTITY Ctr_bmbutton		"Кнопка меню закладок">
 <!ENTITY Ctr_hiderecentbm	"Спливаюче вікно закладок: приховати недавно додані закладки">
 <!ENTITY Ctr_hideeditbm		"Зірка закладок: приховати спливаюче вікно (якщо сторінка не закладена)">
@@ -265,10 +266,11 @@
 <!ENTITY Ctr_lbsbsize		"Налаштовувана ширина для панелей рядку адреси та пошуку">
 <!ENTITY Ctr_searchbar		"Панель пошуку">
 <!ENTITY Ctr_autocomplete	"Спливаюче вікно автозаповнення">
-<!ENTITY Ctr_altautocompl	"Альтернативний вигляд (експериментальний)">
-<!ENTITY Ctr_urlbar_uc		"Вимкнути функцію «автозаповнення» (about:config preference)">
+<!ENTITY Ctr_altautocompl	"Альтернативний вигляд">
+<!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_urlbar_uc		"Вимкнути функцію «автозаповнення»">
 <!ENTITY Ctr_lbsugresi		"Вимкнути обмеження висоти">
-<!ENTITY Ctr_lbsugres		"Кількість результатів (about:config preference)">
+<!ENTITY Ctr_lbsugres		"Кількість результатів">
 <!ENTITY Ctr_lbsbradius		"Налаштовуваний радіус рамки для панелей адреси та пошуку">
 
 <!ENTITY Ctr_menubar_items	"Позиція пунктів меню">
@@ -291,11 +293,12 @@
 <!ENTITY Ctr_dblclnewtab	"Подвійний клік відкриває нову вкладку (використовує адресу нової вкладки браузера)">
 <!ENTITY Ctr_hidetbwot		"Приховувати панель вкладок з одною вкладкою">
 <!ENTITY Ctr_hidetbwote		"Зменшити затримки приховування при запуску">
-<!ENTITY Ctr_hidetbwote_i	"Може викликати збої на панелі вкладок">
+<!ENTITY Ctr_hidetbwote_i	"Може викликати перебої на панелі вкладок">
 <!ENTITY Ctr_hidetbwote2	"Утримувати панель заголовку (вкладки нагорі)">
 <!ENTITY Ctr_notabfog		"Прибрати затуманення тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Прибрати колір тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Зменшити простір над панеллю інструментів (якщо можливо)">
+<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
 <!ENTITY Ctr_alttabstb		"Альтернативний колір тла">
 <!ENTITY Ctr_alttabstb2		"У розширеному режимі (вкладки нагорі)">
 
@@ -305,7 +308,7 @@
 <!ENTITY Ctr_menubarnofog	"Прибрати затуманення/колір тла (Windows AeroGlass/8)">
 
 <!ENTITY Ctr_aerocolors		"Кольори Blue Aero для основних панелей і вкладок">
-<!ENTITY Ctr_aerocolorsg	"Grey-blue Aero colors">
+<!ENTITY Ctr_aerocolorsg	"Сіро-сині кольори Aero">
 <!ENTITY Ctr_transpttbw10	"Панель заголовку/меню/вкладок: прибрати колір тла">
 <!ENTITY Ctr_transpttbew10	"Додаткові налаштування для деяких тем ОС">
 <!ENTITY Ctr_transptcw10	"Приховати типові OС кнопки мін/макс/закрити">
@@ -334,10 +337,10 @@
 <!ENTITY Ctr_tabthrobber	"Типове зображення завантаження">
 <!ENTITY Ctr_bmanimation	"Анімація створення закладок">
 <!ENTITY Ctr_pananimation	"Анімація відкривання панелі">
-<!ENTITY Ctr_tabanimation	"Анімація відкривання/закривання вкладок (about:config preference)">
-<!ENTITY Ctr_dlanimation	"Анімація «Повідомлення завантаження» (about:config preference)">
-<!ENTITY Ctr_fsanimation	"Повноекранні анімації (about:config preference)">
-<!ENTITY Ctr_fsaduration	"Повноекранні анімації для HTML5 вмісту (about:config preferences)">
+<!ENTITY Ctr_tabanimation	"Анімація відкривання/закривання вкладок">
+<!ENTITY Ctr_dlanimation	"Анімація «Повідомлення завантаження»">
+<!ENTITY Ctr_fsanimation	"Повноекранні анімації">
+<!ENTITY Ctr_fsaduration	"Повноекранні анімації для HTML5 вмісту">
 
 <!ENTITY Ctr_toolsitem		"Пункт в меню інструментів">
 <!ENTITY Ctr_appmenuitem	"Пункт меню в кнопках додатку">
@@ -388,9 +391,9 @@
 <!ENTITY Ctr_menu_restart.label			"Рестарт">
 <!ENTITY Ctr_restartapp					"«Рестарт» в кнопці програми та в меню «Файл»">
 
-<!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
-<!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">
-<!ENTITY Ctr_openInNewWindow			"Open inputs in a new window">
+<!ENTITY Ctr_openInCurrentTab			"Відкрити вхідні дані в поточній вкладці">
+<!ENTITY Ctr_openInNewTab				"Відкрити вхідні дані в новій вкладці">
+<!ENTITY Ctr_openInNewWindow			"Відкрити вхідні дані у новому вікні">
 
 <!-- For page context entries. Have to be adjusted for every locale! -->
 <!ENTITY backCmd.accesskey				"Н">
@@ -406,7 +409,7 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"&brandShortName; button color (default)">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
 <!ENTITY Ctr_appbuttonc_s	"Salmon button color">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
