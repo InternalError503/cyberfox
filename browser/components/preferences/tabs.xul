@@ -44,8 +44,8 @@
                 type="bool"/>
 	  <preference id="browser.newtab.search.enabled"         	name="browser.newtab.search.enabled"         		type="bool"/>
 	  <preference id="browser.pagethumbnails.capturing_disabled"         	name="browser.pagethumbnails.capturing_disabled"         		type="bool"/>	  
-	  <!-- Cyberfeatures -->
       <preference id="browser.sessionstore.restore_on_demand" name="browser.sessionstore.restore_on_demand" type="bool"/>
+	  <!-- Cyberfeatures -->
 #ifdef XP_WIN
       <preference id="browser.taskbar.previews.enable" name="browser.taskbar.previews.enable" type="bool"/>
 #endif
@@ -69,11 +69,11 @@
                 preference="browser.tabs.warnOnOpen"/>	
 	  <!-- Cyberfeatures -->				
       <checkbox id="warnOnQuit" label="&warnOnQuit.label;"
-                preference="browser.warnOnQuit"/>								
-	  <!-- Cyberfeatures -->				
+                preference="browser.warnOnQuit"/>			
       <checkbox id="restoreOnDemand" label="&restoreTabsOnDemand.label;"
                 accesskey="&restoreTabsOnDemand.accesskey;"
                 preference="browser.sessionstore.restore_on_demand"/>
+	  <!-- Cyberfeatures -->	
       <checkbox id="switchToNewTabs" label="&switchToNewTabs.label;"
                 accesskey="&switchToNewTabs.accesskey;"
                 preference="browser.tabs.loadInBackground"/>
