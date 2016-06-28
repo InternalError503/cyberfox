@@ -1770,15 +1770,6 @@ pref("browser.menu.aboutconfig", true);
 //Set Bool pref for toogle javascript menu item
 pref("browser.context.togglejavascript", false);
 
-// Disable Flash protected mode to reduce hang/crash rates.
-pref("dom.ipc.plugins.flash.disable-protected-mode", true);
-
-// Feature-disable the protected-mode auto-flip
-pref("browser.flash-protected-mode-flip.enable", false);
-
-// Whether we've already flipped protected mode automatically
-pref("browser.flash-protected-mode-flip.done", false);
-
 pref("browser.selfsupport.url", "");
 
 // Defines the url to be used for new tabs.
