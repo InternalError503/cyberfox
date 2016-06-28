@@ -91,6 +91,9 @@ static const char kAsyncInitPref[] = "dom.ipc.plugins.asyncInit.enabled";
 #ifdef XP_WIN
 static const char kHangUITimeoutPref[] = "dom.ipc.plugins.hangUITimeoutSecs";
 static const char kHangUIMinDisplayPref[] = "dom.ipc.plugins.hangUIMinDisplaySecs";
+#ifdef _WIN64
+static const char *kCompatStageThreeDeePref = "dom.ipc.plugins.stage3dcompat";
+#endif
 #define CHILD_TIMEOUT_PREF kHangUITimeoutPref
 #else
 #define CHILD_TIMEOUT_PREF kChildTimeoutPref
@@ -2680,8 +2683,15 @@ PluginModuleParent::NPP_NewInternal(NPMIMEType pluginType, NPP instance,
     if (mIsFlashPlugin) {
         parentInstance->InitMetadata(strPluginType, srcAttribute);
 #ifdef XP_WIN
-        // Force windowless mode (bug 1201904) when sandbox level >= 2
+    /* 
+			Force windowless mode (bug 1201904) when sandbox level >= 2
+			We briefly will allow a preference controlled override to allow Stage3D to work.
+		*/
+#ifdef _WIN64
+		if (mSandboxLevel >= 2 && !Preferences::GetBool(kCompatStageThreeDeePref, false)) {
+#else	
         if (mSandboxLevel >= 2) {
+#endif			
            NS_NAMED_LITERAL_CSTRING(wmodeAttributeName, "wmode");
            NS_NAMED_LITERAL_CSTRING(opaqueAttributeValue, "opaque");
            auto wmodeAttributeIndex =
@@ -2694,7 +2704,7 @@ PluginModuleParent::NPP_NewInternal(NPMIMEType pluginType, NPP instance,
                names.AppendElement(wmodeAttributeName);
                values.AppendElement(opaqueAttributeValue);
            }
-        }
+        }	
 #endif
     }
 
