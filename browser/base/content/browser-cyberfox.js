@@ -451,6 +451,8 @@ var gCyberfoxCustom = {
 							request.setRequestHeader("Content-Type", "application/json");
 							request.send(null);
 					} else {
+						// Set update notification
+						Services.prefs.setBoolPref("app.update.available", false);							
 						console.log("Update check deferred!");
 					}					
                 }
