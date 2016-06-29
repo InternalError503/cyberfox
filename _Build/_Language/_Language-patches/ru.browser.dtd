@@ -42,9 +42,9 @@
 <!ENTITY bookmarksMenuButton.tooltip   "Показать Ваши закладки">
 
 <!-- cyberfox -->
-<!ENTITY tabGroupsButton.tooltip       "Group your tabs">
+<!ENTITY tabGroupsButton.tooltip       "Группировка вкладок">
 <!-- end of strings to be removed post-Australis -->
-<!ENTITY mixedContentBlocked.helplink "Learn more">
+<!ENTITY mixedContentBlocked.helplink "Узнать больше">
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Очистить кэш памяти">
 <!ENTITY turnOnCleanRam.label "Включить опцию очистки кэша памяти">
