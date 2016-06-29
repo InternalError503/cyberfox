@@ -475,8 +475,8 @@ var gAdvancedPane = {
 
   // XXX: duplicated in browser.js
   _getOfflineAppUsage(perm, groups) {
-    let cacheService = Cc["@mozilla.org/network/application-cache-service;1"].
-                       getService(Ci.nsIApplicationCacheService);
+    let cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
+                       getService(Components.interfaces.nsIApplicationCacheService);
     if (!groups) {
       try {
         groups = cacheService.getGroups();
