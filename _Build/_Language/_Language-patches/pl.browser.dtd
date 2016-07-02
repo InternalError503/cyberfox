@@ -20,7 +20,7 @@
 <!ENTITY appMenuEdit.label             "Edytuj">
 <!ENTITY appMenuToolbarLayout.label    "Układ paska narzędzi…">
 <!ENTITY appMenuFind.label             "Znajdź…">
-<!ENTITY appMenuUnsorted.label         "Nieposortowane zakładki">
+<!ENTITY appMenuUnsorted.label         "Zakładki nieprzypisane">
 <!ENTITY appMenuWebDeveloper.label     "Web Developer">
 <!ENTITY appMenuGettingStarted.label   "Pierwsze kroki">
 <!ENTITY appMenuSafeMode.label         "Zrestartuj z wyłączonymi dodatkami…">
@@ -46,18 +46,18 @@
 <!ENTITY mixedContentBlocked.helplink "Dowiedz się więcej">
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Wyczyść pamięć podręczną RAM">
-<!ENTITY turnOnCleanRam.label "Włącz przycisk menu 'czyszczenie pamięci podręcznej RAM'.">
+<!ENTITY turnOnCleanRam.label "Włącz przycisk menu 'czyszczenie pamięci podręcznej RAM'">
 <!-- End Purge RAM browser tweak -->
 
 <!-- Restart Browser Tweak -->
 <!ENTITY restartBrowser.label "Zrestartuj przeglądarkę">
 <!ENTITY restartBrowserButton.label "Zrestartuj przeglądarkę">
-<!ENTITY turnOnRestart.label "Włącz przycisk menu 'zrestartuj przeglądarkę'.">
-<!ENTITY cleanFastRestartCache.label "Wyczyść pamięć podręczną szybkiego restartu podczas restartu przeglądarki.">
+<!ENTITY turnOnRestart.label "Włącz przycisk menu 'zrestartuj przeglądarkę'">
+<!ENTITY cleanFastRestartCache.label "Wyczyść pamięć podręczną szybkiego restartu podczas restartu przeglądarki">
 <!ENTITY restartOptions.label "Opcje restartu">
-<!ENTITY restart_paneluibtn.label "Dodaj przycisk do interfejsu panelu.">
-<!ENTITY restart_panelbtnsmall.label "Użyj małego przycisku na interfejsie panelu.">
-<!ENTITY restart_reqconfirmation.label "Wymagaj potwierdzenia restartu.">
+<!ENTITY restart_paneluibtn.label "Dodaj przycisk do interfejsu panelu">
+<!ENTITY restart_panelbtnsmall.label "Używaj małego przycisku na interfejsie panelu">
+<!ENTITY restart_reqconfirmation.label "Wymagaj potwierdzenia restartu">
 <!-- End Restart Browser Tweak -->
 
 <!ENTITY FeaturesTabLabel "Funkcje">
@@ -65,7 +65,7 @@
 <!ENTITY menuFeaturesTab.label "Menu kontekstowe">
 
 <!-- Clone Current Tab Tweak -->
-<!ENTITY turnonclone.label "Włącz funkcję klonowania kart.">
+<!ENTITY turnonclone.label "Włącz funkcję klonowania kart">
 <!ENTITY cloneCurrentTab.label "Sklonuj obecną kartę">
 <!ENTITY cloneInNewWindow.label "Sklonuj w nowym oknie">
 <!-- End Clone Current Tab Tweak -->
@@ -73,13 +73,13 @@
 <!-- Features Tab Tweak -->
 <!ENTITY warnOnQuit.label "Ostrzegaj mnie przy zamykaniu okna">
 <!ENTITY newtabsoptions.label "Opcje nowej karty">
-<!ENTITY newtabenabled.label "Włącz stronę nowej karty.">
-<!ENTITY newtabpreload.label "Włącz przeładowywanie nowej karty.">
-<!ENTITY newtabsearch.label "Włącz pasek wyszukiwania na nowej karcie. (Odśwież stronę)">
+<!ENTITY newtabenabled.label "Włącz stronę nowej karty">
+<!ENTITY newtabpreload.label "Włącz przeładowywanie nowej karty">
+<!ENTITY newtabsearch.label "Włącz pasek wyszukiwania na nowej karcie (Odśwież stronę)">
 <!ENTITY newtabpage.label "Strona nowej karty:">
-<!ENTITY newtabthumbnail.label "Wyłącz przechwytywanie miniatur na stronie nowej karty.">
+<!ENTITY newtabthumbnail.label "Wyłącz przechwytywanie miniatur na stronie nowej karty">
 <!ENTITY aboutnewtab.pageTitle "Nowa karta">
-<!ENTITY incontent.label "Pokaż preferencje w karcie.">
+<!ENTITY incontent.label "Pokaż opcje w karcie">
 <!-- End Features Tab Tweak -->
 
 <!-- Tabs Features -->
@@ -150,37 +150,37 @@
 <!-- Update check options -->
 <!ENTITY updateoptions.label "Opcje aktualizacji &brandShortName;">
 <!ENTITY updateautocheck.label "Automatycznie sprawdzaj aktualizacje w 'o programie &brandShortName;' ">
-<!ENTITY updatestartupcheck.label "Automatycznie sprawdzaj aktualizacje, gdy &brandShortName; startuje.">
-<!ENTITY updatecheckenabled.label "Włącz sprawdzanie aktualizacji.">
+<!ENTITY updatestartupcheck.label "Automatycznie sprawdzaj aktualizacje, gdy &brandShortName; startuje">
+<!ENTITY updatecheckenabled.label "Włącz sprawdzanie aktualizacji">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Kopiuj adres karty">
-<!ENTITY copyTabURLOptions.label "Włącz przycisk menu 'kopiuj adres karty'.">
+<!ENTITY copyTabURLOptions.label "Włącz przycisk menu 'kopiuj adres karty'">
 <!ENTITY copyAllTabUrls.label "Kopiuj adresy wszystkich kart">
-<!ENTITY copyAllTabUrlsOptions.label "Włącz przycisk menu 'kopiuj adresy wszystkich kart'.">
+<!ENTITY copyAllTabUrlsOptions.label "Włącz przycisk menu 'kopiuj adresy wszystkich kart'">
 
 <!-- Classic Context Menu Tweak -->
-<!ENTITY contextNavigationClassic.label "Użyj klasycznego menu kontekstowego.">
+<!ENTITY contextNavigationClassic.label "Używaj klasycznego menu kontekstowego">
 
 <!-- Email Link Context Menu Tweak -->
 
-<!ENTITY turnoffemaillink.label "Włącz przycisk menu kontekstowego 'link e-mail'.">
+<!ENTITY turnoffemaillink.label "Włącz przycisk menu kontekstowego 'link e-mail'">
 <!-- about:config Context Menu Tweak -->
-<!ENTITY turnoffcontextabout.label "Włącz przycisk menu kontekstowego 'about:config'.">
+<!ENTITY turnoffcontextabout.label "Włącz przycisk menu kontekstowego 'about:config'">
 <!-- about:config Menu Tweak -->
-<!ENTITY turnoffmenuabout.label "Włącz przycisk menu 'about:config'.">
+<!ENTITY turnoffmenuabout.label "Włącz przycisk menu 'about:config'">
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Wtyczki">
-<!ENTITY browserpluginsdisabled.label "Wyłącz wszystkie wtyczki.">
-<!ENTITY browserpluginswhitelist.label "Włącz białą listę wtyczek.">
-<!ENTITY browserpluginsjavaenabled.label "Włącz wtyczkę Java.">
+<!ENTITY browserpluginsdisabled.label "Wyłącz wszystkie wtyczki">
+<!ENTITY browserpluginswhitelist.label "Włącz białą listę wtyczek">
+<!ENTITY browserpluginsjavaenabled.label "Włącz wtyczkę Java">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Systemowe dodatki">
 <!ENTITY systemaddonsmsg.label "Jeśli zainstalowane są te dodatki systemowe, to możesz je tutaj przełącząć.">
-<!ENTITY enablehellochat.label "Włącz Hello chat.">
-<!ENTITY enablepocket.label "Włącz Pocket.">
+<!ENTITY enablehellochat.label "Włącz Hello chat">
+<!ENTITY enablepocket.label "Włącz Pocket">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Wymagany restart przeglądarki">
