@@ -5,6 +5,7 @@
 	  -moz-appearance:none!important;
       background-image: url("chrome://branding/content/about-background.jpg");
 	  brackground-color:#333!important;
+	  background-size: 100% 100%!important;
 }
 #clientBox {
   color: #FFF;

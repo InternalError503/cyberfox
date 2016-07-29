@@ -3,7 +3,7 @@
   %overlayDTD;
 <!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
 
-<!ENTITY Ctr_title			"Customize &brandShortName;">
+<!ENTITY Ctr_title			"Dostosuj &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Pasek dodatków">
 <!ENTITY Ctr_statusbar		"Pasek statusu">
@@ -187,11 +187,11 @@
 <!ENTITY Ctr_hiderecentbm	"Menu podręczne zakładek: ukryj ostatnio dodane zakładki">
 <!ENTITY Ctr_hideeditbm		"Gwiazdka zakładek: ukryj menu podręczne (jeżeli zakładka nie jest dodana do strony)">
 <!ENTITY Ctr_bmbutpanelm	"Menu podręczne: wygląd menu panelu">
-<!ENTITY Ctr_bmbunsortbm	"Menu podręczne: podmenu 'Zakładki nieposortowane'">
+<!ENTITY Ctr_bmbunsortbm	"Menu podręczne: podmenu 'Zakładki nieprzypisane'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu ponad zakładkami">
 <!ENTITY Ctr_bmbviewbmsb	"Menu podręczne: pokaż 'Wyświetl panel zakładek'">
 <!ENTITY Ctr_bmbviewbmtb	"Menu podręczne: pokaż 'Wyświetl pasek zakładek'">
-<!ENTITY Ctr_bmbnounsort	"Menu podręczne: ukryj 'Zakładki nieposortowane'">
+<!ENTITY Ctr_bmbnounsort	"Menu podręczne: ukryj 'Zakładki nieprzypisane'">
 <!ENTITY Ctr_bmbutnotext	"Ukryj etykietę na pasku zakładek">
 <!ENTITY Ctr_skipprintpr	"Przycisk drukowania: pomiń podgląd wydruku">
 <!ENTITY Ctr_tbconmenu		"Menu kontekstowe paska narzędzi: ukryj 'Przenieś do menu', 'Usuń z paska narzędzi', 'Odśwież wszystkie karty', 'Dodaj zakładki do wszystkich kart...' oraz 'Przywróć zamkniętą kartę'">
@@ -230,8 +230,9 @@
 <!ENTITY Ctr_tabunr			"Karta nieprzeczytana">
 <!ENTITY Ctr_ntabnor		"Nowa karta domyślna">
 <!ENTITY Ctr_ntabhov		"Nowa karta najechana">
-<!ENTITY Ctr_bold			"Pogrubiona">
+<!ENTITY Ctr_bold			"Pogrubienie">
 <!ENTITY Ctr_italic			"Kursywa">
+<!ENTITY Ctr_underlined		"Podkreślenie">
 <!ENTITY Ctr_notabhov		"Włączone ustawienia nie uwzględniają ustawień 'najechania'">
 <!ENTITY Ctr_tabc_act_tb	"Kolor tła na paskach narzędzi">
 
@@ -268,6 +269,9 @@
 <!ENTITY Ctr_autocomplete	"Menu podręczne autouzupełniania">
 <!ENTITY Ctr_altautocompl	"Alternatywny wygląd">
 <!ENTITY Ctr_autocompl_it	"Usuń elementy 'szukaj w...' oraz 'otwórz stronę' (jeżeli obecne)">
+<!ENTITY Ctr_autocompl_hl	"Podświetlanie wystąpień tekstu">
+<!ENTITY Ctr_autocompl_rhl	"Kolory Aero dla podświetlonych wyników">
+<!ENTITY Ctr_autocompl_sep	"Pokaż separator pomiędzy wynikami">
 <!ENTITY Ctr_urlbar_uc		"Wyłącz funkcję 'ujednolicone autouzupełnianie'">
 <!ENTITY Ctr_lbsugresi		"Wyłącz ograniczenie wysokości">
 <!ENTITY Ctr_lbsugres		"Liczba wyników">
@@ -291,6 +295,7 @@
 
 <!ENTITY Ctr_toolbars		"Paski narzędzi">
 <!ENTITY Ctr_dblclnewtab	"Podwójne kliknięcie paska narzędzi otwiera nową kartę">
+<!ENTITY Ctr_dblclnewtabdes	"Nie pasuje do wszystkich kompletnych motywów, podczas gdy pasek tytułu Windows jest aktywny.">
 <!ENTITY Ctr_hidetbwot		"Ukryj pasek kart z widoczną tylko jedną kartą">
 <!ENTITY Ctr_hidetbwote		"Zmniejsz opóźnienie ukrywania przy uruchamianiu">
 <!ENTITY Ctr_hidetbwote_i	"Może powodować usterki kart paska narzędzi">
@@ -298,7 +303,7 @@
 <!ENTITY Ctr_notabfog		"Usuń mgłę tła (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Usuń kolor tła (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Zredukuj przestrzeń powyżej paska narzędzi (jeśli to możliwe)">
-<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
+<!ENTITY Ctr_showalltabsb	"Zawsze pokazuj przycisk 'Pokaż wszystkie karty'">
 <!ENTITY Ctr_alttabstb		"Alternatywny kolor tła">
 <!ENTITY Ctr_alttabstb2		"W trybie zmaksymalizowanym (karty na górze)">
 
@@ -352,22 +357,21 @@
 <!ENTITY Ctr_nodevtheme		"Zapobiegaj włączeniu 'Motywu Edycji Deweloperskiej'">
 
 <!ENTITY Ctr_experttweaks	"Zaawansowane">
-<!ENTITY Ctr_fx34search		"Odznaczenie tego ustawienia usuwa 'nowy wygląd wyszukiwania' i przywraca stary.">
 <!ENTITY Ctr_fx34loop		"Odznaczenie tego ustawienia usuwa funkcje 'dzwonienia i konwersacji'.">
-<!ENTITY Ctr_fx35devtheme	"Odznaczenie tych ustawień wyłącza 'Motyw Edycji Deweloperskiej'.">
-<!ENTITY Ctr_fx36prefs		"Odznaczenie tego ustawienia przywraca stare okno opcji.">
-<!ENTITY Ctr_fx36prefs2		"Uwaga: stare okno opcji nie zawiera wszystkich ostatnio dodanych ustawień przeglądarki!">
 <!ENTITY Ctr_fx38reader		"Odznaczenie tych ustawienia wyłącza funkcję 'Popraw czytelność' oraz usuwa jej ikonę z paska adresu.">
 <!ENTITY Ctr_fx38pocket		"Odznaczenie tego ustawienia wyłącza funkcję 'Pocket' oraz usuwa jej ikonę z pasków narzędzi.">
 <!ENTITY Ctr_fx38pocket2	"Uwaga: przesunięcie przycisku Pocket do strefy 'Dodatkowe funkcje i opcje' w trybie 'Dostosuj' przed wyłączeniem tego ustawienia usunie z menu podręcznych Zakładki oraz Popraw czytelność wszystkie elementy związane z Pocket.">
-<!ENTITY Ctr_e_searchui		"Wygląd wyszukiwania">
 <!ENTITY Ctr_e_loop			"Hello / Dzwonienie i konwersacja / Loop">
-<!ENTITY Ctr_e_deved		"Motyw Edycji Deweloperskiej">
-<!ENTITY Ctr_e_prefsui		"Ustawienia w karcie">
 <!ENTITY Ctr_e_readermode	"Popraw czytelność">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"Ikona odtwarzania dźwięku na kartach">
 <!ENTITY Ctr_fx42tabsaudico	"Odznaczenie tego ustawienia usuwa z kart 'ikonę odtwarzania dźwięku'.">
+<!ENTITY Ctr_e_containertab	"Karty z kontekstem">
+<!ENTITY Ctr_fx50containert	"Odznaczenie tego ustawienia usuwa 'karty z kontekstem'.">
+<!ENTITY Ctr_e_findbarhl	"Podświetlanie paska wyszukiwania">
+<!ENTITY Ctr_fx50findbarhl	"Odznaczenie tych ustawień usuwa funkcje 'podświetlania' paska wyszukiwania.">
+<!ENTITY Ctr_e_flyweb		"FlyWeb">
+<!ENTITY Ctr_fx50flyweb		"Odznaczenie tego ustawienia wyłącza 'FlyWeb'.">
 
 
 <!ENTITY Ctr_pw_settings	"Ustawienia">
@@ -380,10 +384,14 @@
 <!ENTITY Ctr_pw_set_syncoff	"Usuń z Sync">
 
 <!ENTITY Ctr_special_font	"Ustawienia koloru tła są tylko dla domyślnego motywu!">
-<!ENTITY Ctr_special_info	"Niektóre opcje mogą nie oferować widocznych zmian we wszystkich przypadkach">
+<!ENTITY Ctr_special_info	"Niektóre opcje mogą nie zawsze oferować widoczne zmiany">
 <!ENTITY Ctr_special_info2	"Wykryto motyw autorstwa osób trzecich! Niektóre opcje nie działają z motywami autorstwa osób trzecich!">
-<!ENTITY Ctr_support		"Forum wsparcia">
-<!ENTITY Ctr_newversion		"Nowa wersja?">
+<!ENTITY Ctr_special_acr	"Zgłaszaj problemy tylko za pomocą oficjalnych kanałów wsparcia, a nie korzystając z 'Reportera kompatybilności dodatków'!">
+<!ENTITY Ctr_support		"Pomoc">
+<!ENTITY Ctr_support_forum1	"MozillaZine (forum w języku angielskim)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (forum w języku niemieckim)">
+<!ENTITY Ctr_github_issues	"Zgłoś problem na GitHubie">
+<!ENTITY Ctr_newversion		"Sprawdź, czy jest nowa wersja">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Pierwsze kroki">
@@ -409,79 +417,80 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+<!ENTITY Ctr_appbuttonc_d	"Kolor przycisku Cyberfox (domyślny)">
+<!ENTITY Ctr_appbuttonc_s	"Łososiowy kolor przycisku">
 
-<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
-<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
-<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_alt_newtabpalt	"Strona nowej karty: stylizowany wygląd">
+<!ENTITY ctr_aboutnewtab.customhighlight "Używaj niestandardowego koloru podświetlenia">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Zmień niestandardowy kolor podświetlenia">
+<!ENTITY ctr_aboutnewtab.custombase "Używaj niestandardowego koloru tekstu">
+<!ENTITY ctr_aboutnewtab.custombasecol "Zmień podstawowy kolor tekstu">
 
-<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
-<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_alt_newtabcol	"Strona nowej karty: kolumny">
+<!ENTITY Ctr_alt_newtabrow	"Strona nowej karty: wiersze">
 
-<!ENTITY Ctr_classic_elements		"Classic Elements">
-<!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
-<!ENTITY ctr_Support_forums	"Support Forum">
-<!ENTITY ctr_help_features	"Features &amp; Information">
+<!ENTITY Ctr_classic_elements		"Klasyczne elementy">
+<!ENTITY Ctr_pw_set_preaust		"Ustawienia Australis">
+<!ENTITY ctr_Support_forums	"Forum pomocy">
+<!ENTITY ctr_help_features	"Funkcje i informacje">
 
-<!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
+<!ENTITY Ctr_custtabfontsize.label	"Rozmiar czcionki karty: ">
 
-<!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
-<!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
-<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
+<!ENTITY ctr_applyCTRPrefFile.label	"Zatwierdź zmiany">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Przywróć kopię zapasową">
+<!ENTITY ctr_resetCTRPrefFile.label	"Usuń kopię zapasową">
 
-<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
-<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+<!ENTITY ctr_appbuttoncusttextcolor	"Kolor tekstu przycisku aplikacji.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Usuń cień tekstu w przycisku aplikacji">
 
-<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
-<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
-<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
-<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY ctr_toolbarsearchbar.description	"Pasek wyszukiwania">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Włącz niestandardową maksymalną szerokość">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Maksymalna szerokość paska wyszukiwania: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Zwijany pasek wyszukiwania na liście dodatków">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Zawsze pokazuj)">
 
-<!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
-<!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">
-<!ENTITY ctr_cbookmarkfontsize.label	"Bookmarks font size: ">
+<!ENTITY ctr_bookmarkfontsize.description	"Pasek zakładek">
+<!ENTITY ctr_custombookmarkfontsize.label	"Włącz niestandardowy rozmiar czcionki na pasku zakładek">
+<!ENTITY ctr_cbookmarkfontsize.label	"Rozmiar czcionki na pasku zakładek: ">
 
-<!ENTITY ctr_abouthome.caption "Change about:home page style">
-<!ENTITY ctr_abouthome.default "Default about:home style">
-<!ENTITY ctr_abouthome.light "Light about:home style">
-<!ENTITY ctr_abouthome.dark "Dark about:home style">
-<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
-<!ENTITY ctr_abouthome.links "No links on about:home page">
-<!ENTITY ctr_abouthome.logo "No logo on about:home page">
-<!ENTITY ctr_abouthome.icons "No icons on about:home page">
-<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
-<!ENTITY ctr_abouthome.custombg "Use custom background image">
-<!ENTITY ctr_abouthome.custombgbrowse "Browse">
-<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
-<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
-<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
-<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_abouthome.custombase "Use custom text color">
-<!ENTITY ctr_abouthome.custombasecol "Change base text color">
-<!ENTITY ctr_abouthome.animate "Use animations on about:home page">
-<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+<!ENTITY ctr_abouthome.caption "Zmień styl strony startowej">
+<!ENTITY ctr_abouthome.default "Domyślny styl strony startowej">
+<!ENTITY ctr_abouthome.light "Jasny styl strony startowej">
+<!ENTITY ctr_abouthome.dark "Ciemny styl strony startowej">
+<!ENTITY ctr_abouthome.simplicity  "Uproszczony styl strony startowej">
+<!ENTITY ctr_abouthome.links "Usuń linki ze strony startowej">
+<!ENTITY ctr_abouthome.logo "Usuń logo ze strony startowej">
+<!ENTITY ctr_abouthome.icons "Usuń ikony ze strony startowej">
+<!ENTITY ctr_abouthome.snippets "Usuń fragmenty dotyczące informacji ze strony startowej">
+<!ENTITY ctr_abouthome.custombg "Używaj niestandardowego zdjęcia w tle">
+<!ENTITY ctr_abouthome.custombgbrowse "Przeglądaj">
+<!ENTITY ctr_abouthome.custombgurl "Wprowadź link lub ścieżkę do pliku">
+<!ENTITY ctr_abouthome.custombgurlph "Obraz w tle link|ścieżka">
+<!ENTITY ctr_abouthome.customhighlight "Używaj niestandardowego koloru podświetlenia">
+<!ENTITY ctr_abouthome.customhighlightcol "Zmień niestandardowy kolor podświetlenia">
+<!ENTITY ctr_abouthome.custombase "Używaj niestandardowego koloru tekstu">
+<!ENTITY ctr_abouthome.custombasecol "Zmień podstawowy kolor tekstu">
+<!ENTITY ctr_abouthome.animate "Używaj animacji na stronie startowej">
+<!ENTITY ctr_abouthome.custombgstretch "Rozciągnij obraz w tle do okna (Domyślnie).">
 
-<!ENTITY ctr_aboutnewtab.caption "Change about:newtab page style">
+<!ENTITY ctr_aboutnewtab.caption "Zmień styl strony nowej karty">
 
-<!ENTITY cssClassId.description "Hide element classes - element ids">
-<!ENTITY cssClassId.label "Enter a class or id:">
-<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
-<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
-<!ENTITY add.label "ADD">
-<!ENTITY clear.label "Clear Filter">
-<!ENTITY copy.label "Copy Filter">
+<!ENTITY cssClassId.description "Ukryj elementy klas - id elementów">
+<!ENTITY cssClassId.label "Podaj klasę lub id:">
+<!ENTITY useFilterElement.label "Używaj niestandardowego filtru, by ukryć elementy klas lub id">
+<!ENTITY filterElement.placehold "Możesz określić, który element klasy lub id.">
+<!ENTITY add.label "Dodaj">
+<!ENTITY clear.label "Usuń filtr">
+<!ENTITY copy.label "Kopiuj filtr">
 
-<!ENTITY Ctr_tabthrobber_usecust.label "Use custom tab throbber">
-<!ENTITY Ctr_tabthrobber_custurlph.label "Throbber image url|path">
+<!ENTITY Ctr_tabthrobber_usecust.label "Używaj niestandardowego widgetu w karcie">
+<!ENTITY Ctr_tabthrobber_custurlph.label "Obraz widgetu link|ścieżka">
 
-<!ENTITY Ctr_animatelwtheme "Animate Animated light-weight themes on startup.">
+<!ENTITY Ctr_animatelwtheme "Animuj animowane lekkie motywy przy starcie.">
 
-<!ENTITY Ctr_tbp_abouthome "AboutHome Page">
-<!ENTITY Ctr_tbp_newtab "NewTab Page">
+<!ENTITY Ctr_tbp_abouthome "Strona startowa">
+<!ENTITY Ctr_tbp_newtab "Strona nowej karty">
 
-<!ENTITY Ctr_dark.label "(Dark)">
-<!ENTITY Ctr_light.label "(Light)">
-<!ENTITY Ctr_alt.label "(Alt)">
+<!ENTITY Ctr_dark.label "(Ciemny)">
+<!ENTITY Ctr_light.label "(Jasny)">
+<!ENTITY Ctr_alt.label "(Alternatywny)">

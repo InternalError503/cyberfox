@@ -1,0 +1,16 @@
+spn-title=Quickstart
+tab-menustyletab=Menu Style
+tab-themestyletab=Theme Style
+tab-homestyletab=Home Style
+tab-syncstyletab=Sync
+tab-title-menustyle=Select Menu Type:
+tab-title-themestyle=Select Tab Type:
+tab-title-homestyle=Select Home Type:
+tab-title-syncstyle=Sync with firefox sync:
+nav-tab-next=Next
+nav-tab-skip=Skip
+nav-tab-clear=Clear
+nav-tab-done=Apply & close
+
+change-confirm-title=Please confirm your changes!
+change-confirm-message=Would you like to apply your settings?

@@ -14,7 +14,6 @@ ac_add_options --with-branding=browser/branding/official-linux
 ac_add_options --with-app-name=Cyberfox
 ac_add_options --with-app-basename=Cyberfox
 ac_add_options --prefix=/usr
-ac_add_options --libexecdir=/usr/lib/cyberfox 
 
 #Auto parallel compiling
 Cparallel=$(( `grep processor /proc/cpuinfo | wc -l` + 2 ))
@@ -27,20 +26,14 @@ mk_add_options MOZILLA_DIR=@TOPSRCDIR@
 ac_add_options --enable-optimize="-g -O -freorder-blocks"
 ac_add_options --enable-jemalloc
 ac_add_options --enable-release
+ac_add_options --disable-rust
 ac_add_options --enable-gio
 ac_add_options --with-pthreads
 ac_add_options --enable-strip
 ac_add_options --disable-install-strip
 
 #Disable unwanted features
-ac_add_options --disable-pay
 ac_add_options --disable-maintenance-service
-ac_add_options --disable-services-healthreport
-ac_add_options --disable-moz-services-healthreport
-ac_add_options --disable-moz_services_healthreport
-ac_add_options --disable-data-reporting
-ac_add_options --disable-telemetry-reporting
-ac_add_options --disable-auto-deps
 ac_add_options --disable-debug
 ac_add_options --disable-tests
 ac_add_options --disable-debug-symbols
@@ -49,11 +42,6 @@ ac_add_options --disable-updater
 ac_add_options --disable-update-channel
 ac_add_options --disable-update-packaging
 ac_add_options --disable-crashreporter
-ac_add_options --enable-debugger-info-modules=no
-ac_add_options --disable-debugger-info-modules
-ac_add_options --disable-mochitest
-ac_add_options --disable-mochitests
 ac_add_options --disable-accessibility
 ac_add_options --disable-parental-controls
-ac_add_options --disable-gnomevfs
-ac_add_options --disable-elf-hack 
+ac_add_options --disable-elf-hack

@@ -135,8 +135,6 @@
 	
 	<menuitem id="menu_preferences" oncommand="classicthemerestorerjs.ctr.openContentPrefsInWin();"/>
 	
-	<!--panel id="UITourTooltip" targetName="home-button" consumeoutsideclicks="true"/-->
-	
 	<!--<menupopup id="menu_FilePopup">
 	  <menuitem id="ctraddon_restart-menu"
 				label="&Ctr_menu_restart.label;"
@@ -434,9 +432,9 @@
 					  class="menuitem-iconic"/>-->
 <!--- CyberCTR customization settings -->
 	  <menuitem id="appmenu_restartBrowser"
-	  					class="menuitem-iconic"
 				        label="&restartBrowser.label;"
-				        oncommand="gCyberfoxCustom.restartBrowser();"/>	
+				        oncommand="gCyberfoxCustom.restartBrowser();"
+					  class="menuitem-iconic"/>
 <!--- CyberCTR customization settings -->			  
 			<menuitem id="appmenu-quit"
 					  class="menuitem-iconic ctraddon_windowsonly"
@@ -480,7 +478,7 @@
 							label="&showAllBookmarks2.label;"
 							command="Browser:ShowAllBookmarks"
 							key="manBookmarkKb"/>
-				<menuseparator/>
+				  <menuseparator/>
 <!--- CyberCTR customization settings -->
 					<menuitem id="menu_pocket" label="&pocketMenuitem.label;"
 								class="menuitem-iconic"
@@ -1010,7 +1008,7 @@
  
       <!--### creates a movable go button ###-->
 	  <toolbarbutton id="ctraddon_preferences-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
-                     label="&preferencesCmd2.label; (&Ctr_window;)" removable="true"
+                     label="&preferencesCmd2.label;" removable="true"
 					 oncommand="classicthemerestorerjs.ctr.openContentPrefsInWin();"
                      tooltiptext="&preferencesCmd2.label; (&Ctr_window;)"/>
 	  

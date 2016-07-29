@@ -1,0 +1,16 @@
+spn-title=Szybki start
+tab-menustyletab=Styl menu
+tab-themestyletab=Styl motywu
+tab-homestyletab=Styl strony startowej
+tab-syncstyletab=Synchronizuj
+tab-title-menustyle=Wybierz typ menu:
+tab-title-themestyle=Wybierz typ karty:
+tab-title-homestyle=Wybierz typ strony startowej:
+tab-title-syncstyle=Synchronizuj z Firefox Sync:
+nav-tab-next=Dalej
+nav-tab-skip=Pomiń
+nav-tab-clear=Wyczyść
+nav-tab-done=Zastosuj i zamknij
+
+change-confirm-title=Proszę potwierdzić zmiany!
+change-confirm-message=Czy chciałbyś zatwierdzić ustawienia?

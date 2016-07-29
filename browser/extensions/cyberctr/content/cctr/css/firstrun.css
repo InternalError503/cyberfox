@@ -1,0 +1,130 @@
+@-moz-document url("chrome://classic_theme_restorer/content/cctr/firstrun.html") {
+/*
+  @import url('http://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+  @import url('http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css');
+*/
+
+  *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -moz-user-select: none;
+  }
+
+  html, body {
+    height: 100%;
+    background: rgb(238, 238, 238);
+  }
+
+  body {
+    font: 14px/1 'Open Sans', sans-serif;
+    color: #555;
+  }
+
+  h1 {
+    padding: 50px 0;
+    font-weight: 400;
+    text-align: center;
+  }
+
+  p {
+    margin: 0 0 20px;
+    line-height: 1.5;
+  }
+
+  section {
+    display: none;
+    padding: 20px 0 0;
+    border-top: 1px solid #ddd;
+  }
+
+  input {
+    display: none;
+  }
+
+  label {
+    display: inline-block;
+    margin: 0 0 -1px;
+    padding: 15px 25px;
+    font-weight: 600;
+    text-align: center;
+    color: #bbb;
+    border: 1px solid transparent;
+  }
+
+  label:before {
+    font-family: fontawesome;
+    font-weight: normal;
+    margin-right: 10px;
+  }
+
+  label[for*='menu']:before { content: '\f0c9'; }
+  label[for*='theme']:before { content: '\f1fc'; }
+  label[for*='home']:before { content: '\f015'; }
+  label[for*='sync']:before { content: '\f021'; }
+
+  label:hover {
+    color: #888;
+    cursor: pointer;
+  }
+
+  .radio_item:hover + label,
+  input:checked + label{
+    color: #555;
+    border: 1px solid #ddd;
+    border-top: 2px solid #00adee;
+    border-bottom: 1px solid #fff;
+  }
+
+  #menustyletab:checked ~ #menustyle,
+  #themestyletab:checked ~ #themestyle,
+  #homestyletab:checked ~ #homestyle,
+  #syncstyletab:checked ~ #syncstyle {
+    display: block;
+  }
+
+  .radio_item {
+    opacity: 0.6;
+  }
+      
+  .radio_item:checked + label{
+    margin-top: -1px;
+    opacity: 1;
+  }
+
+  .radio_item:hover {
+    margin-top: -1px;
+    opacity: 1;
+  }
+
+  /* Initially Hide Next Buttons */
+  #menunextbutton,
+  #themenextbutton,
+  #homenextbutton,
+  #menunextbuttonclear,
+  #themenextbuttonclear,
+  #homenextbuttonclear,
+  #nav-tab-doneclear {
+    display: none;
+  }
+
+  @media screen and (max-width: 750px) {
+    label {
+      font-size: 0;
+    }
+    label:before {
+      margin: 0;
+      font-size: 18px;
+    }
+    .radio_item:before{
+      margin-right: 10px; 
+      font-size: 14px;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    label {
+      padding: 15px;
+    }
+  }
+}

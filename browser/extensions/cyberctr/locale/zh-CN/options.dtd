@@ -232,6 +232,7 @@
 <!ENTITY Ctr_ntabhov		"悬停新标签页">
 <!ENTITY Ctr_bold			"加粗">
 <!ENTITY Ctr_italic			"斜体">
+<!ENTITY Ctr_underlined		"下载线">
 <!ENTITY Ctr_notabhov		"启用设置覆盖“悬停”设置">
 <!ENTITY Ctr_tabc_act_tb	"工具栏使用背景色">
 
@@ -268,6 +269,9 @@
 <!ENTITY Ctr_autocomplete	"自动完成弹出框">
 <!ENTITY Ctr_altautocompl	"备选的外观">
 <!ENTITY Ctr_autocompl_it	"移除 “使用...搜索” 和 “访问” 项目 (如果存在的话)">
+<!ENTITY Ctr_autocompl_hl	"文本匹配时高亮">
+<!ENTITY Ctr_autocompl_rhl	"高亮结果使用 Aero 颜色">
+<!ENTITY Ctr_autocompl_sep	"在结果之间显示分隔符">
 <!ENTITY Ctr_urlbar_uc		"禁用 “统一自动完成” 功能">
 <!ENTITY Ctr_lbsugresi		"禁用高度限制">
 <!ENTITY Ctr_lbsugres		"结果数量">
@@ -290,7 +294,8 @@
 <!ENTITY Ctr_mbarforceright	"最后一个元素">
 
 <!ENTITY Ctr_toolbars		"工具栏">
-<!ENTITY Ctr_dblclnewtab	"双击新建标签页 (使用 browser.newtab.url 设置)">
+<!ENTITY Ctr_dblclnewtab	"双击新建标签页">
+<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
 <!ENTITY Ctr_hidetbwot		"当只有一个标签页时隐藏标签页栏">
 <!ENTITY Ctr_hidetbwote		"启动时减少隐藏延迟">
 <!ENTITY Ctr_hidetbwote_i	"可能会导致标签页工具栏闪烁">
@@ -298,7 +303,7 @@
 <!ENTITY Ctr_notabfog		"移除背景模糊 (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"移除背景颜色 (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"减少工具栏上方空间 (如果可以)">
-<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
+<!ENTITY Ctr_showalltabsb	"总是显示“所有标签页”按钮">
 <!ENTITY Ctr_alttabstb		"备选背景颜色">
 <!ENTITY Ctr_alttabstb2		"在最大化模式 (标签在顶部)">
 
@@ -352,22 +357,21 @@
 <!ENTITY Ctr_nodevtheme		"阻止“开发者主题”被启用">
 
 <!ENTITY Ctr_experttweaks	"高级">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ 引入“新搜索界面”。不选中此项以恢复“旧搜索界面”。">
-<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ 引入“呼叫和通话”功能。不选中此项以移除它们。">
-<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ 引入新的“开发者版本主题”。不选中此项以禁用“开发者版本主题”以及定制模式下它的一些按钮。">
-<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ 引入在标签页中显示选项设置。不选中此项以使用旧选项窗口。">
-<!ENTITY Ctr_fx36prefs2		"注意: 旧的选项窗口不包含近期添加的浏览器选项！">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ 引入新的“阅读模式”。不选中此项以禁用它并从地址栏移除图标。">
-<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ 引入“Pocket”功能。不选中此项以禁用它并从地址栏移除图标。">
+<!ENTITY Ctr_fx34loop		"不选中此项以移除它们。">
+<!ENTITY Ctr_fx38reader		"不选中此项以禁用它并从地址栏移除图标。">
+<!ENTITY Ctr_fx38pocket		"不选中此项以禁用它并从地址栏移除图标。">
 <!ENTITY Ctr_fx38pocket2	"注意: 在禁用该选项前移动“Pocket”按钮到 “定制面板” 同时会从书签和阅读菜单移除“Pocket”">
-<!ENTITY Ctr_e_searchui		"搜索栏外观">
 <!ENTITY Ctr_e_loop			"呼叫与会话">
-<!ENTITY Ctr_e_deved		"开发者版本主题">
-<!ENTITY Ctr_e_prefsui		"标签页中显示选项设置">
 <!ENTITY Ctr_e_readermode	"阅读模式">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"标签页上显示正在播放音频图标">
 <!ENTITY Ctr_fx42tabsaudico	"不选中此项，从标签页上移除“正在播放音频图标”。">
+<!ENTITY Ctr_e_containertab	"容器标签页">
+<!ENTITY Ctr_fx50containert	"不选中此项以移除“容器标签页”。">
+<!ENTITY Ctr_e_findbarhl	"搜索栏高亮">
+<!ENTITY Ctr_fx50findbarhl	"不选中此项以移除搜索栏“高亮”功能。">
+<!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_fx50flyweb		"不选中此项以禁用“Flyweb”。">
 
 
 <!ENTITY Ctr_pw_settings	"设置">
@@ -382,8 +386,12 @@
 <!ENTITY Ctr_special_font	"只有默认主题才能设置背景颜色!">
 <!ENTITY Ctr_special_info	"一些选项可能无法在所有情况下提供视觉变化!">
 <!ENTITY Ctr_special_info2	"有些设置只能在 &brandShortName; 默认主题中生效，第三方主题可能无法生效!">
-<!ENTITY Ctr_support		"支持讨论区">
-<!ENTITY Ctr_newversion		"有新版本?">
+<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_support		"Support">
+<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
+<!ENTITY Ctr_github_issues	"Report issue on Github">
+<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"开始使用">
@@ -439,6 +447,7 @@
 <!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
 <!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">

@@ -6,33 +6,34 @@ var {Services} = Cu.import("resource://gre/modules/Services.jsm");
 var {FileUtils} = Cu.import("resource://gre/modules/FileUtils.jsm");
 var {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 
-if (typeof gCustomOptionsPanel == "undefined") {
-    var gCustomOptionsPanel = {};
+if (typeof gCustomAgentOptions == "undefined") {
+    var gCustomAgentOptions = {};
 };
-if (!gCustomOptionsPanel) {
-    gCustomOptionsPanel = {};
+if (!gCustomAgentOptions) {
+    gCustomAgentOptions = {};
 };
 
-var gCustomOptionsPanel = {
+var gCustomAgentOptions = {
 
     init: function(e) {
 
         try {
 
-            //Get, Load and parse agents.json	
-            var jsonFile = FileUtils.getFile("CurProcD", ["agents.json"]);
-
             var jsonContent;
-            var contentChannel = NetUtil.newChannel(jsonFile);
-
-            contentChannel.contentType = "application/json";
-
-            NetUtil.asyncFetch(contentChannel, function(aInputStream, aResult) {
+			// Get, Load and parse agents.json
+            NetUtil.asyncFetch(NetUtil.newChannel(FileUtils.getFile("CurProcD", ["agents.json"]),
+                            null, // aCharset
+                            null, // aBaseURI
+                            null, // aLoadingNode
+                            Services.scriptSecurityManager.getSystemPrincipal(),
+                            null, // aTriggeringPrincipal
+                            Ci.nsILoadInfo.SEC_NORMAL,
+							Ci.nsIContentPolicy.TYPE_OTHER), function(aInputStream, aResult) {
 
                 if (!Components.isSuccessCode(aResult)) {
-                    //Prevent panel activation if agents.json not found!
-                    document.getElementById("showUserAgent").hidden = true;
-                    console.log("Were sorry but something has gone wrong while trying to load agents.json (agents.json not found!)" + aResult);
+                    // Prevent panel activation if agents.json not found!
+                    document.getElementById("custom-useragent-options").hidden = true;
+                    console.log("Were sorry but something has gone wrong while trying to load agents.json (agents.json not found!) " + aResult);
                     return;
                 }
 
@@ -40,8 +41,8 @@ var gCustomOptionsPanel = {
 
                 var myJson;
 
-                if (!gCustomOptionsPanel.IsJsonValid(jsonContent)) {
-                    //Need to throw error message and disable agentID if not valid json.
+                if (!gCustomAgentOptions.IsJsonValid(jsonContent)) {
+                    // Need to throw error message and disable agentID if not valid json.
                     document.getElementById("devtools-agent-menu").disabled = true;
                     console.log("Were sorry but something has gone wrong while trying to parse agents.json (json is not valid!)");
                     return;
@@ -53,25 +54,32 @@ var gCustomOptionsPanel = {
 				var optionsListArrayVersion = myJson.userAgents[0].options[0].version;
 
 				for (var i = 0;optionsListArrayVersion[i]; i++) {
-						var optionsItemsList = document.getElementById("devtools-agent-version").appendItem(optionsListArrayVersion[i], optionsListArrayVersion[i]);
+						var optionsItemsList = document.getElementById("devtools-agent-version");
+						var addNewVersionItem = document.createElement("option");
+						addNewVersionItem.textContent = optionsListArrayVersion[i];
+						addNewVersionItem.value = optionsListArrayVersion[i];
+						optionsItemsList.appendChild(addNewVersionItem);
 				}
 
                 for (var i = 0; browserListArray[i]; i++) {
 
-                    var menuItemsList = document.getElementById("devtools-agent-menu").appendItem(browserListArray[i].name, browserListArray[i].agent);
-					
+                    var menuItemsList = document.getElementById("devtools-agent-menu");
+					var addNewBrowserItem = document.createElement("option");
+					addNewBrowserItem.textContent = browserListArray[i].name;
+					addNewBrowserItem.value = browserListArray[i].agent;
+					menuItemsList.appendChild(addNewBrowserItem);
                 }
 
             });
-            //Only if known in list will it show only in current panel session, all other cases select user-agent item is set.
-            document.getElementById("devtools-agent-menu").label = window.navigator.userAgent;
+            // Only if known in list will it show only in current panel session, all other cases select user-agent item is set.
+            document.getElementById("devtools-agent-menu").value = window.navigator.userAgent;
 
            document.getElementById("devtools-agent-options-other").value = "";
            document.getElementById("devtools-agent-options-other").value = window.navigator.userAgent;
 
 
         } catch (e) {
-            //Catch any nasty errors and output to dialogue and console
+            // Catch any nasty errors and output to dialogue and console
             console.log("Were sorry but something has gone wrong while trying to load agents.json " + e);
         }
 
@@ -96,24 +104,48 @@ var gCustomOptionsPanel = {
 
     itemSelectedChanged: function() {
         try {
-            Services.prefs.setCharPref("general.useragent.override", document.getElementById("devtools-agent-menu").value);
-            document.getElementById("devtools-agent-options-other").value = document.getElementById("devtools-agent-menu").value;
-			if(document.getElementById("devtools-agent-menu").label === "Cyberfox (Configurable)" || document.getElementById("devtools-agent-menu").label === "Firefox (Configurable)"){
+			
+			let selectedBrowserItem = document.getElementById("devtools-agent-menu");
+			var selectedBrowserItemIndex = selectedBrowserItem.selectedIndex;
+			var selectedBrowserItemText = selectedBrowserItem.options[selectedBrowserItemIndex].text;
+			
+			if (selectedBrowserItem.value === "0") {
+				return;
+			}
+			
+            Services.prefs.setCharPref("general.useragent.override", selectedBrowserItem.value);
+            document.getElementById("devtools-agent-options-other").value = selectedBrowserItem.value;
+			
+			if(selectedBrowserItemText  === "Cyberfox (Configurable)" || selectedBrowserItemText  === "Firefox (Configurable)"){
 				document.getElementById("configurableAgent").hidden = false;
 			}else{
 				document.getElementById("configurableAgent").hidden = true;
 			}
+			
             this.showOtherUserAgent();
+			
         } catch (e) {
-            //Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong selected item changed event!" + e);
+            // Catch any nasty errors and output to console
+            console.log("Were sorry but something has gone wrong selected item changed event! " + e);
         }
     },
 	
     configurableAgentChanged: function() {
         try {
-			switch (document.getElementById("devtools-agent-menu").label) {
-				case "Cyberfox (Configurable)":
+			
+			let selectedBrowserItem = document.getElementById("devtools-agent-menu");
+			var selectedBrowserItemIndex = selectedBrowserItem.selectedIndex;
+			var selectedBrowserItemText = selectedBrowserItem.options[selectedBrowserItemIndex].text;
+			
+			// All items must be set to continue
+			if (document.getElementById("devtools-agent-os").value === "0" || 
+				document.getElementById("devtools-agent-arch").value === "0" || 
+				document.getElementById("devtools-agent-version").value === "0") {
+					return;
+			}
+					
+			switch (selectedBrowserItemText) {
+				case "Cyberfox (Configurable)":				
 					var newAgent = "Mozilla/5.0 (Windows NT "+document.getElementById("devtools-agent-os").value+"; "+document.getElementById("devtools-agent-arch").value+" rv:"+document.getElementById("devtools-agent-version").value+") Gecko/20100101 Firefox/"+document.getElementById("devtools-agent-version").value+" Cyberfox/"+document.getElementById("devtools-agent-version").value;
 					Services.prefs.setCharPref("general.useragent.override", newAgent);
 					document.getElementById("devtools-agent-options-other").value = newAgent;
@@ -128,8 +160,8 @@ var gCustomOptionsPanel = {
 			}
 			this.showOtherUserAgent();
         } catch (e) {
-            //Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong selected item changed event!" + e);
+            // Catch any nasty errors and output to console
+            console.log("Were sorry but something has gone wrong selected item changed event! " + e);
         }
     },
 
@@ -139,10 +171,11 @@ var gCustomOptionsPanel = {
             Services.prefs.clearUserPref("general.useragent.override");
             document.getElementById("devtools-agent-options-other").value = "";
             document.getElementById("devtools-agent-options-other").value = window.navigator.userAgent;
+			document.getElementById("configurableAgent").hidden = true; // If visible
             this.hideOtherUserAgent();
         } catch (e) {
-            //Catch any nasty errors and output to dialogue and console
-            console.log("Were sorry but something has gone wrong while attempting restore default useragent!" + e);
+            // Catch any nasty errors and output to dialogue and console
+            console.log("Were sorry but something has gone wrong while attempting restore default useragent! " + e);
         }
     },
 
@@ -151,8 +184,8 @@ var gCustomOptionsPanel = {
             Services.prefs.setCharPref("general.useragent.override", document.getElementById("devtools-agent-options-other").value);
             this.hideOtherUserAgent();
         } catch (e) {
-            //Catch any nasty errors and output to dialogue and console
-            console.log("Were sorry but something has gone wrong while attempting to set custom useragent!" + e);
+            // Catch any nasty errors and output to dialogue and console
+            console.log("Were sorry but something has gone wrong while attempting to set custom useragent! " + e);
         }
     },
     showOtherUserAgent: function() {
@@ -163,8 +196,8 @@ var gCustomOptionsPanel = {
             this.isEnabled("clearOtherUserAgent");
 
         } catch (e) {
-            //Catch any nasty errors and output to dialogue and console
-            console.log("Were sorry but something has gone wrong while attempting to showOtherUserAgent!" + e);
+            // Catch any nasty errors and output to dialogue and console
+            console.log("Were sorry but something has gone wrong while attempting to showOtherUserAgent! " + e);
         }
     },
 
@@ -176,8 +209,8 @@ var gCustomOptionsPanel = {
             this.isDisabled("clearOtherUserAgent");
 
         } catch (e) {
-            //Catch any nasty errors and output to dialogue and console
-            console.log("Were sorry but something has gone wrong while attempting to hideOtherUserAgent!" + e);
+            // Catch any nasty errors and output to dialogue and console
+            console.log("Were sorry but something has gone wrong while attempting to hideOtherUserAgent! " + e);
         }
     },
 
@@ -187,8 +220,8 @@ var gCustomOptionsPanel = {
 
 }
 window.addEventListener("load", function() {
-    gCustomOptionsPanel.init();
+    gCustomAgentOptions.init();
 }, false);
 
-  global.gCustomOptionsPanel = gCustomOptionsPanel;
+  global.gCustomAgentOptions = gCustomAgentOptions;
 }(this));

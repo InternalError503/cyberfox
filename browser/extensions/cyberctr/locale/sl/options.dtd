@@ -232,6 +232,7 @@
 <!ENTITY Ctr_ntabhov		"Nov zavihek ob prehodu z miško">
 <!ENTITY Ctr_bold			"Krepko">
 <!ENTITY Ctr_italic			"Ležeče">
+<!ENTITY Ctr_underlined		"Podčrtano">
 <!ENTITY Ctr_notabhov		"Omogočene nastavitve preglasijo nastavitve 'ob prehodu z miško'">
 <!ENTITY Ctr_tabc_act_tb	"Barva ozadja na orodnih vrsticah">
 
@@ -268,6 +269,9 @@
 <!ENTITY Ctr_autocomplete	"Pojavno okno samodokončevanja">
 <!ENTITY Ctr_altautocompl	"Nadomestni videz">
 <!ENTITY Ctr_autocompl_it	"Odstrani predmeta 'Išči s/z …' in 'Obišči' (če sta prisotna)">
+<!ENTITY Ctr_autocompl_hl	"Označevanje zadetkov">
+<!ENTITY Ctr_autocompl_rhl	"Barve Aero za poudarjene rezultate">
+<!ENTITY Ctr_autocompl_sep	"Prikaži ločilo med rezultati">
 <!ENTITY Ctr_urlbar_uc		"Onemogoči značilnost 'poenotenega samodokončevanja'">
 <!ENTITY Ctr_lbsugresi		"Onemogoči omejitev višine">
 <!ENTITY Ctr_lbsugres		"Število rezultatov">
@@ -290,7 +294,8 @@
 <!ENTITY Ctr_mbarforceright	"Drugi element">
 
 <!ENTITY Ctr_toolbars		"Orodne vrstice">
-<!ENTITY Ctr_dblclnewtab	"Dvojni klik odpre 'nov' zavihek (z uporabo nastavitve browser.newtab.url)">
+<!ENTITY Ctr_dblclnewtab	"Dvojni klik odpre 'nov' zavihek">
+<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
 <!ENTITY Ctr_hidetbwot		"Skrij orodno vrstico zavihkov okna s samo enim zavihkom">
 <!ENTITY Ctr_hidetbwote		"Zmanjšaj zakasnitev skritja ob zagonu">
 <!ENTITY Ctr_hidetbwote_i	"Lahko povzroči napake na vrstici zavihkov">
@@ -298,7 +303,7 @@
 <!ENTITY Ctr_notabfog		"Odstrani meglo ozadja (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Odstrani barvo ozadja (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Zmanjšaj prostor nad orodno vrstico (če je možno)">
-<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
+<!ENTITY Ctr_showalltabsb	"Vedno prikaži gumb 'vsi zavihki'">
 <!ENTITY Ctr_alttabstb		"Nadomestna barva ozadja">
 <!ENTITY Ctr_alttabstb2		"V razpetem načinu (zavihki na vrhu)">
 
@@ -352,22 +357,21 @@
 <!ENTITY Ctr_nodevtheme		"Prepreči namestitev teme 'Developer Theme'">
 
 <!ENTITY Ctr_experttweaks	"Napredno">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ je vpeljal 'nov up. vmesnik za iskanje'. Odznačitev te nastavitve povrne 'stari up. vmesnik za iskanje'.">
-<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ je vpeljal možnosti 'klicanja in pogovorov'. Odznačitev te nastavitve jih odstrani.">
-<!ENTITY Ctr_fx35devtheme	"&brandShortName; 35+ je vpeljal novo temo 'Developer theme'. Odznačitev teh nastavitev to temo in pripadajoči gumb v načinu prilagoditve onemogoči.">
-<!ENTITY Ctr_fx36prefs		"&brandShortName; 36+ je vpeljal nastavitve v zavihku. Odznačitev te nastavitve obnovi staro okno nastavitev.">
-<!ENTITY Ctr_fx36prefs2		"Opomba: staro okno nastavitev ne vsebuje vseh nedavno dodanih nastavitev brskalnika!">
-<!ENTITY Ctr_fx38reader		"&brandShortName; 38+ je vpeljal nov 'način za branje'. Odznačitev teh nastavitev ga onemogoči in odstrani njegovo ikono iz naslovne vrstice.">
-<!ENTITY Ctr_fx38pocket		"&brandShortName; 38.0.5+ je vpeljal storitev 'Pocket'. Odznačitev te nastavitve jo onemogoči in iz orodnih vrstic odstrani njen gumb.">
+<!ENTITY Ctr_fx34loop		"Odznačitev te nastavitve jih odstrani.">
+<!ENTITY Ctr_fx38reader		"Odznačitev teh nastavitev ga onemogoči in odstrani njegovo ikono iz naslovne vrstice.">
+<!ENTITY Ctr_fx38pocket		"Odznačitev te nastavitve jo onemogoči in iz orodnih vrstic odstrani njen gumb.">
 <!ENTITY Ctr_fx38pocket2	"Opomba: premikanje gumba 'Pocket' v 'paleto za prilagoditev' pred onemogočanjem te nastavitve odstani tudi vnose 'Pocket' iz menijev zaznamkov in bralnika.">
-<!ENTITY Ctr_e_searchui		"Videz iskanja">
-<!ENTITY Ctr_e_loop			"Klicanje in pogovori">
-<!ENTITY Ctr_e_deved		"Tema Developer Edition">
-<!ENTITY Ctr_e_prefsui		"Nastavitve v zavihku">
+<!ENTITY Ctr_e_loop			"Hello / Loop / Klicanje in pogovori">
 <!ENTITY Ctr_e_readermode	"Način za branje">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"Ikona predvajanja zvoka na zavihkih">
 <!ENTITY Ctr_fx42tabsaudico	"Odznačitev te nastavitve iz zavihkov odstrani 'ikono predvajanja zvoka'.">
+<!ENTITY Ctr_e_containertab	"Zavihki vsebnika">
+<!ENTITY Ctr_fx50containert	"Odznačitev te nastavitve odstrani 'zavihke vsebnika'.">
+<!ENTITY Ctr_e_findbarhl	"Poudarjanje iskalne vrstice">
+<!ENTITY Ctr_fx50findbarhl	"Odznačitev teh nastavitev odstrani možnosti 'poudarjanja' iskalne vrstice.">
+<!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_fx50flyweb		"Odznačitev te nastavitve onemogoči 'Flyweb'.">
 
 
 <!ENTITY Ctr_pw_settings	"Nastavitve">
@@ -382,8 +386,12 @@
 <!ENTITY Ctr_special_font	"Nastavitve barve ozadja so samo za privzeto temo!">
 <!ENTITY Ctr_special_info	"Nekatere možnosti v vseh primerih morda ne bodo povzročile vidnih sprememb">
 <!ENTITY Ctr_special_info2	"Nastavitve so narejene za &brandShortName;ovo privzeto temo in morda ne bodo delovale z vsemi temami tretjih oseb!">
-<!ENTITY Ctr_support		"Forum za podporo">
-<!ENTITY Ctr_newversion		"Nova različica?">
+<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_support		"Support">
+<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
+<!ENTITY Ctr_github_issues	"Report issue on Github">
+<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"d">
 <!ENTITY appMenuGettingStarted.label	"Začetek">
@@ -439,6 +447,7 @@
 <!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
 <!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">

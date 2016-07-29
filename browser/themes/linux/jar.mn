@@ -101,7 +101,8 @@ browser.jar:
   skin/classic/browser/tabbrowser/alltabs.png         (tabbrowser/alltabs.png)
   skin/classic/browser/tabbrowser/alltabs-inverted.png (tabbrowser/alltabs-inverted.png)
   skin/classic/browser/tabbrowser/connecting.png      (tabbrowser/connecting.png)
-  skin/classic/browser/tabbrowser/loading.png         (tabbrowser/loading.png)
+  skin/classic/browser/tabbrowser/newtab.svg                (tabbrowser/newtab.svg)
+  skin/classic/browser/tabbrowser/newtab-inverted.svg       (tabbrowser/newtab-inverted.svg)
   skin/classic/browser/tabbrowser/tab-active-middle.png     (tabbrowser/tab-active-middle.png)
   skin/classic/browser/tabbrowser/tab-arrow-left.png        (tabbrowser/tab-arrow-left.png)
   skin/classic/browser/tabbrowser/tab-arrow-left-inverted.png (tabbrowser/tab-arrow-left-inverted.png)
@@ -118,10 +119,6 @@ browser.jar:
   skin/classic/browser/tabbrowser/tab-stroke-start.png      (tabbrowser/tab-stroke-start.png)
   skin/classic/browser/tabbrowser/tabDragIndicator.png      (tabbrowser/tabDragIndicator.png)
 
-  skin/classic/browser/usercontext/personal.svg       (../shared/usercontext/personal.svg)
-  skin/classic/browser/usercontext/work.svg           (../shared/usercontext/work.svg)
-  skin/classic/browser/usercontext/banking.svg        (../shared/usercontext/banking.svg)
-  skin/classic/browser/usercontext/shopping.svg       (../shared/usercontext/shopping.svg)
   skin/classic/browser/sync-16.png
   skin/classic/browser/sync-32.png
   skin/classic/browser/sync-bg.png
@@ -143,20 +140,6 @@ browser.jar:
 #ifdef E10S_TESTING_ONLY
   skin/classic/browser/e10s-64@2x.png (../shared/e10s-64@2x.png)
 #endif
- 
-# Add Files For Cyberfox
-#Whimsy replacement
-  skin/classic/browser/customizableui/8pecx.png  (../shared/customizableui/8pecx.png)
-  skin/classic/browser/customizableui/8pecx@2x.png  (../shared/customizableui/8pecx@2x.png)
-  skin/classic/browser/customizableui/8pecx-bw.png  (../shared/customizableui/8pecx-bw.png)
-  skin/classic/browser/customizableui/8pecx-bw@2x.png  (../shared/customizableui/8pecx-bw@2x.png)
-#Browser Theme Core
-  skin/classic/browser/newtab/noise.png               (newtab/noise.png)
-#Browser Theme Core Menu
-  skin/classic/browser/appmenu-icons.png
-  skin/classic/browser/appmenu-icons-cf.png
-# Browser downloads
-	skin/classic/browser/downloads/downloadsWindow.css   (downloads/downloadsWindow.css)  
 
 [extensions/{972ce4c6-7e08-4474-a285-3208198ce6fd}] chrome.jar:
 % override chrome://browser/skin/feeds/audioFeedIcon.png              chrome://browser/skin/feeds/feedIcon.png

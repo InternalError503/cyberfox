@@ -232,6 +232,7 @@
 <!ENTITY Ctr_ntabhov		"Yeni sekme (duraksamış)">
 <!ENTITY Ctr_bold			"Kalın">
 <!ENTITY Ctr_italic			"İtalik">
+<!ENTITY Ctr_underlined		"Underlined">
 <!ENTITY Ctr_notabhov		"Enabled settings override 'hovered' settings">
 <!ENTITY Ctr_tabc_act_tb	"Araç çubukları üzerinde arka plan rengi">
 
@@ -268,6 +269,9 @@
 <!ENTITY Ctr_autocomplete	"Autocomplete popup">
 <!ENTITY Ctr_altautocompl	"Alternative appearance">
 <!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_autocompl_hl	"Highlighting of text hits">
+<!ENTITY Ctr_autocompl_rhl	"Aero colors for highlighted results">
+<!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature">
 <!ENTITY Ctr_lbsugresi		"Disable height limit">
 <!ENTITY Ctr_lbsugres		"Number of results">
@@ -290,7 +294,8 @@
 <!ENTITY Ctr_mbarforceright	"Son öge">
 
 <!ENTITY Ctr_toolbars		"Araç çubuğu ayarları">
-<!ENTITY Ctr_dblclnewtab	"Çift tıklama 'yeni' sekme açar (using browser.newtab.url)">
+<!ENTITY Ctr_dblclnewtab	"Çift tıklama 'yeni' sekme açar">
+<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
 <!ENTITY Ctr_hidetbwot		"Sekme ile araç çubuğunu bir sekme ile gizle">
 <!ENTITY Ctr_hidetbwote		"Reduce hiding delay on startup">
 <!ENTITY Ctr_hidetbwote_i	"Sekme araç çubuğunda hatalara neden olabilir">
@@ -352,22 +357,21 @@
 <!ENTITY Ctr_nodevtheme		"Prevent 'Developer Theme' from being enabled">
 
 <!ENTITY Ctr_experttweaks	"Gelişmiş">
-<!ENTITY Ctr_fx34search		"Unchecking this preference removes the 'new search appearance' and returns the old one.">
 <!ENTITY Ctr_fx34loop		"Unchecking this preference removes 'calling and conversation' features.">
-<!ENTITY Ctr_fx35devtheme	"Unchecking this preference disables the 'developer theme'.">
-<!ENTITY Ctr_fx36prefs		"Unchecking this preference restores the old preference window.">
-<!ENTITY Ctr_fx36prefs2		"Note: Old preference window does not contain all recently added browser preferences!">
 <!ENTITY Ctr_fx38reader		"Unchecking this preference disables the 'reader mode' and removes its icon from location bar.">
 <!ENTITY Ctr_fx38pocket		"Unchecking this preference disables the 'Pocket' feature and removes 'Pocket' button from toolbars.">
 <!ENTITY Ctr_fx38pocket2	"Note: Moving 'Pocket'-button to 'customizing palette' before disabling this preference also removes 'Pocket' entries from bookmarks and reader menus.">
-<!ENTITY Ctr_e_searchui		"Arama görünümü">
 <!ENTITY Ctr_e_loop			"Arama ve konuşma">
-<!ENTITY Ctr_e_deved		"Developer Edition Teması">
-<!ENTITY Ctr_e_prefsui		"Sekmeler içinde tercihler">
 <!ENTITY Ctr_e_readermode	"Okuyucu Modu">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"Audio playing icon on tabs">
 <!ENTITY Ctr_fx42tabsaudico	"Unchecking this preference removes 'audio playing icon' from tabs.">
+<!ENTITY Ctr_e_containertab	"Container Tabs">
+<!ENTITY Ctr_fx50containert	"Unchecking this preference removes 'container tabs'.">
+<!ENTITY Ctr_e_findbarhl	"Findbar highlighting">
+<!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
+<!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
 
 
 <!ENTITY Ctr_pw_settings	"Ayarlar">
@@ -382,8 +386,12 @@
 <!ENTITY Ctr_special_font	"Arka plan renk ayarları varsayılan tema içindir!">
 <!ENTITY Ctr_special_info	"Bazı seçenekler, yalnızca belirli durumlarda görsel değişiklikler yapabilir!">
 <!ENTITY Ctr_special_info2	"Ayarlar &brandShortName; varsayılan teması için yapılmıştır ve diğer üçüncü parti temalar ile çalışmayabilir!">
-<!ENTITY Ctr_support		"Destek Forumu">
-<!ENTITY Ctr_newversion		"Yeni versiyon?">
+<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_support		"Support">
+<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
+<!ENTITY Ctr_github_issues	"Report issue on Github">
+<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Başlarken">
@@ -439,6 +447,7 @@
 <!ENTITY ctr_toolbarsearchbarcustwidth.label	"Özel maksimum genişliği etkinleştir">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Arama-çubuğu maksimum genişliği: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Daraltılabilir about:addons arama çubuğu">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
 <!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">

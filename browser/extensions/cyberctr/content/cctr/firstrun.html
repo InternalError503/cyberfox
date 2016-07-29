@@ -1,0 +1,151 @@
+<!doctype html>
+<html class="uk-notouch" lang="en-us" dir="ltr">
+
+<head>
+  <meta charset="utf-8" />
+  <title id="windowtitle">CyberCTR Firstrun</title>
+  <link rel="icon" type="image/png" id="favicon" href="images/icon.png">
+  <link rel="stylesheet" href="css/uikit.almost-flat.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/firstrun.css" type="text/css" />
+  <script src="js/firstrun.js"></script>
+</head>
+
+<body>
+  <div class="uk-container uk-container-center">
+    <div class="uk-grid">
+      <div class="column_main uk-width-medium-*">
+
+        <!-- Top panel -->
+        <div class="uk-width-1-1">
+          <h1 class="uk-text-center">
+            <i class="uk-icon-cubes uk-icon-small"></i><span class="uk-text-primary uk-text-bold">Cyber</span><span class="uk-text-bold">CTR</span>
+            <span id="spn-title">Quickstart</span></h1>
+        </div>
+        <!-- Top panel -->
+
+        <!-- Main panel -->
+        <div class="uk-width-1-1">
+          <div class="uk-panel uk-panel-box">
+
+            <!-- Tabs -->
+            <input id="menustyletab" type="radio" name="tabs" checked>
+            <label for="menustyletab" id="tab-menustyletab">Menu Style</label>
+
+            <input id="themestyletab" type="radio" name="tabs">
+            <label for="themestyletab" id="tab-themestyletab">Theme Style</label>
+
+            <input id="homestyletab" type="radio" name="tabs">
+            <label for="homestyletab" id="tab-homestyletab">Home Page Style</label>
+
+            <input id="syncstyletab" type="radio" name="tabs">
+            <label for="syncstyletab" id="tab-syncstyletab">Sync</label>
+            <!-- Tabs -->
+
+            <section id="menustyle">
+              <h2 id="tab-title-menustyle">Select Menu Type:</h2>
+              <div class="uk-grid">
+                <div class="uk-width-1-1 uk-text-center">
+                  <!-- AppMenu Button -->
+                  <input type="radio" class="radio_item" value="button" name="menutype" id="appmenubuttonradio">
+                  <label class="radio_item" for="appmenubuttonradio"> <img id="appmenubutton_img" src="images/appmenubutton.jpg"> </label>
+
+                  <!-- MenuBar -->
+                  <input type="radio" class="radio_item" value="menu" name="menutype" id="appmenuradio">
+                  <label class="radio_item" for="appmenuradio"> <img id="appmenu_img" src="images/appmenu.jpg"> </label>
+                </div>
+                <hr class="uk-grid-divider" style="border:none;"></hr>
+                <div class="uk-width-1-1">
+                  <div class="uk-align-right">
+                    <!-- Skip -->
+                    <a id="menuskipbutton" class="uk-button uk-button-primary" onclick="cyberctrFirstrun.nav_to('themestyletab');">Skip</a>
+                    <!-- Next -->
+                    <a id="menunextbutton" class="uk-button uk-button-success" onclick="cyberctrFirstrun.nav_to('themestyletab');">Next</a>
+                    <!-- clear -->
+                    <a id="menunextbuttonclear" class="uk-button uk-button-danger" onclick="cyberctrFirstrun.clearSelection('menutype', 'menunextbutton', 'menuskipbutton');">Clear</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="themestyle">
+              <h2 id="tab-title-themestyle">Select Tab Type:</h2>
+              <div class="uk-grid">
+                <div class="uk-width-1-1 uk-text-center">
+                  <!-- Classic -->
+                  <input type="radio" class="radio_item" value="classic" name="themetype" id="classicthemestyleradio">
+                  <label class="radio_item" for="classicthemestyleradio"> <img id="classicthemestyle_img" src="images/appmenubutton.jpg"> </label>
+
+                  <!-- Australis -->
+                  <input type="radio" class="radio_item" value="australis" name="themetype" id="australisthemestyleradio">
+                  <label class="radio_item" for="australisthemestyleradio"> <img id="australisthemestyle_img" src="images/australisthemestyle.jpg"> </label>
+                </div>
+                <hr class="uk-grid-divider" style="border:none;"></hr>
+                <div class="uk-width-1-1">
+                  <div class="uk-align-right">
+                    <!-- Skip -->
+                    <a id="themeskipbutton" class="uk-button uk-button-primary" onclick="cyberctrFirstrun.nav_to('homestyletab');">Skip</a>
+                    <!-- Next -->
+                    <a id="themenextbutton" class="uk-button uk-button-success" onclick="cyberctrFirstrun.nav_to('homestyletab');">Next</a>
+                    <!-- clear -->
+                    <a id="themenextbuttonclear" class="uk-button uk-button-danger" onclick="cyberctrFirstrun.clearSelection('themetype', 'themenextbutton', 'themeskipbutton');">Clear</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="homestyle">
+              <h2 id="tab-title-homestyle">Select Home Type:</h2>
+              <div class="uk-grid">
+                <div class="uk-width-1-1 uk-text-center">
+                  <!-- Dark -->
+                  <input type="radio" class="radio_item" value="dark" name="hometype" id="homestyledarkradio">
+                  <label class="radio_item" for="homestyledarkradio"> <img src="images/homestyledark.jpg"> </label>
+
+                  <!-- Light -->
+                  <input type="radio" class="radio_item" value="light" name="hometype" id="homestylelightradio">
+                  <label class="radio_item" for="homestylelightradio"> <img src="images/homestylelight.jpg"> </label>
+                </div>
+                <hr class="uk-grid-divider" style="border:none;"></hr>
+                <div class="uk-width-1-1">
+                  <div class="uk-align-right">
+                    <!-- Skip -->
+                    <a id="homeskipbutton" class="uk-button uk-button-primary" onclick="cyberctrFirstrun.nav_to('syncstyletab');">Skip</a>
+                    <!-- Next -->
+                    <a id="homenextbutton" class="uk-button uk-button-success" onclick="cyberctrFirstrun.nav_to('syncstyletab');">Next</a>
+                    <!-- clear -->
+                    <a id="homenextbuttonclear" class="uk-button uk-button-danger" onclick="cyberctrFirstrun.clearSelection('hometype', 'homenextbutton', 'homeskipbutton');">Clear</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="syncstyle">
+              <h2 id="tab-title-syncstyle">Sync changes with firefox sync:</h2>
+              <div class="uk-grid">
+                <div class="uk-width-1-1 uk-text-center">
+                  <!-- Sync -->
+                  <input type="checkbox" class="radio_item" value="sync" name="item" id="syncstyleradio">
+                  <label class="radio_item" for="syncstyleradio"> <img src="images/syncstyle.png"> </label>
+                </div>
+                <hr class="uk-grid-divider" style="border:none;"></hr>
+                <div class="uk-width-1-1">
+                  <div class="uk-align-right">
+                    <!-- Skip -->
+                    <a id="nav-tab-done" class="uk-button uk-button" onclick="cyberctrFirstrun.userDone();">Apply &amp; Close</a>
+                    <!-- clear -->
+                    <a id="nav-tab-doneclear" class="uk-button uk-button-danger" onclick="cyberctrFirstrun.clearSelection('item', 'nav-tab-done', null);">Clear</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+        <!-- Main panel -->
+
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

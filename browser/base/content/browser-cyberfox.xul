@@ -39,11 +39,6 @@
 									  tooltiptext="&copyAllTabUrls.label;"  
 									  label="&copyAllTabUrls.label;" 
 									  oncommand="gCyberfoxCustom.CopyAllTabUrls();"/>
-        <toolbarbutton id="tbar_browserconsole" 
-									  class="toolbarbutton-1 chromeclass-toolbar-additional"							  
-									  tooltiptext="&browserConsoleCmd.label;"  
-									  label="&browserConsoleCmd.label;" 
-									  oncommand="HUDService.toggleBrowserConsole();"/>
         <toolbarbutton id="tbar_javascript" 
 									  class="toolbarbutton-1 chromeclass-toolbar-additional"							  
 									  tooltiptext="&togglescriptintab.label;"  

@@ -126,7 +126,7 @@
       <hbox align="center">
         <label value="&homepage.label;" accesskey="&homepage.accesskey;" control="browserHomePage"/>
         <textbox id="browserHomePage" class="padded uri-element" flex="1"
-                 type="autocomplete" autocompletesearch="history"
+                 type="autocomplete" autocompletesearch="unifiedcomplete"
                  onsyncfrompreference="return gMainPane.syncFromHomePref();"
                  onsynctopreference="return gMainPane.syncToHomePref(this.value);"
                  placeholder="&abouthome.pageTitle;"

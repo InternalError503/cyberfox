@@ -5,6 +5,7 @@ eBay
 google
 ixquick
 privatelee
+qwant
 startpage
 twitter
 unbubbleeu

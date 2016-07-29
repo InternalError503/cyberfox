@@ -1,0 +1,16 @@
+spn-title=Быстрый старт
+tab-menustyletab=Стиль Меню
+tab-themestyletab=Стиль Оформления
+tab-homestyletab=Стиль домашней страницы
+tab-syncstyletab=Синхронизация
+tab-title-menustyle=Выберите стиль оформления меню:
+tab-title-themestyle=Выберите тип оформления вкладок:
+tab-title-homestyle=Выберите тип домашней страницы:
+tab-title-syncstyle=Синхронизация с помощью профиля firefox:
+nav-tab-next=Далее
+nav-tab-skip=Пропустить
+nav-tab-clear=Clear
+nav-tab-done=Применить и закрыть
+
+change-confirm-title=Пожалуйста, подтвердите изменения!
+change-confirm-message=Вы хотите применить новые настройки?

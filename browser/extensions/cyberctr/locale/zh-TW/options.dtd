@@ -232,6 +232,7 @@
 <!ENTITY Ctr_ntabhov		"新分頁 (懸停)">
 <!ENTITY Ctr_bold			"粗體">
 <!ENTITY Ctr_italic			"斜體">
+<!ENTITY Ctr_underlined		"Underlined">
 <!ENTITY Ctr_notabhov		"優先權高於「分頁(懸停)」的設定">
 <!ENTITY Ctr_tabc_act_tb	"將目前分頁的背景顏色套用到工具列上">
 
@@ -268,6 +269,9 @@
 <!ENTITY Ctr_autocomplete	"Autocomplete popup">
 <!ENTITY Ctr_altautocompl	"Alternative appearance">
 <!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_autocompl_hl	"Highlighting of text hits">
+<!ENTITY Ctr_autocompl_rhl	"Aero colors for highlighted results">
+<!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature">
 <!ENTITY Ctr_lbsugresi		"Disable height limit">
 <!ENTITY Ctr_lbsugres		"Number of results">
@@ -290,7 +294,8 @@
 <!ENTITY Ctr_mbarforceright	"的右側">
 
 <!ENTITY Ctr_toolbars		"工具列">
-<!ENTITY Ctr_dblclnewtab	"在分頁列上連按兩下，則開啟新分頁(分頁網址由 browser.newtab.url 設定)">
+<!ENTITY Ctr_dblclnewtab	"在分頁列上連按兩下，則開啟新分頁">
+<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
 <!ENTITY Ctr_hidetbwot		"當只有一個分頁時，隱藏分頁工具列">
 <!ENTITY Ctr_hidetbwote		"減少啟動時的隱藏延遲時間">
 <!ENTITY Ctr_hidetbwote_i	"可能導致分頁工具列故障">
@@ -352,22 +357,21 @@
 <!ENTITY Ctr_nodevtheme		"停用「Developer 佈景主題」">
 
 <!ENTITY Ctr_experttweaks	"進階">
-<!ENTITY Ctr_fx34search		"&brandShortName; 34+ 引入了「新搜尋列介面」。取消勾選這個核取方塊，則可恢復為「舊式搜尋列介面」。">
-<!ENTITY Ctr_fx34loop		"&brandShortName; 34+ 實作了「&brandShortName; Hello 即時通訊」功能。取消勾選這個核取方塊，則可移除這項功能。">
-<!ENTITY Ctr_fx35devtheme	"取消勾選這個核取方塊，則可停用「Developer 佈景主題」。">
-<!ENTITY Ctr_fx36prefs		"取消勾選這個核取方塊，則可恢復舊式選項視窗。">
-<!ENTITY Ctr_fx36prefs2		"注意: 舊式選項視窗未包含所有最近新增的選項!">
+<!ENTITY Ctr_fx34loop		"取消勾選這個核取方塊，則可移除這項功能。">
 <!ENTITY Ctr_fx38reader		"取消勾選這個核取方塊，則可停用「閱讀模式」，並將其按鈕從網址列移除。">
 <!ENTITY Ctr_fx38pocket		"取消勾選這個核取方塊，則可停用「Pocket」功能，並將「Pocket」按鈕從工具列移除。">
 <!ENTITY Ctr_fx38pocket2	"註: 若「Pocket」按鈕在自訂模式面板中，同樣會被移除。">
-<!ENTITY Ctr_e_searchui		"搜尋列介面">
 <!ENTITY Ctr_e_loop			"Hello 即時通訊">
-<!ENTITY Ctr_e_deved		"Developer Edition 佈景主題">
-<!ENTITY Ctr_e_prefsui		"選項視窗 / 選項分頁">
 <!ENTITY Ctr_e_readermode	"閱讀模式">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"分頁靜音按鈕">
 <!ENTITY Ctr_fx42tabsaudico	"取消勾選這個核取方塊，則可移除「分頁靜音按鈕」。">
+<!ENTITY Ctr_e_containertab	"Container Tabs">
+<!ENTITY Ctr_fx50containert	"Unchecking this preference removes 'container tabs'.">
+<!ENTITY Ctr_e_findbarhl	"Findbar highlighting">
+<!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
+<!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
 
 
 <!ENTITY Ctr_pw_settings	"設定值">
@@ -382,8 +386,12 @@
 <!ENTITY Ctr_special_font	"背景色彩設定僅生效於預設佈景主題!">
 <!ENTITY Ctr_special_info	"部份選項僅在某些情況下提供視覺上的變化!">
 <!ENTITY Ctr_special_info2	"設定僅在 &brandShortName; 的預設佈景主題下測試，因此可能不生效於第三方佈景主題!">
-<!ENTITY Ctr_support		"技術支援討論區">
-<!ENTITY Ctr_newversion		"有新版本?">
+<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_support		"Support">
+<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
+<!ENTITY Ctr_github_issues	"Report issue on Github">
+<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
@@ -439,6 +447,7 @@
 <!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
 <!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">

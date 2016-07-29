@@ -552,6 +552,7 @@ Sanitizer.prototype = {
           aWindow.skipNextCanClose = true;
           return true;
         }
+        return false;
       },
       _resetAllWindowClosures: function(aWindowList) {
         for (let win of aWindowList) {
@@ -610,6 +611,7 @@ Sanitizer.prototype = {
               e.stopPropagation();
               return false;
             }
+            return undefined;
           }
           newWindow.addEventListener("fullscreen", onFullScreen);
         }

@@ -9,7 +9,9 @@ const Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/AppConstants.jsm");
 
-//Setup Localised Messages.
+const PREF_EM_HOTFIX_ID = "extensions.hotfix.id";
+
+// Setup Localised Messages.
 var aboutDialogLocal = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
 
 function init(aEvent)
@@ -54,7 +56,7 @@ function init(aEvent)
   }
 
   if (AppConstants.platform == "macosx") {
-    // it may not be sized at this point, and we need its width to calculate its position
+    // It may not be sized at this point, and we need its width to calculate its position
     window.sizeToContent();
     window.moveTo((screen.availWidth / 2) - (window.outerWidth / 2), screen.availHeight / 5);
   }
@@ -73,12 +75,12 @@ function init(aEvent)
         ElementState("update-button-no-update", true);
         ElementState("update-button-download", true);
 
-        //Clear any previous set urls
+        // Clear any previous set urls
         Services.prefs.clearUserPref("app.update.url.manual");
 
-        //If its disabled we don't want to see any buttons here.	
+        // If its disabled we don't want to see any buttons here.	
         if (!Services.prefs.getBoolPref("app.update.check.enabled")) {
-            //hide buttons :P	  
+            // Hide buttons :P	  
             ElementState("updateBox", true);
         }
         if (Services.prefs.getCharPref("app.update.channel.type") === "beta") {
@@ -87,7 +89,7 @@ function init(aEvent)
 
         if (Services.prefs.getBoolPref("app.update.autocheck")) {
 
-            //Set manual update url from -firefox-branding.js so update in one location is uniform across all references.
+            // Set manual update url from -firefox-branding.js so update in one location is uniform across all references.
             try {
                 var manualCheck = document.getElementById("checkForUpdatesButton");
                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));
@@ -97,14 +99,14 @@ function init(aEvent)
             }
 
             try {
-                //Set Global to disable update checks entirely 
+                // Set Global to disable update checks entirely 
                 if (Services.prefs.getBoolPref("app.update.check.enabled")) {
 			
-			//Delay about cyberfox update check two & half seconds to allow time for the check to complete on slower connections
+			// Delay about cyberfox update check two & half seconds to allow time for the check to complete on slower connections
 			window.setTimeout(function(){
 				
-                    //Get Latest Browser Version
-                    //Unfortunately same origin policy's prevent us using HTTPS here.
+                    // Get Latest Browser Version
+                    // Unfortunately same origin policy's prevent us using HTTPS here.
                     var url = Services.prefs.getCharPref("app.update.check.url");
                     var request = new XMLHttpRequest();
 
@@ -112,7 +114,7 @@ function init(aEvent)
 
                         var text = aEvent.target.responseText;
 
-                        //Need to check if json is valid, If json not valid don't continue and show error.
+                        // Need to check if json is valid, If json not valid don't continue and show error.
                         function IsJsonValid(text) {
                             try {
                                 JSON.parse(text);
@@ -126,15 +128,15 @@ function init(aEvent)
                         var currentVersion;
 
                         if (!IsJsonValid(text)) {
-                            //hide buttons		  
+                            // Hide buttons		  
                             ElementState("update-button-checkNow", false);
                             ElementState("update-button-checking-throbber", true);
                             ElementState("update-button-checking", true);
                             ElementState("update-button-no-update", true);
                             ElementState("update-button-download", true);
-                            //Throw error message	
+                            // Throw error message	
                             console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
-                            //Return error
+                            // Return error
                             return;
                         } else {
                             jsObject = JSON.parse(text);
@@ -161,14 +163,14 @@ function init(aEvent)
                                 ElementState("update-button-checking", true);
                                 Services.prefs.setCharPref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=" + Services.appinfo.version);
                                 ElementState("update-button-no-update", false);
-                                //set the browsers core version in-case "app.update.url.manual" is not changed from a browser update or switched versions.
+                                // Set the browsers core version in-case "app.update.url.manual" is not changed from a browser update or switched versions.
                                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));
                                 break;
                         }
                     };
 
                     request.ontimeout = function(aEvent) {
-                        //Log return failed check message for request time-out!
+                        // Log return failed check message for request time-out!
                         console.log(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateCheckError"));
                         ElementState("update-button-checkNow", true);
                         ElementState("update-button-checking-throbber", true);
@@ -179,10 +181,10 @@ function init(aEvent)
 
                     request.onerror = function(aEvent) {
 
-                        //Marked to add better error handling and messages.
+                        // Marked to add better error handling and messages.
                         switch (aEvent.target.status) {
                             case 0:
-                                //Log return failed request message for status 0 unsent
+                                // Log return failed request message for status 0 unsent
                                 console.log(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateRequestError"));break;
                             case 1: console.log("Error Status: " + aEvent.target.status);break;
                             case 2:console.log("Error Status: " + aEvent.target.status);break;
@@ -190,7 +192,7 @@ function init(aEvent)
                             case 4:console.log("Error Status: " + aEvent.target.status);break;
                             default:console.log("Error Status: " + aEvent.target.status);break;
                         }
-                        //hide buttons		  
+                        // Hide buttons		  
                         ElementState("update-button-checkNow", true);
                         ElementState("update-button-checking-throbber", true);
                         ElementState("update-button-checking", true);
@@ -198,7 +200,7 @@ function init(aEvent)
                         ElementState("update-button-download", true);
                     };
 
-                    //Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
+                    // Only send async POST requests, Must declare the request header forcing the request to only be for content type json.
                     request.timeout = 6000;
                     request.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
                     request.setRequestHeader("Content-Type", "application/json");
@@ -208,16 +210,16 @@ function init(aEvent)
 				}
 
             } catch (eve) {
-                //Show error
+                // Show error
                 Cu.reportError(eve);
             }
 
         } else {
 
-            //Clear any previous set urls
+            // Clear any previous set urls
             Services.prefs.clearUserPref("app.update.url.manual");
 
-            //Set manual update url from -firefox-branding.js so update in one location is uniform across all references.
+            // Set manual update url from -firefox-branding.js so update in one location is uniform across all references.
             try {
                 var manualCheck = document.getElementById("checkForUpdatesButton");
                 manualCheck.setAttribute('href', Services.prefs.getCharPref("app.update.url.manual"));
@@ -225,7 +227,7 @@ function init(aEvent)
                 // Pref is unset
                 Cu.reportError(ex);
             }
-            //hide buttons		  
+            // Hide buttons		  
             ElementState("update-button-checkNow", false);
             ElementState("update-button-checking-throbber", true);
             ElementState("update-button-checking", true);
@@ -235,10 +237,12 @@ function init(aEvent)
         }
 
     }
-    //Versions.compareVersions where the numeric comparison happens.
-    //Takes 2 variables installed version number as string & required version number as string, The required version comes from update.json
-    //Update.json will in future have versions support for esr, beta & alpha builds.
-    //We will continue using our method over https://developer.mozilla.org/en/docs/Using_nsIXULAppInfo#Version as its working effectively for version.minor version.major revision.
+    /*
+	  Versions.compareVersions where the numeric comparison happens.
+      Takes 2 variables installed version number as string & required version number as string, The required version comes from update.json
+      Update.json will in future have versions support for esr, beta & alpha builds.
+      We will continue using our method over https://developer.mozilla.org/en/docs/Using_nsIXULAppInfo#Version as its working effectively for version.minor version.major revision.
+	*/
 var versions = {
     compareVersions: function(_Installed, _Required) {
 
@@ -268,7 +272,7 @@ var versions = {
             return true;
 
         } catch (rv) {
-            //Show error
+            // Show error
             Cu.reportError(rv);
         }
     }

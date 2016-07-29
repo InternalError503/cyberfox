@@ -232,6 +232,7 @@
 <!ENTITY Ctr_ntabhov		"Κατάδειξη νέας καρτέλας">
 <!ENTITY Ctr_bold		    "Έντονη γραφή">
 <!ENTITY Ctr_italic			"Πλάγια γραφή">
+<!ENTITY Ctr_underlined		"Underlined">
 <!ENTITY Ctr_notabhov		"Παράκαμψη ρυθμίσεων κατάδειξης από τις ενεργοποιημένες ρυθμίσεις εδώ">
 <!ENTITY Ctr_tabc_act_tb	"Χρώμα φόντου σε εργαλειοθήκες">
 
@@ -268,6 +269,9 @@
 <!ENTITY Ctr_autocomplete	"Αναδυόμενο αυτόματης συμπλήρωσης">
 <!ENTITY Ctr_altautocompl	"Εναλλακτική εμφάνιση">
 <!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_autocompl_hl	"Highlighting of text hits">
+<!ENTITY Ctr_autocompl_rhl	"Aero colors for highlighted results">
+<!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Απενεργοποίηση χαρακτηριστικού ενιαίας αυτόματης συμπλήρωσης">
 <!ENTITY Ctr_lbsugresi		"Απενεργοποίηση ορίου ύψους">
 <!ENTITY Ctr_lbsugres		"Αριθμός αποτελεσμάτων">
@@ -291,6 +295,7 @@
 
 <!ENTITY Ctr_toolbars		"Εργαλειοθήκες">
 <!ENTITY Ctr_dblclnewtab	"Άνοιγμα νέας καρτέλας με διπλό κλικ">
+<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
 <!ENTITY Ctr_hidetbwot		"Απόκρυψη εργαλειοθήκης καρτελών με μόνο μία ορατή καρτέλα">
 <!ENTITY Ctr_hidetbwote		"Μείωση καθυστέρησης απόκρυψης κατά την εκκίνηση">
 <!ENTITY Ctr_hidetbwote_i	"Ενδέχεται να προκαλέσει δυσλειτουργίες στην εργαλειοθήκη καρτελών">
@@ -352,22 +357,21 @@
 <!ENTITY Ctr_nodevtheme		"Αποτροπή ενεργοποίησης του «Θέματος έκδοσης για προγραμματιστές»">
 
 <!ENTITY Ctr_experttweaks	"Προηγμένες">
-<!ENTITY Ctr_fx34search		"Αποεπιλέγοντας αυτή την προτίμηση απομακρύνεται η νέα εμφάνιση διεπαφής αναζήτησης και επαναφέρεται η παλιότερη διεπαφή.">
 <!ENTITY Ctr_fx34loop		"Αποεπιλέγοντας αυτή την προτίμηση απομακρύνονται οι δυνατότητες «κλήσης και συνομιλίας».">
-<!ENTITY Ctr_fx35devtheme	"Αποεπιλέγοντας αυτές τις προτιμήσεις απενεργοποιείται το «Θέμα για προγραμματιστές».">
-<!ENTITY Ctr_fx36prefs		"Αποεπιλέγοντας αυτή την προτίμηση επαναφέρεται το παλιό παράθυρο επιλογών.">
-<!ENTITY Ctr_fx36prefs2		"Σημείωση: Το παλιό παράθυρο επιλογών δεν περιέχει όλες τις προσφάτως προστεθείσες επιλογές του περιηγητή!">
 <!ENTITY Ctr_fx38reader		"Αποεπιλέγοντας αυτή την προτίμηση απενεργοποιείται η «λειτουργία ανάγνωσης» και απομακρύνεται το εικονίδιό της από τη γραμμή τοποθεσιών.">
 <!ENTITY Ctr_fx38pocket		"Αποεπιλέγοντας αυτή την προτίμηση απενεργοποιείται το χαρακτηριστικό «Pocket» και απομακρύνεται το κουμπί του από τις εργαλειοθήκες.">
 <!ENTITY Ctr_fx38pocket2	"Σημείωση: Μετακινώντας το κουμπί του «Pocket» στην παλέτα προσαρμογής πριν από την απενεργοποίηση αυτής της προτίμησης, απομακρύνονται επίσης και οι καταχωρίσεις του «Pocket» από τα μενού σελιδοδεικτών και αναγνώστη.">
-<!ENTITY Ctr_e_searchui		"Εμφάνιση αναζήτησης">
-<!ENTITY Ctr_e_loop			"Κλήση και συνομιλία">
-<!ENTITY Ctr_e_deved		"Θέμα έκδοσης για προγραμματιστές">
-<!ENTITY Ctr_e_prefsui		"Επιλογές σε καρτέλα">
+<!ENTITY Ctr_e_loop			"Hello / Loop / Κλήση και συνομιλία">
 <!ENTITY Ctr_e_readermode	"Λειτουργία ανάγνωσης">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"Εικονίδιο αναπαραγωγής ήχου σε καρτέλες">
 <!ENTITY Ctr_fx42tabsaudico	"Αποεπιλέγοντας αυτή την προτίμηση απομακρύνεται το εικονίδιο αναπαραγωγής ήχου από τις καρτέλες.">
+<!ENTITY Ctr_e_containertab	"Container Tabs">
+<!ENTITY Ctr_fx50containert	"Unchecking this preference removes 'container tabs'.">
+<!ENTITY Ctr_e_findbarhl	"Findbar highlighting">
+<!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
+<!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
 
 
 <!ENTITY Ctr_pw_settings	"Ρυθμίσεις">
@@ -382,8 +386,12 @@
 <!ENTITY Ctr_special_font	"Οι ρυθμίσεις χρώματος φόντου είναι για το προεπιλεγμένο θέμα μόνο!">
 <!ENTITY Ctr_special_info	"Ορισμένες επιλογές ενδέχεται να μην προσφέρουν ορατές αλλαγές σε όλες τις περιπτώσεις">
 <!ENTITY Ctr_special_info2	"Aνιχνεύθηκε θέμα τρίτων! Ορισμένες επιλογές δε λειτουργούν με θέματα τρίτων!">
-<!ENTITY Ctr_support		"Φόρουμ υποστήριξης">
-<!ENTITY Ctr_newversion		"Νέα έκδοση;">
+<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_support		"Support">
+<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
+<!ENTITY Ctr_github_issues	"Report issue on Github">
+<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"λ">
 <!ENTITY appMenuGettingStarted.label	"Ξεκινώντας">
@@ -439,6 +447,7 @@
 <!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
 <!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">

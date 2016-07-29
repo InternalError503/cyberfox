@@ -40,6 +40,7 @@
       <vbox id="leftBox" flex="1"/>
       <vbox id="rightBox" flex="1">
 #expand <label id="version">__MOZ_APP_VERSION_DISPLAY__</label>
+#expand <label id="releasenotes" class="text-link" href="https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date/?version=__MOZ_APP_VERSION__">&releaseNotes.link;</label>
         <label id="distribution" class="text-blurb"/>
         <label id="distributionId" class="text-blurb"/>
 
@@ -65,6 +66,11 @@
       </vbox>
     </hbox>
     <vbox id="bottomBox">
+      <hbox pack="center">
+        <label class="text-link bottom-link" useoriginprincipal="true" href="about:license">&bottomLinks.license;</label>
+        <label class="text-link bottom-link" useoriginprincipal="true" href="about:rights">&bottomLinks.rights;</label>
+        <label class="text-link bottom-link" href="https://cyberfox.8pecxstudios.com/privacy/">&bottomLinks.privacy;</label>
+      </hbox>
       <description id="trademark">&trademarkInfo.part1;</description>
     </vbox>
   </vbox>

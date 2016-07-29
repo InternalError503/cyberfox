@@ -1,4 +1,5 @@
 "use strict";
+
 (function(global) {
 var Cu = Components.utils;
 
@@ -13,15 +14,15 @@ if (!ctrAboutNewTab ) {
  
 ctrAboutNewTab = {
 	init: function(){
-		var appversion = parseInt(Services.appinfo.version);
 		if(Services.prefs.getBranch('extensions.classicthemerestorer.').getBoolPref('alt_newtabp')) {
 		  try{
-			if(appversion == 40 || appversion == 41)
-			  document.getElementById("newtab-window").setAttribute('fx40plus',true);
+			document.getElementById("newtab-window").setAttribute('fx40plus',true);
 		  } catch(e){}
 		}		
 	}
 }
   // Make ctrAboutNewTab a global variable
-  global.ctrAboutNewTab = ctrAboutNewTab;
+  try{
+	global.ctrAboutNewTab = ctrAboutNewTab.init();
+  } catch(e){}
 }(this));

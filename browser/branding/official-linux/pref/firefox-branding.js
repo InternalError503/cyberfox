@@ -7,8 +7,8 @@
 pref("startup.homepage_override_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%&oldversion=%OLD_VERSION%");
 pref("startup.homepage_welcome_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 pref("startup.homepage_welcome_url.additional", "");
-pref("app.update.url.manual", "http://sourceforge.net/projects/cyberfox/files/Zipped%20Format"); 
-pref("app.update.url.details", "http://sourceforge.net/projects/cyberfox/files/Zipped%20Format");
+pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/cyberfox-linux"); 
+pref("app.update.url.details", "https://cyberfox.8pecxstudios.com/cyberfox-linux");
 pref("app.releaseNotesURL", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
 pref("app.vendorURL", "https://8pecxstudios.com/");
 

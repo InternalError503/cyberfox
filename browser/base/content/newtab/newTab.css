@@ -475,11 +475,6 @@ input[type=button] {
   background-position: right 15px center;
 }
 
-.newtab-intro-image-customize .newtab-customize-panel-item,
-.newtab-intro-image-customize .newtab-customize-complex-option {
-  max-width: 100%;
-}
-
 .newtab-customize-panel-item:not([selected]),
 .newtab-customize-panel-subitem:not([selected]){
   color: #7A7A7A;

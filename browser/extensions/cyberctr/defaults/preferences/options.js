@@ -125,6 +125,11 @@ pref("extensions.classicthemerestorer.urlbardropm2",false);
 pref("extensions.classicthemerestorer.altreaderico",false);
 pref("extensions.classicthemerestorer.altautocompl",false);
 pref("extensions.classicthemerestorer.autocompl_it",false);
+pref("extensions.classicthemerestorer.autocompl_hlb",false);
+pref("extensions.classicthemerestorer.autocompl_hlu",false);
+pref("extensions.classicthemerestorer.autocompl_hli",false);
+pref("extensions.classicthemerestorer.autocompl_sep",false);
+pref("extensions.classicthemerestorer.autocompl_rhl",false);
 
 pref("extensions.classicthemerestorer.ib_nohovcolor",false);
 pref("extensions.classicthemerestorer.ib_graycolor",false);
@@ -344,8 +349,11 @@ pref("extensions.classicthemerestorer.abouthomebgstretch", false);
 pref("extensions.classicthemerestorer.customsearchbarwidth", false);
 pref("extensions.classicthemerestorer.searchbarwidth", 150);
 
-//Custom colalpible about:addons search bar.
+//Custom collapsible about:addons search bar.
 pref("extensions.classicthemerestorer.colapsesearchaddons", false);
+
+//Custom force about:addons addon version to always show and not vanish at screen width 850px.
+pref("extensions.classicthemerestorer.alwaysshowaddonversion", false);
 
 //Custom bookmarks bar font size.
 pref("extensions.classicthemerestorer.custbookmarkfontsize", false);
@@ -362,8 +370,8 @@ pref("extensions.classicthemerestorer.animatedlwtthemes", true);
 pref("extensions.classicthemerestorer.loadcustomcss", false);
 pref("extensions.classicthemerestorer.customcssurl", "");
 
-//CyberCTR version
-pref("extensions.classicthemerestorer.version", "1.5.5");
+//CyberCTR version, Set by options.js
+pref("extensions.classicthemerestorer.version", "0.0.0");
 
 //CyberCTR Pre-set Configuration
 pref("extensions.classicthemerestorer.ctrpref.firstrun", true);
@@ -371,6 +379,12 @@ pref("extensions.classicthemerestorer.ctrpref.lastmod", "0");
 pref("extensions.classicthemerestorer.ctrpref.lastmodapply", false);
 pref("extensions.classicthemerestorer.ctrpref.updatekey", false);
 pref("extensions.classicthemerestorer.ctrpref.active", false);
+
+//CyberCTR first run
+pref("extensions.classicthemerestorer.firstrun", false);
+
+//CyberCTR sync preferences to firefox accounts
+pref("extensions.classicthemerestorer.syncprefs", false);
 
 //CyberCTR features & information.
 pref("extensions.classicthemerestorer.features.firstrun", false);

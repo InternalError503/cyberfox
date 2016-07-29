@@ -232,6 +232,7 @@
 <!ENTITY Ctr_ntabhov		"Nouvel onglet (au survol)">
 <!ENTITY Ctr_bold			"Gras">
 <!ENTITY Ctr_italic			"Italique">
+<!ENTITY Ctr_underlined		"Souligné">
 <!ENTITY Ctr_notabhov		"Les valeurs paramétrées supplantent celles « au survol »">
 <!ENTITY Ctr_tabc_act_tb	"Couleur d’arrière-plan des barres d’outils">
 
@@ -253,8 +254,8 @@
 <!ENTITY Ctr_ib_graycolor	"Arrière-plan gris pour les pages dont l’identité est inconnue et celles du chrome">
 <!ENTITY Ctr_verifiedcolors	"Couleurs de bouton pour les sites certifiés sécurisés, les connexions sécurisées et non sécurisées">
 <!ENTITY Ctr_ibinfoico		"Remplacer l’icône « i » par celle du globe">
-<!ENTITY Ctr_ibinfoico2		"Hide 'i'-icon (if possible)">
-<!ENTITY Ctr_iblabels		"Hide labels">
+<!ENTITY Ctr_ibinfoico2		"Masquer l'icône « i » (si possible)">
+<!ENTITY Ctr_iblabels		"Masquer le texte">
 <!ENTITY Ctr_faviconurl		"Afficher le favicon du site dans la barre d’adresse">
 <!ENTITY Ctr_padlock		"Cadenas pour les connexions sécurisées">
 <!ENTITY Ctr_padlock_hid	" masqué">
@@ -268,7 +269,10 @@
 <!ENTITY Ctr_urlbar_uc		"Désactiver la fonctionnalité « Autocomplétion unifiée »">
 <!ENTITY Ctr_autocomplete	"Fenêtre surgissante d'autocomplétion">
 <!ENTITY Ctr_altautocompl	"Apparence alternative">
-<!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
+<!ENTITY Ctr_autocompl_it	"Supprimer les éléments « Rechercher avec... » et « Consulter » (si présents)">
+<!ENTITY Ctr_autocompl_hl	"Mettre les correspondances de texte dans les résultats en :">
+<!ENTITY Ctr_autocompl_rhl	"Utiliser des couleurs Aero pour les résultats surlignés">
+<!ENTITY Ctr_autocompl_sep	"Afficher un séparateur entre les résultats">
 <!ENTITY Ctr_lbsugresi		"Désactiver la limite de hauteur">
 <!ENTITY Ctr_lbsugres		"Nombre de résultats :">
 <!ENTITY Ctr_lbsbradius		"Rayon de bordure personnalisé pour la barre d'adresse et la barre de recherche">
@@ -291,6 +295,7 @@
 
 <!ENTITY Ctr_toolbars		"Barres d’outils">
 <!ENTITY Ctr_dblclnewtab	"Double-cliquer pour ouvrir un nouvel onglet">
+<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
 <!ENTITY Ctr_hidetbwot		"Masquer la barre d’onglets quand un seul onglet est ouvert">
 <!ENTITY Ctr_hidetbwote		"Diminuer le délai pour masquer la barre au démarrage">
 <!ENTITY Ctr_hidetbwote_i	"Peut causer des disfonctionnements dans la barre d’onglets">
@@ -298,7 +303,7 @@
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Réduire l’espace en haut (si possible)">
-<!ENTITY Ctr_showalltabsb	"Always show 'all tabs' button">
+<!ENTITY Ctr_showalltabsb	"Toujours afficher le bouton « Lister tous les onglets »">
 <!ENTITY Ctr_alttabstb		"Arrière-plan d’une autre couleur">
 <!ENTITY Ctr_alttabstb2		"En mode maximisé (onglets en haut)">
 
@@ -347,27 +352,26 @@
 <!ENTITY Ctr_contextitem	"« Personnaliser &brandShortName; » dans le menu contextuel des barres d’outils">
 <!ENTITY Ctr_puictrbutton	"« Personnaliser &brandShortName; » dans le Panneau menu">
 
-<!ENTITY Ctr_otherctroptns	"Autres options">
+<!ENTITY Ctr_otherctroptns	"Autres réglages">
 <!ENTITY Ctr_cuibotbuttons	"Boutons supplémentaires en mode personnalisation">
 <!ENTITY Ctr_nodevtheme		"Empêcher l’application du théme développeur">
 
 <!ENTITY Ctr_experttweaks	"Avancé">
-<!ENTITY Ctr_fx34search		"Si ce paramètre est décoché, l’ancienne barre de recherche est activée.">
 <!ENTITY Ctr_fx34loop		"Si ce paramètre est décoché, les fonctions d’appels et de conversations sont désactivées.">
-<!ENTITY Ctr_fx35devtheme	"Si ce paramètre est décoché, le thème développeur est desactivé.">
-<!ENTITY Ctr_fx36prefs		"Si ce paramètre est décoché, les préférences sont affichées dans une fenêtre distincte (mode traditionnel).">
-<!ENTITY Ctr_fx36prefs2		"Note: L’ancienne fenêtre de préférences ne contient pas les préférences récemment ajoutées à &brandShortName;.">
 <!ENTITY Ctr_fx38reader		"Si ce paramètre est décoché, le « mode lecture » est desactivé et son icône est retirée de la barre d’adresse.">
 <!ENTITY Ctr_fx38pocket		"Si ce paramètre est décoché, « Pocket » est desactivé et son bouton retiré des barres d’outils.">
 <!ENTITY Ctr_fx38pocket2	"Note: Déplacer le bouton « Pocket » vers la fenêtre de personnalisation avant de désactiver cette option, permet également de l’enlever des marques pages et du menu de lecture.">
-<!ENTITY Ctr_e_searchui		"Aspect de la barre de recherche">
 <!ENTITY Ctr_e_loop			"Appel et conversation">
-<!ENTITY Ctr_e_deved		"Thème développeur">
-<!ENTITY Ctr_e_prefsui		"Préférences dans un onglet">
 <!ENTITY Ctr_e_readermode	"Mode de lecture d’articles">
 <!ENTITY Ctr_e_pocket		"Sac de rangement (« Pocket »)">
 <!ENTITY Ctr_e_tabsaudioico	"Icône de lecture audio sur les onglets">
 <!ENTITY Ctr_fx42tabsaudico	"Décocher cette préférence pour ne plus afficher d’icône audio sur les onglets.">
+<!ENTITY Ctr_e_containertab	"Onglets conteneurs">
+<!ENTITY Ctr_fx50containert	"Décocher ce paramètre désactive les onglets conteneurs.">
+<!ENTITY Ctr_e_findbarhl	"Surlignage avancé de la barre de recherche">
+<!ENTITY Ctr_fx50findbarhl	"Décocher ces paramètres désactive les fonctionnalités avancées de surlignage de la barre de recherche.">
+<!ENTITY Ctr_e_flyweb		"FlyWeb">
+<!ENTITY Ctr_fx50flyweb		"Décocher ce paramètre désactive « FlyWeb ».">
 
 
 <!ENTITY Ctr_pw_settings	"Réglages">
@@ -382,8 +386,12 @@
 <!ENTITY Ctr_special_font	"La configuration de la couleur d’arrière-plan ne s’applique qu’au thème par défaut.">
 <!ENTITY Ctr_special_info	"Certaines options ne fonctionnent que dans certains cas.">
 <!ENTITY Ctr_special_info2	"Options prévues pour le thème par défaut. Certaines options peuvent ne fonctionner pas avec les autres thèmes.">
-<!ENTITY Ctr_support		"Forum d’assistance">
-<!ENTITY Ctr_newversion		"Nouvelle version ?">
+<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_support		"Support">
+<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
+<!ENTITY Ctr_github_issues	"Report issue on Github">
+<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"D">
 <!ENTITY appMenuGettingStarted.label	"Pour commencer">
@@ -442,6 +450,7 @@
 <!ENTITY ctr_toolbarsearchbarcustwidth.label "Permettre de personnaliser la largeur maximale">
 <!ENTITY ctr_toolbarsearchbarwidth.label	"Largeur maximale de la barre de recherche : ">
 <!ENTITY ctr_colapseaddonsearchbar.label	"Barre de recherche de about:addons compressible">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
 
 <!ENTITY ctr_bookmarkfontsize.description	"Barre personnelle">
 <!ENTITY ctr_custombookmarkfontsize.label	"Permettre de choisir la taille de la police utilisée dans la barre personnelle">

@@ -9,9 +9,7 @@ Source: "{content}\browser\{#PackageType}\wow_helper.exe"; DestDir: "{app}"; Fla
 Source: "{content}\browser\{#PackageType}\dependentlibs.list"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\freebl3.chk"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\freebl3.dll"; DestDir: "{app}"; Flags: ignoreversion
-#if PackageType == "beta86" || PackageType == "beta64"
-Source: "{content}\browser\{#PackageType}\icudt*l.dat"; DestDir: "{app}"; Flags: ignoreversion
-#else
+#if PackageType == "amd86" || PackageType == "amd64" || PackageType == "intel86" || PackageType == "intel64"
 Source: "{content}\browser\{#PackageType}\icudt*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\icuin*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\icuuc*.dll"; DestDir: "{app}"; Flags: ignoreversion

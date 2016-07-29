@@ -69,10 +69,7 @@
                 preference="browser.tabs.warnOnOpen"/>	
 	  <!-- Cyberfeatures -->				
       <checkbox id="warnOnQuit" label="&warnOnQuit.label;"
-                preference="browser.warnOnQuit"/>			
-      <checkbox id="restoreOnDemand" label="&restoreTabsOnDemand.label;"
-                accesskey="&restoreTabsOnDemand.accesskey;"
-                preference="browser.sessionstore.restore_on_demand"/>
+                preference="browser.warnOnQuit"/>
 	  <!-- Cyberfeatures -->	
       <checkbox id="switchToNewTabs" label="&switchToNewTabs.label;"
                 accesskey="&switchToNewTabs.accesskey;"

@@ -18,6 +18,16 @@
 	.tabbrowser-tab:not([selected="true"]):hover:not(:-moz-lwtheme) {
 	  background-image: linear-gradient(transparent,transparent) !important;
 	}
+
+	#main-window[fx50plus="true"] .tabbrowser-tab[usercontextid][style][selected="true"]:not(:-moz-lwtheme) {
+	  background-image: linear-gradient(to top,#eaeaea,#e2e2e2,#ededed,#fcfcfc) !important;
+	}
+	#main-window[fx50plus="true"] .tabbrowser-tab[usercontextid][style]:not([selected="true"]):not(:hover):not(:-moz-lwtheme) {
+	  background-image: linear-gradient(transparent,transparent) !important;
+	}
+	#main-window[fx50plus="true"] .tabbrowser-tab[usercontextid][style]:not([selected="true"]):hover:not(:-moz-lwtheme) {
+	  background-image: linear-gradient(transparent,transparent) !important;
+	}
 	
 	.tabs-newtab-button:not(:-moz-lwtheme) {
 	  background-image: linear-gradient(transparent,transparent) !important;
@@ -345,15 +355,11 @@
  	.tabbrowser-tab[pinned]:not([locked]):not([pinned]) image{
 	  -moz-margin-start:0px !important;
 	}
-	
-	/* pinned tabs fix (Fx38+) */
-	#main-window[fx38plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab .tab-content[pinned] {
-	  -moz-padding-end: 0px !important;
-	}
-	
+
 	/* pinned tabs fix (Fx45+) */
-	#main-window[fx45plus="true"] #TabsToolbar #tabbrowser-tabs .tabbrowser-tab .tab-content[pinned] {
+	#main-window #TabsToolbar #tabbrowser-tabs .tabbrowser-tab .tab-content[pinned] {
 	  -moz-padding-start: 6px !important;
+	  -moz-padding-end: 0px !important;
 	}
 	
 	/* TabUtilities workaround */

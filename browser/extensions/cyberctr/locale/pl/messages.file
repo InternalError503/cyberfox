@@ -1,20 +1,20 @@
 # LOCALIZATION NOTE (popup.title, popup.msg.restart):
 # %S will be replaced by brandShortName
-popup.title=Customize %S
-popup.msg.restart=%S musi zostać zerestartowany, aby zmiany przyniosły efekt.\nZrestartować teraz?
+popup.title=Dostosuj %S
+popup.msg.restart=%S musi zostać zrestartowany, aby zmiany przyniosły efekt.\nZrestartować teraz?
 import.error=BŁĄD: Znaleziono błędny albo zmodyfikowany plik!\nNic nie zostało zaimportowane!
 ctr_extrabar=Dodatkowy pasek narzędzi
 ctr_actthrobber=Wskaźnik aktywności
 
 # Extra CyberCTR Additions
-import.errorJSON=Were sorry but something has gone wrong while trying to import CTRpreferences.json (json is not valid!)
-notification_msg_firstrun=CTRpreferences has been found select restart to apply
+import.errorJSON=Przykro nam, ale coś poszło nie tak podczas próby importu CTRpreferences.json (json jest nieprawidłowy!)
+notification_msg_firstrun=Opcje CTR (CTRpreferences) zostały znalezione, wybierz restart, by zatwierdzić
 notification_button_firstrun=Restart
-notification_msg_change=Your pre-set CTRpreferences has been modified 
-notification_button_change=Options
-clearFilter.title=Confirm clear filter.
-clearFilter.msg=Are you sure you want to clear the filter?
-popup_compatibility_title=Compatibility issues detected!
-popup_compatibility_permenu=Would you like to enable compatibility mode? \n If not please uninstall (CyberCTR) or (Personal Menu)!
-notification_confirm_clear_title=Please confirm action!
-notification_confirm_clear=Are you sure you want to do this?
+notification_msg_change=Twoje wstępnie ustawione opcje CTR (CTRpreferences) zostały zmodyfikowane
+notification_button_change=Opcje
+clearFilter.title=Potwierdź usunięcie filtra.
+clearFilter.msg=Czy jesteś pewny, że chcesz usunąć filtr?
+popup_compatibility_title=Wykryto problemy ze zgodnością!
+popup_compatibility_permenu=Czy chcesz włączyć tryb kompatybilności? \n Jeśli nie to odinstaluj (CyberCTR) lub (Personal Menu)!
+notification_confirm_clear_title=Proszę potwierdzić akcję!
+notification_confirm_clear=Czy jesteś pewny, że chcesz to zrobić?
