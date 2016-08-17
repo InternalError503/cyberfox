@@ -54,7 +54,7 @@ var gCyberfoxCustom = {
         try {
             var gClipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
                 .getService(Ci.nsIClipboardHelper);
-            gClipboardHelper.copyString(content.location.href);
+            gClipboardHelper.copyString(gBrowser.currentURI.spec);
         } catch (e) {
             // Catch any nasty errors and output to console
             console.log("Were sorry but something has gone wrong with 'CopyCurrentTabUrl' " + e);

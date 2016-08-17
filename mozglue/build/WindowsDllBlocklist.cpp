@@ -76,6 +76,8 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
   // { "uxtheme.dll", ALL_VERSIONS },
   // { "uxtheme.dll", 0x0000123400000000ULL },
   // The DLL name must be in lowercase!
+  // The version field is a maximum, that is, we block anything that is
+  // less-than or equal to that version.
   
   // NPFFAddon - Known malware
   { "npffaddon.dll", ALL_VERSIONS},
