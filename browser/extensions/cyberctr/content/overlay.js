@@ -104,11 +104,6 @@ classicthemerestorerjs.ctr = {
   activityObserverOn:	false, // activity observer is always disabled, when a window get initialized
 
   init: function() {
-	  
-	  //Clean up old preferences
-	try{
-	  Services.prefs.clearUserPref("extensions.classicthemerestorer.movableurlbar");
-	} catch(e){}
 
 	// Here we do first run globally, Show firstrun page.
 	if (Services.prefs.getBoolPref("extensions.classicthemerestorer.firstrun") == false){
@@ -169,6 +164,7 @@ classicthemerestorerjs.ctr = {
 	try{if (this.appversion >= 47) document.getElementById("main-window").setAttribute('fx47plus',true);} catch(e){}
 	try{if (this.appversion >= 48) document.getElementById("main-window").setAttribute('fx48plus',true);} catch(e){}
 	try{if (this.appversion >= 50) document.getElementById("main-window").setAttribute('fx50plus',true);} catch(e){}
+	try{if (this.appversion >= 51) document.getElementById("main-window").setAttribute('fx51plus',true);} catch(e){}
 
 	// add CTR version number to '#main-window' node, so other add-ons/themes can easier distinguish between versions
 	AddonManager.getAddonByID('ClassicThemeRestorer@ArisT2Noia4dev', function(addon) {
@@ -182,6 +178,9 @@ classicthemerestorerjs.ctr = {
 	
 	// prevent location bar moving to palette or panel menu
 	this.preventLocationbarRemoval();
+	
+	// prevent location bar hiding by ac-popup
+	this.preventLocationbarHidingByACPopup();
 	
 	// additional toolbars
 	this.createAdditionalToolbars();
@@ -251,9 +250,9 @@ classicthemerestorerjs.ctr = {
 	// move 'Tools' menus dev tools into application buttons popup 
 	this.moveDevtoolsmenu();
 	
-	// prevent browser from disablning CTRs reload button for no reason
+	// prevent browser from disabling CTRs reload button for no reason
 	this.preventReloaddisabling();
-	
+
 	// CTR Preferences listener
 	function PrefListener(branch_name, callback) {
 	  // Keeping a reference to the observed preference branch or it will get
@@ -1020,6 +1019,11 @@ classicthemerestorerjs.ctr = {
 			}
 
 		  break;
+		  
+		  case "aboutpages":
+			if (branch.getBoolPref("aboutpages") && classicthemerestorerjs.ctr.appversion >= 48) classicthemerestorerjs.ctr.loadUnloadCSS("aboutpages",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("aboutpages",false);
+		  break;
 
 		  case "svgfilters":
 			if (branch.getBoolPref("svgfilters")) classicthemerestorerjs.ctr.loadUnloadCSS("svgfilters",true);
@@ -1047,9 +1051,17 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("altalertbox",false);
 		  break;
 
-		  case "oldtoplevimg":
-			if (branch.getBoolPref("oldtoplevimg")) classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",false);
+		  case "oldtoplevimg": case "oldtoplevimg2":
+			if (branch.getBoolPref("oldtoplevimg") && branch.getBoolPref("oldtoplevimg2")) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg2",true);
+			} else if (branch.getBoolPref("oldtoplevimg") && branch.getBoolPref("oldtoplevimg2")==false) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",true);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg2",false);
+			} else {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("oldtoplevimg2",false);
+			}
 		  break;
 		  
 		  case "activndicat":
@@ -1302,10 +1314,24 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("urlresults")) classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",false);
 		  
-			if (branch.getBoolPref("autocompl_it") && branch.getBoolPref("urlresults") && classicthemerestorerjs.ctr.appversion >= 48) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it",true);
+			if (branch.getBoolPref("autocompl_it") && branch.getBoolPref("urlresults")
+				&& classicthemerestorerjs.ctr.appversion >= 48
+					&& classicthemerestorerjs.ctr.appversion < 50)
+						classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it",false);
 		  break;
 		  
+		  case "cresultshcb":  
+			if (branch.getBoolPref("cresultshcb") && branch.getBoolPref("altautocompl") && classicthemerestorerjs.ctr.appversion >= 48)
+			  classicthemerestorerjs.ctr.loadUnloadCSS("cresultshcb",true);
+			else classicthemerestorerjs.ctr.loadUnloadCSS("cresultshcb",false);
+		  break;
+		  
+		  case "autocompl_it2":
+			if (branch.getBoolPref("autocompl_it2") && classicthemerestorerjs.ctr.appversion >= 50) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it2",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it2",false);
+		  break;
+	  
 		  case "autocompl_hlb":
 			if (branch.getBoolPref("autocompl_hlb")) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hlb",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hlb",false);
@@ -1330,7 +1356,7 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("autocompl_rhl") && classicthemerestorerjs.ctr.appversion >= 48) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_rhl",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_rhl",false);
 		  break;
-
+	  
 		  case "locsearchbw10":
 			if (branch.getBoolPref("locsearchbw10") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("locsearchbw10",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("locsearchbw10",false);
@@ -2105,96 +2131,6 @@ classicthemerestorerjs.ctr = {
 		  break;
 */
 		  
-		  case "hiderecentbm":
-		    if(classicthemerestorerjs.ctr.appversion >= 47) {
-				if (branch.getBoolPref("hiderecentbm")) {
-				  classicthemerestorerjs.ctr.loadUnloadCSS("hiderecentbm",true);
-				  
-				  if (classicthemerestorerjs.ctr.osstring=="Darwin"){
-
-					setTimeout(function(){
-
-					  var recentlyBookmarked0 = document.getElementById("menu_recentBookmarks");
-					  var recentlyBookmarked1 = recentlyBookmarked0.nextSibling; // 1st recent bookmark
-					  var recentlyBookmarked2 = recentlyBookmarked1.nextSibling; // 2nd...
-					  var recentlyBookmarked3 = recentlyBookmarked2.nextSibling;
-					  var recentlyBookmarked4 = recentlyBookmarked3.nextSibling;
-					  var recentlyBookmarked5 = recentlyBookmarked4.nextSibling;
-					  
-					  var rec_stop=false;
-					  
-					  if(recentlyBookmarked0.previousSibling!=null && recentlyBookmarked0.previousSibling.nodeName=="menuseparator")
-					    recentlyBookmarked0.previousSibling.collapsed=true;
-					  
-					  recentlyBookmarked0.collapsed=true;
-					  
-					  if(recentlyBookmarked1!=null && recentlyBookmarked1.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked1.collapsed=true;
-					  else rec_stop=true;
-					  if(recentlyBookmarked2!=null && recentlyBookmarked2.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked2.collapsed=true;
-					  else rec_stop=true;
-					  if(recentlyBookmarked3!=null && recentlyBookmarked3.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked3.collapsed=true;
-					  else rec_stop=true;
-					  if(recentlyBookmarked4!=null && recentlyBookmarked4.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked4.collapsed=true;
-					  else rec_stop=true;
-					  if(recentlyBookmarked5!=null && recentlyBookmarked5.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked5.collapsed=true;
-					},1000);
-				  
-				    classicthemerestorerjs.ctr.removeRecentBmOn = true;
-				  }
-				}
-				else {
-				  classicthemerestorerjs.ctr.loadUnloadCSS("hiderecentbm",false);
-				  
-				  if (classicthemerestorerjs.ctr.osstring=="Darwin"){
-				   if(classicthemerestorerjs.ctr.removeRecentBmOn) {
-
-					setTimeout(function(){
-
-					  var recentlyBookmarked0 = document.getElementById("menu_recentBookmarks");
-					  var recentlyBookmarked1 = recentlyBookmarked0.nextSibling; // 1st recent bookmark
-					  var recentlyBookmarked2 = recentlyBookmarked1.nextSibling; // 2nd...
-					  var recentlyBookmarked3 = recentlyBookmarked2.nextSibling;
-					  var recentlyBookmarked4 = recentlyBookmarked3.nextSibling;
-					  var recentlyBookmarked5 = recentlyBookmarked4.nextSibling;
-					  
-					  var rec_stop=false;
-					  
-					  if(recentlyBookmarked0.previousSibling!=null && recentlyBookmarked0.previousSibling.nodeName=="menuseparator")
-					    recentlyBookmarked0.previousSibling.collapsed=false;
-
-					  recentlyBookmarked0.collapsed=false;
-					  
-					  if(recentlyBookmarked1!=null && recentlyBookmarked1.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked1.collapsed=false;
-					  else rec_stop=true;
-					  if(recentlyBookmarked2!=null && recentlyBookmarked2.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked2.collapsed=false;
-					  else rec_stop=true;
-					  if(recentlyBookmarked3!=null && recentlyBookmarked3.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked3.collapsed=false;
-					  else rec_stop=true;
-					  if(recentlyBookmarked4!=null && recentlyBookmarked4.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked4.collapsed=false;
-					  else rec_stop=true;
-					  if(recentlyBookmarked5!=null && recentlyBookmarked5.nodeName=="menuitem" && rec_stop==false)
-						recentlyBookmarked5.collapsed=false;
-
-					},1000);
-					
-					classicthemerestorerjs.ctr.removeRecentBmOn = false;
-				  
-				   }
-				  }
-				  
-				}
-			}
-		  break;
-		  
 		  case "hideeditbm":
 		    if(classicthemerestorerjs.ctr.appversion >= 47) {
 				if (branch.getBoolPref("hideeditbm")) {
@@ -2221,6 +2157,11 @@ classicthemerestorerjs.ctr = {
 					}, false);
 				}
 			}
+		  break;
+		  
+		  case "oldplacesbut":
+			if (branch.getBoolPref("oldplacesbut") && classicthemerestorerjs.ctr.appversion >= 50) classicthemerestorerjs.ctr.loadUnloadCSS("oldplacesbut",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("oldplacesbut",false);
 		  break;
 
 		  case "bmbutpanelm":
@@ -2426,6 +2367,16 @@ classicthemerestorerjs.ctr = {
 			}
 
 		  break;
+		  
+		  case "anewtaburlpcb":
+		  
+			if (branch.getBoolPref("anewtaburlpcb") && classicthemerestorerjs.ctr.appversion >= 48) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("anewtaburlpcb",true);
+			  classicthemerestorerjs.ctr.newPrivateTabPageForwarding();
+			}
+			else classicthemerestorerjs.ctr.loadUnloadCSS("anewtaburlpcb",false);
+		  
+		  break;
 
 		  case "dblclnewtab":
 			
@@ -2473,7 +2424,12 @@ classicthemerestorerjs.ctr = {
 		  break;
 
 		  case "faviconurl": case "padlockex":
-			if (branch.getBoolPref("faviconurl")) classicthemerestorerjs.ctr.favIconinUrlbarCTR();
+			if (branch.getBoolPref("faviconurl")) {
+				classicthemerestorerjs.ctr.favIconinUrlbarCTR();
+				classicthemerestorerjs.ctr.loadUnloadCSS("faviconurl",true);
+			} else {
+				classicthemerestorerjs.ctr.loadUnloadCSS("faviconurl",false);
+			}
 		  break;
 		  
 		  case "padlock":
@@ -2661,6 +2617,25 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("cuibuttons",false);
 		  break;
 		  
+		  case "ctrnewinv":
+			if (branch.getBoolPref("ctrnewinv")) {
+			  if (classicthemerestorerjs.ctr.appversion == 47)
+				classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv47",true);
+			  else if (classicthemerestorerjs.ctr.appversion == 48)
+				classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv48",true);
+			  else if (classicthemerestorerjs.ctr.appversion == 50)
+				classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv50",true);
+			  else if (classicthemerestorerjs.ctr.appversion == 51)
+				classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv51",true);
+			}
+			else { 
+			  classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv47",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv48",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv50",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("ctrnewinv51",false);
+			}
+		  break;
+		  
 		  case "restartapp":
 		  
 			if (branch.getBoolPref("restartapp")) classicthemerestorerjs.ctr.loadUnloadCSS("restartapp",false);
@@ -2784,30 +2759,10 @@ classicthemerestorerjs.ctr = {
 			case "syncprefs":
 				if (branch.getBoolPref("syncprefs")){
 				var preflist = Services.prefs.getChildList("extensions.classicthemerestorer.");
-				var blacklist = [
-					"extensions.classicthemerestorer.pref_actindx",
-					"extensions.classicthemerestorer.pref_actindx2",
-					"extensions.classicthemerestorer.ctrreset",
-					"extensions.classicthemerestorer.compatibility.treestyle",
-					"extensions.classicthemerestorer.compatibility.treestyle.disable",
-					"extensions.classicthemerestorer.compatibility.tabmix",
-					"extensions.classicthemerestorer.ctrpref.firstrun",
-					"extensions.classicthemerestorer.features.firstrun",
-					"extensions.classicthemerestorer.features.lastcheck",
-					"extensions.classicthemerestorer.features.updatecheck",
-					"extensions.classicthemerestorer.ctrpref.lastmod",
-					"extensions.classicthemerestorer.ctrpref.lastmodapply",
-					"extensions.classicthemerestorer.ctrpref.updatekey",
-					"extensions.classicthemerestorer.version",
-					"extensions.classicthemerestorer.ctrpref.lastmod.backup",
-					"extensions.classicthemerestorer.ctrpref.importjson",
-					"extensions.classicthemerestorer.ctrpref.active",
-					"extensions.classicthemerestorer.compatibility.personalmenu",
-					"extensions.classicthemerestorer.syncprefs"
-					];
+					// Blacklist is handled in blacklist.js, blacklist.js must be loaded first before overlay.js and options.js
 					try {
 						for (var i=0; i < preflist.length; i++) {
-							var index = preflist.indexOf(blacklist[i]);
+							var index = preflist.indexOf(ctrblacklist[i]);
 							if (index > -1) {
 								preflist.splice(index, 1);
 							}
@@ -3164,6 +3119,37 @@ classicthemerestorerjs.ctr = {
 	observer.observe(document.querySelector('#urlbar-container'), { attributes: true, attributeFilter: ['cui-areatype'] });
 	
   },
+  
+  // prevent location bar hiding by ac-popup
+  preventLocationbarHidingByACPopup: function() {
+  
+   if (classicthemerestorerjs.ctr.prefs.getBoolPref("altautocompl")==false && classicthemerestorerjs.ctr.appversion >= 48) {
+	
+	document.getElementById('PopupAutoCompleteRichResult').addEventListener("popupshown", function onACPopupshown(){
+		
+	  if(document.querySelector('#urlbar-container').parentNode.id != "nav-bar-customization-target" &&
+		document.querySelector('#urlbar-container').parentNode.parentNode.id == "navigator-toolbox"){
+		  
+		var urlbarpos = document.getElementById("urlbar").boxObject.screenY + document.getElementById("urlbar").boxObject.height;
+		var navbarpos = document.getElementById("nav-bar").boxObject.screenY + document.getElementById("nav-bar").boxObject.height;
+		
+		var newpos = urlbarpos - navbarpos;
+		
+		if(newpos>=0)
+		  document.getElementById('PopupAutoCompleteRichResult').style.marginTop = ""+newpos+"px";
+		  
+		console.log(document.querySelector('#urlbar-container').parentNode.parentNode.id);
+	  
+	  }
+	
+	}, false);
+		
+	document.getElementById('PopupAutoCompleteRichResult').addEventListener("popuphidden", function onACPopuphidden(){
+		document.getElementById('PopupAutoCompleteRichResult').style.marginTop = "0px";
+	}, false);
+	
+   }
+  },
 
   // create 0-20 additional toolbars on startup
   // easier and more accurate compared to adding toolbars manually to overlay.xul
@@ -3323,6 +3309,7 @@ classicthemerestorerjs.ctr = {
 		try{
 		  document.getElementById("ctraddon_BMB_unsortedBookmarks_mm").collapsed = true;
 		  document.getElementById("ctraddon_BMB_unsortedBookmarks_mm2").collapsed = true;
+		  document.getElementById("ctraddon_BMB_unsortedBookmarks_mm2sep").collapsed = true;
 		} catch(e){}
 	  },1000);
 	}
@@ -3386,77 +3373,124 @@ classicthemerestorerjs.ctr = {
 
 	var observer = new MutationObserver(function(mutations) {
 	  mutations.forEach(function(mutation) {
-		ctrTabClose();
+		ctrHideTabbar();
 	  });    
 	});
-
-	window.addEventListener("TabClose", ctrTabClose, false);  
-	window.addEventListener("TabOpen", ctrTabClose, false);
-	window.addEventListener("DOMContentLoaded", ctrTabClose, false);
-	observer.observe(document.querySelector('#toolbar-menubar'), { attributes: true, attributeFilter: ['inactive'] });
-
-	function ctrTabClose(event){
 	
+	var observer_mw = new MutationObserver(function(mutations) {
+	  mutations.forEach(function(mutation) {
+		ctrHideTabbar();
+	  });    
+	});
+	
+	var mainWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("navigator:browser");
+
+	mainWindow.addEventListener("TabClose", ctrHideTabbar, false);  
+	mainWindow.addEventListener("TabOpen", ctrHideTabbar, false);
+	mainWindow.addEventListener("load", ctrHideTabbar, false);
+	mainWindow.addEventListener("DOMContentLoaded", ctrHideTabbar, false);
+	observer.observe(mainWindow.document.querySelector('#toolbar-menubar'), { attributes: true, attributeFilter: ['inactive','autohide'] });
+	observer_mw.observe(mainWindow.document.querySelector('#main-window'), { attributes: true, attributeFilter: ['sizemode','tabsintitlebar'] });
+
+	function ctrHideTabbar(event){
+
+	  var recentWindow = mainWindow;
 	  var tabsintitlebar = Services.prefs.getBranch("browser.tabs.").getBoolPref("drawInTitlebar");
-					  
-	  if(gBrowser.tabContainer.tabbrowser.visibleTabs.length < 2) {
+	  var tabsontop = classicthemerestorerjs.ctr.prefs.getCharPref("tabsontop");
 		
-		// optionally reduces delay on startup (because it can cause glitches with Windows Classic visual style)
-		if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote")) {
+	  if(recentWindow.gBrowser.tabContainer.tabbrowser.visibleTabs.length < 2) {
+		if(classicthemerestorerjs.ctr.appversion >= 47) {
+		  recentWindow.document.getElementById("TabsToolbar").style.visibility = 'collapse';
+		} else {
+		  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote")) {
+			recentWindow.document.getElementById("TabsToolbar").style.visibility = 'collapse';
+		  } else {
+			recentWindow.document.getElementById("TabsToolbar").collapsed = true;
+		  }
+		}
+		
+		if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote2")) {
 		  
-		  // MacOSX + 47+: this combo does not like 'style.visibility' for tabs toolbar
-		  if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true && classicthemerestorerjs.ctr.appversion >= 47) {
-			classicthemerestorerjs.ctr.loadUnloadCSS("hidetabsbarwot",true);
-			document.getElementById("TabsToolbar").collapsed = true;
-		  } 		  
-		  else document.getElementById("TabsToolbar").style.visibility = 'collapse';
-		}
-		else {
-		  classicthemerestorerjs.ctr.loadUnloadCSS("hidetabsbarwot",true);
-		  document.getElementById("TabsToolbar").collapsed = true;
-		}
-		
-		// correct titlebar appearance, if needed (not required for all visual styles)
-		if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote2")) {
-		
 		  if(classicthemerestorerjs.ctr.osstring=="WINNT" && tabsintitlebar==true){ // Windows
-			if (document.getElementById("toolbar-menubar").getAttribute("autohide") == "true"
-				&& document.getElementById("toolbar-menubar").getAttribute("inactive") == "true") {
-			  document.getElementById("toolbar-menubar").style.marginBottom="26px";
+			if (recentWindow.document.getElementById("toolbar-menubar").getAttribute("autohide") == "true"
+				&& recentWindow.document.getElementById("toolbar-menubar").getAttribute("inactive") == "true") {
+			  recentWindow.document.getElementById("toolbar-menubar").style.marginBottom="26px";
 			} else document.getElementById("toolbar-menubar").style.marginBottom="unset";
+		  } else if (classicthemerestorerjs.ctr.osstring=="WINNT" && tabsintitlebar==false) {
+			  document.getElementById("toolbar-menubar").style.marginBottom="unset";
 		  } else if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true) { // MacOSX
-			  document.getElementById("titlebar").style.paddingBottom="28px";
+			if(classicthemerestorerjs.ctr.appversion >= 47) {
+			  recentWindow.document.getElementById("TabsToolbar").style.marginTop="unset";
+			  if(tabsontop == 'false' || tabsontop == 'false2')
+			    recentWindow.document.getElementById("titlebar").style.marginBottom="-28px";
+			  else
+				recentWindow.document.getElementById("titlebar").style.marginBottom="-10px";
+			} else {
+			  recentWindow.document.getElementById("titlebar").style.paddingBottom="28px";
+			}
 		  } else {} //Linux does not need special treatment
-		
+		  
+		} else if(classicthemerestorerjs.ctr.osstring=="WINNT" && tabsintitlebar==true){
+			if(classicthemerestorerjs.ctr.appversion >= 47)
+		      recentWindow.document.getElementById("titlebar").style.marginBottom="-23px";
+		} else if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true){
+			if(classicthemerestorerjs.ctr.appversion >= 47)
+		      recentWindow.document.getElementById("titlebar").style.marginBottom="-28px";
 		}
-	  }
-	  else {
-		
-		if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote")) {
-			
-		  if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true && classicthemerestorerjs.ctr.appversion >= 47) {
-			classicthemerestorerjs.ctr.loadUnloadCSS("hidetabsbarwot",false);
-			document.getElementById("TabsToolbar").collapsed = false;
-		  } 
-		  else document.getElementById("TabsToolbar").style.visibility = 'visible';
-		}
-		else {
-		  classicthemerestorerjs.ctr.loadUnloadCSS("hidetabsbarwot",false);
-		  document.getElementById("TabsToolbar").collapsed = false;
+	  } else {
+
+		if(classicthemerestorerjs.ctr.appversion >= 47) {
+		  recentWindow.document.getElementById("TabsToolbar").style.visibility = 'visible';
+		} else {
+		  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote")) {
+			recentWindow.document.getElementById("TabsToolbar").style.visibility = 'visible';
+		  } else {
+			recentWindow.document.getElementById("TabsToolbar").collapsed = false;
+		  }
 		}
 		
 		if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hidetbwote2")) {
-			
 		  if(classicthemerestorerjs.ctr.osstring=="WINNT") 
-			document.getElementById("toolbar-menubar").style.marginBottom="unset";		
-		  else if(classicthemerestorerjs.ctr.osstring=="Darwin")
-			document.getElementById("titlebar").style.paddingBottom="unset";
-	      else {} //Linux does not need special treatment
-		
-	    }
+			recentWindow.document.getElementById("toolbar-menubar").style.marginBottom="unset";		
+		  else if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true) {
+			if(classicthemerestorerjs.ctr.appversion >= 47) {
+			  recentWindow.document.getElementById("TabsToolbar").style.marginTop="-10px";
+			  recentWindow.document.getElementById("titlebar").style.marginBottom="-28px";
+			} else {
+			  recentWindow.document.getElementById("titlebar").style.paddingBottom="unset";
+			}
+		  } else {} //Linux does not need special treatment
+		} else if(classicthemerestorerjs.ctr.osstring=="WINNT" && tabsintitlebar==true){
+			if(classicthemerestorerjs.ctr.appversion >= 47)
+		      recentWindow.document.getElementById("titlebar").style.marginBottom="-23px";
+		} else if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true){
+			if(classicthemerestorerjs.ctr.appversion >= 47)
+		      recentWindow.document.getElementById("titlebar").style.marginBottom="-28px";
+		}
 	  }
 
 	}
+
+  },
+  
+  // forward new private browsing tab to custom url
+  newPrivateTabPageForwarding: function() {
+	  
+	function _newPrivateTabPageForwarding(){
+		
+	  var newURLp = classicthemerestorerjs.ctr.prefs.getCharPref("anewtaburlp");
+				
+	  if (newURLp=='') newURLp='about:privatebrowsing';
+	  
+	  setTimeout(function(){
+		if(gBrowser.currentURI.spec=="about:privatebrowsing") openUILinkIn(newURLp, "current");
+	  },500);
+	}
+	
+	window.addEventListener("TabClose", _newPrivateTabPageForwarding, false);  
+	window.addEventListener("TabOpen", _newPrivateTabPageForwarding, false);
+	window.addEventListener("load", _newPrivateTabPageForwarding, false);
+	window.addEventListener("DOMContentLoaded", _newPrivateTabPageForwarding, false);
 
   },
   
@@ -4313,6 +4347,7 @@ classicthemerestorerjs.ctr = {
 		case "options_win_alt": 	manageCSS("alt_optionswindow2.css");	break;
 		case "options_win_ct": 		manageCSS("alt_optionswindow_ct.css");	break;
 		case "altoptionsmitem": 	manageCSS("alt_options_mitem.css");		break;
+		case "aboutpages": 			manageCSS("aboutpages.css");			break;
 		case "svgfilters": 			manageCSS("svgfilters.css");			break;
 		case "iat_notf_vt": 		manageCSS("mode_iat_no_vt.css");		break;
 		case "to_notf_vt": 			manageCSS("mode_to_no_vt.css");			break;
@@ -4322,6 +4357,7 @@ classicthemerestorerjs.ctr = {
 		case "puib_leftsep": 		manageCSS("puibutton_leftsep.css");		break;
 		case "puib_rightsep": 		manageCSS("puibutton_rightsep.css");	break;
 		case "oldtoplevimg": 		manageCSS("old_toplevel_img.css");		break;
+		case "oldtoplevimg2": 		manageCSS("old_toplevel_img2.css");		break;
 		case "altalertbox": 		manageCSS("alt_alertboxfx44.css");		break;
 		case "navthrobber": 		manageCSS("navthrobber.css");			break;
 		case "hideprbutton": 		manageCSS("hidepagereportbutton.css");	break;
@@ -4337,6 +4373,7 @@ classicthemerestorerjs.ctr = {
 		case "altreaderico": 		manageCSS("alt_reader_icons.css");		break;
 		case "altautocompl": 		manageCSS("alt_autocomplete.css");		break;
 		case "autocompl_it": 		manageCSS("alt_autocompl_items.css");	break;
+		case "autocompl_it2": 		manageCSS("alt_autocompl_items2.css");	break;
 		case "autocompl_hlb": 		manageCSS("alt_autocompl_hl_b.css");	break;
 		case "autocompl_hlu": 		manageCSS("alt_autocompl_hl_u.css");	break;
 		case "autocompl_hli": 		manageCSS("alt_autocompl_hl_i.css");	break;
@@ -4408,7 +4445,7 @@ classicthemerestorerjs.ctr = {
 		break;
 */
 		
-		case "hiderecentbm": 		manageCSS("hide_recently_bm.css");		break;
+		case "oldplacesbut": 		manageCSS("oldplacesbut.css");			break;
 		case "bmbutpanelm": 		manageCSS("bmbut_pmenu.css");			break;
 		case "bmbunsortbm": 		manageCSS("bmbut_unsortedbookm.css");	break;
 		case "bmbunsortbm2": 		manageCSS("bmbut_unsortedbookm2.css");	break;
@@ -4423,6 +4460,7 @@ classicthemerestorerjs.ctr = {
 		case "ib_nohovcolor": 		manageCSS("ib_nohovcolor.css");			break;
 		case "ib_graycolor": 		manageCSS("ib_graycolor.css");			break;
 		case "verifiedcolors": 		manageCSS("verifiedcolors.css");		break;
+		case "faviconurl": 			manageCSS("faviconurl_extra.css");		break;
 		case "ibinfoico": 			manageCSS("hide_ibinfoico.css");		break;
 		case "ibinfoico2": 			manageCSS("hide_ibinfoico2.css");		break;
 		case "iblabels": 			manageCSS("hide_iblabels.css");			break;
@@ -4448,6 +4486,8 @@ classicthemerestorerjs.ctr = {
 		case "tabmokcolor": 		manageCSS("tabmokcolor.css");			break;
 		case "tabmokcolor2": 		manageCSS("tabmokcolor2.css");			break;
 		case "tabmokcolor4": 		manageCSS("tabmokcolor4.css");			break;
+		
+		case "anewtaburlpcb": 		manageCSS("no_pbrowsing_page.css");		break;
 		
 		case "padlock_default": 	manageCSS("padlock_default.css");		break;
 		case "padlock_classic": 	manageCSS("padlock_classic.css");		break;
@@ -4476,6 +4516,11 @@ classicthemerestorerjs.ctr = {
 		case "toolsitem": 			manageCSS("ctraddon_toolsitem.css");	break;
 		
 		case "restartapp":			manageCSS("ctraddon_restartapp.css");	break;
+		case "ctrnewinv47":			manageCSS("ctraddon_new_in_v47.css");	break;
+		case "ctrnewinv48":			manageCSS("ctraddon_new_in_v48.css");	break;
+		case "ctrnewinv50":			manageCSS("ctraddon_new_in_v50.css");	break;
+		case "ctrnewinv51":			manageCSS("ctraddon_new_in_v51.css");	break;
+		
 		case "cuibuttons":			manageCSS("cuibuttons.css");			break;
 		
 		case "nodevtheme2":			manageCSS("no_devtheme.css");			break;
@@ -4537,6 +4582,7 @@ classicthemerestorerjs.ctr = {
 		
 		case "hidetabaudioico": 	manageCSS("hidetabaudioico.css");		break;
 		case "urlresults":			manageCSS("urlbar_results.css");		break;
+		case "cresultshcb":			manageCSS("urlbar_results2.css");		break;
 		
 		case "aerocolors":
 			
@@ -5208,7 +5254,7 @@ classicthemerestorerjs.ctr = {
 			}
 		
 		break;
-		
+	
 		case "ctabheight":
 			removeOldSheet(this.tabheight);
 			

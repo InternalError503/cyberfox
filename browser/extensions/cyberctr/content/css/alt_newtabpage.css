@@ -31,11 +31,10 @@
    .newtab-link {
       overflow:visible !important;
    }
-	
-	html #newtab-grid {
-	  min-height: unset !important;
-	  max-height: unset !important;
-	}
+
+  body {
+      overflow: hidden !important;
+  }
 
 	#newtab-customize-button,
 	.newtab-customize,

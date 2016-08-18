@@ -442,6 +442,8 @@
 	#ctraddon_BMB_viewBookmarksToolbar {
 	  display:none;
 	}
+	
+	#ctraddon_BMB_unsortedBookmarks_mm2sep,
 	#ctraddon_BMB_viewBookmarksToolbar + menuseparator {
 	  visibility: collapse;
 	}
@@ -592,22 +594,22 @@
 	}
 	
 	/* support for old icons+text mode */
-	toolbar[mode="full"] .toolbarbutton-1:not([type="menu-button"]):not(#urlbar-reload-button):not(#urlbar-stop-button):not(#urlbar-go-button):not(.tabs-newtab-button):not(.tab-close-button):not(#back-button):not(#forward-button) {
+	toolbar[mode="full"]:not(#web-developer-toolbar) .toolbarbutton-1:not([type="menu-button"]):not(#urlbar-reload-button):not(#urlbar-stop-button):not(#urlbar-go-button):not(.tabs-newtab-button):not(.tab-close-button):not(#back-button):not(#forward-button) {
 	  -moz-box-orient: vertical !important;
 	}
 
 	#TabsToolbar[mode="full"] toolbarbutton .toolbarbutton-text,
-	toolbar[mode="full"] #back-button .toolbarbutton-text,
-	toolbar[mode="full"] #forward-button .toolbarbutton-text{
+	toolbar[mode="full"]:not(#web-developer-toolbar) #back-button .toolbarbutton-text,
+	toolbar[mode="full"]:not(#web-developer-toolbar) #forward-button .toolbarbutton-text{
 	  display: none !important;
 	}
 	
-	toolbar[mode="full"] toolbarbutton[type="menu"]:not(#bookmarks-menu-button) dropmarker{
+	toolbar[mode="full"]:not(#web-developer-toolbar) toolbarbutton[type="menu"]:not(#bookmarks-menu-button) dropmarker{
 	  display: none !important;
 	}
 
-	toolbar[mode="full"] .toolbarbutton-1:not(#urlbar-reload-button):not(#urlbar-stop-button):not(#urlbar-go-button):not(.tabs-newtab-button):not(.tab-close-button):not(#back-button):not(#forward-button),
-	toolbar[mode="full"] .toolbarbutton-1:not(#urlbar-reload-button):not(#urlbar-stop-button):not(#urlbar-go-button):not(.tabs-newtab-button):not(.tab-close-button):not(#back-button):not(#forward-button) > .toolbarbutton-menubutton-button {
+	toolbar[mode="full"]:not(#web-developer-toolbar) .toolbarbutton-1:not(#urlbar-reload-button):not(#urlbar-stop-button):not(#urlbar-go-button):not(.tabs-newtab-button):not(.tab-close-button):not(#back-button):not(#forward-button),
+	toolbar[mode="full"]:not(#web-developer-toolbar) .toolbarbutton-1:not(#urlbar-reload-button):not(#urlbar-stop-button):not(#urlbar-go-button):not(.tabs-newtab-button):not(.tab-close-button):not(#back-button):not(#forward-button) > .toolbarbutton-menubutton-button {
 	  min-width: 57px !important;
 	}
 
@@ -631,10 +633,10 @@
 	  visibility: collapse !important;
 	}
 	
-	#nav-bar[mode="full"] #downloads-button image,
-	#nav-bar[mode="full"] #downloads-button stack {
-	  margin-left: 30px !important;
-	  margin-right: 30px !important;
+	#main-window:not([fx48plus="true"]) #nav-bar[mode="full"] #downloads-button image,
+	#main-window:not([fx48plus="true"]) #nav-bar[mode="full"] #downloads-button stack {
+	  margin-left: 22px !important;
+	  margin-right: 22px !important;
 	}
 	
 	/* Auto Form add-ons icon sizes*/

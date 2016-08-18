@@ -451,10 +451,10 @@
 		  
 		if(appversion >= '42') {
 		  
-		  var SIGNING_REQUIRED = true;
+		  var SIGNING_REQUIRED = false;
 		  
 		  try {
-			SIGNING_REQUIRED = Services.prefs.getBranch("xpinstall.signatures.").getBoolPref("required");
+			SIGNING_REQUIRED = false;
 		  } catch(e) {}
 		
           if (this.parentNode.selectedItem == this)

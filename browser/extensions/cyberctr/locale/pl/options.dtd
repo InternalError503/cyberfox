@@ -125,8 +125,9 @@
 <!ENTITY Ctr_altoptionswh	"Wysokość">
 <!ENTITY Ctr_altoptionsi	"Symulowane okno opcji nie jest już oknem dialogowym, ale 'oknem przeglądarki' z ukrytymi wszystkimi paskami narzędzi. Funkcja 'Użyj bieżących stron' dodaje tylko adresy stron otwartych w bieżącym oknie, w tym przypadku tylko 'about:preferences'. 'Przycisk opcji paska narzędzi' zostaje zastąpiony nowym, aby mógł otwierać opcje w oknie.">
 <!ENTITY Ctr_options_rem	"Pamiętaj ostatnio wybraną kategorię">
+<!ENTITY Ctr_aboutpages		"Ogólne strony 'about:': alternatywny wygląd">
 <!ENTITY Ctr_svgfilters		"Kolory SVG ikon przycisków domyślnego paska narzędzi">
-<!ENTITY Ctr_wincontrols	"Ruchome kontrolki okna pełnego ekranu">
+<!ENTITY Ctr_wincontrols	"Ruchome kontrolki okna dla trybu pełnoekranowego">
 <!ENTITY Ctr_puibuttonsep	"Separator przycisku menu">
 <!ENTITY Ctr_puibut_no_sep	"Ukryty">
 <!ENTITY Ctr_puibut_l_sep	"Po lewej">
@@ -186,12 +187,13 @@
 <!ENTITY Ctr_bmbutton		"Przycisk menu zakładek">
 <!ENTITY Ctr_hiderecentbm	"Menu podręczne zakładek: ukryj ostatnio dodane zakładki">
 <!ENTITY Ctr_hideeditbm		"Gwiazdka zakładek: ukryj menu podręczne (jeżeli zakładka nie jest dodana do strony)">
+<!ENTITY Ctr_oldplacesbut	"Zakładki na pasku: stary wygląd">
 <!ENTITY Ctr_bmbutpanelm	"Menu podręczne: wygląd menu panelu">
-<!ENTITY Ctr_bmbunsortbm	"Menu podręczne: podmenu 'Zakładki nieprzypisane'">
+<!ENTITY Ctr_bmbunsortbm	"Menu podręczne: podmenu 'Pozostałe zakładki'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu ponad zakładkami">
 <!ENTITY Ctr_bmbviewbmsb	"Menu podręczne: pokaż 'Wyświetl panel zakładek'">
 <!ENTITY Ctr_bmbviewbmtb	"Menu podręczne: pokaż 'Wyświetl pasek zakładek'">
-<!ENTITY Ctr_bmbnounsort	"Menu podręczne: ukryj 'Zakładki nieprzypisane'">
+<!ENTITY Ctr_bmbnounsort	"Menu podręczne: ukryj 'Pozostałe zakładki'">
 <!ENTITY Ctr_bmbutnotext	"Ukryj etykietę na pasku zakładek">
 <!ENTITY Ctr_skipprintpr	"Przycisk drukowania: pomiń podgląd wydruku">
 <!ENTITY Ctr_tbconmenu		"Menu kontekstowe paska narzędzi: ukryj 'Przenieś do menu', 'Usuń z paska narzędzi', 'Odśwież wszystkie karty', 'Dodaj zakładki do wszystkich kart...' oraz 'Przywróć zamkniętą kartę'">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Dodaj adres albo pozostaw puste">
 <!ENTITY Ctr_anewtaburl		"Adres strony nowej karty">
 <!ENTITY Ctr_anewtaburlcb	"Niestandardowy adres strony nowej karty (domyślny: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Niestandardowy adres strony nowej prywatnej karty (domyślny: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Nazwy kolorów, kod szesnastkowy, wartości rgb(a) i hsl(a) są obsługiwane.">
 <!ENTITY Ctr_tab_tf_info2	"Wejścia nie będą zatwierdzane!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Pokaż separator pomiędzy wynikami">
 <!ENTITY Ctr_urlbar_uc		"Wyłącz funkcję 'ujednolicone autouzupełnianie'">
 <!ENTITY Ctr_lbsugresi		"Wyłącz ograniczenie wysokości">
+<!ENTITY Ctr_cresultshcb	"Niestandardowe ograniczenie wysokości: ">
 <!ENTITY Ctr_lbsugres		"Liczba wyników">
 <!ENTITY Ctr_lbsbradius		"Niestandardowe zaokrąglenia obrzeży paska adresu i paska wyszukiwania">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Ukryj pasek kart z widoczną tylko jedną kartą">
 <!ENTITY Ctr_hidetbwote		"Zmniejsz opóźnienie ukrywania przy uruchamianiu">
 <!ENTITY Ctr_hidetbwote_i	"Może powodować usterki kart paska narzędzi">
-<!ENTITY Ctr_hidetbwote2	"Zachowaj pasek tytułu (karty na górze)">
+<!ENTITY Ctr_hidetbwote2	"Automatycznie dostosuj obszar paska tytułu">
 <!ENTITY Ctr_notabfog		"Usuń mgłę tła (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Usuń kolor tła (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Zredukuj przestrzeń powyżej paska narzędzi (jeśli to możliwe)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Odznaczenie tych ustawień usuwa funkcje 'podświetlania' paska wyszukiwania.">
 <!ENTITY Ctr_e_flyweb		"FlyWeb">
 <!ENTITY Ctr_fx50flyweb		"Odznaczenie tego ustawienia wyłącza 'FlyWeb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Wybór wyszukiwarki w menu podręcznym autouzupełniania">
+<!ENTITY Ctr_fx51OOSeach	"Odznaczenie tego ustawienia usuwa wybór wyszukiwarki z menu podręcznego paska adresu.">
 
 
 <!ENTITY Ctr_pw_settings	"Ustawienia">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Przejdź">
 <!ENTITY Ctr_menu_restart.label			"Zrestartuj">
 <!ENTITY Ctr_restartapp					"Pokaż 'Zrestartuj' w menu programu &brandShortName; oraz w menu Plik">
+<!ENTITY Ctr_ctrnewinv					"Podkreśl nowe opcje dla bieżącej wersji programu &brandShortName;">
 
 <!ENTITY Ctr_openInCurrentTab			"Otwórz dane wejściowe w bieżącej karcie">
 <!ENTITY Ctr_openInNewTab				"Otwórz dane wejściowe w nowej karcie">

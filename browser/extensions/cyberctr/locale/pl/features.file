@@ -1,10 +1,9 @@
-# LOCALIZATION NOTE (<a id="url-new-download"> or <a id="url-new-notes">):
-# Don't edit text contained in <a> symbols you can only edit the test "here"
 btn-check-update=Sprawdź aktualizacje
 btn-Documentation=Dokumentacja
 btn-faq=Najczęściej zadawane pytania
 btn-support-forums=Forum pomocy
 btn-contact-us=Skontaktuj się z nami
 msg-firstrun-welcome=Witamy w funkcjach i informacji. Tutaj znajdziesz przydatne informacje i linki w celu zapewnienia ci wygody podczas przeglądania stron www.
-msg-new-version-blob=Nowsza wersja CyberCTR jest dostępna do pobrania! Kliknij <a id="url-new-download">here</a> , by odwiedzić dział pobierania. Kliknij <a id="url-new-notes">here</a> , by odwiedzić dział listy zmian.
+msg-new-version-blob-a=Nowsza wersja CyberCTR jest dostępna do pobrania! Odwiedź
+msg-new-version-blob-b=By odwiedzić dział listy zmian, wyświetl
 msg-no-new-version=Brak dostępnych aktualizacji dla CyberCTR. Masz najnowszą wersję.

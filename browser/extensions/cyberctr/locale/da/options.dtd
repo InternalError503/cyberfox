@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Højde">
 <!ENTITY Ctr_altoptionsi	"Det simulerede indstillinger-vindue er ikke længere en dialog men et 'browservindue' med alle værktøjslinjer skjult. Funktionen 'Anvend nuværende side' tilføjer kun url'er fra sider som er åbne i det nuværende vindue, hvilket i dette tilfælde kun er 'about:preferences'. Værktøjslinjeknappen 'indstillinger' erstattes af en ny en for at kunne åbne indstillinger i et vindue.">
 <!ENTITY Ctr_options_rem	"Husk senest valgte kategori">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"SVG-farver til standard værktøjslinje knap ikoner">
 <!ENTITY Ctr_wincontrols	"Flytbar fuldskærmsvindue kontrolelementer">
 <!ENTITY Ctr_puibuttonsep	"Menuknapseparator">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Bogmærker-menuknap">
 <!ENTITY Ctr_hiderecentbm	"Bogmærkers popup: skjul senest tilførte bogmærker">
 <!ENTITY Ctr_hideeditbm		"Bogmærkers stjerne: skjul popup (hvis side ikke er bogmærket)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Popup: panelmenu udseende">
 <!ENTITY Ctr_bmbunsortbm	"Popup: 'Usorterede bogmærker'-undermenu">
 <!ENTITY Ctr_bmbunsortbm2	"Menu over bogmærker">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Tilføj URL eller lad den være tom">
 <!ENTITY Ctr_anewtaburl		"Nyt faneblad-URL-side">
 <!ENTITY Ctr_anewtaburlcb	"Tilpasset nyt faneblad-URL-side (standard: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Farvenavne, hex-koder, rgb(a), og hsl(a) værdier er understøttet.">
 <!ENTITY Ctr_tab_tf_info2	"Indtastede værdier valideres ikke!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Deaktivér 'samlede autofuldfør'-funktion">
 <!ENTITY Ctr_lbsugresi		"Deaktivér højdegrænse">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Antal resultater">
 <!ENTITY Ctr_lbsbradius		"Brugerdefineret kantradius for adresselinje og søgelinje">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Skjul fanebladslinjen når der kun er ét faneblad">
 <!ENTITY Ctr_hidetbwote		"Reducér forsinkelse ved skjulning under opstart">
 <!ENTITY Ctr_hidetbwote_i	"Kan give fejl på fanebladenes værktøjslinje">
-<!ENTITY Ctr_hidetbwote2	"Bevar titellinje (faneblade øverst)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"Fjern baggrundståge (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Fjern baggrundsfarve (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Reducér mellemrum over værktøjslinje (hvis det er muligt)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"Indstillinger">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Gå">
 <!ENTITY Ctr_menu_restart.label			"Genstart">
 <!ENTITY Ctr_restartapp					"Vis 'Genstart' i &brandShortName;-menu og Filer-menu">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Åbn inputs i nuværende faneblad">
 <!ENTITY Ctr_openInNewTab				"Åbn inputs i et nyt faneblad">

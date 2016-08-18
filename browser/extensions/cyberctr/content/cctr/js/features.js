@@ -35,9 +35,9 @@ cyberctrFeatures = {
             document.getElementById("btn-contact-us").textContent =cyberctrFeatures.i18n("btn-contact-us");
             // Updates
             document.getElementById("msg-firstrun-welcome").textContent =cyberctrFeatures.i18n("msg-firstrun-welcome");
-            document.getElementById("msg-new-version-blob").innerHTML = cyberctrFeatures.i18n("msg-new-version-blob");
-            document.getElementById("url-new-download").setAttribute('href', 'https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#download');
-            document.getElementById("url-new-notes").setAttribute('href', 'https://8pecxstudios.com/Forums/viewtopic.php?f=6&t=475#release-notes');
+            document.getElementById("msg-new-version-blob-a").textContent = cyberctrFeatures.i18n("msg-new-version-blob-a");
+            document.getElementById("msg-new-version-blob-b").textContent = cyberctrFeatures.i18n("msg-new-version-blob-b");
+            document.getElementById("url-new-notes").setAttribute('href', 'https://github.com/InternalError503/CyberCTR/releases/tag/' + Services.prefs.getCharPref("extensions.classicthemerestorer.version"));
             document.getElementById("msg-no-new-version").textContent =cyberctrFeatures.i18n("msg-no-new-version");
 		} catch (e) {
 			throw new Error("Error unable to setup event listeners!");

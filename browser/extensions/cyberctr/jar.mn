@@ -26,7 +26,6 @@
 % locale	classic_theme_restorer	pt-BR					%locale/pt-BR/
 % locale	classic_theme_restorer	ru							%locale/ru/
 % locale	classic_theme_restorer	sl							%locale/sl/
-% locale	classic_theme_restorer	tr							%locale/tr/
 % locale	classic_theme_restorer	uk							%locale/uk/
 % locale	classic_theme_restorer	zh-CN					%locale/zh-CN/
 % locale	classic_theme_restorer	zh-TW					%locale/zh-TW/
@@ -34,7 +33,7 @@
 % skin	ctraddon_os_special	classic_theme_restorer	%content/css/winaero/	os=WINNT osversion=6.0
 % skin	ctraddon_os_special	classic_theme_restorer	%content/css/winaero/	os=WINNT osversion=6.1
 % skin	ctraddon_os_special	classic_theme_restorer	%content/css/win8/		os=WINNT osversion>=6.2
-% skin	ctraddon_os_special	classic_theme_restorer	%content/css/mac/		os=Darwin
+
 % skin	ctraddon_os_special	classic_theme_restorer	%content/css/linux/		os=Linux
 % skin	ctraddon_os_special	classic_theme_restorer	%content/css/linux/		os=FreeBSD
 % skin	ctraddon_os_special	classic_theme_restorer	%content/css/linux/		os=OpenBSD
@@ -44,3 +43,13 @@
 % overlay chrome://browser/content/browser.xul			     chrome://classic_theme_restorer/content/overlay.xul
 % overlay about:newtab												 chrome://classic_theme_restorer/content/aboutnewtab.xul
 % overlay about:preferences											 chrome://classic_theme_restorer/content/aboutprefs.xul
+
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlay45.xul appversion>=45.0 platformversion<48.0
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlay48.xul appversion>=48.0
+
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayWin.xul os=WINNT
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=Linux
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=FreeBSD
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=OpenBSD
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=NetBSD
+% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=SunOS

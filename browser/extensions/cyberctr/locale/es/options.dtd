@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Alto">
 <!ENTITY Ctr_altoptionsi	"La ventana simulada de opciones ya no es un cuadro de diálogo sino una 'ventana de navegador' con todas las barras de herramientas ocultas. La característica 'Usar página actual' como página de inicio sólo añade URLs de páginas abiertas en la ventana actual, que en este caso sólo es 'about:preferences'. El botón de barra de herramientas 'Opciones' se sustituye por uno nuevo para poder abrir las opciones en una ventana.">
 <!ENTITY Ctr_options_rem	"Recordar la última categoría seleccionada">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"Colores SVG para iconos predeterminados de botones de barra de herramientas">
 <!ENTITY Ctr_wincontrols	"Controles de ventana móviles en pantalla completa">
 <!ENTITY Ctr_puibuttonsep	"Posición del separador del botón de menú">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Botón de menú emergente de Marcadores">
 <!ENTITY Ctr_hiderecentbm	"Menú emergente de Marcadores: Ocultar marcadores añadidos recientemente">
 <!ENTITY Ctr_hideeditbm		"Estrella de marcadores: Ocultar panel emergente (si la página no está en marcadores)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Estilo de panel para el menú emergente ">
 <!ENTITY Ctr_bmbunsortbm	"Mostrar submenú 'Marcadores no ordenados'">
 <!ENTITY Ctr_bmbunsortbm2	"Menú por encima de los marcadores">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Añada una URL o déjelo vacío">
 <!ENTITY Ctr_anewtaburl		"URL de la página de nueva pestaña">
 <!ENTITY Ctr_anewtaburlcb	"URL personalizada de la página de nueva pestaña (predeterminada: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Están soportadas entradas de nombres de colores, códigos hexadecimales, y valores rgb(a) y hsl(a).">
 <!ENTITY Ctr_tab_tf_info2	"¡Las entradas no serán validadas!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_rhl	"Colores Aero para resultados destacados">
 <!ENTITY Ctr_autocompl_sep	"Mostrar separador entre resultados">
 <!ENTITY Ctr_lbsugresi		"Deshabilitar límite de altura">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Número de resultados">
 <!ENTITY Ctr_lbsbradius		"Radio de borde redondeado personalizado para barra de direcciones y barra de búsqueda">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Ocultar barra de pestañas con una sola pestaña visible">
 <!ENTITY Ctr_hidetbwote		"Reducir retardo al ocultar en el inicio">
 <!ENTITY Ctr_hidetbwote_i	"Podría causar problemas en la barra de pestañas">
-<!ENTITY Ctr_hidetbwote2	"Conservar barra de título (pestañas arriba)">
+<!ENTITY Ctr_hidetbwote2	"Ajustar automáticamente el espacio de la barra de título">
 <!ENTITY Ctr_notabfog		"Eliminar niebla de fondo (Windows Aeroglass/8)">
 <!ENTITY Ctr_notabbg		"Eliminar color de fondo (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Reducir espacio sobre la barra de herramientas (si es posible)">
@@ -371,7 +375,9 @@
 <!ENTITY Ctr_e_findbarhl	"Resaltado de la barra de herramientas de búsqueda.">
 <!ENTITY Ctr_fx50findbarhl	"Desmarcar estos ajustes suprime las funciones de 'resaltado' de la barra de herramientas de búsqueda.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_fx50flyweb		"Desmarcar esta preferencia deshabilita 'flyweb'.">
+<!ENTITY Ctr_fx50flyweb		"Desmarcar esta preferencia deshabilita 'Flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"Configuración">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Ir">
 <!ENTITY Ctr_menu_restart.label			"Reiniciar">
 <!ENTITY Ctr_restartapp					"'Reiniciar' en el menú de &brandShortName; y el menú 'Archivo'">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Abrir entradas en la pestaña actual">
 <!ENTITY Ctr_openInNewTab				"Abrir entradas en una nueva pestaña">

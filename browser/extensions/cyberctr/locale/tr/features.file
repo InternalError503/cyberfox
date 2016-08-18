@@ -1,10 +1,9 @@
-# LOCALIZATION NOTE (<a id="url-new-download"> or <a id="url-new-notes">):
-# Don't edit text contained in <a> symbols you can only edit the test "here"
 btn-check-update=Güncellemeleri Denetle
 btn-Documentation=Belgeler
 btn-faq=Sıkça Sorulan Sorular
 btn-support-forums=Destek Forumları
 btn-contact-us=Bize Ulaşın
 msg-firstrun-welcome=Özellikler ve Bilgi, Hoş Geldiniz, burada tarayıcı deneyiminizi geliştirmek için yararlı bilgiler ve bağlantılar bulacaksınız.
-msg-new-version-blob=Yeni bir CyberCTR sürümü indirmek için hazır!, <a id="url-new-download">Buraya</a> tıklayarak indirme sayfasına gidin, <a id="url-new-notes">Buraya</a> tıklayarak sürüm notlarını görebilirsiniz.
+msg-new-version-blob-a=A newer version of CyberCTR is available for download!, Visit
+msg-new-version-blob-b=To visit the release notes section, View
 msg-no-new-version=CyberCTR güncellemesi mevcut değil, en güncel sürümü kullanıyorsunuz.

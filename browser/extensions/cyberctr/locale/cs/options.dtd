@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Výška">
 <!ENTITY Ctr_altoptionsi	"V simulaci nastavení už není dialogové okno, ale 'okno prohlížeče' s lištami je skryto. Volba 'Použít stávající stránku' přidávající URL stránek, otevřených v současném okně, je dostupná přes 'about:preferences'. Tlačítko 'Možnosti' je nahrazeno novým, aby bylo možné otevírat možnosti v okně.">
 <!ENTITY Ctr_options_rem	"Pamatovat poslední zvolenou kategorii">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"SVG barvy pro defaultní ikony tlačítek lišty">
 <!ENTITY Ctr_wincontrols	"Přesunutelné ovládací prvky okna v režimu celé obrazovky">
 <!ENTITY Ctr_puibuttonsep	"Oddělovač tlačítka menu">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Tlačítko menu záložek">
 <!ENTITY Ctr_hiderecentbm	"Záložky (bublina): skrýt posledně přidané záložky">
 <!ENTITY Ctr_hideeditbm		"Hvězdička záložek: skrýt bublinu (pokud stránka není v záložkách)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Popup: panel menu vzhledu">
 <!ENTITY Ctr_bmbunsortbm	"Popup: 'Netříděné záložky' v submenu">
 <!ENTITY Ctr_bmbunsortbm2	"Menu nad záložkami">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Zadejte url nebo ponechte prázdné">
 <!ENTITY Ctr_anewtaburl		"Adresa stránky v novém panelu">
 <!ENTITY Ctr_anewtaburlcb	"Volitelná adresa nového panelu (defaultně: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Podporovány jsou názvy barev, hex, rgb(a) a hsl(a) hodnoty.">
 <!ENTITY Ctr_tab_tf_info2	"Vstupy nejsou validovány!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Zakázat automatické doplňování">
 <!ENTITY Ctr_lbsugresi		"Zrušit limit pro výšku">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Počet výsledků">
 <!ENTITY Ctr_lbsbradius		"Volitelné zaoblení pro adresní řádek a vyhledávání">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Skrývat lištu s pouze jedním panelem">
 <!ENTITY Ctr_hidetbwote		"Snížení prodlevy skrytí při spouštění">
 <!ENTITY Ctr_hidetbwote_i	"Může způsobit chyby na liště panelů">
-<!ENTITY Ctr_hidetbwote2	"Zachovat lištu záhlaví (panely nahoře)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"Odstranit zamlžené pozadí (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Odstranit barvu pozadí (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Zmenšit prostor nad lištou nástrojů (pokud lze)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"Možnosti">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Přejít">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
 <!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">

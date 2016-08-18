@@ -125,8 +125,9 @@
 <!ENTITY Ctr_altoptionswh	"Height:">
 <!ENTITY Ctr_altoptionsi	"The simulated options window is not a dialog anymore but a 'browser window' with all toolbars hidden. The 'Use Current Page' feature only adds urls of pages opened in the current window, which is only 'about:preferences' in this case. The 'options toolbar button' gets replaced by a new one to be able to open options in a window.">
 <!ENTITY Ctr_options_rem	"Remember last selected category">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"SVG colors for default toolbar button icons">
-<!ENTITY Ctr_wincontrols	"Movable full screen window controls">
+<!ENTITY Ctr_wincontrols	"Movable window controls for full screen mode">
 <!ENTITY Ctr_puibuttonsep	"Menu button separator">
 <!ENTITY Ctr_puibut_no_sep	"Hidden">
 <!ENTITY Ctr_puibut_l_sep	"Left">
@@ -186,12 +187,13 @@
 <!ENTITY Ctr_bmbutton		"Bookmarks menu button">
 <!ENTITY Ctr_hiderecentbm	"Bookmarks popup: hide recently added bookmarks">
 <!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Popup: panel menu appearance">
-<!ENTITY Ctr_bmbunsortbm	"Popup: 'Unsorted Bookmarks' menu">
+<!ENTITY Ctr_bmbunsortbm	"Popup: 'Other Bookmarks' menu">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
 <!ENTITY Ctr_bmbviewbmsb	"Popup: show 'View Bookmarks Sidebar'">
 <!ENTITY Ctr_bmbviewbmtb	"Popup: show 'View Bookmarks Toolbar'">
-<!ENTITY Ctr_bmbnounsort	"Popup: hide 'Unsorted Bookmarks'">
+<!ENTITY Ctr_bmbnounsort	"Popup: hide 'Other Bookmarks'">
 <!ENTITY Ctr_bmbutnotext	"Hide label on bookmarks bar">
 <!ENTITY Ctr_skipprintpr	"Print button: skip print preview">
 <!ENTITY Ctr_tbconmenu		"Toolbar context menu: hide 'move to menu', 'remove from toolbar', 'reload/bookmark all tabs' and 'undo close tab'">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Add url or leave empty">
 <!ENTITY Ctr_anewtaburl		"New tab page url">
 <!ENTITY Ctr_anewtaburlcb	"Custom new tab page url (default: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Color names, hexcodes, rgb(a) and hsl(a) values are supported.">
 <!ENTITY Ctr_tab_tf_info2	"Inputs won't be validated!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature">
 <!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Number of results">
 <!ENTITY Ctr_lbsbradius		"Custom border roundness for location bar and search bar">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Hide tabs toolbar with only one visible tab">
 <!ENTITY Ctr_hidetbwote		"Reduce hiding delay on startup">
 <!ENTITY Ctr_hidetbwote_i	"Could cause glitches on tabs toolbar">
-<!ENTITY Ctr_hidetbwote2	"Keep titlebar (tabs on top)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"Remove background fog (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Remove background color (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Reduce space above toolbar (if possible)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"Settings">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Go">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"Show 'Restart' in &brandShortName; menu and File menu">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
 <!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">

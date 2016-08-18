@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"高度">
 <!ENTITY Ctr_altoptionsi	"本套件模擬選項視窗將會是一個隱藏所有工具列的「瀏覽器視窗」。 若你在 [選項視窗]/[一般]/[首頁] 的設定頁內按下「使用目前頁面」按鈕，會將首頁網址設定變更為「about:preferences」，而非主瀏覽視窗的所有分頁。本套件會新增一個工具列按鈕，名為「選項(視窗)」，若你是第一次開啟本設定的話，可以在介面自訂模式中找到該按鈕。">
 <!ENTITY Ctr_options_rem	"記住上次選擇的選項分頁">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"改變預設工具列按鈕圖示顏色">
 <!ENTITY Ctr_wincontrols	"可移動的全螢幕視窗控制項">
 <!ENTITY Ctr_puibuttonsep	"Menu button separator">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"書籤選單按鈕">
 <!ENTITY Ctr_hiderecentbm	"Bookmarks popup: hide recently added bookmarks">
 <!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"彈出式書籤選單: 書籤選單使用和面板選單同風格的外觀">
 <!ENTITY Ctr_bmbunsortbm	"彈出式書籤選單: 「未排序書籤」項目附加子選單">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"填入網址或留空">
 <!ENTITY Ctr_anewtaburl		"新分頁網址">
 <!ENTITY Ctr_anewtaburlcb	"自訂新分頁網址 (預設值: 「about:newtab」)">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"可使用色彩名稱, hexcodes, rgb(a) 和 hsl(a) 值.">
 <!ENTITY Ctr_tab_tf_info2	"沒有防呆機制（輸入無效值，不會有警告）!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature">
 <!ENTITY Ctr_lbsugresi		"Disable height limit">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Number of results">
 <!ENTITY Ctr_lbsbradius		"Custom border radius for location bar and search bar">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"當只有一個分頁時，隱藏分頁工具列">
 <!ENTITY Ctr_hidetbwote		"減少啟動時的隱藏延遲時間">
 <!ENTITY Ctr_hidetbwote_i	"可能導致分頁工具列故障">
-<!ENTITY Ctr_hidetbwote2	"保留標題列 (分頁列置頂)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"移除背景模糊 (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"移除背景色彩 (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"縮小分頁列上方空間 (如有可能)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"設定值">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Go">
 <!ENTITY Ctr_menu_restart.label			"Restart">
 <!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
 <!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">

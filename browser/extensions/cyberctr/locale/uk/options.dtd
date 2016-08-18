@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Висота">
 <!ENTITY Ctr_altoptionsi	"Вікно змодельованих параметрів не є більше діалогом, але «вікно браузера» з усіма панелями інструментів приховані. Функція «Використовувати поточну сторінку» тільки додає URL-адреси сторінок, відкритих в поточному вікні, які є тільки «about:preferences» в цьому випадку. Кнопка «Параметри» панелі інструментів замінюється на нову, щоб бути в змозі відкрити параметри у вікні.">
 <!ENTITY Ctr_options_rem	"Пам’ятати останню обрану категорію">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"SVG кольори для типових іконок кнопок панелі інструментів">
 <!ENTITY Ctr_wincontrols	"Рухоме управління повноекранним режимом">
 <!ENTITY Ctr_puibuttonsep	"Розділювач кнопки меню">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Кнопка меню закладок">
 <!ENTITY Ctr_hiderecentbm	"Спливаюче вікно закладок: приховати недавно додані закладки">
 <!ENTITY Ctr_hideeditbm		"Зірка закладок: приховати спливаюче вікно (якщо сторінка не закладена)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Спливаюче вікно: вигляд меню панелі">
 <!ENTITY Ctr_bmbunsortbm	"Спливаюче вікно: субменю «несортованих закладок»">
 <!ENTITY Ctr_bmbunsortbm2	"Меню над закладками">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Додати адресу або залишити порожнім">
 <!ENTITY Ctr_anewtaburl		"Адреса сторінки в новій вкладці">
 <!ENTITY Ctr_anewtaburlcb	"Налаштовувана адреса сторінки в новій вкладці (за замовчуванням: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Назви кольорів, hex коди, rgb(a) та hsl(a) величини підтримуються.">
 <!ENTITY Ctr_tab_tf_info2	"Введене не буде перевірятися!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Показати розділювач між результатами">
 <!ENTITY Ctr_urlbar_uc		"Вимкнути функцію «автозаповнення»">
 <!ENTITY Ctr_lbsugresi		"Вимкнути обмеження висоти">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Кількість результатів">
 <!ENTITY Ctr_lbsbradius		"Налаштовуваний радіус рамки для панелей адреси та пошуку">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Приховувати панель вкладок з одною вкладкою">
 <!ENTITY Ctr_hidetbwote		"Зменшити затримки приховування при запуску">
 <!ENTITY Ctr_hidetbwote_i	"Може викликати перебої на панелі вкладок">
-<!ENTITY Ctr_hidetbwote2	"Утримувати панель заголовку (вкладки нагорі)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"Прибрати затуманення тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_notabbg		"Прибрати колір тла (Windows AeroGlass/8)">
 <!ENTITY Ctr_hightabpos		"Зменшити простір над панеллю інструментів (якщо можливо)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Вимкнення цього параметру усуває «підсвічувальні» особливості пошукової панелі.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Вимкнення цього налаштування вимикає «Flyweb».">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"Налаштування">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Перейти">
 <!ENTITY Ctr_menu_restart.label			"Рестарт">
 <!ENTITY Ctr_restartapp					"«Рестарт» в кнопці програми та в меню «Файл»">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Відкрити вхідні дані в поточній вкладці">
 <!ENTITY Ctr_openInNewTab				"Відкрити вхідні дані в новій вкладці">

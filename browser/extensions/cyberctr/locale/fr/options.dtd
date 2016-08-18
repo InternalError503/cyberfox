@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Hauteur">
 <!ENTITY Ctr_altoptionsi	"La fenêtre des paramètres n’est plus une boîte de dialogue, mais une «fenêtre de navigateur » dont les barres d’outils sont cachées. La fonctionnalité « Utiliser la page courante » ne fait qu'ajouter les adresses des pages ouvertes dans la fenêtre active (« about:preferences »).  Le bouton d’« options » de la barre d’outils est remplacé par un nouveau bouton qui permet l’ouverture d’une fenêtre spécifique pour les options.">
 <!ENTITY Ctr_options_rem	"Se rappeler de la dernière catégorie choisie">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"Couleurs SVG pour les icônes par défaut de la barre d’outils">
 <!ENTITY Ctr_wincontrols	"Mode plein écran : boutons déplaçables">
 <!ENTITY Ctr_puibuttonsep	"Séparateur du bouton de menu :">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Bouton marque-pages">
 <!ENTITY Ctr_hiderecentbm	"Popup marque-pages : masquer le groupe « marqués récemment »">
 <!ENTITY Ctr_hideeditbm		"Étoile des marque-pages : masquer le menu déroulant (si la page n'a pas été marquée)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Menu déroulant : apparence de menu de type « panneau »">
 <!ENTITY Ctr_bmbunsortbm	"Popup : sous menu des « marque-pages non triés »">
 <!ENTITY Ctr_bmbunsortbm2	"Menu au-dessus des marque-pages">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Saisir une adresse ou laisser vide">
 <!ENTITY Ctr_anewtaburl		"Adresse de la page Nouvel onglet">
 <!ENTITY Ctr_anewtaburlcb	"Adresse personnalisée de la page Nouvel onglet (défaut : « about:newtab »)">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Les noms de couleurs, les codes hexadécimaux, les valeurs rgb(a) et hsl(a) sont pris en charge.">
 <!ENTITY Ctr_tab_tf_info2	"Les valeurs saisies ne sont pas validées.">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_rhl	"Utiliser des couleurs Aero pour les résultats surlignés">
 <!ENTITY Ctr_autocompl_sep	"Afficher un séparateur entre les résultats">
 <!ENTITY Ctr_lbsugresi		"Désactiver la limite de hauteur">
+<!ENTITY Ctr_cresultshcb	"Limite de hauteur personnalisée :">
 <!ENTITY Ctr_lbsugres		"Nombre de résultats :">
 <!ENTITY Ctr_lbsbradius		"Rayon de bordure personnalisé pour la barre d'adresse et la barre de recherche">
 
@@ -295,11 +299,11 @@
 
 <!ENTITY Ctr_toolbars		"Barres d’outils">
 <!ENTITY Ctr_dblclnewtab	"Double-cliquer pour ouvrir un nouvel onglet">
-<!ENTITY Ctr_dblclnewtabdes	"Not suitable for all complete themes while Windows titlebar is active.">
+<!ENTITY Ctr_dblclnewtabdes	"Ne convient pas aux thèmes complets lorsque la barre de titre de Windows est active.">
 <!ENTITY Ctr_hidetbwot		"Masquer la barre d’onglets quand un seul onglet est ouvert">
 <!ENTITY Ctr_hidetbwote		"Diminuer le délai pour masquer la barre au démarrage">
 <!ENTITY Ctr_hidetbwote_i	"Peut causer des disfonctionnements dans la barre d’onglets">
-<!ENTITY Ctr_hidetbwote2	"Conserver la barre de titre (onglets en haut)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Réduire l’espace en haut (si possible)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Décocher ces paramètres désactive les fonctionnalités avancées de surlignage de la barre de recherche.">
 <!ENTITY Ctr_e_flyweb		"FlyWeb">
 <!ENTITY Ctr_fx50flyweb		"Décocher ce paramètre désactive « FlyWeb ».">
+<!ENTITY Ctr_e_oneoffsearch	"Sélection de recherche des fenêtres surgissantes d'autocomplétion">
+<!ENTITY Ctr_fx51OOSeach	"Décocher ce paramètre retire la sélection de recherche des fenêtres surgissantes de la barre de navigation.">
 
 
 <!ENTITY Ctr_pw_settings	"Réglages">
@@ -386,18 +392,19 @@
 <!ENTITY Ctr_special_font	"La configuration de la couleur d’arrière-plan ne s’applique qu’au thème par défaut.">
 <!ENTITY Ctr_special_info	"Certaines options ne fonctionnent que dans certains cas.">
 <!ENTITY Ctr_special_info2	"Options prévues pour le thème par défaut. Certaines options peuvent ne fonctionner pas avec les autres thèmes.">
-<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_special_acr	"Ne signalez des problèmes qu'en utilisant les canaux de support officiels, et non à l'aide de « Add-on Compatibility Reporter » !">
 <!ENTITY Ctr_support		"Support">
-<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
-<!ENTITY Ctr_github_issues	"Report issue on Github">
-<!ENTITY Ctr_newversion		"Check for new version">
+<!ENTITY Ctr_support_forum1	"MozillaZine (forum anglais)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (forum allemand)">
+<!ENTITY Ctr_github_issues	"Signaler des problèmes via Github">
+<!ENTITY Ctr_newversion		"Vérifier s'il y a une nouvelle version">
 
-<!ENTITY Ctr_addon-bar.accesskey		"D">
+<!ENTITY Ctr_addon-bar.accesskey		"U">
 <!ENTITY appMenuGettingStarted.label	"Pour commencer">
 <!ENTITY goCmd.label					"Aller à">
 <!ENTITY Ctr_menu_restart.label			"Redémarrer">
 <!ENTITY Ctr_restartapp					"« Redémarrer » dans le menu &brandShortName; et le menu Fichier">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Ouvrir les entrées dans l'onglet actuel">
 <!ENTITY Ctr_openInNewTab				"Ouvrir les entrées dans un nouvel onglet">

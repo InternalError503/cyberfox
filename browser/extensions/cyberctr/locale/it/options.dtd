@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Altezza">
 <!ENTITY Ctr_altoptionsi	"La finestra delle opzioni non si presenta più come un dialogo ma come una finestra del browser con tutte le barre degli strumenti nascoste. La caratteristica 'Usa la pagina corrente' aggiunge gli url delle pagine aperte nella finestra corrente, che in questo caso è solo 'about:preferences'. Il pulsante delle 'opzioni' è sostituito da uno nuovo che è in grado di aprire le opzioni in una finestra.">
 <!ENTITY Ctr_options_rem	"Ricorda l'ultima categoria selezionata">
+<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
 <!ENTITY Ctr_svgfilters		"Colori SVG per le icone dei pulsanti della barra strumenti">
 <!ENTITY Ctr_wincontrols	"Angoli finestra mobili in modalità schermo intero">
 <!ENTITY Ctr_puibuttonsep	"Separatore del pulsante Menu">
@@ -186,6 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Menu del pulsante segnalibri">
 <!ENTITY Ctr_hiderecentbm	"Popup segnalibri: nascondi i segnalibri aggiunti di recente">
 <!ENTITY Ctr_hideeditbm		"Stella dei segnalibri: nascondi popup (se la pagina non è nei segnalibri)">
+<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
 <!ENTITY Ctr_bmbutpanelm	"Aspetto del menu a pannello">
 <!ENTITY Ctr_bmbunsortbm	"Menu dei 'Segnalibri non catalogati'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Aggiungi URL o lascia vuoto">
 <!ENTITY Ctr_anewtaburl		"URL della pagina Nuova scheda">
 <!ENTITY Ctr_anewtaburlcb	"URL personalizzato della pagina Nuova scheda (predefinito: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"È possibile usare nomi di colori (in inglese), valori esadecimali e i formati rgb(a) e hsl(a).">
 <!ENTITY Ctr_tab_tf_info2	"Nessuna validazione dell’input.">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Mostra i separatori tra i risultati">
 <!ENTITY Ctr_urlbar_uc		"Disattiva il completamento automatico">
 <!ENTITY Ctr_lbsugresi		"Disattiva il limite di altezza">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
 <!ENTITY Ctr_lbsugres		"Numero di risultati">
 <!ENTITY Ctr_lbsbradius		"Arrotondamento personalizzato della barra degli indirizzi e di ricerca">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Nascondi la barra delle schede quando è aperta una sola scheda">
 <!ENTITY Ctr_hidetbwote		"Velocizza la scomparsa della barra all’avvio">
 <!ENTITY Ctr_hidetbwote_i	"Potrebbe causare anomalie nella barra delle schede">
-<!ENTITY Ctr_hidetbwote2	"Mantieni la barra del titolo (schede in alto)">
+<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
 <!ENTITY Ctr_notabfog		"Disattiva l’effetto nebbia (Windows AeroGlass e Win8)">
 <!ENTITY Ctr_notabbg		"Rimuovi colore di sfondo (Windows AeroGlass e Win8)">
 <!ENTITY Ctr_hightabpos		"Quando possibile, riduci lo spazio sopra le barre">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Unchecking this preference disables 'flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
+<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes location bar popups search selection.">
 
 
 <!ENTITY Ctr_pw_settings	"Impostazioni">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Vai">
 <!ENTITY Ctr_menu_restart.label			"Riavvia">
 <!ENTITY Ctr_restartapp					"'Riavvia' nel menu del Pulsante &brandShortName; e nel menu File">
+<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Apri l'indirizzo nella scheda corrente">
 <!ENTITY Ctr_openInNewTab				"Apri l'indirizzo in una nuova scheda">

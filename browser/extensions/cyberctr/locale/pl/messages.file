@@ -2,7 +2,7 @@
 # %S will be replaced by brandShortName
 popup.title=Dostosuj %S
 popup.msg.restart=%S musi zostać zrestartowany, aby zmiany przyniosły efekt.\nZrestartować teraz?
-import.error=BŁĄD: Znaleziono błędny albo zmodyfikowany plik!\nNic nie zostało zaimportowane!
+import.error=BŁĄD: Znaleziono błędny albo zmodyfikowany plik!\nUstawienia nie zostały zaimportowane!
 ctr_extrabar=Dodatkowy pasek narzędzi
 ctr_actthrobber=Wskaźnik aktywności
 

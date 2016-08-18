@@ -125,6 +125,7 @@
 <!ENTITY Ctr_altoptionswh	"Höhe:">
 <!ENTITY Ctr_altoptionsi	"Das simulierte Einstellungsfenster ist kein Dialogfenster mehr, sondern ein leistenloses normales Fenster. Die Leistenschaltfläche 'Einstellungen' wird durch 'Einstellungen (Fenster)' ersetzt. Diese Schaltfläche muss einmalig im Modus 'Anpassen' zur Menüleiste hinzugefügt werden.">
 <!ENTITY Ctr_options_rem	"Zuletzt besuchte Kategorie speichern">
+<!ENTITY Ctr_aboutpages		"Allgemeine 'about:'-Seiten: alternative Darstellung">
 <!ENTITY Ctr_svgfilters		"SVG-Farben für Symbole von 'Standard-Schaltflächen'">
 <!ENTITY Ctr_wincontrols	"Verschiebbare Fenster-Schaltflächen im Vollbildmodus">
 <!ENTITY Ctr_puibuttonsep	"Menüschaltfläche">
@@ -133,7 +134,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Trennlinie rechts">
 <!ENTITY Ctr_html5warning	"HTML5-Vollbildwarnung">
 <!ENTITY Ctr_oldtoplevimg	"Klassische 'Bilddarstellung' auf weißem Hintergrund">
-<!ENTITY Ctr_altalertbox	"'Benachrichtigungs-Box': alternative Darstellung">
+<!ENTITY Ctr_altalertbox	"Benachrichtigungs-Box: alternative Darstellung">
 <!ENTITY Ctr_emptygfavico	"Allgemeines Lesezeichensymbol ersetzen">
 <!ENTITY Ctr_mstatusbar		"Statusbereich: sichtbar und verschiebbar">
 <!ENTITY Ctr_mstatusbars4e	"Statusbereich wird von 'Status-4-Evar' kontrolliert">
@@ -186,12 +187,13 @@
 <!ENTITY Ctr_bmbutton		"Lesezeichen-Menüschaltfläche">
 <!ENTITY Ctr_hiderecentbm	"Lesezeichen-Pop-up: zuletzt hinzugefügte Lesezeichen verstecken">
 <!ENTITY Ctr_hideeditbm		"Lesezeichen-Stern: Pop-up verstecken (wenn Seite noch kein Lesezeichen ist)">
+<!ENTITY Ctr_oldplacesbut	"Leisten-Lesezeichen: Alte Darstellung">
 <!ENTITY Ctr_bmbutpanelm	"Aufklappmenü: 'Panel'-Darstellung">
-<!ENTITY Ctr_bmbunsortbm	"Aufklappmenü: 'Unsortierte Lesezeichen'-Menü anzeigen">
+<!ENTITY Ctr_bmbunsortbm	"Aufklappmenü: 'Weitere Lesezeichen'-Menü anzeigen">
 <!ENTITY Ctr_bmbunsortbm2	"Menü über den Lesezeichen">
 <!ENTITY Ctr_bmbviewbmsb	"Aufklappmenü: 'Lesezeichen-Seitenleiste' anzeigen">
 <!ENTITY Ctr_bmbviewbmtb	"Aufklappmenü: 'Lesezeichen-Symbolleiste' anzeigen">
-<!ENTITY Ctr_bmbnounsort	"Aufklappmenü: 'Unsortierte Lesezeichen' verstecken">
+<!ENTITY Ctr_bmbnounsort	"Aufklappmenü: 'Weitere Lesezeichen' verstecken">
 <!ENTITY Ctr_bmbutnotext	"Text auch auf der Lesezeichen-Symbolleiste verstecken">
 <!ENTITY Ctr_skipprintpr	"Drucken-Schaltfläche: Druckvorschau überspringen">
 <!ENTITY Ctr_tbconmenu		"Leistenkontextmenü: 'In Menü verschieben', 'Aus Symbolleiste entfernen', 'Alle Tabs neu laden', 'Lesezeichen für alle Tabs hinzufügen …' und 'Geschlossenen Tab wiederherstellen' verstecken">
@@ -211,6 +213,7 @@
 <!ENTITY Ctr_navthrobber2	"Adresse eintragen oder leer lassen">
 <!ENTITY Ctr_anewtaburl		"Seite 'Neuer Tab'">
 <!ENTITY Ctr_anewtaburlcb	"Eigene Seite 'Neuer Tab' (Standard: 'about:newtab')">
+<!ENTITY Ctr_anewtaburlpcb	"Eigene private Seite 'Neuer Tab' (Standard: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Textfelder erlauben Farbnamen sowie hexadezimale, RGB(A)- und HSL(A)-Werte.">
 <!ENTITY Ctr_tab_tf_info2	"Eingegebene Werte werden nicht auf Korrektheit überprüft!">
@@ -274,6 +277,7 @@
 <!ENTITY Ctr_autocompl_sep	"Trennlinie zwischen den Ergebnissen anzeigen">
 <!ENTITY Ctr_urlbar_uc		"'Vereinigte Autovervollständigung' deaktivieren">
 <!ENTITY Ctr_lbsugresi		"Höhenlimit deaktivieren">
+<!ENTITY Ctr_cresultshcb	"Eigenes Höhenlimit setzen: ">
 <!ENTITY Ctr_lbsugres		"Anzahl der Vorschläge">
 <!ENTITY Ctr_lbsbradius		"Benutzerdefinierte Krümmung für Adressleisten- und Suchleistenrand">
 
@@ -299,7 +303,7 @@
 <!ENTITY Ctr_hidetbwot		"Leiste mit nur einem sichtbaren Tab verstecken">
 <!ENTITY Ctr_hidetbwote		"Verzögerung beim Start reduzieren">
 <!ENTITY Ctr_hidetbwote_i	"Hintergrundfarbe der Tableiste könnte fehlerhaft sein.">
-<!ENTITY Ctr_hidetbwote2	"Titelleiste beibehalten (Tabs oben)">
+<!ENTITY Ctr_hidetbwote2	"Titelleistenabstand automatisch anpassen">
 <!ENTITY Ctr_notabfog		"Hintergrundnebel entfernen (Windows Aero Glass / Windows 8)">
 <!ENTITY Ctr_notabbg		"Hintergrundfarbe entfernen (Windows Aero Glass / Windows 8)">
 <!ENTITY Ctr_hightabpos		"Oberen Leistenabstand reduzieren (falls möglich)">
@@ -372,6 +376,8 @@
 <!ENTITY Ctr_fx50findbarhl	"Das Deaktivieren dieser Optionen entfernt die 'Seitensuchhervorhebung'.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
 <!ENTITY Ctr_fx50flyweb		"Das Deaktivieren dieser Option entfernt 'Flyweb'.">
+<!ENTITY Ctr_e_oneoffsearch	"Autovervollständigungs-Pop-ups Suchauswahl">
+<!ENTITY Ctr_fx51OOSeach	"Das Deaktivieren dieser Optionen entfernt die Suchauswahl des Autovervollständigungs-Pop-ups.">
 
 
 <!ENTITY Ctr_pw_settings	"Einstellungen">
@@ -398,6 +404,7 @@
 <!ENTITY goCmd.label					"Los">
 <!ENTITY Ctr_menu_restart.label			"Neustarten">
 <!ENTITY Ctr_restartapp					"'Neustarten'-Eintrag im '&brandShortName;'- und 'Datei-Menü'">
+<!ENTITY Ctr_ctrnewinv					"Neue Einstellungen in aktueller &brandShortName; Version unterstreichen">
 
 <!ENTITY Ctr_openInCurrentTab			"Eingabe im aktiven Tab öffnen">
 <!ENTITY Ctr_openInNewTab				"Eingabe in neuem Tab öffnen">
