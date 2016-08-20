@@ -1,17 +1,15 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-#filter substitution
  
  //Since the beta does not have a release notes page we will disable this.
 pref("startup.homepage_override_url","");
 pref("startup.homepage_welcome_url","");
 pref("startup.homepage_welcome_url.additional", "");
 
-//We have no manual update url.
-pref("app.update.url.manual", ""); 
-pref("app.update.url.details", "");
+//We have a manual update url.
+pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com#selection"); 
+pref("app.update.url.details", "https://cyberfox.8pecxstudios.com#selection");
 
 pref("app.update.check.url", "https://download.8pecxstudios.com/current_version/update.json");
 // app.update.channel.type:
