@@ -52,6 +52,7 @@ Source: "{content}\browser\{#PackageType}\plugin-hang-ui.exe"; DestDir: "{app}";
 Source: "{content}\browser\{#PackageType}\precomplete"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\removed-files"; DestDir: "{app}"; Flags: ignoreversion
 #if PackageType == "amd86" || PackageType == "amd64" || PackageType == "intel86" || PackageType == "intel64"
+Source: "{content}\browser\{#PackageType}\qipcap*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\sandboxbroker.dll"; DestDir: "{app}"; Flags: ignoreversion
 #endif
 Source: "{content}\browser\{#PackageType}\SHA512SUMS"; DestDir: "{app}"; Flags: ignoreversion
