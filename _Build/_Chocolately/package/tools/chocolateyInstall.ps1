@@ -1,6 +1,6 @@
 $packageName = 'cyberfox'
 $installerType = 'exe'
-$version = '47.0.1'
+$version = '48.0.2'
 $url = "https://8pecxstudios.com/download/latest/Cyberfox-${version}.en-US.win32.intel.exe"
 $url64 = "https://8pecxstudios.com/download/latest/Cyberfox-${version}.en-US.win64-x86_64.intel.exe"
 $silentArgs = '/VERYSILENT'

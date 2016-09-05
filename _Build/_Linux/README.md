@@ -23,7 +23,7 @@ Now `clone` the release repository
 
 Once it has finished downloaded you need to *set the folder permissions*, The reason for this is its inheriting git servers file permissions, In the terminal type
 
-```chmod -R 777 cyberfox```
+```chmod -R 755 cyberfox```
 
 Then press enter.
 
@@ -83,7 +83,7 @@ The reason for this is its inheriting git servers file permissions, if your insi
 
 This will take you up one directory then in the terminal type
 
-```chmod -R 777 cyberfox```
+```chmod -R 755 cyberfox```
 
 Then press enter, Now the permissions have be set to you, Now just `cd` back in to `cyberfox directory`
 
@@ -130,11 +130,11 @@ IDENTITY_BRANDING_INTEL=
 
 Here is a quick build script for cyberfox on Linux that will expand over time, This will allow you to automate most of the manual tasks mentioned above.
 
-Script version: *2.2*
+Script version: *2.3*
 
 ```bash
 # Cyberfox quick build script
-# Version: 2.2
+# Version: 2.3
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -190,8 +190,8 @@ function setHomeStyle(){
 
 # Set chmod permissons.
 function setPerms(){
-	echo "Changing chmod of $1 to 777"
-	chmod -R 777 $1
+	echo "Changing chmod of $1 to 755"
+	chmod -R 755 $1
 }
 
 # Add changing directory information to console.
@@ -223,34 +223,22 @@ function testConnection(){
 # Generate buildconfig.html source information.
 function GenerateBuildInfo(){
 	echo "Setting source code information!"
-	timestamp=$(date +%F_%T)
-	configFile=$WORKDIR/$1/toolkit/content/buildconfig.html
-	if grep -q -E "__SOURCEURL__|__SOURCEURLNAME__|__HASHSUM__|__GITURL__" "$configFile" ; then  
-	  sed -i.$timestamp.bak "s|__SOURCEURL__|$2|" $configFile
-	  sed -i "s|__SOURCEURLNAME__|$3|" $configFile
+	TIMESTAMP=$(date +%F_%T)
+	CONFIGFILE=$WORKDIR/$1/toolkit/content/buildconfig.html
+	if grep -q -E "__SOURCEURL__|__SOURCEURLNAME__|__HASHSUM__|__GITURL__" "$CONFIGFILE" ; then  
+	  sed -i.$TIMESTAMP.bak "s|__SOURCEURL__|$2|" $CONFIGFILE
+	  sed -i "s|__SOURCEURLNAME__|$3|" $CONFIGFILE
 		if testConnection; then
 		  echo "Getting HASHSUN information from source code this may take a few minutes depending on internet connection!"	
-		  online_sha512=$(curl -s $2 | sha512sum | awk '{print $1}')
-		  sed -i "s|__HASHSUM__|$online_sha512|" $configFile
+		  ONLINE_SHA512=$(curl -s $2 | sha512sum | awk '{print $1}')
+		  sed -i "s|__HASHSUM__|$ONLINE_SHA512|" $CONFIGFILE
 		else
-		  sed -i "s|SHA512:__HASHSUM__|Failed to generate SHA512|" $configFile
+		  sed -i "s|SHA512:__HASHSUM__|Failed to generate SHA512|" $CONFIGFILE
 		fi	
-	  sed -i "s|__GITURL__|$4|g" $configFile
+	  sed -i "s|__GITURL__|$4|g" $CONFIGFILE
 	  else
 	  	echo "Source code information appears to be generated check if needs updating!"	
 	fi
-}
-
-# Apply unity patch to locally downloaded repository.
-function ApplyUnity(){
-    if [ -f $WORKDIR/unity-menubar-$1.patch ]; then		
-        git apply $WORKDIR/unity-menubar-$1.patch
-        changeDirectory $WORKDIR
-        setPerms $LDIR
-        UNITY=true
-    else
-        echo "Unable to find '$WORKDIR/unity-menubar-$1.patch' unity patch skipping unity edition!"
-    fi; 
 }
 
 # Set working directory default is ~/Documents
@@ -263,7 +251,6 @@ WORKDIR=~/Documents
 GITURI=""
 IDENTITY=""
 LDIR=""
-UNITY=false
 
   echo "What package do you wish to build?"
   select answer in "Release" "Beta" "Quit"; do
@@ -340,41 +327,6 @@ done
 # Set CyberCTR default start page style.
 setHomeStyle $IDENTITY
 
-echo "Do you wish to apply unity patch?"
-VERSON=$(<$WORKDIR/$LDIR/browser/config/version.txt)
-select yn in "Yes" "No" "Quit"; do
-    case $yn in
-        Yes )	  	
-		echo "Do you wish to test unity patch?"
-		select yn in "Yes" "No"; do
-		    case $yn in
-		      Yes )
-                if [ -f $WORKDIR/unity-menubar-$VERSON.patch ]; then		
-                        git apply --check $WORKDIR/unity-menubar-$VERSON.patch
-                fi; 
-                echo "Do you wish to apply unity patch?"
-                select yn in "Yes" "No"; do
-                    case $yn in
-                        Yes ) 
-                            ApplyUnity $VERSON 
-                        break;;
-                        No ) break;;
-                    esac
-                done
-              break;;
-		      No ) 
-                  ApplyUnity $VERSON 
-              break;;
-		    esac
-		done
-	  break;;
-        No ) break;;
-	  "Quit" )
-			exit 0
-		break;;
-    esac
-done
-
 echo "Do you wish to build $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
     case $yn in
@@ -433,35 +385,45 @@ select yn in "Yes" "No" "Quit"; do
 	  changeDirectory "$WORKDIR/obj64/dist"
            
 	  # Get the current filename with browser version!
-	  filename=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
+	  FILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
 	  
-	    if [ -f $filename ]; then
-	      echo "Packaging: Found $filename removing file!"
-	      rm -f $filename
+	    if [ -f $FILENAME ]; then
+	      echo "Packaging: Found $FILENAME removing file!"
+	      rm -f $FILENAME
 	    fi
         
 	  	# Generate compiled files hashsums (SHA512).  
         echo "Generating file hashes, Please wait!"
         find Cyberfox -type f -print0 | xargs -0 sha512sum  > Cyberfox/SHA512SUMS.chk
 
-        echo "Packaging: Now re-packaging Cyberfox into $filename!"
+        echo "Packaging: Now re-packaging Cyberfox into $FILENAME!"
 		if [ -f README.txt ]; then
-			echo "Packaging: Adding README into $filename!"
-		  	tar cvfj $filename Cyberfox README.txt; 
+			echo "Packaging: Adding README into $FILENAME!"
+		  	tar cvfj $FILENAME Cyberfox README.txt; 
 		else
-			echo "Packaging: README not added into $filename!"
-			tar cvfj $filename Cyberfox;
+			echo "Packaging: README not added into $FILENAME!"
+			tar cvfj $FILENAME Cyberfox;
 		fi
-        
-	  if $UNITY ; then	
-	    echo "Packaging: Renaming unity package!"  	
-	  	mv $filename $(echo $filename | sed 's/.tar.bz2/-Unity-Edition.tar.bz2/g');
-	  fi;
 
 	  if [ "$IDENTITY" == "Beta" ]; then
 	    echo "Packaging: Renaming beta package!"
-	    name=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)  	
-	  	mv $filename "Cyberfox-$name.en-US.linux-x86_64.beta.tar.bz2";
+	    VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)  	
+	  	mv $FILENAME "Cyberfox-$VERSION.en-US.linux-x86_64.beta.tar.bz2";
+
+		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then
+		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI;
+
+				# Get the current deb filename with browser version to rename it!
+	  			DEBFILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.deb)
+				mv $DEBFILENAME "Cyberfox-$VERSION.en-US.linux-x86_64.beta.deb";
+		  fi
+
+	  else
+
+		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then
+		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI;
+		  fi 
+
 	  fi
 
 	  else
@@ -501,7 +463,7 @@ Then asks you if you would like to download the latest build files for the first
 
 It will automatically set the branding identity to Linux so not need to edit that file manually
 
-It will then change the permissions to *777*
+It will then change the permissions to *755*
 
 Then prompt to build cyberfox
 It will check if a existing obj64 directory then prompt if you would like to remove it
@@ -510,7 +472,7 @@ If you don't remove the old build output it will want to do a clobber build you 
 
 If cyberfox repository does not exist then it will clone the repository in the __$WORKDIR__
 
-It will then change the permissions to *777*
+It will then change the permissions to *755*
 
 It will automatically set the branding identity to Linux so not need to edit that file manually
 
@@ -535,7 +497,7 @@ When you download this file you can run it form anywhere however you will need t
 
 so you would cd in to the directory its contained in then type
 
-```chmod -R 777 build_cyberfox.sh```
+```chmod -R 755 build_cyberfox.sh```
 
 Then your all set.
 
@@ -546,4 +508,4 @@ To use the script just open the terminal then supply the path to it for example
 ```
 
 Note: Don't edit build_cyberfox.sh on windows as windows adds \r or \r\n to line endings to assimilate carriage returns this will just cause error messages in the script or cause it not to work
-unless using a good text editor i.e notepad++.
+unless using a good text editor i.e notepad++, VSCODE.

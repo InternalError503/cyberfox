@@ -51,8 +51,8 @@ Source: "{content}\browser\{#PackageType}\plugin-container.exe"; DestDir: "{app}
 Source: "{content}\browser\{#PackageType}\plugin-hang-ui.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\precomplete"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\removed-files"; DestDir: "{app}"; Flags: ignoreversion
-#if PackageType == "amd86" || PackageType == "amd64" || PackageType == "intel86" || PackageType == "intel64"
 Source: "{content}\browser\{#PackageType}\qipcap*.dll"; DestDir: "{app}"; Flags: ignoreversion
+#if PackageType == "amd86" || PackageType == "amd64" || PackageType == "intel86" || PackageType == "intel64"
 Source: "{content}\browser\{#PackageType}\sandboxbroker.dll"; DestDir: "{app}"; Flags: ignoreversion
 #endif
 Source: "{content}\browser\{#PackageType}\SHA512SUMS"; DestDir: "{app}"; Flags: ignoreversion
@@ -62,7 +62,7 @@ Source: "{content}\browser\{#PackageType}\softokn3.dll"; DestDir: "{app}"; Flags
 Source: "{content}\browser\{#PackageType}\ucrtbase.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\vcruntime*.dll"; DestDir: "{app}"; Flags: ignoreversion
 #endif
-#if PackageType == "amd86" || PackageType == "amd64" && False == VS2015
+#if PackageType == "amd86" || PackageType == "amd64"
 Source: "{content}\browser\{#PackageType}\vcomp*.dll"; DestDir: "{app}"; Flags: ignoreversion
 #endif
 Source: "{content}\browser\{#PackageType}\xul.dll"; DestDir: "{app}"; Flags: ignoreversion

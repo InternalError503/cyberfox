@@ -1,0 +1,3 @@
+Cyberfox binary: embedded-library usr/lib/Cyberfox/libxul.so: libjpeg
+Cyberfox binary: embedded-library usr/lib/Cyberfox/libmozsqlite3.so: sqlite
+Cyberfox binary: image-file-in-usr-lib

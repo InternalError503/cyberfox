@@ -1,0 +1,1 @@
+Place Cyberfox plugins in this directory (Flash, Shockwave, etc)

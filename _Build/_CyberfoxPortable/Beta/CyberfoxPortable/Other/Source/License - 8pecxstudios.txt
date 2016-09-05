@@ -1,0 +1,40 @@
+﻿SOFTWARE DISTRIBUTION AGREEMENT
+
+IMPORTANT - PLEASE READ THESE TERMS CAREFULLY BEFORE APPLYING FOR, ACCEPTING, OR USING 8pecxstudios Cyberfox. BY USING, APPLYING FOR, OR ACCEPTING THE SERVICES OR BY DISTRIBUTING THIS SOFTWARE PROGRAM, YOU ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT, THAT YOU UNDERSTAND IT, AND THAT YOU AGREE TO BE BOUND BY ITS TERMS. IF YOU DO NOT AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT, DO NOT APPLY FOR, ACCEPT, OR USE 8pecxstudios Cyberfox.
+
+1. LICENSE RIGHTS; TERMS AND CONDITIONS
+
+1.1. License. Subject to the terms and conditions herein, 8pecxstudios grants Distributor a royalty-free, non-transferable, non-exclusive, and world-wide right license to make copies of and distribute 8pecxstudios Cyberfox ("Software") via Distributor's normal distribution avenues, including web site, magazine, book, DVD, or CD. This license is free of charge to Distributor.
+
+1.2. No Right to Create Derivative Works. Distributor may not create derivative works or make modifications to the Software except to bundle the Software with Distributor's other products or services.
+
+1.3. Trademarks. Distributor is granted a limited license to 8pecxstudios's trademarks to distribute Software. Use of 8pecxstudios's trademarks shall inure to the sole benefit of 8pecxstudios. Distributor may not alter or add to any of 8pecxstudios's trademarks or incorporate 8pecxstudios's trademarks into Distributor's own trademarks, product names, service marks, company names, slogans, domain names or use the 8pecxstudios trademark to market other software or services that could cause customer confusion or dilute 8pecxstudios's trademarks.
+
+1.4. Ownership. No ownership rights are granted herein. 8pecxstudios shall retain all rights, title, and interest in the Software and all associated intellectual property.
+
+1.5. Access. Distributor may not use the Software to develop or manufacture goods or services which compete with Software. This Agreement does not preclude Distributor from independently developing similar technologies or products without reference to the Software.
+
+1.6. Updates. 8pecxstudios is under no obligation to provide any updates to the Software or to make available any updates created. If updates are made available then Distributor shall have the same licenses, rights, and obligations to the Updates as with the original Software.
+
+1.7. Support. 8pecxstudios is under no obligation to provide support or technical help services for the Software. All Software distributed by Distributor is provided on an "as is" basis.
+
+1.8. Compliance with Laws. Distributor shall be exclusively responsible for compliance with all laws pertaining to its distribution of the Software.
+
+2. TERM AND TERMINATION
+
+2.1. Term. This Agreement will become effective upon the Effective Date, and will remain in force for a period of three (3) years (the "Term"), unless otherwise terminated as provided herein. Upon Expiration of the Term or a Renewal Term (as defined herein) of this Agreement, this Agreement shall automatically renew for an additional one-year term (a "Renewal Term").
+
+2.2. Termination. Either party may prematurely terminate this Agreement at any time and for any reason by providing at least sixty (60) days written notice. Either party may terminate this Agreement immediately if the other commits a material breach of this Agreement.
+
+2.3. Effect of Termination.
+(a) Licenses Terminated. The licenses and rights granted herein will terminate immediately. Distributor shall discontinue distribution of Software.
+(b) Return or Destruction of Information. Distributor shall return all Software in its possession to 8pecxstudios or destroy all Software in Distributor's possession. Distributor shall immediately cease all use of 8pecxstudios trademarks and immediately discontinue all representations or statements from which it might be inferred that any relationship exists between Distributor and 8pecxstudios.
+(c) Continued Use by End-User. Software distributed to end-users prior to the effective date of termination shall continue in accordance with their terms and conditions of the applicable subscriber agreement.
+
+3. WARRANTIES
+
+3.1. TO THE MAXIMUM EXTENT ALLOWED BY LAW, ALL WARRANTIES EITHER EXPRESSED OR IMPLIED, INCLUDING WITHOUT LIMITATION, WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE, ARE HEREBY EXCLUDED TO THE FULLEST EXTENT PERMISSIBLE BY LAW.
+
+4. LIMITATION ON LIABILITY
+
+4.1. 8PECXSTUDIOS DISCLAIMS ALL LIABILITY FOR ITS SOFTWARE. IN NO EVENT SHALL 8PECXSTUDIOS OR ITS AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL DAMAGES EVEN IF 8PECXSTUDIOS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. TO THE EXTENT THAT A STATE DOES NOT PERMIT THE EXCLUSION OR LIMITATION OF LIABILITY AS SET FORTH HEREIN, 8PECXSTUDIOS'S LIABILITY IS LIMITED TO THE FULL EXTENT PERMITTED BY LAW IN SUCH STATE. UNDER NO CIRCUMSTANCES WILL 8PECXSTUDIOS BE LIABLE ANY LOSS SUFFERED DUE TO USE OF SOFTWARE BY DISTRIBUTOR OR A THIRD PARTY.
