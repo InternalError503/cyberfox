@@ -15,10 +15,12 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
   "resource://gre/modules/AppConstants.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
-  "resource://gre/modules/PrivateBrowsingUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AutoMigrate",
+  "resource:///modules/AutoMigrate.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "fxAccounts",
   "resource://gre/modules/FxAccounts.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils",
+  "resource://gre/modules/PrivateBrowsingUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Promise",
   "resource://gre/modules/Promise.jsm");
 
@@ -37,6 +39,7 @@ var AboutHome = {
     "AboutHome:Sync",
     "AboutHome:Settings",
     "AboutHome:RequestUpdate",
+    "AboutHome:MaybeShowAutoMigrationUndoNotification",
   ],
 
   init: function() {
@@ -95,6 +98,10 @@ var AboutHome = {
       case "AboutHome:RequestUpdate":
         this.sendAboutHomeData(aMessage.target);
         break;
+
+      case "AboutHome:MaybeShowAutoMigrationUndoNotification":
+        AutoMigrate.maybeShowUndoNotification(aMessage.target);
+        break;
     }
   },
 
@@ -120,5 +127,6 @@ var AboutHome = {
     }).then(null, function onError(x) {
       Cu.reportError("Error in AboutHome.sendAboutHomeData: " + x);
     });
-  }
+  },
+
 };

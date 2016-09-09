@@ -3481,6 +3481,10 @@ var gDetailView = {
       timeout = null;
 
       let doc = browser.contentDocument;
+      if (!doc) {
+        return;
+      }
+
       let body = doc.body || doc.documentElement;
 
       let docHeight = doc.documentElement.getBoundingClientRect().height;

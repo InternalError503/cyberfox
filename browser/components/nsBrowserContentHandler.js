@@ -715,6 +715,17 @@ nsDefaultCommandLineHandler.prototype = {
 
   /* nsICommandLineHandler */
   handle : function dch_handle(cmdLine) {
+    // The -url flag is inserted by the operating system when the default
+    // application handler is used. We check for default browser to remove
+    // instances where users explicitly decide to "open with" the browser.
+    // Note that users who launch firefox manually with the -url flag will
+    // get erroneously counted.
+    try {
+      if (cmdLine.findFlag("url", false) &&
+          ShellService.isDefaultBrowser(false, false)) {
+      }
+    } catch (e) {}
+
     var urilist = [];
 
     if (AppConstants.platform == "win") {

@@ -4,7 +4,4 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "cleaninstall"; Description: "{cm:CleanInstallDescription}"; GroupDescription: "{cm:CleanInstallGroupDescription}"; Flags: dontinheritcheck unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 Name: "cyberctr"; Description: "{cm:CyberCTRInstallDescription}"; GroupDescription: "{cm:SystemAddonsGroupDescription}"
-#if True == HasLoop
-Name: "loop"; Description: "{cm:LoopInstallDescription}"; GroupDescription: "{cm:SystemAddonsGroupDescription}"; Flags: unchecked
-#endif
 Name: "pocket"; Description: "{cm:PocketInstallDescription}"; GroupDescription: "{cm:SystemAddonsGroupDescription}"; Flags: unchecked

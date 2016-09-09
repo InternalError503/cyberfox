@@ -19,7 +19,7 @@
 <overlay id="AdvancedPaneOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <prefpane id="paneAdvanced" onpaneload="gAdvancedPane.init();">
+  <prefpane id="paneAdvanced"  helpTopic="prefs-advanced-general" onpaneload="gAdvancedPane.init();">
 
     <preferences id="advancedPreferences">
       <preference id="browser.preferences.advanced.selectedTabIndex"
@@ -80,9 +80,6 @@
 						   type="bool"/>
 	  <preference id="app.update.check.enabled" 
 						   name="app.update.check.enabled" 
-						   type="bool"/>
-	  <preference id="loop.enabled" 
-						   name="loop.enabled" 
 						   type="bool"/>
  	  <preference id="browser.tabs.copyallurls" 
 						   name="browser.tabs.copyallurls" 
@@ -503,9 +500,6 @@
 			<groupbox id="alternateOptionsSystem" orient="vertical">
 				<caption label="&systemaddons.label;"/>
 				<label>&systemaddonsmsg.label;</label>
- 					<checkbox id="loop.enabled" label="&enablehellochat.label; (&restartRequiredMSG.label;)"
-							preference="loop.enabled" 
-							tooltiptext="&restartRequiredMSG.label;" />
  					<checkbox id="extensions.pocket.enabled" label="&enablepocket.label;"
 							preference="extensions.pocket.enabled" />							
 			</groupbox>

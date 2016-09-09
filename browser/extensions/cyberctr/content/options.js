@@ -176,7 +176,6 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_okbutton').style.display = 'block';
 		document.getElementById('ctraddon_pw_okbutton').disabled = false;
 	}
-		
 	
 	// Custom search bar width
 	if (this.prefs.getBoolPref("customsearchbarwidth")){
@@ -458,6 +457,7 @@ classicthemerestorerjso.ctr = {
 
 	if (this.appversion < 51) {
 	  document.getElementById('ctraddon_pw_oneoffsearchgb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_hideurlzoom').style.visibility = 'collapse';
 	}
 	
 	function PrefListener(branch_name, callback) {

@@ -61,11 +61,7 @@ this.AppConstants = Object.freeze({
 #endif
 
   MOZ_SERVICES_HEALTHREPORT:
-#ifdef MOZ_SERVICES_HEALTHREPORT
-  true,
-#else
   false,
-#endif
 
   MOZ_DATA_REPORTING:
 #ifdef MOZ_DATA_REPORTING
@@ -89,18 +85,10 @@ this.AppConstants = Object.freeze({
 #endif
 
   MOZ_TELEMETRY_REPORTING:
-#ifdef MOZ_TELEMETRY_REPORTING
-  true,
-#else
   false,
-#endif
 
   MOZ_TELEMETRY_ON_BY_DEFAULT:
-#ifdef MOZ_TELEMETRY_ON_BY_DEFAULT
-  true,
-#else
   false,
-#endif
 
   MOZ_SERVICES_CLOUDSYNC:
 #ifdef MOZ_SERVICES_CLOUDSYNC
@@ -110,11 +98,7 @@ this.AppConstants = Object.freeze({
 #endif
 
   MOZ_UPDATER:
-#ifdef MOZ_UPDATER
-  true,
-#else
   false,
-#endif
 
   MOZ_SWITCHBOARD:
 #ifdef MOZ_SWITCHBOARD
@@ -242,11 +226,7 @@ this.AppConstants = Object.freeze({
 #endif
 
   MOZ_REQUIRE_SIGNING:
-#ifdef MOZ_REQUIRE_SIGNING
-  true,
-#else
   false,
-#endif
 
   MENUBAR_CAN_AUTOHIDE:
 #ifdef MENUBAR_CAN_AUTOHIDE

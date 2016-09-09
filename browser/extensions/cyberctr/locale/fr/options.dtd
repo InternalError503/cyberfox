@@ -1,7 +1,7 @@
 <!ENTITY % overlayDTD
     SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
   %overlayDTD;
-<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+<!-- Ne pas éditer au-dessus de cette ligne, et ne pas modifier la variable « &brandShortName; » à l'intérieur des chaînes de caractères traduites -->
 
 <!ENTITY Ctr_title			"Personnaliser &brandShortName;">
 
@@ -74,7 +74,7 @@
 
 <!ENTITY Ctr_hctpinfotab	"Certains styles d’onglets sont incompatibles avec le module « Hide Caption Titlebar Plus ».">
 <!ENTITY Ctr_hctpinfoab		"Le bouton sur la barre de titre est incompatible avec le module « Hide Caption Titlebar Plus ».">
-<!ENTITY Ctr_tobainfotab	"The add-on 'Tabs on Bottom' is not compatible with '&Ctr_title;' and should be disabled. Use available '&Ctr_cuitabsnontop;' settings instead!">
+<!ENTITY Ctr_tobainfotab	"Le module « Tabs on Bottom » n'est pas compatible avec « &Ctr_title; » et devrait être désactivé. Utilisez les paramètres « &Ctr_cuitabsnontop; » disponibles à la place !">
 
 <!ENTITY Ctr_appbutton		"Bouton &brandShortName;">
 <!ENTITY Ctr_appbutton0		"Bouton désactivé">
@@ -187,7 +187,7 @@
 <!ENTITY Ctr_bmbutton		"Bouton marque-pages">
 <!ENTITY Ctr_hiderecentbm	"Popup marque-pages : masquer le groupe « marqués récemment »">
 <!ENTITY Ctr_hideeditbm		"Étoile des marque-pages : masquer le menu déroulant (si la page n'a pas été marquée)">
-<!ENTITY Ctr_oldplacesbut	"Bookmarks on toolbar: old appearance">
+<!ENTITY Ctr_oldplacesbut	"Éléments et dossiers de marque-pages sur une barre d'outil : ancienne apparence">
 <!ENTITY Ctr_bmbutpanelm	"Menu déroulant : apparence de menu de type « panneau »">
 <!ENTITY Ctr_bmbunsortbm	"Popup : sous menu des « marque-pages non triés »">
 <!ENTITY Ctr_bmbunsortbm2	"Menu au-dessus des marque-pages">
@@ -250,6 +250,7 @@
 <!ENTITY Ctr_urlbardropm	"Placer le dropmarker en dernier">
 <!ENTITY Ctr_urlbardropm2	"Dropmarker toujours visible">
 <!ENTITY Ctr_altreaderico	"Autres icônes du « lecteur »">
+<!ENTITY Ctr_hideurlzoom	"Masquer le bouton de zoom (si présent)">
 <!ENTITY Ctr_hideprbutton	"Masquer l’icône de notification quand un popup est bloqué">
 <!ENTITY Ctr_locsearchbw10	"Réduire la hauteur de la barre d’adresse et la barre de recherche (expérimental)">
 <!ENTITY Ctr_urlbar_ib		"Bouton d’identité du site">
@@ -303,7 +304,7 @@
 <!ENTITY Ctr_hidetbwot		"Masquer la barre d’onglets quand un seul onglet est ouvert">
 <!ENTITY Ctr_hidetbwote		"Diminuer le délai pour masquer la barre au démarrage">
 <!ENTITY Ctr_hidetbwote_i	"Peut causer des disfonctionnements dans la barre d’onglets">
-<!ENTITY Ctr_hidetbwote2	"Automatically adjust titlebar space">
+<!ENTITY Ctr_hidetbwote2	"Ajuster automatiquement l'espace de la barre de titre">
 <!ENTITY Ctr_notabfog		"Enlever l’effet de flou (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_notabbg		"Enlever l’arrière-plan (Windows AeroGlass / Win8)">
 <!ENTITY Ctr_hightabpos		"Réduire l’espace en haut (si possible)">
@@ -362,20 +363,16 @@
 
 <!ENTITY Ctr_experttweaks	"Avancé">
 <!ENTITY Ctr_fx34loop		"Si ce paramètre est décoché, les fonctions d’appels et de conversations sont désactivées.">
-<!ENTITY Ctr_fx38reader		"Si ce paramètre est décoché, le « mode lecture » est desactivé et son icône est retirée de la barre d’adresse.">
 <!ENTITY Ctr_fx38pocket		"Si ce paramètre est décoché, « Pocket » est desactivé et son bouton retiré des barres d’outils.">
 <!ENTITY Ctr_fx38pocket2	"Note: Déplacer le bouton « Pocket » vers la fenêtre de personnalisation avant de désactiver cette option, permet également de l’enlever des marques pages et du menu de lecture.">
 <!ENTITY Ctr_e_loop			"Appel et conversation">
 <!ENTITY Ctr_e_readermode	"Mode de lecture d’articles">
 <!ENTITY Ctr_e_pocket		"Sac de rangement (« Pocket »)">
 <!ENTITY Ctr_e_tabsaudioico	"Icône de lecture audio sur les onglets">
-<!ENTITY Ctr_fx42tabsaudico	"Décocher cette préférence pour ne plus afficher d’icône audio sur les onglets.">
 <!ENTITY Ctr_e_containertab	"Onglets conteneurs">
-<!ENTITY Ctr_fx50containert	"Décocher ce paramètre désactive les onglets conteneurs.">
 <!ENTITY Ctr_e_findbarhl	"Surlignage avancé de la barre de recherche">
 <!ENTITY Ctr_fx50findbarhl	"Décocher ces paramètres désactive les fonctionnalités avancées de surlignage de la barre de recherche.">
 <!ENTITY Ctr_e_flyweb		"FlyWeb">
-<!ENTITY Ctr_fx50flyweb		"Décocher ce paramètre désactive « FlyWeb ».">
 <!ENTITY Ctr_e_oneoffsearch	"Sélection de recherche des fenêtres surgissantes d'autocomplétion">
 <!ENTITY Ctr_fx51OOSeach	"Décocher ce paramètre retire la sélection de recherche des fenêtres surgissantes de la barre de navigation.">
 
@@ -404,20 +401,20 @@
 <!ENTITY goCmd.label					"Aller à">
 <!ENTITY Ctr_menu_restart.label			"Redémarrer">
 <!ENTITY Ctr_restartapp					"« Redémarrer » dans le menu &brandShortName; et le menu Fichier">
-<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
+<!ENTITY Ctr_ctrnewinv					"Souligner les nouvelles options de la version actuelle de &brandShortName;">
 
 <!ENTITY Ctr_openInCurrentTab			"Ouvrir les entrées dans l'onglet actuel">
 <!ENTITY Ctr_openInNewTab				"Ouvrir les entrées dans un nouvel onglet">
 <!ENTITY Ctr_openInNewWindow			"Ouvrir les entrées dans une nouvelle fenêtre">
 
-<!-- For page context entries. Have to be adjusted for every locale! -->
+<!-- Pour les entrées contextuelles des pages. Doivent être adaptées pour chaque langue ! -->
 <!ENTITY backCmd.accesskey				"d">
 <!ENTITY forwardCmd.accesskey			"a">
 <!ENTITY reloadCmd.accesskey			"c">
 <!ENTITY stopCmd.accesskey				"r">
 <!ENTITY bookmarkPageCmd2.accesskey		"M">
 
-<!-- Fallback entities. Leave empty! -->
+<!-- Entitées de secours. Laisser vide ! -->
 <!ENTITY openCmd.commandkey				"">
 <!ENTITY urlbar.accesskey				"">
 <!ENTITY urlbar.placeholder2			"">

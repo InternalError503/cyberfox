@@ -88,9 +88,6 @@
 	  <preference id="app.update.check.enabled" 
 						   name="app.update.check.enabled" 
 						   type="bool"/>
-	  <preference id="loop.enabled" 
-						   name="loop.enabled" 
-						   type="bool"/>
 	  <preference id="browser.tabs.copyallurls" 
 						   name="browser.tabs.copyallurls" 
 						   type="bool"/>  
@@ -277,7 +274,7 @@
 #ifdef MOZ_DATA_REPORTING
     <!-- Data Choices -->
     <tabpanel id="dataChoicesPanel" orient="vertical">
-#ifdef MOZ_SERVICES_HEALTHREPORT
+#ifdef MOZ_TELEMETRY_REPORTING
       <groupbox>
         <caption>
           <checkbox id="submitHealthReportBox" label="&enableHealthReport.label;"
@@ -290,7 +287,6 @@
             <label id="FHRLearnMore"
                    class="text-link">&healthReportLearnMore.label;</label>
           </hbox>
-#ifdef MOZ_TELEMETRY_REPORTING
           <hbox class="indent">
             <groupbox flex="1">
               <caption>
@@ -306,7 +302,6 @@
               </hbox>
             </groupbox>
           </hbox>
-#endif
         </vbox>
       </groupbox>
 #endif
@@ -363,7 +358,6 @@
             &limitCacheSizeBefore.label;
           </label>
           <textbox id="cacheSize" type="number" size="4" max="1024"
-                   onchange="gAdvancedPane.updateCacheSizePref();"
                    aria-labelledby="useCacheBefore cacheSize useCacheAfter"/>
           <label id="useCacheAfter" flex="1">&limitCacheSizeAfter.label;</label>
         </hbox>
@@ -416,14 +410,6 @@
                  value="auto"
                  label="&updateAuto1.label;"
                  accesskey="&updateAuto1.accesskey;"/>
-          <hbox class="indent">
-            <checkbox id="warnIncompatible"
-                      label="&updateAutoAddonWarn.label;"
-                      accesskey="&updateAutoAddonWarn.accesskey;"
-                      preference="app.update.mode"
-                      onsyncfrompreference="return gAdvancedPane.readAddonWarn();"
-                      onsynctopreference="return gAdvancedPane.writeAddonWarn();"/>
-          </hbox>
           <radio value="checkOnly"
                 label="&updateCheck.label;"
                 accesskey="&updateCheck.accesskey;"/>
@@ -530,10 +516,6 @@
 			<!-- System Addons -->
 			<groupbox id="alternateOptionsSystem" orient="vertical">
 				<caption label="&systemaddons.label;"/>
-				<label>&systemaddonsmsg.label;</label>
- 					<checkbox id="loop.enabled" label="&enablehellochat.label; (&restartRequiredMSG.label;)"
-							preference="loop.enabled" 
-							tooltiptext="&restartRequiredMSG.label;" />	
  					<checkbox id="extensions.pocket.enabled" label="&enablepocket.label;"
 							preference="extensions.pocket.enabled" />
 			</groupbox>

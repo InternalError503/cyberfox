@@ -7,7 +7,7 @@
 .header-icon {
   width: 40px;
   max-height: 40px;
-  -moz-margin-end: 20px;
+  margin-inline-end: 20px;
   list-style-image: url("chrome://global/skin/in-content/header.png");
 }
 

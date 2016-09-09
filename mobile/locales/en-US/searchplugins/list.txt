@@ -1,7 +1,6 @@
 amazondotcom
 bing
 duckduckgo
-eBay
 google
 google-nocodes
 ixquick

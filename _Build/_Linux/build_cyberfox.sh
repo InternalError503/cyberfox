@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.3
+# Version: 2.4
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -97,6 +97,7 @@ function GenerateBuildInfo(){
 		  echo "Getting HASHSUN information from source code this may take a few minutes depending on internet connection!"	
 		  ONLINE_SHA512=$(curl -s $2 | sha512sum | awk '{print $1}')
 		  sed -i "s|__HASHSUM__|$ONLINE_SHA512|" $CONFIGFILE
+			echo "$ONLINE_SHA512" >> "$WORKDIR/$LDIR/sourcesha512"
 		else
 		  sed -i "s|SHA512:__HASHSUM__|Failed to generate SHA512|" $CONFIGFILE
 		fi	
@@ -105,6 +106,27 @@ function GenerateBuildInfo(){
 	  	echo "Source code information appears to be generated check if needs updating!"	
 	fi
 }
+
+# Apply unity patch to locally downloaded repository.
+function ApplyUnity(){
+
+	# Download pacth if not exist
+	if [ ! -f "$WORKDIR/unity-menubar-$1.patch" ]; then
+		# Check url mext release for changes.	
+		wget -O $WORKDIR/unity-menubar-$1.patch 'https://bazaar.launchpad.net/~mozillateam/firefox/firefox.trusty/download/head:/unitymenubar.patch-20130215095938-1n6mqqau8tdfqwhg-1/unity-menubar.patch'
+	fi
+
+	# Apply patch if exists
+    if [ -f "$WORKDIR/unity-menubar-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/unitylock" ]; then		
+        git apply $WORKDIR/unity-menubar-$1.patch
+				echo >> "$WORKDIR/$LDIR/unitylock"
+        changeDirectory $WORKDIR
+        setPerms $LDIR
+    else
+        echo "Unable to find '$WORKDIR/unity-menubar-$1.patch' unity patch! or patch has already been applied!"
+    fi; 
+}
+
 
 # Set working directory default is ~/Documents
 WORKDIR=~/Documents
@@ -116,6 +138,7 @@ WORKDIR=~/Documents
 GITURI=""
 IDENTITY=""
 LDIR=""
+VERSION=""
 
   echo "What package do you wish to build?"
   select answer in "Release" "Beta" "Quit"; do
@@ -152,26 +175,26 @@ select yn in "Yes" "No" "Quit"; do
         Yes )	  
 	  if [ -d "$LDIR" ]; then
 	      changeDirectory $LDIR
-	    echo "Auto purge uncommited untracked changes"
+	    	echo "Auto purge uncommited untracked changes"
 	      git reset --hard
-	    echo "Cloning latest cyberfox source files"
+	    	echo "Cloning latest cyberfox source files"
 	      git pull
-			setIdentity $IDENTITY
+				setIdentity $IDENTITY
 	      changeDirectory ".."
-	      	setPerms $LDIR
+	      setPerms $LDIR
 	      changeDirectory $LDIR
 	  		VERSION=$(<$WORKDIR/$LDIR/browser/config/version.txt)	
 		    GenerateBuildInfo $LDIR "https://ftp.mozilla.org/pub/firefox/candidates/$VERSION-candidates/build1/source/firefox-$VERSION.source.tar.xz" "firefox-$VERSION.source.tar.xz" $GITURI
 	  else
 	  	if [ ! -z "$GITURI" ]; then
-	    echo "Downloading $LDIR source repository"
-	    git clone $GITURI
-	      	setPerms $LDIR
-	    echo "mozconfig does not exist copying pre-configured to $LDIR root"
-	    cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
-			setIdentity $IDENTITY
+	    	echo "Downloading $LDIR source repository"
+	    	git clone $GITURI
+	      setPerms $LDIR
+	    	echo "mozconfig does not exist copying pre-configured to $LDIR root"
+	    	cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
+				setIdentity $IDENTITY
 	      changeDirectory $LDIR
-	  		VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)	
+	  		VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)
 		    GenerateBuildInfo $LDIR "https://ftp.mozilla.org/pub/firefox/candidates/$VERSION-candidates/build1/source/firefox-$VERSION.source.tar.xz" "firefox-$VERSION.source.tar.xz" $GITURI
 	  else
 	  		echo "Sorry, I don't understand your answer!"
@@ -179,9 +202,9 @@ select yn in "Yes" "No" "Quit"; do
 	    fi;
 	  fi; break;;
         No ) 
-		  setIdentity $IDENTITY
-	  	  VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)	
-		  GenerateBuildInfo $LDIR "https://ftp.mozilla.org/pub/firefox/candidates/$VERSION-candidates/build1/source/firefox-$VERSION.source.tar.xz" "firefox-$VERSION.source.tar.xz" $GITURI
+					setIdentity $IDENTITY
+					VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)	
+					GenerateBuildInfo $LDIR "https://ftp.mozilla.org/pub/firefox/candidates/$VERSION-candidates/build1/source/firefox-$VERSION.source.tar.xz" "firefox-$VERSION.source.tar.xz" $GITURI
 		  break;;
 	  "Quit" )
 			exit 0
@@ -191,6 +214,18 @@ done
 
 # Set CyberCTR default start page style.
 setHomeStyle $IDENTITY
+
+# Check if VERSION was set
+if [ -z "$VERSION" ] || [ ! -n "$VERSION" ]; then
+    echo "VERSION was not set, Setting VERSION now!"
+    VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)
+fi
+
+# Set unity patch
+if [ "$IDENTITY" == "Release" ]; then
+	echo "Applying unity patch"
+	ApplyUnity $VERSION
+fi
 
 echo "Do you wish to build $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
@@ -205,9 +240,9 @@ select yn in "Yes" "No" "Quit"; do
 		  esac
 	      done
 	  fi
-	  if [ -f $WORKDIR/$LDIR/mozconfig ]; then
-	      	changeDirectory "$WORKDIR/$LDIR"
-		./mach build
+	  if [ -f "$WORKDIR/$LDIR/mozconfig" ]; then
+	    changeDirectory "$WORKDIR/$LDIR"
+			./mach build
 	  else
 		 echo "Were sorry but we can't build $LDIR the mozconfig is missing!" && exit
 	  fi; break;;       
@@ -222,8 +257,11 @@ echo "Do you wish to test $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
-	  if [ -d $WORKDIR/obj64/dist/bin ]; then
-	      	changeDirectory $LDIR
+	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
+			# Check if in correct directory if not enter it.
+			if [ "$PWD" != "$WORKDIR/$LDIR" ]; then
+						changeDirectory $LDIR
+			fi
 	      ./mach run
 	  else
 	      echo "Unable to start $LDIR $WORKDIR/obj64/dist/bin does not exist!"
@@ -239,20 +277,20 @@ echo "Do you wish to package $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
-	  if [ -d $WORKDIR/obj64/dist/bin ]; then
+	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
 	    	changeDirectory "$WORKDIR/$LDIR"
 	    ./mach package
 
 	# Include readme.txt
-	if [ -f $Dir/README.txt ]; then
+	if [ -f "$Dir/README.txt" ]; then
     		cp -r $Dir/README.txt $WORKDIR/obj64/dist/
-    fi
+  fi
 	  changeDirectory "$WORKDIR/obj64/dist"
            
 	  # Get the current filename with browser version!
 	  FILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
 	  
-	    if [ -f $FILENAME ]; then
+	    if [ -f "$FILENAME" ]; then
 	      echo "Packaging: Found $FILENAME removing file!"
 	      rm -f $FILENAME
 	    fi
@@ -262,7 +300,7 @@ select yn in "Yes" "No" "Quit"; do
         find Cyberfox -type f -print0 | xargs -0 sha512sum  > Cyberfox/SHA512SUMS.chk
 
         echo "Packaging: Now re-packaging Cyberfox into $FILENAME!"
-		if [ -f README.txt ]; then
+		if [ -f "README.txt" ]; then
 			echo "Packaging: Adding README into $FILENAME!"
 		  	tar cvfj $FILENAME Cyberfox README.txt; 
 		else
@@ -271,8 +309,7 @@ select yn in "Yes" "No" "Quit"; do
 		fi
 
 	  if [ "$IDENTITY" == "Beta" ]; then
-	    echo "Packaging: Renaming beta package!"
-	    VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)  	
+	    echo "Packaging: Renaming beta package!"	
 	  	mv $FILENAME "Cyberfox-$VERSION.en-US.linux-x86_64.beta.tar.bz2";
 
 		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then

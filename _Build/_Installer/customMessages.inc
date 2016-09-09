@@ -16,7 +16,6 @@ en.DeleteProfileData=Do you want to delete your profile data?
 en.ConfirmDeleteProfileData=Are you sure this can not be undone!
 en.CleanInstallDescription=Perform clean installation.
 en.CleanInstallGroupDescription=Installation Options
-en.LoopInstallDescription=Install firefox hello chat (Optional)
 en.PocketInstallDescription=Install firefox pocket (Optional)
 en.SystemAddonsGroupDescription=System Addons
 ;Albanian
@@ -32,7 +31,6 @@ al.DeleteProfileData=A dëshironi të fshini të dhënat e profilit tuaj?
 al.ConfirmDeleteProfileData=A jeni i sigurt se kjo nuk mund të zhbëhet!
 al.CleanInstallDescription=Perform clean installation.
 al.CleanInstallGroupDescription=Installation Options
-al.LoopInstallDescription=Install firefox hello chat (Optional)
 al.PocketInstallDescription=Install firefox pocket (Optional)
 al.SystemAddonsGroupDescription=System Addons
 ;Afrikaans
@@ -48,7 +46,6 @@ af.DeleteProfileData=Do you want to delete your profile data?
 af.ConfirmDeleteProfileData=Are you sure this can not be undone!
 af.CleanInstallDescription=Perform clean installation.
 af.CleanInstallGroupDescription=Installation Options
-af.LoopInstallDescription=Install firefox hello chat (Optional)
 af.PocketInstallDescription=Install firefox pocket (Optional)
 af.SystemAddonsGroupDescription=System Addons
 ;Arabic
@@ -64,7 +61,6 @@ ar.DeleteProfileData=Do you want to delete your profile data?
 ar.ConfirmDeleteProfileData=Are you sure this can not be undone!
 ar.CleanInstallDescription=Perform clean installation.
 ar.CleanInstallGroupDescription=Installation Options
-ar.LoopInstallDescription=Install firefox hello chat (Optional)
 ar.PocketInstallDescription=Install firefox pocket (Optional)
 ar.SystemAddonsGroupDescription=System Addons
 ;Bengali
@@ -80,7 +76,6 @@ be.DeleteProfileData=Do you want to delete your profile data?
 be.ConfirmDeleteProfileData=Are you sure this can not be undone!
 be.CleanInstallDescription=Perform clean installation.
 be.CleanInstallGroupDescription=Installation Options
-be.LoopInstallDescription=Install firefox hello chat (Optional)
 be.PocketInstallDescription=Install firefox pocket (Optional)
 be.SystemAddonsGroupDescription=System Addons
 ;Bosnian
@@ -96,7 +91,6 @@ bo.DeleteProfileData=Do you want to delete your profile data?
 bo.ConfirmDeleteProfileData=Are you sure this can not be undone!
 bo.CleanInstallDescription=Perform clean installation.
 bo.CleanInstallGroupDescription=Installation Options
-bo.LoopInstallDescription=Install firefox hello chat (Optional)
 bo.PocketInstallDescription=Install firefox pocket (Optional)
 bo.SystemAddonsGroupDescription=System Addons
 ;BrazilianPortuguese
@@ -112,7 +106,6 @@ br_pt.DeleteProfileData=Você quer apagar os dados do perfil?
 br_pt.ConfirmDeleteProfileData=Você está certo de que este não pode ser desfeita!
 br_pt.CleanInstallDescription=Perform clean installation.
 br_pt.CleanInstallGroupDescription=Installation Options
-br_pt.LoopInstallDescription=Install firefox hello chat (Optional)
 br_pt.PocketInstallDescription=Install firefox pocket (Optional)
 br_pt.SystemAddonsGroupDescription=System Addons
 ;Catalan
@@ -128,7 +121,6 @@ ca.DeleteProfileData=Vols eliminar les seves dades del perfil?
 ca.ConfirmDeleteProfileData=Està vostè segur que això no es pot desfer!
 ca.CleanInstallDescription=Perform clean installation.
 ca.CleanInstallGroupDescription=Installation Options
-ca.LoopInstallDescription=Install firefox hello chat (Optional)
 ca.PocketInstallDescription=Install firefox pocket (Optional)
 ca.SystemAddonsGroupDescription=System Addons
 ;Chinese (Simplified)
@@ -144,7 +136,6 @@ cns.DeleteProfileData=你想删除您的个人资料数据？
 cns.ConfirmDeleteProfileData=你确定这不能撤消！
 cns.CleanInstallDescription=Perform clean installation.
 cns.CleanInstallGroupDescription=Installation Options
-cns.LoopInstallDescription=Install firefox hello chat (Optional)
 cns.PocketInstallDescription=Install firefox pocket (Optional)
 cns.SystemAddonsGroupDescription=System Addons
 ;Corsican
@@ -160,7 +151,6 @@ cr.DeleteProfileData=Do you want to delete your profile data?
 cr.ConfirmDeleteProfileData=Are you sure this can not be undone!
 cr.CleanInstallDescription=Perform clean installation.
 cr.CleanInstallGroupDescription=Installation Options
-cr.LoopInstallDescription=Install firefox hello chat (Optional)
 cr.PocketInstallDescription=Install firefox pocket (Optional)
 cr.SystemAddonsGroupDescription=System Addons
 ;Croatian
@@ -176,7 +166,6 @@ cro.DeleteProfileData=Do you want to delete your profile data?
 cro.ConfirmDeleteProfileData=Are you sure this can not be undone!
 cro.CleanInstallDescription=Perform clean installation.
 cro.CleanInstallGroupDescription=Installation Options
-cro.LoopInstallDescription=Install firefox hello chat (Optional)
 cro.PocketInstallDescription=Install firefox pocket (Optional)
 cro.SystemAddonsGroupDescription=System Addons
 ;Czech
@@ -192,7 +181,6 @@ cz.DeleteProfileData=Chcete-li odstranit data profilu?
 cz.ConfirmDeleteProfileData=Jsi si jistý, že to nelze vrátit zpět!
 cz.CleanInstallDescription=Perform clean installation.
 cz.CleanInstallGroupDescription=Installation Options
-cz.LoopInstallDescription=Install firefox hello chat (Optional)
 cz.PocketInstallDescription=Install firefox pocket (Optional)
 cz.SystemAddonsGroupDescription=System Addons
 ;Danish
@@ -208,7 +196,6 @@ da.DeleteProfileData=Ønsker du at slette din profil data?
 da.ConfirmDeleteProfileData=Er du sikker på, det kan ikke fortrydes!
 da.CleanInstallDescription=Perform clean installation.
 da.CleanInstallGroupDescription=Installation Options
-da.LoopInstallDescription=Install firefox hello chat (Optional)
 da.PocketInstallDescription=Install firefox pocket (Optional)
 da.SystemAddonsGroupDescription=System Addons
 ;German
@@ -224,7 +211,6 @@ de.DeleteProfileData=Möchten Sie Ihre Profildaten löschen?
 de.ConfirmDeleteProfileData=Sind Sie sicher? Es kann nicht rückgängig gemacht werden!
 de.CleanInstallDescription=Führt eine saubere Installation aus.
 de.CleanInstallGroupDescription=Installation Optionen
-de.LoopInstallDescription=Installiert Firefox Hello Chat (Optional)
 de.PocketInstallDescription=Installiert Firefox Pocket (Optional)
 de.SystemAddonsGroupDescription=Zusätzliche Systemkomponente
 ;Dutch
@@ -240,7 +226,6 @@ nl.DeleteProfileData=Wilt u uw profiel gegevens te verwijderen?
 nl.ConfirmDeleteProfileData=Bent u zeker dat dit kan niet ongedaan gemaakt worden!
 nl.CleanInstallDescription=Perform clean installation.
 nl.CleanInstallGroupDescription=Installation Options
-nl.LoopInstallDescription=Install firefox hello chat (Optional)
 nl.PocketInstallDescription=Install firefox pocket (Optional)
 nl.SystemAddonsGroupDescription=System Addons
 ;Finnish
@@ -256,7 +241,6 @@ fi.DeleteProfileData=Haluatko poistaa profiilisi tietoja?
 fi.ConfirmDeleteProfileData=Oletko varma, että tämä ei voi perua!
 fi.CleanInstallDescription=Perform clean installation.
 fi.CleanInstallGroupDescription=Installation Options
-fi.LoopInstallDescription=Install firefox hello chat (Optional)
 fi.PocketInstallDescription=Install firefox pocket (Optional)
 fi.SystemAddonsGroupDescription=System Addons
 ;French
@@ -272,7 +256,6 @@ fr.DeleteProfileData=Voulez-vous effacer les données personnelles de votre prof
 fr.ConfirmDeleteProfileData=Êtes-vous certain ? Cette opération ne peut être annulée !
 fr.CleanInstallDescription=Perform clean installation.
 fr.CleanInstallGroupDescription=Installation Options
-fr.LoopInstallDescription=Install firefox hello chat (Optional)
 fr.PocketInstallDescription=Install firefox pocket (Optional)
 fr.SystemAddonsGroupDescription=System Addons
 ;Greek
@@ -288,7 +271,6 @@ gr.DeleteProfileData=Μήπως θέλετε να διαγράψετε τα δε
 gr.ConfirmDeleteProfileData=Είσαι σίγουρος ότι αυτό δεν μπορεί να αναιρεθεί!
 gr.CleanInstallDescription=Perform clean installation.
 gr.CleanInstallGroupDescription=Installation Options
-gr.LoopInstallDescription=Install firefox hello chat (Optional)
 gr.PocketInstallDescription=Install firefox pocket (Optional)
 gr.SystemAddonsGroupDescription=System Addons
 ;Hebrew
@@ -304,7 +286,6 @@ he.DeleteProfileData=האם ברצונך למחוק את נתוני הפרופי
 he.ConfirmDeleteProfileData=האם אתה בטוח שזה לא ניתן לבטל!
 he.CleanInstallDescription=Perform clean installation.
 he.CleanInstallGroupDescription=Installation Options
-he.LoopInstallDescription=Install firefox hello chat (Optional)
 he.PocketInstallDescription=Install firefox pocket (Optional)
 he.SystemAddonsGroupDescription=System Addons
 ;Hindi
@@ -320,7 +301,6 @@ hi.DeleteProfileData=Do you want to delete your profile data?
 hi.ConfirmDeleteProfileData=Are you sure this can not be undone!
 hi.CleanInstallDescription=Perform clean installation.
 hi.CleanInstallGroupDescription=Installation Options
-hi.LoopInstallDescription=Install firefox hello chat (Optional)
 hi.PocketInstallDescription=Install firefox pocket (Optional)
 hi.SystemAddonsGroupDescription=System Addons
 ;Hungarian
@@ -336,7 +316,6 @@ hu.DeleteProfileData=Szeretné törölni a profil adatait?
 hu.ConfirmDeleteProfileData=Biztos benne, hogy ez nem lehet visszavonni!
 hu.CleanInstallDescription=Perform clean installation.
 hu.CleanInstallGroupDescription=Installation Options
-hu.LoopInstallDescription=Install firefox hello chat (Optional)
 hu.PocketInstallDescription=Install firefox pocket (Optional)
 hu.SystemAddonsGroupDescription=System Addons
 ;Indonesian
@@ -352,7 +331,6 @@ in.DeleteProfileData=Do you want to delete your profile data?
 in.ConfirmDeleteProfileData=Are you sure this can not be undone!
 in.CleanInstallDescription=Perform clean installation.
 in.CleanInstallGroupDescription=Installation Options
-in.LoopInstallDescription=Install firefox hello chat (Optional)
 in.PocketInstallDescription=Install firefox pocket (Optional)
 in.SystemAddonsGroupDescription=System Addons
 ;Italian
@@ -368,7 +346,6 @@ it.DeleteProfileData=Vuoi eliminare i dati del tuo profilo?
 it.ConfirmDeleteProfileData=Sei sicuro? Ciò non può essere ripristinato!
 it.CleanInstallDescription=Esegui un'installazione pulita.
 it.CleanInstallGroupDescription=Opzioni per l'installazione
-it.LoopInstallDescription=Installa Firefox Hello Chat (Optional)
 it.PocketInstallDescription=Installa Firefox Pocket (Optional)
 it.SystemAddonsGroupDescription=Componenti aggiuntivi di sistema
 ;Korean
@@ -384,7 +361,6 @@ kor.DeleteProfileData=Do you want to delete your profile data?
 kor.ConfirmDeleteProfileData=Are you sure this can not be undone!
 kor.CleanInstallDescription=Perform clean installation.
 kor.CleanInstallGroupDescription=Installation Options
-kor.LoopInstallDescription=Install firefox hello chat (Optional)
 kor.PocketInstallDescription=Install firefox pocket (Optional)
 kor.SystemAddonsGroupDescription=System Addons
 ;Japanese
@@ -400,7 +376,6 @@ ja.DeleteProfileData=プロファイル データを削除しますか？
 ja.ConfirmDeleteProfileData=元に戻すことはできませんがよろしいですか？
 ja.CleanInstallDescription=クリーン インストールを実行する
 ja.CleanInstallGroupDescription=インストール オプション
-ja.LoopInstallDescription=Firefox Hello チャットをインストールする(オプション)
 ja.PocketInstallDescription=Firefox Pocket をインストールする(オプション)
 ja.SystemAddonsGroupDescription=システム アドオン
 ;Norwegian
@@ -416,7 +391,6 @@ nr.DeleteProfileData=Ønsker du å slette din profil data?
 nr.ConfirmDeleteProfileData=Er du sikker på at dette kan ikke angres!
 nr.CleanInstallDescription=Perform clean installation.
 nr.CleanInstallGroupDescription=Installation Options
-nr.LoopInstallDescription=Install firefox hello chat (Optional)
 nr.PocketInstallDescription=Install firefox pocket (Optional)
 nr.SystemAddonsGroupDescription=System Addons
 ;Polish
@@ -432,7 +406,6 @@ pl.DeleteProfileData=Czy chcesz usunąć swoje dane z profilu?
 pl.ConfirmDeleteProfileData=Czy jesteś pewny/a? Tego nie można cofnąć!
 pl.CleanInstallDescription=Wykonaj czystą instalację.
 pl.CleanInstallGroupDescription=Opcje instalacji
-pl.LoopInstallDescription=Zainstaluj czat Firefox Hello (Opcjalne)
 pl.PocketInstallDescription=Zainstaluj Firefox Pocket (Opcjalne)
 pl.SystemAddonsGroupDescription=Dodatki systemowe
 ;Portuguese
@@ -448,7 +421,6 @@ pt.DeleteProfileData=Você quer apagar os dados do perfil?
 pt.ConfirmDeleteProfileData=Você está certo de que este não pode ser desfeita!
 pt.CleanInstallDescription=Perform clean installation.
 pt.CleanInstallGroupDescription=Installation Options
-pt.LoopInstallDescription=Install firefox hello chat (Optional)
 pt.PocketInstallDescription=Install firefox pocket (Optional)
 pt.SystemAddonsGroupDescription=System Addons
 ;Russian
@@ -464,7 +436,6 @@ ru.DeleteProfileData=Вы ходите удалить Ваши личные да
 ru.ConfirmDeleteProfileData=Вы уверены? Эта операция не может быть отменена!
 ru.CleanInstallDescription=Выполнить чистую установку.
 ru.CleanInstallGroupDescription=Настройки установки
-ru.LoopInstallDescription=Установить чат Firefox hello (необязательно)
 ru.PocketInstallDescription=Установить Firefox pocket (необязательно)
 ru.SystemAddonsGroupDescription=Системные дополнения
 ;SerbianCyrillic
@@ -480,7 +451,6 @@ sbc.DeleteProfileData=Да ли желите да избришете подат�
 sbc.ConfirmDeleteProfileData=Да ли сте сигурни да не може да се опозове!
 sbc.CleanInstallDescription=Perform clean installation.
 sbc.CleanInstallGroupDescription=Installation Options
-sbc.LoopInstallDescription=Install firefox hello chat (Optional)
 sbc.PocketInstallDescription=Install firefox pocket (Optional)
 sbc.SystemAddonsGroupDescription=System Addons
 ;SerbianLatin
@@ -496,7 +466,6 @@ sbl.DeleteProfileData=Do you want to delete your profile data?
 sbl.ConfirmDeleteProfileData=Are you sure this can not be undone!
 sbl.CleanInstallDescription=Perform clean installation.
 sbl.CleanInstallGroupDescription=Installation Options
-sbl.LoopInstallDescription=Install firefox hello chat (Optional)
 sbl.PocketInstallDescription=Install firefox pocket (Optional)
 sbl.SystemAddonsGroupDescription=System Addons
 ;Slovenian
@@ -512,7 +481,6 @@ sl.DeleteProfileData=Ali želite izbrisati podatke profila?
 sl.ConfirmDeleteProfileData=Ali ste prepričani, da to ni mogoče razveljaviti!
 sl.CleanInstallDescription=Perform clean installation.
 sl.CleanInstallGroupDescription=Installation Options
-sl.LoopInstallDescription=Install firefox hello chat (Optional)
 sl.PocketInstallDescription=Install firefox pocket (Optional)
 sl.SystemAddonsGroupDescription=System Addons
 ;Swedish
@@ -528,7 +496,6 @@ sw.DeleteProfileData=Do you want to delete your profile data?
 sw.ConfirmDeleteProfileData=Are you sure this can not be undone!
 sw.CleanInstallDescription=Perform clean installation.
 sw.CleanInstallGroupDescription=Installation Options
-sw.LoopInstallDescription=Install firefox hello chat (Optional)
 sw.PocketInstallDescription=Install firefox pocket (Optional)
 sw.SystemAddonsGroupDescription=System Addons
 ;Turkish
@@ -544,7 +511,6 @@ tr.DeleteProfileData=Profil verilerinizi de silmek istiyor musunuz?
 tr.ConfirmDeleteProfileData=Emin misiniz bu işlem geri alınamaz!
 tr.CleanInstallDescription=Temiz Bir Kurulum Gerçekleştir.
 tr.CleanInstallGroupDescription=Kurulum Seçenekleri
-tr.LoopInstallDescription=Install firefox hello chat (Optional)
 tr.PocketInstallDescription=Install firefox pocket (Optional)
 tr.SystemAddonsGroupDescription=System Addons
 ;Spanish
@@ -560,7 +526,6 @@ en_es.DeleteProfileData=¿Quieres eliminar sus datos del perfil?
 en_es.ConfirmDeleteProfileData=¿Está usted seguro de que esto no se puede deshacer!
 en_es.CleanInstallDescription=Perform clean installation.
 en_es.CleanInstallGroupDescription=Installation Options
-en_es.LoopInstallDescription=Install firefox hello chat (Optional)
 en_es.PocketInstallDescription=Install firefox pocket (Optional)
 en_es.SystemAddonsGroupDescription=System Addons
 ;Ukrainian
@@ -576,6 +541,5 @@ ukr.DeleteProfileData=Ви хочете видалити дані профілю
 ukr.ConfirmDeleteProfileData=Are you sure this can not be undone!
 ukr.CleanInstallDescription=Perform clean installation.
 ukr.CleanInstallGroupDescription=Installation Options
-ukr.LoopInstallDescription=Install firefox hello chat (Optional)
 ukr.PocketInstallDescription=Install firefox pocket (Optional)
 ukr.SystemAddonsGroupDescription=System Addons

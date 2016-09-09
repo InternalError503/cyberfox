@@ -19,8 +19,8 @@
 #engineList treechildren::-moz-tree-image(engineShown) {
   list-style-image: url("chrome://browser/skin/preferences/checkbox.png");
   -moz-image-region: rect(0, 16px, 16px, 0);
-  -moz-margin-start: 4px;
-  -moz-margin-end: 1px;
+  margin-inline-start: 4px;
+  margin-inline-end: 1px;
 }
 
 #engineList treechildren::-moz-tree-image(engineShown, checked) {
@@ -41,8 +41,8 @@
 }
 
 #engineList treechildren::-moz-tree-image(engineName) {
-  -moz-margin-end: 4px;
-  -moz-margin-start: 1px;
+  margin-inline-end: 4px;
+  margin-inline-start: 1px;
   width: 16px;
   height: 16px;
 }
@@ -56,5 +56,5 @@
   width: 10000px; /* 100% doesn't work; 10k is hopefully larger than any window
                      we may have, overflow isn't visible. */
   height: 2px;
-  -moz-margin-start: 0;
+  margin-inline-start: 0;
 }

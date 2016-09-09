@@ -56,7 +56,12 @@ Site.prototype = {
       aIndex = this.cell.index;
 
     this._updateAttributes(true);
-    gPinnedLinks.pin(this._link, aIndex);
+    let changed = gPinnedLinks.pin(this._link, aIndex);
+    if (changed) {
+      // render site again to remove suggested/sponsored tags
+      this._render();
+    }
+    return changed;
   },
 
   /**
@@ -239,7 +244,10 @@ Site.prototype = {
         action = "unpin";
       }
       else if (!pinned && target.classList.contains("newtab-control-pin")) {
-        this.pin();
+        if (this.pin()) {
+          // suggested link has changed - update rest of the pages
+          gAllPages.update(gPage);
+        }
         action = "pin";
       }
     }

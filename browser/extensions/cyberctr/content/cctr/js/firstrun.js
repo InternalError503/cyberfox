@@ -180,6 +180,10 @@
 								break;
 							case "Linux":
 								Services.prefs.setCharPref("extensions.classicthemerestorer.appbutton", "appbutton_v1");
+								if(parseInt(Services.appinfo.version) >= 48 && 
+									Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase()){
+									Services.prefs.setBoolPref("ui.use_unity_menubar", false);
+								}
 								break;
 						}
 
@@ -191,6 +195,13 @@
 					try {
 						Services.prefs.setCharPref("extensions.classicthemerestorer.appbutton", "appbutton_off");
 						_doc.getElementById("toolbar-menubar").setAttribute('autohide', false);
+						
+						if(this.OS === "Linux" && 
+							parseInt(Services.appinfo.version) >= 48 && 
+							Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase()){
+							Services.prefs.setBoolPref("ui.use_unity_menubar", false);
+						}
+						
 					} catch (e) { }
 				}
 				if (document.getElementById("classicthemestyleradio").checked) {

@@ -8,18 +8,11 @@ cd $Dir
 
 # Init vars
 VERSION=""
-SOURCE=$1
-IDENTITY=$2
-
-# Check if source code url was passed to script
-if [ -z "$SOURCE" ] || [ ! -n "$SOURCE" ]; then
-    echo "Source url must be passed to the script build_deb_package.sh 'URL'"
-    exit 1
-fi
+IDENTITY=$1
 
 # Check if IDENTITY was passed to script
 if [ -z "$IDENTITY" ] || [ ! -n "$IDENTITY" ]; then
-    echo "IDENTITY type must be passed to the script build_deb_package.sh 'IDENTITY'"
+    echo "IDENTITY type must be passed to the script build_deb_and_ppa_package.sh 'IDENTITY'"
     exit 1
 fi
 
@@ -63,13 +56,23 @@ fi
 # Set current directory to directory of package.
 cd $Dir/deb_ppa/cyberfox-$VERSION
 
-# Copy PPA templates
+# Copy DEB and PPA templates
 if [ -d "$Dir/deb_and_ppa_templates/_template" ]; then
 	cp -r $Dir/deb_and_ppa_templates/_template/* $Dir/deb_ppa/cyberfox-$VERSION/debian
 else
     echo "Unable to locate ppa templates!"
     exit 1 
 fi
+
+# Copy control file
+if [ "$IDENTITY" == "Release" ]; then
+	cp $Dir/deb_and_ppa_templates/control.release $Dir/deb_ppa/cyberfox-$VERSION/debian/control
+elif [ "$IDENTITY" == "Beta" ]; then
+	cp $Dir/deb_and_ppa_templates/control.beta $Dir/deb_ppa/cyberfox-$VERSION/debian/control
+else
+    echo "IDENTITY was not set. Unable to copy control file!"
+    exit 1 
+fi	
 
 # Generate change log template
 CHANGELOGDIR=$Dir/deb_ppa/cyberfox-$VERSION/debian/changelog
@@ -104,9 +107,10 @@ fi
 if [ -d "../../../../../obj64/dist/Cyberfox" ]; then
     cp -r ../../../../../obj64/dist/Cyberfox/* $Dir/deb_ppa/cyberfox-$VERSION/usr/lib/Cyberfox
 	cp $Dir/deb_and_ppa_templates/cyberfox.desktop $Dir/deb_ppa/cyberfox-$VERSION/usr/share/applications
-	#cp $Dir/deb_and_ppa_templates/Cyberfox $Dir/deb_ppa/cyberfox-$VERSION/usr/share/lintian/overrides #throws error file missing ?
+	cp $Dir/deb_and_ppa_templates/Cyberfox $Dir/deb_ppa/cyberfox-$VERSION/usr/share/lintian/overrides
     cp $Dir/deb_and_ppa_templates/Cyberfox.sh $Dir/deb_ppa/cyberfox-$VERSION
 	cp $Dir/deb_and_ppa_templates/vendor-gre.js $Dir/deb_ppa/cyberfox-$VERSION
+	cp $Dir/deb_and_ppa_templates/vendor-cyberfox.js $Dir/deb_ppa/cyberfox-$VERSION
 else
     echo "Unable to Cyberfox package files, Please check the build was created and packaged successfully!"
     exit 1     
@@ -120,8 +124,10 @@ fi
 
 # Make sure correct permissions are set
 chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/control
-chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/prerm
+chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/cyberfox.prerm
+chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/cyberfox.postinst
 chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/copyright
+chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/rules
 
 # Make symlinks
 ln -s /usr/lib/Cyberfox/Cyberfox.sh $Dir/deb_ppa/cyberfox-$VERSION/cyberfox
@@ -135,14 +141,14 @@ ln -s /usr/share/hunspell $Dir/deb_ppa/cyberfox-$VERSION/usr/lib/Cyberfox/dictio
 # Build .deb package (Requires devscripts to be installed sudo apt install devscripts)
 notify-send "Building deb package!"
 debuild -us -uc #throws error
-if [ -f "$Dir/deb_ppa/cyberfox-$VERSION_amd64.deb" ]; then
-    mv $Dir/deb_ppa/cyberfox-$VERSION_amd64.deb ../../../obj64/dist/Cyberfox-$VERSION.en-US.linux-x86_64.deb
+if [ -f "$Dir/deb_ppa/cyberfox_$VERSION_amd64.deb" ]; then
+    cp $Dir/deb_ppa/cyberfox_$VERSION_amd64.deb ../../../obj64/dist/Cyberfox-$VERSION.en-US.linux-x86_64.deb
 else
-    echo "Unable to move $Dir/deb_ppa/cyberfox-$VERSION_amd64.deb the file maybe missing or had errors during creation!"
+    echo "Unable to move $Dir/deb_ppa/cyberfox_$VERSION_amd64.deb the file maybe missing or had errors during creation!"
     exit 1
 fi
 
-exit 1
+exit 1 #Just exit here until above builds correctly.@
 # Build package for upload to PPA (Requires devscripts to be installed sudo apt install devscripts)
 notify-send "Building package for upload to PPA"
 debuild -S -sa
@@ -152,7 +158,7 @@ cd $Dir/deb_and_ppa
 if [ "$IDENTITY" == "Release" ]; then
     notify-send "Uploading package to PPA"
     dput ppa:8pecxstudios/cyberfox cyberfox-$VERSION-0~ppa1.source.changes
-else if [ "$IDENTITY" == "Beta" ]; then
+elif [ "$IDENTITY" == "Beta" ]; then
     notify-send "Uploading package to PPA"
     dput ppa:8pecxstudios/cyberfox-next cyberfox-$VERSION-0~ppa1.source.changes
 else

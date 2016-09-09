@@ -16,6 +16,7 @@
 
 !define URLStubDownload ""
 !define URLManualDownload ""
+!define URLSystemRequirements ""
 !define Channel "unofficial"
 
 # The installer's certificate name and issuer expected by the stub installer

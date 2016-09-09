@@ -382,13 +382,10 @@ var PinnedLinks = {
     this.unpin(aLink);
 
     // change pinned link into a history link
-    // update all pages on link change
-    let updatePages = this._makeHistoryLink(aLink);
+    let changed = this._makeHistoryLink(aLink);
     this.links[aIndex] = aLink;
     this.save();
-    if (updatePages) {
-      AllPages.update();
-    }
+    return changed;
   },
 
   /**

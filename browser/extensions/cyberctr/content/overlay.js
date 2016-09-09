@@ -1304,6 +1304,11 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("altreaderico") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("altreaderico",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("altreaderico",false);
 		  break;
+		  
+		  case "hideurlzoom":
+			if (branch.getBoolPref("hideurlzoom") && classicthemerestorerjs.ctr.appversion >= 51) classicthemerestorerjs.ctr.loadUnloadCSS("hideurlzoom",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("hideurlzoom",false);
+		  break;
 
 		  case "altautocompl":
 			if (branch.getBoolPref("altautocompl") && classicthemerestorerjs.ctr.appversion >= 48) classicthemerestorerjs.ctr.loadUnloadCSS("altautocompl",true);
@@ -1311,8 +1316,19 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  case "urlresults": case "autocompl_it":
-			if (branch.getBoolPref("urlresults")) classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",false);
+			if (branch.getBoolPref("urlresults")) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",true);
+			  
+			  if(branch.getBoolPref("altautocompl")==false) {
+				classicthemerestorerjs.ctr.ctrGetId('PopupAutoCompleteRichResult').addEventListener("popupshown", function unlockACPopupHeight(event){
+				  try {
+					var navbarpos = document.getElementById("nav-bar").boxObject.screenY + document.getElementById("nav-bar").boxObject.height - window.screen.top;
+					classicthemerestorerjs.ctr.ctrGetId('PopupAutoCompleteRichResult').setAttribute("maxheight",document.getElementById("main-window").boxObject.height-navbarpos);
+				  } catch(e){}
+				}, false);
+			  }
+			  
+			} else classicthemerestorerjs.ctr.loadUnloadCSS("urlresults",false);
 		  
 			if (branch.getBoolPref("autocompl_it") && branch.getBoolPref("urlresults")
 				&& classicthemerestorerjs.ctr.appversion >= 48
@@ -1333,8 +1349,12 @@ classicthemerestorerjs.ctr = {
 		  break;
 	  
 		  case "autocompl_hlb":
-			if (branch.getBoolPref("autocompl_hlb")) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hlb",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hlb",false);
+			if (branch.getBoolPref("autocompl_hlb")) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hlb",true);
+			  
+			  if (branch.getBoolPref("autocompl_hln")) branch.setBoolPref("autocompl_hln",false);
+			}
+			else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hlb",false);
 		  break;
 
 		  case "autocompl_hlu":
@@ -1345,6 +1365,15 @@ classicthemerestorerjs.ctr = {
 		  case "autocompl_hli":
 			if (branch.getBoolPref("autocompl_hli")) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hli",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hli",false);
+		  break;
+		  
+		  case "autocompl_hln":
+			if (branch.getBoolPref("autocompl_hln")) {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hln",true);
+			  
+			  if (branch.getBoolPref("autocompl_hlb")) branch.setBoolPref("autocompl_hlb",false);
+			}
+			else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hln",false);
 		  break;
 
 		  case "autocompl_sep":
@@ -3136,10 +3165,7 @@ classicthemerestorerjs.ctr = {
 		var newpos = urlbarpos - navbarpos;
 		
 		if(newpos>=0)
-		  document.getElementById('PopupAutoCompleteRichResult').style.marginTop = ""+newpos+"px";
-		  
-		console.log(document.querySelector('#urlbar-container').parentNode.parentNode.id);
-	  
+		  document.getElementById('PopupAutoCompleteRichResult').style.marginTop = ""+newpos+"px";  
 	  }
 	
 	}, false);
@@ -4371,12 +4397,14 @@ classicthemerestorerjs.ctr = {
 		case "urlbardropm": 		manageCSS("urlbar_dropm.css"); 			break;
 		case "urlbardropm2": 		manageCSS("urlbar_dropm2.css"); 		break;
 		case "altreaderico": 		manageCSS("alt_reader_icons.css");		break;
+		case "hideurlzoom": 		manageCSS("hide_ulbar_zoom.css");		break;
 		case "altautocompl": 		manageCSS("alt_autocomplete.css");		break;
 		case "autocompl_it": 		manageCSS("alt_autocompl_items.css");	break;
 		case "autocompl_it2": 		manageCSS("alt_autocompl_items2.css");	break;
 		case "autocompl_hlb": 		manageCSS("alt_autocompl_hl_b.css");	break;
 		case "autocompl_hlu": 		manageCSS("alt_autocompl_hl_u.css");	break;
 		case "autocompl_hli": 		manageCSS("alt_autocompl_hl_i.css");	break;
+		case "autocompl_hln": 		manageCSS("alt_autocompl_hl_n.css");	break;
 		case "autocompl_sep": 		manageCSS("alt_autocompl_sep.css");		break;
 		case "autocompl_rhl": 		manageCSS("alt_autocompl_rhl.css");		break;
 		case "locsearchbw10": 		manageCSS("locationsearchbarw10.css");	break;
@@ -7006,9 +7034,13 @@ classicthemerestorerjs.ctr = {
 	  var w = (screen.availWidth-wwidth)/2;
 	  var h = (screen.availHeight-wheight)/2;
 	  
-	  if(classicthemerestorerjs.ctr.prefs.getCharPref('altoptions')=='options_win' || classicthemerestorerjs.ctr.prefs.getCharPref('altoptions')=='options_win_alt')
-		classicthemerestorerjs.ctr.ctrcontentprefswin = window.open('about:preferences', '', 'width='+wwidth+',height='+wheight+',top='+h+',left='+w+',resizable=yes');
-	  else openPreferences();
+	  if(classicthemerestorerjs.ctr.prefs.getCharPref('altoptions')=='options_win' || classicthemerestorerjs.ctr.prefs.getCharPref('altoptions')=='options_win_alt') {
+		
+		if(which=='search')		
+		  classicthemerestorerjs.ctr.ctrcontentprefswin = window.open('about:preferences#search', '', 'width='+wwidth+',height='+wheight+',top='+h+',left='+w+',resizable=yes');
+	    else classicthemerestorerjs.ctr.ctrcontentprefswin = window.open('about:preferences', '', 'width='+wwidth+',height='+wheight+',top='+h+',left='+w+',resizable=yes');
+
+	  } else openPreferences();
 
   },
   

@@ -74,6 +74,8 @@
 !define MinSupportedVer "Microsoft Windows Vista SP2"
 #endif
 
+!define MinSupportedCPU "SSE2"
+
 #ifdef MOZ_MAINTENANCE_SERVICE
 !define MOZ_MAINTENANCE_SERVICE
 #endif

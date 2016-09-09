@@ -29,6 +29,7 @@
 #include "mozilla/UniquePtr.h"
 #include "mozilla/WindowsVersion.h"
 #include "nsWindowsHelpers.h"
+#include "WindowsDllBlocklist.h"
 
 using namespace mozilla;
 
@@ -127,11 +128,6 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
 
   // sprotector.dll crashes, bug 957258
   {"sprotector.dll", ALL_VERSIONS},
-
-  // Topcrash with Websense Endpoint, bug 828184
-  // Mass startup crash with Websense Endpoint set block too {ALL_VERSIONS} for now see if helps.
-  {"qipcap.dll", ALL_VERSIONS},
-  {"qipcap64.dll", ALL_VERSIONS},
 
   // leave these two in always for tests
   { "mozdllblockingtest.dll", ALL_VERSIONS },
@@ -270,6 +266,10 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
   { "ss2osd.dll", ALL_VERSIONS },
   { "ss2devprops.dll", ALL_VERSIONS },
 
+  // NHASUSSTRIXOSD.DLL, bug 1269244
+  { "nhasusstrixosd.dll", ALL_VERSIONS },
+  { "nhasusstrixdevprops.dll", ALL_VERSIONS },
+
   // Crashes with PremierOpinion/RelevantKnowledge, bug 1277846
   { "opls.dll", ALL_VERSIONS },
   { "opls64.dll", ALL_VERSIONS },
@@ -279,10 +279,6 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
   { "prls64.dll", ALL_VERSIONS },
   { "rlls.dll", ALL_VERSIONS },
   { "rlls64.dll", ALL_VERSIONS },
-
-  // NHASUSSTRIXOSD.DLL, bug 1269244
-  { "nhasusstrixosd.dll", ALL_VERSIONS },
-  { "nhasusstrixdevprops.dll", ALL_VERSIONS },
 
   { nullptr, 0 }
 };
@@ -307,6 +303,7 @@ static const int kUser32BeforeBlocklistParameterLen =
   sizeof(kUser32BeforeBlocklistParameter) - 1;
 
 static DWORD sThreadLoadingXPCOMModule;
+static bool sBlocklistInitAttempted;
 static bool sBlocklistInitFailed;
 static bool sUser32BeforeBlocklist;
 
@@ -817,9 +814,13 @@ WindowsDllInterceptor NtDllIntercept;
 
 } // namespace
 
-NS_EXPORT void
+MFBT_API void
 DllBlocklist_Initialize()
 {
+  if (sBlocklistInitAttempted) {
+    return;
+  }
+  sBlocklistInitAttempted = true;
 #if defined(_MSC_VER) && _MSC_VER < 1900 && defined(_M_X64)
   // The code below is not blocklist-related, but is the best place for it.
   // This is the earliest place where msvcr120.dll is loaded, and this
@@ -838,6 +839,8 @@ DllBlocklist_Initialize()
   if (GetModuleHandleA("user32.dll")) {
     sUser32BeforeBlocklist = true;
   }
+  // Catch any missing DELAYLOADS for user32.dll
+  MOZ_ASSERT(!sUser32BeforeBlocklist);
 
   NtDllIntercept.Init("ntdll.dll");
 
@@ -856,7 +859,7 @@ DllBlocklist_Initialize()
   }
 }
 
-NS_EXPORT void
+MFBT_API void
 DllBlocklist_SetInXPCOMLoadOnMainThread(bool inXPCOMLoadOnMainThread)
 {
   if (inXPCOMLoadOnMainThread) {
@@ -867,7 +870,7 @@ DllBlocklist_SetInXPCOMLoadOnMainThread(bool inXPCOMLoadOnMainThread)
   }
 }
 
-NS_EXPORT void
+MFBT_API void
 DllBlocklist_WriteNotes(HANDLE file)
 {
   DWORD nBytes;

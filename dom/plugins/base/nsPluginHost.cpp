@@ -651,7 +651,6 @@ nsresult nsPluginHost::FindProxyForURL(const char* url, char* *result)
   NS_ENSURE_SUCCESS(res, res);
 
   nsCOMPtr<nsIPrincipal> nullPrincipal = nsNullPrincipal::Create();
-  NS_ENSURE_TRUE(nullPrincipal, NS_ERROR_FAILURE);
   // The following channel is never openend, so it does not matter what
   // securityFlags we pass; let's follow the principle of least privilege.
   nsCOMPtr<nsIChannel> tempChannel;
@@ -1409,7 +1408,7 @@ nsPluginHost::GetPluginForContentProcess(uint32_t aPluginId, nsNPAPIPlugin** aPl
   return NS_ERROR_FAILURE;
 }
 
-class nsPluginUnloadRunnable : public nsRunnable
+class nsPluginUnloadRunnable : public Runnable
 {
 public:
   explicit nsPluginUnloadRunnable(uint32_t aPluginId) : mPluginId(aPluginId) {}
@@ -2533,6 +2532,7 @@ nsPluginHost::FindPluginsInContent(bool aCreatePluginList, bool* aPluginsChanged
                                                tag.isJavaPlugin(),
                                                tag.isFlashPlugin(),
                                                tag.supportsAsyncInit(),
+                                               tag.supportsAsyncRender(),
                                                tag.lastModifiedTime(),
                                                tag.isFromExtension(),
                                                tag.sandboxLevel());
@@ -2773,6 +2773,7 @@ nsPluginHost::FindPluginsForContent(uint32_t aPluginEpoch,
                                       tag->mIsJavaPlugin,
                                       tag->mIsFlashPlugin,
                                       tag->mSupportsAsyncInit,
+                                      tag->mSupportsAsyncRender,
                                       tag->FileName(),
                                       tag->Version(),
                                       tag->mLastModifiedTime,
@@ -3447,7 +3448,8 @@ nsresult nsPluginHost::NewPluginURLStream(const nsString& aURL,
   // in case aURL is relative
   RefPtr<nsPluginInstanceOwner> owner = aInstance->GetOwner();
   if (owner) {
-    rv = NS_MakeAbsoluteURI(absUrl, aURL, nsCOMPtr<nsIURI>(owner->GetBaseURI()));
+    nsCOMPtr<nsIURI> baseURI = owner->GetBaseURI();
+    rv = NS_MakeAbsoluteURI(absUrl, aURL, baseURI);
   }
 
   if (absUrl.IsEmpty())
@@ -4248,7 +4250,7 @@ nsPluginHost::DestroyRunningInstances(nsPluginTag* aPluginTag)
 
 // Runnable that does an async destroy of a plugin.
 
-class nsPluginDestroyRunnable : public nsRunnable,
+class nsPluginDestroyRunnable : public Runnable,
                                 public PRCList
 {
 public:

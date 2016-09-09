@@ -22,6 +22,7 @@
 #include "nsIFileURL.h"
 
 #include "mozilla/Preferences.h"
+#include "mozilla/Telemetry.h"
 #include "mozilla/net/RemoteOpenFileChild.h"
 #include "nsITabChild.h"
 #include "private/pprio.h"
@@ -875,6 +876,12 @@ nsJARChannel::AsyncOpen(nsIStreamListener *listener, nsISupports *ctx)
             return NS_ERROR_UNSAFE_CONTENT_TYPE;
         }
 
+        static bool reportedRemoteJAR = false;
+        if (!reportedRemoteJAR) {
+            reportedRemoteJAR = true;
+            Telemetry::Accumulate(Telemetry::REMOTE_JAR_PROTOCOL_USED, 1);
+        }
+
         // kick off an async download of the base URI...
         nsCOMPtr<nsIStreamListener> downloader = new MemoryDownloader(this);
         uint32_t loadFlags =
@@ -1197,11 +1204,10 @@ nsJARChannel::OnDataAvailable(nsIRequest *req, nsISupports *ctx,
         if (NS_IsMainThread()) {
             FireOnProgress(offset + count);
         } else {
-            nsCOMPtr<nsIRunnable> runnable =
-              NS_NewRunnableMethodWithArg<uint64_t>(this,
-                                                    &nsJARChannel::FireOnProgress,
-                                                    offset + count);
-            NS_DispatchToMainThread(runnable);
+            NS_DispatchToMainThread(NewRunnableMethod
+                                    <uint64_t>(this,
+                                               &nsJARChannel::FireOnProgress,
+                                               offset + count));
         }
     }
 

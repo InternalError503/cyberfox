@@ -1,7 +1,6 @@
 amazondotcom
 bing
 duckduckgo
-eBay
 google
 ixquick
 privatelee

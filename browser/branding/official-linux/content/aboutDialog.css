@@ -1,14 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-#aboutDialog{
-	  -moz-appearance:none!important;
-      background-image: url("chrome://branding/content/about-background.jpg");
-	  brackground-color:#333!important;
-	  background-size: 100% 100%!important;
+ 
+ :root {
+	--main-text-color:#0fd101;
+	--main-alphabg-color:rgba(0,0,0,.7);
 }
-#clientBox {
-  color: #FFF;
+
+#aboutDialogContainer{
+      background-image: url("chrome://branding/content/about-background.jpg");
+	  background-repeat: no-repeat;
+	  brackground-color:#222!important;
+	  background-size: 100% 100%!important;
+	  color: #FFF;
 }
 
 #leftBox {
@@ -22,7 +26,6 @@
   -moz-margin-start: 30px;
 }
 
-
 @media (min-resolution: 2dppx) {
   #leftBox {
     background-image: url("chrome://branding/content/about-logo@2x.png");
@@ -35,19 +38,16 @@
 }
 
 #updateDeck > hbox > label:not([class="text-link"]) {
-  color: #0fd101;
+  color: var(--main-text-color)!important;
 }
 .text-link, .bottom-link{
-  color: #0fd101;
+  color: var(--main-text-color)!important;
 }
-.text-link:hover, .bottom-link:hover{
-  color: #EFEFEF;
-}
-#aboutDialogContainer{
-     color: #333;
+.text-link:hover, .bottom-link:hover {
+  color: #EFEFEF!important;
 }
 #bottomBox {
-  color: #333;
+  background-color: var(--main-alphabg-color)!important;
 }
 #trademark {
   font-size: xx-small;

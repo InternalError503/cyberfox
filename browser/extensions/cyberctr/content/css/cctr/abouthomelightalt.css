@@ -387,9 +387,6 @@
     #history::before {
         content: url("chrome://classic_theme_restorer/content/images/abouthome/history_light.png") !important;
     }
-    #apps::before {
-        content: url("chrome://classic_theme_restorer/content/images/abouthome/apps_light.png") !important;
-    }
     #addons::before {
         content: url("chrome://classic_theme_restorer/content/images/abouthome/addons_light.png") !important;
     }
@@ -483,9 +480,6 @@
         }
         #history::before {
             content: url("chrome://classic_theme_restorer/content/images/abouthome/history_light@2x.png") !important;
-        }
-        #apps::before {
-            content: url("chrome://classic_theme_restorer/content/images/abouthome/apps_light@2x.png") !important;
         }
         #addons::before {
             content: url("chrome://classic_theme_restorer/content/images/abouthome/addons_light@2x.png") !important;
