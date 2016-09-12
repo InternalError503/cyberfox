@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.4
+# Version: 2.5
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -113,7 +113,11 @@ function ApplyUnity(){
 	# Download pacth if not exist
 	if [ ! -f "$WORKDIR/unity-menubar-$1.patch" ]; then
 		# Check url mext release for changes.	
-		wget -O $WORKDIR/unity-menubar-$1.patch 'https://bazaar.launchpad.net/~mozillateam/firefox/firefox.trusty/download/head:/unitymenubar.patch-20130215095938-1n6mqqau8tdfqwhg-1/unity-menubar.patch'
+		if [ "$2" == "Release" ]; then	
+			wget -O $WORKDIR/unity-menubar-$1.patch 'https://bazaar.launchpad.net/~mozillateam/firefox/firefox.trusty/download/head:/unitymenubar.patch-20130215095938-1n6mqqau8tdfqwhg-1/unity-menubar.patch'
+		elif [ "$2" == "Beta" ]; then
+			wget -O $WORKDIR/unity-menubar-$1.patch 'https://bazaar.launchpad.net/~mozillateam/firefox/firefox-beta.trusty/download/head:/unitymenubar.patch-20130215095938-1n6mqqau8tdfqwhg-1/unity-menubar.patch'
+		fi
 	fi
 
 	# Apply patch if exists
@@ -222,10 +226,8 @@ if [ -z "$VERSION" ] || [ ! -n "$VERSION" ]; then
 fi
 
 # Set unity patch
-if [ "$IDENTITY" == "Release" ]; then
-	echo "Applying unity patch"
-	ApplyUnity $VERSION
-fi
+echo "Applying unity patch"
+ApplyUnity $VERSION $IDENTITY
 
 echo "Do you wish to build $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
