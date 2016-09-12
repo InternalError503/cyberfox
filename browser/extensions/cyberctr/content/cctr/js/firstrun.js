@@ -180,8 +180,8 @@
 								break;
 							case "Linux":
 								Services.prefs.setCharPref("extensions.classicthemerestorer.appbutton", "appbutton_v1");
-								if(parseInt(Services.appinfo.version) >= 48 && 
-									Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase()){
+								if(parseInt(Services.appinfo.version) >= 49 && 
+									Services.appinfo.name.toLowerCase() === "Cyberfox".toLowerCase()){
 									Services.prefs.setBoolPref("ui.use_unity_menubar", false);
 								}
 								break;
@@ -197,8 +197,8 @@
 						_doc.getElementById("toolbar-menubar").setAttribute('autohide', false);
 						
 						if(this.OS === "Linux" && 
-							parseInt(Services.appinfo.version) >= 48 && 
-							Services.appinfo.name.toLowerCase() != "Cyberfox".toLowerCase()){
+							parseInt(Services.appinfo.version) >= 49 && 
+							Services.appinfo.name.toLowerCase() === "Cyberfox".toLowerCase()){
 							Services.prefs.setBoolPref("ui.use_unity_menubar", false);
 						}
 						
