@@ -40,6 +40,8 @@
 <!ENTITY openLocationCmd.label         "Konumu aç…">
 <!ENTITY openLocationCmd.accesskey     "K">
 <!ENTITY bookmarksMenuButton.tooltip   "Yer imlerini göster">
+<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
 <!ENTITY tabGroupsButton.tooltip       "Sekmelerini grupla">

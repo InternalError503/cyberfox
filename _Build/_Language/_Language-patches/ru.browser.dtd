@@ -40,6 +40,8 @@
 <!ENTITY openLocationCmd.label         "Открыть адрес…">
 <!ENTITY openLocationCmd.accesskey     "L">
 <!ENTITY bookmarksMenuButton.tooltip   "Показать Ваши закладки">
+<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
 <!ENTITY tabGroupsButton.tooltip       "Группировка вкладок">

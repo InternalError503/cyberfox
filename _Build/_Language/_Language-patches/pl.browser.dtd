@@ -39,6 +39,8 @@
 <!ENTITY openLocationCmd.label         "Otwórz lokalizację…">
 <!ENTITY openLocationCmd.accesskey     "L">
 <!ENTITY bookmarksMenuButton.tooltip   "Wyświetl zakładki">
+<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
 <!ENTITY tabGroupsButton.tooltip       "Pogrupuj karty">

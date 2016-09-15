@@ -39,6 +39,8 @@
 <!ENTITY openLocationCmd.label         "Adresse öffnen…">
 <!ENTITY openLocationCmd.accesskey     "L">
 <!ENTITY bookmarksMenuButton.tooltip   "Meine Lesezeichen anzeigen">
+<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
 <!ENTITY tabGroupsButton.tooltip       "Tabs gruppieren">
