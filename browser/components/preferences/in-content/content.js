@@ -183,13 +183,17 @@ var gContentPane = {
   showImageExceptions: function ()
   {
     var bundlePreferences = document.getElementById("bundlePreferences");
-    var params = { blockVisible: false, sessionVisible: false, allowVisible: true,
-                   prefilledHost: "", permissionType: "image" }
+    var params = { 
+					blockVisible: true, 
+					sessionVisible: false, 
+					allowVisible: true,
+					prefilledHost: "", 
+					permissionType: "image"};
     params.windowTitle = bundlePreferences.getString("imagepermissionstitle");
     params.introText = bundlePreferences.getString("imagepermissionstext");
 
     gSubDialog.open("chrome://browser/content/preferences/permissions.xul", 
-                    "resizable=yes", params);
+                    null, params);
   },
 
   // JAVASCRIPT
