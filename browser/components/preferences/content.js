@@ -194,7 +194,7 @@ var gContentPane = {
     var bundlePreferences = document.getElementById("bundlePreferences");
     var params = {
 					blockVisible: true,
-					sessionVisible: true,
+					sessionVisible: false,
 					allowVisible: true,
 					prefilledHost: "",
 					permissionType: "image" };
