@@ -17,29 +17,34 @@
 # link title for https://cyberfox.8pecxstudios.com/
 #define getting_started Getting Started
 
-# LOCALIZATION NOTE (firefox_heading):
+# LOCALIZATION NOTE (Cyberfox_heading):
 # Firefox links folder name
-#define firefox_heading 8pecxstudios
+#define cyberfox_heading 8pecxstudios
 
-# LOCALIZATION NOTE (firefox_help):
+# LOCALIZATION NOTE (Cyberfox_help):
 # link title for https://8pecxstudios.com/Forums/viewforum.php?f=8
-#define firefox_help Help and Tutorials
+#define cyberfox_help Help and Tutorials
 
-# LOCALIZATION NOTE (Cyberfox_customize):
-# link title for https://8pecxstudios.com/Forums/viewforum.php?f=11
-#define firefox_customize Customize Cyberfox
+# LOCALIZATION NOTE (Cyberfox_update):
+# link title for https://cyberfox.8pecxstudios.com#selection
+#define cyberfox_update Stay up to date
 
-# LOCALIZATION NOTE (firefox_community):
+# LOCALIZATION NOTE (Cyberfox_community):
 # link title for https://8pecxstudios.com/Forums/index.php
-#define firefox_community Get Involved
+#define cyberfox_community Get Involved
 
-# LOCALIZATION NOTE (firefox_about):
+# LOCALIZATION NOTE (Cyberfox_about):
 # link title for https://cyberfox.8pecxstudios.com/about-us
-#define firefox_about About Us
+#define cyberfox_about About Us
 
-# LOCALIZATION NOTE (firefox_feedback):
+# LOCALIZATION NOTE (Cyberfox_feedback):
 # link title for browser feedback page
-# currently used by Metro only: https://8pecxstudios.com/Forums/viewforum.php?f=9
-#define firefox_feedback User Reviews
+# link title for https://8pecxstudios.com/Forums/viewforum.php?f=9
+#define cyberfox_feedback User Reviews
+
+# LOCALIZATION NOTE (Cyberfox_notifications):
+# link title for browser notifications page
+# link title for https://cyberfox.8pecxstudios.com/notifications
+#define cyberfox_notifications Notifications
 
 #unfilter emptyLines

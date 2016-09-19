@@ -32,28 +32,38 @@ template = '''#filter emptyLines
 #define bookmarks_toolbarfolder_description %s
 
 # LOCALIZATION NOTE (getting_started):
-# link title for https://www.mozilla.org/en-US/firefox/central/
-#define getting_started %s
+# link title for https://cyberfox.8pecxstudios.com/
+#define getting_started Getting Started
 
-# LOCALIZATION NOTE (firefox_heading):
+# LOCALIZATION NOTE (Cyberfox_heading):
 # Firefox links folder name
-#define firefox_heading %s
+#define cyberfox_heading 8pecxstudios
 
-# LOCALIZATION NOTE (firefox_help):
-# link title for https://www.mozilla.org/en-US/firefox/help/
-#define firefox_help %s
+# LOCALIZATION NOTE (Cyberfox_help):
+# link title for https://8pecxstudios.com/Forums/viewforum.php?f=8
+#define cyberfox_help Help and Tutorials
 
-# LOCALIZATION NOTE (firefox_customize):
-# link title for https://www.mozilla.org/en-US/firefox/customize/
-#define firefox_customize %s
+# LOCALIZATION NOTE (Cyberfox_update):
+# link title for https://cyberfox.8pecxstudios.com#selection
+#define cyberfox_update Stay up to date
 
-# LOCALIZATION NOTE (firefox_community):
-# link title for https://www.mozilla.org/en-US/contribute/
-#define firefox_community %s
+# LOCALIZATION NOTE (Cyberfox_community):
+# link title for https://8pecxstudios.com/Forums/index.php
+#define cyberfox_community Get Involved
 
-# LOCALIZATION NOTE (firefox_about):
-# link title for https://www.mozilla.org/en-US/about/
-#define firefox_about %s
+# LOCALIZATION NOTE (Cyberfox_about):
+# link title for https://cyberfox.8pecxstudios.com/about-us
+#define cyberfox_about About Us
+
+# LOCALIZATION NOTE (Cyberfox_feedback):
+# link title for browser feedback page
+# link title for https://8pecxstudios.com/Forums/viewforum.php?f=9
+#define cyberfox_feedback User Reviews
+
+# LOCALIZATION NOTE (Cyberfox_notifications):
+# link title for browser notifications page
+# link title for https://cyberfox.8pecxstudios.com/notifications
+#define cyberfox_notifications Notifications
 
 #unfilter emptyLines'''
 
