@@ -91,9 +91,6 @@ static const char kAsyncInitPref[] = "dom.ipc.plugins.asyncInit.enabled";
 #ifdef XP_WIN
 static const char kHangUITimeoutPref[] = "dom.ipc.plugins.hangUITimeoutSecs";
 static const char kHangUIMinDisplayPref[] = "dom.ipc.plugins.hangUIMinDisplaySecs";
-#ifdef _WIN64
-static const char *kCompatStageThreeDeePref = "dom.ipc.plugins.stage3dcompat";
-#endif
 #define CHILD_TIMEOUT_PREF kHangUITimeoutPref
 #else
 #define CHILD_TIMEOUT_PREF kChildTimeoutPref
@@ -2696,15 +2693,15 @@ PluginModuleParent::NPP_NewInternal(NPMIMEType pluginType, NPP instance,
 #ifdef XP_WIN
         bool supportsAsyncRender = false;
         CallModuleSupportsAsyncRender(&supportsAsyncRender);
-        /* 
-			Force windowless mode (bug 1201904) when sandbox level >= 2
-			We briefly will allow a preference controlled override to allow Stage3D to work.
-		*/
 #ifdef _WIN64
-		if (!supportsAsyncRender && mSandboxLevel >= 2 && !Preferences::GetBool(kCompatStageThreeDeePref, false)) {
-#else	
+        // For 64-bit builds force windowless if the flash library doesn't support
+        // async rendering regardless of sandbox level.
+        if (!supportsAsyncRender) {
+#else
+        // For 32-bit builds force windowless if the flash library doesn't support
+        // async rendering and the sandbox level is 2 or greater.
         if (!supportsAsyncRender && mSandboxLevel >= 2) {
-#endif			
+#endif
            NS_NAMED_LITERAL_CSTRING(wmodeAttributeName, "wmode");
            NS_NAMED_LITERAL_CSTRING(opaqueAttributeValue, "opaque");
            auto wmodeAttributeIndex =
@@ -2717,7 +2714,7 @@ PluginModuleParent::NPP_NewInternal(NPMIMEType pluginType, NPP instance,
                names.AppendElement(wmodeAttributeName);
                values.AppendElement(opaqueAttributeValue);
            }
-        }	
+        }
 #endif
     }
 

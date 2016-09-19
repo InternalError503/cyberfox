@@ -888,11 +888,6 @@ pref("browser.flash-protected-mode-flip.enable", false);
 // Whether we've already flipped protected mode automatically
 pref("browser.flash-protected-mode-flip.done", false);
 
-#if defined(_AMD64_)
-// Wheater to enable stage 3d support in x64 bit at the loss of some sandbox protection to allow flash games to work. (Default: False)
-pref("dom.ipc.plugins.stage3dcompat", false);
-#endif
-
 pref("dom.ipc.shims.enabledWarnings", false);
 
 // Start the browser in e10s mode
