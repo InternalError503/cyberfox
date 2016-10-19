@@ -15,6 +15,7 @@
 <!ENTITY Ctr_windowcontrols	"Свернуть/развернуть/закрыть (В полноэкранном режиме)">
 <!ENTITY Ctr_rr				"Перезапустите &brandShortName;!">
 <!ENTITY Ctr_window			"окно">
+<!ENTITY Ctr_centered		"По центру">
 
 <!ENTITY Ctr_cuibuttons		"Кнопки:">
 <!ENTITY Ctr_cuibutnormal	"Обычные">
@@ -48,6 +49,7 @@
 <!ENTITY Ctr_tabwidthcla	"(классическая)">
 <!ENTITY Ctr_tabminheight	"Высота:">
 <!ENTITY Ctr_tabheightinfo	"Низкое значение вызовет сбои в развёрнутом режиме!">
+<!ENTITY Ctr_ctrltabprev	"Предварительный просмотр вкладок при переключении по 'Ctrl + Tab'">
 <!ENTITY Ctr_tabmaxwidth	"Макс. ширина:">
 <!ENTITY Ctr_tabminwidth	"Мин. ширина:">
 <!ENTITY Ctr_tabwidthinfo	"Минимальная и максимальная ширина вкладок изменяются расширением TabMixPlus">
@@ -150,10 +152,13 @@
 <!ENTITY Ctr_nbisizedelay0	"Задержка выполнения">
 <!ENTITY Ctr_nbisizedelay	"мс (1000 мс = 1 сек)">
 <!ENTITY Ctr_findbar		"Панель поиска">
+<!ENTITY Ctr_findbar_hws	"Закрывать панель поиска при прокрутке страницы">
+<!ENTITY Ctr_findbar_width	"Ширина панели поиска: ">
+<!ENTITY Ctr_findbarpos		"Положение панели поиска">
 <!ENTITY Ctr_findbar_def	"Положение по умолчанию">
-<!ENTITY Ctr_findbar_top	"вверху">
-<!ENTITY Ctr_findbar_topa	"вверху (по-другому)">
-<!ENTITY Ctr_findbar_bota	"внизу (по-другому)">
+<!ENTITY Ctr_findbar_top	"Вверху">
+<!ENTITY Ctr_findbar_topa	"Вверху (по-другому)">
+<!ENTITY Ctr_findbar_bota	"Внизу (по-другому)">
 <!ENTITY Ctr_nav_txt_ico0	"Показывать только значки (по умолчанию)">
 <!ENTITY Ctr_nav_txt_ico1	"Показывать большие значки">
 <!ENTITY Ctr_nav_txt_ico2	"Показывать значки и текст">
@@ -168,6 +173,7 @@
 <!ENTITY Ctr_ctroldsearch	"Старая форма поиска">
 <!ENTITY Ctr_ctroldsearchc	"Очистить форму после поиска">
 <!ENTITY Ctr_ctroldsearchr	"По окончании поиска переключаться на первую в списке поисковую систему">
+<!ENTITY Ctr_ctrosearchdel	"Задержка выполнения">
 <!ENTITY Ctr_search_oit		"Открывать поиск в новой вкладке">
 <!ENTITY Ctr_osearch_meoit	"Клик средней кнопкой: поиск в новой активной вкладке">
 <!ENTITY Ctr_osearch_iwidth	"Автоматически подгонять ширину всплывающего меню">
@@ -175,6 +181,7 @@
 <!ENTITY Ctr_osearch_dm		"Маленький маркер">
 <!ENTITY Ctr_addonmanager	"Управление дополнениями">
 <!ENTITY Ctr_alt_addonsp	"Альтернативное представление страницы дополнительной информации о дополнениях">
+<!ENTITY Ctr_am_showrecup	"Всегда отображать категорию 'Последние обновления'">
 <!ENTITY Ctr_alt_addonsm	"Управление дополнениями: альтернативное представление">
 <!ENTITY Ctr_am_nowarning	"Список дополнений в менеджере: скрыть предупреждения">
 <!ENTITY Ctr_am_compact		"Компактный вид списка дополнений">
@@ -188,6 +195,7 @@
 <!ENTITY Ctr_hiderecentbm	"Всплывающее меню: скрывать недавно добавленные закладки">
 <!ENTITY Ctr_hideeditbm		"Звездочка закладок: скрыть всплытие (если страница не в закладках)">
 <!ENTITY Ctr_oldplacesbut	"Папки и элементы закладок на панели инструментов: старый внешний вид">
+<!ENTITY Ctr_dl_pm_drop		"Панель кнопок загрузки: отображать выпадающее меню">
 <!ENTITY Ctr_bmbutpanelm	"Всплывающее меню: вид панели меню">
 <!ENTITY Ctr_bmbunsortbm	"Всплывающее меню: подменю 'несортированные закладки'">
 <!ENTITY Ctr_bmbunsortbm2	"Меню над закладками">
@@ -237,6 +245,7 @@
 <!ENTITY Ctr_italic			"Курсив">
 <!ENTITY Ctr_underlined		"Подчеркнутый">
 <!ENTITY Ctr_notabhov		"Разрешить перезапись настроек при 'зависании'">
+<!ENTITY Ctr_tablowopa		"Снизить видимость вкладки">
 <!ENTITY Ctr_tabc_act_tb	"Цвет фона панели инструментов">
 
 <!ENTITY Ctr_urlbar			"Адресная строка">
@@ -275,6 +284,7 @@
 <!ENTITY Ctr_autocompl_it	"Удалить пункты «Искать в...» и «Посетить» (при наличии)">
 <!ENTITY Ctr_autocompl_hl	"Подсветка найденных фрагментов текста">
 <!ENTITY Ctr_autocompl_rhl	"Цвета Aero для подсвеченных результатов">
+<!ENTITY Ctr_autocompl_not	"Скрывать заголовок страницы">
 <!ENTITY Ctr_autocompl_sep	"Разделитель между результатами">
 <!ENTITY Ctr_urlbar_uc		"Отключить функцию «автозаполнение»">
 <!ENTITY Ctr_lbsugresi		"Отображать максимально возможное количество результатов в подсказках (без прокрутки)">
@@ -333,6 +343,7 @@
 <!ENTITY Ctr_nonavbarbg2	"Поддержка всех панелей инструментов в стиле Slim Chrome при использовании расширения «Beyond Australis».">
 <!ENTITY Ctr_nonavborder	"Панель закладок: добавить верхнюю границу для панели инструментов">
 <!ENTITY Ctr_nonavtbborder	"Популярные панели инструментов: удалить границы панелей инструментов">
+<!ENTITY Ctr_toptb_oldpad	"Верхние панели: вернуть старые отступы слева и справа">
 <!ENTITY Ctr_hidesbclose	"Боковые панели: скрыть кнопку «Закрыть» на боковой панели">
 <!ENTITY Ctr_notextshadow	"Скрыть тень под шрифтами вкладок и панелей инструментов">
 <!ENTITY Ctr_chevronfix		"Панель навигации: скрыть двойную стрелку ('шеврон') в конце панели">

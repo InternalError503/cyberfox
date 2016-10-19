@@ -427,6 +427,8 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_anewtaburlpurlbox').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_cresultshbox').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_aboutpages').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_ctrltabprev').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_autocompl_not').style.visibility = 'collapse';
 	}
 
 	if (this.appversion >= 48) {
@@ -458,6 +460,9 @@ classicthemerestorerjso.ctr = {
 	if (this.appversion < 51) {
 	  document.getElementById('ctraddon_pw_oneoffsearchgb').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_hideurlzoom').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_dl_pm_drop').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_dl_pm_dropdes').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_toptb_oldpad').style.visibility = 'collapse';
 	}
 	
 	function PrefListener(branch_name, callback) {
@@ -520,23 +525,60 @@ classicthemerestorerjso.ctr = {
 	  "extensions.classicthemerestorer.",
 	  function(branch, name) {
 		switch (name) {
+			
+		  case "tttitlebar":
+		    if(branch.getBoolPref("tttitlebar"))
+			  document.getElementById('ctraddon_pw_tttitlebar_c').disabled = false;
+			else
+			  document.getElementById('ctraddon_pw_tttitlebar_c').disabled = true;
+		  break;
 
 		  case "ctabmwidth": case "ctabwidth":
-		  
 		    if(branch.getIntPref("ctabmwidth")<48 || branch.getIntPref("ctabwidth")<48 )
 			  document.getElementById('ctraddon_pw_tabwidthinfo3').style.visibility = 'visible';
 			else
 			  document.getElementById('ctraddon_pw_tabwidthinfo3').style.visibility = 'collapse';
-		  
 		  break;
 		  
 		  case "ctabheightcb":
-		  
 		    if(branch.getBoolPref("ctabheightcb"))
 			  document.getElementById('ctraddon_pw_tabheightinfo').style.visibility = 'visible';
 			else
 			  document.getElementById('ctraddon_pw_tabheightinfo').style.visibility = 'collapse';
+		  break;
 		  
+		  case "altautocompl":
+		    if(branch.getBoolPref("altautocompl")) {
+			  document.getElementById('ctraddon_pw_cresultshcb').disabled = false;
+			  document.getElementById('ctraddon_pw_cresultsh').disabled = false;
+			} else {
+			  document.getElementById('ctraddon_pw_cresultshcb').disabled = true;
+			  document.getElementById('ctraddon_pw_cresultsh').disabled = true;
+			}
+		  break;
+		  
+		  case "ctroldsearchc":
+		    if(branch.getBoolPref("ctroldsearchc"))
+			  document.getElementById('ctraddon_pw_ctroldsearchcdelay').disabled = false;
+			else
+			  document.getElementById('ctraddon_pw_ctroldsearchcdelay').disabled = true;
+		  break;
+		  
+		  case "ctroldsearchr":
+		    if(branch.getBoolPref("ctroldsearchr"))
+			  document.getElementById('ctraddon_pw_ctroldsearchrdelay').disabled = false;
+			else
+			  document.getElementById('ctraddon_pw_ctroldsearchrdelay').disabled = true;
+		  break;
+		  
+		  case "osearch_cwidth":
+		    if(branch.getBoolPref("osearch_cwidth")) {
+			  document.getElementById('ctraddon_os_spsize_minw').disabled = false;
+			  document.getElementById('ctraddon_os_spsize_maxw').disabled = false;
+			} else {
+			  document.getElementById('ctraddon_os_spsize_minw').disabled = true;
+			  document.getElementById('ctraddon_os_spsize_maxw').disabled = true;
+			}
 		  break;
 		  
 			// Temp fix visual glitch changing from square to curved tabs after installing TMP
@@ -737,11 +779,9 @@ classicthemerestorerjso.ctr = {
 	this.ctrpwUnsortBM(this.prefs.getBoolPref("bmbunsortbm"));
 	this.ctrpwHideUrlStopRel(this.prefs.getBoolPref("hideurelstop"));
 	this.ctrpwExtraUrlbar(this.prefs.getBoolPref("extraurlkeycb"));
-	this.ctrpwSearchPopupSize(this.prefs.getBoolPref("osearch_cwidth"));
 	this.ctrpwAeroColors(this.prefs.getBoolPref("aerocolors"));
 	this.ctrpwOldTopLevelImg(this.prefs.getBoolPref("oldtoplevimg"));
 	this.ctrpwAutoCompleteHeight(this.prefs.getBoolPref("urlresults"));
-	this.ctrpwAltAutocomplete(this.prefs.getBoolPref("altautocompl"));
 	
 	var closetab_value = this.prefs.getCharPref("closetab");
   
@@ -947,11 +987,9 @@ classicthemerestorerjso.ctr = {
 	var itemvis = 'collapse';
 	
     if(which==true) {
-	  which=false;
-	  itemvis = 'visible';
+	  which=false; itemvis = 'visible';
 	} else {
-	  which=true;
-	  itemvis = 'collapse';
+	  which=true; itemvis = 'collapse';
 	}
 	
     document.getElementById('ctraddon_pw_hide_bf_popup').disabled = which;
@@ -1100,16 +1138,7 @@ classicthemerestorerjso.ctr = {
 	
     document.getElementById('ctraddon_extraurltarget_list').disabled = which;
   },
-  
-  ctrpwSearchPopupSize: function(which) {
-	
-    if(which==true) which=false;
-	else which=true;
-	
-	document.getElementById('ctraddon_os_spsize_minw').disabled = which;
-	document.getElementById('ctraddon_os_spsize_maxw').disabled = which;
-  },
-  
+
   ctrpwAeroColors: function(which) {
 	var itemvis = 'collapse';
 	
@@ -1145,15 +1174,6 @@ classicthemerestorerjso.ctr = {
 
   },
   
-  ctrpwAltAutocomplete: function(which) {
-	
-    if(which==true) which=false;
-	else which=true;
-	
-    document.getElementById('ctraddon_pw_cresultshcb').disabled = which;
-	document.getElementById('ctraddon_pw_cresultsh').disabled = which;
-  },
-
   ctrpwCtrOldSearch: function(which) {
 	
     if(which==true) which=false;
@@ -1171,6 +1191,16 @@ classicthemerestorerjso.ctr = {
 	} else {
 	  document.getElementById('ctraddon_os_spsize_minw').disabled = true;
 	  document.getElementById('ctraddon_os_spsize_maxw').disabled = true;
+	}
+	if(this.prefs.getBoolPref("ctroldsearchc") && which == false) {
+	  document.getElementById('ctraddon_pw_ctroldsearchcdelay').disabled = false;
+	} else {
+	  document.getElementById('ctraddon_pw_ctroldsearchcdelay').disabled = true;
+	}
+	if(this.prefs.getBoolPref("ctroldsearchr") && which == false) {
+	  document.getElementById('ctraddon_pw_ctroldsearchrdelay').disabled = false;
+	} else {
+	  document.getElementById('ctraddon_pw_ctroldsearchrdelay').disabled = true;
 	}
 	
   },
@@ -1500,13 +1530,15 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("hideurlsrg",true);
 
 	this.prefs.setBoolPref("oldsearch",true);
+
+	if(this.appversion >= 48) {
+	  this.prefs.setBoolPref("altautocompl",true);
+	  this.prefs.setBoolPref("aboutpages",true);
+	}
 	
 	if(this.appversion >= 50)
 	  this.prefs.setBoolPref("oldplacesbut",true);
-
-	if(this.appversion >= 48)
-	  this.prefs.setBoolPref("altautocompl",true);
-	
+  
 	setTimeout(function(){
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("starinurl",true);
 		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref("feedinurl",true);
@@ -1529,11 +1561,20 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("statusbar",false);
 	this.prefs.setBoolPref("activndicat",false);
 	this.prefs.setBoolPref("cuibuttons",false);
-	
+	this.prefs.setCharPref("altoptions",'options_default');
+	this.prefs.setBoolPref("alt_addonsm",false);
+	this.prefs.setBoolPref("am_highlight",false);
 	if (this.oswindows) this.prefs.setBoolPref("dblclnewtab",true);
 	
 	this.needsBrowserRestart();
 
+  },
+
+  openNewTabLinkFromPW: function(url) {
+	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+					   .getService(Components.interfaces.nsIWindowMediator);
+	var mainWindow = wm.getMostRecentWindow("navigator:browser");
+	mainWindow.gBrowser.selectedTab = mainWindow.gBrowser.addTab(url);
   },
 
 	// Need to check if json is valid. If json not valid. don't continue and show error.

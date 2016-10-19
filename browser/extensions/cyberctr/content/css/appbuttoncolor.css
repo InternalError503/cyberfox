@@ -1,0 +1,27 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+@-moz-document url(chrome://browser/content/browser.xul) {
+	:root {
+		--color-button-main: linear-gradient(rgb(247,182,82), rgb(215,98,10) 95%);
+	}
+	#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button {
+	  background: var(--color-button-main) !important;
+	  border-color: rgba(83,42,6,.9) !important;
+	  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset,
+				  0 0 0 1px rgba(255,255,255,.25) inset !important;
+	}
+	#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button:hover:not(:active):not([open]){
+	  background-image: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),
+	radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),
+	var(--color-button-main) !important;
+	  border-color: rgba(83,42,6,.9) !important;
+	  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,
+				  0 0 2px 1px rgba(250,234,169,.7) inset,
+				  0 -1px 0 rgba(250,234,169,.5) inset !important;
+	}
+	#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button:hover:active,
+	#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button[open]{
+	  background-image: var(--color-button-main) !important;
+	  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,
+				  0 1px 1px rgba(0,0,0,.2) inset !important;
+	}
+}

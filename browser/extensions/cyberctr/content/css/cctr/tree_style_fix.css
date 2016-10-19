@@ -3,5 +3,5 @@
 *  Note: Menu-Bar Still Needs To Be Enabled.
 */ 
 #toolbar-menubar{
-	visibility:hidden;
+	visibility:collapse!important;
 }

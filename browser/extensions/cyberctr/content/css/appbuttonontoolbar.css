@@ -1,0 +1,57 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+@-moz-document url(chrome://browser/content/browser.xul) {	
+	:root {
+		--color-button-main: linear-gradient(rgb(247,182,82), rgb(215,98,10) 95%);
+		--color-button-text: white;
+		--text-style-shadow: 0 0 1px rgba(0,0,0,.7), 0 1px 1.5px rgba(0,0,0,.5);
+	}	
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-icon,
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text {
+		background: var(--color-button-main) !important;
+		border-color: hsla(210,59%,13%,.9) !important;
+		box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,
+				  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;
+	}
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-icon,
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-text {
+		background: var(--color-button-main) !important;
+		border-color: hsla(210,59%,13%,.9) !important;
+		box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,
+				  0 0 2px 1px hsla(210,48%,90%,.4) inset,
+				  0 -1px 0 hsla(210,48%,90%,.2) inset !important;
+	}
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-icon,
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-icon,
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-text,
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-text {
+		background-image: var(--color-button-main) !important;
+		box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,
+				  0 1px 1px rgba(0,0,0,.2) inset !important;
+	}
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-icon,
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text{
+		background-image: linear-gradient(rgb(153,38,211), rgb(105,19,163) 95%) !important;
+		border-color: rgba(43,8,65,.9) !important;
+	}
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-icon,
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-text{
+		background-image: radial-gradient(farthest-side at center bottom, rgba(240,193,255,.5) 10%, rgba(240,193,255,0) 70%),
+						radial-gradient(farthest-side at center bottom, rgb(192,81,247), rgba(236,172,255,0)),
+						linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;
+		border-color: rgba(43,8,65,.9) !important;
+		box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,
+				  0 0 2px 1px rgba(240,193,255,.7) inset,
+				  0 -1px 0 rgba(240,193,255,.5) inset !important;
+	}
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-icon,
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-icon,
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-text,
+	#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-text{
+		background-image: linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;
+	}
+	toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text {
+	  color: var(--color-button-text) !important;
+	  text-shadow: var(--text-style-shadow) !important;
+	  font-weight:bold !important;
+	}
+}

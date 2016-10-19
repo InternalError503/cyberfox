@@ -41,4 +41,9 @@
 	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
 	  -moz-image-region: rect(0px, 512px, 32px, 480px) !important;
 	}
+	
+	#nav-bar #tbar-clonenewwindowpb {
+	  list-style-image: url("chrome://classic_theme_restorer/content/images/menuPanel2.png") !important;
+	  -moz-image-region: rect(0px, 544px, 32px, 512px) !important;
+	}	
 }

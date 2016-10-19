@@ -1,0 +1,15 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+@-moz-document url(chrome://browser/content/browser.xul) {
+
+	#nav-bar-customization-target > toolbaritem:not(#search-container):not(#urlbar-container) toolbarbutton,
+	#nav-bar-customization-target > toolbarbutton toolbarbutton,
+	#nav-bar-customization-target > #bookmarks-menu-button .toolbarbutton-menubutton-dropmarker,
+	#nav-bar-customization-target > toolbarbutton,
+	#nav-bar-customization-target,
+	#nav-bar-overflow-button {
+	  margin-top:-1px !important;
+	  margin-bottom: -1px !important;
+	}
+
+}

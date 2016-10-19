@@ -15,6 +15,7 @@
 <!ENTITY Ctr_windowcontrols	"最小化/最大化/關閉 (全螢幕)">
 <!ENTITY Ctr_rr				"需重啟 &brandShortName;!">
 <!ENTITY Ctr_window			"視窗">
+<!ENTITY Ctr_centered		"Centered">
 
 <!ENTITY Ctr_cuibuttons		"按鈕">
 <!ENTITY Ctr_cuibutnormal	"標準圖示">
@@ -48,6 +49,7 @@
 <!ENTITY Ctr_tabwidthcla	"(經典傳統)">
 <!ENTITY Ctr_tabminheight	"高度:">
 <!ENTITY Ctr_tabheightinfo	"在視窗最大化模式下，過小的值可能導致故障!">
+<!ENTITY Ctr_ctrltabprev	"Preview tabs using 'Ctrl + Tab'">
 <!ENTITY Ctr_tabmaxwidth	"最大寬度:">
 <!ENTITY Ctr_tabminwidth	"最小寬度:">
 <!ENTITY Ctr_tabwidthinfo	"分頁的最小和最大寬度由 Tab Mix Plus 控制">
@@ -149,7 +151,10 @@
 <!ENTITY Ctr_navlargeicons	"大圖示">
 <!ENTITY Ctr_nbisizedelay0	"瀏覽器啟動後的初始化延遲">
 <!ENTITY Ctr_nbisizedelay	"毫秒 (1000 毫秒 = 1 秒)">
-<!ENTITY Ctr_findbar		"尋找列位於">
+<!ENTITY Ctr_findbar		"Findbar">
+<!ENTITY Ctr_findbar_hws	"Close findbar when scrolling page">
+<!ENTITY Ctr_findbar_width	"Findboxes width: ">
+<!ENTITY Ctr_findbarpos		"尋找列位於">
 <!ENTITY Ctr_findbar_def	"預設位置">
 <!ENTITY Ctr_findbar_top	"頂部">
 <!ENTITY Ctr_findbar_topa	"頂部 (非預設風格)">
@@ -168,6 +173,7 @@
 <!ENTITY Ctr_ctroldsearch	"傳統搜尋列">
 <!ENTITY Ctr_ctroldsearchc	"搜尋後清除搜尋列">
 <!ENTITY Ctr_ctroldsearchr	"Revert to first search engine in list after search">
+<!ENTITY Ctr_ctrosearchdel	"delay">
 <!ENTITY Ctr_search_oit		"Open search in new tab">
 <!ENTITY Ctr_osearch_meoit	"Middle-clicks: search in new 'foreground tab'">
 <!ENTITY Ctr_osearch_iwidth	"Automatically adjust popup width">
@@ -175,6 +181,7 @@
 <!ENTITY Ctr_osearch_dm		"Small dropmarker">
 <!ENTITY Ctr_addonmanager	"附加元件管理員">
 <!ENTITY Ctr_alt_addonsp	"「更多資訊」頁面: 換個項目順序">
+<!ENTITY Ctr_am_showrecup	"Always show 'Recent updates' category">
 <!ENTITY Ctr_alt_addonsm	"換個外觀">
 <!ENTITY Ctr_am_nowarning	"附加元件清單: 隱藏警告">
 <!ENTITY Ctr_am_compact		"附加元件清單: 緊湊風格">
@@ -188,6 +195,7 @@
 <!ENTITY Ctr_hiderecentbm	"Bookmarks popup: hide recently added bookmarks">
 <!ENTITY Ctr_hideeditbm		"Bookmarks star: hide popup (if page is not bookmarked)">
 <!ENTITY Ctr_oldplacesbut	"Bookmark items and folders on toolbar: old appearance">
+<!ENTITY Ctr_dl_pm_drop		"Download buttons panel: show dropmarker">
 <!ENTITY Ctr_bmbutpanelm	"彈出式書籤選單: 書籤選單使用和面板選單同風格的外觀">
 <!ENTITY Ctr_bmbunsortbm	"彈出式書籤選單: 「未排序書籤」項目附加子選單">
 <!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
@@ -237,6 +245,7 @@
 <!ENTITY Ctr_italic			"斜體">
 <!ENTITY Ctr_underlined		"Underlined">
 <!ENTITY Ctr_notabhov		"優先權高於「分頁(懸停)」的設定">
+<!ENTITY Ctr_tablowopa		"Reduce tab visibility">
 <!ENTITY Ctr_tabc_act_tb	"將目前分頁的背景顏色套用到工具列上">
 
 <!ENTITY Ctr_urlbar			"網址列">
@@ -275,6 +284,7 @@
 <!ENTITY Ctr_autocompl_it	"Remove 'Search with...' and 'Visit' items (if present)">
 <!ENTITY Ctr_autocompl_hl	"Highlighting of text hits">
 <!ENTITY Ctr_autocompl_rhl	"Aero colors for highlighted results">
+<!ENTITY Ctr_autocompl_not	"Hide page title">
 <!ENTITY Ctr_autocompl_sep	"Show separator between results">
 <!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature">
 <!ENTITY Ctr_lbsugresi		"Disable height limit">
@@ -333,6 +343,7 @@
 <!ENTITY Ctr_nonavbarbg2	"「Beyond Australis」套件之精簡介面(Slim Chrome)的工具列都受影響。">
 <!ENTITY Ctr_nonavborder	"書籤列: 顯示上邊框">
 <!ENTITY Ctr_nonavtbborder	"頂部工具列: 移除工具列邊框">
+<!ENTITY Ctr_toptb_oldpad	"Top toolbars: old left and right padding">
 <!ENTITY Ctr_hidesbclose	"側邊欄: 隱藏側邊欄關閉按鈕">
 <!ENTITY Ctr_notextshadow	"工具列: 隱藏工具列和分頁的文字陰影">
 <!ENTITY Ctr_chevronfix		"瀏覽工具列: 隱藏工具列末端的雙右箭頭 (「更多工具...」按鈕)">

@@ -306,6 +306,11 @@
 	  background-position: 0px 2px !important;
 	  background-size: calc(100% - 0px) calc(100% - 1px) !important;
 	}
+	
+	#main-window[fx51plus="true"] .tabbrowser-tab::after,
+	#main-window[fx51plus="true"] .tabbrowser-tab::before {
+	  opacity: 0 !important;
+	}
 
 	#tabbrowser-tabs[movingtab] > .tabbrowser-tab[beforeselected]:not([last-visible-tab])::after,
 	.tabbrowser-tab:not([selected]):not([afterselected-visible]):not([afterhovered]):not([first-visible-tab]):not(:hover)::before,
@@ -348,10 +353,6 @@
 	  border-bottom: 0px !important;
 	}
 	
-	/*#main-window[tabsontop="false"]:-moz-lwtheme #TabsToolbar #tabbrowser-tabs .tabbrowser-tab[selected] {
-	  background:none !important
-	}*/
-
 	/* remove ridiculous clipping */
 	#main-window[tabsintitlebar]:not([sizemode="maximized"]):not([inFullscreen]) #toolbar-menubar:-moz-any([autohide="true"][inactive],:not([autohide])) + #TabsToolbar .tab-background-middle:not([selected=true]) {
 	  clip-path: none !important;

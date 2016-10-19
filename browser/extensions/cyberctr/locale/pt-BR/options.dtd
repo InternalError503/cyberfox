@@ -3,7 +3,7 @@
   %overlayDTD;
 <!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
 
-<!ENTITY Ctr_title			"Customize &brandShortName;">
+<!ENTITY Ctr_title			"Customizar &brandShortName;">
 
 <!ENTITY Ctr_addonbar		"Barra de complementos">
 <!ENTITY Ctr_statusbar		"Barra de status">
@@ -15,6 +15,7 @@
 <!ENTITY Ctr_windowcontrols	"Mínimo/máximo/fechar (tela cheia)">
 <!ENTITY Ctr_rr				"Reinicie o &brandShortName;!">
 <!ENTITY Ctr_window			"Janela">
+<!ENTITY Ctr_centered		"Centralizado">
 
 <!ENTITY Ctr_cuibuttons		"Botões">
 <!ENTITY Ctr_cuibutnormal	"Normais">
@@ -48,6 +49,7 @@
 <!ENTITY Ctr_tabwidthcla	"(clássica)">
 <!ENTITY Ctr_tabminheight	"Altura:">
 <!ENTITY Ctr_tabheightinfo	"Baixos valores causarão falhas no modo maximizado!">
+<!ENTITY Ctr_ctrltabprev	"Pré-visualizar abas usando 'Ctrl + Tab'">
 <!ENTITY Ctr_tabmaxwidth	"Largura máxima:">
 <!ENTITY Ctr_tabminwidth	"Largura mínima:">
 <!ENTITY Ctr_tabwidthinfo	"Larguras mínimas e máximas são controladas pelo 'TabMixPlus'">
@@ -125,9 +127,9 @@
 <!ENTITY Ctr_altoptionswh	"Altura">
 <!ENTITY Ctr_altoptionsi	"A janela de opções simulada não é mais um diálogo, mas uma 'janela do navegador' com todas as barras de ferramentas ocultadas. O recurso 'Usar página atual' somente adicionas URLs de páginas abertas na janela atual, que é somente 'about:preferences' neste caso. O botão 'Opções' na barra de ferramentas foi substituída por uma nova para ser possível abrir as opções em uma janela.">
 <!ENTITY Ctr_options_rem	"Lembrar última categoria selecionada">
-<!ENTITY Ctr_aboutpages		"General 'about:' pages: alternative appearance">
+<!ENTITY Ctr_aboutpages		"Páginas 'about:' gerais: aparência alternativa">
 <!ENTITY Ctr_svgfilters		"Cores sVG para os ícones dos botões da barra de ferramentas padrão">
-<!ENTITY Ctr_wincontrols	"Controles móveis da janela em tela cheia">
+<!ENTITY Ctr_wincontrols	"Controles móveis da janela para o modo tela cheia">
 <!ENTITY Ctr_puibuttonsep	"Separador de botões do menu">
 <!ENTITY Ctr_puibut_no_sep	"Oculto">
 <!ENTITY Ctr_puibut_l_sep	"Esquerda">
@@ -150,6 +152,9 @@
 <!ENTITY Ctr_nbisizedelay0	"Atraso (em msegs.) na execução">
 <!ENTITY Ctr_nbisizedelay	"msegs. (1000 msegs. = 1 seg.)">
 <!ENTITY Ctr_findbar		"Barra de pesquisas">
+<!ENTITY Ctr_findbar_hws	"Fechar barra de pesquisas ao rolar pela página">
+<!ENTITY Ctr_findbar_width	"Largura das caixas de pesquisa: ">
+<!ENTITY Ctr_findbarpos		"Posição das barras de pesquisa">
 <!ENTITY Ctr_findbar_def	"Posição padrão">
 <!ENTITY Ctr_findbar_top	"Posição no topo">
 <!ENTITY Ctr_findbar_topa	"Posição no topo - alternativa">
@@ -168,6 +173,7 @@
 <!ENTITY Ctr_ctroldsearch	"Pesquisa antiga">
 <!ENTITY Ctr_ctroldsearchc	"Limpar caixa de pesquisa após pesquisar">
 <!ENTITY Ctr_ctroldsearchr	"Reverter para primeiro mecanismo de busca na lista após pesquisar">
+<!ENTITY Ctr_ctrosearchdel	"Atraso (em msegs.) na execução">
 <!ENTITY Ctr_search_oit		"Abrir pesquisa em nova aba">
 <!ENTITY Ctr_osearch_meoit	"Cliques do meio: pesquisar em nova 'aba em primeiro plano'">
 <!ENTITY Ctr_osearch_iwidth	"Automaticamente ajustar largura do popup">
@@ -175,6 +181,7 @@
 <!ENTITY Ctr_osearch_dm		"Marcador pequeno">
 <!ENTITY Ctr_addonmanager	"Gerenciador de complementos">
 <!ENTITY Ctr_alt_addonsp	"Página 'Mais informações': ordem alternativa">
+<!ENTITY Ctr_am_showrecup	"Sempre exibir categoria 'Atualizações recentes'">
 <!ENTITY Ctr_alt_addonsm	"Aparência alternativa">
 <!ENTITY Ctr_am_nowarning	"Lista de complementos: ocultar avisos">
 <!ENTITY Ctr_am_compact		"Lista de complementos: visualização compacta">
@@ -187,7 +194,8 @@
 <!ENTITY Ctr_bmbutton		"Botão do menu de favoritos">
 <!ENTITY Ctr_hiderecentbm	"Popup de favoritos: ocultar favoritos adicionados recentemente">
 <!ENTITY Ctr_hideeditbm		"Estrela de favoritos: ocultar popup (se a página não está nos favoritos)">
-<!ENTITY Ctr_oldplacesbut	"Bookmark items and folders on toolbar: old appearance">
+<!ENTITY Ctr_oldplacesbut	"Itens e pastas de favoritos na barra de ferramentas: aparência antiga">
+<!ENTITY Ctr_dl_pm_drop		"Painel dos botões de download: exibir marcador de lista">
 <!ENTITY Ctr_bmbutpanelm	"Popup: aparência do menu do painel">
 <!ENTITY Ctr_bmbunsortbm	"Popup: menu 'outros favoritos'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu acima dos favoritos">
@@ -213,7 +221,7 @@
 <!ENTITY Ctr_navthrobber2	"Adicione uma uRL ou deixe em branco">
 <!ENTITY Ctr_anewtaburl		"URL da página 'Nova Aba'">
 <!ENTITY Ctr_anewtaburlcb	"URL personalizada da página 'Nova Aba' (padrão: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Custom private new tab page url (default: 'about:privatebrowsing')">
+<!ENTITY Ctr_anewtaburlpcb	"URL personalizada da página nova aba privativa (padrão: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Nomes de cores, códigos hex., valores rgb(a) e hsl(a) são suportados.">
 <!ENTITY Ctr_tab_tf_info2	"As entradas não serão validadas!">
@@ -237,6 +245,7 @@
 <!ENTITY Ctr_italic			"Itálico">
 <!ENTITY Ctr_underlined		"Sublinhado">
 <!ENTITY Ctr_notabhov		"As configurações habilitadas substituirão as configurações 'flutuantes'">
+<!ENTITY Ctr_tablowopa		"Reduzir visibilidade da aba">
 <!ENTITY Ctr_tabc_act_tb	"Cor de fundo nas barras de ferramentas">
 
 <!ENTITY Ctr_urlbar			"Barra de URLs">
@@ -250,7 +259,7 @@
 <!ENTITY Ctr_urlbardropm	"Mover marcador para a última posição possível">
 <!ENTITY Ctr_urlbardropm2	"Tornar marcador sempre visível">
 <!ENTITY Ctr_altreaderico	"Ícones alternativos do 'Leitor'">
-<!ENTITY Ctr_hideurlzoom	"Hide zoom button (if present)">
+<!ENTITY Ctr_hideurlzoom	"Ocultar botão de zoom (se disponível)">
 <!ENTITY Ctr_hideprbutton	"Ocultar o Ícone de notificação quando um pop-up ficar bloqueado">
 <!ENTITY Ctr_locsearchbw10	"Reduzir altura das barras de localização e barras de pesquisa (experimental)">
 <!ENTITY Ctr_urlbar_ib		"Botão de identidade do site (caixa de identidade)">
@@ -275,10 +284,11 @@
 <!ENTITY Ctr_autocompl_it	"Remover itens 'Pesquisar com...' e 'Visitar' itens (se presente)">
 <!ENTITY Ctr_autocompl_hl	"Realçar ocorrências do texto">
 <!ENTITY Ctr_autocompl_rhl	"Cores Aero para resultados realçados">
+<!ENTITY Ctr_autocompl_not	"Ocultar título da página">
 <!ENTITY Ctr_autocompl_sep	"Exibir separador entre resultados">
 <!ENTITY Ctr_urlbar_uc		"Desativar recurso 'auto completar unificado'">
 <!ENTITY Ctr_lbsugresi		"Desativar limite de altura">
-<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
+<!ENTITY Ctr_cresultshcb	"Limite de altura personalizado: ">
 <!ENTITY Ctr_lbsugres		"Número de resultados">
 <!ENTITY Ctr_lbsbradius		"Tamanho personalizado da borda para barra de localização e busca">
 
@@ -333,6 +343,7 @@
 <!ENTITY Ctr_nonavbarbg2	"Todas as barras de ferramentas em 'Beyond australis' no slim chrome dos complementos, são afetadas.">
 <!ENTITY Ctr_nonavborder	"Barra de favoritos: adicionar borda no topo da barra">
 <!ENTITY Ctr_nonavtbborder	"Barras superiores: remover bordas da barra">
+<!ENTITY Ctr_toptb_oldpad	"Barras de ferramentas superiores: antigo preenchimento esquerdo e direito">
 <!ENTITY Ctr_hidesbclose	"Barras laterais: ocultar o botão fechar da barra lateral">
 <!ENTITY Ctr_notextshadow	"Barras de ferramentas: ocultar sombra para texto da barra e da aba">
 <!ENTITY Ctr_chevronfix		"Barra de ferramentas navegação: ocultar a seta dupla ('Mais ferramentas') no final das barras de ferramentas">
@@ -373,8 +384,8 @@
 <!ENTITY Ctr_e_findbarhl	"Realce da barra de localização">
 <!ENTITY Ctr_fx50findbarhl	"Desmarcar estas preferências remove os recursos de 'realce' das barra de localização.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_e_oneoffsearch	"Autocomplete popups search selection">
-<!ENTITY Ctr_fx51OOSeach	"Unchecking this preference removes search selection from location bars autocomplete popup.">
+<!ENTITY Ctr_e_oneoffsearch	"Seleção de pesquisa no popup de preenchimento automático">
+<!ENTITY Ctr_fx51OOSeach	"Desmarcar esta preferência remove a seleção de pesquisa do popup de preenchimento automático das barras de localização.">
 
 
 <!ENTITY Ctr_pw_settings	"Configurações">
@@ -401,7 +412,7 @@
 <!ENTITY goCmd.label					"Ir">
 <!ENTITY Ctr_menu_restart.label			"Reiniciar">
 <!ENTITY Ctr_restartapp					"Exibir 'Reiniciar' no menu &brandShortName; e menu Arquivo">
-<!ENTITY Ctr_ctrnewinv					"Underline new options for current &brandShortName; version">
+<!ENTITY Ctr_ctrnewinv					"Sublinhe novas opções para a atual &brandShortName; versão">
 
 <!ENTITY Ctr_openInCurrentTab			"Abrir entradas na aba atual">
 <!ENTITY Ctr_openInNewTab				"Abrir entradas em uma nova aba">
@@ -421,79 +432,79 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"Cyebrfox (Default)">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+<!ENTITY Ctr_appbuttonc_d	"Cor do botão Cyberfox (Padrão)">
+<!ENTITY Ctr_appbuttonc_s	"Cor do botão, Salmon">
 
-<!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
-<!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
-<!ENTITY ctr_aboutnewtab.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_aboutnewtab.custombase "Use custom text color">
-<!ENTITY ctr_aboutnewtab.custombasecol "Change base text color">
+<!ENTITY Ctr_alt_newtabpalt	"Nova Aba: aparência de estilo">
+<!ENTITY ctr_aboutnewtab.customhighlight "Use personalizada cor de destaque">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Alterar cor de destaque personalizada">
+<!ENTITY ctr_aboutnewtab.custombase "Use cores de texto personalizado">
+<!ENTITY ctr_aboutnewtab.custombasecol "Alterar a cor do texto base">
 
-<!ENTITY Ctr_alt_newtabcol	"New tab page: columns">
-<!ENTITY Ctr_alt_newtabrow	"New tab page: rows">
+<!ENTITY Ctr_alt_newtabcol	"Nova aba: colunas">
+<!ENTITY Ctr_alt_newtabrow	"Nova aba: linhas">
 
-<!ENTITY Ctr_classic_elements		"Classic Elements">
-<!ENTITY Ctr_pw_set_preaust		"Australis Pre-set">
-<!ENTITY ctr_Support_forums	"Support Forum">
-<!ENTITY ctr_help_features	"Features &amp; Information">
+<!ENTITY Ctr_classic_elements		"Elementos Clássicos">
+<!ENTITY Ctr_pw_set_preaust		"Australis pré-definida">
+<!ENTITY ctr_Support_forums	"Fórum de suporte">
+<!ENTITY ctr_help_features	"Características &amp; Informação">
 
-<!ENTITY Ctr_custtabfontsize.label	"Tab font size: ">
+<!ENTITY Ctr_custtabfontsize.label	"Tamanho da fonte da aba: ">
 
-<!ENTITY ctr_applyCTRPrefFile.label	"Apply Changes">
-<!ENTITY ctr_restoreCTRPrefFile.label	"Restore Backup">
-<!ENTITY ctr_resetCTRPrefFile.label	"Clear Backup">
+<!ENTITY ctr_applyCTRPrefFile.label	"Aplicar Mudanças">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Restaurar Backup">
+<!ENTITY ctr_resetCTRPrefFile.label	"Limpar Backup">
 
-<!ENTITY ctr_appbuttoncusttextcolor	"AppButton text color.">
-<!ENTITY ctr_appbuttoncusttextshadow	"Remove AppButton text shadow">
+<!ENTITY ctr_appbuttoncusttextcolor	"Cor do texto do botão do aplicativo.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Remover sombra de texto do botão do aplicativo">
 
-<!ENTITY ctr_toolbarsearchbar.description	"Tool-bar search bar">
-<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Enable custom maximum width">
-<!ENTITY ctr_toolbarsearchbarwidth.label	"Search-bar maximum width: ">
-<!ENTITY ctr_colapseaddonsearchbar.label	"Collapsible about:addons search bar">
-<!ENTITY Ctr_alwaysshowaddonversion.label	"(Always Show)">
+<!ENTITY ctr_toolbarsearchbar.description	"Barra de ferramentas da barra de pesquisa">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Ativar largura máxima personalizada">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Largura máxima da barra de pesquisa: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Dobráveis sobre: addons da barra de pesquisa">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Sempre Mostrar)">
 
-<!ENTITY ctr_bookmarkfontsize.description	"Bookmarks Tool-Bar">
-<!ENTITY ctr_custombookmarkfontsize.label	"Enable custom font size on bookmarks tool-bar">
-<!ENTITY ctr_cbookmarkfontsize.label	"Bookmarks font size: ">
+<!ENTITY ctr_bookmarkfontsize.description	"Barra de favoritos">
+<!ENTITY ctr_custombookmarkfontsize.label	"Ativar o tamanho da fonte personalizada na barra de favoritos">
+<!ENTITY ctr_cbookmarkfontsize.label	"Tamanho da fonte dos favoritos: ">
 
-<!ENTITY ctr_abouthome.caption "Change about:home page style">
-<!ENTITY ctr_abouthome.default "Default about:home style">
-<!ENTITY ctr_abouthome.light "Light about:home style">
-<!ENTITY ctr_abouthome.dark "Dark about:home style">
-<!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
-<!ENTITY ctr_abouthome.links "No links on about:home page">
-<!ENTITY ctr_abouthome.logo "No logo on about:home page">
-<!ENTITY ctr_abouthome.icons "No icons on about:home page">
-<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
-<!ENTITY ctr_abouthome.custombg "Use custom background image">
-<!ENTITY ctr_abouthome.custombgbrowse "Browse">
-<!ENTITY ctr_abouthome.custombgurl "Enter url or file path">
-<!ENTITY ctr_abouthome.custombgurlph "Background image url|path">
-<!ENTITY ctr_abouthome.customhighlight "Use custom highlight color">
-<!ENTITY ctr_abouthome.customhighlightcol "Change custom highlight color">
-<!ENTITY ctr_abouthome.custombase "Use custom text color">
-<!ENTITY ctr_abouthome.custombasecol "Change base text color">
-<!ENTITY ctr_abouthome.animate "Use animations on about:home page">
-<!ENTITY ctr_abouthome.custombgstretch "Stretch background image to window (Default).">
+<!ENTITY ctr_abouthome.caption "Mudar sobre: ​​estilo da página inicial">
+<!ENTITY ctr_abouthome.default "Padrão sobre: ​​estilo da página inicial">
+<!ENTITY ctr_abouthome.light "Light sobre: ​​estilo da página inicial">
+<!ENTITY ctr_abouthome.dark "Dark sobre: ​​estilo da página inicial">
+<!ENTITY ctr_abouthome.simplicity  "Simplicity sobre: ​​estilo da página inicial">
+<!ENTITY ctr_abouthome.links "Não há links em sobre:página inicial">
+<!ENTITY ctr_abouthome.logo "Nenhum logotipo em sobre:página inicial">
+<!ENTITY ctr_abouthome.icons "Não há ícones em sobre:página inicial">
+<!ENTITY ctr_abouthome.snippets "Não há trechos em sobre:página inicial">
+<!ENTITY ctr_abouthome.custombg "Usar uma imagem de fundo personalizada">
+<!ENTITY ctr_abouthome.custombgbrowse "Navegue por">
+<!ENTITY ctr_abouthome.custombgurl "Entrar com URL ou caminho de arquivo">
+<!ENTITY ctr_abouthome.custombgurlph "Imagem de Fundo url|arquivo">
+<!ENTITY ctr_abouthome.customhighlight "Use personalizada cor de destaque">
+<!ENTITY ctr_abouthome.customhighlightcol "Alterar cor de destaque personalizada">
+<!ENTITY ctr_abouthome.custombase "Use cores de texto personalizadas">
+<!ENTITY ctr_abouthome.custombasecol "Alterar a cor do texto base">
+<!ENTITY ctr_abouthome.animate "Use animações em sobre:página inicial">
+<!ENTITY ctr_abouthome.custombgstretch "Imagem de fundo do estiramento à janela (Padrão).">
 
-<!ENTITY ctr_aboutnewtab.caption "Change about:newtab page style">
+<!ENTITY ctr_aboutnewtab.caption "Mudar sobre: ​​estilo de página nova aba">
 
-<!ENTITY cssClassId.description "Hide element classes - element ids">
-<!ENTITY cssClassId.label "Enter a class or id:">
-<!ENTITY useFilterElement.label "Use custom filter to hide element classes or element ids">
-<!ENTITY filterElement.placehold "You can specify which element classes or element ids.">
+<!ENTITY cssClassId.description "Esconder classes de elemento - ">
+<!ENTITY cssClassId.label "Digite uma classe ou id:">
+<!ENTITY useFilterElement.label "Use filtro personalizado para ocultar classes de elemento ou ids de elemento">
+<!ENTITY filterElement.placehold "Você pode especificar quais classes de elemento ou ids de elemento.">
 <!ENTITY add.label "ADD">
-<!ENTITY clear.label "Clear Filter">
-<!ENTITY copy.label "Copy Filter">
+<!ENTITY clear.label "Limpar Filtro">
+<!ENTITY copy.label "Copiar Filtro">
 
-<!ENTITY Ctr_tabthrobber_usecust.label "Use custom tab throbber">
-<!ENTITY Ctr_tabthrobber_custurlph.label "Throbber image url|path">
+<!ENTITY Ctr_tabthrobber_usecust.label "Use aba personalizada throbber">
+<!ENTITY Ctr_tabthrobber_custurlph.label "Throbber imagem url|arquivo">
 
-<!ENTITY Ctr_animatelwtheme "Animate Animated light-weight themes on startup.">
+<!ENTITY Ctr_animatelwtheme "Animar temas leves animados no arranque.">
 
-<!ENTITY Ctr_tbp_abouthome "AboutHome Page">
-<!ENTITY Ctr_tbp_newtab "NewTab Page">
+<!ENTITY Ctr_tbp_abouthome "Sobre a Página Inicial">
+<!ENTITY Ctr_tbp_newtab "Nova aba">
 
 <!ENTITY Ctr_dark.label "(Dark)">
 <!ENTITY Ctr_light.label "(Light)">

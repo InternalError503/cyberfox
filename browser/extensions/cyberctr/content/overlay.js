@@ -25,9 +25,9 @@ window.addEventListener("load", function () {
 var treeStyleCompatMode;
 var sheetIO = Services.io.newURI("data:text/css;charset=utf-8," + encodeURIComponent(''), null, null);
 classicthemerestorerjs.ctr = {
- 
+
   // initialize custom sheets for tab color settings
-  
+
   ctabsheet_def: sheetIO,
   ctabsheet_act: sheetIO,
   ctabsheet_hov: sheetIO,
@@ -56,10 +56,15 @@ classicthemerestorerjs.ctr = {
   tabitasheet_hov: sheetIO,
   tabitasheet_pen: sheetIO,
   tabitasheet_unr: sheetIO,
+ 
+  tablowsheet_pen:	sheetIO,
+  tablowopa_unr:		sheetIO,
   
   aerocolors: sheetIO,
   
   tabheight: sheetIO,
+  
+  findbarwidth: sheetIO,
 
   locsearchbarsize: sheetIO,
   locsearchbarradius:	sheetIO,
@@ -165,6 +170,7 @@ classicthemerestorerjs.ctr = {
 	try{if (this.appversion >= 48) document.getElementById("main-window").setAttribute('fx48plus',true);} catch(e){}
 	try{if (this.appversion >= 50) document.getElementById("main-window").setAttribute('fx50plus',true);} catch(e){}
 	try{if (this.appversion >= 51) document.getElementById("main-window").setAttribute('fx51plus',true);} catch(e){}
+	try{if (this.appversion >= 52) document.getElementById("main-window").setAttribute('fx52plus',true);} catch(e){}
 
 	// add CTR version number to '#main-window' node, so other add-ons/themes can easier distinguish between versions
 	AddonManager.getAddonByID('ClassicThemeRestorer@ArisT2Noia4dev', function(addon) {
@@ -420,11 +426,11 @@ classicthemerestorerjs.ctr = {
 			  
 			  // TreeStyleTabs add-on works better with tabs not on top, so this is enabled on reset/first run
 			  AddonManager.getAddonByID('treestyletab@piro.sakura.ne.jp', function(addon) {
-			if(addon && addon.isActive && classicthemerestorerjs.ctr.osstring=="WINNT"){
-				Services.prefs.getBranch("extensions.classicthemerestorer.").setCharPref('tabsontop','false');
-				classicthemerestorerjs.ctr.fixThatTreeStyleBro();			
-				Services.prefs.setBoolPref("extensions.classicthemerestorer.compatibility.treestyle", true);											
-					}else{ Services.prefs.setBoolPref("extensions.classicthemerestorer.compatibility.treestyle", false);}
+				if(addon && addon.isActive && classicthemerestorerjs.ctr.osstring=="WINNT"){
+				  Services.prefs.getBranch("extensions.classicthemerestorer.").setCharPref('tabsontop','false');
+				  classicthemerestorerjs.ctr.fixThatTreeStyleBro();			
+				  Services.prefs.setBoolPref("extensions.classicthemerestorer.compatibility.treestyle", true);											
+				}else{ Services.prefs.setBoolPref("extensions.classicthemerestorer.compatibility.treestyle", false);}
 				
 			  });
 			  
@@ -489,13 +495,7 @@ classicthemerestorerjs.ctr = {
 			classicthemerestorerjs.ctr.loadUnloadCSS('tabs_devedextra',false);
 
 			var devtheme=false;
-
-			try {
-			  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
-				devtheme=true;
-			  }
-			} catch(e) {}
-			
+		
 			if(classicthemerestorerjs.ctr.fxdevelopertheme==true) devtheme=true;
 
 			if (branch.getCharPref("tabs")!="tabs_default" && classicthemerestorerjs.ctr.fxdefaulttheme==true && devtheme==false){
@@ -577,6 +577,11 @@ classicthemerestorerjs.ctr = {
 				classicthemerestorerjs.ctr.loadUnloadCSS("square_edges",true);
 			}
 			else classicthemerestorerjs.ctr.loadUnloadCSS("square_edges",false);
+		  break;
+		  
+		  case "tttitlebar_c":
+			if (branch.getBoolPref("tttitlebar_c") && branch.getBoolPref("tttitlebar")) classicthemerestorerjs.ctr.loadUnloadCSS("tttitlebar_c",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("tttitlebar_c",false);
 		  break;
 		  
 		  case "ctabheightcb":
@@ -738,6 +743,8 @@ classicthemerestorerjs.ctr = {
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_red_dark',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_salmon',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_custom1',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_ontoolbar',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_buttoncolor',false);
 
 			if (branch.getCharPref("appbuttonc")!="off"){
 			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("appbuttonc"),true);
@@ -775,6 +782,8 @@ classicthemerestorerjs.ctr = {
 			classicthemerestorerjs.ctr.loadUnloadCSS('altabico_dark_nd',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('altabico_grey',false);
 			classicthemerestorerjs.ctr.loadUnloadCSS('altabico_grey_nd',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('altabico_white_pm',false);
+			classicthemerestorerjs.ctr.loadUnloadCSS('altabico_dark_pm',false);
 		
 			if (branch.getCharPref("altabico")!="altabico_white"){
 			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("altabico"),true);
@@ -799,13 +808,7 @@ classicthemerestorerjs.ctr = {
 		  case "aerocolors": case "aerocolorsg":
 		 
 			var devtheme=false;
-
-			try {
-			  if(Services.prefs.getBranch("browser.devedition.theme.").getBoolPref('enabled')!=false){
-				devtheme=true;
-			  }
-			} catch(e) {}
-			
+	
 			if(classicthemerestorerjs.ctr.fxdevelopertheme==true) devtheme=true;
 	
 			if (branch.getBoolPref("aerocolors") && classicthemerestorerjs.ctr.fxdefaulttheme==true && devtheme==false) {
@@ -946,7 +949,7 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("backforward")) {
 			  classicthemerestorerjs.ctr.loadUnloadCSS("backforward",true);
 			  
-			  if (branch.getBoolPref("nbcompact") && classicthemerestorerjs.ctr.osstring!="Darwin" && branch.getBoolPref("smallnavbut")==false){
+			  if (branch.getBoolPref("nbcompact") && branch.getBoolPref("smallnavbut")==false){
 				classicthemerestorerjs.ctr.loadUnloadCSS("nbcompact",true);
 			  }
 			}
@@ -960,7 +963,7 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  case "nbcompact":
-			if (branch.getBoolPref("nbcompact") && branch.getBoolPref("backforward") && classicthemerestorerjs.ctr.osstring!="Darwin" && branch.getBoolPref("smallnavbut")==false){
+			if (branch.getBoolPref("nbcompact") && branch.getBoolPref("backforward") && branch.getBoolPref("smallnavbut")==false){
 			  classicthemerestorerjs.ctr.loadUnloadCSS("nbcompact",true);
 
 			  if (branch.getCharPref("nav_txt_ico").indexOf('iconstxt')!=-1)
@@ -1311,7 +1314,7 @@ classicthemerestorerjs.ctr = {
 		  break;
 
 		  case "altautocompl":
-			if (branch.getBoolPref("altautocompl") && classicthemerestorerjs.ctr.appversion >= 48) classicthemerestorerjs.ctr.loadUnloadCSS("altautocompl",true);
+			if (branch.getBoolPref("altautocompl") && branch.getBoolPref("autocompl_not")==false && classicthemerestorerjs.ctr.appversion >= 48) classicthemerestorerjs.ctr.loadUnloadCSS("altautocompl",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("altautocompl",false);
 		  break;
 		  
@@ -1344,8 +1347,25 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  case "autocompl_it2":
-			if (branch.getBoolPref("autocompl_it2") && classicthemerestorerjs.ctr.appversion >= 50) classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it2",true);
-			  else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it2",false);
+			if (branch.getBoolPref("autocompl_it2") && classicthemerestorerjs.ctr.appversion >= 50) {
+			  
+			  document.getElementById('PopupAutoCompleteRichResult').addEventListener("popupshowing", function unlockACPopupHeight(event){
+				
+				//get inner 'autocomplete richlistbox' of '#PopupAutoCompleteRichResult' panel
+				var acrichlistbox = document.getElementById("PopupAutoCompleteRichResult").boxObject.firstChild.nextSibling;
+				
+				var ACObserver = new MutationObserver(function(mutations) {
+				  mutations.forEach(function(mutation) {
+					document.getElementById("PopupAutoCompleteRichResult").setAttribute('ctrsubboxstyle', acrichlistbox.getAttribute('style'));
+				  });    
+				});
+				
+				ACObserver.observe(acrichlistbox, { attributes: true, attributeFilter: ['style'] });
+			  }, false);
+			  
+			  classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it2",true);
+			}
+			else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_it2",false);
 		  break;
 	  
 		  case "autocompl_hlb":
@@ -1374,6 +1394,26 @@ classicthemerestorerjs.ctr = {
 			  if (branch.getBoolPref("autocompl_hlb")) branch.setBoolPref("autocompl_hlb",false);
 			}
 			else classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_hln",false);
+		  break;
+		  
+		  case "autocompl_not":
+			if (branch.getBoolPref("autocompl_not") && classicthemerestorerjs.ctr.appversion >= 48) {
+				
+			  if (branch.getBoolPref("altautocompl")) {
+			    classicthemerestorerjs.ctr.loadUnloadCSS("altautocompl",false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_no_t1",false);
+				classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_no_t2",true);  // for alt ac popup
+			  } else {
+			    classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_no_t1",true); // for default ac popup
+				classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_no_t2",false);
+			  }
+			} else {
+			  classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_no_t1",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("autocompl_no_t2",false);
+			  
+			  if (branch.getBoolPref("altautocompl"))
+			    classicthemerestorerjs.ctr.loadUnloadCSS("altautocompl",true);
+			}
 		  break;
 
 		  case "autocompl_sep":
@@ -1404,6 +1444,30 @@ classicthemerestorerjs.ctr = {
 			if (branch.getCharPref("findbar")!="findbar_default"){
 			  classicthemerestorerjs.ctr.loadUnloadCSS(branch.getCharPref("findbar"),true);
 			}
+		  break;
+		  
+		  case "findb_hide_ws":
+		    if (branch.getBoolPref("findb_hide_ws")) {
+				// close findbar, once mouse wheel is used
+				window.addEventListener("wheel", function() {
+				  if(!gFindBar.hidden) gFindBar.close();
+				}, false);
+				
+				// close findbar, once UP/DOWN keys are used
+				window.addEventListener("keydown", function(event) {
+				  if(event.key=="ArrowUp" || event.key=="ArrowDown")
+					if(!gFindBar.hidden) gFindBar.close();
+				}, false);
+			}
+		  break;
+		  
+		  case "findb_widthcb":
+			if (branch.getBoolPref("findb_widthcb")) classicthemerestorerjs.ctr.loadUnloadCSS("findb_widthva",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("findb_widthva",false);
+		  break;
+		  
+		  case "findb_widthva":
+			if (branch.getBoolPref("findb_widthcb")) classicthemerestorerjs.ctr.loadUnloadCSS("findb_widthva",true);
 		  break;
 		  
 		  case "nav_txt_ico":
@@ -1729,6 +1793,16 @@ classicthemerestorerjs.ctr = {
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("tabfita_unr",false);
 		  break;
 		  
+		  case "tablowopa_pen":
+			if (branch.getBoolPref("tablowopa_pen")) classicthemerestorerjs.ctr.loadUnloadCSS("tablowopa_pen",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("tablowopa_pen",false);
+		  break;
+		  
+		  case "tablowopa_unr":
+			if (branch.getBoolPref("tablowopa_unr")) classicthemerestorerjs.ctr.loadUnloadCSS("tablowopa_unr",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("tablowopa_unr",false);
+		  break;
+		  
 		  /* exclude hover settings from unloaded/pending tab */
 		  case "tabc_hov_unl":
 		    if (branch.getBoolPref("tabcolor_pen")) {
@@ -1955,6 +2029,11 @@ classicthemerestorerjs.ctr = {
 			else classicthemerestorerjs.ctr.loadUnloadCSS("nonavtbborder",false);
 		  break;
 		  
+		  case "toptb_oldpad":
+			if (branch.getBoolPref("toptb_oldpad") && classicthemerestorerjs.ctr.appversion >= 51) classicthemerestorerjs.ctr.loadUnloadCSS("toptb_oldpad",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("toptb_oldpad",false);
+		  break;
+
 		  case "hidesbclose":
 			if (branch.getBoolPref("hidesbclose")) classicthemerestorerjs.ctr.loadUnloadCSS("hidesbclose",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("hidesbclose",false);
@@ -2147,10 +2226,23 @@ classicthemerestorerjs.ctr = {
 			if (branch.getBoolPref("alt_addonsp")) classicthemerestorerjs.ctr.loadUnloadCSS("alt_addonsp",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("alt_addonsp",false);
 		  break;
+
+		  case "am_showrecup":
+			if (branch.getBoolPref("am_showrecup")) classicthemerestorerjs.ctr.loadUnloadCSS("am_showrecup",true);
+			  else classicthemerestorerjs.ctr.loadUnloadCSS("am_showrecup",false);
+		  break;
 		  
 		  case "alt_addonsm":
 			if (branch.getBoolPref("alt_addonsm") && classicthemerestorerjs.ctr.fxdefaulttheme==true) classicthemerestorerjs.ctr.loadUnloadCSS("alt_addonsm",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("alt_addonsm",false);
+
+			var devtheme=false;
+			if(classicthemerestorerjs.ctr.fxdevelopertheme==true) devtheme=true;
+			
+			if (branch.getBoolPref("aerocolors") && classicthemerestorerjs.ctr.fxdefaulttheme==true && devtheme==false) { 
+			  classicthemerestorerjs.ctr.loadUnloadCSS("aerocolors",false);
+			  classicthemerestorerjs.ctr.loadUnloadCSS("aerocolors",true);
+			}
 		  break;
 
 /*
@@ -2224,6 +2316,24 @@ classicthemerestorerjs.ctr = {
 		  case "bmbnounsort":
 			if (branch.getBoolPref("bmbnounsort")) classicthemerestorerjs.ctr.loadUnloadCSS("bmbnounsort",true);
 			  else classicthemerestorerjs.ctr.loadUnloadCSS("bmbnounsort",false);
+			  
+			// for MacOSX: hide item using js instead of css or it won't work
+			if (classicthemerestorerjs.ctr.osstring=="Darwin"){
+				if (branch.getBoolPref("bmbnounsort")) {
+					setTimeout(function(){
+					  try{
+						document.getElementById("menu_unsortedBookmarks").collapsed = true;
+					  } catch(e){}
+					},500);
+				}
+				else {
+				  setTimeout(function(){
+					try{
+					  document.getElementById("menu_unsortedBookmarks").collapsed = false;
+					} catch(e){}
+				  },500);
+				}
+			}
 		  break;
 
 		  case "bmbutnotext":
@@ -2522,7 +2632,7 @@ classicthemerestorerjs.ctr = {
 		  break;
 		  
 		  case "hightabpososx":
-			if (branch.getBoolPref("hightabpososx") && classicthemerestorerjs.ctr.fxdefaulttheme==true){
+			if (branch.getBoolPref("hightabpososx") && branch.getBoolPref("hidetbwot")==false && classicthemerestorerjs.ctr.fxdefaulttheme==true){
 			  classicthemerestorerjs.ctr.loadUnloadCSS("hightabpososx",true);
 			  branch.setBoolPref("appbutmhi",false);
 			}
@@ -2877,7 +2987,8 @@ classicthemerestorerjs.ctr = {
 				case "appbutton_off":
 					classicthemerestorerjs.ctr.loadUnloadCSS("tree_style_fix",false);
 					if (menutoolbarHasAttribute.getAttribute('autohide', true)){
-						if (treeStyleCompatMode === false){Services.prefs.setBoolPref("browser.tabs.drawInTitlebar", false);}else{}
+						if (!treeStyleCompatMode)
+							Services.prefs.setBoolPref("browser.tabs.drawInTitlebar", false);
 					}
 					Services.prefs.setBoolPref("extensions.classicthemerestorer.titleintitlebar", false);
 					classicthemerestorerjs.ctr.loadUnloadCSS("tabs_titlebar",false);	
@@ -3037,18 +3148,8 @@ classicthemerestorerjs.ctr = {
   
 	// this button can only be placed on Firefox titlebar using Windows OS
 	if(classicthemerestorerjs.ctr.osstring == "WINNT"){
-
-  //If in rome do what the romans do use the browsers name.
-  var brandName	= '';
 	
-	try {
-	  brandName = Services.strings.createBundle("chrome://branding/locale/brand.properties").GetStringFromName("brandShortName");
-	} catch(e) {
-      brandName = "Cybefox"; //Add name as fallback  
-  }
-
-	
-		var buttontitle = brandName; // init with default title
+		var buttontitle = Services.appinfo.name; // init with default title
 		var custombuttontitle = Services.prefs.getBranch("extensions.classicthemerestorer.").getCharPref('appbuttontxt');
 		
 		var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
@@ -3449,8 +3550,13 @@ classicthemerestorerjs.ctr = {
 			  recentWindow.document.getElementById("TabsToolbar").style.marginTop="unset";
 			  if(tabsontop == 'false' || tabsontop == 'false2')
 			    recentWindow.document.getElementById("titlebar").style.marginBottom="-28px";
-			  else
-				recentWindow.document.getElementById("titlebar").style.marginBottom="-10px";
+			  else{
+				if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hightabpososx")) {
+				  recentWindow.document.getElementById("titlebar").style.marginBottom="-10px";
+				} else {
+				  recentWindow.document.getElementById("titlebar").style.marginBottom="0px";
+				}
+			  }
 			} else {
 			  recentWindow.document.getElementById("titlebar").style.paddingBottom="28px";
 			}
@@ -3480,7 +3586,12 @@ classicthemerestorerjs.ctr = {
 			recentWindow.document.getElementById("toolbar-menubar").style.marginBottom="unset";		
 		  else if(classicthemerestorerjs.ctr.osstring=="Darwin" && tabsintitlebar==true) {
 			if(classicthemerestorerjs.ctr.appversion >= 47) {
-			  recentWindow.document.getElementById("TabsToolbar").style.marginTop="-10px";
+			  if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("hightabpososx")) {
+			    recentWindow.document.getElementById("TabsToolbar").style.marginTop="-10px";
+			  } else {
+				recentWindow.document.getElementById("TabsToolbar").style.marginTop="0px";
+			  }
+
 			  recentWindow.document.getElementById("titlebar").style.marginBottom="-28px";
 			} else {
 			  recentWindow.document.getElementById("titlebar").style.paddingBottom="unset";
@@ -3774,28 +3885,39 @@ classicthemerestorerjs.ctr = {
 		 if(classicthemerestorerjs.ctr.osstring=="WINNT" && classicthemerestorerjs.ctr.fxdefaulttheme==true) {
 
 		  try {
-
+		
+			var titlebarspacer1 = document.createElement("spacer");
+			titlebarspacer1.setAttribute("id", "ctraddon_titlebarspacer");
+			titlebarspacer1.setAttribute("ordinal", "0");
+			titlebarspacer1.setAttribute("flex", "1");
+			
 			var titlebartitle = document.createElement("toolbarbutton");
 			titlebartitle.setAttribute("id", "ctraddon_titlebartitle");
 			titlebartitle.setAttribute("ordinal", "0");
-			titlebartitle.setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
-
+			titlebartitle.setAttribute("label", gBrowser.contentTitle || Services.appinfo.name);
+			
+			document.getElementById("titlebar-content").appendChild(titlebarspacer1);
 			document.getElementById("titlebar-content").appendChild(titlebartitle);
 
 			window.addEventListener("load", function update_title() {
-			   document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+			  if (gBrowser.contentTitle=="") document.getElementById("ctraddon_titlebartitle").setAttribute("label", Services.appinfo.name);
+			  else document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.contentTitle);
 			}, false);
 			window.addEventListener("DOMContentLoaded", function update_title() {
-			  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+			  if (gBrowser.contentTitle=="") document.getElementById("ctraddon_titlebartitle").setAttribute("label", Services.appinfo.name);
+			  else document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.contentTitle);
 			}, false);
 			window.addEventListener("TabOpen", function update_title() {
-			  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+			  if (gBrowser.contentTitle=="") document.getElementById("ctraddon_titlebartitle").setAttribute("label", Services.appinfo.name);
+			  else document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.contentTitle);
 			}, false);
 			window.addEventListener("TabSelect", function update_title() {
-			  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+			  if (gBrowser.contentTitle=="") document.getElementById("ctraddon_titlebartitle").setAttribute("label", Services.appinfo.name);
+			  else document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.contentTitle);
 			}, false);
 			window.addEventListener("TabAttrModified", function update_title() {
-			  document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.selectedTab.getAttribute("label"));
+			  if (gBrowser.contentTitle=="") document.getElementById("ctraddon_titlebartitle").setAttribute("label", Services.appinfo.name);
+			  else document.getElementById("ctraddon_titlebartitle").setAttribute("label", gBrowser.contentTitle);
 			}, false);
 
 		  } catch(e) {}
@@ -4197,6 +4319,7 @@ classicthemerestorerjs.ctr = {
 	
 		case "square_edges": 			manageCSS("tabssquare_edges.css");  	break;
 		case "tttitlebar": 				manageCSS("tabsttitleintitlebar.css");  break;
+		case "tttitlebar_c": 			manageCSS("tabsttitleintitlebar_centered.css");  break;
 		
 		case "closetab_active": 		manageCSS("closetab_active.css");  		break;
 		case "closetab_none": 			manageCSS("closetab_none.css");  		break;
@@ -4343,7 +4466,7 @@ classicthemerestorerjs.ctr = {
 
 		break;
 		
-		case "appbuttonc_orange":	manageCSS("appbutton_orange.css");		break;
+		case "appbuttonc_orange":	manageCSS("appbutton_base.css");		break;
 		case "appbuttonc_aurora":	manageCSS("appbutton_aurora.css");		break;
 		case "appbuttonc_nightly":	manageCSS("appbutton_nightly.css");		break;
 		case "appbuttonc_transp":	manageCSS("appbutton_transparent.css");	break;
@@ -4359,6 +4482,8 @@ classicthemerestorerjs.ctr = {
 		case "altabico_dark_nd": 	manageCSS("alt_appbutton_icons3.css");	break;
 		case "altabico_grey": 		manageCSS("alt_appbutton_icons4.css");	break;
 		case "altabico_grey_nd": 	manageCSS("alt_appbutton_icons5.css");	break;
+		case "altabico_white_pm": 	manageCSS("alt_appbutton_icons6.css");	break;
+		case "altabico_dark_pm": 	manageCSS("alt_appbutton_icons7.css");	break;
 		case "appbutmhi": 			manageCSS("appbuthigherposition.css");  break;
 		case "appbutbdl": 			manageCSS("appbutton_borderless.css");  break;
 		
@@ -4406,6 +4531,8 @@ classicthemerestorerjs.ctr = {
 		case "autocompl_hli": 		manageCSS("alt_autocompl_hl_i.css");	break;
 		case "autocompl_hln": 		manageCSS("alt_autocompl_hl_n.css");	break;
 		case "autocompl_sep": 		manageCSS("alt_autocompl_sep.css");		break;
+		case "autocompl_no_t1": 	manageCSS("autocompl_no_title1.css");	break;
+		case "autocompl_no_t2": 	manageCSS("autocompl_no_title2.css");	break;
 		case "autocompl_rhl": 		manageCSS("alt_autocompl_rhl.css");		break;
 		case "locsearchbw10": 		manageCSS("locationsearchbarw10.css");	break;
 		case "combrelstop":			manageCSS("combrelstop.css");			break;
@@ -4427,6 +4554,7 @@ classicthemerestorerjs.ctr = {
 		case "nonavbarbg": 			manageCSS("nonavbarbg.css");			break;
 		case "nonavborder": 		manageCSS("nonavborder.css");			break;
 		case "nonavtbborder": 		manageCSS("nonavtbborder.css");			break;
+		case "toptb_oldpad": 		manageCSS("toptb_oldpadding.css");		break;
 		case "hidesbclose": 		manageCSS("hidesidebarclose.css");		break;
 		case "notextshadow": 		manageCSS("notextshadow.css");			break;
 		case "chevronfix": 			manageCSS("chevronfix.css");			break;
@@ -4464,6 +4592,7 @@ classicthemerestorerjs.ctr = {
 		case "am_buticons": 		manageCSS("am_buttonicons.css");		break;
 		case "am_hovshowb": 		manageCSS("am_hovshowbut.css");			break;
 		case "alt_addonsp": 		manageCSS("alt_addonspage.css");		break;
+		case "am_showrecup": 		manageCSS("am_showrecentupdates.css");	break;
 		case "alt_addonsm": 		manageCSS("alt_addonsmanager.css");		break;
 
 /*		
@@ -4556,8 +4685,9 @@ classicthemerestorerjs.ctr = {
 		case "spaces_extra": 		manageCSS("spaces_extra.css");			break;
 
 
-
- 		case "appbuttonc_default":	manageCSS("cctr/appbutton_default.css");		break;
+ 		case "appbuttonc_ontoolbar":	manageCSS("appbuttonontoolbar.css");		break;
+ 		case "appbuttonc_buttoncolor":	manageCSS("appbuttoncolor.css");		break;
+ 		case "appbuttonc_default":	manageCSS("cctr/appbutton_base.css");		break;
 		case "appbuttonc_orange_dark":	manageCSS("cctr/appbutton_orange_dark.css");		break;
 		case "appbuttonc_cyan":	manageCSS("cctr/appbutton_cyan.css");		break;
 		case "appbuttonc_red_dark":		manageCSS("cctr/appbutton_red_dark.css");			break;
@@ -4783,7 +4913,8 @@ classicthemerestorerjs.ctr = {
 						#main-window[defaultfxtheme="true"][tabsontop="false"] #TabsToolbar:not(:-moz-lwtheme),\
 						#main-window[defaultfxtheme="true"] :not(#theFoxOnlyBetter-slimChrome-toolbars) > toolbar:not(#toolbar-menubar):not(#TabsToolbar):not(#nav-bar):not(.devtools-tabbar):not(#developer-toolbar):not(.devtools-responsiveui-toolbar):not(#puzzleBars-urlbar-bar):not(#theFoxOnlyBetter-skyLights-container):not(#theFoxOnlyBetter-slimChrome-slimmer),\
 						#main-window[defaultfxtheme="true"] #theFoxOnlyBetter-slimChrome-container > *:not(#theFoxOnlyBetter-slimChrome-toolbars-bottom):not(:-moz-lwtheme),\
-						#main-window[defaultfxtheme="true"] #ctraddon_urlextrabar:not(:-moz-lwtheme){\
+						#main-window[defaultfxtheme="true"] #ctraddon_urlextrabar:not(:-moz-lwtheme),\
+						#main-window[defaultfxtheme="true"] findbar{\
 						  background-image:unset !important;\
 						  background-color:'+main_ab_color+' !important;\
 						}\
@@ -4886,194 +5017,56 @@ classicthemerestorerjs.ctr = {
 			var newColor = this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' '+ this.prefs.getIntPref('cappbutcpercent') +'%';	
 			var buttonTextShadow = "";
 			if(this.prefs.getBoolPref('cappbutnotxtsh')){
-				buttonTextShadow = "text-shadow:none!important;";
+				buttonTextShadow = "none!important;";
 			}	
 			if(enable==true && this.prefs.getCharPref('appbuttonc')=='appbuttonc_custom' && (this.prefs.getCharPref('appbutton')=='appbutton_pm' || this.prefs.getCharPref('appbutton')=='appbutton_pm2')) {
 			
 				this.appbutton_color=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
 					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
 					@-moz-document url(chrome://browser/content/browser.xul) {\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button {\
-						  background: linear-gradient('+this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' 95%) !important;\
-						  border-color: rgba(83,42,6,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset,\
-									  0 0 0 1px rgba(255,255,255,.25) inset !important;\
+						:root {\
+							--color-button-main: linear-gradient('+newColor+');\
 						}\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button:hover:not(:active):not([open]){\
-						  background-image: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
-																radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
-																linear-gradient('+this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' 95%) !important;\
-						  border-color: rgba(83,42,6,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,\
-									  0 0 2px 1px rgba(250,234,169,.7) inset,\
-									  0 -1px 0 rgba(250,234,169,.5) inset !important;\
-						}\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button:hover:active,\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button[open]{\
-						  background-image: linear-gradient('+this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' 95%) !important;\
-						  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,\
-									  0 1px 1px rgba(0,0,0,.2) inset !important;\
-						}\
+					}\
 				'), null, null);
-			
+
+				classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_buttoncolor',true);
 				applyNewSheet(this.appbutton_color);
 			
 			} else if(enable==true && this.prefs.getCharPref('appbuttonc')=='appbuttonc_custom') {
 				
 				var appbuttonontoolbar='';
 				
-				if(this.prefs.getBoolPref('appbuttonct'))
+				if(this.prefs.getBoolPref('appbuttonct')){
+				classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_ontoolbar',true);
 				appbuttonontoolbar='\
+					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
 					@-moz-document url(chrome://browser/content/browser.xul) {\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text {\
-						  background: linear-gradient('+newColor+') !important;\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;\
-						}\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-text {\
-						  background-image: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
-											radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
-											linear-gradient('+newColor+') !important;\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(210,48%,90%,.4) inset,\
-									  0 -1px 0 hsla(210,48%,90%,.2) inset !important;\
-						}\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-text,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-text {\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,\
-									  0 1px 1px rgba(0,0,0,.2) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text{\
-						  background-image: linear-gradient(rgb(153,38,211), rgb(105,19,163) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-text{\
-						  background-image: radial-gradient(farthest-side at center bottom, rgba(240,193,255,.5) 10%, rgba(240,193,255,0) 70%),\
-											radial-gradient(farthest-side at center bottom, rgb(192,81,247), rgba(236,172,255,0)),\
-											linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,\
-									  0 0 2px 1px rgba(240,193,255,.7) inset,\
-									  0 -1px 0 rgba(240,193,255,.5) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-text,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-text{\
-						  background-image: linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						}\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text {\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  font-weight:bold !important;\
+						:root {\
+							--color-button-main: linear-gradient('+newColor+');\
+							--color-button-text:'+this.prefs.getCharPref('cappbuttxtc')+';\
+							--text-style-shadow:'+buttonTextShadow+';\
 						}\
 					}\
 				';
-				
+				}
+
 				this.appbutton_color=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
-					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
-					@-moz-document url(chrome://browser/content/browser.xul) {\
-						#ctraddon_appbutton2:not(:hover):not(:active):not([open]){\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;\
-						}\
-						#TabsToolbar #ctraddon_appbutton{\
-						  background: linear-gradient('+newColor+') !important;\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;\
-						}\
-						#TabsToolbar #ctraddon_appbutton:hover:not(:active):not([open]),\
-						#ctraddon_appbutton2:hover:not(:active):not([open]){\
-						  background-image: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
-											radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
-											linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(210,48%,90%,.4) inset,\
-									  0 -1px 0 hsla(210,48%,90%,.2) inset !important;\
-						}\
-						#TabsToolbar #ctraddon_appbutton:hover:active,\
-						#TabsToolbar #ctraddon_appbutton[open],\
-						#ctraddon_appbutton2:hover:active,\
-						#ctraddon_appbutton2[open] {\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,\
-									  0 1px 1px rgba(0,0,0,.2) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton,\
-						#main-window[privatebrowsingmode=temporary] #ctraddon_appbutton2{\
-						  background-image: linear-gradient(rgb(153,38,211), rgb(105,19,163) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton:hover:not(:active):not([open]),\
-						#main-window[privatebrowsingmode=temporary] #ctraddon_appbutton2:hover:not(:active):not([open]){\
-						  background-image: radial-gradient(farthest-side at center bottom, rgba(240,193,255,.5) 10%, rgba(240,193,255,0) 70%),\
-											radial-gradient(farthest-side at center bottom, rgb(192,81,247), rgba(236,172,255,0)),\
-											linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,\
-									  0 0 2px 1px rgba(240,193,255,.7) inset,\
-									  0 -1px 0 rgba(240,193,255,.5) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton:hover:active,\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton[open],\
-						#main-window[privatebrowsingmode=temporary] #ctraddon_appbutton2:hover:active,\
-						#main-window[privatebrowsingmode=temporary]  #ctraddon_appbutton2[open] {\
-						  background-image: linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						}\
+				@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
+				@-moz-document url(chrome://browser/content/browser.xul), url(chrome://classic_theme_restorer/content/options.xul) {\
+					:root {\
+					  --color-button-main: linear-gradient('+newColor+');\
+					  --color-button-hover:radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
+															radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
+															linear-gradient('+newColor+');\
+					  --color-button-open: linear-gradient('+newColor+');\
+					  --color-button-text:'+this.prefs.getCharPref('cappbuttxtc')+';\
+					  --text-style-shadow:'+buttonTextShadow+';\
 					}\
-					@-moz-document url(chrome://classic_theme_restorer/content/options.xul) {\
-						#ctraddon_pw_appbuttonname {\
-						  -moz-appearance: none !important;\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset,\
-									  0 0 0 1px rgba(255,255,255,.25) inset !important;\
-						  background-clip: padding-box !important;\
-						  border-radius: 0 0 4px 4px;\
-						  height:22px !important;\
-						  border-top: 2px solid !important;\
-						  border-right: 2px solid !important;\
-						  border-left: 2px solid !important;\
-						  border-bottom: 2px solid !important;\
-						  -moz-border-top-colors: rgba(255,255,255,.70) hsla(214,89%,21%,.5) !important;\
-						  -moz-border-right-colors: rgba(255,255,255,.60) hsla(214,89%,21%,.5) !important;\
-						  -moz-border-left-colors: rgba(255,255,255,.60) hsla(214,89%,21%,.5) !important;\
-						  -moz-border-bottom-colors: rgba(255,255,255,.70) hsla(214,89%,21%,.5) !important;\
-						}\
-						#ctraddon_pw_appbuttonname label {\
-						  padding: 2px 12px !important;\
-						  background: -moz-image-rect(url(chrome://classic_theme_restorer/content/images/appmenu-dropmarker.png), 0, 16, 16, 0) no-repeat right !important;\
-						  -moz-margin-end:10px !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  text-shadow: 0 0 1px rgba(0,0,0,.7),\
-									   0 1px 1.5px rgba(0,0,0,.5) !important;\
-              '+buttonTextShadow+'\
-						  font-weight: bold !important;\
-						}\
-					}\
-        '+appbuttonontoolbar+'\
+				'+appbuttonontoolbar+'\
 				'), null, null);
-			
+
+				classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_orange',true);			
 				applyNewSheet(this.appbutton_color);
 			
 			}
@@ -5087,7 +5080,7 @@ classicthemerestorerjs.ctr = {
 			var newColor = this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutcm')+', '+this.prefs.getCharPref('cappbutc2')+' '+ this.prefs.getIntPref('cappbutcpercent') +'%';
 			var buttonTextShadow = "";
 			if(this.prefs.getBoolPref('cappbutnotxtsh')){
-				buttonTextShadow = "text-shadow:none!important;";
+				buttonTextShadow = "none!important;";
 			}
       			
 			if(enable==true && this.prefs.getCharPref('appbuttonc')=='appbuttonc_custom' && this.prefs.getCharPref('appbutton')=='appbutton_pm') {
@@ -5095,29 +5088,13 @@ classicthemerestorerjs.ctr = {
 				this.appbutton_color=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
 					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
 					@-moz-document url(chrome://browser/content/browser.xul) {\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button {\
-						  background: linear-gradient('+this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' 95%) !important;\
-						  border-color: rgba(83,42,6,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset,\
-									  0 0 0 1px rgba(255,255,255,.25) inset !important;\
+						:root {\
+							--color-button-main: linear-gradient('+newColor+');\
 						}\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button:hover:not(:active):not([open]){\
-						  background-image: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
-																radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
-																linear-gradient('+this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' 95%) !important;\
-						  border-color: rgba(83,42,6,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,\
-									  0 0 2px 1px rgba(250,234,169,.7) inset,\
-									  0 -1px 0 rgba(250,234,169,.5) inset !important;\
-						}\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button:hover:active,\
-						#navigator-toolbox #TabsToolbar #ctraddon_panelui-button #PanelUI-menu-button[open]{\
-						  background-image: linear-gradient('+this.prefs.getCharPref('cappbutc1')+', '+this.prefs.getCharPref('cappbutc2')+' 95%) !important;\
-						  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,\
-									  0 1px 1px rgba(0,0,0,.2) inset !important;\
-						}\
+					}\
 				'), null, null);
-			
+
+				classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_buttoncolor',true);			
 				applyNewSheet(this.appbutton_color);
 			
 			} else if(enable==true && this.prefs.getCharPref('appbuttonc')=='appbuttonc_custom1') {
@@ -5125,158 +5102,36 @@ classicthemerestorerjs.ctr = {
 				
 				var appbuttonontoolbar='';
 				
-				if(this.prefs.getBoolPref('appbuttonct'))
+				if(this.prefs.getBoolPref('appbuttonct')){
+				classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_ontoolbar',true);
 				appbuttonontoolbar='\
+					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
 					@-moz-document url(chrome://browser/content/browser.xul) {\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text {\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;\
-						}\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-text {\
-						  background: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
-											radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
-											linear-gradient('+newColor+') !important;\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(210,48%,90%,.4) inset,\
-									  0 -1px 0 hsla(210,48%,90%,.2) inset !important;\
-						}\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-icon,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-text,\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-text {\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,\
-									  0 1px 1px rgba(0,0,0,.2) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text{\
-						  background-image: linear-gradient(rgb(153,38,211), rgb(105,19,163) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:not(:active):not([open]) .toolbarbutton-text{\
-						  background-image: radial-gradient(farthest-side at center bottom, rgba(240,193,255,.5) 10%, rgba(240,193,255,0) 70%),\
-											radial-gradient(farthest-side at center bottom, rgb(192,81,247), rgba(236,172,255,0)),\
-											linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,\
-									  0 0 2px 1px rgba(240,193,255,.7) inset,\
-									  0 -1px 0 rgba(240,193,255,.5) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-icon,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton:hover:active .toolbarbutton-text,\
-						#main-window[privatebrowsingmode=temporary] toolbar:not(#TabsToolbar) #ctraddon_appbutton[open] .toolbarbutton-text{\
-						  background-image: linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						}\
-						toolbar:not(#TabsToolbar) #ctraddon_appbutton .toolbarbutton-text {\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  font-weight:bold !important;\
+						:root {\
+							--color-button-main: linear-gradient('+newColor+');\
+							--color-button-text:'+this.prefs.getCharPref('cappbuttxtc')+';\
+							--text-style-shadow:'+buttonTextShadow+';\
 						}\
 					}\
 				';
-			
+				}
+
 				this.appbutton_color=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
-					@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
-					@-moz-document url(chrome://browser/content/browser.xul) {\
-						#ctraddon_appbutton2:not(:hover):not(:active):not([open]){\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;\
-						}\
-						#TabsToolbar #ctraddon_appbutton{\
-						  background: linear-gradient('+newColor+') !important;\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(211,65%,85%,.15) inset !important;\
-						}\
-						#TabsToolbar #ctraddon_appbutton:hover:not(:active):not([open]),\
-						#ctraddon_appbutton2:hover:not(:active):not([open]){\
-						  background-image: radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
-											radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
-											linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  border-color: hsla(210,59%,13%,.9) !important;\
-						  box-shadow: 0 1px 0 hsla(210,48%,90%,.15) inset,\
-									  0 0 2px 1px hsla(210,48%,90%,.4) inset,\
-									  0 -1px 0 hsla(210,48%,90%,.2) inset !important;\
-						}\
-						#TabsToolbar #ctraddon_appbutton:hover:active,\
-						#TabsToolbar #ctraddon_appbutton[open],\
-						#ctraddon_appbutton2:hover:active,\
-						#ctraddon_appbutton2[open] {\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,\
-									  0 1px 1px rgba(0,0,0,.2) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton,\
-						#main-window[privatebrowsingmode=temporary] #ctraddon_appbutton2{\
-						  background-image: linear-gradient(rgb(153,38,211), rgb(105,19,163) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton:hover:not(:active):not([open]),\
-						#main-window[privatebrowsingmode=temporary] #ctraddon_appbutton2:hover:not(:active):not([open]){\
-						  background-image: radial-gradient(farthest-side at center bottom, rgba(240,193,255,.5) 10%, rgba(240,193,255,0) 70%),\
-											radial-gradient(farthest-side at center bottom, rgb(192,81,247), rgba(236,172,255,0)),\
-											linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						  border-color: rgba(43,8,65,.9) !important;\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,\
-									  0 0 2px 1px rgba(240,193,255,.7) inset,\
-									  0 -1px 0 rgba(240,193,255,.5) inset !important;\
-						}\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton:hover:active,\
-						#main-window[privatebrowsingmode=temporary] #TabsToolbar #ctraddon_appbutton[open],\
-						#main-window[privatebrowsingmode=temporary] #ctraddon_appbutton2:hover:active,\
-						#main-window[privatebrowsingmode=temporary]  #ctraddon_appbutton2[open] {\
-						  background-image: linear-gradient(rgb(144,20,207), rgb(95,0,158) 95%) !important;\
-						}\
+				@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\
+				@-moz-document url(chrome://browser/content/browser.xul), url(chrome://classic_theme_restorer/content/options.xul) {\
+					:root {\
+					  --color-button-main: linear-gradient('+newColor+');\
+					  --color-button-hover:radial-gradient(farthest-side at center bottom, hsla(210,48%,90%,.5) 10%, hsla(210,48%,90%,0) 70%),\
+															radial-gradient(farthest-side at center bottom, hsla(211,70%,83%,.5), hsla(211,70%,83%,0)),\
+															linear-gradient('+newColor+');\
+					  --color-button-open: linear-gradient('+newColor+');\
+					  --color-button-text:'+this.prefs.getCharPref('cappbuttxtc')+';\
+					  --text-style-shadow:'+buttonTextShadow+';\
 					}\
-					@-moz-document url(chrome://classic_theme_restorer/content/options.xul) {\
-						#ctraddon_pw_appbuttonname {\
-						  -moz-appearance: none !important;\
-						  background-image: linear-gradient('+newColor+') !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  '+buttonTextShadow+'\
-						  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset,\
-									  0 0 0 1px rgba(255,255,255,.25) inset !important;\
-						  background-clip: padding-box !important;\
-						  border-radius: 0 0 4px 4px;\
-						  height:22px !important;\
-						  border-top: 2px solid !important;\
-						  border-right: 2px solid !important;\
-						  border-left: 2px solid !important;\
-						  border-bottom: 2px solid !important;\
-						  -moz-border-top-colors: rgba(255,255,255,.70) hsla(214,89%,21%,.5) !important;\
-						  -moz-border-right-colors: rgba(255,255,255,.60) hsla(214,89%,21%,.5) !important;\
-						  -moz-border-left-colors: rgba(255,255,255,.60) hsla(214,89%,21%,.5) !important;\
-						  -moz-border-bottom-colors: rgba(255,255,255,.70) hsla(214,89%,21%,.5) !important;\
-						}\
-						#ctraddon_pw_appbuttonname label {\
-						  padding: 2px 12px !important;\
-						  background: -moz-image-rect(url(chrome://classic_theme_restorer/content/images/appmenu-dropmarker.png), 0, 16, 16, 0) no-repeat right !important;\
-						  -moz-margin-end:10px !important;\
-						  color:'+this.prefs.getCharPref('cappbuttxtc')+'!important;\
-						  text-shadow: 0 0 1px rgba(0,0,0,.7),\
-									   0 1px 1.5px rgba(0,0,0,.5) !important;\
-              '+buttonTextShadow+'\
-						  font-weight: bold !important;\
-						}\
-					}\
-					'+appbuttonontoolbar+'\
+				'+appbuttonontoolbar+'\
 				'), null, null);
-			
+
+				classicthemerestorerjs.ctr.loadUnloadCSS('appbuttonc_orange',true);			
 				applyNewSheet(this.appbutton_color);
 			
 			}
@@ -5353,6 +5208,25 @@ classicthemerestorerjs.ctr = {
 				'), null, null);
 				
 				applyNewSheet(this.tabheight);
+			
+			}
+		
+		break;
+		
+		case "findb_widthva":
+			removeOldSheet(this.findbarwidth);
+			
+			if(enable==true && this.prefs.getBoolPref('findb_widthcb')){
+			
+				this.findbarwidth=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					findbar .findbar-textbox{\
+					  min-width: '+this.prefs.getIntPref('findb_widthva')+'px !important;\
+					  width: '+this.prefs.getIntPref('findb_widthva')+'px !important;\
+					  max-width: unset !important;\
+					}\
+				'), null, null);
+				
+				applyNewSheet(this.findbarwidth);
 			
 			}
 		
@@ -6468,6 +6342,40 @@ classicthemerestorerjs.ctr = {
 			}
 
 		break;
+	
+		case "tablowopa_pen":
+
+			removeOldSheet(this.tablowsheet_pen);
+			
+			if(enable==true){
+				
+				this.tablowsheet_pen=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					.tabbrowser-tab[pending] {\
+					  opacity: 0.6 !important;\
+					}\
+				'), null, null);
+
+				applyNewSheet(this.tablowsheet_pen);
+			}
+
+		break;
+		
+		case "tablowopa_unr":
+
+			removeOldSheet(this.tablowopa_unr);
+			
+			if(enable==true){
+				
+				this.tablowopa_unr=ios.newURI("data:text/css;charset=utf-8," + encodeURIComponent('\
+					.tabbrowser-tab[unread] {\
+					  opacity: 0.6 !important;\
+					}\
+				'), null, null);
+
+				applyNewSheet(this.tablowopa_unr);
+			}
+
+		break;
 		
 		case "lbsbsize":
 			removeOldSheet(this.locsearchbarsize);
@@ -6973,7 +6881,9 @@ classicthemerestorerjs.ctr = {
 			return;
 		  }
 		}
+
 		window.open(aAddon.optionsURL,'', 'chrome').focus();
+		
 	});
   },
 
