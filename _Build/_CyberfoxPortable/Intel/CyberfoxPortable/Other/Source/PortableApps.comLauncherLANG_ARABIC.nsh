@@ -7,3 +7,5 @@ LangString LauncherAskCopyLocal ${LANG_ARABIC} "يبدو أن برنامج ${POR
 LangString LauncherNoReadOnly ${LANG_ARABIC} "برنامج ${PORTABLEAPPNAME} لا يمكنه العمل في مجلد بتصريحات القراءة فقط. سوف يتم الآن إغلاق البرنامج."
 LangString LauncherPathTooLong ${LANG_ARABIC} "الطريق إلى ${PORTABLEAPPNAME} طويل جدا. يرجى تقصير المسار من خلال القضاء على بعض الدلائل الأصل أو تقصير أسماء الدليل."
 LangString LauncherNextButton ${LANG_ARABIC} "التالي >"
+LangString LauncherErrorWinXP ${LANG_ARABIC} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_ARABIC} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

@@ -4,3 +4,5 @@ LangString LauncherAskCopyLocal ${LANG_HUNGARIAN} "A(z) ${PORTABLEAPPNAME} alkal
 LangString LauncherNoReadOnly ${LANG_HUNGARIAN} "A(z) ${PORTABLEAPPNAME} alkalmazás nem futtatható közvetlenül csak olvasható helyrol, így az alkalmazás most bezáródik."
 LangString LauncherPathTooLong ${LANG_HUNGARIAN} "A(z) ${PORTABLEAPPNAME} alkalmazás elérési útvonala túl hosszú. Adjon meg rövidebb elérési utat."
 LangString notfound ${LANG_HUNGARIAN} "nem található"
+LangString LauncherErrorWinXP ${LANG_HUNGARIAN} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_HUNGARIAN} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

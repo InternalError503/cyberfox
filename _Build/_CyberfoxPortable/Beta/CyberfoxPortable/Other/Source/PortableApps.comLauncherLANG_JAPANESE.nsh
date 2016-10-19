@@ -3,3 +3,5 @@ LangString LauncherAlreadyRunning ${LANG_JAPANESE} "同じ${APPNAME}がもう一
 LangString LauncherAskCopyLocal ${LANG_JAPANESE} "${PORTABLEAPPNAME}は、書込みできない「読取専用」エリアから起動しているようです。${PORTABLEAPPNAME}を一時的にPC本体のハードディスクにコピーして、そこから起動させますか？$\n$\n個人情報に関する注意：あなたがYesと答えた場合、${PORTABLEAPPNAME}の中に有るあなたの個人データが一時的にPC本体のハードドライブにコピーされます。${PORTABLEAPPNAME}を閉じた時にこのデータのコピーは削除されますが、後で他の誰かがあなたのこのデータにアクセスすることができるかもしれません。"
 LangString LauncherNoReadOnly ${LANG_JAPANESE} "${PORTABLEAPPNAME}は「読取専用エリア」からは直接起動ができないので、終了します。"
 LangString LauncherNextButton ${LANG_JAPANESE} "次へ(&N) >"
+LangString LauncherErrorWinXP ${LANG_JAPANESE} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_JAPANESE} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

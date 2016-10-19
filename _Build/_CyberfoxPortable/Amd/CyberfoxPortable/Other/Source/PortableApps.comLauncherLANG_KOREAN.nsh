@@ -4,3 +4,5 @@ LangString LauncherAskCopyLocal ${LANG_KOREAN} "${PORTABLEAPPNAME} appears to be
 LangString LauncherNoReadOnly ${LANG_KOREAN} "${PORTABLEAPPNAME} can not run directly from a read-only location and will now close."
 LangString LauncherPathTooLong ${LANG_KOREAN} "The path to ${PORTABLEAPPNAME} is too long.  Please shorten the path by eliminating some parent directories or shortening directory names."
 LangString LauncherNextButton ${LANG_KOREAN} "&Next >"
+LangString LauncherErrorWinXP ${LANG_KOREAN} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_KOREAN} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

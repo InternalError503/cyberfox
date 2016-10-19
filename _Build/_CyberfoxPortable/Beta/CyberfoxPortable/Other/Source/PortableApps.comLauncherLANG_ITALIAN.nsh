@@ -5,3 +5,5 @@ LangString LauncherAskCopyLocal ${LANG_ITALIAN} "Sembra che ${PORTABLEAPPNAME} v
 LangString LauncherNoReadOnly ${LANG_ITALIAN} "L'applicazione ${PORTABLEAPPNAME} non può essere eseguita direttamente da un supporto di sola lettura e verrà chiusa."
 LangString LauncherPathTooLong ${LANG_ITALIAN} "Il percorso ${PORTABLEAPPNAME} è troppo lungo. Si prega di abbreviarlo eliminando alcune directory superiori o accorciandone i nomi."
 LangString LauncherNextButton ${LANG_ITALIAN} "&Avanti >"
+LangString LauncherErrorWinXP ${LANG_ITALIAN} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_ITALIAN} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

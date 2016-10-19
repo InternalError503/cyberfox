@@ -3,3 +3,5 @@ LangString LauncherAlreadyRunning ${LANG_SIMPCHINESE} "另一个${APPNAME}正在
 LangString LauncherAskCopyLocal ${LANG_SIMPCHINESE} "${PORTABLEAPPNAME} appears to be running from a location that is read-only. Would you like to temporarily copy it to the local hard drive and run it from there?$\n$\nPrivacy Note: If you say Yes, your personal data within ${PORTABLEAPPNAME} will be temporarily copied to a local drive. Although this copy of your data will be deleted when you close ${PORTABLEAPPNAME}, it may be possible for someone else to access your data later."
 LangString LauncherNoReadOnly ${LANG_SIMPCHINESE} "${PORTABLEAPPNAME} can not run directly from a read-only location and will now close."
 LangString LauncherNextButton ${LANG_SIMPCHINESE} "下一步(&N) >"
+LangString LauncherErrorWinXP ${LANG_SIMPCHINESE} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_SIMPCHINESE} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

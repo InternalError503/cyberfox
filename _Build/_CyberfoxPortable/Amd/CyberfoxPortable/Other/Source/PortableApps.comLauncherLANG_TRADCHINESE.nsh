@@ -4,3 +4,5 @@ LangString LauncherAskCopyLocal ${LANG_TRADCHINESE} "${PORTABLEAPPNAME} 似乎�
 LangString LauncherNoReadOnly ${LANG_TRADCHINESE} "${PORTABLEAPPNAME} 無法在唯讀的裝置上執行，程式即將結束。"
 LangString LauncherPathTooLong ${LANG_TRADCHINESE} "${PORTABLEAPPNAME} 的檔案路徑過長，請透過減少目錄層數或縮短目錄名稱等方式縮短檔案路徑的長度。"
 LangString LauncherNextButton ${LANG_TRADCHINESE} "下一步(&N) >"
+LangString LauncherErrorWinXP ${LANG_TRADCHINESE} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_TRADCHINESE} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

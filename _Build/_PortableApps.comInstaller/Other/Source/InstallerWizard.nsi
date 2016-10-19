@@ -1,4 +1,4 @@
-﻿;Copyright (C) 2006-2015 John T. Haller
+﻿;Copyright (C) 2006-2016 John T. Haller
 
 ;Website: http://PortableApps.com/Installer
 
@@ -19,11 +19,15 @@
 ;along with this program; if not, write to the Free Software
 ;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+;=== NSIS3
+Unicode true
+ManifestDPIAware true
+
 !define APPNAME "PortableApps.com Installer"
-!define VER "3.0.20.0"
+!define VER "3.4.3.0"
 !define WEBSITE "PortableApps.com/Installer"
-!define FRIENDLYVER "3.0.20"
-!define PORTABLEAPPS.COMFORMATVERSION "3.0"
+!define FRIENDLYVER "3.4.3"
+!define PORTABLEAPPS.COMFORMATVERSION "3.4"
 
 ;=== Program Details
 Name "${APPNAME}"
@@ -51,6 +55,10 @@ SetCompressor /SOLID lzma
 SetCompressorDictSize 32
 SetDatablockOptimize On
 
+;=== For NSIS3 when ready
+;Unicode true 
+;ManifestDPIAware true
+
 ;=== Include
 ;(Standard)
 !include WordFunc.nsh
@@ -62,9 +70,7 @@ SetDatablockOptimize On
 !insertmacro GetSize
 !include LogicLib.nsh
 !include MUI.nsh
-
-;(Addons)
-!include dialogs.nsh
+!include nsDialogs.nsh
 
 ;(Custom)
 !include MoveFiles.nsh
@@ -113,6 +119,13 @@ Var InstallerINIFile
 Var PluginInstaller
 Var OptionalSectionSelectedInstallType
 
+
+Var dialogOptions
+Var labelOptionsCreateInstaller
+Var dirrequestOptions
+Var checkboxInteractive
+Var browseOptions
+
 ;=== Pages
 !define MUI_WELCOMEFINISHPAGE_BITMAP welcomefinish.bmp
 !define MUI_WELCOMEPAGE_TITLE "PortableApps.com Installer ${FRIENDLYVER}"
@@ -138,7 +151,7 @@ Page custom ShowOptionsWindow LeaveOptionsWindow " | Portable App Folder Selecti
 !insertmacro MUI_LANGUAGE "English"
 
 Function .onInit
-	!insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallerWizardForm.ini"
+	;!insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallerWizardForm.ini"
 
 	;=== Check for settings.ini
 	${IfNot} ${FileExists} $EXEDIR\Data\settings.ini
@@ -164,7 +177,7 @@ Function .onInit
 	${EndIf}
 
 	;=== Pre-Fill Path with Directory
-	WriteINIStr $PLUGINSDIR\InstallerWizardForm.ini "Field 2" "State" "$INSTALLAPPDIRECTORY"
+	;WriteINIStr $PLUGINSDIR\InstallerWizardForm.ini "Field 2" "State" "$INSTALLAPPDIRECTORY"
 FunctionEnd
 
 Function ShowWelcomeWindow
@@ -197,17 +210,65 @@ Function ShowOptionsWindow
 		${EndIf}
 	${EndIf}
 	${ReadINIStrWithDefault} $INTERACTIVEMODE "$EXEDIR\Data\settings.ini" "InstallerWizard" "InteractiveMode" "1"
-	WriteINIStr "$PLUGINSDIR\InstallerWizardForm.ini" "Field 3" "State" "$INTERACTIVEMODE"
-	InstallOptions::InitDialog /NOUNLOAD "$PLUGINSDIR\InstallerWizardForm.ini"
+	
+	nsDialogs::Create 1018
+	Pop $dialogOptions
+	
+	${NSD_CreateLabel} 0 0 100% 13u "Create Installer For:"
+	Pop $labelOptionsCreateInstaller
+	
+	${NSD_CreateDirRequest} 0 13u 84% 13u "Choose directory"
+	Pop $dirrequestOptions
+	${NSD_SetText} $dirrequestOptions $INSTALLAPPDIRECTORY
+	
+	${NSD_CreateBrowseButton} 85% 13u 15% 13u "Browse..."
+    Pop $browseOptions
+    ${NSD_OnClick} $browseOptions OnBrowseForDir
+	
+	${NSD_CreateCheckbox} 0 30u 100% 13u "Interactive Mode (prompts for missing information)"
+	Pop $checkboxInteractive
+	
+	${If} $INTERACTIVEMODE == "1"
+		${NSD_Check} $checkboxInteractive
+	${Else}
+		${NSD_Uncheck} $checkboxInteractive
+	${EndIf}
+
+	nsDialogs::Show
+FunctionEnd
+
+Function OnBrowseForDir
+	${NSD_GetText} $dirrequestOptions $0
+	${IfNot} ${FileExists} "$0\*.*"
+		${GetParent} $0 $0
+		${IfNot} ${FileExists} "$0\*.*"
+			StrCpy $0 $EXEDIR
+		${EndIf}
+	${EndIf}
+	nsDialogs::SelectFolderDialog /NOUNLOAD "Directory" $0
     Pop $0
-    InstallOptions::Show
+    ${If} $0 == error
+    ${Else}
+        ${NSD_SetText} $dirrequestOptions $0
+    ${EndIf}
 FunctionEnd
 
 Function LeaveOptionsWindow
 	;=== Blank
-	ReadINIStr $INSTALLAPPDIRECTORY $PLUGINSDIR\InstallerWizardForm.ini "Field 2" "State"
-	ReadINIStr $INTERACTIVEMODE "$PLUGINSDIR\InstallerWizardForm.ini" "Field 3" "State"
+	;ReadINIStr $INSTALLAPPDIRECTORY $PLUGINSDIR\InstallerWizardForm.ini "Field 2" "State"
+	;ReadINIStr $INTERACTIVEMODE "$PLUGINSDIR\InstallerWizardForm.ini" "Field 3" "State"
 
+	${NSD_GetText} $dirrequestOptions $INSTALLAPPDIRECTORY
+	
+	${NSD_GetState} $checkboxInteractive $0
+	
+	${If} $0 == ${BST_CHECKED}
+		StrCpy $INTERACTIVEMODE "1"
+	${Else}
+		StrCpy $INTERACTIVEMODE "0"
+	${EndIf}
+	
+	
 	StrCmp $INSTALLAPPDIRECTORY "" NoInstallAppDirectoryError
 	${If} ${FileExists} "$INSTALLAPPDIRECTORY\App\AppInfo\appinfo.ini"
 		StrCpy $AppInfoINIFile "$INSTALLAPPDIRECTORY\App\AppInfo\appinfo.ini"
@@ -323,9 +384,12 @@ Section Main
 	;FindWindow $0 "#32770" "" $HWNDPARENT
 	;FindWindow $1 "msctls_progress32" "" $0
 	
-	;DetailPrint "Hanlde: $1"
-	RealProgress::SetProgress /NOUNLOAD 1
-	RealProgress::GradualProgress /NOUNLOAD 2 1 90 "Processing complete."
+	;DetailPrint "Handle: $1"
+	${If} $AUTOMATICCOMPILE != "true"
+		;Work around for bug where Finish auto-closes and doesn't call OnGUIEnd
+		RealProgress::SetProgress /NOUNLOAD 1
+		RealProgress::GradualProgress /NOUNLOAD 2 1 90 "Processing complete."
+	${EndIf}
 	DetailPrint "Generating installer code..."
 	SetDetailsPrint none
 
@@ -419,16 +483,32 @@ Section Main
 		StrCpy $1 "0.90"
 	${EndIf}
 	${If} $1 == "0.90"
-		;0.90 to 0.91 needs no changes, so it brings it to 0.91
-		StrCpy $1 "0.91"
-	${EndIf}
-	${If} $1 == "0.91"
-		;0.91 to 1.0 needs no changes, so it brings it to 1.0
-		StrCpy $1 "1.0"
-	${EndIf}
-	${If} $1 == "1.0"
+	${OrIf} $1 == "0.91"
+	${OrIf} $1 == "1.0"
 	${OrIf} $1 == "2.0"
-		;1.0 to 2.0 needs no changes, so it brings it to 2.0
+	${OrIf} $1 == "3.0"
+		;Versions from 0.90 and later can be moved forward to 3.2
+		;ExtractTo must be updated to AdvancedExtractTo
+		${ReadINIStrWithDefault} $2 $InstallerINIFile "DownloadFiles" "Extract1To" ""
+		${If} $2 != ""
+			;Update from ExtractTo to AdvancedExtractTo
+			${For} $R1 1 10
+				${ReadINIStrWithDefault} $2 $InstallerINIFile "DownloadFiles" "Extract$R1To" ""
+				${If} $2 != ""
+					WriteINIStr $InstallerINIFile "DownloadFiles" "AdvancedExtract$R1To" "$2"
+					${ReadINIStrWithDefault} $3 $InstallerINIFile "DownloadFiles" "Extract$R1File" ""
+					WriteINIStr $InstallerINIFile "DownloadFiles" "AdvancedExtract$R1Filter" "$3"
+					DeleteINIStr $InstallerINIFile "DownloadFiles" "Extract$R1To"
+					DeleteINIStr $InstallerINIFile "DownloadFiles" "Extract$R1File"
+				${EndIf}
+			${Next}
+		${EndIf}
+		StrCpy $1 "3.2"
+	${EndIf}
+	${If} $1 == "3.2"
+	${OrIf} $1 == "3.3"
+		;No changes from 3.2/3.3 to 3.4
+		StrCpy $1 "3.4"
 		WriteINIStr $AppInfoINIFile "Format" "Version" "${PORTABLEAPPS.COMFORMATVERSION}"
 	${EndIf}
 
@@ -436,8 +516,10 @@ Section Main
 		ReadINIStr ${Variable} $AppInfoINIFile ${Section} ${Key}
 		${If} ${Variable} == ""
 			${If} $INTERACTIVEMODE = 1
-				${InputTextBox} "${APPNAME}" "${Prompt}" "${DefaultValue}" "255" "OK" "Cancel" 9
-				${If} $9 != ""
+				;${InputTextBox} "${APPNAME}" "${Prompt}" "${DefaultValue}" "255" "OK" "Cancel" 9
+				StrCpy $9 "${DefaultValue}"
+				DialogsW::InputBox 1 "${APPNAME}" "${Prompt}" "OK" "Cancel" 8 9
+				${If} $8 == 1 ;OK was pressed
 					StrCpy ${Variable} $9
 					WriteINIStr $AppInfoINIFile ${Section} ${Key} $9
 				!if ${Required} == required
@@ -677,6 +759,9 @@ Section Main
 	${WriteConfig} INSTALLERCOMMENTS "For additional details, visit PortableApps.com"
 	${ReadINIStrWithDefault} $1 $AppInfoINIFile "Details" "Trademarks" ""
 	${If} $1 != ""
+		;Replace double quotes with single quotes
+		${WordReplace} $1 '"' "'" "+" $1
+		WriteINIStr $AppInfoINIFile "Details" "Trademarks" $1
 		StrCpy $1 "$1. "
 	${EndIf}
 	${WriteConfig} INSTALLERADDITIONALTRADEMARKS "$1"
@@ -905,8 +990,11 @@ Section Main
 	${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "DownloadURL" ""
 	${If} $1 != ""
 		StrCpy $2 $1 7
+		StrCpy $3 $1 8
 
 		${If} $2 == "http://"
+		${OrIf} $3 == "https://"
+		
 			${WriteConfig} DownloadURL "$1"
 
 			!insertmacro TransferInstallerINIToConfig DownloadFiles DownloadKnockURL      -
@@ -915,23 +1003,6 @@ Section Main
 			!insertmacro TransferInstallerINIToConfig DownloadFiles DownloadMD5           -
 			!insertmacro TransferInstallerINIToConfig DownloadFiles DownloadTo            -
 			!insertmacro TransferInstallerINIToConfig DownloadFiles AdditionalInstallSize required
-
-			${For} $R1 1 10
-				${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Extract$R1To" ""
-				${If} $1 != ""
-					${If} $1 == "<ROOT>"
-						StrCpy $1 ""
-					${EndIf}
-					${WriteConfig} Extract$R1To "$1"
-				${EndIf}
-			${Next}
-
-			${For} $R1 1 10
-				${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Extract$R1File" ""
-				${If} $1 != ""
-					${WriteConfig} Extract$R1File "$1"
-				${EndIf}
-			${Next}
 
 			${For} $R1 1 10
 				${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "AdvancedExtract$R1To" ""
@@ -974,6 +1045,67 @@ Section Main
 			${EndIf}
 		${Else}
 			${WriteErrorToLog} "Installer.ini - DownloadFiles - DownloadURL must begin with http://"
+		${EndIf}
+	${EndIf}
+	
+	;Download2 files
+	${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Download2URL" ""
+	${If} $1 != ""
+		StrCpy $2 $1 7
+		StrCpy $3 $1 8
+
+		${If} $2 == "http://"
+		${OrIf} $3 == "https://"
+		
+			${WriteConfig} Download2URL "$1"
+
+			!insertmacro TransferInstallerINIToConfig DownloadFiles Download2KnockURL      -
+			!insertmacro TransferInstallerINIToConfig DownloadFiles Download2Name          required
+			!insertmacro TransferInstallerINIToConfig DownloadFiles Download2Filename      required
+			!insertmacro TransferInstallerINIToConfig DownloadFiles Download2MD5           -
+			!insertmacro TransferInstallerINIToConfig DownloadFiles Download2To            -
+
+			${For} $R1 1 10
+				${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Download2AdvancedExtract$R1To" ""
+				${If} $1 != ""
+					${If} $1 == "<ROOT>"
+						StrCpy $1 ""
+					${EndIf}
+					${WriteConfig} Download2AdvancedExtract$R1To "$1"
+				${EndIf}
+			${Next}
+
+			${For} $R1 1 10
+				${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Download2AdvancedExtract$R1Filter" ""
+				${If} $1 != ""
+					${WriteConfig} Download2AdvancedExtract$R1Filter "$1"
+				${EndIf}
+			${Next}
+
+			${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Download2DoubleExtractFilename" ""
+			${If} $1 != ""
+				${WriteConfig} Download2DoubleExtractFilename "$1"
+
+				${For} $R1 1 10
+					${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Download2DoubleExtract$R1To" ""
+					${If} $1 != ""
+						${If} $1 == "<ROOT>"
+							StrCpy $1 ""
+						${EndIf}
+						${WriteConfig} Download2DoubleExtract$R1To "$1"
+					${EndIf}
+				${Next}
+
+				${For} $R1 1 10
+					${ReadINIStrWithDefault} $1 $InstallerINIFile "DownloadFiles" "Download2DoubleExtract$R1Filter" ""
+					${If} $1 != ""
+						${WriteConfig} Download2DoubleExtract$R1Filter "$1"
+					${EndIf}
+				${Next}
+
+			${EndIf}
+		${Else}
+			${WriteErrorToLog} "Installer.ini - DownloadFiles - Download2URL must begin with http://"
 		${EndIf}
 	${EndIf}
 
@@ -1137,5 +1269,7 @@ Function RunOnFinish
 FunctionEnd
 
 Function .onGUIEnd
-	RealProgress::Unload
+	${If} $AUTOMATICCOMPILE != "true"
+		RealProgress::Unload
+	${EndIf}
 FunctionEnd

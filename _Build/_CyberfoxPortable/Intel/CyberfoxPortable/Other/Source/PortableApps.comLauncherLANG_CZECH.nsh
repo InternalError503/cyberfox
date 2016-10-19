@@ -23,3 +23,5 @@ LangString LauncherNoJava ${LANG_CZECH} "${APPNAME} vyžaduje instalaci Java Run
 LangString LauncherNoJavaDownload ${LANG_CZECH} "${APPNAME} vyžaduje Java Runtime Environment. Chcete nyní automaticky stáhnout a nainstalovat jPortable na vaše zařízení?"
 LangString LauncherNoJavaCancelled ${LANG_CZECH} "Aplikaci ${PORTABLEAPPNAME} nelze spustit bez Java Runtime Environment a bude nyní ukončena."
 LangString LauncherProgramFiles ${LANG_CZECH} "${PORTABLEAPPNAME} nelze spustit z $0. Toto umístění je pouze pro standardní místní software. Spusťte tedy prosím tuto aplikaci z jiného umístění."
+LangString LauncherErrorWinXP ${LANG_CZECH} "Windows XP is not supported by this application!, Compatible operating system is (Windows 7 or Higher)"
+LangString LauncherErrorWinVista ${LANG_CZECH} "Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!" 

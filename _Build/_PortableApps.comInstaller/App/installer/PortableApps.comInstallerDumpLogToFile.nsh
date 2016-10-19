@@ -12,8 +12,12 @@
 	call DumpLog
 !macroend
 
-!define LVM_GETITEMCOUNT 0x1004
-!define LVM_GETITEMTEXT 0x1073
+!ifndef LVM_GETITEMCOUNT
+	!define LVM_GETITEMCOUNT 0x1004
+!endif
+!ifndef LVM_GETITEMTEXT
+	!define LVM_GETITEMTEXT 0x1073
+!endif
 
 Function DumpLog
   Exch $5

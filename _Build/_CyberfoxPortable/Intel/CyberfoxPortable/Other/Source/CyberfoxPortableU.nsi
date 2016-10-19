@@ -1,4 +1,4 @@
-﻿;Copyright 2004-2014 John T. Haller of PortableApps.com
+﻿;Copyright 2004-2016 John T. Haller of PortableApps.com
 
 ;Website: http://PortableApps.com/FirefoxPortable
 
@@ -21,6 +21,8 @@
 
 ;Code modified by 8pecxstudios.com for cyberfox project.
 
+!define PF_XMMI64_INSTRUCTIONS_AVAILABLE 10
+
 ;Include check for win64.txt file used to define or undefined 64bit builds.
 !include CheckFile.nsh
 ;Define x64 bit builds comment out for x86
@@ -37,8 +39,8 @@ ${!IfExist} "win64.txt"
 !define APPNAME "Cyberfox"
 !define NAME "CyberfoxPortable"
 !include "..\..\..\..\shared\version.nsh"
-!define WEBSITE "https://8pecxstudios.com/"
-!define DEFAULTEXE "cyberfox.exe"
+!define WEBSITE "https://cyberfox.8pecxstudios.com/"
+!define DEFAULTEXE "Cyberfox.exe"
 !define DEFAULTAPPDIR "cyberfox"
 !define LAUNCHERLANGUAGE "English"
 !define VENDOR "8pecxstudios"
@@ -56,12 +58,7 @@ VIAddVersionKey FileDescription "${PORTABLEAPPNAME}"
 VIAddVersionKey FileVersion "${VER}"
 VIAddVersionKey ProductVersion "${VER}"
 VIAddVersionKey InternalName "${PORTABLEAPPNAME}"
-
-!ifdef ISWIN64
-	VIAddVersionKey LegalTrademarks "Firefox source code is a Registered Trademark of The Mozilla Foundation.  ${APPNAME} Portable is designed and developed by ${VENDOR}."
-!else
-	VIAddVersionKey LegalTrademarks "Firefox source code is a Registered Trademark of The Mozilla Foundation.  ${APPNAME} Portable (x86) is designed and developed by ${VENDOR}."
-!endif
+VIAddVersionKey LegalTrademarks "Firefox source code is a Registered Trademark of The Mozilla Foundation.  ${PORTABLEAPPNAME} Portable is designed and developed by ${VENDOR}."
 VIAddVersionKey OriginalFilename "${DEFAULTEXE}"
 
 ;=== Runtime Switches
@@ -86,6 +83,7 @@ SetDatablockOptimize On
 !include Registry.nsh
 !include TextFunc.nsh
 !insertmacro GetParent
+!include WinVer.nsh
 !include WordFunc.nsh
 !insertmacro VersionCompare
 
@@ -140,6 +138,26 @@ Var bolHKCUSoftwareMozillaExists
 Var SubmitCrashReportBackup
 
 Section "Main"
+
+	;Window XP do before SSE2 check.
+  ${If} ${IsWinXP}
+		MessageBox MB_OK|MB_ICONEXCLAMATION `$(LauncherErrorWinXP)`
+		Abort
+  ${EndIf}
+
+	System::Call kernel32::IsProcessorFeaturePresent(i${PF_XMMI64_INSTRUCTIONS_AVAILABLE})i.r0
+
+	${If} $0 == 0
+		;SSE2 unavailable
+		MessageBox MB_ICONEXCLAMATION|MB_OK "This computer has an older CPU that lacks SSE2 instruction set support. Cyberfox 49 and later can not run on this computer."
+		Abort
+	${EndIf}
+
+  ;Windows Vista do after SSE2 check.
+  ${If} ${IsWinVista}
+		MessageBox MB_OK|MB_ICONEXCLAMATION `$(LauncherErrorWinVista)`
+  ${EndIf}
+
 	;=== Setup variables
 	ReadEnvStr $APPDATAPATH "APPDATA"
 
@@ -165,10 +183,11 @@ Section "Main"
 		${ReadINIStrWithDefault} $DISABLEINTELLIGENTSTART "$INIPATH\${NAME}.ini" "${NAME}" "DisableIntelligentStart" "false"
 		${ReadINIStrWithDefault} $LOCALHOMEPAGE "$INIPATH\${NAME}.ini" "${NAME}" "LocalHomepage" ""
 		${ReadINIStrWithDefault} $RUNLOCALLY "$INIPATH\${NAME}.ini" "${NAME}" "RunLocally" "false"
-		StrCmp $RUNLOCALLY "true" "" CheckIfDefaultDirectories
+		${If} $RUNLOCALLY == "true"
 			StrCpy $WAITFORPROGRAM "true"
+		${EndIf}
 
-	CheckIfDefaultDirectories:
+	;CheckIfDefaultDirectories:
 		;=== Check if default directories
 		StrCmp $PROGRAMDIRECTORY "$EXEDIR\App\${DEFAULTAPPDIR}" "" EndINI
 		StrCmp $PROFILEDIRECTORY "$EXEDIR\Data\profile" "" EndINI
@@ -242,11 +261,7 @@ Section "Main"
 	;CheckIfRunning:
 		;=== Check if running
 		StrCmp $ALLOWMULTIPLEINSTANCES "true" ProfileWork
-!ifdef ISWIN64		
-		FindProcDLL64::FindProc "${DEFAULTEXE}"
-!else
-		FindProcDLL86::FindProc "${DEFAULTEXE}"
-!endif		
+		FindProcDLL::FindProc "${DEFAULTEXE}"
 		StrCmp $R0 "1" "" CheckForCrashReports
 			;=== Already running, check if it is using the portable profile
 			IfFileExists "$PROFILEDIRECTORY\parent.lock" "" WarnAnotherInstance
@@ -315,6 +330,7 @@ Section "Main"
 				MessageBox MB_OK|MB_ICONEXCLAMATION `Warning: ${PORTABLEAPPNAME} was installed or upgraded without using the official PortableApps.com Installer which can cause compatibility issues and may be a violation of the application's license. You may encounter issues while using this application. Please visit PortableApps.com to obtain the official release of this application to install or upgrade.`
 				WriteINIStr "$SETTINGSDIRECTORY\${NAME}Settings.ini" "${NAME}Settings" "InvalidPackageWarningShown" $0
 				DeleteINISec "$EXEDIR\App\AppInfo\appinfo.ini" "Installer"
+				Goto TheEnd
 			${EndIf}
 		${EndIf}
 	
@@ -473,20 +489,6 @@ Section "Main"
 			StrCpy $PLUGINSDIRECTORY ""
 		${EndIf}
 		${GetParent} $EXEDIR $0
-		${If} ${FileExists} "$0\CommonFiles\Java\bin\plugin2\*.*"
-			${If} $PLUGINSDIRECTORY != ""
-				StrCpy $PLUGINSDIRECTORY "$PLUGINSDIRECTORY;$0\CommonFiles\Java\bin\plugin2"
-			${Else}
-				StrCpy $PLUGINSDIRECTORY "$0\CommonFiles\Java\bin\plugin2"
-			${EndIf}
-		${ElseIf} ${FileExists} "$0\CommonFiles\Java\bin\new_plugin\*.*"
-			${If} $PLUGINSDIRECTORY != ""
-				StrCpy $PLUGINSDIRECTORY "$PLUGINSDIRECTORY;$0\CommonFiles\Java\bin\new_plugin"
-			${Else}
-				StrCpy $PLUGINSDIRECTORY "$0\CommonFiles\Java\bin\new_plugin"
-			${EndIf}
-		${EndIf}
-		
 !ifdef ISWIN64
 		${If} ${FileExists} "$0\CommonFiles\Java64\bin\plugin2\*.*"
 			${If} $PLUGINSDIRECTORY != ""
@@ -500,9 +502,22 @@ Section "Main"
 			${Else}
 				StrCpy $PLUGINSDIRECTORY "$0\CommonFiles\Java64\bin\new_plugin"
 			${EndIf}
-		${EndIf}		
+		${EndIf}
+!else
+		${If} ${FileExists} "$0\CommonFiles\Java\bin\plugin2\*.*"
+			${If} $PLUGINSDIRECTORY != ""
+				StrCpy $PLUGINSDIRECTORY "$PLUGINSDIRECTORY;$0\CommonFiles\Java\bin\plugin2"
+			${Else}
+				StrCpy $PLUGINSDIRECTORY "$0\CommonFiles\Java\bin\plugin2"
+			${EndIf}
+		${ElseIf} ${FileExists} "$0\CommonFiles\Java\bin\new_plugin\*.*"
+			${If} $PLUGINSDIRECTORY != ""
+				StrCpy $PLUGINSDIRECTORY "$PLUGINSDIRECTORY;$0\CommonFiles\Java\bin\new_plugin"
+			${Else}
+				StrCpy $PLUGINSDIRECTORY "$0\CommonFiles\Java\bin\new_plugin"
+			${EndIf}
+		${EndIf}
 !endif
-		
 		${If} ${FileExists} "$0\CommonFiles\Silverlight\files\*.*"
 			${If} $PLUGINSDIRECTORY != ""
 				StrCpy $PLUGINSDIRECTORY "$PLUGINSDIRECTORY;$0\CommonFiles\Silverlight\files"
@@ -536,14 +551,13 @@ Section "Main"
 		SetOutPath $PROGRAMDIRECTORY
 		ExecWait $EXECSTRING
 
-	CheckRunning:
-		Sleep 2000
+	;CheckRunning:
 		StrCmp $ALLOWMULTIPLEINSTANCES "true" CheckIfRemoveLocalFiles
-!ifdef ISWIN64		
-		FindProcDLL64::FindProc "${DEFAULTEXE}"
-!else
-		FindProcDLL86::FindProc "${DEFAULTEXE}"
-!endif               
+		
+	CheckRunning:
+		FindProcDLL::WaitProcEnd "${DEFAULTEXE}" -1
+		Sleep 2000
+		FindProcDLL::FindProc "${DEFAULTEXE}"
 		StrCmp $R0 "1" CheckRunning CleanupRunLocally
 	
 	StartProgramAndExit:
@@ -556,11 +570,7 @@ Section "Main"
 		RMDir /r "$TEMP\${NAME}\"
 
 	CheckIfRemoveLocalFiles:
-!ifdef ISWIN64		
-		FindProcDLL64::FindProc "${DEFAULTEXE}"
-!else
-		FindProcDLL86::FindProc "${DEFAULTEXE}"
-!endif	
+		FindProcDLL::FindProc "${DEFAULTEXE}"
 		Pop $R0
 		StrCmp $R0 "1" TheEnd RemoveLocalFiles
 
