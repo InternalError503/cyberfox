@@ -4,7 +4,7 @@
 
 pref("startup.homepage_override_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%&oldversion=%OLD_VERSION%");
 pref("startup.homepage_welcome_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
-pref("startup.homepage_welcome_url.additional", "");
+pref("startup.homepage_welcome_url.additional", "https://cyberfox.8pecxstudios.com/notifications");
 
 pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com#selection"); 
 pref("app.update.url.details", "https://cyberfox.8pecxstudios.com#selection");

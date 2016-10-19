@@ -5,7 +5,7 @@
  //Since the beta does not have a release notes page we will disable this.
 pref("startup.homepage_override_url","");
 pref("startup.homepage_welcome_url","");
-pref("startup.homepage_welcome_url.additional", "");
+pref("startup.homepage_welcome_url.additional", "https://cyberfox.8pecxstudios.com/notifications");
 
 //We have no manual update url.
 pref("app.update.url.manual", ""); 

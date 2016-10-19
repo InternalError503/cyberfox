@@ -4,11 +4,10 @@
 
 pref("startup.homepage_override_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%&oldversion=%OLD_VERSION%");
 pref("startup.homepage_welcome_url","https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
-pref("startup.homepage_welcome_url.additional", "");
+pref("startup.homepage_welcome_url.additional", "https://cyberfox.8pecxstudios.com/notifications");
+
 pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com/cyberfox-linux"); 
 pref("app.update.url.details", "https://cyberfox.8pecxstudios.com/cyberfox-linux");
-pref("app.releaseNotesURL", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
-pref("app.vendorURL", "https://8pecxstudios.com/");
 
 pref("app.update.check.url", "https://download.8pecxstudios.com/current_version/update.json");
 // app.update.channel.type:
@@ -18,6 +17,10 @@ pref("app.update.check.url", "https://download.8pecxstudios.com/current_version/
 pref("app.update.channel.type", "release");
 //Set if update available
 pref("app.update.available", false);
+
+
+pref("app.releaseNotesURL", "https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date?version=%VERSION%");
+pref("app.vendorURL", "https://8pecxstudios.com/");
 
 //Disable default browser.
 pref("browser.shell.checkDefaultBrowser", false);
