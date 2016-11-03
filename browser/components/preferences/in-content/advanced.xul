@@ -88,6 +88,15 @@
 	  <preference id="app.update.check.enabled" 
 						   name="app.update.check.enabled" 
 						   type="bool"/>
+	  <preference id="app.update.notifications.enabled" 
+						   name="app.update.notifications.enabled" 
+						   type="bool"/>
+	  <preference id="app.update.releasenotes.enabled" 
+						   name="app.update.releasenotes.enabled" 
+						   type="bool"/>
+	  <preference id="app.update.verifysha" 
+						   name="app.update.verifysha" 
+						   type="bool"/>
 	  <preference id="browser.tabs.copyallurls" 
 						   name="browser.tabs.copyallurls" 
 						   type="bool"/>  
@@ -109,6 +118,9 @@
 #ifdef XP_WIN
  	  <preference id="plugin.allowed_whitelist.enabled" 
 						   name="plugin.allowed_whitelist.enabled" 
+						   type="bool"/>
+ 	  <preference id="plugin.flash_allowed" 
+						   name="plugin.flash_allowed" 
 						   type="bool"/>
  	  <preference id="plugin.java_allowed" 
 						   name="plugin.java_allowed" 
@@ -146,9 +158,6 @@
   <preference id="app.update.auto"
               name="app.update.auto"
               type="bool"/>
-  <preference id="app.update.mode"
-              name="app.update.mode"
-              type="int"/>
 
   <preference id="app.update.disable_button.showUpdateHistory"
               name="app.update.disable_button.showUpdateHistory"
@@ -506,6 +515,9 @@
 					<checkbox id="plugin.allowed_whitelist.enabled" label="&browserpluginswhitelist.label; (&restartRequiredMSG.label;)"
 							preference="plugin.allowed_whitelist.enabled"
 							tooltiptext="&restartRequiredMSG.label;"/>
+					<checkbox id="plugin.flash_allowed" label="&browserpluginsflashenabled.label;  (&restartRequiredMSG.label;)"
+							preference="plugin.flash_allowed"
+							tooltiptext="&restartRequiredMSG.label;"/>
 					<checkbox id="plugin.java_allowed" label="&browserpluginsjavaenabled.label;  (&restartRequiredMSG.label;)"
 							preference="plugin.java_allowed"
 							tooltiptext="&restartRequiredMSG.label;"/>							
@@ -516,6 +528,7 @@
 			<!-- System Addons -->
 			<groupbox id="alternateOptionsSystem" orient="vertical">
 				<caption label="&systemaddons.label;"/>
+				<label>&systemaddonsmsg.label;</label>
  					<checkbox id="extensions.pocket.enabled" label="&enablepocket.label;"
 							preference="extensions.pocket.enabled" />
 			</groupbox>
@@ -528,7 +541,13 @@
 					<checkbox id="app.update.startup.check" label="&updatestartupcheck.label;"
 							preference="app.update.startup.check"/>
 					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
-							preference="app.update.check.enabled"/>								
+							preference="app.update.check.enabled"/>
+					<checkbox id="app.update.verifysha" label="&updateverifysha.label;"
+							preference="app.update.verifysha"/>
+					<checkbox id="app.update.notifications.enabled" label="&updatenotificationsenabled.label;"
+							preference="app.update.notifications.enabled"/>
+					<checkbox id="app.update.releasenotes.enabled" label="&updatereleasenotesenabled.label;"
+							preference="app.update.releasenotes.enabled"/>
 				</groupbox>
 
 			<!-- Download Settings -->				

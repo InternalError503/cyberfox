@@ -265,6 +265,8 @@ xul|*.help-button {
   min-width: 16px;
   margin-inline-end: 0;
   border-width: 0;
+  /* Override default button background */
+  background-color: transparent;
   background-image: none;
   box-shadow: none;
   list-style-image: url("chrome://global/skin/in-content/help-glyph.svg#help");
@@ -431,6 +433,14 @@ xul|textbox {
   min-height: 30px;
   padding-right: 10px;
   padding-left: 10px;
+}
+
+/* Create a separate rule to unset these styles on .tree-input instead of
+   using :not(.tree-input) so the selector specifity doesn't change. */
+xul|textbox.tree-input {
+  min-height: unset;
+  padding-right: unset;
+  padding-left: unset;
 }
 
 html|input[type="text"],

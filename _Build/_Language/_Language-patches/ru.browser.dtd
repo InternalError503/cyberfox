@@ -154,6 +154,9 @@
 <!ENTITY updateautocheck.label "Автоматически проверять обновления в окне 'О &brandShortName;'">
 <!ENTITY updatestartupcheck.label "Автоматически проверять наличие обновлений при запуске &brandShortName;">
 <!ENTITY updatecheckenabled.label "Разрешить проверку обновлений">
+<!ENTITY updateverifysha.label "Разрешить проверку обновлений по SHA512.">
+<!ENTITY updatenotificationsenabled.label "Разрешить отображение страницы уведомлений при первом запуске или после обновления &brandShortName;.">
+<!ENTITY updatereleasenotesenabled.label "Разрешить отображение страницы 'Что нового' при первом запуске или после обновления &brandShortName;.">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Копировать адрес страницы">
@@ -176,6 +179,7 @@
 <!ENTITY browserplugins.label "Плагины браузера">
 <!ENTITY browserpluginsdisabled.label "Отключить плагины браузера (отключаются все плагины)">
 <!ENTITY browserpluginswhitelist.label "Разрешить белый список плагинов">
+<!ENTITY browserpluginsflashenabled.label "Включить плагин Flash.">
 <!ENTITY browserpluginsjavaenabled.label "Включить плагин Java">
 
 <!-- System Addons Tweak -->
@@ -189,7 +193,7 @@
 
 <!-- Flashplayer Protect Mode -->
 <!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
-<!ENTITY disableflashprotect.label "Отключить режим защиты проигрывателя flash">
+<!ENTITY disableflashprotect.label "Отключить режим защиты проигрывателя Flash">
 
 <!-- Toggle JavaScript in tab feature -->
 <!ENTITY togglescriptintab.label "Включить/выключить JavaScript">

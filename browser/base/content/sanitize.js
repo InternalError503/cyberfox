@@ -292,7 +292,7 @@ Sanitizer.prototype = {
           // If this exception is raised before the soft timeout, it
           // will appear in `seenException`. Otherwise, it's too late
           // to do anything about it.
-        }).then(() => {});
+        });
 
         if (seenException) {
           throw seenException;
@@ -330,11 +330,9 @@ Sanitizer.prototype = {
 
     offlineApps: {
       clear: Task.async(function* (range) {
-        try {
-          Components.utils.import("resource:///modules/offlineAppCache.jsm");
-          // This doesn't wait for the cleanup to be complete.
-          OfflineAppCacheHelper.clear();
-        } finally {}
+        Components.utils.import("resource:///modules/offlineAppCache.jsm");
+        // This doesn't wait for the cleanup to be complete.
+        OfflineAppCacheHelper.clear();
       })
     },
 

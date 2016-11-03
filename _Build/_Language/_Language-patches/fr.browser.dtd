@@ -161,6 +161,9 @@
 <!ENTITY updateautocheck.label "Vérifier automatiquement les mises à jour dans « À propos de &brandShortName; »">
 <!ENTITY updatestartupcheck.label "Vérifier automatiquement les mises à jour au démarrage de &brandShortName;.">
 <!ENTITY updatecheckenabled.label "Permettre la vérification des mises à jour.">
+<!ENTITY updateverifysha.label "Enable SHA512 update verification.">
+<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
+<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Copier l’URL de l’onglet">
@@ -184,6 +187,7 @@
 <!ENTITY browserplugins.label "Browser Plugins">
 <!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
 <!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
+<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
 <!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
 
 <!-- System Addons Tweak -->

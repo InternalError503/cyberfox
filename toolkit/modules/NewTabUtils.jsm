@@ -376,6 +376,7 @@ var PinnedLinks = {
    * Pins a link at the given position.
    * @param aLink The link to pin.
    * @param aIndex The grid index to pin the cell at.
+   * @return true if link changes, false otherwise
    */
   pin: function PinnedLinks_pin(aLink, aIndex) {
     // Clear the link's old position, if any.

@@ -34,19 +34,18 @@ var gCyberfoxCustom = {
             }
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'restartBrowser' " + e);
+            throw new Error("Were sorry but something has gone wrong with 'restartBrowser' " + e);
         }
     },
     // Clones current tab into new tab or window.
-    CloneCurrent: function(type) {
+    CloneCurrent: function(type, isprivate) {
         try {
-
             if (gURLBar.value) {
-                gBrowser.selectedTab = openUILinkIn(gURLBar.value, type, { relatedToCurrent: true });
+                gBrowser.selectedTab = openUILinkIn(gURLBar.value, type, { relatedToCurrent: true, private: isprivate });	
             }
         } catch (type) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'CloneCurrent' " + type + " " + e);
+            throw new Error("Were sorry but something has gone wrong with 'CloneCurrent' " + type + " " + e);
         }
     },
     // Copies current tab url to clipboard	
@@ -57,7 +56,7 @@ var gCyberfoxCustom = {
             gClipboardHelper.copyString(gBrowser.currentURI.spec);
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'CopyCurrentTabUrl' " + e);
+            throw new Error("Were sorry but something has gone wrong with 'CopyCurrentTabUrl' " + e);
         }
     },
     // Copies all tab urls to clipboard	
@@ -88,7 +87,7 @@ var gCyberfoxCustom = {
 		       urlList = "";
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'CopyAllTabUrls' " + e);
+            throw new Error("Were sorry but something has gone wrong with 'CopyAllTabUrls' " + e);
         }
     },
     // Get all the tab urls into a json array.
@@ -119,7 +118,7 @@ var gCyberfoxCustom = {
             document.getElementById(element).hidden = state;
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with '_ElementState' " + e);
+            throw new Error("Were sorry but something has gone wrong with '_ElementState' " + e);
         }
     },
     toggleTabJavascript: function() {
@@ -137,7 +136,7 @@ var gCyberfoxCustom = {
             }
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'toggleTabJavascript' " + e);
+            throw new Error("Were sorry but something has gone wrong with 'toggleTabJavascript' " + e);
         }
     },
     // Always open about:config a new tab.
@@ -146,7 +145,7 @@ var gCyberfoxCustom = {
                 gBrowser.selectedTab = openUILinkIn("about:config", 'tab');
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'openAboutConfig' " + e);
+            throw new Error("Were sorry but something has gone wrong with 'openAboutConfig' " + e);
         }
     },
     customPrefSettings: function(e) {
@@ -175,7 +174,7 @@ var gCyberfoxCustom = {
                     }
                 } catch (e) {
                     // Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'browser.tabs.clonetab' | browser.tabs.copyurl | browser.tabs.copyallurls " + e);
+                    throw new Error("Were sorry but something has gone wrong with 'browser.tabs.clonetab' | browser.tabs.copyurl | browser.tabs.copyallurls " + e);
                 }
             }, false);
         document.getElementById("contentAreaContextMenu")
@@ -195,7 +194,7 @@ var gCyberfoxCustom = {
                     }
                 } catch (e) {
                     // Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'browser.context.emaillink' | 'browser.context.togglejavascript' " + e);
+                    throw new Error("Were sorry but something has gone wrong with 'browser.context.emaillink' | 'browser.context.togglejavascript' " + e);
                 }
             }, false);
         document.getElementById("menu_ToolsPopup")
@@ -209,7 +208,7 @@ var gCyberfoxCustom = {
                     }
                 } catch (e) {
                     // Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'clean.ram.cache' " + e);
+                    throw new Error("Were sorry but something has gone wrong with 'clean.ram.cache' " + e);
                 }
             }, false);
         document.getElementById("menu_FilePopup")
@@ -223,7 +222,7 @@ var gCyberfoxCustom = {
                     }
                 } catch (e) {
                     // Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'browser.restart.enabled' " + e);
+                    throw new Error("Were sorry but something has gone wrong with 'browser.restart.enabled' " + e);
                 }
             }, false);
         document.getElementById("toolbar-context-menu")
@@ -237,7 +236,7 @@ var gCyberfoxCustom = {
                     }
                 } catch (e) {
                     // Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'browser.context.aboutconfig' " + e);
+                    throw new Error("Were sorry but something has gone wrong with 'browser.context.aboutconfig' " + e);
                 }
             }, false);
         document.getElementById("menu_viewPopup")
@@ -251,7 +250,7 @@ var gCyberfoxCustom = {
                     }
                 } catch (e) {
                     // Catch any nasty errors and output to console
-                    console.log("Were sorry but something has gone wrong with 'browser.menu.aboutconfig' " + e);
+                    throw new Error("Were sorry but something has gone wrong with 'browser.menu.aboutconfig' " + e);
                 }
             }, false);
         // Restart browser panel UI		
@@ -269,7 +268,7 @@ var gCyberfoxCustom = {
                 }
             } catch (e) {
                 // Catch any nasty errors and output to console
-                console.log("Were sorry but something has gone wrong with 'browser.restart.showpanelmenubtn' | 'browser.restart.smallpanelmenubtn' " + e);
+                throw new Error("Were sorry but something has gone wrong with 'browser.restart.showpanelmenubtn' | 'browser.restart.smallpanelmenubtn' " + e);
             }
         });
         window.addEventListener("beforecustomization", function(e) {
@@ -301,7 +300,7 @@ var gCyberfoxCustom = {
             }
         } catch (e) {
             // Catch any nasty errors and output to console
-            console.log("Were sorry but something has gone wrong with 'toolsDownloads' " + e);
+            throw new Error("Were sorry but something has gone wrong with 'toolsDownloads' " + e);
         }
     },
 	// Version comparison
@@ -330,19 +329,83 @@ var gCyberfoxCustom = {
             Cu.reportError(rv);
         }
     },
+	// Version build comparison
+	compareBuildVersions: function(_Installed, _Required) {
+	try{
+			var installed = Number(_Installed.substring(_Installed.indexOf("b")+1, _Installed.length));
+			var required = Number(_Required.substring(_Required.indexOf("b")+1, _Required.length));
+			if (installed === required || installed > required) return true;
+			if (installed < required) return false;
+			
+			return true;		
+		} catch (rv) {
+			// Show error
+			Cu.reportError(rv);
+		}
+	},
+	getUpdates: function(){	
+	try {
+			var appDir = Cc["@mozilla.org/file/directory_service;1"]
+						.getService(Ci.nsIProperties).get("GreD", Ci.nsILocalFile);
+			appDir.append("updater.exe");
+			
+			// create an nsIFile for the executable
+			var file = Cc["@mozilla.org/file/local;1"]
+									 .createInstance(Ci.nsIFile);
+			file.initWithPath(appDir.path.toString());
+
+			// create an nsIProcess
+			var process = Cc["@mozilla.org/process/util;1"]
+										.createInstance(Ci.nsIProcess);
+			if (file.exists()){
+				process.init(file);
+
+				// Run the process.
+				// If first param is true, calling thread will be blocked until
+				// called process terminates.
+				// Second and third params are used to pass command-line arguments
+				// to the process.
+				var args = ["--checknow"];
+				if (!Services.prefs.getBoolPref("app.update.verifysha")) { 
+					args.push("--nosha");
+				}
+				process.run(false, args, args.length);
+			}else{
+				throw new Error('Whoops! Hey somethings is not right maybe contact support!');
+			}
+		} catch (rv) {
+			// Show error
+			 Cu.reportError(rv);
+		}
+	},
 	// Update notification notify
 	updateNotification: function(){
 		if (Services.prefs.getBoolPref("app.update.autocheck") && 
 			Services.prefs.getBoolPref("app.update.available") && 
 			Services.prefs.getBoolPref("app.update.check.enabled")){			
         // Clear any previous set urls
-        Services.prefs.clearUserPref("app.update.url.manual");	
+		Services.prefs.clearUserPref("app.update.url.manual");	
+	
+		// Set button text by platform
+		var buttonText = "";
+		if(AppConstants.platform == "win"){
+			buttonText = this.UplodateLocal.GetStringFromName("update.notification.button.win");
+		} else {
+			buttonText = this.UplodateLocal.GetStringFromName("update.notification.button");
+		}
+		
 			// Set notification bar button.
 			var button = [];
 			button = [{
-				label: this.UplodateLocal.GetStringFromName("update.notification.button"),
+				label: buttonText,
 				accessKey: "v",
-				callback: function() { openUILinkIn(Services.prefs.getCharPref("app.update.url.manual"), 'tab'); }
+				callback: function() { 
+					if (AppConstants.platform == "win"){
+						gCyberfoxCustom.getUpdates();
+					} else {
+						openUILinkIn(Services.prefs.getCharPref("app.update.url.manual"), 'tab');
+					}
+				}
 			}];		
 			try {
 				if(Services.prefs.getBoolPref("app.update.notification-new")){
@@ -374,21 +437,16 @@ var gCyberfoxCustom = {
 		}else{Services.prefs.setBoolPref("app.update.available", false);}		
 	},
 	startupUpdateCheck: function(aBoolean){
-		if (Services.prefs.getBoolPref("app.update.startup.check") === false) {
-			return;
-		}	
-		// We are skipping update checks entirely if cyberfox beta for now.
-        if (Services.prefs.getCharPref("app.update.channel.type") === "beta") {
-            return;
-        }
+		if (!Services.prefs.getBoolPref("app.update.startup.check")) return;
+
         if (Services.prefs.getBoolPref("app.update.autocheck")) {
             try {
                 // Set Global to disable update checks entirely 
                 if (Services.prefs.getBoolPref("app.update.check.enabled") && aBoolean === true) {
 														
-						var curTime = new Date();
-						if 	(Services.prefs.getCharPref("app.update.startup.lastcheck") != curTime.getHours()) {
-											Services.prefs.setCharPref("app.update.startup.lastcheck", curTime.getHours());
+						var curTime = new Date(); // Increase time between checks by 2 hours.
+						if 	(Services.prefs.getCharPref("app.update.startup.lastcheck") <= curTime.getHours()) {
+											Services.prefs.setCharPref("app.update.startup.lastcheck", curTime.getHours() + 2);
 							// Get Latest Browser Version
 							var url = Services.prefs.getCharPref("app.update.check.url");
 							var request = new XMLHttpRequest();
@@ -407,7 +465,7 @@ var gCyberfoxCustom = {
 								var currentVersion = null;
 								if (!IsJsonValid(text)) { 
 									// Throw error message	
-									console.log("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
+									throw new Error("Were sorry but something has gone wrong while trying to parse update.json (json is not valid!)");
 									// Return error
 									return;
 								} else {
@@ -418,32 +476,46 @@ var gCyberfoxCustom = {
 									case "beta":currentVersion = jsObject.beta;break;
 									case "esr":currentVersion = jsObject.esr;break;
 								}
-								if (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()) === false && aBoolean === true) {
-									try {
+								var updateAvailable = false;
+															
+								if (Services.prefs.getCharPref("app.update.channel.type") === "beta") {
+									updateAvailable = (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString().replace(/b[0-9]+/g, '')) && 
+										gCyberfoxCustom.compareBuildVersions(AppConstants.MOZ_APP_VERSION_DISPLAY, currentVersion.toString()));
+								} else if (Services.prefs.getCharPref("app.update.channel.type") === "release") {
+									updateAvailable = (gCyberfoxCustom.compareVersions(Services.appinfo.version, currentVersion.toString()));
+								}
+
+								switch (updateAvailable) {
+									case true:
 										// Set update available
-										Services.prefs.setBoolPref("app.update.available", true);
-										gCyberfoxCustom.updateNotification();
-									  } catch(e) {
-										// Prevents runtime error on platforms that don't implement nsIAlertsService
-									  }								
-								}else{
-									// Set update available
-									Services.prefs.setBoolPref("app.update.available", false);	
-									console.log("Update check event was spawned!");									
-								}	
+										Services.prefs.setBoolPref("app.update.available", false);	
+										console.log("Update check event was spawned!");	
+									break;
+									case false:
+									try {
+											// Set update available
+											Services.prefs.setBoolPref("app.update.available", true);
+											gCyberfoxCustom.updateNotification();
+										  } catch(e) {
+											// Prevents runtime error on platforms that don't implement nsIAlertsService
+										  }
+									break;
+								}
+
+								
 							};
 							request.ontimeout = function(aEvent) {
 								// Log return failed check message for request time-out!
-								console.log("Startup update check failed! timed out");
+								throw new Error("Startup update check failed! timed out");
 							};
 							request.onerror = function(aEvent) {
 								switch (aEvent.target.status) {
-									case 0:console.log("Startup update check failed! no connection or blocked. " + aEvent.target.status);break;
-									case 1:console.log("Error Status: " + aEvent.target.status);break;
-									case 2:console.log("Error Status: " + aEvent.target.status);break;
-									case 3:console.log("Error Status: " + aEvent.target.status);break;
-									case 4:console.log("Error Status: " + aEvent.target.status);break;
-									default:console.log("Error Status: " + aEvent.target.status);break;
+									case 0:throw new Error("Startup update check failed! no connection or blocked. " + aEvent.target.status);break;
+									case 1:throw new Error("Error Status: " + aEvent.target.status);break;
+									case 2:throw new Error("Error Status: " + aEvent.target.status);break;
+									case 3:throw new Error("Error Status: " + aEvent.target.status);break;
+									case 4:throw new Error("Error Status: " + aEvent.target.status);break;
+									default:throw new Error("Error Status: " + aEvent.target.status);break;
 								}
 							};
 							request.timeout = Services.prefs.getIntPref("app.update.startup-timeout");
@@ -460,7 +532,10 @@ var gCyberfoxCustom = {
                 // Catch any nasty errors
                 Cu.reportError(eve);
             }
-        }
+        } else {
+			// Set update notification (Additional fallback)
+			Services.prefs.setBoolPref("app.update.available", false);	
+		}
 	}
 }
 window.addEventListener("load", function() {

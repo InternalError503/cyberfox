@@ -18,6 +18,8 @@ en.CleanInstallDescription=Perform clean installation.
 en.CleanInstallGroupDescription=Installation Options
 en.PocketInstallDescription=Install firefox pocket (Optional)
 en.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+en.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Albanian
 al.ProcessName={#MyAppName}
 al.IsAppRunning= tashmë është i rrjedhshëm, Ju lutemi mbyllni {#MyAppName} pastaj të drejtuar installer përsëri.
@@ -33,6 +35,8 @@ al.CleanInstallDescription=Perform clean installation.
 al.CleanInstallGroupDescription=Installation Options
 al.PocketInstallDescription=Install firefox pocket (Optional)
 al.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+al.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Afrikaans
 af.ProcessName={#MyAppName}
 af.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -48,6 +52,8 @@ af.CleanInstallDescription=Perform clean installation.
 af.CleanInstallGroupDescription=Installation Options
 af.PocketInstallDescription=Install firefox pocket (Optional)
 af.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+af.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Arabic
 ar.ProcessName={#MyAppName}
 ar.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -63,6 +69,8 @@ ar.CleanInstallDescription=Perform clean installation.
 ar.CleanInstallGroupDescription=Installation Options
 ar.PocketInstallDescription=Install firefox pocket (Optional)
 ar.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+ar.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Bengali
 be.ProcessName={#MyAppName}
 be.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -78,6 +86,8 @@ be.CleanInstallDescription=Perform clean installation.
 be.CleanInstallGroupDescription=Installation Options
 be.PocketInstallDescription=Install firefox pocket (Optional)
 be.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+be.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Bosnian
 bo.ProcessName={#MyAppName}
 bo.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -93,6 +103,8 @@ bo.CleanInstallDescription=Perform clean installation.
 bo.CleanInstallGroupDescription=Installation Options
 bo.PocketInstallDescription=Install firefox pocket (Optional)
 bo.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+bo.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;BrazilianPortuguese
 br_pt.ProcessName={#MyAppName}
 br_pt.IsAppRunning= já está em execução, feche {#MyAppName} em seguida, execute o instalador novamente.
@@ -108,6 +120,8 @@ br_pt.CleanInstallDescription=Perform clean installation.
 br_pt.CleanInstallGroupDescription=Installation Options
 br_pt.PocketInstallDescription=Install firefox pocket (Optional)
 br_pt.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+br_pt.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Catalan
 ca.ProcessName={#MyAppName}
 ca.IsAppRunning= ja s'està executant, tancament{#MyAppName} a continuació, executeu el programa d'instal · lació de nou.
@@ -123,6 +137,8 @@ ca.CleanInstallDescription=Perform clean installation.
 ca.CleanInstallGroupDescription=Installation Options
 ca.PocketInstallDescription=Install firefox pocket (Optional)
 ca.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+ca.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Chinese (Simplified)
 cns.ProcessName={#MyAppName}
 cns.IsAppRunning= 已经在运行，请关闭 {#MyAppName} 然后再次运行安装程序。
@@ -138,6 +154,8 @@ cns.CleanInstallDescription=Perform clean installation.
 cns.CleanInstallGroupDescription=Installation Options
 cns.PocketInstallDescription=Install firefox pocket (Optional)
 cns.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+cns.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Corsican
 cr.ProcessName={#MyAppName}
 cr.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -153,6 +171,8 @@ cr.CleanInstallDescription=Perform clean installation.
 cr.CleanInstallGroupDescription=Installation Options
 cr.PocketInstallDescription=Install firefox pocket (Optional)
 cr.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+cr.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Croatian
 cro.ProcessName={#MyAppName}
 cro.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -168,6 +188,8 @@ cro.CleanInstallDescription=Perform clean installation.
 cro.CleanInstallGroupDescription=Installation Options
 cro.PocketInstallDescription=Install firefox pocket (Optional)
 cro.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+cro.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Czech
 cz.ProcessName={#MyAppName}
 cz.IsAppRunning= je již spuštěna, prosím zavřete {#MyAppName} spusťte instalační program znovu.
@@ -183,6 +205,8 @@ cz.CleanInstallDescription=Perform clean installation.
 cz.CleanInstallGroupDescription=Installation Options
 cz.PocketInstallDescription=Install firefox pocket (Optional)
 cz.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+cz.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Danish
 da.ProcessName={#MyAppName}
 da.IsAppRunning= allerede kører, Luk {#MyAppName} derefter køre installationsprogrammet igen.
@@ -198,6 +222,8 @@ da.CleanInstallDescription=Perform clean installation.
 da.CleanInstallGroupDescription=Installation Options
 da.PocketInstallDescription=Install firefox pocket (Optional)
 da.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+da.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;German
 de.ProcessName={#MyAppName}
 de.IsAppRunning= läuft noch. Bitte schliessen sie {#MyAppName} und starten sie den Installationsprozess erneut.
@@ -213,6 +239,8 @@ de.CleanInstallDescription=Führt eine saubere Installation aus.
 de.CleanInstallGroupDescription=Installation Optionen
 de.PocketInstallDescription=Installiert Firefox Pocket (Optional)
 de.SystemAddonsGroupDescription=Zusätzliche Systemkomponente
+;Localization note must preserve %n this is a new line break.
+de.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Dutch
 nl.ProcessName={#MyAppName}
 nl.IsAppRunning= wordt al uitgevoerd, Sluit {#MyAppName} dan weer het installatieprogramma.
@@ -228,6 +256,8 @@ nl.CleanInstallDescription=Perform clean installation.
 nl.CleanInstallGroupDescription=Installation Options
 nl.PocketInstallDescription=Install firefox pocket (Optional)
 nl.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+nl.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Finnish
 fi.ProcessName={#MyAppName}
 fi.IsAppRunning= on jo käynnissä, sulje {#MyAppName} suorita sitten asennusohjelma uudelleen.
@@ -243,6 +273,8 @@ fi.CleanInstallDescription=Perform clean installation.
 fi.CleanInstallGroupDescription=Installation Options
 fi.PocketInstallDescription=Install firefox pocket (Optional)
 fi.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+fi.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;French
 fr.ProcessName={#MyAppName}
 fr.IsAppRunning= est en cours d’exécution. Veuillez fermer {#MyAppName} puis redémarrer de nouveau le programme d’installation.
@@ -258,6 +290,8 @@ fr.CleanInstallDescription=Perform clean installation.
 fr.CleanInstallGroupDescription=Installation Options
 fr.PocketInstallDescription=Install firefox pocket (Optional)
 fr.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+fr.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Greek
 gr.ProcessName={#MyAppName}
 gr.IsAppRunning= εκτελείται ήδη, παρακαλώ κλείστε {#MyAppName} Στη συνέχεια, εκτελέστε ξανά το πρόγραμμα εγκατάστασης.
@@ -273,6 +307,8 @@ gr.CleanInstallDescription=Perform clean installation.
 gr.CleanInstallGroupDescription=Installation Options
 gr.PocketInstallDescription=Install firefox pocket (Optional)
 gr.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+gr.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Hebrew
 he.ProcessName={#MyAppName}
 he.IsAppRunning= כבר פועל, אנא סגור {#MyAppName} לאחר מכן הפעל שוב את תוכנית ההתקנה.
@@ -288,6 +324,8 @@ he.CleanInstallDescription=Perform clean installation.
 he.CleanInstallGroupDescription=Installation Options
 he.PocketInstallDescription=Install firefox pocket (Optional)
 he.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+he.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Hindi
 hi.ProcessName={#MyAppName}
 hi.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -303,6 +341,8 @@ hi.CleanInstallDescription=Perform clean installation.
 hi.CleanInstallGroupDescription=Installation Options
 hi.PocketInstallDescription=Install firefox pocket (Optional)
 hi.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+hi.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Hungarian
 hu.ProcessName={#MyAppName}
 hu.IsAppRunning= már fut, zárja {#MyAppName} majd futtassa újra a telepítőt.
@@ -318,6 +358,8 @@ hu.CleanInstallDescription=Perform clean installation.
 hu.CleanInstallGroupDescription=Installation Options
 hu.PocketInstallDescription=Install firefox pocket (Optional)
 hu.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+hu.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Indonesian
 in.ProcessName={#MyAppName}
 in.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -333,6 +375,8 @@ in.CleanInstallDescription=Perform clean installation.
 in.CleanInstallGroupDescription=Installation Options
 in.PocketInstallDescription=Install firefox pocket (Optional)
 in.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+in.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Italian
 it.ProcessName={#MyAppName}
 it.IsAppRunning= è già in esecuzione, chiudere {#MyAppName} quindi eseguire nuovamente il programma di installazione.
@@ -348,6 +392,8 @@ it.CleanInstallDescription=Esegui un'installazione pulita.
 it.CleanInstallGroupDescription=Opzioni per l'installazione
 it.PocketInstallDescription=Installa Firefox Pocket (Optional)
 it.SystemAddonsGroupDescription=Componenti aggiuntivi di sistema
+;Localization note must preserve %n this is a new line break.
+it.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Korean
 kor.ProcessName={#MyAppName}
 kor.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -363,6 +409,8 @@ kor.CleanInstallDescription=Perform clean installation.
 kor.CleanInstallGroupDescription=Installation Options
 kor.PocketInstallDescription=Install firefox pocket (Optional)
 kor.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+kor.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Japanese
 ja.ProcessName={#MyAppName}
 ja.IsAppRunning= はすでに実行されています。{#MyAppName} を閉じて、もう一度インストーラーを実行してください。
@@ -378,6 +426,8 @@ ja.CleanInstallDescription=クリーン インストールを実行する
 ja.CleanInstallGroupDescription=インストール オプション
 ja.PocketInstallDescription=Firefox Pocket をインストールする(オプション)
 ja.SystemAddonsGroupDescription=システム アドオン
+;Localization note must preserve %n this is a new line break.
+ja.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Norwegian
 nr.ProcessName={#MyAppName}
 nr.IsAppRunning= er allerede i gang, Vennligst lukk {#MyAppName} deretter kjøre installasjonsprogrammet på nytt.
@@ -393,6 +443,8 @@ nr.CleanInstallDescription=Perform clean installation.
 nr.CleanInstallGroupDescription=Installation Options
 nr.PocketInstallDescription=Install firefox pocket (Optional)
 nr.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+nr.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Polish
 pl.ProcessName={#MyAppName}
 pl.IsAppRunning= jest już uruchomiony. Proszę zamknąć {#MyAppName}, a następnie ponownie uruchomić instalator.
@@ -408,6 +460,8 @@ pl.CleanInstallDescription=Wykonaj czystą instalację.
 pl.CleanInstallGroupDescription=Opcje instalacji
 pl.PocketInstallDescription=Zainstaluj Firefox Pocket (Opcjalne)
 pl.SystemAddonsGroupDescription=Dodatki systemowe
+;Localization note must preserve %n this is a new line break.
+pl.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Portuguese
 pt.ProcessName={#MyAppName}
 pt.IsAppRunning= já está em execução, feche {#MyAppName} em seguida, execute o instalador novamente.
@@ -423,11 +477,13 @@ pt.CleanInstallDescription=Perform clean installation.
 pt.CleanInstallGroupDescription=Installation Options
 pt.PocketInstallDescription=Install firefox pocket (Optional)
 pt.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+pt.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Russian
 ru.ProcessName={#MyAppName}
 ru.IsAppRunning= уже запущен, закройте {#MyAppName} и запустите программу установки повторно.
 ru.IsAppRunningUninstall= уже запущен, закройте {#MyAppName} и запустите программу удаления повторно.
-ru.IsAppRunningOnVista=Warning: Windows Vista is no longer supported, But can still run on this platform, Press OK to continue!
+ru.IsAppRunningOnVista=Внимание: Windows Vista больше не поддерживается, но мы можете запустить программу в этой системе - нажмите ОК для продолжения!
 ru.Isx64BitOS=Простите, но Вы не можете установить 64-битную версию {#MyAppName} в 32-битной ОС.
 ru.CyberCTRInstallDescription=Установить CyberCTR [рекомендуется] (необязательно)
 ru.CreateStartMenuIcons=Создать ярлыки в меню «Пуск»
@@ -438,6 +494,8 @@ ru.CleanInstallDescription=Выполнить чистую установку.
 ru.CleanInstallGroupDescription=Настройки установки
 ru.PocketInstallDescription=Установить Firefox pocket (необязательно)
 ru.SystemAddonsGroupDescription=Системные дополнения
+;Localization note must preserve %n this is a new line break.
+ru.SystemCpuUnsupported=На Вашем компьютере установлен старый процессор, не поддерживающий набор инструкций SSE2. %n%nCyberfox 49.0 и более поздних версий не может быть запущен на этом компьютере.
 ;SerbianCyrillic
 sbc.ProcessName={#MyAppName}
 sbc.IsAppRunning= је већ покренут, затворите Молимо {#MyAppName} затим покрените инсталер поново.
@@ -453,6 +511,8 @@ sbc.CleanInstallDescription=Perform clean installation.
 sbc.CleanInstallGroupDescription=Installation Options
 sbc.PocketInstallDescription=Install firefox pocket (Optional)
 sbc.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+sbc.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;SerbianLatin
 sbl.ProcessName={#MyAppName}
 sbl.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -468,6 +528,8 @@ sbl.CleanInstallDescription=Perform clean installation.
 sbl.CleanInstallGroupDescription=Installation Options
 sbl.PocketInstallDescription=Install firefox pocket (Optional)
 sbl.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+sbl.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Slovenian
 sl.ProcessName={#MyAppName}
 sl.IsAppRunning= že teče, Prosimo, zaprite {#MyAppName} nato ponovno zaženite namestitveni program.
@@ -483,6 +545,8 @@ sl.CleanInstallDescription=Perform clean installation.
 sl.CleanInstallGroupDescription=Installation Options
 sl.PocketInstallDescription=Install firefox pocket (Optional)
 sl.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+sl.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Swedish
 sw.ProcessName={#MyAppName}
 sw.IsAppRunning= is already running, Please close {#MyAppName} then run the installer again.
@@ -498,6 +562,8 @@ sw.CleanInstallDescription=Perform clean installation.
 sw.CleanInstallGroupDescription=Installation Options
 sw.PocketInstallDescription=Install firefox pocket (Optional)
 sw.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+sw.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Turkish
 tr.ProcessName={#MyAppName}
 tr.IsAppRunning= zaten çalışıyor, Lütfen {#MyAppName} kapatın ve kurulumu tekrar çalıştırın.
@@ -513,6 +579,8 @@ tr.CleanInstallDescription=Temiz Bir Kurulum Gerçekleştir.
 tr.CleanInstallGroupDescription=Kurulum Seçenekleri
 tr.PocketInstallDescription=Install firefox pocket (Optional)
 tr.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+tr.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Spanish
 en_es.ProcessName={#MyAppName}
 en_es.IsAppRunning= ya se está ejecutando, cierre {#MyAppName} a continuación, ejecute el programa de instalación de nuevo.
@@ -528,6 +596,8 @@ en_es.CleanInstallDescription=Perform clean installation.
 en_es.CleanInstallGroupDescription=Installation Options
 en_es.PocketInstallDescription=Install firefox pocket (Optional)
 en_es.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+en_es.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
 ;Ukrainian
 ukr.ProcessName={#MyAppName}
 ukr.IsAppRunning= вже запущений, закрийте {#MyAppName} потім запустити програму установки ще раз.
@@ -543,3 +613,5 @@ ukr.CleanInstallDescription=Perform clean installation.
 ukr.CleanInstallGroupDescription=Installation Options
 ukr.PocketInstallDescription=Install firefox pocket (Optional)
 ukr.SystemAddonsGroupDescription=System Addons
+;Localization note must preserve %n this is a new line break.
+ukr.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.

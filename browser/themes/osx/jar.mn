@@ -16,14 +16,9 @@ browser.jar:
 * skin/classic/browser/browser-lightweightTheme.css
   skin/classic/browser/click-to-play-warning-stripes.png
   skin/classic/browser/content-contextmenu.svg
-  skin/classic/browser/Geolocation-16.png
-  skin/classic/browser/Geolocation-16@2x.png
-  skin/classic/browser/Geolocation-64.png
-  skin/classic/browser/Geolocation-64@2x.png
   skin/classic/browser/Info.png
   skin/classic/browser/keyhole-circle.png
   skin/classic/browser/keyhole-circle@2x.png
-  skin/classic/browser/KUI-background.png
   skin/classic/browser/subtle-pattern.png
   skin/classic/browser/menu-back.png
   skin/classic/browser/menu-forward.png
@@ -45,10 +40,6 @@ browser.jar:
   skin/classic/browser/page-livemarks.png
   skin/classic/browser/page-livemarks@2x.png
   skin/classic/browser/pageInfo.css
-  skin/classic/browser/pointerLock-16.png
-  skin/classic/browser/pointerLock-16@2x.png
-  skin/classic/browser/pointerLock-64.png
-  skin/classic/browser/pointerLock-64@2x.png
   skin/classic/browser/privatebrowsing-mask.png
   skin/classic/browser/privatebrowsing-mask@2x.png
   skin/classic/browser/privatebrowsing-mask-short.png
@@ -80,7 +71,7 @@ browser.jar:
   skin/classic/browser/customizableui/customizeMode-gridTexture.png  (customizableui/customizeMode-gridTexture.png)
   skin/classic/browser/customizableui/customizeMode-separatorHorizontal.png  (customizableui/customizeMode-separatorHorizontal.png)
   skin/classic/browser/customizableui/customizeMode-separatorVertical.png  (customizableui/customizeMode-separatorVertical.png)
-* skin/classic/browser/customizableui/panelUIOverlay.css    (customizableui/panelUIOverlay.css)
+* skin/classic/browser/customizableui/panelUI.css    (customizableui/panelUI.css)
 * skin/classic/browser/downloads/allDownloadsViewOverlay.css (downloads/allDownloadsViewOverlay.css)
   skin/classic/browser/downloads/buttons.png                (downloads/buttons.png)
   skin/classic/browser/downloads/buttons@2x.png             (downloads/buttons@2x.png)
@@ -160,8 +151,6 @@ browser.jar:
   skin/classic/browser/tabbrowser/newtab@2x.png                          (tabbrowser/newtab@2x.png)
   skin/classic/browser/tabbrowser/newtab-inverted.png                    (tabbrowser/newtab-inverted.png)
   skin/classic/browser/tabbrowser/newtab-inverted@2x.png                 (tabbrowser/newtab-inverted@2x.png)
-  skin/classic/browser/tabbrowser/connecting.png                         (tabbrowser/connecting.png)
-  skin/classic/browser/tabbrowser/connecting@2x.png                      (tabbrowser/connecting@2x.png)
   skin/classic/browser/tabbrowser/tab-active-middle.png                  (tabbrowser/tab-active-middle.png)
   skin/classic/browser/tabbrowser/tab-active-middle@2x.png               (tabbrowser/tab-active-middle@2x.png)
   skin/classic/browser/tabbrowser/tab-arrow-left.png                     (tabbrowser/tab-arrow-left.png)

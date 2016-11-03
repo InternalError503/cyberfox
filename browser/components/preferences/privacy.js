@@ -1,9 +1,7 @@
-/* -*- indent-tabs-mode: nil; js-indent-level: 4 -*- */
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/AppConstants.jsm");
 
 var gPrivacyPane = {
@@ -18,7 +16,6 @@ var gPrivacyPane = {
    */
   _shouldPromptForRestart: true,
 
-#ifdef NIGHTLY_BUILD
   /**
    * Show the Tracking Protection UI depending on the
    * privacy.trackingprotection.ui.enabled pref, and linkify its Learn More link
@@ -32,9 +29,11 @@ var gPrivacyPane = {
     let url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "tracking-protection";
     link.setAttribute("href", url);
 
+    this.trackingProtectionReadPrefs();
+
     document.getElementById("trackingprotectionbox").hidden = false;
+    document.getElementById("trackingprotectionpbmbox").hidden = true;
   },
-#endif
 
   /**
    * Linkify the Learn More link of the Private Browsing Mode Tracking
@@ -55,22 +54,123 @@ var gPrivacyPane = {
   },
 
   /**
+   * Show the Containers UI depending on the privacy.userContext.ui.enabled pref.
+   */
+  _initBrowserContainers: function () {
+    if (!Services.prefs.getBoolPref("privacy.userContext.ui.enabled")) {
+      return;
+    }
+
+    let link = document.getElementById("browserContainersLearnMore");
+    link.href = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "containers";
+
+    document.getElementById("browserContainersbox").hidden = false;
+  },
+
+  /**
    * Sets up the UI for the number of days of history to keep, and updates the
    * label of the "Clear Now..." button.
    */
   init: function ()
   {
+    function setEventListener(aId, aEventType, aCallback)
+    {
+      document.getElementById(aId)
+              .addEventListener(aEventType, aCallback.bind(gPrivacyPane));
+    }
+
     this._updateSanitizeSettingsButton();
     this.initializeHistoryMode();
     this.updateHistoryModePane();
     this.updatePrivacyMicroControls();
     this.initAutoStartPrivateBrowsingReverter();
-#ifdef NIGHTLY_BUILD
     this._initTrackingProtection();
-#endif
     this._initTrackingProtectionPBM();
     this._initAutocomplete();
+    this._initBrowserContainers();
 
+    setEventListener("privacy.sanitize.sanitizeOnShutdown", "change",
+                     gPrivacyPane._updateSanitizeSettingsButton);
+    setEventListener("browser.privatebrowsing.autostart", "change",
+                     gPrivacyPane.updatePrivacyMicroControls);
+    setEventListener("historyMode", "command", function () {
+      gPrivacyPane.updateHistoryModePane();
+      gPrivacyPane.updateHistoryModePrefs();
+      gPrivacyPane.updatePrivacyMicroControls();
+      gPrivacyPane.updateAutostart();
+    });
+    setEventListener("historyRememberClear", "click", function () {
+      gPrivacyPane.clearPrivateDataNow(false);
+      return false;
+    });
+    setEventListener("historyRememberCookies", "click", function () {
+      gPrivacyPane.showCookies();
+      return false;
+    });
+    setEventListener("historyDontRememberClear", "click", function () {
+      gPrivacyPane.clearPrivateDataNow(true);
+      return false;
+    });
+    setEventListener("doNotTrackSettings", "click", function () {
+      gPrivacyPane.showDoNotTrackSettings();
+      return false;
+    });
+    setEventListener("privateBrowsingAutoStart", "command",
+                     gPrivacyPane.updateAutostart);
+    setEventListener("cookieExceptions", "command",
+                     gPrivacyPane.showCookieExceptions);
+    setEventListener("showCookiesButton", "command",
+                     gPrivacyPane.showCookies);
+    setEventListener("clearDataSettings", "command",
+                     gPrivacyPane.showClearPrivateDataSettings);
+    setEventListener("trackingProtectionRadioGroup", "command",
+                     gPrivacyPane.trackingProtectionWritePrefs);
+    setEventListener("trackingProtectionExceptions", "command",
+                     gPrivacyPane.showTrackingProtectionExceptions);
+    setEventListener("changeBlockList", "command",
+                     gPrivacyPane.showBlockLists);
+    setEventListener("changeBlockListPBM", "command",
+                     gPrivacyPane.showBlockLists);
+  },
+
+  // TRACKING PROTECTION MODE
+
+  /**
+   * Selects the right item of the Tracking Protection radiogroup.
+   */
+  trackingProtectionReadPrefs() {
+    let enabledPref = document.getElementById("privacy.trackingprotection.enabled");
+    let pbmPref = document.getElementById("privacy.trackingprotection.pbmode.enabled");
+    let radiogroup = document.getElementById("trackingProtectionRadioGroup");
+
+    // Global enable takes precedence over enabled in Private Browsing.
+    radiogroup.value = enabledPref.value ? "always" :
+                       pbmPref.value ? "private" :
+                       "never";
+  },
+
+  /**
+   * Sets the pref values based on the selected item of the radiogroup.
+   */
+  trackingProtectionWritePrefs() {
+    let enabledPref = document.getElementById("privacy.trackingprotection.enabled");
+    let pbmPref = document.getElementById("privacy.trackingprotection.pbmode.enabled");
+    let radiogroup = document.getElementById("trackingProtectionRadioGroup");
+
+    switch (radiogroup.value) {
+      case "always":
+        enabledPref.value = true;
+        pbmPref.value = true;
+        break;
+      case "private":
+        enabledPref.value = false;
+        pbmPref.value = true;
+        break;
+      case "never":
+        enabledPref.value = false;
+        pbmPref.value = false;
+        break;
+    }
   },
 
   // HISTORY MODE
@@ -79,12 +179,13 @@ var gPrivacyPane = {
    * The list of preferences which affect the initial history mode settings.
    * If the auto start private browsing mode pref is active, the initial
    * history mode would be set to "Don't remember anything".
-   * If all of these preferences have their default values, and the auto-start
+   * If ALL of these preferences are set to the values that correspond
+   * to keeping some part of history, and the auto-start
    * private browsing mode is not active, the initial history mode would be
    * set to "Remember everything".
    * Otherwise, the initial history mode would be set to "Custom".
    *
-   * Extensions adding their own preferences can append their IDs to this array if needed.
+   * Extensions adding their own preferences can set values here if needed.
    */
   prefsForKeepingHistory: {
     "places.history.enabled": true, // History is enabled
@@ -323,16 +424,47 @@ var gPrivacyPane = {
 
       this._shouldPromptForRestart = true;
   },
+
+  /**
+   * Displays fine-grained, per-site preferences for tracking protection.
+   */
+  showTrackingProtectionExceptions() {
+    let bundlePreferences = document.getElementById("bundlePreferences");
+    let params = {
+      permissionType: "trackingprotection",
+      hideStatusColumn: true,
+      windowTitle: bundlePreferences.getString("trackingprotectionpermissionstitle"),
+      introText: bundlePreferences.getString("trackingprotectionpermissionstext"),
+    };
+    document.documentElement.openWindow("Browser:Permissions",
+										"chrome://browser/content/preferences/permissions.xul",
+                    null, params);
+  },
+
+  /**
+   * Displays the available block lists for tracking protection.
+   */
+  showBlockLists: function ()
+  {
+    var bundlePreferences = document.getElementById("bundlePreferences");
+    let brandName = document.getElementById("bundleBrand")
+                            .getString("brandShortName");
+    var params = { brandShortName: brandName,
+                   windowTitle: bundlePreferences.getString("blockliststitle"),
+                   introText: bundlePreferences.getString("blockliststext") };
+    document.documentElement.openWindow("Browser:Blocklist",
+										"chrome://browser/content/preferences/blocklists.xul",
+										null, params);
+  },
+
   /**
    * Displays the Do Not Track settings dialog.
    */
   showDoNotTrackSettings() {
       document.documentElement.openWindow(null,
                     "chrome://browser/content/preferences/donottrack.xul",
-                    "resizable",null);
+                    "resizable=no", null);
   },
-
-  // HISTORY
 
   /**
    * Update browser.urlbar.autocomplete.enabled when a
@@ -346,6 +478,8 @@ var gPrivacyPane = {
     let enabled = ["history", "bookmark", "openpage", "searches"].map(getVal).some(v => v);
     Services.prefs.setBoolPref("browser.urlbar.autocomplete.enabled", enabled);
   },
+
+  // HISTORY
 
   /*
    * Preferences:
@@ -393,7 +527,7 @@ var gPrivacyPane = {
 
     acceptThirdPartyLabel.disabled = acceptThirdPartyMenu.disabled = !acceptCookies;
     keepUntil.disabled = menu.disabled = this._autoStartPrivateBrowsing || !acceptCookies;
-    
+
     return acceptCookies;
   },
 
@@ -412,7 +546,7 @@ var gPrivacyPane = {
 
     return accept.checked ? 0 : 2;
   },
-  
+
   /**
    * Converts between network.cookie.cookieBehavior and the third-party cookie UI
    */
@@ -433,7 +567,7 @@ var gPrivacyPane = {
         return undefined;
     }
   },
-  
+
   writeAcceptThirdPartyCookies: function ()
   {
     var accept = document.getElementById("acceptThirdPartyMenu").selectedItem;
@@ -476,22 +610,6 @@ var gPrivacyPane = {
     document.documentElement.openWindow("Browser:Cookies",
                                         "chrome://browser/content/preferences/cookies.xul",
                                         "resizable", null);
-  },
-  
-  /**
-   * Displays the available block lists for tracking protection.
-   */
-  showBlockLists: function ()
-  {
-    var bundlePreferences = document.getElementById("bundlePreferences");
-    let brandName = document.getElementById("bundleBrand")
-                            .getString("brandShortName");
-    var params = { brandShortName: brandName,
-                   windowTitle: bundlePreferences.getString("blockliststitle"),
-                   introText: bundlePreferences.getString("blockliststext") };
-    document.documentElement.openWindow("Browser:Blocklist",
-										"chrome://browser/content/preferences/blocklists.xul",
-										"resizable", params);
   },
 
   // CLEAR PRIVATE DATA

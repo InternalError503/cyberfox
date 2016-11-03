@@ -26,7 +26,13 @@ var gTabsPane = {
    * - true if tabs are to be shown in the Windows 7 taskbar
    */
 
-  init: function () {
+  init: function () 
+  {
+    function setEventListener(aId, aEventType, aCallback)
+    {
+      document.getElementById(aId)
+              .addEventListener(aEventType, aCallback.bind(gTabsPane));
+    }
 #ifdef XP_WIN
     const Cc = Components.classes;
     const Ci = Components.interfaces;
@@ -50,6 +56,11 @@ var gTabsPane = {
       document.getElementById("warnCloseMultiple").hidden = true;
     if (!TransientPrefs.prefShouldBeVisible("browser.tabs.warnOnOpen"))
       document.getElementById("warnOpenMany").hidden = true;
+
+      setEventListener("useBookmarkNewTabPage", "command",
+      gMainPane.setNewTabPageToBookmark);  
+      setEventListener("restoreDefaultNewTabPage", "command",
+      gMainPane.restoreDefaultNewTabPage);
   },
 
   /**

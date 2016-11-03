@@ -448,11 +448,30 @@
           var where = "current";
 		  var newTabPref = Services.prefs.getBranch("browser.search.").getBoolPref("openintab");
 		  
-		  Components.utils.import("resource://gre/modules/Services.jsm", {})
+		  Components.utils.import("resource://gre/modules/Services.jsm", {});
+		  
+		  var {NewTabURL} = Components.utils.import("resource:///modules/NewTabURL.jsm", {});
+		  var ctr_newtaburl = NewTabURL.get();
+		  var ctr_blankpage = "about:blank";
+		  var ctr_ahomepage = "about:home";
 		  
 		  // force search to open in a new tab, if the corresponding browser preference it active
 		  try {
-			if(newTabPref) where = "tab";
+			if(newTabPref) {
+			  
+			  if(!Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("search_ant") &&
+				gBrowser.currentURI.spec==ctr_newtaburl)
+				  where = "current";
+			  else if(!Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("search_abl") &&
+				gBrowser.currentURI.spec==ctr_blankpage)
+				  where = "current";
+			  else if(!Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("search_aho") &&
+				gBrowser.currentURI.spec==ctr_ahomepage)
+				  where = "current";
+			  else where = "tab";
+			  
+			}
+			
 		  } catch(e) {}
 
           // Open ctrl/cmd clicks on one-off buttons in a new background tab.
@@ -582,7 +601,7 @@
     </handlers>
   </binding>
   
-<binding id="searchbar-textbox"
+ <binding id="searchbar-textbox"
       extends="chrome://global/content/bindings/autocomplete.xml#autocomplete">
     <implementation implements="nsIObserver">
       <constructor><![CDATA[
@@ -703,9 +722,9 @@
             popup.hidden = false;
 
             // Don't roll up on mouse click in the anchor for the search UI.
-            if (popup.id == "PopupSearchAutoComplete") {
+           /* if (popup.id == "PopupSearchAutoComplete") {
               popup.setAttribute("norolluponanchor", "true");
-            }
+            }*/
 
             popup.mInput = this;
             popup.view = this.controller.QueryInterface(Components.interfaces.nsITreeView);
@@ -741,7 +760,7 @@
 				popup.setAttribute("width", width > 100 ? width : 100);
 			}
 
-            popup.openPopup(this, "after_start", 0, 0, false, false);
+            popup.openPopup(this, "after_start", 0, -1, false, false);
           }
         ]]></body>
       </method>

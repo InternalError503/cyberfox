@@ -8,7 +8,7 @@
   --color-grey-lightest: #fbfbfb;
   --color-grey: #b1b1b1;
 
-  --color-blue: #0996f8;
+  --color-blue: #BEB8CC;
   --color-blue-dark: #0670cc;
   --color-blue-darker: #005bab;
 
@@ -18,7 +18,7 @@
 html.private {
   --in-content-page-color: #beb8cc;
   --in-content-text-color: #beb8cc;
-  --in-content-page-background: #1c023c;
+  --in-content-page-background: #303030;
 }
 
 body {
@@ -128,8 +128,8 @@ p {
 
 a.button {
   padding: 5px 40px;
-  background-color: #381e59;
-  border: 1px solid #43256a;
+  background-color: #8D20AE;
+  border: 1px solid #8B1FAC;
   border-radius: 4px;
   text-decoration: none;
   display: inline-block;

@@ -31,7 +31,7 @@ class ManifestEntry(object):
     type = None
     allowed_flags = [
         'application',
-		'appversion',
+        'appversion',
         'platformversion',
         'os',
         'osversion',

@@ -52,9 +52,11 @@
                         class="text-link" href="" onclick="window.close();" style="text-decoration:none!important;">
 						<button id="update-button-checkNow" label="&update.checkForUpdatesButton.label;"/>
 						<image class="update-throbber" id="update-button-checking-throbber"></image><button id="update-button-checking" label="&update.checkingForUpdates;"/>
-						<button id="update-button-no-update" label="&update.noUpdatesFound;"/>
 						<button id="update-button-download" label="&update.manual.start; 8pecxstudios"/>
 						</label>
+					    <hbox id="noUpdatesFound" align="start" style="font-size:1.2em;font-weight:bold;">
+						    <label>&update.noUpdatesFound;</label>
+					    </hbox>
                 <spacer flex="1"/>
               </hbox>
             </deck>

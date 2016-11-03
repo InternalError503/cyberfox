@@ -1,21 +1,27 @@
 /* -*- indent-tabs-mode: nil; js-indent-level: 2 -*- */
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 Components.utils.import("resource://gre/modules/Downloads.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/Task.jsm");
+Components.utils.import("resource:///modules/ShellService.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "OS",
+                                  "resource://gre/modules/osfile.jsm");
 
 var gMainPane = {
-  _pane: null,
-
   /**
    * Initialization of this.
    */
   init: function ()
   {
-    this._pane = document.getElementById("paneMain");
+    function setEventListener(aId, aEventType, aCallback)
+    {
+      document.getElementById(aId)
+              .addEventListener(aEventType, aCallback.bind(gMainPane));
+    }
 
 #ifdef HAVE_SHELL_SERVICE
     this.updateSetDefaultBrowser();
@@ -23,9 +29,9 @@ var gMainPane = {
     // In Windows 8 we launch the control panel since it's the only
     // way to get all file type association prefs. So we don't know
     // when the user will select the default.  We refresh here periodically
-    // in case the default changes.  On other Windows OS's defaults can also
+    // in case the default changes. On other Windows OS's defaults can also
     // be set while the prefs are open.
-    window.setInterval(this.updateSetDefaultBrowser, 1000);
+    window.setInterval(this.updateSetDefaultBrowser.bind(this), 1000);
 #endif
 #endif
 
@@ -45,6 +51,23 @@ var gMainPane = {
       showTabsInTaskbar.hidden = ver < 6.1;
     } catch (ex) {}
 #endif
+
+    setEventListener("browser.privatebrowsing.autostart", "change",
+                     gMainPane.updateBrowserStartupLastSession);
+    setEventListener("browser.download.dir", "change",
+                     gMainPane.displayDownloadDirPref);
+#ifdef HAVE_SHELL_SERVICE
+    setEventListener("setDefaultButton", "command",
+                     gMainPane.setDefaultBrowser);
+#endif
+    setEventListener("useCurrent", "command",
+                     gMainPane.setHomePageToCurrent);
+    setEventListener("useBookmark", "command",
+                     gMainPane.setHomePageToBookmark);
+    setEventListener("restoreDefaultHomePage", "command",
+                     gMainPane.restoreDefaultHomePage);
+    setEventListener("chooseFolder", "command",
+                     gMainPane.chooseFolder);
 
 #ifdef MOZ_DEV_EDITION
     let separateProfileModeCheckbox = document.getElementById("separateProfileMode");
@@ -119,7 +142,7 @@ var gMainPane = {
   onGetStarted: function (aEvent) {
     const Cc = Components.classes, Ci = Components.interfaces;
     let wm = Cc["@mozilla.org/appshell/window-mediator;1"]
-               .getService(Components.interfaces.nsIWindowMediator);
+                .getService(Components.interfaces.nsIWindowMediator);
     let win = wm.getMostRecentWindow("navigator:browser");
 
     if (win) {
@@ -310,7 +333,7 @@ var gMainPane = {
       const Cc = Components.classes, Ci = Components.interfaces;
       // If we're in instant-apply mode, use the most recent browser window
       var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
-                 .getService(Components.interfaces.nsIWindowMediator);
+                 .getService(Ci.nsIWindowMediator);
       win = wm.getMostRecentWindow("navigator:browser");
     }
     else {
@@ -322,9 +345,18 @@ var gMainPane = {
       // We should only include visible & non-pinned tabs
 
       tabs = win.gBrowser.visibleTabs.slice(win.gBrowser._numPinnedTabs);
+      tabs = tabs.filter(this.isNotAboutPreferences);
     }
-    
+
     return tabs;
+  },
+
+  /**
+   * Check to see if a tab is not about:preferences
+   */
+  isNotAboutPreferences: function (aElement, aIndex, aArray)
+  {
+    return !aElement.linkedBrowser.currentURI.spec.startsWith("about:preferences");
   },
 
   /**
@@ -392,8 +424,8 @@ var gMainPane = {
     var downloadFolder = document.getElementById("downloadFolder");
     var chooseFolder = document.getElementById("chooseFolder");
     var preference = document.getElementById("browser.download.useDownloadDir");
-    downloadFolder.disabled = !preference.value;
-    chooseFolder.disabled = !preference.value;
+    downloadFolder.disabled = !preference.value || preference.locked;
+    chooseFolder.disabled = !preference.value || preference.locked;
 
     // don't override the preference's value in UI
     return undefined;
@@ -614,8 +646,11 @@ var gMainPane = {
       return;
     }
     let setDefaultPane = document.getElementById("setDefaultPane");
-    let selectedIndex = shellSvc.isDefaultBrowser(false, true) ? 1 : 0;
-    setDefaultPane.selectedIndex = selectedIndex;
+    let isDefault = shellSvc.isDefaultBrowser(false, true);
+    setDefaultPane.selectedIndex = isDefault ? 1 : 0;
+    let alwaysCheck = document.getElementById("alwaysCheckDefault");
+    alwaysCheck.disabled = alwaysCheck.disabled ||
+                           isDefault && alwaysCheck.checked;
   },
 
   /**
@@ -623,6 +658,9 @@ var gMainPane = {
    */
   setDefaultBrowser: function()
   {
+    let alwaysCheckPref = document.getElementById("browser.shell.checkDefaultBrowser");
+    alwaysCheckPref.value = true;
+
     let shellSvc = getShellService();
     if (!shellSvc)
       return;
@@ -632,8 +670,8 @@ var gMainPane = {
       Components.utils.reportError(ex);
       return;
     }
-    let selectedIndex =
-      shellSvc.isDefaultBrowser(false, true) ? 1 : 0;
+
+    let selectedIndex = shellSvc.isDefaultBrowser(false, true) ? 1 : 0;
     document.getElementById("setDefaultPane").selectedIndex = selectedIndex;
   }
 #endif

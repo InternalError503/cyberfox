@@ -54,7 +54,7 @@ var gSearchPane = {
       document.getElementById("browser.search.suggest.enabled");
     let permanentPB =
       Services.prefs.getBoolPref("browser.privatebrowsing.autostart");
-      let urlbarSuggests = document.getElementById("urlBarSuggestion");
+    let urlbarSuggests = document.getElementById("urlBarSuggestion");
     urlbarSuggests.disabled = !suggestsPref.value || permanentPB;
 
     let urlbarSuggestsPref =
@@ -498,9 +498,15 @@ EngineView.prototype = {
   },
 
   getImageSrc: function(index, column) {
-    if (column.id == "engineName" && this._engineStore.engines[index].iconURI) {
-      return this._engineStore.engines[index].iconURI.spec;
+    if (column.id == "engineName") {
+      if (this._engineStore.engines[index].iconURI)
+        return this._engineStore.engines[index].iconURI.spec;
+
+      if (window.devicePixelRatio > 1)
+        return "chrome://browser/skin/search-engine-placeholder@2x.png";
+      return "chrome://browser/skin/search-engine-placeholder.png";
     }
+
     return "";
   },
 

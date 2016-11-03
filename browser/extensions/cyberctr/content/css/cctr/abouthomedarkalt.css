@@ -3,9 +3,11 @@
 @namespace url(http://www.w3.org/1999/xhtml);
 @-moz-document url("about:home")
 {
+    :root {
+		--main-background-image: url("chrome://classic_theme_restorer/content/images/abouthome/two_tone.jpg");
+    }
 	body
 	{
-		background-image: url("chrome://classic_theme_restorer/content/images/abouthome/two_tone.jpg");
 		background-size: 100% 100%!important;
 	}
 }

@@ -38,9 +38,9 @@
       <preference id="browser.safebrowsing.malware.enabled"
                   name="browser.safebrowsing.malware.enabled"
                   type="bool"/>
-      <preference id="browser.safebrowsing.enabled"
-                  name="browser.safebrowsing.enabled"
-                  type="bool"/>
+  <preference id="browser.safebrowsing.phishing.enabled"
+              name="browser.safebrowsing.phishing.enabled"
+              type="bool"/>
       <preference id="browser.safebrowsing.downloads.enabled"
                   name="browser.safebrowsing.downloads.enabled"
                   type="bool"/>
@@ -79,8 +79,7 @@
                   onsyncfrompreference="return gSecurityPane.readWarnAddonInstall();"/>
         <button id="addonExceptions"
                 label="&addonExceptions.label;"
-                accesskey="&addonExceptions.accesskey;"
-                oncommand="gSecurityPane.showAddonExceptions();"/>
+                accesskey="&addonExceptions.accesskey;"/>
       </hbox>
 
       <separator class="thin"/>
@@ -116,25 +115,21 @@
         <button id="passwordExceptions"
                 label="&passwordExceptions.label;"
                 accesskey="&passwordExceptions.accesskey;"
-                oncommand="gSecurityPane.showPasswordExceptions();"
                 preference="pref.privacy.disable_button.view_passwords_exceptions"/>
       </hbox>
       <hbox id="masterPasswordBox">
         <checkbox id="useMasterPassword" flex="1"
-                  oncommand="gSecurityPane.updateMasterPasswordButton();"
                   label="&useMasterPassword.label;"
                   accesskey="&useMasterPassword.accesskey;"/>
         <button id="changeMasterPassword"
                 label="&changeMasterPassword.label;"
-                accesskey="&changeMasterPassword.accesskey;"
-                oncommand="gSecurityPane.changeMasterPassword();"/>
+                accesskey="&changeMasterPassword.accesskey;"/>
       </hbox>
 
       <hbox id="showPasswordsBox">
         <spacer flex="1"/>
         <button id="showPasswords"
                 label="&savedLogins.label;" accesskey="&savedLogins.accesskey;"
-                oncommand="gSecurityPane.showPasswords();"
                 preference="pref.privacy.disable_button.view_passwords"/>
       </hbox>
     </groupbox>

@@ -23,6 +23,11 @@
 									  tooltiptext="&cloneInNewWindow.label;"  
 									  label="&cloneInNewWindow.label;" 
 									  oncommand="gCyberfoxCustom.CloneCurrent('window');"/>
+        <toolbarbutton id="tbar-clonenewwindowpb" 
+									  class="toolbarbutton-1 chromeclass-toolbar-additional"	
+									  tooltiptext="&cloneInNewWindow.label; (Private)"  
+									  label="&cloneInNewWindow.label; (Private)" 
+									  oncommand="gCyberfoxCustom.CloneCurrent('window', true);"/>
         <toolbarbutton id="downloads-button-additional" class="toolbarbutton-1 chromeclass-toolbar-additional"
 									  key="key_openDownloads"
 									  command="Tools:Downloads"

@@ -31,10 +31,12 @@
 .tab-throbber:not([busy]),
 .tab-icon-sound:not([soundplaying]):not([muted]),
 .tab-icon-sound[pinned],
+.tab-sharing-icon-overlay,
 .tab-icon-overlay {
   display: none;
 }
 
+.tab-sharing-icon-overlay[sharing]:not([selected]),
 .tab-icon-overlay[soundplaying][pinned],
 .tab-icon-overlay[muted][pinned],
 .tab-icon-overlay[crashed] {

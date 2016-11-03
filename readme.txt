@@ -14,7 +14,7 @@ submit it to Bugzilla (https://bugzilla.mozilla.org). Instructions are at:
     https://developer.mozilla.org/en/docs/Getting_your_patch_in_the_tree
 
 If you have a question about developing Mozilla, and can't find the solution
-on http://developer.mozilla.org, you can try asking your question in a
+on https://developer.mozilla.org, you can try asking your question in a
 mozilla.* Usenet group, or on IRC at irc.mozilla.org. [The Mozilla news groups
 are accessible on Google Groups, or news.mozilla.org with a NNTP reader.]
 

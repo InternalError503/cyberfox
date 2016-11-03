@@ -14,11 +14,10 @@
 %doNotTrackDTD;
 ]>
 
-<prefwindow id="DoNotTrackDialog" type="child"
+<prefwindow id="DoNotTrackDialog"
             xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
             xmlns:html="http://www.w3.org/1999/xhtml"
             title="&window.title;"
-            style="width: &window.width;; height: &window.height;;"
             dlgbuttons="accept,cancel">
   <prefpane>
     <preferences>

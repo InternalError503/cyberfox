@@ -154,6 +154,9 @@
 <!ENTITY updateautocheck.label "&brandShortName; についての更新を自動的に確認する">
 <!ENTITY updatestartupcheck.label "&brandShortName; の起動時に更新を自動的に確認する">
 <!ENTITY updatecheckenabled.label "更新の確認を有効にする">
+<!ENTITY updateverifysha.label "Enable SHA512 update verification.">
+<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
+<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "タブの URL をコピー">
@@ -176,6 +179,7 @@
 <!ENTITY browserplugins.label "ブラウザ プラグイン">
 <!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
 <!ENTITY browserpluginswhitelist.label "プラグインのホワイトリストを有効にする">
+<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
 <!ENTITY browserpluginsjavaenabled.label "Java ブラウザ プラグインを有効にする">
 
 <!-- System Addons Tweak -->

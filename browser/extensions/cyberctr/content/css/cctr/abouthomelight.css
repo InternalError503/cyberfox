@@ -5,6 +5,7 @@
     :root {
         --main-highlight-color: #00adee;
         --main-text-color: #555555;
+		--main-background-image: url("chrome://classic_theme_restorer/content/images/abouthome/noise.png");
     }
     html {
         font: message-box;
@@ -21,7 +22,7 @@
         width: 100%;
         height: 100%;
         background-color: #dedede !important;
-        background-image: url("chrome://classic_theme_restorer/content/images/abouthome/noise.png");
+		background-image: var(--main-background-image)!important;   
     }
     input,
     button {

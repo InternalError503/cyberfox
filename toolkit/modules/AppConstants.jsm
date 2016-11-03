@@ -84,6 +84,13 @@ this.AppConstants = Object.freeze({
   false,
 #endif
 
+  MOZ_CONTENT_SANDBOX:
+#ifdef MOZ_CONTENT_SANDBOX
+  true,
+#else
+  false,
+#endif
+
   MOZ_TELEMETRY_REPORTING:
   false,
 
@@ -133,8 +140,6 @@ this.AppConstants = Object.freeze({
 # builds will be misidentified as linux.
   platform:
 #ifdef MOZ_WIDGET_GTK
-  "linux",
-#elif MOZ_WIDGET_QT
   "linux",
 #elif XP_WIN
   "win",
@@ -192,6 +197,13 @@ this.AppConstants = Object.freeze({
 
   DEBUG:
 #ifdef DEBUG
+  true,
+#else
+  false,
+#endif
+
+  ASAN:
+#ifdef MOZ_ASAN
   true,
 #else
   false,
@@ -296,8 +308,15 @@ this.AppConstants = Object.freeze({
 
   MOZ_NUWA_PROCESS:
 #ifdef MOZ_NUWA_PROCESS
-    true
+    true,
 #else
-    false
+    false,
+#endif
+
+  HAVE_USR_LIB64_DIR:
+#ifdef HAVE_USR_LIB64_DIR
+    true,
+#else
+    false,
 #endif
 });

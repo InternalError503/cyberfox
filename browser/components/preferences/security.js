@@ -1,7 +1,9 @@
-/* -*- indent-tabs-mode: nil; js-indent-level: 4 -*- */
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+XPCOMUtils.defineLazyModuleGetter(this, "LoginHelper",
+ "resource://gre/modules/LoginHelper.jsm");
 
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 
@@ -13,9 +15,26 @@ var gSecurityPane = {
    */
   init: function ()
   {
+    function setEventListener(aId, aEventType, aCallback)
+    {
+      document.getElementById(aId)
+              .addEventListener(aEventType, aCallback.bind(gSecurityPane));
+    }
+
     this._pane = document.getElementById("paneSecurity");
     this._initMasterPasswordUI();
     this._initSafeBrowsing();
+
+    setEventListener("addonExceptions", "command",
+      gSecurityPane.showAddonExceptions);
+    setEventListener("passwordExceptions", "command",
+      gSecurityPane.showPasswordExceptions);
+    setEventListener("useMasterPassword", "command",
+      gSecurityPane.updateMasterPasswordButton);
+    setEventListener("changeMasterPassword", "command",
+      gSecurityPane.changeMasterPassword);
+    setEventListener("showPasswords", "command",
+      gSecurityPane.showPasswords);
   },
 
   // ADD-ONS
@@ -59,7 +78,7 @@ var gSecurityPane = {
 
     document.documentElement.openWindow("Browser:Permissions",
                                         "chrome://browser/content/preferences/permissions.xul",
-                                        "", params);
+                                        null, params);
   },
 
   /**
@@ -123,7 +142,7 @@ var gSecurityPane = {
    */
   _initMasterPasswordUI: function ()
   {
-    var noMP = !this._masterPasswordSet();
+    var noMP = !LoginHelper.isMasterPasswordSet();
 
     var button = document.getElementById("changeMasterPassword");
     button.disabled = noMP;
@@ -131,13 +150,13 @@ var gSecurityPane = {
     var checkbox = document.getElementById("useMasterPassword");
     checkbox.checked = !noMP;
   },
-  
+
   _initSafeBrowsing() {
     let enableSafeBrowsing = document.getElementById("enableSafeBrowsing");
     let blockDownloads = document.getElementById("blockDownloads");
     let blockUncommonUnwanted = document.getElementById("blockUncommonUnwanted");
 
-    let safeBrowsingPhishingPref = document.getElementById("browser.safebrowsing.enabled");
+    let safeBrowsingPhishingPref = document.getElementById("browser.safebrowsing.phishing.enabled");
     let safeBrowsingMalwarePref = document.getElementById("browser.safebrowsing.malware.enabled");
 
     let blockDownloadsPref = document.getElementById("browser.safebrowsing.downloads.enabled");
@@ -206,26 +225,6 @@ var gSecurityPane = {
   },
 
   /**
-   * Returns true if the user has a master password set and false otherwise.
-   */
-  _masterPasswordSet: function ()
-  {
-    const Cc = Components.classes, Ci = Components.interfaces;
-    var secmodDB = Cc["@mozilla.org/security/pkcs11moduledb;1"].
-                   getService(Ci.nsIPKCS11ModuleDB);
-    var slot = secmodDB.findSlotByName("");
-    if (slot) {
-      var status = slot.status;
-      var hasMP = status != Ci.nsIPKCS11Slot.SLOT_UNINITIALIZED &&
-                  status != Ci.nsIPKCS11Slot.SLOT_READY;
-      return hasMP;
-    } else {
-      // XXX I have no bloody idea what this means
-      return false;
-    }
-  },
-
-  /**
    * Enables/disables the master password button depending on the state of the
    * "use master password" checkbox, and prompts for master password removal if
    * one is set.
@@ -270,9 +269,8 @@ var gSecurityPane = {
     }
     else {
       document.documentElement.openSubDialog("chrome://mozapps/content/preferences/removemp.xul",
-                                             "", null);
+                                             null, null, this._initMasterPasswordUI.bind(this));
     }
-    this._initMasterPasswordUI();
   },
 
   /**
@@ -281,8 +279,7 @@ var gSecurityPane = {
   changeMasterPassword: function ()
   {
     document.documentElement.openSubDialog("chrome://mozapps/content/preferences/changemp.xul",
-                                           "", null);
-    this._initMasterPasswordUI();
+                                           "", null, this._initMasterPasswordUI.bind(this));
   },
 
   /**

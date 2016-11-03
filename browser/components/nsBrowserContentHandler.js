@@ -502,9 +502,18 @@ nsBrowserContentHandler.prototype = {
       if (override != OVERRIDE_NONE) {
         switch (override) {
           case OVERRIDE_NEW_PROFILE:
-            // New profile.
-            overridePage = Services.urlFormatter.formatURLPref("startup.homepage_welcome_url");
-            additionalPage = Services.urlFormatter.formatURLPref("startup.homepage_welcome_url.additional");
+			if (Services.prefs.getBoolPref("app.update.releasenotes.enabled")) {
+				// New profile.
+				overridePage = Services.urlFormatter.formatURLPref("startup.homepage_welcome_url");
+				additionalPage = Services.urlFormatter.formatURLPref("startup.homepage_welcome_url.additional");
+			}
+			// Show notifications page on first run or after updating
+			if (Services.prefs.getBoolPref("app.update.notifications.enabled")){
+				let onceShowNotificationInfo = Services.urlFormatter.formatURLPref("app.update.notificationsURL");
+				if (onceShowNotificationInfo && onceShowNotificationInfo.length) {
+					additionalPage = onceShowNotificationInfo;
+				}		
+			}
             // Turn on 'later run' pages for new profiles.
             LaterRun.enabled = true;
             break;
@@ -518,11 +527,20 @@ nsBrowserContentHandler.prototype = {
                                .getService(Components.interfaces.nsISessionStartup);
             willRestoreSession = ss.isAutomaticRestoreEnabled();
 
-            overridePage = Services.urlFormatter.formatURLPref("startup.homepage_override_url");
-            if (prefb.prefHasUserValue("app.update.postupdate"))
-              overridePage = getPostUpdateOverridePage(overridePage);
+			if (Services.prefs.getBoolPref("app.update.releasenotes.enabled")) {
+				overridePage = Services.urlFormatter.formatURLPref("startup.homepage_override_url");
+				if (prefb.prefHasUserValue("app.update.postupdate"))
+				  overridePage = getPostUpdateOverridePage(overridePage);
 
-            overridePage = overridePage.replace("%OLD_VERSION%", old_mstone);
+				overridePage = overridePage.replace("%OLD_VERSION%", old_mstone);
+			}
+			// Show notifications page on first run or after updating
+			if (Services.prefs.getBoolPref("app.update.notifications.enabled")){
+				let onceShowNotificationInfo = Services.urlFormatter.formatURLPref("app.update.notificationsURL");
+				if (onceShowNotificationInfo && onceShowNotificationInfo.length) {
+					additionalPage = onceShowNotificationInfo;
+				}		
+			}
             break;
         }
       }
@@ -531,22 +549,16 @@ nsBrowserContentHandler.prototype = {
     // formatURLPref might return "about:blank" if getting the pref fails
     if (overridePage == "about:blank")
       overridePage = "";
-
-    // Temporary override page for users who are running Cyberfox on Windows 10 for their first time.
-    let platformVersion = Services.sysinfo.getProperty("version");
-    if (AppConstants.platform == "win" &&
-        Services.vc.compare(platformVersion, "10") == 0 &&
-        !Services.prefs.getBoolPref("browser.usedOnWindows10")) {
-      Services.prefs.setBoolPref("browser.usedOnWindows10", true);
-      let firstUseOnWindows10URL = Services.urlFormatter.formatURLPref("browser.usedOnWindows10.introURL");
-
-      if (firstUseOnWindows10URL && firstUseOnWindows10URL.length) {
-        additionalPage = firstUseOnWindows10URL;
-        if (override == OVERRIDE_NEW_PROFILE) {
-          additionalPage += "&utm_content=firstrun";
-        }
-      }
-    }
+  
+	// Show update information page once.
+	if (!Services.prefs.getBoolPref("app.update.infoshown") 
+			&& AppConstants.platform == "win"){
+		let onceShowUpdateInfo = Services.urlFormatter.formatURLPref("app.update.infoshownURL");
+		if (onceShowUpdateInfo && onceShowUpdateInfo.length) {
+			additionalPage = onceShowUpdateInfo;
+			Services.prefs.setBoolPref("app.update.infoshown", true);
+		}		
+	}
 
     if (!additionalPage) {
       additionalPage = LaterRun.getURL() || "";

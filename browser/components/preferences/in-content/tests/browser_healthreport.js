@@ -24,19 +24,19 @@ function test() {
 }
 
 function testBasic(win, doc) {
-  is(Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED), true,
+  is(Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED), false,
      "Health Report upload enabled on app first run.");
 
   let checkbox = doc.getElementById("submitHealthReportBox");
   ok(checkbox);
-  is(checkbox.checked, true, "Health Report checkbox is checked on app first run.");
+  is(checkbox.checked, false, "Health Report checkbox is checked on app first run.");
 
   checkbox.checked = false;
   checkbox.doCommand();
   is(Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED), false,
      "Unchecking checkbox opts out of FHR upload.");
 
-  checkbox.checked = true;
+  checkbox.checked = false;
   checkbox.doCommand();
   is(Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED), false,
      "Checking checkbox allows FHR upload.");

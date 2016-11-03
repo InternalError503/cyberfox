@@ -111,11 +111,9 @@
  <hbox align="center" pack="end">
      <button label="&chooseBookmark.label;"
             accesskey="&chooseBookmark.accesskey;"
-            oncommand="gMainPane.setNewTabPageToBookmark();"
-            id="useBookmark"
+            id="useBookmarkNewTabPage"
             preference="pref.browser.newtabpage.disable_button.bookmark_page"/>
     <button label="&restoreDefault.label;"
-            oncommand="gMainPane.restoreDefaultNewTabPage();"
             id="restoreDefaultNewTabPage"
             preference="pref.browser.newtabpage.disable_button.restore_default"/>
   </hbox>					   

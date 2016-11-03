@@ -5,7 +5,7 @@
 // Since the beta does not have a release notes page we will disable this.
 pref("startup.homepage_override_url","");
 pref("startup.homepage_welcome_url","");
-pref("startup.homepage_welcome_url.additional", "https://cyberfox.8pecxstudios.com/notifications");
+pref("startup.homepage_welcome_url.additional", "");
 
 //We have a manual update url.
 pref("app.update.url.manual", "https://cyberfox.8pecxstudios.com#selection"); 
@@ -19,13 +19,6 @@ pref("app.update.check.url", "https://download.8pecxstudios.com/current_version/
 pref("app.update.channel.type", "beta");
 //Set if update available
 pref("app.update.available", false);
-
-
-//Disable update check beta versions not added yet!
-pref("app.update.autocheck", false);
-
-//Disable check browser version (Since we are not ready globally disable)
-pref("app.update.check.enabled", false);
 
  //Since the beta does not have a release notes page we will disable this.
 pref("app.releaseNotesURL", "");

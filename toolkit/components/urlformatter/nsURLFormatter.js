@@ -118,8 +118,8 @@ nsURLFormatterService.prototype = {
     GOOGLE_API_KEY:   () => "AIzaSyD_Drzahe4dBzGCZ9ArvowCvrPx_yFrlCM",
     GOOGLE_OAUTH_API_CLIENTID:() => "147935343582-jfl0e0psc7kh1mut1nftb7de0f1h0ro0.apps.googleusercontent.com",
     GOOGLE_OAUTH_API_KEY:     () => "KtHCFCc09ltCyJCjCwH7ZJwG",
-    BING_API_CLIENTID:() => "@MOZ_BING_API_CLIENTID@",
-    BING_API_KEY:     () => "@MOZ_BING_API_KEY@",
+    BING_API_CLIENTID:() => "no-bing-api-clientid",
+    BING_API_KEY:     () => "no-bing-api-key",
     DISTRIBUTION:     function() { return this.distribution.id; },
     DISTRIBUTION_VERSION: function() { return this.distribution.version; }
   },

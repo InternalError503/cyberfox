@@ -26,15 +26,6 @@ var gAdvancedPane = {
     this._inited = true;
     var advancedPrefs = document.getElementById("advancedPrefs");
 
-	//Temp solution as the update system not active for beta so we don't want users trying just yet.
-	if(Services.prefs.getCharPref("app.update.channel.type") === "beta"){
-		document.getElementById("updateOptions").hidden = true;
-		document.getElementById("app.update.autocheck").hidden = true;
-		document.getElementById("app.update.check.enabled").hidden = true;
-		Services.prefs.setBoolPref("app.update.autocheck", false);
-		Services.prefs.setBoolPref("app.update.check.enabled", false);		
-	}	
-
     var preference = document.getElementById("browser.preferences.advanced.selectedTabIndex");
     if (preference.value !== null)
         advancedPrefs.selectedIndex = preference.value;
@@ -281,14 +272,13 @@ var gAdvancedPane = {
     this._setupLearnMoreLink("toolkit.telemetry.infoURL", "telemetryLearnMore");
 #endif
   },
-
+#ifdef MOZ_TELEMETRY_REPORTING
   /**
    * Set the status of the telemetry controls based on the input argument.
    * @param {Boolean} aEnabled False disables the controls, true enables them.
    */
   setTelemetrySectionEnabled: function (aEnabled)
   {
-#ifdef MOZ_TELEMETRY_REPORTING
     // If FHR is disabled, additional data sharing should be disabled as well.
     let disabled = !aEnabled;
     document.getElementById("submitTelemetryBox").disabled = disabled;
@@ -297,9 +287,8 @@ var gAdvancedPane = {
       Services.prefs.setBoolPref("toolkit.telemetry.enabled", false);
     }
     document.getElementById("telemetryDataDesc").disabled = disabled;
-#endif
   },
-
+#endif
 #ifdef MOZ_TELEMETRY_REPORTING
   /**
    * Initialize the health report service reference and checkbox.
@@ -617,25 +606,23 @@ var gAdvancedPane = {
     var pm = Components.classes["@mozilla.org/permissionmanager;1"]
                        .getService(Components.interfaces.nsIPermissionManager);
     var perm = pm.getPermissionObject(principal, "offline-app", true);
-
-    // clear offline cache entries
-    try {
-      var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
-                         getService(Components.interfaces.nsIApplicationCacheService);
-      var ios = Components.classes["@mozilla.org/network/io-service;1"].
-                getService(Components.interfaces.nsIIOService);
-      var groups = cacheService.getGroups();
-      for (var i = 0; i < groups.length; i++) {
-          var uri = ios.newURI(groups[i], null, null);
+    if (perm) {
+      // clear offline cache entries
+      try {
+        var cacheService = Components.classes["@mozilla.org/network/application-cache-service;1"].
+                           getService(Components.interfaces.nsIApplicationCacheService);
+        var groups = cacheService.getGroups();
+        for (var i = 0; i < groups.length; i++) {
+          var uri = Services.io.newURI(groups[i], null, null);
           if (perm.matchesURI(uri, true)) {
-              var cache = cacheService.getActiveCache(groups[i]);
-              cache.discard();
+            var cache = cacheService.getActiveCache(groups[i]);
+            cache.discard();
           }
-      }
-    } catch (e) {}
+        }
+      } catch (e) {}
 
-    pm.removePermission(perm);
-
+      pm.removePermission(perm);
+    }
     list.removeChild(item);
     gAdvancedPane.offlineAppSelected();
     this.updateActualAppCacheSize();

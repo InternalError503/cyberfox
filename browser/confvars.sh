@@ -8,6 +8,11 @@ MOZ_APP_VENDOR=8pecxstudios
 MOZ_UPDATER=
 MOZ_PHOENIX=1
 
+if test "$OS_ARCH" = "WINNT" -o \
+        "$OS_ARCH" = "Linux"; then
+  MOZ_BUNDLED_FONTS=1
+fi
+
 if test "$OS_ARCH" = "WINNT"; then
   MOZ_MAINTENANCE_SERVICE=
   if ! test "$HAVE_64BIT_BUILD"; then
@@ -51,8 +56,6 @@ MOZ_APP_STATIC_INI=1
 MOZ_WEBGL_CONFORMANT=1
 # Enable navigator.mozPay
 MOZ_PAY=
-# Enable activities. These are used for FxOS developers currently.
-MOZ_ACTIVITIES=1
 MOZ_JSDOWNLOADS=1
 MOZ_RUST_MP4PARSE=1
 

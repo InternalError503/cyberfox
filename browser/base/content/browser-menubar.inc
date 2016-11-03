@@ -77,7 +77,7 @@
                           accesskey="&emailPageCmd.accesskey;"
                           command="Browser:SendLink"/>
                 <menuseparator/>
-#if !defined(MOZ_WIDGET_GTK) && !defined(MOZ_WIDGET_QT)
+#if !defined(MOZ_WIDGET_GTK)
                 <menuitem id="menu_printSetup"
                           label="&printSetupCmd.label;"
                           accesskey="&printSetupCmd.accesskey;"
@@ -104,6 +104,7 @@
                           observes="workOfflineMenuitemState"
                           oncommand="BrowserOffline.toggleOfflineStatus();"/>
  				       <menuitem id="app_restartBrowser"
+						              class="menuitem-iconic"
 						              label="&restartBrowser.label;"
 						              oncommand="gCyberfoxCustom.restartBrowser();"/>
                 <menuitem id="menu_FileQuitItem"

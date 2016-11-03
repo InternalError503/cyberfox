@@ -77,23 +77,20 @@
       <textbox id="filter" flex="1"
                type="search"
                placeholder="&filter.emptytext;"
-               aria-controls="handlersView"
-               oncommand="gApplicationsPane.filter();"/>
+               aria-controls="handlersView"/>
     </hbox>
 
     <separator class="thin"/>
 
     <richlistbox id="handlersView" orient="vertical" persist="lastSelectedType"
-                 preference="pref.downloads.disable_button.edit_actions"
-                 onselect="gApplicationsPane.onSelectionChanged();">
+                 preference="pref.downloads.disable_button.edit_actions">
       <listheader equalsize="always" style="border: 0; padding: 0; -moz-appearance: none;">
         <treecol id="typeColumn" label="&typeColumn.label;" value="type"
                  accesskey="&typeColumn.accesskey;" persist="sortDirection"
-                 flex="1" onclick="gApplicationsPane.sort(event);"
-                 sortDirection="ascending"/>
+                 flex="1" sortDirection="ascending"/>
         <treecol id="actionColumn" label="&actionColumn2.label;" value="action"
                  accesskey="&actionColumn2.accesskey;" persist="sortDirection"
-                 flex="1" onclick="gApplicationsPane.sort(event);"/>
+                 flex="1"/>
       </listheader>
     </richlistbox>
   </prefpane>

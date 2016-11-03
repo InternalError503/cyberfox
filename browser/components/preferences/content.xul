@@ -47,8 +47,7 @@
       <!-- FONTS -->
       <preference id="font.language.group"
                   name="font.language.group"
-                  type="wstring"
-                  onchange="gContentPane._rebuildFonts();"/>
+                  type="wstring"/>
 
       <!-- LANGUAGES -->
       <preference id="browser.translation.detectLanguage"
@@ -78,7 +77,6 @@
         </hbox>
         <hbox pack="end">
           <button id="notificationsPolicyButton" label="&notificationsPolicyButton.label;"
-				  oncommand="gContentPane.showNotificationExceptions();"
                   accesskey="&notificationsPolicyButton.accesskey;"/>
         </hbox>
       </row>
@@ -121,7 +119,6 @@
             </vbox>
             <hbox pack="end">
               <button id="popupPolicyButton" label="&popupExceptions.label;"
-                      oncommand="gContentPane.showPopupExceptions();"
                       accesskey="&popupExceptions.accesskey;"/>
             </hbox>
           </row>
@@ -136,9 +133,8 @@
                         onsynctopreference="return gContentPane.writeLoadImages();"/>
             </vbox>
             <vbox>
-              <button label="&exceptions.label;"
+              <button id="loadImagesExceptions" label="&exceptions.label;"
                       accesskey="&exceptions.accesskey;"
-                      oncommand="gContentPane.showImageExceptions();"
                       preference="pref.advanced.images.disable_button.view_image"/>
             </vbox>
           </row>
@@ -152,7 +148,6 @@
             <vbox>
               <button id="advancedJSButton" label="&advancedJS.label;"
                       accesskey="&advancedJS.accesskey;"
-                      oncommand="gContentPane.showAdvancedJS();"
                       preference="pref.advanced.javascript.disable_button.advanced"/>
             </vbox>
           </row> 
@@ -208,15 +203,13 @@
             </hbox>
             <button id="advancedFonts" icon="select-font"
                     label="&advancedFonts.label;"
-                    accesskey="&advancedFonts.accesskey;"
-                    oncommand="gContentPane.configureFonts();"/>
+                    accesskey="&advancedFonts.accesskey;"/>
           </row>
           <row id="colorsRow">
             <hbox/>
             <button id="colors" icon="select-color"
                     label="&colors.label;"
-                    accesskey="&colors.accesskey;"
-                    oncommand="gContentPane.configureColors();"/>
+                    accesskey="&colors.accesskey;"/>
           </row>
         </rows>
       </grid>
@@ -236,8 +229,7 @@
             <label flex="1" control="chooseLanguage">&chooseLanguage.label;</label>
             <button id="chooseLanguage"
                     label="&chooseButton.label;"
-                    accesskey="&chooseButton.accesskey;"
-                    oncommand="gContentPane.showLanguages();"/>
+                    accesskey="&chooseButton.accesskey;"/>
           </row>
           <row id="translationBox" hidden="true">
             <hbox align="center">
@@ -248,13 +240,11 @@
              <hbox id="bingAttribution" hidden="true">								  
               <label>&translation.options.attribution.beforeLogo;</label>
               <image id="translationAttributionImage" aria-label="Microsoft Translator"
-                     onclick="gContentPane.openTranslationProviderAttribution()"
                      src="chrome://browser/content/microsoft-translator-attribution.png"/>
               <label>&translation.options.attribution.afterLogo;</label>
              </hbox>
             </hbox>
             <button id="translateButton" label="&translateExceptions.label;"
-                    oncommand="gContentPane.showTranslationExceptions();"
                     accesskey="&translateExceptions.accesskey;"/>
           </row>
         </rows>

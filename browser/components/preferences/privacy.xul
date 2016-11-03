@@ -98,7 +98,6 @@
       <!-- Clear Private Data -->
       <preference id="privacy.sanitize.sanitizeOnShutdown"
                   name="privacy.sanitize.sanitizeOnShutdown"
-                  onchange="gPrivacyPane._updateSanitizeSettingsButton();"
                   type="bool"/>
       <preference id="privacy.sanitize.timeSpan"
                   name="privacy.sanitize.timeSpan"
@@ -107,8 +106,12 @@
       <!-- Private Browsing -->
       <preference id="browser.privatebrowsing.autostart"
                   name="browser.privatebrowsing.autostart"
-                  onchange="gPrivacyPane.updatePrivacyMicroControls();"
                   type="bool"/>
+
+      <!-- Containers -->
+      <preference id="privacy.userContext.enabled"
+                   name="privacy.userContext.enabled"
+                   type="bool"/>
 
     </preferences>
     
@@ -175,14 +178,13 @@
       <spacer flex="1" />
       <button id="changeBlockListPBM"
               label="&changeBlockList.label;" accesskey="&changeBlockList.accesskey;"
-              preference="pref.privacy.disable_button.change_blocklist"
-              oncommand="gPrivacyPane.showBlockLists();"/>
+              preference="pref.privacy.disable_button.change_blocklist"/>
     </hbox>
       </vbox>
         <vbox>
-    <description>&doNotTrack.pre.label;<html:a
-    class="inline-link" id="doNotTrackSettings" href="#" onclick="gPrivacyPane.showDoNotTrackSettings();"
-    >&doNotTrack.settings.label;</html:a>&doNotTrack.post.label;</description>
+    <description>&doNotTrack.pre.label;<label
+    class="text-link" id="doNotTrackSettings"
+    >&doNotTrack.settings.label;</label>&doNotTrack.post.label;</description>
   </vbox>
 
     </groupbox>
@@ -195,11 +197,7 @@
         <label id="historyModeLabel"
                control="historyMode"
                accesskey="&historyHeader.pre.accesskey;">&historyHeader.pre.label;</label>
-        <menulist id="historyMode"
-                  oncommand="gPrivacyPane.updateHistoryModePane();
-                             gPrivacyPane.updateHistoryModePrefs();
-                             gPrivacyPane.updatePrivacyMicroControls();
-                             gPrivacyPane.updateAutostart();">
+        <menulist id="historyMode">
           <menupopup>
             <menuitem label="&historyHeader.remember.label;" value="remember"/>
             <menuitem label="&historyHeader.dontremember.label;" value="dontremember"/>
@@ -215,14 +213,12 @@
             <spacer flex="1" class="indent"/>
             <vbox flex="2">
               <description>&rememberDescription.label;</description>
-              <separator/>
-              <description>&rememberActions.pre.label;<html:a
-                class="inline-link" href="#"
-                onclick="gPrivacyPane.clearPrivateDataNow(false); return false;"
-              >&rememberActions.clearHistory.label;</html:a>&rememberActions.middle.label;<html:a
-                class="inline-link" href="#"
-                onclick="gPrivacyPane.showCookies(); return false;"
-              >&rememberActions.removeCookies.label;</html:a>&rememberActions.post.label;</description>
+              <separator class="thin"/>
+			  <description>&rememberActions.pre.label;<label
+			  class="text-link" id="historyRememberClear"
+			  >&rememberActions.clearHistory.label;</label>&rememberActions.middle.label;<label
+			  class="text-link" id="historyRememberCookies"
+			  >&rememberActions.removeCookies.label;</label>&rememberActions.post.label;</description>
             </vbox>
             <spacer flex="1" class="indent"/>
           </hbox>
@@ -233,10 +229,9 @@
             <vbox flex="2">
               <description>&dontrememberDescription.label;</description>
               <separator/>
-              <description>&dontrememberActions.pre.label;<html:a
-                class="inline-link" href="#"
-                onclick="gPrivacyPane.clearPrivateDataNow(true); return false;"
-              >&dontrememberActions.clearHistory.label;</html:a>&dontrememberActions.post.label;</description>
+			  <description>&dontrememberActions.pre.label;<label
+			  class="text-link" id="historyDontRememberClear"
+			  >&dontrememberActions.clearHistory.label;</label>&dontrememberActions.post.label;</description>
             </vbox>
             <spacer flex="1" class="indent"/>
           </hbox>
@@ -246,8 +241,7 @@
           <checkbox id="privateBrowsingAutoStart" class="indent"
                     label="&privateBrowsingPermanent2.label;"
                     accesskey="&privateBrowsingPermanent2.accesskey;"
-                    preference="browser.privatebrowsing.autostart"
-                    oncommand="gPrivacyPane.updateAutostart()"/>
+                    preference="browser.privatebrowsing.autostart"/>
 
           <vbox class="indent">
             <vbox class="indent">
@@ -266,8 +260,8 @@
                           accesskey="&acceptCookies.accesskey;"
                           onsyncfrompreference="return gPrivacyPane.readAcceptCookies();"
                           onsynctopreference="return gPrivacyPane.writeAcceptCookies();"/>
-                <button id="cookieExceptions" oncommand="gPrivacyPane.showCookieExceptions();"
-                        label="&cookieExceptions.label;" accesskey="&cookieExceptions.accesskey;"
+                <button id="cookieExceptions" label="&cookieExceptions.label;" 
+                        accesskey="&cookieExceptions.accesskey;"
                         preference="pref.privacy.disable_button.cookie_exceptions"/>
               </hbox>
 
@@ -303,7 +297,6 @@
                 <hbox flex="1"/>
                 <button id="showCookiesButton"
                         label="&showCookies.label;" accesskey="&showCookies.accesskey;"
-                        oncommand="gPrivacyPane.showCookies();"
                         preference="pref.privacy.disable_button.view_cookies"/>
               </hbox>
 
@@ -313,8 +306,7 @@
                           label="&clearOnClose.label;"
                           accesskey="&clearOnClose.accesskey;"/>
                 <button id="clearDataSettings" label="&clearOnCloseSettings.label;"
-                        accesskey="&clearOnCloseSettings.accesskey;"
-                        oncommand="gPrivacyPane.showClearPrivateDataSettings();"/>
+                        accesskey="&clearOnCloseSettings.accesskey;"/>
               </hbox>
             </vbox>
           </vbox>
@@ -349,6 +341,19 @@
                   preference="browser.urlbar.suggest.searches"/>
       </vbox>
     </groupbox>
+	<!-- Containers -->
+	<groupbox id="browserContainersGroup" hidden="true">
+		<caption><label>&browserContainersHeader.label;
+		  <label id="browserContainersLearnMore" class="text-link"
+				 value="&browserContainersLearnMore.label;"/>
+		</label></caption>
+	  <vbox id="browserContainersbox" hidden="true">
+		<checkbox id="browserContainersCheckbox"
+				  label="&browserContainersEnabled.label;"
+				  accesskey="&browserContainersEnabled.accesskey;"
+				  preference="privacy.userContext.enabled"/>
+	  </vbox>
+	</groupbox>
         </tabpanel>
 		
 		<tabpanel id="featuresTab" orient="vertical">

@@ -1,9 +1,13 @@
 [Code]
-//Setup exit code for check for running function.
+// Setup exit code for check for running function.
 procedure ExitProcess(exitCode:integer);
   external 'ExitProcess@kernel32.dll stdcall';
+ 
+// Setup check cpu support function 
+function IsProcessorFeaturePresent(Feature: Integer): Boolean;
+external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 
-//Check for running process before initializing the installer (Boolean)
+// Check for running process before initializing the installer (Boolean)
 function IsAppRunning(const FileName : string): Boolean;
 	var
 		FSWbemLocator: Variant;
@@ -28,6 +32,7 @@ function IsAppRunning(const FileName : string): Boolean;
 		end;		
 	end;
 
+// Check if force install command line argument was set.
 function forcedInstallation(const Count : LongInt): boolean;
 var
 	ForceInstallation : Boolean;
@@ -46,6 +51,7 @@ var
 		end;
 end;
 
+// Check if clean install command line argument was set.
 function DoCleanInstall(const Count : LongInt): boolean;
 var
 	CleanInstallation : Boolean;
@@ -63,8 +69,46 @@ var
 			end;
 		end;
 end;
+
+// Check if run command line argument was set.
+function StartAfterInstall(const Count : LongInt): boolean;
+var
+	StartAfterInstallation : Boolean;
+	ii : LongInt;
+	Param : String;	
+	begin
+		StartAfterInstallation := FALSE;
+		for ii := 0 to Count do
+		begin
+			Param := ParamStr(ii)
+			if CompareText(Param,'--run')=0 then
+			begin
+				StartAfterInstallation := TRUE;
+				Result := TRUE;
+			end;
+		end;
+end;
+
+// Check if update command line argument was set.
+function WasUpdateInstall(const Count : LongInt): boolean;
+var
+	WasUpgradeInstallation : Boolean;
+	ii : LongInt;
+	Param : String;	
+	begin
+		WasUpgradeInstallation := FALSE;
+		for ii := 0 to Count do
+		begin
+			Param := ParamStr(ii)
+			if CompareText(Param,'--upgrade')=0 then
+			begin
+				WasUpgradeInstallation := TRUE;
+				Result := TRUE;
+			end;
+		end;
+end;
 	
-//Get the uninstall string;
+// Get the uninstall string;
 function GetUninstallString: string;
 	var
 		sUnInstPath: string;
@@ -79,12 +123,13 @@ function GetUninstallString: string;
 	Result := sUnInstallString;
 end;	
 
+// Helper function for clean install. 
 function cleanUninstall : boolean;
 	var
 		iResultCode: Integer;
 		sUnInstallString: string;
     begin
-			//Perform clean install and uninstall existing installation.
+			// Perform clean install and uninstall existing installation.
 			if RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then
 				begin
 					sUnInstallString := GetUninstallString();
@@ -95,10 +140,10 @@ function cleanUninstall : boolean;
 					log('Current installation found!');
 			if Exec(ExpandConstant(sUnInstallString), '/VERYSILENT', '', SW_SHOW, ewWaitUntilTerminated, iResultCode) then
 			begin
-				//All IO operations have completed.
+				// All IO operations have completed.
 				log('Older installation was uninstalled');
-				//Ensure time out between uninstall and install.
-				sleep(2000);
+				// Ensure time out between uninstall and install.
+				sleep(1000);
 				Result := True;
 			end
 			else begin
@@ -109,7 +154,41 @@ function cleanUninstall : boolean;
 		end	
 end;
 
-//Check task.
+// Helper function for upgrade command line argument.
+function wasUpdate : boolean;
+	var
+		iResultCode: Integer;
+    begin
+			if ExecAsOriginalUser(ExpandConstant('{app}\updater.exe'), '--upgrade', '', SW_SHOWNORMAL, ewNoWait, iResultCode) then
+			begin
+				log('Program was launched successfully.');
+				Result := True;
+			end
+			else begin
+				log('Error occurred trying to start program.');
+				ExitProcess(14); // Our Exit code for upgrade complete after install.
+				Result := False;				
+			end;
+end;
+
+// Helper function for run command line argument.
+function startBrowser : boolean;
+	var
+		iResultCode: Integer;
+    begin
+			if ExecAsOriginalUser(ExpandConstant('{app}\{#MyAppExeName}'), '', '',SW_SHOWNORMAL, ewNoWait, iResultCode) then
+			begin
+				log('Program was launched successfully.');
+				Result := True;
+			end
+			else begin
+				log('Error occurred trying to start program.');
+				ExitProcess(12); // Our Exit code for startBrowser after install.
+				Result := False;				
+			end;
+end;
+
+// Check task.
 function TaskSelected(const Tasks: String): Boolean;
 begin
 	if IsTaskSelected(Tasks) then
@@ -124,7 +203,7 @@ begin
 		end
 end;
 
-//Check for windows Vista.
+// Check for windows Vista.
 function CheckIfVista: boolean;
 var 
 	Version: TWindowsVersion;
@@ -138,9 +217,25 @@ begin
 	end
 end;
 
-//Initialize installer run check for running process.	
+// Check if cpu supports SSE2
+function Is_SSE2_Supported(): Boolean;
+// PF_XMMI64_INSTRUCTIONS_AVAILABLE:= 10;
+begin
+  Result := IsProcessorFeaturePresent(10);
+end;
+
+// Check if instllation is upgrading previous install.
+function IsUpgrade(): Boolean;
+var
+  sPrevPath: String;
+begin
+  sPrevPath := WizardForm.PrevAppDir;
+  Result := (sPrevPath <> '');
+end;
+
+// Initialize installer run check for running process.	
 #if Arch == "amd64"
-//Check and warn user if installing Cyberfox x64 bit on x86 OS.
+// Check and warn user if installing Cyberfox x64 bit on x86 OS.
 #endif
 function InitializeSetup(): Boolean;
 var 
@@ -179,20 +274,27 @@ var
 			ExitProcess(10); // Our Exit code for incompatible OS.
 		end;	
 #endif
-		//Check if running windows vista, We no longer support it but still allow the executables to run.
-		//When run in silent or verysilent modes the user must pass /suppressmsgboxes to suppress the warning notification.
+		// Check if running windows vista, We no longer support it but still allow the executables to run.
+		// When run in silent or verysilent modes the user must pass /suppressmsgboxes to suppress the warning notification.
 		if CheckIfVista() then
 		begin
 			SuppressibleMsgBox(ExpandConstant('{cm:IsAppRunningOnVista}'), mbCriticalError, MB_OK, IDOK)
-		end		
+		end;	
+		// Check if PC supports SSE2, If not then show error and exit.
+		if not Is_SSE2_Supported() then
+		begin
+			msgbox(ExpandConstant('{cm:SystemCpuUnsupported}'), mbError, MB_OK)
+			log('Incompatible CPU: This computer has an older CPU that lacks SSE2 instruction set support. Cyberfox 49.0 and later can not run on this computer.');
+			ExitProcess(13); // Our Exit code for no sse2 support.
+		end;	
 	end
 end;
-//After initializing installer event.
+// After initializing installer event.
 procedure InitializeWizard();
 begin
 	if (DoCleanInstall(ParamCount())) then begin cleanUninstall(); end;
 end;
-//Make sure to remove start-menu entries during install as not to have many of the same short-cuts in other languages.
+// Make sure to remove start-menu entries during install as not to have many of the same short-cuts in other languages.
 procedure CurStepChanged(CurStep: TSetupStep);
 	begin
 			if CurStep = ssInstall then
@@ -200,11 +302,23 @@ procedure CurStepChanged(CurStep: TSetupStep);
 		if FileOrDirExists(ExpandConstant('{group}')) then
 				log('Removing start-menu group to prevent duplicate.');
 				DelTree(ExpandConstant('{group}'), True, True, True);
-		end
-
+		end;
+			if CurStep = ssDone then
+	begin
+		if (WasUpdateInstall(ParamCount())) then begin wasUpdate(); end;
+		if (StartAfterInstall(ParamCount())) and not (WasUpdateInstall(ParamCount())) then begin startBrowser(); end;
+	end
 end;
-//Check if install exists of not disable clean install check-box
-//Note when changing task ordering to update array order below for clean install checkbox.
+
+// Skip license page if already installed
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  if IsUpgrade() and (PageID = wpLicense) then
+    Result := True;
+end;
+
+// Check if install exists of not disable clean install check-box
+// Note when changing task ordering to update array order below for clean install checkbox.
 procedure CurPageChanged(CurPageID: Integer);
 	begin
 		if CurPageID = wpSelectTasks then
@@ -221,7 +335,7 @@ procedure CurPageChanged(CurPageID: Integer);
 	end;
 end;	
 
-//Check if cleanInstall has been selected
+// Check if cleanInstall has been selected
 function NextButtonClick(CurPageID: Integer): Boolean;
 	begin
 		Result := True;
@@ -231,7 +345,7 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 			 cleanUninstall();			
 	end;
 end;
-//Initialize uninstaller run check for process
+// Initialize uninstaller run check for process
 function InitializeUninstall(): Boolean;
 begin
   if (IsAppRunning(ExpandConstant ('{#MyAppExeName}'))) then
@@ -244,8 +358,8 @@ begin
 		Result := true;
 	end
 end;
-//Make sure to remove distribution folder on uninstall, Get user input if they want to delete profile data.
-//Keep distribution folder clean up for next few releases of 45* to ensure clean up.
+// Make sure to remove distribution folder on uninstall, Get user input if they want to delete profile data.
+// Keep distribution folder clean up for next few releases of 45* to ensure clean up.
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 	begin
 		if CurUninstallStep = usPostUninstall then
@@ -286,8 +400,7 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 			#elif Arch == "amd64"	
 			if FileExists(ExpandConstant('{userdesktop}\{#MyAppName}.LNK')) then
 				DeleteFile(ExpandConstant('{userdesktop}\{#MyAppName}.LNK'));
-			#endif
-				
+			#endif			
 		end				
 	end
 end;
