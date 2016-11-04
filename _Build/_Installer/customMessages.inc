@@ -461,7 +461,7 @@ pl.CleanInstallGroupDescription=Opcje instalacji
 pl.PocketInstallDescription=Zainstaluj Firefox Pocket (Opcjalne)
 pl.SystemAddonsGroupDescription=Dodatki systemowe
 ;Localization note must preserve %n this is a new line break.
-pl.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instruction set support. %n%nCyberfox 49.0 and later can not run on this computer.
+pl.SystemCpuUnsupported=Ten komputer ma starszy procesor, który nie obsługuje zestawu instrukcji SSE2. %n%nCyberfox 49.0 i późniejsze wersje nie uruchomią się na tym komputerze.
 ;Portuguese
 pt.ProcessName={#MyAppName}
 pt.IsAppRunning= já está em execução, feche {#MyAppName} em seguida, execute o instalador novamente.

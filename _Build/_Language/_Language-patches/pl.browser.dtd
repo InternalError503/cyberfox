@@ -154,9 +154,9 @@
 <!ENTITY updateautocheck.label "Automatycznie sprawdzaj aktualizacje w 'o programie &brandShortName;' ">
 <!ENTITY updatestartupcheck.label "Automatycznie sprawdzaj aktualizacje, gdy &brandShortName; startuje">
 <!ENTITY updatecheckenabled.label "Włącz sprawdzanie aktualizacji">
-<!ENTITY updateverifysha.label "Enable SHA512 update verification.">
-<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
-<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
+<!ENTITY updateverifysha.label "Włącz weryfikację aktualizacji poprzez sprawdzanie SHA512.">
+<!ENTITY updatenotificationsenabled.label "Włącz stronę z powiadomieniami przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;.">
+<!ENTITY updatereleasenotesenabled.label "Włącz stronę z listą zmian przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;.">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Kopiuj adres karty">
@@ -179,7 +179,7 @@
 <!ENTITY browserplugins.label "Wtyczki">
 <!ENTITY browserpluginsdisabled.label "Wyłącz wszystkie wtyczki">
 <!ENTITY browserpluginswhitelist.label "Włącz białą listę wtyczek">
-<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
+<!ENTITY browserpluginsflashenabled.label "Włącz wtyczkę Flash">
 <!ENTITY browserpluginsjavaenabled.label "Włącz wtyczkę Java">
 
 <!-- System Addons Tweak -->
