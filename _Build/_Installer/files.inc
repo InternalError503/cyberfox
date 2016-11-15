@@ -4,10 +4,8 @@ Source: "{content}\browser\{#PackageType}\browser\components\components.manifest
 Source: "{content}\browser\{#PackageType}\browser\extensions\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi"; DestDir: "{app}\browser\extensions"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\features\CTR@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: cyberctr; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\features\firefox@getpocket.com.xpi"; DestDir: "{app}\browser\features"; Tasks: pocket; Flags: promptifolder replacesameversion
-#if PackageType == "beta86" || PackageType == "beta64"
 Source: "{content}\browser\{#PackageType}\browser\VisualElements\VisualElements_70.png"; DestDir: "{app}\browser\VisualElements"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\VisualElements\VisualElements_150.png"; DestDir: "{app}\browser\VisualElements"; Flags: ignoreversion
-#endif
 Source: "{content}\browser\{#PackageType}\browser\agents.json"; DestDir: "{app}\browser"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\blocklist.xml"; DestDir: "{app}\browser"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\chrome.manifest"; DestDir: "{app}\browser"; Flags: ignoreversion
@@ -16,18 +14,14 @@ Source: "{content}\browser\{#PackageType}\browser\ua-update.json"; DestDir: "{ap
 Source: "{content}\browser\{#PackageType}\defaults\pref\channel-prefs.js"; DestDir: "{app}\defaults\pref"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\dictionaries\en-US.aff"; DestDir: "{app}\dictionaries"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\dictionaries\en-US.dic"; DestDir: "{app}\dictionaries"; Flags: ignoreversion
-#if PackageType == "beta86" || PackageType == "beta64"
 Source: "{content}\browser\{#PackageType}\fonts\EmojiOneMozilla.ttf"; DestDir: "{app}\fonts"; Flags: ignoreversion
-#endif
 Source: "{content}\browser\{#PackageType}\gmp-clearkey\0.1\clearkey.dll"; DestDir: "{app}\gmp-clearkey\0.1"; Flags: ignoreversion signonce
 Source: "{content}\browser\{#PackageType}\gmp-clearkey\0.1\clearkey.info"; DestDir: "{app}\gmp-clearkey\0.1"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\uninstall\helper.exe"; DestDir: "{app}\uninstall"; Flags: ignoreversion signonce
 Source: "{content}\browser\{#PackageType}\api-ms-win-*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\application.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\Cyberfox.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
-#if PackageType == "beta86" || PackageType == "beta64"
 Source: "{content}\browser\{#PackageType}\Cyberfox.VisualElementsManifest.xml"; DestDir: "{app}"; Flags: ignoreversion
-#endif
 Source: "{content}\browser\{#PackageType}\d3dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
 #if Arch == "i368"
 Source: "{content}\browser\{#PackageType}\D3DCompiler_43.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -56,10 +50,8 @@ Source: "{content}\browser\{#PackageType}\removed-files"; DestDir: "{app}"; Flag
 Source: "{content}\browser\{#PackageType}\softokn3.chk"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\softokn3.dll"; DestDir: "{app}"; Flags: ignoreversion signonce
 Source: "{content}\browser\{#PackageType}\ucrtbase.dll"; DestDir: "{app}"; Flags: ignoreversion
-#if PackageType == "beta86" || PackageType == "beta64"
 Source: "{content}\browser\{#PackageType}\update.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\updater.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
-#endif
 Source: "{content}\browser\{#PackageType}\vcruntime*.dll"; DestDir: "{app}"; Flags: ignoreversion
 #if PackageType == "amd86" || PackageType == "amd64"
 Source: "{content}\browser\{#PackageType}\vcomp*.dll"; DestDir: "{app}"; Flags: ignoreversion

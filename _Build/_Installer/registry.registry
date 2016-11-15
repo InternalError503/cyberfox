@@ -28,6 +28,8 @@ Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; Val
 Root: "HKLM"; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppExeNameUC}\Capabilities"; Flags: deletevalue
 
 ;Generate update manager information.
+;Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey deletekey uninsdeletekey
+;Remove in next update these values are no longer needed as the cyberfox update manager is being depreciated
 Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
 Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
@@ -62,6 +64,8 @@ Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; V
 Root: "HKLM64"; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppExeNameUC}\Capabilities"; Flags: deletevalue
 
 ;Generate update manager information.
+;Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey deletekey uninsdeletekey
+;Remove in next update these values are no longer needed as the cyberfox update manager is being depreciated
 Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
 Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
@@ -73,24 +77,4 @@ Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; V
 Root: "HKCR"; Subkey: "{#MyAppName}HTML"; ValueType: none; Flags: dontcreatekey uninsdeletekey
 Root: "HKCR"; Subkey: "{#MyAppName}URL"; ValueType: none; Flags: dontcreatekey uninsdeletekey
 Root: "HKCU"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey uninsdeletekey
-#endif
-
-;Gerenate experimental entries for cyberfox beta
-;Used in new cyberfox update manager
-#if True == Experimental && PackageType == "beta86"
-[Registry]
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "BetaVersion"; ValueData: "{#BetaVersion}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
-#elif True == Experimental && PackageType == "beta64"
-[Registry]
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "BetaVersion"; ValueData: "{#BetaVersion}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
 #endif
