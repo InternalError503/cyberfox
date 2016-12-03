@@ -1,0 +1,219 @@
+<!-- cyberfox unused australis-->
+
+<!-- LOCALIZATION NOTE: the following strings are unused in Australis, they're
+     kept here to avoid warnings from l10n tools like compare-locales on
+     l10n-central. They will be definitely removed when Australis is ready
+     for mozilla-aurora. -->
+
+<!ENTITY navbarCmd.accesskey           "N">
+<!ENTITY addonBarCmd.label             "Barra de extras">
+<!ENTITY addonBarCmd.accesskey         "A">
+<!ENTITY throbberItem.title            "Indicador de atividade">
+<!ENTITY appMenuButton.label           "Menu">
+<!ENTITY appMenuButton.tooltip         "Abrir menu do &brandShortName;">
+<!ENTITY feedButton.label              "Subscrever">
+<!ENTITY feedButton.tooltip            "Subscrever esta página…">
+<!ENTITY bookmarksButton.tooltip       "Mostrar marcadores">
+<!ENTITY historyButton.tooltip         "Mostra as páginas visitadas recentemente">
+<!ENTITY viewTabsOnTop.label           "Separadores em cima">
+<!ENTITY viewTabsOnTop.accesskey       "c">
+<!ENTITY appMenuEdit.label             "Editar">
+<!ENTITY appMenuToolbarLayout.label    "Disposição da barra de ferramentas…">
+<!ENTITY appMenuFind.label             "Localizar…">
+<!ENTITY appMenuUnsorted.label         "Marcadores não organizados">
+<!ENTITY appMenuWebDeveloper.label     "Programador web">
+<!ENTITY appMenuGettingStarted.label   "Iniciação">
+<!ENTITY appMenuSafeMode.label         "Reiniciar com os extras desativados…">
+<!ENTITY appMenuSafeMode.accesskey     "R">
+<!ENTITY cutButton.tooltip             "Cortar">
+<!ENTITY copyButton.tooltip            "Copiar">
+<!ENTITY pasteButton.tooltip           "Colar">
+<!ENTITY zoomOutButton.tooltip         "Ampliar">
+<!ENTITY zoomInButton.tooltip          "Reduzir">
+<!ENTITY zoomControls.label            "Controlos de tamanho">
+<!ENTITY addonBarCloseButton.tooltip   "Fechar barra de extras">
+<!ENTITY toggleAddonBarCmd.key         "/">
+<!ENTITY backForwardItem.title         "Recuar/Avançar">
+<!ENTITY viewBookmarksSidebar.label    "Mostrar na barra lateral">
+<!ENTITY bookmarksItem.title           "Marcadores">
+<!ENTITY openLocationCmd.label         "Abrir localização…">
+<!ENTITY openLocationCmd.accesskey     "l">
+<!ENTITY bookmarksMenuButton.tooltip   "Mostrar os meus marcadores">
+<!ENTITY restoreTabsOnDemand.label     "Não carregar separadores até os selecionar">
+<!ENTITY restoreTabsOnDemand.accesskey "N">
+
+<!-- cyberfox -->
+<!ENTITY tabGroupsButton.tooltip       "Agrupar separadores">
+<!-- end of strings to be removed post-Australis -->
+<!ENTITY mixedContentBlocked.helplink "Saber mais">
+<!-- Purge RAM browser tweak -->
+<!ENTITY minimizeMemoryCache.label "Limpar cache">
+<!ENTITY turnOnCleanRam.label "Ativa o item de menu Limpar cache.">
+<!-- End Purge RAM browser tweak -->
+
+<!-- Restart Browser Tweak -->
+<!ENTITY restartBrowser.label "Reiniciar navegador">
+<!ENTITY restartBrowserButton.label "Reiniciar navegador">
+<!ENTITY turnOnRestart.label "Ativa o item de menu Reiniciar navegador.">
+<!ENTITY cleanFastRestartCache.label "Clear fast restart cache on browser restart.">
+<!ENTITY restartOptions.label "Restart Options">
+<!ENTITY restart_paneluibtn.label "Adicionar botão ao painel">
+<!ENTITY restart_panelbtnsmall.label "Utilizar botão pequeno no painel.">
+<!ENTITY restart_reqconfirmation.label "Tem que reiniciar o navegador.">
+<!-- End Restart Browser Tweak -->
+
+<!ENTITY FeaturesTabLabel "Funcionalidades">
+<!ENTITY cyberfoxOptions.label "Funcionalidades do &brandShortName;">
+<!ENTITY menuFeaturesTab.label "Contexto\Menus">
+
+<!-- Clone Current Tab Tweak -->
+<!ENTITY turnonclone.label "Ativar a opção Clonar separador.">
+<!ENTITY cloneCurrentTab.label "Clonar separador atual">
+<!ENTITY cloneInNewWindow.label "Clonar em nova janela">
+<!-- End Clone Current Tab Tweak -->
+
+<!-- Features Tab Tweak -->
+<!ENTITY warnOnQuit.label "Avisar-me ao fechar a janela">
+<!ENTITY newtabsoptions.label "Opções de Novo separador">
+<!ENTITY newtabenabled.label "Ativar página Novo separador.">
+<!ENTITY newtabpreload.label "Ativar pré-carregamento do Novo separador.">
+<!ENTITY newtabsearch.label "Ativar barra de pesquisa no Novo separador. (Recarregue a página)">
+<!ENTITY newtabpage.label "Página do Novo separador:">
+<!ENTITY newtabthumbnail.label "Desativar captura de miniaturas na página Novo separador.">
+<!ENTITY aboutnewtab.pageTitle "Acerca:Novo separador">
+<!ENTITY incontent.label "Mostrar preferências num separador.">
+<!-- End Features Tab Tweak -->
+
+<!-- Tabs Features -->
+<!ENTITY tabsAnimation.label "Ativar animação dos separadores">
+
+<!-- End Tabs Features -->
+
+<!-- Click 2 Play Via Checkbox Tweak -->
+<!ENTITY  enableClickToPlay.label     "Ativar a opção 'Clique para reproduzir'">
+<!-- End Click 2 Play Via Checkbox Tweak -->
+
+<!-- Geo Location Via Checkbox Tweak -->
+<!ENTITY  geographicalLocation.label          "Localização geográfica">
+<!ENTITY  disableGeolocation.label            "Ativar geolocalização">
+<!-- End Geo Location Via Checkbox Tweak -->
+
+<!-- Tracking sendRefererHeader Tweak -->
+<!ENTITY  sendRefererHeader.label            "Supressão de envio do cabeçalho HTTP">
+<!ENTITY  sendRefererHeaderopt0.label            "Nunca enviar cabeçalho">
+<!ENTITY  sendRefererHeaderopt1.label            "Enviar cabeçalho (Página a ir para)">
+<!ENTITY  sendRefererHeaderopt2.label            "Enviar cabeçalho (Padrão)">
+
+<!-- End Tracking sendRefererHeader Tweak -->
+
+<!-- ToolKitUi Browser Tweak -->
+<!ENTITY  toolKitUi.label "Ativar interface alternativa para as descargas">
+<!ENTITY  toolKitUi.title "Opções de descargas">
+<!-- End ToolKitUi Browser Tweak -->
+
+<!-- Disable Javascript & Block Images Feature Dont Remove -->
+<!ENTITY  loadImages.label            "Carregar imagens automaticamente>
+<!ENTITY  loadImages.accesskey        "i">
+<!ENTITY  exceptions.label            "Exceções…">
+<!ENTITY  exceptions.accesskey        "x">
+
+<!ENTITY  enableJavaScript.label      "Ativar JavaScript">
+<!ENTITY  enableJavaScript.accesskey  "J">
+<!ENTITY  advancedJS.label            "Avançado…">
+<!ENTITY  advancedJS.accesskey        "v">
+
+<!ENTITY  enableJava.label            "Ativar Java">
+<!ENTITY  enableJava.accesskey        "t">
+<!ENTITY showTabBar.label             "Mostrar sempre a barra de separadores">
+<!ENTITY showTabBar.accesskey         "b">
+
+<!ENTITY advancedJSDialog.title         "Definições avançadas de JavaScript">
+<!ENTITY window.width                   "37em">
+
+<!ENTITY allowScripts.label             "Permitir aos scripts:">
+
+<!ENTITY moveResizePopupWindows.label     "Mover ou redimensionar janelas emergentes">
+<!ENTITY moveResizePopupWindows.accesskey "M">
+<!ENTITY raiseLowerWindows.label        "Mostrar ou ocultar janelas">
+<!ENTITY raiseLowerWindows.accesskey    "r">
+<!ENTITY disableContextMenus.label      "Desativar ou substituir menus de contexto">
+<!ENTITY disableContextMenus.accesskey  "D">
+<!-- End Disable Javascript & Block Images Feature Dont Remove -->
+
+<!-- User Agent Feature -->
+<!ENTITY userAgentOverride.label     "Opções de susbstituição do User-agent">
+<!ENTITY selectUserAgentMenuItem.label     "Selecionar item User-Agent">
+<!ENTITY clearUserAgentButton.label     "Limpar User-agent">
+<!ENTITY enterAgentManually.label     "Digite o User-Agent:">
+<!ENTITY enterAgentApplyButton.label "Aplicar">
+<!ENTITY enterAgentClearButton.label "Limpar">
+<!ENTITY showOptionsAgentOverride.label "Mostrar opções">
+
+<!-- Update check options -->
+<!ENTITY updateoptions.label "Opções de atualização do &brandShortName;">
+<!ENTITY updateautocheck.label "Procura automática de atualizações em Acerca do &brandShortName;">
+<!ENTITY updatestartupcheck.label "Procurar atualizações ao iniciar o &brandShortName;.">
+<!ENTITY updatecheckenabled.label "Ativar procura de atualizações.">
+<!ENTITY updateverifysha.label "Ativar verificação SHA512 de atualizações.">
+<!ENTITY updatenotificationsenabled.label "Ativar página de notificações ao iniciar o &brandShortName; após a atualização.">
+<!ENTITY updatereleasenotesenabled.label "Ativar página sobre as notas da versão ao iniciar o &brandShortName; após a atualização.">
+
+<!-- Copy tab URL Tweak -->
+<!ENTITY copyTabURL.label "Copiar URL do separador">
+<!ENTITY copyTabURLOptions.label "Ativa o item de menu Copiar URL do separador.">
+<!ENTITY copyAllTabUrls.label "Copiar URL de todos os separadores">
+<!ENTITY copyAllTabUrlsOptions.label "Ativa o item de menu Copiar URL de todos os separadores.">
+
+<!-- Classic Context Menu Tweak -->
+<!ENTITY contextNavigationClassic.label "Utilizar menus de contexto clássicos.">
+
+<!-- Email Link Context Menu Tweak -->
+<!ENTITY turnoffemaillink.label "Ativa o item de menu Enviar ligação por e-mail.">
+
+<!-- about:config Context Menu Tweak -->
+<!ENTITY turnoffcontextabout.label "Ativa o item de menu about:config.">
+<!-- about:config Menu Tweak -->
+<!ENTITY turnoffmenuabout.label "Ativar item de menu about:config.">
+
+<!-- Plugin Settings Tweak -->
+<!ENTITY browserplugins.label "Plugins do navegador">
+<!ENTITY browserpluginsdisabled.label "Desativar plugins (desativa todos os plugins).">
+<!ENTITY browserpluginswhitelist.label "Ativar lista de permissões para os plugins.">
+<!ENTITY browserpluginsflashenabled.label "Ativar o plugin Flash Player.">
+<!ENTITY browserpluginsjavaenabled.label "Ativar o plugin Java.">
+
+<!-- System Addons Tweak -->
+<!ENTITY systemaddons.label "Extras do sistema">
+<!ENTITY systemaddonsmsg.label "Se estes extras estiverem instalados, aqui pode alternar a sua utilização.">
+<!ENTITY enablehellochat.label "Ativar Hello Chat.">
+<!ENTITY enablepocket.label "Ativar pocket.">
+
+<!-- Helpful ToolTips -->
+<!ENTITY restartRequiredMSG.label "Tem que reiniciar o navegador.">
+
+<!-- Flashplayer Protect Mode -->
+<!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
+<!ENTITY disableflashprotect.label "Desativar modo de proteção do Flash Player">
+
+<!-- Toggle JavaScript in tab feature -->
+<!ENTITY togglescriptintab.label "Alternar JavaScript">
+
+<!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
+<!ENTITY webrtcp2group.description "Ligação WebRTC Peer">
+<!ENTITY webrtcp2preference.label "Ativar ligação WebRTC">
+
+<!-- about:home localization Tweak -->
+<!ENTITY abouthome.google.label "Google">
+<!ENTITY abouthome.google.url "https://www.google.com/">
+<!ENTITY abouthome.youtube.label "YouTube">
+<!ENTITY abouthome.youtube.url "https://www.youtube.com/">
+<!ENTITY abouthome.facebook.label "Facebook">
+<!ENTITY abouthome.facebook.url "https://www.facebook.com/">
+<!ENTITY abouthome.twitter.label "Twitter">
+<!ENTITY abouthome.twitter.url "https://www.twitter.com/">
+<!ENTITY abouthome.support.label "Support">
+<!ENTITY abouthome.support.url "https://8pecxstudios.com/Forums/index.php">
+<!ENTITY abouthome.feedback.label "Feedback">
+<!ENTITY abouthome.feedback.url "https://8pecxstudios.com/Forums/viewforum.php?f=9">
+<!ENTITY abouthome.addons.label "Addons">
+<!ENTITY abouthome.addons.url "https://addons.mozilla.org/en-US/firefox/">
