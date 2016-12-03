@@ -1,0 +1,10 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. --> 
+
+<!ENTITY  brandShorterName      "Cyberfox">
+<!ENTITY  brandShortName        "Cyberfox">
+<!ENTITY  brandFullName         "Cyberfox">
+<!ENTITY  vendorShortName       "8pecxstudios">
+
+<!ENTITY  trademarkInfo.part1   "Cyberfox e os logotipos Cyberfox são marcas registadas de 8pecxstudios e o Cyberfox é baseado no código fonte do Mozilla Firefox.">
