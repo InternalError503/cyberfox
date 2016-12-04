@@ -55,8 +55,8 @@
 <!ENTITY restartBrowser.label "Reiniciar navegador">
 <!ENTITY restartBrowserButton.label "Reiniciar navegador">
 <!ENTITY turnOnRestart.label "Ativa o item de menu Reiniciar navegador.">
-<!ENTITY cleanFastRestartCache.label "Clear fast restart cache on browser restart.">
-<!ENTITY restartOptions.label "Restart Options">
+<!ENTITY cleanFastRestartCache.label "Limpar cache ao reiniciar o navegador.">
+<!ENTITY restartOptions.label "Opções de reinício">
 <!ENTITY restart_paneluibtn.label "Adicionar botão ao painel">
 <!ENTITY restart_panelbtnsmall.label "Utilizar botão pequeno no painel.">
 <!ENTITY restart_reqconfirmation.label "Tem que reiniciar o navegador.">
@@ -77,7 +77,7 @@
 <!ENTITY newtabsoptions.label "Opções de Novo separador">
 <!ENTITY newtabenabled.label "Ativar página Novo separador.">
 <!ENTITY newtabpreload.label "Ativar pré-carregamento do Novo separador.">
-<!ENTITY newtabsearch.label "Ativar barra de pesquisa no Novo separador. (Recarregue a página)">
+<!ENTITY newtabsearch.label "Ativar barra de pesquisa no Novo separador (Recarregue página).">
 <!ENTITY newtabpage.label "Página do Novo separador:">
 <!ENTITY newtabthumbnail.label "Desativar captura de miniaturas na página Novo separador.">
 <!ENTITY aboutnewtab.pageTitle "Acerca:Novo separador">
