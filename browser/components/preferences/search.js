@@ -30,6 +30,18 @@ var gSearchPane = {
     document.getElementById("engineList").view = gEngineView;
     this.buildDefaultEngineDropDown();
 
+    let addEnginesLink = document.getElementById("addEngines");
+    let searchEnginesURL = Services.wm.getMostRecentWindow('navigator:browser')
+                                      .BrowserSearch.searchEnginesURL;
+    addEnginesLink.setAttribute("href", searchEnginesURL);
+
+    window.addEventListener("click", this, false);
+    window.addEventListener("command", this, false);
+    window.addEventListener("dragstart", this, false);
+    window.addEventListener("keypress", this, false);
+    window.addEventListener("select", this, false);
+    window.addEventListener("blur", this, true);
+
     Services.obs.addObserver(this, "browser-search-engine-modified", false);
     window.addEventListener("unload", () => {
       Services.obs.removeObserver(this, "browser-search-engine-modified", false);
@@ -72,15 +84,8 @@ var gSearchPane = {
   buildDefaultEngineDropDown: function() {
     // This is called each time something affects the list of engines.
     let list = document.getElementById("defaultEngine");
-    let currentEngine;
-
-    // First, try to preserve the current selection.
-    if (list.selectedItem)
-      currentEngine = list.selectedItem.label;
-
-    // If there's no current selection, use the current default engine.
-    if (!currentEngine)
-      currentEngine = Services.search.currentEngine.name;
+    // Set selection to the current default engine.
+    let currentEngine = Services.search.currentEngine.name;
 
     // If the current engine isn't in the list any more, select the first item.
     let engines = gEngineView._engineStore._engines;
@@ -99,6 +104,68 @@ var gSearchPane = {
       if (e.name == currentEngine)
         list.selectedItem = item;
     });
+  },
+
+  handleEvent: function(aEvent) {
+    switch (aEvent.type) {
+      case "click":
+        if (aEvent.target.id != "engineChildren" &&
+            !aEvent.target.classList.contains("searchEngineAction")) {
+          let engineList = document.getElementById("engineList");
+          // We don't want to toggle off selection while editing keyword
+          // so proceed only when the input field is hidden.
+          // We need to check that engineList.view is defined here
+          // because the "click" event listener is on <window> and the
+          // view might have been destroyed if the pane has been navigated
+          // away from.
+          if (engineList.inputField.hidden && engineList.view) {
+            let selection = engineList.view.selection;
+            if (selection.count > 0) {
+              selection.toggleSelect(selection.currentIndex);
+            }
+            engineList.blur();
+          }
+        }
+        break;
+      case "command":
+        switch (aEvent.target.id) {
+          case "":
+            if (aEvent.target.parentNode &&
+                aEvent.target.parentNode.parentNode &&
+                aEvent.target.parentNode.parentNode.id == "defaultEngine") {
+              gSearchPane.setDefaultEngine();
+            }
+            break;
+          case "restoreDefaultSearchEngines":
+            gSearchPane.onRestoreDefaults();
+            break;
+          case "removeEngineButton":
+            Services.search.removeEngine(gEngineView.selectedEngine.originalEngine);
+            break;
+        }
+        break;
+      case "dragstart":
+        if (aEvent.target.id == "engineChildren") {
+          onDragEngineStart(aEvent);
+        }
+        break;
+      case "keypress":
+        if (aEvent.target.id == "engineList") {
+          gSearchPane.onTreeKeyPress(aEvent);
+        }
+        break;
+      case "select":
+        if (aEvent.target.id == "engineList") {
+          gSearchPane.onTreeSelect();
+        }
+        break;
+      case "blur":
+        if (aEvent.target.id == "engineList" &&
+            aEvent.target.inputField == document.getBindingParent(aEvent.originalTarget)) {
+          gSearchPane.onInputBlur();
+        }
+        break;
+    }
   },
 
   observe: function(aEngine, aTopic, aVerb) {
@@ -133,9 +200,14 @@ var gSearchPane = {
     }
   },
 
+  onInputBlur: function() {
+    let tree = document.getElementById("engineList");
+    tree.stopEditing(false);
+  },
+
   onTreeSelect: function() {
     document.getElementById("removeEngineButton").disabled =
-      gEngineView.selectedIndex == -1 || gEngineView.lastIndex == 0;
+      !gEngineView.isEngineSelectedAndRemovable();
   },
 
   onTreeKeyPress: function(aEvent) {
@@ -149,12 +221,21 @@ var gSearchPane = {
       let newValue = !gEngineView._engineStore.engines[index].shown;
       gEngineView.setCellValue(index, tree.columns.getFirstColumn(),
                                newValue.toString());
+      // Prevent page from scrolling on the space key.
+      aEvent.preventDefault();
     }
     else {
       let isMac = Services.appinfo.OS == "Darwin";
       if ((isMac && aEvent.keyCode == KeyEvent.DOM_VK_RETURN) ||
-          (!isMac && aEvent.keyCode == KeyEvent.DOM_VK_F2))
+          (!isMac && aEvent.keyCode == KeyEvent.DOM_VK_F2)) {
         tree.startEditing(index, tree.columns.getLastColumn());
+      } else if (aEvent.keyCode == KeyEvent.DOM_VK_DELETE ||
+                 (isMac && aEvent.shiftKey &&
+                  aEvent.keyCode == KeyEvent.DOM_VK_BACK_SPACE &&
+                  gEngineView.isEngineSelectedAndRemovable())) {
+        // Delete and Shift+Backspace (Mac) removes selected engine.
+        Services.search.removeEngine(gEngineView.selectedEngine.originalEngine);
+     }
     }
   },
 
@@ -168,9 +249,8 @@ var gSearchPane = {
     document.getElementById("restoreDefaultSearchEngines").disabled = !aEnable;
   },
 
-  remove: function() {
-    gEngineView._engineStore.removeEngine(gEngineView.selectedEngine);
-    let index = gEngineView.selectedIndex;
+  remove: function(aEngine) {
+    let index = gEngineView._engineStore.removeEngine(aEngine);
     gEngineView.rowCountChanged(index, -1);
     gEngineView.invalidate();
     gEngineView.selection.select(Math.min(index, gEngineView.lastIndex));
@@ -179,17 +259,18 @@ var gSearchPane = {
   },
 
   editKeyword: Task.async(function* (aEngine, aNewKeyword) {
-    if (aNewKeyword) {
+    let keyword = aNewKeyword.trim();
+    if (keyword) {
       let eduplicate = false;
       let dupName = "";
 
       // Check for duplicates in Places keywords.
-      let bduplicate = !!(yield PlacesUtils.keywords.fetch(aNewKeyword));
+      let bduplicate = !!(yield PlacesUtils.keywords.fetch(keyword));
 
       // Check for duplicates in changes we haven't committed yet
       let engines = gEngineView._engineStore.engines;
       for (let engine of engines) {
-        if (engine.alias == aNewKeyword &&
+        if (engine.alias == keyword &&
             engine.name != aEngine.name) {
           eduplicate = true;
           dupName = engine.name;
@@ -209,7 +290,7 @@ var gSearchPane = {
       }
     }
 
-    gEngineView._engineStore.changeEngine(aEngine, "alias", aNewKeyword);
+    gEngineView._engineStore.changeEngine(aEngine, "alias", keyword);
     gEngineView.invalidate();
     return true;
   }),
@@ -225,15 +306,8 @@ var gSearchPane = {
   },
 
   setDefaultEngine: function () {
-    if (document.documentElement.instantApply) {
-      Services.search.currentEngine =
-        document.getElementById("defaultEngine").selectedItem.engine;
-    }
-  },
-
-  loadAddEngines: function () {
-    window.opener.BrowserSearch.loadAddEngines();
-    window.document.documentElement.acceptDialog();
+    Services.search.currentEngine =
+      document.getElementById("defaultEngine").selectedItem.engine;
   }
 };
 
@@ -248,64 +322,6 @@ function onDragEngineStart(event) {
   }
 }
 
-// "Operation" objects
-function EngineMoveOp(aEngineClone, aNewIndex) {
-  if (!aEngineClone)
-    throw new Error("bad args to new EngineMoveOp!");
-  this._engine = aEngineClone.originalEngine;
-  this._newIndex = aNewIndex;
-}
-EngineMoveOp.prototype = {
-  _engine: null,
-  _newIndex: null,
-  commit: function EMO_commit() {
-    Services.search.moveEngine(this._engine, this._newIndex);
-  }
-};
-
-function EngineRemoveOp(aEngineClone) {
-  if (!aEngineClone)
-    throw new Error("bad args to new EngineRemoveOp!");
-  this._engine = aEngineClone.originalEngine;
-}
-EngineRemoveOp.prototype = {
-  _engine: null,
-  commit: function ERO_commit() {
-    Services.search.removeEngine(this._engine);
-  }
-};
-
-function EngineUnhideOp(aEngineClone, aNewIndex) {
-  if (!aEngineClone)
-    throw new Error("bad args to new EngineUnhideOp!");
-  this._engine = aEngineClone.originalEngine;
-  this._newIndex = aNewIndex;
-}
-EngineUnhideOp.prototype = {
-  _engine: null,
-  _newIndex: null,
-  commit: function EUO_commit() {
-    this._engine.hidden = false;
-    Services.search.moveEngine(this._engine, this._newIndex);
-  }
-};
-
-function EngineChangeOp(aEngineClone, aProp, aValue) {
-  if (!aEngineClone)
-    throw new Error("bad args to new EngineChangeOp!");
-
-  this._engine = aEngineClone.originalEngine;
-  this._prop = aProp;
-  this._newValue = aValue;
-}
-EngineChangeOp.prototype = {
-  _engine: null,
-  _prop: null,
-  _newValue: null,
-  commit: function ECO_commit() {
-    this._engine[this._prop] = this._newValue;
-  }
-};
 
 function EngineStore() {
   let pref = document.getElementById("browser.search.hiddenOneOffs").value;
@@ -314,18 +330,6 @@ function EngineStore() {
   this._engines = Services.search.getVisibleEngines().map(this._cloneEngine, this);
   this._defaultEngines = Services.search.getDefaultEngines().map(this._cloneEngine, this);
 
-  if (document.documentElement.instantApply) {
-    this._ops = {
-      push: function(op) { op.commit(); }
-    };
-  }
-  else {
-    this._ops = [];
-    document.documentElement.addEventListener("beforeaccept", () => {
-      gEngineView._engineStore.commit();
-    });
-  }
-
   // check if we need to disable the restore defaults button
   var someHidden = this._defaultEngines.some(e => e.hidden);
   gSearchPane.showRestoreDefaults(someHidden);
@@ -333,7 +337,6 @@ function EngineStore() {
 EngineStore.prototype = {
   _engines: null,
   _defaultEngines: null,
-  _ops: null,
 
   get engines() {
     return this._engines;
@@ -365,14 +368,6 @@ EngineStore.prototype = {
     return aEngineClone.originalEngine == this.originalEngine;
   },
 
-  commit: function ES_commit() {
-    for (op of this._ops)
-      op.commit();
-
-    Services.search.currentEngine =
-      document.getElementById("defaultEngine").selectedItem.engine;
-  },
-
   addEngine: function ES_addEngine(aEngine) {
     this._engines.push(this._cloneEngine(aEngine));
   },
@@ -391,19 +386,26 @@ EngineStore.prototype = {
     var removedEngine = this._engines.splice(index, 1)[0];
     this._engines.splice(aNewIndex, 0, removedEngine);
 
-    this._ops.push(new EngineMoveOp(aEngine, aNewIndex));
+    Services.search.moveEngine(aEngine.originalEngine, aNewIndex);
   },
 
   removeEngine: function ES_removeEngine(aEngine) {
-    var index = this._getIndexForEngine(aEngine);
+    if (this._engines.length == 1) {
+      throw new Error("Cannot remove last engine!");
+    }
+
+    let engineName = aEngine.name;
+    let index = this._engines.findIndex(element => element.name == engineName);
+
     if (index == -1)
       throw new Error("invalid engine?");
 
     this._engines.splice(index, 1);
-    this._ops.push(new EngineRemoveOp(aEngine));
-    if (this._defaultEngines.some(this._isSameEngine, aEngine))
+
+    if (this._defaultEngines.some(this._isSameEngine, this._engines[index]))
       gSearchPane.showRestoreDefaults(true);
     gSearchPane.buildDefaultEngineDropDown();
+    return index;
   },
 
   restoreDefaultEngines: function ES_restoreDefaultEngines() {
@@ -423,10 +425,13 @@ EngineStore.prototype = {
         e.alias = "";
 
         this._engines.splice(i, 0, e);
-        this._ops.push(new EngineUnhideOp(e, i));
+        let engine = e.originalEngine;
+        engine.hidden = false;
+        Services.search.moveEngine(engine, i);
         added++;
       }
     }
+    Services.search.resetToOriginalDefaultEngine();
     gSearchPane.showRestoreDefaults(false);
     gSearchPane.buildDefaultEngineDropDown();
     return added;
@@ -438,7 +443,7 @@ EngineStore.prototype = {
       throw new Error("invalid engine?");
 
     this._engines[index][aProp] = aNewValue;
-    this._ops.push(new EngineChangeOp(aEngine, aProp, aNewValue));
+    aEngine.originalEngine[aProp] = aNewValue;
   },
 
   reloadIcons: function ES_reloadIcons() {
@@ -492,6 +497,10 @@ EngineView.prototype = {
     return column.id == "engineShown";
   },
 
+  isEngineSelectedAndRemovable: function() {
+    return this.selectedIndex != -1 && this.lastIndex != 0;
+  },
+
   // nsITreeView
   get rowCount() {
     return this._engineStore.engines.length;
@@ -537,9 +546,8 @@ EngineView.prototype = {
     if (dropIndex > sourceIndex) {
       if (orientation == nsITreeView.DROP_BEFORE)
         dropIndex--;
-    } else {
-      if (orientation == nsITreeView.DROP_AFTER)
-        dropIndex++;
+    } else if (orientation == nsITreeView.DROP_AFTER) {
+      dropIndex++;
     }
 
     this._engineStore.moveEngine(sourceEngine, dropIndex);

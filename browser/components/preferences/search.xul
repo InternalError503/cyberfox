@@ -48,7 +48,7 @@
     <groupbox id="defaultEngineGroup" align="start">
       <caption label="&defaultSearchEngine.label;"/>
       <label>&chooseYourDefaultSearchEngine.label;</label>
-      <menulist id="defaultEngine" oncommand="gSearchPane.setDefaultEngine();">
+      <menulist id="defaultEngine">
         <menupopup/>
       </menulist>
       <checkbox id="suggestionsInSearchFieldsCheckbox"
@@ -57,7 +57,6 @@
                 preference="browser.search.suggest.enabled"/>
       <hbox class="indent">
         <checkbox id="urlBarSuggestion" label="&showURLBarSuggestions.label;"
-                  hidden="true"
                   accesskey="&showURLBarSuggestions.accesskey;"
                   preference="browser.urlbar.suggest.searches"/>
         <hbox id="urlBarSuggestionPermanentPBLabel"
@@ -76,13 +75,10 @@
       <label>&chooseWhichOneToDisplay.label;</label>
 
       <tree id="engineList" flex="1" rows="8" hidecolumnpicker="true" editable="true"
-            seltype="single" onselect="gSearchPane.onTreeSelect();"
-            onkeypress="gSearchPane.onTreeKeyPress(event);">
-        <treechildren id="engineChildren" flex="1"
-                      ondragstart="onDragEngineStart(event);"/>
+            seltype="single">
+        <treechildren id="engineChildren" flex="1"/>
         <treecols>
-          <treecol id="engineShown" type="checkbox" style="min-width: 26px;" editable="true"
-                   sortable="false"/>
+          <treecol id="engineShown" type="checkbox" style="min-width: 26px;" editable="true" sortable="false"/>
           <treecol id="engineName" flex="4" label="&engineNameColumn.label;" sortable="false"/>
           <treecol id="engineKeyword" flex="1" label="&engineKeywordColumn.label;" editable="true"
                    sortable="false"/>
@@ -92,21 +88,19 @@
       <hbox>
         <button id="restoreDefaultSearchEngines"
                 label="&restoreDefaultSearchEngines.label;"
-                accesskey="&restoreDefaultSearchEngines.accesskey;"
-                oncommand="gSearchPane.onRestoreDefaults();"/>
+                accesskey="&restoreDefaultSearchEngines.accesskey;"/>
         <spacer flex="1"/>
         <button id="removeEngineButton"
+                class="searchEngineAction"
                 label="&removeEngine.label;"
                 accesskey="&removeEngine.accesskey;"
-                disabled="true"
-                oncommand="gSearchPane.remove();"/>
+                disabled="true"/>
       </hbox>
 
       <separator class="thin"/>
 
-      <hbox pack="start">
-        <label id="addEngines" class="text-link" value="&addMoreSearchEngines.label;"
-               onclick="if (event.button == 0) { gSearchPane.loadAddEngines(); }"/>
+      <hbox id="addEnginesBox" pack="start">
+        <label id="addEngines" class="text-link" value="&addMoreSearchEngines.label;"/>
       </hbox>
     </groupbox>
 
