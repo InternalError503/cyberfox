@@ -78,7 +78,7 @@
 <!ENTITY newtabenabled.label "Ativar página Novo separador.">
 <!ENTITY newtabpreload.label "Ativar pré-carregamento do Novo separador.">
 <!ENTITY newtabsearch.label "Ativar barra de pesquisa na página Novo separador (Recarregue a página).">
-<!ENTITY newtabpage.label "Página do Novo separador:">
+<!ENTITY newtabpage.label "Página Novo separador:">
 <!ENTITY newtabthumbnail.label "Desativar captura de miniaturas na página Novo separador.">
 <!ENTITY aboutnewtab.pageTitle "Acerca:Novo separador">
 <!ENTITY incontent.label "Mostrar preferências num separador.">
@@ -160,18 +160,18 @@
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Copiar URL do separador">
-<!ENTITY copyTabURLOptions.label "Ativa o item de menu Copiar URL do separador.">
+<!ENTITY copyTabURLOptions.label "Ativar item de menu Copiar URL do separador.">
 <!ENTITY copyAllTabUrls.label "Copiar URL de todos os separadores">
-<!ENTITY copyAllTabUrlsOptions.label "Ativa o item de menu Copiar URL de todos os separadores.">
+<!ENTITY copyAllTabUrlsOptions.label "Ativar item de menu Copiar URL de todos os separadores.">
 
 <!-- Classic Context Menu Tweak -->
 <!ENTITY contextNavigationClassic.label "Utilizar menus de contexto clássicos.">
 
 <!-- Email Link Context Menu Tweak -->
-<!ENTITY turnoffemaillink.label "Ativa o item de menu Enviar ligação por e-mail.">
+<!ENTITY turnoffemaillink.label "Ativar item de menu Enviar ligação por e-mail.">
 
 <!-- about:config Context Menu Tweak -->
-<!ENTITY turnoffcontextabout.label "Ativa o item de menu about:config.">
+<!ENTITY turnoffcontextabout.label "Ativar item de contexto about:config.">
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Ativar item de menu about:config.">
 
