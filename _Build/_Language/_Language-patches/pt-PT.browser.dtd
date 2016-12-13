@@ -112,7 +112,7 @@
 <!-- End ToolKitUi Browser Tweak -->
 
 <!-- Disable Javascript & Block Images Feature Dont Remove -->
-<!ENTITY  loadImages.label            "Carregar imagens automaticamente>
+<!ENTITY  loadImages.label            "Carregar imagens automaticamente">
 <!ENTITY  loadImages.accesskey        "i">
 <!ENTITY  exceptions.label            "Exceções…">
 <!ENTITY  exceptions.accesskey        "x">
