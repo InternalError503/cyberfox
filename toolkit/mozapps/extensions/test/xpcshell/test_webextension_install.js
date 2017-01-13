@@ -1,6 +1,4 @@
 
-const {ADDON_SIGNING} = AM_Cu.import("resource://gre/modules/addons/AddonConstants.jsm", {});
-
 function run_test() {
   run_next_test();
 }

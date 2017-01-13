@@ -417,6 +417,24 @@
                       accesskey="&enableSearchUpdate.accesskey;"
                       preference="browser.search.update"/>
           </groupbox>
+		  
+			<!-- Update Settings -->
+			<groupbox id="updateOptions" orient="vertical">
+				<caption label="&updateoptions.label;"/>
+					<checkbox id="app.update.autocheck" label="&updateautocheck.label;"
+							preference="app.update.autocheck"/>
+					<checkbox id="app.update.startup.check" label="&updatestartupcheck.label;"
+							preference="app.update.startup.check"/>
+					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
+							preference="app.update.check.enabled"/>
+					<checkbox id="app.update.verifysha" label="&updateverifysha.label;"
+							preference="app.update.verifysha"/>
+					<checkbox id="app.update.notifications.enabled" label="&updatenotificationsenabled.label;"
+							preference="app.update.notifications.enabled"/>
+					<checkbox id="app.update.releasenotes.enabled" label="&updatereleasenotesenabled.label;"
+							preference="app.update.releasenotes.enabled"/>
+				</groupbox>
+		  
         </tabpanel>
 
         <!-- Certificates -->
@@ -495,23 +513,6 @@
  					<checkbox id="extensions.pocket.enabled" label="&enablepocket.label;"
 							preference="extensions.pocket.enabled" />							
 			</groupbox>
-			
-			<!-- Update Settings -->
-			<groupbox id="updateOptions" orient="vertical">
-				<caption label="&updateoptions.label;"/>
-					<checkbox id="app.update.autocheck" label="&updateautocheck.label;"
-							preference="app.update.autocheck"/>
-					<checkbox id="app.update.startup.check" label="&updatestartupcheck.label;"
-							preference="app.update.startup.check"/>
-					<checkbox id="app.update.check.enabled" label="&updatecheckenabled.label;"
-							preference="app.update.check.enabled"/>
-					<checkbox id="app.update.verifysha" label="&updateverifysha.label;"
-							preference="app.update.verifysha"/>
-					<checkbox id="app.update.notifications.enabled" label="&updatenotificationsenabled.label;"
-							preference="app.update.notifications.enabled"/>
-					<checkbox id="app.update.releasenotes.enabled" label="&updatereleasenotesenabled.label;"
-							preference="app.update.releasenotes.enabled"/>
-				</groupbox>
 
 			<!-- Download Settings -->				
 		    <groupbox id="browserDownload.useToolkitUI">

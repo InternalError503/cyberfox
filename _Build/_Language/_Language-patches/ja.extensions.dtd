@@ -1,0 +1,3 @@
+<!-- global informations -->
+<!ENTITY info.plugincheck.label			"プラグインが最新バージョンであるか確認する">
+<!ENTITY info.plugincheck.tooltip		"インストールされた有効なプラグインが最新バージョンであるか確認します">

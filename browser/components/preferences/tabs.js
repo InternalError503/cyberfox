@@ -1,7 +1,6 @@
-# -*- indent-tabs-mode: nil; js-indent-level: 4 -*-
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var gTabsPane = {
 
@@ -33,25 +32,24 @@ var gTabsPane = {
       document.getElementById(aId)
               .addEventListener(aEventType, aCallback.bind(gTabsPane));
     }
-#ifdef XP_WIN
-    const Cc = Components.classes;
-    const Ci = Components.interfaces;
-    try {
-      let sysInfo = Cc["@mozilla.org/system-info;1"].
-                    getService(Ci.nsIPropertyBag2);
-      let ver = parseFloat(sysInfo.getProperty("version"));
-      let showTabsInTaskbar = document.getElementById("showTabsInTaskbar");
-      showTabsInTaskbar.hidden = ver < 6.1;
-    } catch (ex) {}
-#endif
+	if (AppConstants.platform = "win") {
+		const Cc = Components.classes;
+		const Ci = Components.interfaces;
+		try {
+		  let sysInfo = Cc["@mozilla.org/system-info;1"].
+						getService(Ci.nsIPropertyBag2);
+		  let ver = parseFloat(sysInfo.getProperty("version"));
+		  let showTabsInTaskbar = document.getElementById("showTabsInTaskbar");
+		  showTabsInTaskbar.hidden = ver < 6.1;
+		} catch (ex) {}
+	}
 
     // The "closing multiple tabs" and "opening multiple tabs might slow down
     // &brandShortName;" warnings provide options for not showing these
     // warnings again. When the user disabled them, we provide checkboxes to
     // re-enable the warnings.
     let TransientPrefs =
-      Components.utils.import("resource:///modules/TransientPrefs.jsm", {})
-                .TransientPrefs;
+		Cu.import("resource:///modules/TransientPrefs.jsm", {}).TransientPrefs;
     if (!TransientPrefs.prefShouldBeVisible("browser.tabs.warnOnClose"))
       document.getElementById("warnCloseMultiple").hidden = true;
     if (!TransientPrefs.prefShouldBeVisible("browser.tabs.warnOnOpen"))

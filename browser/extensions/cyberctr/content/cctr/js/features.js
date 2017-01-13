@@ -130,7 +130,7 @@ cyberctrFeatures = {
                 };
 
                 // Only send async requests
-                request.timeout = 5000;
+                request.timeout = 10000;
                 request.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
                 request.setRequestHeader("Content-Type", "application/json");
                 request.send(null);

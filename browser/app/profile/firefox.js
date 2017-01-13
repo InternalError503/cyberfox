@@ -611,6 +611,8 @@ pref("accessibility.typeaheadfind.flashBar", 1);
 // Tracks when accessibility is loaded into the previous session.
 pref("accessibility.loadedInLastSession", false);
 
+pref("plugins.update.url", "https://www.mozilla.org/%LOCALE%/plugincheck/");
+
 pref("plugins.click_to_play", true);
 pref("plugins.testmode", false);
 

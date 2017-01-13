@@ -36,8 +36,7 @@
       data-category="paneSync">
   <image class="header-icon"/>
   <label class="header-name" flex="1">&paneSync.title;</label>
-  <button class="help-button"
-          aria-label="&helpButton.label;"/>
+  <html:a class="help-button text-link" target="_blank" aria-label="&helpButton.label;"></html:a>
 </hbox>
 
 <deck id="weavePrefsDeck" data-category="paneSync" hidden="true">
@@ -224,7 +223,6 @@
                 <hbox class="fxaAccountBoxButtons" align="center">
                   <button id="fxaUnlinkButton" label="&disconnect.label;"/>
                   <label id="verifiedManage" class="text-link"
-                         onclick="gSyncPane.openManageFirefoxAccount(event);"
                          onkeypress="gSyncPane.openManageFirefoxAccount(event);"><!--
                   -->&verifiedManage.label;</label>
                 </hbox>

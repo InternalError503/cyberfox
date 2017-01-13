@@ -62,3 +62,5 @@ filefield + button {
 #dialogTitle {
   font-size: 1em;
 }
+
+%include ../../../shared/incontentprefs/preferences-cyberfox.inc

@@ -491,3 +491,13 @@
 	#main-window[tabsintitlebar][customizing="true"] :-moz-any(#toolbar-menubar,#TabsToolbar):-moz-any([currentset*="customizableui-special-spring"],[currentset*="customizableui-special-separator"],[currentset*="customizableui-special-spacer"]){
 	  -moz-window-dragging: no-drag !important;
 	}
+	
+	/* Fix app menu pane panel box-shadow on windows classic theme */
+	@media all and (-moz-windows-classic) {
+		 #main-window[defaultfxtheme="true"] #appmenuSecondaryPane {
+			box-shadow: 1px 0 1px rgb(204,214,234) h-shadow!important;
+			-moz-border-start: none!important;
+			border: none!important;
+		}
+
+	}

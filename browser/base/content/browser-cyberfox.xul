@@ -50,12 +50,12 @@
 									  label="&togglescriptintab.label;" 
 									  oncommand="gCyberfoxCustom.toggleTabJavascript();"/>
     </toolbarpalette>
-    <panel id="PanelUI-footer-inner">
+    <hbox id="PanelUI-footer-inner">
         <toolbarbutton id="panelUI_menu_restartBrowser"
 					label="&restartBrowserButton.label;"
 					oncommand="gCyberfoxCustom.restartBrowser();"
 					insertbefore="PanelUI-quit"
 				    tooltiptext="&restartBrowserButton.label;"/>
         <toolbarseparator insertbefore="PanelUI-quit"/>
-    </panel>
+    </hbox>
 </overlay>

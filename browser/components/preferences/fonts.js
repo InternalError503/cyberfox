@@ -40,14 +40,14 @@ var gFontsDialog = {
         preference.setAttribute("type", prefs[i].type);
         preferences.appendChild(preference);
       }
-      
+
       if (!prefs[i].element)
         continue;
-        
+
       var element = document.getElementById(prefs[i].element);
       if (element) {
         element.setAttribute("preference", preference.id);
-      
+
         if (prefs[i].fonttype)
           FontBuilder.buildFontList(aLanguageGroup, prefs[i].fonttype, element);
 
@@ -55,20 +55,20 @@ var gFontsDialog = {
       }
     }
   },
-  
+
   readFontLanguageGroup: function ()
   {
     var languagePref = document.getElementById("font.language.group");
     this._selectLanguageGroup(languagePref.value);
     return undefined;
   },
-  
+
   readUseDocumentFonts: function ()
   {
     var preference = document.getElementById("browser.display.use_document_fonts");
     return preference.value == 1;
   },
-  
+
   writeUseDocumentFonts: function ()
   {
     var useDocumentFonts = document.getElementById("useDocumentFonts");
@@ -91,7 +91,7 @@ var gFontsDialog = {
       return prefEl.value > 24 && prefEl.value != prefEl.valueFromPreferences;
     });
     if (!preferences.length) {
-      return;
+      return true;
     }
 
     let strings = document.getElementById("bundlePreferences");

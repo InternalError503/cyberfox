@@ -7,7 +7,6 @@
 var tempScope = {};
 Components.utils.import("resource://gre/modules/LightweightThemeManager.jsm", tempScope);
 var LightweightThemeManager = tempScope.LightweightThemeManager;
-const { REQUIRE_SIGNING } = Components.utils.import("resource://gre/modules/addons/AddonConstants.jsm", {});
 
 var gProvider;
 var gManagerWindow;
@@ -419,7 +418,6 @@ add_task(function*() {
   is_element_hidden(get_node(addon, "pending"), "Pending message should be hidden");
 
   // These tests are only appropriate when signing can be turned off
-  if (!REQUIRE_SIGNING) {
     info("Addon 10");
     addon = items["Test add-on 10"];
     addon.parentNode.ensureElementIsVisible(addon);
@@ -467,7 +465,6 @@ add_task(function*() {
     is_element_hidden(filterButton, "Button for showing disabled unsigned extensions should be hidden");
     is_element_hidden(showAllButton, "Button for showing all extensions should be hidden");
     is_element_hidden(signingInfoUI, "Signing info UI should be hidden");
-  }
 });
 
 // Check the add-ons are now in the right state

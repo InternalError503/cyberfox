@@ -16,6 +16,7 @@
 <!ENTITY Ctr_rr				"Neustart benötigt!">
 <!ENTITY Ctr_window			"Fenster">
 <!ENTITY Ctr_centered		"Zentriert">
+<!ENTITY Ctr_page			"Seite">
 
 <!ENTITY Ctr_cuibuttons		"Schaltflächen">
 <!ENTITY Ctr_cuibutnormal	"Normal">
@@ -57,6 +58,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Werte unter 48 px sorgen meistens für eine fehlerhafte Darstellung!">
 <!ENTITY Ctr_square_edges	"Eckige obere Tabränder">
 <!ENTITY Ctr_tttitlebar		"Tabtitel in der &brandShortName;-Titelleiste">
+<!ENTITY Ctr_ttnooverfl		"Überblendeffekt von langen Tabtiteln entfernen">
 <!ENTITY Ctr_tabinsertion	"Verwandten Tab nach aktivem Tab einfügen">
 <!ENTITY Ctr_emptytfavico	"Lesezeichensymbol auf Tabs zeigen (falls keines vorhanden ist)">
 <!ENTITY Ctr_emptytfavico_n	"Kein Symbol">
@@ -88,17 +90,18 @@
 <!ENTITY Ctr_paneluibtweak	"Menüschaltfläche visuell als &brandShortName;-Schaltfläche …">
 <!ENTITY Ctr_paneluibtweak2	"Menüschaltfläche visuell als &brandShortName;-Schaltfläche (nur Symbol) …">
 <!ENTITY Ctr_paneluibtweak3	"… darstellen, wenn sie sich auf der Tableiste befindet.">
-<!ENTITY Ctr_appbuttonc_o	"Orange Schaltflächenfarbe (Firefox)">
-<!ENTITY Ctr_appbuttonc_a	"Blaue Schaltflächenfarbe (Aurora)">
-<!ENTITY Ctr_appbuttonc_n	"Schwarze Schaltflächenfarbe (Nightly)">
-<!ENTITY Ctr_appbuttonc_t	"Transparente Schaltfläche">
-<!ENTITY Ctr_appbuttonc_p	"Blaue Schaltflächenfarbe (Palemoon)">
-<!ENTITY Ctr_appbuttonc_r	"Rote Schaltflächenfarbe">
-<!ENTITY Ctr_appbuttonc_g	"Grüne Schaltflächenfarbe">
-<!ENTITY Ctr_appbuttonc_gr	"Graue Schaltflächenfarbe">
-<!ENTITY Ctr_appbuttonc_pu	"Violette Schaltflächenfarbe (Privater Modus)">
-<!ENTITY Ctr_appbuttonc_wh	"Weiße Schaltflächenfarbe">
-<!ENTITY Ctr_appbuttonc_cu	"Eigene Schaltflächenfarbe">
+<!ENTITY Ctr_appbuttonc		"Schaltflächenfarbe">
+<!ENTITY Ctr_appbuttonc_o	"Orange  (Firefox)">
+<!ENTITY Ctr_appbuttonc_a	"Blau (Aurora)">
+<!ENTITY Ctr_appbuttonc_n	"Schwarz (Nightly)">
+<!ENTITY Ctr_appbuttonc_t	"Transparent">
+<!ENTITY Ctr_appbuttonc_p	"Blau (Palemoon)">
+<!ENTITY Ctr_appbuttonc_r	"Rot">
+<!ENTITY Ctr_appbuttonc_g	"Grün">
+<!ENTITY Ctr_appbuttonc_gr	"Grau">
+<!ENTITY Ctr_appbuttonc_pu	"Violett (Privater Modus)">
+<!ENTITY Ctr_appbuttonc_wh	"Weiß">
+<!ENTITY Ctr_appbuttonc_cu	"Eigene">
 <!ENTITY Ctr_appbuttonct	"Eigene Farbe für Schaltfläche auf Symbolleisten">
 <!ENTITY Ctr_appbuttonI1	"Nach einer Änderung wird ein Neustart empfohlen.">
 <!ENTITY Ctr_appbuttonI1e	"Die &brandShortName;-Schaltfläche ist auf der Windows-Titelleiste nicht sichtbar!">
@@ -123,6 +126,8 @@
 <!ENTITY Ctr_altoptionsd	"Standard-Darstellung">
 <!ENTITY Ctr_altoptionsp	"Alternative Darstellung">
 <!ENTITY Ctr_altoptionsw	"Einstellungsseite in einem Fenster öffnen">
+<!ENTITY Ctr_altoptions_hm	"horizontales Menü">
+<!ENTITY Ctr_altoptions_vm	"vertikales Menü">
 <!ENTITY Ctr_altoptionsww	"Breite:">
 <!ENTITY Ctr_altoptionswh	"Höhe:">
 <!ENTITY Ctr_altoptionsi	"Das simulierte Einstellungsfenster ist kein Dialogfenster mehr, sondern ein leistenloses normales Fenster. Die Leistenschaltfläche 'Einstellungen' wird durch 'Einstellungen (Fenster)' ersetzt. Diese Schaltfläche muss einmalig im Modus 'Anpassen' zur Menüleiste hinzugefügt werden.">
@@ -179,7 +184,7 @@
 <!ENTITY Ctr_osearch_iwidth	"Pop-up-Breite automatisch der Suchfeldbreite anpassen">
 <!ENTITY Ctr_osearch_cwidth	"Eigene Breite für Such-Pop-ups">
 <!ENTITY Ctr_osearch_dm		"Kleinere Aufklapp-Schaltfläche">
-<!ENTITY Ctr_addonmanager	"Add-ons-Manager">
+<!ENTITY Ctr_addonmanager	"Add-ons-Verwaltung">
 <!ENTITY Ctr_alt_addonsp	"'Mehr Details'-Seite: Alternative Anordnung">
 <!ENTITY Ctr_am_showrecup	"'Zuletzt durchgeführte Updates' immer anzeigen">
 <!ENTITY Ctr_alt_addonsm	"Alternative Darstellung">
@@ -260,6 +265,7 @@
 <!ENTITY Ctr_urlbardropm2	"Aufklapp-Schaltfläche immer anzeigen">
 <!ENTITY Ctr_altreaderico	"Alternatives Symbol für die 'Lesemodus'-Schaltfläche">
 <!ENTITY Ctr_hideurlzoom	"Zoom-Schaltfläche verstecken (falls vorhanden)">
+<!ENTITY Ctr_urlbardark		"Dunkle Hintergrundfarbe">
 <!ENTITY Ctr_hideprbutton	"'Infosymbol' verstecken (wenn ein Pop-up-Fenster blockiert wurde)">
 <!ENTITY Ctr_locsearchbw10	"Höhe der Adress- und Suchleiste reduzieren (experimentell)">
 <!ENTITY Ctr_urlbar_ib		"Schaltfläche zur Webseitenidentität">
@@ -277,11 +283,12 @@
 <!ENTITY Ctr_padlock_mod	"modern">
 <!ENTITY Ctr_padlock_ext	"'&brandShortName;'-Symbol für gültige 'about:'-Seiten">
 <!ENTITY Ctr_icopageinfo	"Globus-/Lesezeichen-/'i'-Symbol: 'Seiteninfo'-Fenster per Klick öffnen">
-<!ENTITY Ctr_lbsbsize		"Benutzerdefinierte Breite für Adressleiste und Suchleiste">
+<!ENTITY Ctr_lbsbsize		"Benutzerdefinierte Breite">
 <!ENTITY Ctr_searchbar		"Suchleiste">
 <!ENTITY Ctr_autocomplete	"Autovervollständigungs-Pop-up">
 <!ENTITY Ctr_altautocompl	"Alternative Darstellung">
 <!ENTITY Ctr_autocompl_it	"'Mit ... suchen'- und 'Aufrufen'-Elemente entfernen (falls vorhanden)">
+<!ENTITY Ctr_acompl_search	"Suchmaschinen anzeigen">
 <!ENTITY Ctr_autocompl_hl	"Hervorhebung von Texttreffern">
 <!ENTITY Ctr_autocompl_rhl	"Blaue 'Aero'-Farben für hervorgehobene Ergebnisse">
 <!ENTITY Ctr_autocompl_not	"Seitentitel verbergen">
@@ -290,7 +297,7 @@
 <!ENTITY Ctr_lbsugresi		"Höhenlimit deaktivieren">
 <!ENTITY Ctr_cresultshcb	"Eigenes Höhenlimit setzen: ">
 <!ENTITY Ctr_lbsugres		"Anzahl der Vorschläge">
-<!ENTITY Ctr_lbsbradius		"Benutzerdefinierte Krümmung für Adressleisten- und Suchleistenrand">
+<!ENTITY Ctr_lbsbradius		"Benutzerdefinierter Rundungsgrad">
 
 <!ENTITY Ctr_menubar_items	"Position der Menüeinträge">
 <!ENTITY Ctr_extrabar		"Extraleisten">
@@ -354,12 +361,11 @@
 <!ENTITY Ctr_lessaddonsbar	"Leistenhöhe verringern">
 <!ENTITY Ctr_addonbarfs		"Im 'Vollbildmodus'">
 
-<!ENTITY Ctr_animation		"Animationen">
-<!ENTITY Ctr_tabthrobber	"Standard-Ladeanzeige">
-<!ENTITY Ctr_bmanimation	"'Lesezeichen hinzufügen'">
-<!ENTITY Ctr_pananimation	"'Panel-Aufklappmenü öffnen'">
-<!ENTITY Ctr_tabanimation	"'Tab schließen und öffnen'">
-<!ENTITY Ctr_dlanimation	"'Download gestartet und beendet'">
+<!ENTITY Ctr_tabthrobber	"Ladeanzeige">
+<!ENTITY Ctr_bmanimation	"'Lesezeichen hinzufügen'-Animation">
+<!ENTITY Ctr_pananimation	"'Panel-Aufklappmenü öffnen'-Animation">
+<!ENTITY Ctr_tabanimation	"'Tab schließen und öffnen'-Animation">
+<!ENTITY Ctr_dlanimation	"'Download gestartet und beendet'-Animation">
 <!ENTITY Ctr_fsanimation	"'Vollbild-Animationen'">
 <!ENTITY Ctr_fsaduration	"'Vollbild-Animationen' für HTML5-Inhalte">
 
@@ -378,14 +384,13 @@
 <!ENTITY Ctr_fx38pocket2	"Info: Das Verschieben der 'Pocket'-Schaltfläche zu den nicht verwendeten Schaltflächen im 'Anpassen-Modus' vor der Deaktivierung dieser Option entfernt zusätzlich die 'Pocket'-Einträge aus den Lesezeichen- und 'Lese'-Bereichen.">
 <!ENTITY Ctr_e_loop			"'Hello' / Anruf- und Konversationsfunktionen / Loop">
 <!ENTITY Ctr_e_readermode	"Lesemodus">
+<!ENTITY Ctr_e_geolocation	"Standortbestimmung">
 <!ENTITY Ctr_e_pocket		"Pocket">
-<!ENTITY Ctr_e_tabsaudioico	"Audio-Abspiel-Symbol auf Tabs">
+<!ENTITY Ctr_e_tabsaudioico	"Audio-Abspiel-Symbol">
 <!ENTITY Ctr_e_containertab	"'Tab in Umgebung' / 'Kontainer-Tabs'">
 <!ENTITY Ctr_e_findbarhl	"Seitensuchhervorhebung">
 <!ENTITY Ctr_fx50findbarhl	"Das Deaktivieren dieser Optionen entfernt die 'Seitensuchhervorhebung'.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_e_oneoffsearch	"Suchauswahl im Autovervollständigungs-Pop-up">
-<!ENTITY Ctr_fx51OOSeach	"Das Deaktivieren dieser Optionen entfernt die Suchauswahl im Autovervollständigungs-Pop-up.">
 
 
 <!ENTITY Ctr_pw_settings	"Einstellungen">
@@ -412,7 +417,7 @@
 <!ENTITY goCmd.label					"Los">
 <!ENTITY Ctr_menu_restart.label			"Neustarten">
 <!ENTITY Ctr_restartapp					"'Neustarten'-Eintrag im '&brandShortName;'- und 'Datei-Menü'">
-<!ENTITY Ctr_ctrnewinv					"Neue Einstellungen in aktueller &brandShortName; Version unterstreichen">
+<!ENTITY Ctr_ctrnewinv					"Einstellungen für diese &brandShortName; Version 'unterstreichen'">
 
 <!ENTITY Ctr_openInCurrentTab			"Eingabe im aktiven Tab öffnen">
 <!ENTITY Ctr_openInNewTab				"Eingabe in neuem Tab öffnen">
@@ -432,8 +437,8 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox (default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
 <!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
@@ -474,6 +479,7 @@
 <!ENTITY ctr_abouthome.dark "Dark about:home style">
 <!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
 <!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.apps "No apps on about:home page">
 <!ENTITY ctr_abouthome.logo "No logo on about:home page">
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">

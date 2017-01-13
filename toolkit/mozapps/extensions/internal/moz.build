@@ -25,7 +25,3 @@ if CONFIG['MOZ_WIDGET_TOOLKIT'] != 'android':
     EXTRA_JS_MODULES.addons += [
         'PluginProvider.jsm',
     ]
-
-EXTRA_PP_JS_MODULES.addons += [
-    'AddonConstants.jsm',
-]

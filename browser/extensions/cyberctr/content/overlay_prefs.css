@@ -19,6 +19,7 @@
   font-style:italic;
 }
 
+#ctraddon_pw_square_edges,
 .tabcolorbox,
 .tabhovcolorbox,
 .tabpencolorbox,
@@ -107,7 +108,7 @@
 radio.ctraddontab {
   -moz-appearance: none;
   margin: 0;
-  padding: 1px;
+  padding: 3px 0;
   border: solid 1px transparent;
 }
 
@@ -562,7 +563,8 @@ radio.ctraddontab .radio-check-box1 {
 #ctraddon_pw_altoptions_default label,
 #ctraddon_pw_options_alt label,
 #ctraddon_pw_options_alt2 label,
-#ctraddon_pw_options_alt3 label{
+#ctraddon_pw_options_alt3 label,
+#ctraddon_pw_options_alt4 label{
   background:url('chrome://classic_theme_restorer/content/images/prefs_incontent.png') no-repeat left  !important;
   padding-left:20px !important;
   min-height:16px !important;
@@ -727,6 +729,10 @@ radio.ctraddontab .radio-check-box1 {
 #ctraddon_closeicon_def {
   -moz-margin-end:0;
 }
+#ctraddon_pw_tabthrobber_def{
+  list-style-image:url('chrome://global/skin/icons/loading.png');
+}
+
 #ctraddon_pw_tabthrobber_alt {
   list-style-image:url('chrome://classic_theme_restorer/content/images/throbber-loading-alt.png');
 }
@@ -735,6 +741,9 @@ radio.ctraddontab .radio-check-box1 {
 }
 #ctraddon_pw_tabthrobber_nav{
   list-style-image:url('chrome://classic_theme_restorer/content/images/throbber_loading.png');
+}
+#ctraddon_pw_tabthrobber_ub{
+  list-style-image:url('chrome://classic_theme_restorer/content/images/throbber-loading-ubuntu.png');
 }
 #ctraddon_pw_throbber_loading_1{
   list-style-image:url('chrome://classic_theme_restorer/content/images/cctr/throbber-loading-1.png');

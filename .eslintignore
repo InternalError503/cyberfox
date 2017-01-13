@@ -246,7 +246,6 @@ toolkit/components/urlformatter/nsURLFormatter.js
 toolkit/identity/FirefoxAccounts.jsm
 toolkit/modules/AppConstants.jsm
 toolkit/mozapps/downloads/nsHelperAppDlg.js
-toolkit/mozapps/extensions/internal/AddonConstants.jsm
 toolkit/mozapps/update/tests/data/xpcshellConstantsPP.js
 toolkit/webapps/**
 

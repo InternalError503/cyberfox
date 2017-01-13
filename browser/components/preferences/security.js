@@ -116,11 +116,10 @@ var gSecurityPane = {
       document.getElementById("savePasswords").disabled = true;
       excepts.disabled = true;
       return false;
-    } else {
-      excepts.disabled = !pref.value;
-      // don't override pref value in UI
-      return undefined;
     }
+    excepts.disabled = !pref.value;
+    // don't override pref value in UI
+    return undefined;
   },
 
   /**
@@ -255,7 +254,6 @@ var gSecurityPane = {
    */
   _removeMasterPassword: function ()
   {
-    const Cc = Components.classes, Ci = Components.interfaces;
     var secmodDB = Cc["@mozilla.org/security/pkcs11moduledb;1"].
                    getService(Ci.nsIPKCS11ModuleDB);
     if (secmodDB.isFIPSEnabled) {

@@ -59,7 +59,7 @@
       <preference id="network.proxy.backup.socks"        name="network.proxy.backup.socks"        type="string"/>
       <preference id="network.proxy.backup.socks_port"   name="network.proxy.backup.socks_port"   type="int"/>
     </preferences>
-    
+
     <script type="application/javascript" src="chrome://browser/content/preferences/connection.js"/>
 
     <stringbundle id="preferencesBundle" src="chrome://browser/locale/preferences/preferences.properties"/>
@@ -156,7 +156,7 @@
                    oninput="gConnectionsDialog.updateReloadButton();"/>
           <button id="autoReload" icon="refresh"
                   label="&reload.label;" accesskey="&reload.accesskey;"
-                  oncommand="gConnectionsDialog.reloadPAC();" 
+                  oncommand="gConnectionsDialog.reloadPAC();"
                   preference="pref.advanced.proxies.disable_button.reload"/>
         </hbox>
       </radiogroup>
@@ -171,4 +171,3 @@
     <separator/>
   </prefpane>
 </prefwindow>
-

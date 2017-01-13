@@ -6,6 +6,13 @@
 	#urlbar-wrapper #urlbar[pageproxystate="valid"] .chromeUI {
       background: linear-gradient(#fcfcfc,#d4d4d4) !important;
       border-image-source: none !important;
+	  color: black !important;
+	}
+	
+	#urlbar-wrapper #urlbar[pageproxystate="invalid"] .unknownIdentity:not(.mixedDisplayContentLoadedActiveBlocked) #identity-icon,
+	#urlbar-wrapper #urlbar[pageproxystate="valid"] .unknownIdentity:not(.mixedDisplayContentLoadedActiveBlocked) #identity-icon, 
+	#urlbar-wrapper #urlbar[pageproxystate="valid"] .chromeUI #identity-icon{
+      background-color: unset !important;
 	}
 	
 	#main-window:not([fx50plus="true"]) #urlbar-wrapper #urlbar[pageproxystate="invalid"] .unknownIdentity:not(.mixedDisplayContentLoadedActiveBlocked),
@@ -34,6 +41,13 @@
 	#main-window[fx50plus="true"] #urlbar-wrapper #urlbar[pageproxystate="valid"]  :-moz-any(.urlbar-input-box, #urlbar-display-box),
 	#main-window[fx50plus="true"] #urlbar-wrapper #urlbar[pageproxystate="invalid"]  :-moz-any(.urlbar-input-box, #urlbar-display-box) {
 	  border-image: unset !important;
+	}
+	
+	@media (-moz-os-version: windows-win10) {
+		.urlbar-textbox-container {
+		  margin-top: -1px !important;
+		  margin-bottom: -1px !important;
+		}
 	}
 
 }

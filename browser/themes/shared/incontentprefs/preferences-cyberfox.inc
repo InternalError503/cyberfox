@@ -30,7 +30,7 @@
   -moz-image-region: rect(0, 320px, 40px, 280px);
 }
 
-#header-application > .header-icon {
+#header-applications > .header-icon {
   -moz-image-region: rect(0, 120px, 40px, 80px);
 }
 
@@ -67,7 +67,7 @@
   -moz-image-region: rect(0, 640px, 80px, 560px);
 }  
   
-  #header-application > .header-icon {
+  #header-applications > .header-icon {
     -moz-image-region: rect(0, 240px, 80px, 160px);
   }
 

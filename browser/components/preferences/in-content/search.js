@@ -222,6 +222,8 @@ var gSearchPane = {
       let newValue = !gEngineView._engineStore.engines[index].shown;
       gEngineView.setCellValue(index, tree.columns.getFirstColumn(),
                                newValue.toString());
+      // Prevent page from scrolling on the space key.
+      aEvent.preventDefault();
     }
     else {
       let isMac = Services.appinfo.OS == "Darwin";
@@ -535,9 +537,8 @@ EngineView.prototype = {
     if (dropIndex > sourceIndex) {
       if (orientation == nsITreeView.DROP_BEFORE)
         dropIndex--;
-    } else {
-      if (orientation == nsITreeView.DROP_AFTER)
-        dropIndex++;
+    } else if (orientation == nsITreeView.DROP_AFTER) {
+      dropIndex++;
     }
 
     this._engineStore.moveEngine(sourceEngine, dropIndex);

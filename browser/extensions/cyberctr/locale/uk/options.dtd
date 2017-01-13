@@ -16,6 +16,7 @@
 <!ENTITY Ctr_rr				"Перезапустіть &brandShortName;!">
 <!ENTITY Ctr_window			"вікно">
 <!ENTITY Ctr_centered		"По центру">
+<!ENTITY Ctr_page			"Сторінка">
 
 <!ENTITY Ctr_cuibuttons		"Кнопки">
 <!ENTITY Ctr_cuibutnormal	"Нормальні">
@@ -57,6 +58,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Значення нижче 48пікс викличе збої в більшості випадків!">
 <!ENTITY Ctr_square_edges	"Квадратні верхні кути">
 <!ENTITY Ctr_tttitlebar		"Заголовок вкладки на панелі заголовку &brandShortName;">
+<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
 <!ENTITY Ctr_tabinsertion	"Вставити відповідну вкладку після поточної вкладки">
 <!ENTITY Ctr_emptytfavico	"Показувати іконку сайту (якщо сайт не пропонує його)">
 <!ENTITY Ctr_emptytfavico_n	"Немає">
@@ -88,17 +90,18 @@
 <!ENTITY Ctr_paneluibtweak	"Оранжева кнопка меню на панелі вкладок">
 <!ENTITY Ctr_paneluibtweak2	"Оранжева кнопка меню на панелі вкладок (тільки іконка)">
 <!ENTITY Ctr_paneluibtweak3	"...коли на панелі вкладок">
-<!ENTITY Ctr_appbuttonc_o	"Оранжева кнопка (Firefox)">
-<!ENTITY Ctr_appbuttonc_a	"Синя кнопка (Aurora)">
-<!ENTITY Ctr_appbuttonc_n	"Чорна кнопка (Nightly)">
-<!ENTITY Ctr_appbuttonc_t	"Прозора кнопка">
-<!ENTITY Ctr_appbuttonc_p	"Блакитна кнопка (Palemoon)">
-<!ENTITY Ctr_appbuttonc_r	"Червона кнопка">
-<!ENTITY Ctr_appbuttonc_g	"Зелена кнопка">
-<!ENTITY Ctr_appbuttonc_gr	"Сіра кнопка">
-<!ENTITY Ctr_appbuttonc_pu	"Фіолетова кнопка">
-<!ENTITY Ctr_appbuttonc_wh	"Біла кнопка">
-<!ENTITY Ctr_appbuttonc_cu	"Вибрати колір кнопки">
+<!ENTITY Ctr_appbuttonc		"Кнопка">
+<!ENTITY Ctr_appbuttonc_o	"Оранжева (Firefox)">
+<!ENTITY Ctr_appbuttonc_a	"Синя (Aurora)">
+<!ENTITY Ctr_appbuttonc_n	"Чорна (Nightly)">
+<!ENTITY Ctr_appbuttonc_t	"Прозора">
+<!ENTITY Ctr_appbuttonc_p	"Блакитна (Palemoon)">
+<!ENTITY Ctr_appbuttonc_r	"Червона">
+<!ENTITY Ctr_appbuttonc_g	"Зелена">
+<!ENTITY Ctr_appbuttonc_gr	"Сіра">
+<!ENTITY Ctr_appbuttonc_pu	"Фіолетова">
+<!ENTITY Ctr_appbuttonc_wh	"Біла">
+<!ENTITY Ctr_appbuttonc_cu	"Вибрати колір">
 <!ENTITY Ctr_appbuttonct	"Налаштовуваний колір кнопки на панелі">
 <!ENTITY Ctr_appbuttonI1	"рекомендовано перезапуск">
 <!ENTITY Ctr_appbuttonI1e	"Не видно в рядку заголовку Windows OS, тільки в &brandShortName; заголовку!">
@@ -123,6 +126,8 @@
 <!ENTITY Ctr_altoptionsd	"Типовий вигляд">
 <!ENTITY Ctr_altoptionsp	"Альтернативний вигляд">
 <!ENTITY Ctr_altoptionsw	"Відкрити сторінку налаштувань у новому вікні">
+<!ENTITY Ctr_altoptions_hm	"горизонтальне меню">
+<!ENTITY Ctr_altoptions_vm	"вертикальне меню">
 <!ENTITY Ctr_altoptionsww	"Ширина">
 <!ENTITY Ctr_altoptionswh	"Висота">
 <!ENTITY Ctr_altoptionsi	"Вікно змодельованих параметрів не є більше діалогом, але «вікно браузера» з усіма панелями інструментів приховані. Функція «Використовувати поточну сторінку» тільки додає URL-адреси сторінок, відкритих в поточному вікні, які є тільки «about:preferences» в цьому випадку. Кнопка «Параметри» панелі інструментів замінюється на нову, щоб бути в змозі відкрити параметри у вікні.">
@@ -260,6 +265,7 @@
 <!ENTITY Ctr_urlbardropm2	"Зробити позначку випадного списку завжди видимою">
 <!ENTITY Ctr_altreaderico	"Альтернативні іконки «Читача»">
 <!ENTITY Ctr_hideurlzoom	"Приховати кнопку зміни розміру (якщо є)">
+<!ENTITY Ctr_urlbardark		"Dark background color">
 <!ENTITY Ctr_hideprbutton	"Приховати інфо кнопку «спливаюче вікно блоковано»">
 <!ENTITY Ctr_locsearchbw10	"Зменшити висоту панелей рядку адреси та пошуку (експериментальне)">
 <!ENTITY Ctr_urlbar_ib		"Індикатори справжності панелі рядку адреси">
@@ -277,11 +283,12 @@
 <!ENTITY Ctr_padlock_mod	"сучасний">
 <!ENTITY Ctr_padlock_ext	"Іконка «&brandShortName;» для дійсних «Про...» сторінок">
 <!ENTITY Ctr_icopageinfo	"Іконка сайту, глобальна та «i» іконки: «клік» відкриває «вікно інформації про сторінку»">
-<!ENTITY Ctr_lbsbsize		"Налаштовувана ширина для панелей рядку адреси та пошуку">
+<!ENTITY Ctr_lbsbsize		"Налаштовувана ширина">
 <!ENTITY Ctr_searchbar		"Панель пошуку">
 <!ENTITY Ctr_autocomplete	"Спливаюче вікно автозаповнення">
 <!ENTITY Ctr_altautocompl	"Альтернативний вигляд">
 <!ENTITY Ctr_autocompl_it	"Усунути пункти «Шукати з...» та «Відвідати» (якщо присутні)">
+<!ENTITY Ctr_acompl_search	"Показати пошукові рушії">
 <!ENTITY Ctr_autocompl_hl	"Виділення текстових результатів">
 <!ENTITY Ctr_autocompl_rhl	"Кольори Aero для виділених результатів">
 <!ENTITY Ctr_autocompl_not	"Приховати заголовок сторінки">
@@ -290,7 +297,7 @@
 <!ENTITY Ctr_lbsugresi		"Вимкнути обмеження висоти">
 <!ENTITY Ctr_cresultshcb	"Налаштовуване обмеження висоти: ">
 <!ENTITY Ctr_lbsugres		"Кількість результатів">
-<!ENTITY Ctr_lbsbradius		"Налаштовуваний радіус рамки для панелей адреси та пошуку">
+<!ENTITY Ctr_lbsbradius		"Налаштовуваний радіус рамки">
 
 <!ENTITY Ctr_menubar_items	"Позиція пунктів меню">
 <!ENTITY Ctr_extrabar		"Додаткові панелі інструментів">
@@ -354,8 +361,7 @@
 <!ENTITY Ctr_lessaddonsbar	"Зменшити висоту">
 <!ENTITY Ctr_addonbarfs		"У повноекранному режимі">
 
-<!ENTITY Ctr_animation		"Анімація">
-<!ENTITY Ctr_tabthrobber	"Типове зображення завантаження">
+<!ENTITY Ctr_tabthrobber	"Зображення завантаження">
 <!ENTITY Ctr_bmanimation	"Анімація створення закладок">
 <!ENTITY Ctr_pananimation	"Анімація відкривання панелі">
 <!ENTITY Ctr_tabanimation	"Анімація відкривання/закривання вкладок">
@@ -378,14 +384,13 @@
 <!ENTITY Ctr_fx38pocket2	"Примітка: Переміщення кнопки «Кишеня» на сторінку «Пристосувати &brandShortName;» перед вимкненням цього налаштування також усуває написи «Кишеня» в закладках і меню читання.">
 <!ENTITY Ctr_e_loop			"Виклик та сеанс зв’язку">
 <!ENTITY Ctr_e_readermode	"Режим читання">
+<!ENTITY Ctr_e_geolocation	"Геолокація">
 <!ENTITY Ctr_e_pocket		"Кишеня">
 <!ENTITY Ctr_e_tabsaudioico	"Іконка аудіовідтворення на вкладках">
 <!ENTITY Ctr_e_containertab	"Контейнерні вкладки">
 <!ENTITY Ctr_e_findbarhl	"Підсвічування в пошуковій панелі">
 <!ENTITY Ctr_fx50findbarhl	"Вимкнення цього параметру усуває «підсвічувальні» особливості пошукової панелі.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_e_oneoffsearch	"Автозавершення спливаючих вікон пошукового вибору">
-<!ENTITY Ctr_fx51OOSeach	"Вимкнення цього параметру усуває пошуковий вибір зі спливаючого вікна панелей розташування.">
 
 
 <!ENTITY Ctr_pw_settings	"Налаштування">
@@ -432,8 +437,8 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox (default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
 <!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
@@ -474,6 +479,7 @@
 <!ENTITY ctr_abouthome.dark "Dark about:home style">
 <!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
 <!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.apps "No apps on about:home page">
 <!ENTITY ctr_abouthome.logo "No logo on about:home page">
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">

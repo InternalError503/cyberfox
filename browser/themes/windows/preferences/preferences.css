@@ -162,6 +162,146 @@ label.small {
 
 /* Sync Pane */
 
+#fxaProfileImage {
+  max-width: 60px;
+  border-radius: 50%;
+  list-style-image: url(chrome://browser/skin/fxa/default-avatar.svg);
+  margin-inline-end: 15px;
+  image-rendering: -moz-crisp-edges;
+}
+
+#fxaLoginStatus[hasName] #fxaProfileImage {
+  max-width: 80px;
+}
+
+#fxaProfileImage.actionable {
+  cursor: pointer;
+}
+
+#fxaProfileImage.actionable:hover {
+  box-shadow: 0px 0px 0px 1px #0095DD;
+}
+
+#fxaProfileImage.actionable:hover:active {
+  box-shadow: 0px 0px 0px 1px #ff9500;
+}
+
+#fxaContentWrapper {
+  -moz-box-flex: 1;
+}
+
+#noFxaGroup {
+  -moz-box-flex: 1;
+  margin: 0;
+}
+
+#fxaContentWrapper {
+  padding-right: 15px;
+}
+
+#noFxaGroup > vbox,
+#fxaGroup {
+  -moz-box-align: start;
+}
+
+#fxaSyncEngines > vbox:first-child {
+  margin-right: 80px;
+}
+
+#fxaSyncComputerName {
+  margin-inline-start: 0px;
+  -moz-box-flex: 1;
+}
+
+#tosPP-small-ToS {
+  margin-bottom: 14px;
+}
+
+#noFxaCaption {
+  font-weight: bold;
+  margin-bottom: 11px;
+}
+
+.fxaSyncIllustration {
+  margin-top: 35px;
+}
+
+#syncOptions caption {
+  margin-bottom: 11px;
+}
+
+#fxaDeviceName {
+  margin-bottom: 27.5px;
+}
+
+#noFxaDescription {
+  margin-bottom: 20px !important;
+}
+
+.fxaAccountBox {
+  padding: 14px 20px 14px 14px;
+}
+
+#signedOutAccountBoxTitle {
+  font-weight: bold;
+}
+
+.fxaAccountBoxButtons {
+  margin-bottom: 0 !important;
+  margin-top: 11px;
+}
+
+.fxaAccountBoxButtons > * {
+  -moz-box-flex: 1;
+}
+
+.fxaAccountBoxButtons > button {
+  text-align: center;
+  padding-left: 11px;
+  padding-right: 11px;
+  margin: 0;
+  min-width: 0;
+}
+
+.fxaAccountBoxButtons > button:first-child {
+  margin-right: 14px !important;
+}
+
+#fxaLoginStatus[hasName] #fxaEmailAddress1 {
+  font-size: 1.1rem;
+}
+
+#fxaEmailAddress1,
+#fxaEmailAddress2,
+#fxaEmailAddress3 {
+  word-break: break-all;
+}
+
+.fxaFirefoxLogo {
+  list-style-image: url(chrome://browser/skin/fxa/logo.png);
+  max-width: 64px;
+  margin-inline-end: 14px;
+}
+
+#fxaLoginRejectedWarning {
+  list-style-image: url(chrome://browser/skin/warning.svg);
+  filter: drop-shadow(0 1px 0 hsla(206, 50%, 10%, .15));
+  margin: 4px 8px 0px 0px;
+}
+
+#fxaProfileImage {
+  -moz-user-focus: normal;
+}
+
+#syncOptions {
+  margin-bottom: 27.5px;
+}
+
+#tosPP-small {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 #syncDesc {
   padding: 0 8em;
 }

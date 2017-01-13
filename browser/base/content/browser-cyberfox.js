@@ -444,9 +444,9 @@ var gCyberfoxCustom = {
                 // Set Global to disable update checks entirely 
                 if (Services.prefs.getBoolPref("app.update.check.enabled") && aBoolean === true) {
 														
-						var curTime = new Date(); // Increase time between checks by 2 hours.
-						if 	(Services.prefs.getCharPref("app.update.startup.lastcheck") <= curTime.getHours()) {
-											Services.prefs.setCharPref("app.update.startup.lastcheck", curTime.getHours() + 2);
+						var curTime = new Date();
+						if 	(Services.prefs.getCharPref("app.update.startup.lastcheck") != curTime.getHours()) {
+											Services.prefs.setCharPref("app.update.startup.lastcheck", curTime.getHours());
 							// Get Latest Browser Version
 							var url = Services.prefs.getCharPref("app.update.check.url");
 							var request = new XMLHttpRequest();

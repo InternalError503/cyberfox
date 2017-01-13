@@ -174,7 +174,13 @@ var gAdvancedPane = {
   writeCheckSpelling: function ()
   {
     var checkbox = document.getElementById("checkSpelling");
-    return checkbox.checked ? (this._storedSpellCheck == 2 ? 2 : 1) : 0;
+    if (checkbox.checked) {
+      if (this._storedSpellCheck == 2) {
+        return 2;
+      }
+      return 1;
+    }
+    return 0;
   },
 
   /**
@@ -206,11 +212,11 @@ var gAdvancedPane = {
    */
   updateHardwareAcceleration: function()
   {
-#ifdef XP_WIN
-    var fromPref = document.getElementById("layers.acceleration.disabled");
-    var toPref = document.getElementById("gfx.direct2d.disabled");
-    toPref.value = fromPref.value;
-#endif
+    if (AppConstants.platform = "win") {
+      var fromPref = document.getElementById("layers.acceleration.disabled");
+      var toPref = document.getElementById("gfx.direct2d.disabled");
+      toPref.value = fromPref.value;
+    }
   },
 
   // DATA CHOICES TAB
@@ -461,7 +467,7 @@ var gAdvancedPane = {
       var cache = Components.classes["@mozilla.org/netwerk/cache-storage-service;1"]
                             .getService(Components.interfaces.nsICacheStorageService);
       cache.clear();
-    } catch(ex) {}
+    } catch (ex) {}
     this.updateActualCacheSize();
   },
 

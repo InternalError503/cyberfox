@@ -51,8 +51,7 @@
       data-category="paneContent">
   <image class="header-icon"/>
   <label class="header-name" flex="1">&paneContent.title;</label>
-  <button class="help-button"
-          aria-label="&helpButton.label;"/>
+  <html:a class="help-button" target="_blank" aria-label="&helpButton.label;"></html:a>
 </hbox>
 
 <groupbox id="notificationsGroup" data-category="paneContent" hidden="true">

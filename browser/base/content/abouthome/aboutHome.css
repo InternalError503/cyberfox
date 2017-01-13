@@ -453,6 +453,19 @@ body[narrow] #restorePreviousSession::before {
 	}
 }
 
+/* Adjust about:home gui when resized smaller than 540px wide */
+@media (max-width: 540px) {
+	#searchIconAndTextContainer {
+		width: calc(100% - 50%);
+	}
+	.hmenubar,
+	.headerbar,
+	#brandLogo,
+    #launcher	{
+        display: none!important;
+    }
+}
+
 /* [HiDPI]
  * At resolutions above 1dppx, prefer downscaling the 2x Retina graphics
  * rather than upscaling the original-size ones (bug 818940).

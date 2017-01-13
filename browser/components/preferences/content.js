@@ -4,10 +4,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 XPCOMUtils.defineLazyGetter(this, "AlertsServiceDND", function () {
+  var {interfaces: Ci, utils: Cu, classes: Cc, results: Cr} = Components;
   try {
-    let alertsService = Components.classes["@mozilla.org/alerts-service;1"]
-                          .getService(Components.interfaces.nsIAlertsService)
-                          .QueryInterface(Components.interfaces.nsIAlertsDoNotDisturb);
+    let alertsService = Cc["@mozilla.org/alerts-service;1"]
+                          .getService(Ci.nsIAlertsService)
+                          .QueryInterface(Ci.nsIAlertsDoNotDisturb);
     // This will throw if manualDoNotDisturb isn't implemented.
     alertsService.manualDoNotDisturb;
     return alertsService;

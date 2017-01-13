@@ -16,6 +16,7 @@
 <!ENTITY Ctr_rr				"Startujće &brandShortName; znowa!">
 <!ENTITY Ctr_window			"wokno">
 <!ENTITY Ctr_centered		"Centrowano">
+<!ENTITY Ctr_page			"Strona">
 
 <!ENTITY Ctr_cuibuttons		"Tłóčatka">
 <!ENTITY Ctr_cuibutnormal	"Normalny">
@@ -57,6 +58,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Hódnoty pod 48px w najwjace padach zwobraznjenske zmylki zawinuja!">
 <!ENTITY Ctr_square_edges	"Kwadratiske hornje róžki">
 <!ENTITY Ctr_tttitlebar		"Rajtarkowy titul w titulne lajsće &brandShortName;">
+<!ENTITY Ctr_ttnooverfl		"Přeběžkowy efekt z dołhich rajtarkowych titulow wotstronić">
 <!ENTITY Ctr_tabinsertion	"Přiwuzny rajtark za aktualnym rajtarkom zasadźić">
 <!ENTITY Ctr_emptytfavico	"Faworitowy symbol pokazać (jeli sydło žadyn njepodawa)">
 <!ENTITY Ctr_emptytfavico_n	"Žadyn">
@@ -88,17 +90,18 @@
 <!ENTITY Ctr_paneluibtweak	"Menijowe tłóčatko jako tłóčatko &brandShortName; pokazać,...">
 <!ENTITY Ctr_paneluibtweak2	"Menijowe tłóčatko jako tłóčatko &brandShortName; pokazać (jenož symbol),...">
 <!ENTITY Ctr_paneluibtweak3	"...hdyž je na rajtarkowej lajsće">
-<!ENTITY Ctr_appbuttonc_o	"Tłóčatkowa barba: Oranžowy (Firefox)">
-<!ENTITY Ctr_appbuttonc_a	"Tłóčatkowa barba: Módry (Aurora)">
-<!ENTITY Ctr_appbuttonc_n	"Tłóčatkowa barba: Čorny (Nightly)">
-<!ENTITY Ctr_appbuttonc_t	"Transparentne tłóčatko">
-<!ENTITY Ctr_appbuttonc_p	"Tłóčatkowa barba: Módry (Palemoon)">
-<!ENTITY Ctr_appbuttonc_r	"Tłóčatkowa barba: Čerwjeny">
-<!ENTITY Ctr_appbuttonc_g	"Tłóčatkowa barba: Zeleny">
-<!ENTITY Ctr_appbuttonc_gr	"Tłóčatkowa barba: Šěry">
-<!ENTITY Ctr_appbuttonc_pu	"Tłóčatkowa barba: Purpur">
-<!ENTITY Ctr_appbuttonc_wh	"Tłóčatkowa barba: Běły">
-<!ENTITY Ctr_appbuttonc_cu	"Swójska tłóčatkowa barba">
+<!ENTITY Ctr_appbuttonc		"Tłóčatkowa barba">
+<!ENTITY Ctr_appbuttonc_o	"Oranžowy (Firefox)">
+<!ENTITY Ctr_appbuttonc_a	"Módry (Aurora)">
+<!ENTITY Ctr_appbuttonc_n	"Čorny (Nightly)">
+<!ENTITY Ctr_appbuttonc_t	"Transparentne">
+<!ENTITY Ctr_appbuttonc_p	"Módry (Palemoon)">
+<!ENTITY Ctr_appbuttonc_r	"Čerwjeny">
+<!ENTITY Ctr_appbuttonc_g	"Zeleny">
+<!ENTITY Ctr_appbuttonc_gr	"Šěry">
+<!ENTITY Ctr_appbuttonc_pu	"Purpur">
+<!ENTITY Ctr_appbuttonc_wh	"Běły">
+<!ENTITY Ctr_appbuttonc_cu	"Swójska">
 <!ENTITY Ctr_appbuttonct	"Swójska barba za tłóčatko na symbolowej lajsće">
 <!ENTITY Ctr_appbuttonI1	"Nowy start doporučeny">
 <!ENTITY Ctr_appbuttonI1e	"Jenož widźomny w titulnej lajsće &brandShortName;, nic na titulnej lajsće dźěłoweho systema Windows!">
@@ -123,6 +126,8 @@
 <!ENTITY Ctr_altoptionsd	"Standardny zwonkowny napohlad">
 <!ENTITY Ctr_altoptionsp	"Alternatiwny zwonkowny napohlad">
 <!ENTITY Ctr_altoptionsw	"Strona nastajenjow we woknje wočinić">
+<!ENTITY Ctr_altoptions_hm	"horicontalny meni">
+<!ENTITY Ctr_altoptions_vm	"wertikalny meni">
 <!ENTITY Ctr_altoptionsww	"Šěrokosć">
 <!ENTITY Ctr_altoptionswh	"Wysokosć">
 <!ENTITY Ctr_altoptionsi	"Simulowane wokno nastajenjow dialog hižo njeje, ale 'wobhladowakowe wokno', hdźež wšě symbolowe lajsty su schowane. Funkcija 'Aktualnu stronu wužiwać' přidawa jenož URL stronow, kotrež so w aktualnym woknje wočinjeja, kotrež je w tutym padźe jenož 'about:preferences'. 'Tłóčatko symboloweje lajsty Nastajenja' so přez nowe wuměnja, zo bychu so nastajenja we woknje wočinili.">
@@ -201,7 +206,7 @@
 <!ENTITY Ctr_bmbunsortbm2	"Meni nad zapołožkami">
 <!ENTITY Ctr_bmbviewbmsb	"Wuskakowacy meni: 'Bóčnicu zapołožkow pokazać' pokazać">
 <!ENTITY Ctr_bmbviewbmtb	"Wuskakowacy meni: 'Lajstu zapołožkow pokazać' pokazać">
-<!ENTITY Ctr_bmbnounsort	"Wuskakowcy meni: 'Druhe zapołožki' schować">
+<!ENTITY Ctr_bmbnounsort	"Wuskakowacy meni: 'Druhe zapołožki' schować">
 <!ENTITY Ctr_bmbutnotext	"Tekst na lajśce zapołožkow schować">
 <!ENTITY Ctr_skipprintpr	"Ćišćerske tłóčatko: Ćišćerski přehlad přeskočić">
 <!ENTITY Ctr_tbconmenu		"Kontekstowy meni symboloweje lajsty: 'Do menija přesunyć', 'Ze symboloweje lajsty wotstronić', 'Wšě rajtarki znowa začitać/jako zapołožki składować' a 'Začinjenje rajtarka cofnyć' schować">
@@ -260,6 +265,7 @@
 <!ENTITY Ctr_urlbardropm2	"Tłóčatko šipkoweho kónčka přeco pokazać">
 <!ENTITY Ctr_altreaderico	"Alternatiwne 'čitakowe' symbole">
 <!ENTITY Ctr_hideurlzoom	"Skalowanske tłóčatko schować (jeli eksistuje)">
+<!ENTITY Ctr_urlbardark		"Ćmowa pozadkowa barba">
 <!ENTITY Ctr_hideprbutton	"Zdźělenski symbol schować, hdyž so wuskakowace wokno blokuje">
 <!ENTITY Ctr_locsearchbw10	"Wysokosć adresowych a pytanskich polow redukować (eksperimentelne)">
 <!ENTITY Ctr_urlbar_ib		"Tłóčatko sydłoweje identity">
@@ -277,11 +283,12 @@
 <!ENTITY Ctr_padlock_mod	"moderny">
 <!ENTITY Ctr_padlock_ext	"Symbol '&brandShortName;' za płaćiwe strony 'about'">
 <!ENTITY Ctr_icopageinfo	"Faworitowy symbol/globusowy symbol/'i'-symbol: 'Kliknjenje' wokno 'Info wo stronje' wočinja">
-<!ENTITY Ctr_lbsbsize		"Swójska šěrokosć za adresowe polo a pytanske polo">
+<!ENTITY Ctr_lbsbsize		"Swójska šěrokosć">
 <!ENTITY Ctr_searchbar		"Pytanske polo">
 <!ENTITY Ctr_autocomplete	"Wuskakowace wokno awtowudospołnjenja">
 <!ENTITY Ctr_altautocompl	"Alternatiwny napohlad">
 <!ENTITY Ctr_autocompl_it	"Zapiski 'Pytać z...' and 'Wopytać' wotstronić (jeli eksistujetej)">
+<!ENTITY Ctr_acompl_search	"Pytawy pokazać">
 <!ENTITY Ctr_autocompl_hl	"Wuzběhnjenje tekstowych wotpowědnikow">
 <!ENTITY Ctr_autocompl_rhl	"Aero-barby za wuzběhnjene wuslědki">
 <!ENTITY Ctr_autocompl_not	"Titul strony schować">
@@ -290,7 +297,7 @@
 <!ENTITY Ctr_lbsugresi		"Limit wysokosće znjemóžnić">
 <!ENTITY Ctr_cresultshcb	"Swójski limit wysokosće: ">
 <!ENTITY Ctr_lbsugres		"Ličba wuslědkow">
-<!ENTITY Ctr_lbsbradius		"Swójska ramikowa křiwizna za adresowe polo a pytanske polo">
+<!ENTITY Ctr_lbsbradius		"Swójska ramikowa křiwizna">
 
 <!ENTITY Ctr_menubar_items	"Pozicija menijowych zapiskow">
 <!ENTITY Ctr_extrabar		"Přidatne symbolowe lajsty">
@@ -354,8 +361,7 @@
 <!ENTITY Ctr_lessaddonsbar	"Wysokosć pomjeńšić">
 <!ENTITY Ctr_addonbarfs		"W modusu połneje wobrazowki">
 
-<!ENTITY Ctr_animation		"Animacija">
-<!ENTITY Ctr_tabthrobber	"Standardny začitowanski wobraz">
+<!ENTITY Ctr_tabthrobber	"Začitowanski wobraz">
 <!ENTITY Ctr_bmanimation	"Animacija za 'Zapołožku přidać'">
 <!ENTITY Ctr_pananimation	"Animacija za wočinjenje pola">
 <!ENTITY Ctr_tabanimation	"Animacija za začinjenje/wočinjenje rajtarka">
@@ -378,14 +384,13 @@
 <!ENTITY Ctr_fx38pocket2	"Kedźbu: Přez přesuwanje tłóčatka 'Pocket' do 'přiměrjenskeho wokna' před znjemóžnjenjom tutoho nastajenja wotstroni tež zapiski 'Pocket' w menijomaj zapołožkow a čitanskeho modusa.">
 <!ENTITY Ctr_e_loop			"Hello / Loop / Zawołanje a konwersacija">
 <!ENTITY Ctr_e_readermode	"Čitanski modus">
+<!ENTITY Ctr_e_geolocation	"Postajenje stejnišća">
 <!ENTITY Ctr_e_pocket		"Pocket">
-<!ENTITY Ctr_e_tabsaudioico	"Symbol za awdiowothrawanje na rajtarkach">
+<!ENTITY Ctr_e_tabsaudioico	"Symbol za awdiowothrawanje">
 <!ENTITY Ctr_e_containertab	"Kontejnerowe rajtarki">
 <!ENTITY Ctr_e_findbarhl	"Wuzběhnjenje pytanskeho pola">
 <!ENTITY Ctr_fx50findbarhl	"Hdyž so tute nastajenja znjemóžnja, so 'wuzběhnjenske' funkcije wotstronja.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_e_oneoffsearch	"Pytanski wuběr we wudospołnjowanskim wuskakowacym woknje">
-<!ENTITY Ctr_fx51OOSeach	"Hdyž tute nastajenje znjemóžnjeće, so pytanski wuběr awtowudospołnjowaceho wuskakowaceho wokna adresoweho pola wotstronja.">
 
 
 <!ENTITY Ctr_pw_settings	"Nastajenja">
@@ -432,8 +437,8 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (default)">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox (default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
 <!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
@@ -474,6 +479,7 @@
 <!ENTITY ctr_abouthome.dark "Dark about:home style">
 <!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
 <!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.apps "No apps on about:home page">
 <!ENTITY ctr_abouthome.logo "No logo on about:home page">
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">

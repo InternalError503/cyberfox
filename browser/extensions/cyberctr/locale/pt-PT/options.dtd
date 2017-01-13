@@ -1,0 +1,517 @@
+<!ENTITY % overlayDTD
+    SYSTEM "chrome://classic_theme_restorer/content/overlay.dtd">
+  %overlayDTD;
+<!-- Do not edit above this line and do not edit the variable '&brandShortName;' inside translated strings -->
+
+<!ENTITY Ctr_title			"Personalizar o &brandShortName;">
+
+<!ENTITY Ctr_addonbar		"Barra de extras">
+<!ENTITY Ctr_statusbar		"Barra de estado">
+<!ENTITY Ctr_flexspace		"Espaço flexível">
+<!ENTITY Ctr_space			"Espaço">
+<!ENTITY Ctr_separator		"Separadoror">
+<!ENTITY Ctr_navthrobber	"Indicador de atividade">
+<!ENTITY Ctr_sidebarbutton	"(Barra lateral)">
+<!ENTITY Ctr_windowcontrols	"Min./max./fechar (ecrã completo)">
+<!ENTITY Ctr_rr				"Tem que reiniciar!">
+<!ENTITY Ctr_window			"Janela">
+<!ENTITY Ctr_centered		"Centro">
+<!ENTITY Ctr_page			"Página">
+
+<!ENTITY Ctr_cuibuttons		"Botões">
+<!ENTITY Ctr_cuibutnormal	"Normais">
+<!ENTITY Ctr_cuibutsmall	"Pequenos">
+<!ENTITY Ctr_cuimode		"Modo">
+<!ENTITY Ctr_cuiico			"Ícones">
+<!ENTITY Ctr_cuiicotxt		"Ícones + Texto">
+<!ENTITY Ctr_cuitxt			"Texto">
+<!ENTITY Ctr_cuitabsnontop	"Separadores em baixo">
+
+<!ENTITY Ctr_tnot			"(separadores em baixo)">
+
+<!ENTITY Ctr_tabcolors_t	"Cor e texto dos separadores">
+
+<!ENTITY Ctr_tabs			"Separadores">
+<!ENTITY Ctr_tabs0			"Padrão do &brandShortName; (separadores curvos)">
+<!ENTITY Ctr_tabs1			"Separadores quadrados (clássico)">
+<!ENTITY Ctr_tabs1m			"Separadores quadrados (australis)">
+<!ENTITY Ctr_tabs2			"Separadores curvos (alternativo)">
+<!ENTITY Ctr_tabs3			"Separadores curvos (Aero alternativo)">
+<!ENTITY Ctr_tabforminfo	"A aparência dos separadores é controlada pelo tema atual.">
+<!ENTITY Ctr_coltabsinfo	"A aparência dos separadores não é totalmente compatível com o extra 'ColorfulTabs'!">
+<!ENTITY Ctr_tabsontop0		"Separadores em cima (padrão)">
+<!ENTITY Ctr_tabsontop1		"Separadores em cima, atributo --- [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Separadores em baixo (v1) atributo --- [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Separadores em baixo (v2) atributo --- [tabsontop=false]">
+<!ENTITY Ctr_tabsontopW1	"A v2 apenas pode ser utilizada por alguns extras e para temas completos!">
+<!ENTITY Ctr_tabsontopI1	"Atributo [tabsontop=true/false] é adicionado a">
+<!ENTITY Ctr_tabsintitlebar	"Usar barra de título do &brandShortName; em vez da barra de título do sistema operativo">
+<!ENTITY Ctr_tabwidthdef	"(padrão)">
+<!ENTITY Ctr_tabwidthcla	"(clássico)">
+<!ENTITY Ctr_tabminheight	"Altura:">
+<!ENTITY Ctr_tabheightinfo	"Valores baixos causarão imperfeições em janelas mazimizadas!">
+<!ENTITY Ctr_ctrltabprev	"Pré-visualizar separadores com 'Ctrl + Tab'">
+<!ENTITY Ctr_tabmaxwidth	"Largura máxima:">
+<!ENTITY Ctr_tabminwidth	"Largura mínima:">
+<!ENTITY Ctr_tabwidthinfo	"A largura dos separadores é controlada pelo extra TabMixPlus">
+<!ENTITY Ctr_tabwidthinfo2	"A largura dos separadores é controlada pelo extra TabUtilities">
+<!ENTITY Ctr_tabwidthinfo3	"Valores abaixo de 48 px causarão imperfeições na maioria dos casos!">
+<!ENTITY Ctr_square_edges	"Cantos superiores quadrados">
+<!ENTITY Ctr_tttitlebar		"Título do separador na barra de título do &brandShortName;">
+<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
+<!ENTITY Ctr_tabinsertion	"Inserir separadores relacionados após o separador atual">
+<!ENTITY Ctr_emptytfavico	"Mostrar 'favicon' (se o site não o disponibilizar)">
+<!ENTITY Ctr_emptytfavico_n	"Não">
+<!ENTITY Ctr_emptytfavico_g	"Genérico">
+<!ENTITY Ctr_noemptypticon	"Remover 'favicon' vazio dos separadores fixos">
+<!ENTITY Ctr_closetab_0		"Botão para fechar separador">
+<!ENTITY Ctr_closetab_1		"Apenas no separador ativo">
+<!ENTITY Ctr_closetab_2		"Em nenhum">
+<!ENTITY Ctr_closetab_3		"No fim da barra de ferramentas">
+<!ENTITY Ctr_closetab_4		"No início da barra de ferramentas">
+<!ENTITY Ctr_closetab_5		"Em todos os separadores">
+<!ENTITY Ctr_closetab_hfot	"Ocultar se apenas existir um separador">
+<!ENTITY Ctr_closei_def		"Ícones padrão">
+<!ENTITY Ctr_closeonleft	"Posição alternativa no separador">
+<!ENTITY Ctr_closetabbig	"Ícones grandes (20x20 px)">
+<!ENTITY Ctr_close_wwltab	"Fechar janela ao fechar todos os separadores">
+
+<!ENTITY Ctr_hctpinfotab	"Algumas variantes de separadores não são compatíveis com o extra 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_hctpinfoab		"O botão na barra de título não é compatível com o extra 'Hide Caption Titlebar Plus'.">
+<!ENTITY Ctr_tobainfotab	"O extra 'Tabs on Bottom' não é compatível com '&Ctr_title;' e deve ser desativado. Utilize antes a definições '&Ctr_cuitabsnontop;'!">
+
+<!ENTITY Ctr_appbutton		"Botão do &brandShortName;">
+<!ENTITY Ctr_appbutton0		"Desativado">
+<!ENTITY Ctr_appbutton1		"Na barra de ferramentas">
+<!ENTITY Ctr_appbutton1wt	"Na barra de ferramentas (apenas texto)">
+<!ENTITY Ctr_appbutton2		"Na barra de título do &brandShortName;">
+<!ENTITY Ctr_appbutton2h	"Na barra de título do &brandShortName; (oculto)">
+<!ENTITY Ctr_appbutton2io	"Na barra de título do &brandShortName; (apenas ícone)">
+<!ENTITY Ctr_paneluibtweak	"Mostrar botão de menu como botão do &brandShortName;...">
+<!ENTITY Ctr_paneluibtweak2	"Mostrar botão de menu como botão do &brandShortName; (apenas ícone)...">
+<!ENTITY Ctr_paneluibtweak3	"...se na barra de separadores">
+<!ENTITY Ctr_appbuttonc		"Botão color">
+<!ENTITY Ctr_appbuttonc_o	"laranja (Firefox)">
+<!ENTITY Ctr_appbuttonc_a	"azul (Aurora)">
+<!ENTITY Ctr_appbuttonc_n	"preto (Nightly)">
+<!ENTITY Ctr_appbuttonc_t	"transparente">
+<!ENTITY Ctr_appbuttonc_p	"azul (Palemoon)">
+<!ENTITY Ctr_appbuttonc_r	"vermelho">
+<!ENTITY Ctr_appbuttonc_g	"verde">
+<!ENTITY Ctr_appbuttonc_gr	"cinzento">
+<!ENTITY Ctr_appbuttonc_pu	"púrpura">
+<!ENTITY Ctr_appbuttonc_wh	"branco">
+<!ENTITY Ctr_appbuttonc_cu	"Custom">
+<!ENTITY Ctr_appbuttonct	"Cor personalizada para o botão da barra de ferramentas">
+<!ENTITY Ctr_appbuttonI1	"Recomendamos que reinicie o navegador">
+<!ENTITY Ctr_appbuttonI1e	"Apenas visível na barra de título do &brandShortName; e não na barra de título do sistema Windows!">
+<!ENTITY Ctr_appbuttonI2	"Apenas visível se o botão estiver na barra de título ou na barra de separadores!">
+<!ENTITY Ctr_appbutmhi		"Posição superior (se na barra de separadores)">
+<!ENTITY Ctr_appbautocol	"Definição automática de cor conforme o canal da versão (estável/Aurora/Nightly)">
+<!ENTITY Ctr_appbutbdl		"Ocultar contorno e cores de fundo">
+<!ENTITY Ctr_dblclclosefx	"Duplo clique no botão para fechar a janela atual">
+<!ENTITY Ctr_appbclmmenus	"Menus clicáveis nos itens de menu (Novo separador, Imprimir...)">
+<!ENTITY Ctr_appbutonclab	"Título">
+<!ENTITY Ctr_appbutonclab2	"Adicione o título ou deixe em branco">
+
+<!ENTITY Ctr_ui				"Interface">
+<!ENTITY Ctr_nbiconsize0	"Atributo 'iconsize' na barra de navegação">
+<!ENTITY Ctr_smallnavbut	"Botões pequenos na barra de navegação">
+<!ENTITY Ctr_backforward	"Botões Recuar/Avançar amovíveis">
+<!ENTITY Ctr_nbcompact		"Reduzir altura da barra de navegação">
+<!ENTITY Ctr_hide_bf_popup	"Ao premir os botões, ocultar histórico de navegação">
+<!ENTITY Ctr_bf_space		"Reduzir espaço entre os botões (se possível)">
+<!ENTITY Ctr_noconicons		"Menu de contexto da página: substituir ícones por texto (Recuar, Avançar...)">
+<!ENTITY Ctr_prefpage		"Página/janela de opções">
+<!ENTITY Ctr_altoptionsd	"Aparência padrão">
+<!ENTITY Ctr_altoptionsp	"Aparência alternativa">
+<!ENTITY Ctr_altoptionsw	"Abrir página de opções em nova janela">
+<!ENTITY Ctr_altoptions_hm	"menu horizontal">
+<!ENTITY Ctr_altoptions_vm	"menu vertical">
+<!ENTITY Ctr_altoptionsww	"Largura:">
+<!ENTITY Ctr_altoptionswh	"Altura:">
+<!ENTITY Ctr_altoptionsi	"A janela de opções já não é um diálogo mas sim uma janela do navegador com todas as barras de ferramentas ocultas. A funcionalidade 'Utilizar página atual' apenas adiciona os URL das páginas abertas na janela atual que, neste caso, é apenas a janela 'about:preferences'. A barra de ferramentas 'Opções' é substituída por uma outra que permite abrir as opções em janelas.">
+<!ENTITY Ctr_options_rem	"Memorizar última categoria selecionada">
+<!ENTITY Ctr_aboutpages		"Páginas 'about:' - aparência alternativa">
+<!ENTITY Ctr_svgfilters		"Cor SVG para os ícones padrão na barra de ferramentas">
+<!ENTITY Ctr_wincontrols	"Controlos de janela amovíveis no modo de ecrã completo">
+<!ENTITY Ctr_puibuttonsep	"Separador do botão de menu">
+<!ENTITY Ctr_puibut_no_sep	"Oculto">
+<!ENTITY Ctr_puibut_l_sep	"Esquerda">
+<!ENTITY Ctr_puibut_r_sep	"Direita">
+<!ENTITY Ctr_html5warning	"Aviso de ecrã completo para HTML5">
+<!ENTITY Ctr_oldtoplevimg	"Aparência clássica com fundo branco">
+<!ENTITY Ctr_altalertbox	"Caixa de alerta: aparência alternativa">
+<!ENTITY Ctr_emptygfavico	"Substituir 'favicon' genérico">
+<!ENTITY Ctr_mstatusbar		"Painel de estado amovível">
+<!ENTITY Ctr_mstatusbars4e	"O painel da barra de estado é controlado por 'Status-4-Evar'">
+<!ENTITY Ctr_mstatusbartpp	"O painel da barra de estado é controlado por 'ThePuzzlePiece'">
+<!ENTITY Ctr_mstatusbarpzt	"O painel da barra de estado é controlado por 'Puzzle Bars'">
+<!ENTITY Ctr_mstatusbarabr	"O painel da barra de estado é controlado por 'The Addon Bar (Restored)'">
+<!ENTITY Ctr_combrelstop	"Combinar botões Parar e Recarregar na barra de ferramentas">
+<!ENTITY Ctr_stoprel1		"Importante: posição do botão Recarregar após o botão Parar!">
+<!ENTITY Ctr_panelmenucol	"Popups dos menus: cor de fundo alternativa">
+<!ENTITY Ctr_hideprivmask	"Navegação privada: ocultar indicador de privacidade">
+<!ENTITY Ctr_navsmallicons	"Ícones pequenos">
+<!ENTITY Ctr_navlargeicons	"Ícones grandes">
+<!ENTITY Ctr_nbisizedelay0	"Atraso de inicialização ao arrancar">
+<!ENTITY Ctr_nbisizedelay	"ms (1000 ms = 1 seg)">
+<!ENTITY Ctr_findbar		"Barra de pesquisa">
+<!ENTITY Ctr_findbar_hws	"Fechar barra de pesquisa ao deslocar a página">
+<!ENTITY Ctr_findbar_width	"Largura da caixa de pesquisa: ">
+<!ENTITY Ctr_findbarpos		"Posição da barra de pesquisa">
+<!ENTITY Ctr_findbar_def	"Baixo (padrão)">
+<!ENTITY Ctr_findbar_top	"Cima">
+<!ENTITY Ctr_findbar_topa	"Cima (ordem alternativa de conteúdo)">
+<!ENTITY Ctr_findbar_bota	"Baixo (ordem alternativa de conteúdo)">
+<!ENTITY Ctr_nav_txt_ico0	"Mostrar apenas ícones (padrão)">
+<!ENTITY Ctr_nav_txt_ico1	"Mostrar ícones grandes">
+<!ENTITY Ctr_nav_txt_ico2	"Mostrar ícones e texto">
+<!ENTITY Ctr_nav_txt_ico3	"Mostrar apenas texto">
+<!ENTITY Ctr_nav_txt_exp	"Atributos clássicos (experimental):">
+<!ENTITY Ctr_iat_notf_vt	"Excluir barras de ferramentas verticais">
+<!ENTITY Ctr_cpanelmenus	"Popups do menu (marcadores, histórico...): vista compacta">
+<!ENTITY Ctr_hidezoomres	"Controlos de ampliação na barra de ferramentas: ocultar botão ampliação-repor">
+<!ENTITY Ctr_alt_newtabp	"Página Novo separador (about:newtab): aparência alternativa">
+<!ENTITY Ctr_nosnippets		"Página inicial (about:home): ocultar 'snippets'">
+<!ENTITY Ctr_search_ui		"Pesquisa">
+<!ENTITY Ctr_ctroldsearch	"Pesquisa antiga">
+<!ENTITY Ctr_ctroldsearchc	"Limpar caixa de pesquisa após pesquisar">
+<!ENTITY Ctr_ctroldsearchr	"Após a pesquisa, reverter para o primeiro motor de pesquisa da lista">
+<!ENTITY Ctr_ctrosearchdel	"atraso">
+<!ENTITY Ctr_search_oit		"Abrir pesquisa em novo separador">
+<!ENTITY Ctr_osearch_meoit	"Clique central do rato: pesquisar em novo separador de fundo">
+<!ENTITY Ctr_osearch_iwidth	"Ajustar largura automaticamente">
+<!ENTITY Ctr_osearch_cwidth	"Largura personalizada para os popups da pesquisa">
+<!ENTITY Ctr_osearch_dm		"Botão pequeno com seta">
+<!ENTITY Ctr_addonmanager	"Gestor de extras">
+<!ENTITY Ctr_alt_addonsp	"Página 'Mais informação': ordem alternativa">
+<!ENTITY Ctr_am_showrecup	"Mostrar sempre a categoria 'Atualizações recentes'">
+<!ENTITY Ctr_alt_addonsm	"Aparência alternativa">
+<!ENTITY Ctr_am_nowarning	"Lista de extras: ocultar avisos">
+<!ENTITY Ctr_am_compact		"Lista de extras: vista compacta">
+<!ENTITY Ctr_am_compact2	"Vista compacta +">
+<!ENTITY Ctr_am_highlight	"Lista de extras: destacar entrada ao passar com o rato">
+<!ENTITY Ctr_am_buticons	"Lista de extras: substituir texto dos botões por ícones">
+<!ENTITY Ctr_am_hovshowb	"Lista de extras: apenas mostrar botões ao passar com o rato">
+<!ENTITY Ctr_addonversion	"Lista de extras: mostrar versão do extra">
+<!ENTITY Ctr_xpinstallui	"Janela antiga de instalação dos extras">
+<!ENTITY Ctr_bmbutton		"Botão do menu de marcadores">
+<!ENTITY Ctr_hiderecentbm	"Popup de marcadores: ocultar marcadores recentes">
+<!ENTITY Ctr_hideeditbm		"Estrela de marcador: ocultar popup (se a página não estiver nos marcadores)">
+<!ENTITY Ctr_oldplacesbut	"Itens e pastas na barra de marcadores: aparência antiga">
+<!ENTITY Ctr_dl_pm_drop		"Botões no painel de descargas: mostrar seta">
+<!ENTITY Ctr_bmbutpanelm	"Popup: aparência do menu">
+<!ENTITY Ctr_bmbunsortbm	"Popup: menu 'Outros marcadores'">
+<!ENTITY Ctr_bmbunsortbm2	"Menu acima dos marcadores">
+<!ENTITY Ctr_bmbviewbmsb	"Popup: mostrar 'Ver barra lateral de marcadores'">
+<!ENTITY Ctr_bmbviewbmtb	"Popup: mostrar 'Ver barra de marcadores'">
+<!ENTITY Ctr_bmbnounsort	"Popup: ocultar 'Outros marcadores'">
+<!ENTITY Ctr_bmbutnotext	"Ocultar texto na barra de marcadores">
+<!ENTITY Ctr_skipprintpr	"Botão de impressão: ignorar pré-visualização">
+<!ENTITY Ctr_tbconmenu		"Menu de contexto da barra de ferramentas: ocultar 'Mover para o menu', 'Remover da barra de ferramentas', 'Recarregar todos os separadores, 'Criar marcadores para todos os separadores' e 'Reabrir separador fechado'">
+<!ENTITY Ctr_noresizerxp	"Ocultar redimensionador (Windows XP)">
+<!ENTITY Ctr_extraurlkeycb	"Abrir barra de localização adicional (Cmd/Ctrl+)">
+<!ENTITY Ctr_pmhidelabels	"Popup de menu do painel principal: ocultar texto dos botões">
+<!ENTITY Ctr_menupopupscr	"Popups de menu: mostrar barra de deslocação em vez de setas de deslocação">
+<!ENTITY Ctr_closegeneral	"Ícone genérico de fecho">
+
+<!ENTITY Ctr_tabsep_def		"Default tab separators">
+<!ENTITY Ctr_fxmockup		"&brandShortName; Mockup">
+<!ENTITY Ctr_tabmokcolor	"White color for tab buttons (close, new, groups, list all)">
+<!ENTITY Ctr_tabmokcolor2	"White color and dark shadow for text on non-active tabs">
+<!ENTITY Ctr_tabmokcolor4	"White color for empty dotted tab favicon">
+
+<!ENTITY Ctr_navthrobber1	"Ao clicar no indicador de atividade abrir este URL num novo separador:">
+<!ENTITY Ctr_navthrobber2	"Adicione o URL ou deixe em branco">
+<!ENTITY Ctr_anewtaburl		"URL da págiona Novo separador">
+<!ENTITY Ctr_anewtaburlcb	"URL personalizado normal(padrão: about:newtab)">
+<!ENTITY Ctr_anewtaburlpcb	"URL personalizado privado (padrão: about:privatebrowsing)">
+
+<!ENTITY Ctr_tab_tf_info1	"Nomes de cores, códigos hex, valores rgb(a) e hsl(a) são permitidos.">
+<!ENTITY Ctr_tab_tf_info2	"As entradas não serão validadas!">
+<!ENTITY Ctr_tabact_t		"selecionado">
+<!ENTITY Ctr_tabhov_t		"hovered">
+<!ENTITY Ctr_tabnor_t		"padrão">
+<!ENTITY Ctr_tabpen_t		"não carregado">
+<!ENTITY Ctr_tabunr_t		"não lido">
+<!ENTITY Ctr_ntab_t			"novo separador">
+<!ENTITY Ctr_customsqtab1	"Fundo">
+<!ENTITY Ctr_ctext			"Texto">
+<!ENTITY Ctr_ctextsh		"Sombra do texto">
+<!ENTITY Ctr_tabnor			"Separador padrão">
+<!ENTITY Ctr_tabhov			"Hovered Tab">
+<!ENTITY Ctr_tabact			"Separador selecionado">
+<!ENTITY Ctr_tabpen			"Separador não carregado">
+<!ENTITY Ctr_tabunr			"Separador não lido">
+<!ENTITY Ctr_ntabnor		"Default New tab">
+<!ENTITY Ctr_ntabhov		"Hovered New tab">
+<!ENTITY Ctr_bold			"Negrito">
+<!ENTITY Ctr_italic			"Itálico">
+<!ENTITY Ctr_underlined		"Sublinhado">
+<!ENTITY Ctr_notabhov		"Enabled settings override 'hovered' settings">
+<!ENTITY Ctr_tablowopa		"Reduzir visibilidade dos separadores">
+<!ENTITY Ctr_tabc_act_tb	"Cor de fundo das barras de ferramentas">
+
+<!ENTITY Ctr_urlbar			"Barra de localização">
+<!ENTITY Ctr_starinurl		"Botão 'Estrela'">
+<!ENTITY Ctr_starinurlinfo	"Default bookmarks menu button gets hidden">
+<!ENTITY Ctr_feedinurl		"Botão 'Fonte RSS'">
+<!ENTITY Ctr_hideurelstop	"Ocultar os botões 'Parar' e 'Recarregar'">
+<!ENTITY Ctr_hideurelstop2	"Mostrar sempre o botão 'Ir'">
+<!ENTITY Ctr_hideurlgo		"Ocultar o botão 'Ir'">
+<!ENTITY Ctr_hideurlsrg		"Ocultar espaço entre os botões 'Parar', 'Recarregar' e 'Ir'">
+<!ENTITY Ctr_urlbardropm	"Move dropmarker to the last possible position">
+<!ENTITY Ctr_urlbardropm2	"Make dropmarker always visible">
+<!ENTITY Ctr_altreaderico	"Alternative 'Reader' icons">
+<!ENTITY Ctr_hideurlzoom	"Ocultar botão de ampliação (se existente)">
+<!ENTITY Ctr_urlbardark		"Dark background color">
+<!ENTITY Ctr_hideprbutton	"Ocultar notificação ao bloqquear as janelas popup">
+<!ENTITY Ctr_locsearchbw10	"Reduzir altura das barras de localização e de pesquisa (experimental)">
+<!ENTITY Ctr_urlbar_ib		"Botão 'Identidade do site'">
+<!ENTITY Ctr_ib_nohovcolor	"Do not show gray color when hovered">
+<!ENTITY Ctr_ib_graycolor	"Gray color for unknown identity and 'about:' pages">
+<!ENTITY Ctr_verifiedcolors	"Button colors for verified websites, secure and not secure connections">
+<!ENTITY Ctr_ibinfoico		"Replace 'i'-icon with globe icon">
+<!ENTITY Ctr_ibinfoico2		"Ocultar o ícone 'i' (se possível)">
+<!ENTITY Ctr_iblabels		"Ocultar texto">
+<!ENTITY Ctr_faviconurl		"Favicon: ícone dos websites atuais">
+<!ENTITY Ctr_padlock		"Ícone para ligações seguras">
+<!ENTITY Ctr_padlock_hid	"oculto">
+<!ENTITY Ctr_padlock_def	"padrão">
+<!ENTITY Ctr_padlock_cla	"clássico">
+<!ENTITY Ctr_padlock_mod	"moderno">
+<!ENTITY Ctr_padlock_ext	"Ícone '&brandShortName;' para páginas 'about' válidas">
+<!ENTITY Ctr_icopageinfo	"Favicon/globe-/'i'-icon: 'click' opens 'page info window'">
+<!ENTITY Ctr_lbsbsize		"Largura personalizada">
+<!ENTITY Ctr_searchbar		"Barra de pesquisa">
+<!ENTITY Ctr_autocomplete	"Autocomplete popup">
+<!ENTITY Ctr_altautocompl	"Aparência alternativa">
+<!ENTITY Ctr_autocompl_it	"Remover os itens 'Pesquisar com...' e 'Visitar' (se existentes)">
+<!ENTITY Ctr_acompl_search	"Mostrar motores de pesquisa">
+<!ENTITY Ctr_autocompl_hl	"Highlighting of text hits">
+<!ENTITY Ctr_autocompl_rhl	"Aero colors for highlighted results">
+<!ENTITY Ctr_autocompl_not	"Ocultar título da página>
+<!ENTITY Ctr_autocompl_sep	"Mostrar separador entre os resultados">
+<!ENTITY Ctr_urlbar_uc		"Disable 'unified autocomplete' feature">
+<!ENTITY Ctr_lbsugresi		"Desativar limite de altura">
+<!ENTITY Ctr_cresultshcb	"Custom height limit: ">
+<!ENTITY Ctr_lbsugres		"Número de resultados">
+<!ENTITY Ctr_lbsbradius		"Custom border roundness">
+
+<!ENTITY Ctr_menubar_items	"Posição dos itens de menu">
+<!ENTITY Ctr_extrabar		"Barras de ferramentas extra">
+<!ENTITY Ctr_extrabar0		"Barra(s) de ferramentas extra">
+<!ENTITY Ctr_extrabar1		"Barra de ferramentas extra">
+<!ENTITY Ctr_extrabarinfo	"Switching between 'tabs on top' and 'tabs not on top' modes randomly alters additional toolbars order. &brandShortName; has to be restarted to solve this issue.">
+
+<!ENTITY Ctr_invicons		"Ícones invertidos">
+<!ENTITY Ctr_menubar		"Barra de menu">
+<!ENTITY Ctr_tabstoolbar	"Barra de separadores">
+<!ENTITY Ctr_navbar			"Barra de navegação">
+<!ENTITY Ctr_bookbar		"Barra de marcadores">
+<!ENTITY Ctr_notoolbar		"Oculta (não mostrar itens de menu)">
+
+<!ENTITY Ctr_mbarforceleft	"Primeiro elemento">
+<!ENTITY Ctr_mbarforceright	"Último elemento">
+
+<!ENTITY Ctr_toolbars		"Barras de ferramentas">
+<!ENTITY Ctr_dblclnewtab	"Duplo clique na barra de ferramentas abre um novo separador">
+<!ENTITY Ctr_dblclnewtabdes	"Não adequeada para temas completos se a barra de título do Windows estiver ativa.">
+<!ENTITY Ctr_hidetbwot		"Ocultar barra de separadores se apenas um estiver visível">
+<!ENTITY Ctr_hidetbwote		"Reduzir atraso de ocultação ao iniciar">
+<!ENTITY Ctr_hidetbwote_i	"Pode originar imperfeições na barra de separadores">
+<!ENTITY Ctr_hidetbwote2	"Ajustar espaço da barra de título automaticamente">
+<!ENTITY Ctr_notabfog		"Remover desfoque de fundo (Windows AeroGlass/8)">
+<!ENTITY Ctr_notabbg		"Remover cor de fundo (Windows AeroGlass/8)">
+<!ENTITY Ctr_hightabpos		"Reduzir espaço acima da barra de ferramentas (se possível)">
+<!ENTITY Ctr_showalltabsb	"Mostrar sempre o botão 'Todos os separadores'">
+<!ENTITY Ctr_alttabstb		"Cor de fundo alternativa">
+<!ENTITY Ctr_alttabstb2		"No modo maximizado (separadores em cima)">
+
+<!ENTITY Ctr_altmenubar		"Adicionar cor de fundo (barra de título do SO)">
+<!ENTITY Ctr_altmenubarpos	"posição alternativa">
+<!ENTITY Ctr_altmenubarpos2	"Abaixo da barra de título do &brandShortName;">
+<!ENTITY Ctr_menubarnofog	"Remover cor de fundo (Windows AeroGlass/8)">
+
+<!ENTITY Ctr_aerocolors		"Cor Azul Aero para as barras de ferramentas (e separadores)">
+<!ENTITY Ctr_aerocolorsg	"Cor Cinzento-Azul Aero">
+<!ENTITY Ctr_transpttbw10	"Barra de titulo/menu/separadores: remover cor de fundo">
+<!ENTITY Ctr_transpttbew10	"Ajustes extra para alguns temas do sistema operativo">
+<!ENTITY Ctr_transptcw10	"Ocultar os botões min./max./fecahr do sistema operativo">
+<!ENTITY Ctr_hidenavbar		"Ocultar barra de ferramentas">
+<!ENTITY Ctr_navbarpad		"Espaço extra à esquerda e à direita">
+<!ENTITY Ctr_navbarpad_l	"Esquerda:">
+<!ENTITY Ctr_navbarpad_r	"Direita:">
+<!ENTITY Ctr_nobookbarbg	"Remover cor de fundo">
+<!ENTITY Ctr_bookbarfs		"No modo de ecrã completo">
+<!ENTITY Ctr_nonavbarbg		"Remover cor de fundo">
+<!ENTITY Ctr_nonavbarbg1	"This add-on's additional toolbars and other top toolbars are affected.">
+<!ENTITY Ctr_nonavbarbg2	"All toolbars in 'Beyond Australis' add-on's 'Slim Chrome' are affected.">
+<!ENTITY Ctr_nonavborder	"Adicionar contorno superior à barra de ferramentas">
+<!ENTITY Ctr_nonavtbborder	"Top toolbars: remove toolbar borders">
+<!ENTITY Ctr_toptb_oldpad	"Top toolbars: old left and right padding">
+<!ENTITY Ctr_hidesbclose	"Barra lateral: ocultar botão para fechar">
+<!ENTITY Ctr_notextshadow	"Barras de ferramentas: ocultar sombra para o texto da barra e dos separadores">
+<!ENTITY Ctr_chevronfix		"Barra de navegação: ocultar seta duplo ('Mais ferramentas') no fim da barra">
+<!ENTITY Ctr_tbsep_winc		"Barras de ferramentas superiores: separadores adicionais">
+
+<!ENTITY Ctr_closeabarbut	"Barra de extras: ocultar o botão Fechar">
+<!ENTITY Ctr_highaddonsbar	"Aumentar altura">
+<!ENTITY Ctr_lessaddonsbar	"Diminuir altura">
+<!ENTITY Ctr_addonbarfs		"No modo de ecrã completo">
+
+<!ENTITY Ctr_tabthrobber	"Carregar imagem">
+<!ENTITY Ctr_bmanimation	"Animação da estrela ao adicionar páginas aos marcadores">
+<!ENTITY Ctr_pananimation	"Animação ao abrir o painel">
+<!ENTITY Ctr_tabanimation	"Animação ao abrir/fechar separadores">
+<!ENTITY Ctr_dlanimation	"Animação de notificação de descargas">
+<!ENTITY Ctr_fsanimation	"Animação em ecrã completo">
+<!ENTITY Ctr_fsaduration	"Animação em ecrã completo para conteúdo HTML5">
+
+<!ENTITY Ctr_toolsitem		"Item de menu no menu Ferramentas">
+<!ENTITY Ctr_appmenuitem	"Item de menu no menu Botão da aplicação">
+<!ENTITY Ctr_contextitem	"Item de menu no menu de contexto das barras de ferramentas">
+<!ENTITY Ctr_puictrbutton	"Botão de menu no Painel principal">
+
+<!ENTITY Ctr_otherctroptns	"Outras definições">
+<!ENTITY Ctr_cuibotbuttons	"Botões extra no modo 'Personalizar'">
+<!ENTITY Ctr_nodevtheme		"Impedir ativação do tema 'Developer Edition'">
+
+<!ENTITY Ctr_experttweaks	"Avançado">
+<!ENTITY Ctr_fx34loop		"Unchecking this preference removes 'calling and conversation' features.">
+<!ENTITY Ctr_fx38pocket		"Unchecking this preference disables the 'Pocket' feature and removes 'Pocket' button from toolbars.">
+<!ENTITY Ctr_fx38pocket2	"Note: Moving Pocket button to 'Additional Tools and Features' area in 'Customize' mode before disabling this preference removes all Pocket-related entries from Bookmarks menu and Reader menu popups.">
+<!ENTITY Ctr_e_loop			"Hello / Calling and conversation / Loop">
+<!ENTITY Ctr_e_readermode	"Modo de leitura">
+<!ENTITY Ctr_e_geolocation	"Geolocalização">
+<!ENTITY Ctr_e_pocket		"Pocket">
+<!ENTITY Ctr_e_tabsaudioico	"Ícone de reprodução de áudio">
+<!ENTITY Ctr_e_containertab	"Container Tabs">
+<!ENTITY Ctr_e_findbarhl	"Findbar highlighting">
+<!ENTITY Ctr_fx50findbarhl	"Unchecking these preferences removes findbars 'highlight' features.">
+<!ENTITY Ctr_e_flyweb		"Flyweb">
+
+
+<!ENTITY Ctr_pw_settings	"Definições">
+<!ENTITY Ctr_pw_set_reset	"Restaurar predefinições">
+<!ENTITY Ctr_pw_set_predef	"Predefinições clássicas">
+<!ENTITY Ctr_pw_set_preaus	"Predefinição do &brandShortName;">
+<!ENTITY Ctr_pw_set_export	"Exportar preferências">
+<!ENTITY Ctr_pw_set_import	"Importar preferências">
+<!ENTITY Ctr_pw_set_syncon	"Adicionar ao Sync">
+<!ENTITY Ctr_pw_set_syncoff	"Remover do Sync">
+
+<!ENTITY Ctr_special_font	"As definições para a cor de fundo apenas funcionam com o tema padrão!">
+<!ENTITY Ctr_special_info	"Algumas opções não disponibilizam alterações visivelmente relevantes">
+<!ENTITY Ctr_special_info2	"Detetado um tema de terceiros! Algumas opções não funcionam com este tipo de temas!">
+<!ENTITY Ctr_special_acr	"Apenas reporte erros através dos canais oficiais de suporte e nunca através da opção 'Compatibilidade de extras'!">
+<!ENTITY Ctr_support		"Suporte">
+<!ENTITY Ctr_support_forum1	"MozillaZine (Fórum em inglês)">
+<!ENTITY Ctr_support_forum2	"Camp Firefox (Fórum em alemão)">
+<!ENTITY Ctr_github_issues	"Reportar um erro no Github">
+<!ENTITY Ctr_newversion		"Procurar por novas versões">
+
+<!ENTITY Ctr_addon-bar.accesskey		"E">
+<!ENTITY appMenuGettingStarted.label	"Introdução">
+<!ENTITY goCmd.label					"Ir">
+<!ENTITY Ctr_menu_restart.label			"Reiniciar">
+<!ENTITY Ctr_restartapp					"Mostrar 'Reiniciar' no menu do &brandShortName; e no menu 'Ficheiro'">
+<!ENTITY Ctr_ctrnewinv					"Sublinhar novas opções para a versão atual do &brandShortName;">
+
+<!ENTITY Ctr_openInCurrentTab			"Abrir no separador atual">
+<!ENTITY Ctr_openInNewTab				"Abrir em novo separador">
+<!ENTITY Ctr_openInNewWindow			"Abrir em nova janela">
+
+<!-- For page context entries. Have to be adjusted for every locale! -->
+<!ENTITY backCmd.accesskey				"R">
+<!ENTITY forwardCmd.accesskey			"A">
+<!ENTITY reloadCmd.accesskey			"R">
+<!ENTITY stopCmd.accesskey				"P">
+<!ENTITY bookmarkPageCmd2.accesskey		"m">
+
+<!-- Fallback entities. Do not change! -->
+<!ENTITY openCmd.commandkey				"">
+<!ENTITY urlbar.accesskey				"">
+<!ENTITY urlbar.placeholder2			"">
+
+<!-- Extra CyberCTR Additions -->
+
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox (padrão)">
+<!ENTITY Ctr_appbuttonc_s	"salmão">
+
+<!ENTITY Ctr_alt_newtabpalt	"Página Novo separador: aparência personalizada">
+<!ENTITY ctr_aboutnewtab.customhighlight "Utilizar cor personalizada de destaque">
+<!ENTITY ctr_aboutnewtab.customhighlightcol "Alterar cor de destaque">
+<!ENTITY ctr_aboutnewtab.custombase "Utilizar cor personalizada para o texto">
+<!ENTITY ctr_aboutnewtab.custombasecol "Alterar cor base do texto">
+
+<!ENTITY Ctr_alt_newtabcol	"Página Novo separador: colunas">
+<!ENTITY Ctr_alt_newtabrow	"Página Novo separador: linhas">
+
+<!ENTITY Ctr_classic_elements	"Elementos clássicos">
+<!ENTITY Ctr_pw_set_preaust		"Predefinições Australis">
+<!ENTITY ctr_Support_forums		"Fórum de suporte">
+<!ENTITY ctr_help_features		"Funcionalidades e informações">
+
+<!ENTITY Ctr_custtabfontsize.label	"Tamanho do tipo de letra do separador: ">
+
+<!ENTITY ctr_applyCTRPrefFile.label		"Aplicar alterações">
+<!ENTITY ctr_restoreCTRPrefFile.label	"Restaurar backup">
+<!ENTITY ctr_resetCTRPrefFile.label		"Limpar backup">
+
+<!ENTITY ctr_appbuttoncusttextcolor	"Cor de texto do botão da aplicação.">
+<!ENTITY ctr_appbuttoncusttextshadow	"Remover sombra do texto do botão da aplicação">
+
+<!ENTITY ctr_toolbarsearchbar.description	"Barra de pesquisa">
+<!ENTITY ctr_toolbarsearchbarcustwidth.label	"Ativar largura personalizada">
+<!ENTITY ctr_toolbarsearchbarwidth.label	"Largura máxima da barra de pesquisa: ">
+<!ENTITY ctr_colapseaddonsearchbar.label	"Barra de pesquisa about:addons recolhível">
+<!ENTITY Ctr_alwaysshowaddonversion.label	"(Mostrar sempre)">
+
+<!ENTITY ctr_bookmarkfontsize.description	"Barra de marcadores">
+<!ENTITY ctr_custombookmarkfontsize.label	"Ativar tamanho personalizado para o tipo de letra da barra de marcadores">
+<!ENTITY ctr_cbookmarkfontsize.label	"Tamanho do tipo de letra da barra de marcadores: ">
+
+<!ENTITY ctr_abouthome.caption "Alterar estilo da página about:home">
+<!ENTITY ctr_abouthome.default "Estilo padrão">
+<!ENTITY ctr_abouthome.light "Estilo claro">
+<!ENTITY ctr_abouthome.dark "Estilo escuro">
+<!ENTITY ctr_abouthome.simplicity  "Estilo Simplicity">
+<!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.apps "No apps on about:home page">
+<!ENTITY ctr_abouthome.logo "No logo on about:home page">
+<!ENTITY ctr_abouthome.icons "No icons on about:home page">
+<!ENTITY ctr_abouthome.snippets "No snippets on about:home page">
+<!ENTITY ctr_abouthome.custombg "Use custom background image">
+<!ENTITY ctr_abouthome.custombgbrowse "Navegar">
+<!ENTITY ctr_abouthome.custombgurl "Digitar URL ou o caminho do ficheiro">
+<!ENTITY ctr_abouthome.custombgurlph "Caminho/URL da imagem de fundo">
+<!ENTITY ctr_abouthome.customhighlight "Utilizar cor personalizada de destaque">
+<!ENTITY ctr_abouthome.customhighlightcol "Alterar cor personalizada de destaque">
+<!ENTITY ctr_abouthome.custombase "Utilizar cor de texto personalizada">
+<!ENTITY ctr_abouthome.custombasecol "Alterar cor base do texto">
+<!ENTITY ctr_abouthome.animate "Utilizar animações na página about:home">
+<!ENTITY ctr_abouthome.custombgstretch "Ajustar imagem de fundo à janela (padrão).">
+
+<!ENTITY ctr_aboutnewtab.caption "Alterar estilo da página about:newtab">
+
+<!ENTITY cssClassId.description "Ocultar classes e ID dos elementos">
+<!ENTITY cssClassId.label "Digite a classe ou ID:">
+<!ENTITY useFilterElement.label "Utilizar filtro personalizado para ocultar as classes ou ID dos elementos">
+<!ENTITY filterElement.placehold "Pode especificar as classes e as ID dos elementos.">
+<!ENTITY add.label		"Adicionar">
+<!ENTITY clear.label	"Limpar filtro">
+<!ENTITY copy.label		"Copiar filtro">
+
+<!ENTITY Ctr_tabthrobber_usecust.label "Use custom tab throbber">
+<!ENTITY Ctr_tabthrobber_custurlph.label "Throbber image url|path">
+
+<!ENTITY Ctr_animatelwtheme "Animate Animated light-weight themes on startup.">
+
+<!ENTITY Ctr_tbp_abouthome	"Página About:Home">
+<!ENTITY Ctr_tbp_newtab		"Página Novo separador">
+
+<!ENTITY Ctr_dark.label		"(Escuro)">
+<!ENTITY Ctr_light.label	"(Claro)">
+<!ENTITY Ctr_alt.label		"(Alt)">

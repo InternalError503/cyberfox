@@ -6,6 +6,13 @@
     var ctrblacklist = [
         "extensions.classicthemerestorer.pref_actindx",
         "extensions.classicthemerestorer.pref_actindx2",
+        "extensions.classicthemerestorer.pw_actidx_c",
+        "extensions.classicthemerestorer.pw_actidx_t",
+        "extensions.classicthemerestorer.pw_actidx_tc",
+        "extensions.classicthemerestorer.pw_actidx_g",
+        "extensions.classicthemerestorer.pw_actidx_tb",
+        "extensions.classicthemerestorer.pw_actidx_lb",
+        "extensions.classicthemerestorer.pw_actidx_sb",
         "extensions.classicthemerestorer.ctrreset",
         "extensions.classicthemerestorer.compatibility.treestyle",
         "extensions.classicthemerestorer.compatibility.treestyle.disable",

@@ -43,15 +43,20 @@ classicthemerestorerjso.ctr = {
 	} catch(e){}
 	
 	// restore last selected categories/tabs
-	document.getElementById("CtrRadioGroup").selectedIndex = this.prefs.getIntPref('pref_actindx');
-	document.getElementById("ctraddon_tabcolor_tabs").selectedIndex = this.prefs.getIntPref('pref_actindx2');
+	document.getElementById("CtrRadioGroup").selectedIndex = this.prefs.getIntPref('pw_actidx_c');
+	document.getElementById("ctraddon_pw_tabs_tabs").selectedIndex = this.prefs.getIntPref('pw_actidx_t');
+	document.getElementById("ctraddon_tabcolor_tabs").selectedIndex = this.prefs.getIntPref('pw_actidx_tc');
+	document.getElementById("ctraddon_pw_generalui_tabs").selectedIndex = this.prefs.getIntPref('pw_actidx_g');
+	document.getElementById("ctraddon_pw_toolbars_tabs").selectedIndex = this.prefs.getIntPref('pw_actidx_tb');
+	document.getElementById("ctraddon_pw_locationbar_tabs").selectedIndex = this.prefs.getIntPref('pw_actidx_lb');
+	document.getElementById("ctraddon_pw_searchbar_tabs").selectedIndex = this.prefs.getIntPref('pw_actidx_sb');
 	
 	// disable and hide items not usable on third party themes
 	if (!this.fxdefaulttheme) {
 		document.getElementById('ctraddon_pw_tabmenulist').disabled = true;
 		document.getElementById('ctraddon_pw_colors_ntab_t').disabled = true;
     // Check this
-		if (this.contexts.getBoolPref("classic")){}else{
+		if (!this.contexts.getBoolPref("classic")){
 			document.getElementById('ctraddon_pw_noconicons').disabled = true;
 		}
 
@@ -85,7 +90,7 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_nobookbarbg').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_noaddonbarbg').style.visibility = 'collapse';
 
-		if (this.contexts.getBoolPref("classic")){}else{
+		if (!this.contexts.getBoolPref("classic")){
 			document.getElementById('ctraddon_pw_noconicons').style.visibility = 'collapse';
 		}
 
@@ -108,7 +113,8 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_pw_altreaderico').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_alt_addonsm').style.visibility = 'collapse';
 		document.getElementById('ctraddon_altoptions_list').style.visibility = 'collapse';
-		
+		document.getElementById('ctraddon_pw_urlbardark').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_searchbardark').style.visibility = 'collapse';
 	} else {
 		document.getElementById('ctraddon_pw_themes_note').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_special_font').style.visibility = 'collapse';
@@ -437,11 +443,16 @@ classicthemerestorerjso.ctr = {
 	}
 
 	if (this.appversion < 51) {
-	  document.getElementById('ctraddon_pw_oneoffsearchgb').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_oneoffsearch').style.visibility = 'collapse';
+	  document.getElementById('ctraddon_pw_oneoffsearch_desc').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_hideurlzoom').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_dl_pm_drop').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_dl_pm_dropdes').style.visibility = 'collapse';
 	  document.getElementById('ctraddon_pw_toptb_oldpad').style.visibility = 'collapse';
+	}
+
+	if (this.appversion < 53) {
+	  document.getElementById('ctraddon_pw_ttnooverfl').style.visibility = 'collapse';
 	}
 	
 	function PrefListener(branch_name, callback) {
@@ -748,12 +759,13 @@ classicthemerestorerjso.ctr = {
 	this.ctrpwHidetbwotExtra(this.prefs.getBoolPref("hidetbwot"));
 	this.altTabsToolbarBgExtra(this.prefs.getBoolPref("alttabstb"));
 	this.ctrpwModeextra(this.prefs.getCharPref("nav_txt_ico"));
-	this.currentTabAppearance(this.prefs.getCharPref("tabs"));
 	this.currentAboutPrefs(this.prefs.getCharPref("altoptions"));
 	this.ctrpwTranspTbW10(this.prefs.getBoolPref("transpttbw10"));
 	this.ctrpwNavBarPadding(this.prefs.getBoolPref("navbarpad"));
-	this.ctrpwLocationSearchbarSize(this.prefs.getBoolPref("lbsbsize"));
-	this.ctrpwLocationSearchbarRadius(this.prefs.getBoolPref("lbsbradius"));
+	this.ctrpwLocationbarSize(this.prefs.getBoolPref("lb_width"));
+	this.ctrpwSearchbarSize(this.prefs.getBoolPref("sb_width"));
+	this.ctrpwLocationbarRadius(this.prefs.getBoolPref("lb_roundness"));
+	this.ctrpwSearchbarRadius(this.prefs.getBoolPref("sb_roundness"));
 	if (this.fxdefaulttheme) this.ctrpwCompactAddonList(this.prefs.getBoolPref("am_compact"));
 	this.ctrpwUnsortBM(this.prefs.getBoolPref("bmbunsortbm"));
 	this.ctrpwHideUrlStopRel(this.prefs.getBoolPref("hideurelstop"));
@@ -893,8 +905,13 @@ classicthemerestorerjso.ctr = {
 	}
 	
 	// save last selected categories/tabs
-	this.prefs.setIntPref('pref_actindx',document.getElementById("CtrRadioGroup").selectedIndex);
-	this.prefs.setIntPref('pref_actindx2',document.getElementById("ctraddon_tabcolor_tabs").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_c',document.getElementById("CtrRadioGroup").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_t',document.getElementById("ctraddon_pw_tabs_tabs").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_tc',document.getElementById("ctraddon_tabcolor_tabs").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_g',document.getElementById("ctraddon_pw_generalui_tabs").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_tb',document.getElementById("ctraddon_pw_toolbars_tabs").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_lb',document.getElementById("ctraddon_pw_locationbar_tabs").selectedIndex);
+	this.prefs.setIntPref('pw_actidx_sb',document.getElementById("ctraddon_pw_searchbar_tabs").selectedIndex);
 
 	return true;
   },
@@ -919,7 +936,21 @@ classicthemerestorerjso.ctr = {
 	  this.prefs.setBoolPref('aerocolors',false);
  
 	this.hideThemeInfoForTabs();
-	this.unsetTabColorsAndMore();
+
+	this.prefs.setBoolPref('tabcolor_def',false);
+	this.prefs.setBoolPref('tabcolor_act',false);
+	this.prefs.setBoolPref('tabcolor_pen',false);
+	this.prefs.setBoolPref('tabcolor_unr',false);
+	this.prefs.setBoolPref('tabcolor_hov',false);
+	this.prefs.setBoolPref('ntabcolor_def',false);
+	this.prefs.setBoolPref('ntabcolor_hov',false);
+	
+	if(this.prefs.getBoolPref('closeonleft')) {
+	  this.prefs.setBoolPref('closeonleft',false);
+	  setTimeout(function(){
+		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref('closeonleft',true);
+	  },20);
+	}
 
   },
  
@@ -939,23 +970,6 @@ classicthemerestorerjso.ctr = {
 	},100);
   },
 
-  unsetTabColorsAndMore: function() {
-	this.prefs.setBoolPref('tabcolor_def',false);
-	this.prefs.setBoolPref('tabcolor_act',false);
-	this.prefs.setBoolPref('tabcolor_pen',false);
-	this.prefs.setBoolPref('tabcolor_unr',false);
-	this.prefs.setBoolPref('tabcolor_hov',false);
-	this.prefs.setBoolPref('ntabcolor_def',false);
-	this.prefs.setBoolPref('ntabcolor_hov',false);
-	
-	if(this.prefs.getBoolPref('closeonleft')) {
-	  this.prefs.setBoolPref('closeonleft',false);
-	  setTimeout(function(){
-		Services.prefs.getBranch("extensions.classicthemerestorer.").setBoolPref('closeonleft',true);
-	  },20);
-	}
-  },
-  
   ctrpwFaviconextra: function(which) {
 	if(which==true) which=false; else which=true;
 	document.getElementById('ctraddon_padlock_extra').disabled = which;
@@ -1045,28 +1059,42 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_pw_navbarmar_lr').style.visibility = itemvis;
   },
   
-  ctrpwLocationSearchbarSize: function(which) {
+  ctrpwLocationbarSize: function(which) {
 	
     if(which==true) which=false;
 	else which=true;
 	
-    document.getElementById('ctraddon_pw_lbsbsize_lb').disabled = which;
-    document.getElementById('ctraddon_pw_lbsbsize_sb').disabled = which;
+    document.getElementById('ctraddon_pw_lb_width').disabled = which;
 	document.getElementById('ctraddon_lbsize_minw').disabled = which;
 	document.getElementById('ctraddon_lbsize_maxw').disabled = which;
+  },
+  
+  ctrpwSearchbarSize: function(which) {
+	
+    if(which==true) which=false;
+	else which=true;
+	
+    document.getElementById('ctraddon_pw_sb_width').disabled = which;
 	document.getElementById('ctraddon_sbsize_minw').disabled = which;
 	document.getElementById('ctraddon_sbsize_maxw').disabled = which;
   },
   
-  ctrpwLocationSearchbarRadius: function(which) {
+  ctrpwLocationbarRadius: function(which) {
 	
     if(which==true) which=false;
 	else which=true;
 	
     document.getElementById('ctraddon_pw_lbsbradius_lb').disabled = which;
-    document.getElementById('ctraddon_pw_lbsbradius_sb').disabled = which;
 	document.getElementById('ctraddon_lbradius_left').disabled = which;
 	document.getElementById('ctraddon_lbradius_right').disabled = which;
+  },
+  
+  ctrpwSearchbarRadius: function(which) {
+	
+    if(which==true) which=false;
+	else which=true;
+	
+    document.getElementById('ctraddon_pw_lbsbradius_sb').disabled = which;
 	document.getElementById('ctraddon_sbradius_left').disabled = which;
 	document.getElementById('ctraddon_sbradius_right').disabled = which;
   },
@@ -1415,18 +1443,7 @@ classicthemerestorerjso.ctr = {
 		}
   
   },
-  
-  currentTabAppearance: function(which) {
-	
-	if(which=="tabs_squaredc2" || which=="tabs_squared2c2") {
-	  document.getElementById('ctraddon_pw_square_edges').disabled = false;
-	  document.getElementById('ctraddon_pw_square_edges').style.visibility = 'visible';
-	} else {
-	  document.getElementById('ctraddon_pw_square_edges').disabled = true;
-	  document.getElementById('ctraddon_pw_square_edges').style.visibility = 'collapse';
-	}
-  },
-  
+ 
   currentAboutPrefs: function(which) {
 	
 	if(which=="options_win" || which=="options_win_alt") {
@@ -1496,7 +1513,7 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setBoolPref("faviconurl",true);
 	this.prefs.setBoolPref("bmanimation",true);
 	this.prefs.setBoolPref("pananimation",true);
-	if (classicthemerestorerjso.ctr.contexts.getBoolPref("classic")){}else{
+	if (!classicthemerestorerjso.ctr.contexts.getBoolPref("classic")){
 		this.prefs.setBoolPref("noconicons",true);
 	}
 	this.prefs.setBoolPref("alt_newtabp",true);
@@ -1547,6 +1564,7 @@ classicthemerestorerjso.ctr = {
 	this.prefs.setCharPref("altoptions",'options_default');
 	this.prefs.setBoolPref("alt_addonsm",false);
 	this.prefs.setBoolPref("am_highlight",false);
+	this.prefs.setBoolPref("ttnooverfl",false);
 	if (this.oswindows) this.prefs.setBoolPref("dblclnewtab",true);
 	
 	this.needsBrowserRestart();

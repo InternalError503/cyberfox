@@ -459,6 +459,7 @@
 <!ENTITY ctr_abouthome.dark "Koyu renk about:home stili">
 <!ENTITY ctr_abouthome.simplicity  "Basit about:home stili">
 <!ENTITY ctr_abouthome.links "Bağlantısız about:home sayfası">
+<!ENTITY ctr_abouthome.apps "No apps on about:home page">
 <!ENTITY ctr_abouthome.logo "Logosuz about:home sayfası">
 <!ENTITY ctr_abouthome.icons "İkonsuz about:home sayfası">
 <!ENTITY ctr_abouthome.snippets "Parçacıksız about:home sayfası">

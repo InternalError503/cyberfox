@@ -3,10 +3,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+
 Components.utils.import("resource://gre/modules/Downloads.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/Task.jsm");
 Components.utils.import("resource:///modules/ShellService.jsm");
+Components.utils.import('resource://gre/modules/AppConstants.jsm');
 
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
                                   "resource://gre/modules/osfile.jsm");
@@ -25,14 +27,14 @@ var gMainPane = {
 
 #ifdef HAVE_SHELL_SERVICE
     this.updateSetDefaultBrowser();
-#ifdef XP_WIN
-    // In Windows 8 we launch the control panel since it's the only
-    // way to get all file type association prefs. So we don't know
-    // when the user will select the default.  We refresh here periodically
-    // in case the default changes. On other Windows OS's defaults can also
-    // be set while the prefs are open.
-    window.setInterval(this.updateSetDefaultBrowser.bind(this), 1000);
-#endif
+    if (AppConstants.platform == "win") {
+        // In Windows 8 we launch the control panel since it's the only
+        // way to get all file type association prefs. So we don't know
+        // when the user will select the default.  We refresh here periodically
+        // in case the default changes. On other Windows OS's defaults can also
+        // be set while the prefs are open.
+        window.setInterval(this.updateSetDefaultBrowser.bind(this), 1000);
+      }
 #endif
 
     // set up the "use current page" label-changing listener
@@ -41,16 +43,16 @@ var gMainPane = {
 
     this.updateBrowserStartupLastSession();
 
-#ifdef XP_WIN
-    // Functionality for "Show tabs in taskbar" on Windows 7 and up.
-    try {
-      let sysInfo = Components.classes["@mozilla.org/system-info;1"].
-                    getService(Components.interfaces.nsIPropertyBag2);
-      let ver = parseFloat(sysInfo.getProperty("version"));
-      let showTabsInTaskbar = document.getElementById("showTabsInTaskbar");
-      showTabsInTaskbar.hidden = ver < 6.1;
-    } catch (ex) {}
-#endif
+    if (AppConstants.platform == "win") {
+      // Functionality for "Show tabs in taskbar" on Windows 7 and up.
+      try {
+        let sysInfo = Cc["@mozilla.org/system-info;1"].
+                      getService(Ci.nsIPropertyBag2);
+        let ver = parseFloat(sysInfo.getProperty("version"));
+        let showTabsInTaskbar = document.getElementById("showTabsInTaskbar");
+        showTabsInTaskbar.hidden = ver < 6.1;
+      } catch (ex) {}
+    }
 
     setEventListener("browser.privatebrowsing.autostart", "change",
                      gMainPane.updateBrowserStartupLastSession);
@@ -177,10 +179,17 @@ var gMainPane = {
   {
     let homePref = document.getElementById("browser.startup.homepage");
 
-    // If the pref is set to about:home, set the value to "" to show the
-    // placeholder text (about:home title).
-    if (homePref.value.toLowerCase() == "about:home")
+    // If the pref is set to about:home or about:newtab, set the value to ""
+    // to show the placeholder text (about:home title) rather than
+    // exposing those URLs to users.
+    let defaultBranch = Services.prefs.getDefaultBranch("");
+    let defaultValue = defaultBranch.getComplexValue("browser.startup.homepage",
+                                                     Ci.nsIPrefLocalizedString).data;
+    let currentValue = homePref.value.toLowerCase();
+    if (currentValue == "about:home" ||
+        (currentValue == defaultValue && currentValue == "about:newtab")) {
       return "";
+    }
 
     // If the pref is actually "", show about:blank.  The actual home page
     // loading code treats them the same, and we don't want the placeholder text
@@ -318,8 +327,8 @@ var gMainPane = {
       useCurrent.label = useCurrent.getAttribute("label1");
 
     // In this case, the button's disabled state is set by preferences.xml.
-    if (document.getElementById
-        ("pref.browser.homepage.disable_button.current_page").locked)
+    let prefName = "pref.browser.homepage.disable_button.current_page";
+    if (document.getElementById(prefName).locked)
       return;
 
     useCurrent.disabled = !tabs.length
@@ -667,7 +676,7 @@ var gMainPane = {
     try {
       shellSvc.setDefaultBrowser(true, false);
     } catch (ex) {
-      Components.utils.reportError(ex);
+      Cu.reportError(ex);
       return;
     }
 

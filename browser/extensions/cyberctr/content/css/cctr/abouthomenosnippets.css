@@ -2,6 +2,8 @@
 @-moz-document url("about:home") {
 	  div[id^=snippet-],
 	  div[id^=logo-replacement],
+	  .heart-background-image-left-container,
+	  .heart-background-image-right-container,
     #defaultSnippet1,
     #defaultSnippet2,
     #rightsSnippet ,

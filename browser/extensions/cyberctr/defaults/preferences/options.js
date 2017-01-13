@@ -15,6 +15,7 @@ pref("extensions.classicthemerestorer.closetabbig",false);
 pref("extensions.classicthemerestorer.closeicon",'closeicon_default');
 pref("extensions.classicthemerestorer.tttitlebar",false);
 pref("extensions.classicthemerestorer.tttitlebar_c",false);
+pref("extensions.classicthemerestorer.ttnooverfl",false);
 
 //Appbutton settings
 pref("extensions.classicthemerestorer.appbutton",'appbutton_v1');
@@ -78,6 +79,7 @@ pref("extensions.classicthemerestorer.osearch_iwidth",true);
 pref("extensions.classicthemerestorer.osearch_cwidth",false);
 pref("extensions.classicthemerestorer.os_spsize_minw",200);
 pref("extensions.classicthemerestorer.os_spsize_maxw",200);
+pref("extensions.classicthemerestorer.searchbardark",false);
 //pref("extensions.classicthemerestorer.addonversion",true);
 pref("extensions.classicthemerestorer.alt_addonsm",false);
 pref("extensions.classicthemerestorer.am_nowarning",false);
@@ -141,6 +143,7 @@ pref("extensions.classicthemerestorer.urlbardropm",false);
 pref("extensions.classicthemerestorer.urlbardropm2",false);
 pref("extensions.classicthemerestorer.altreaderico",false);
 pref("extensions.classicthemerestorer.hideurlzoom",false);
+pref("extensions.classicthemerestorer.urlbardark",false);
 pref("extensions.classicthemerestorer.altautocompl",false);
 pref("extensions.classicthemerestorer.autocompl_it",false);
 pref("extensions.classicthemerestorer.autocompl_it2",false);
@@ -167,14 +170,16 @@ pref("extensions.classicthemerestorer.extraurlkeycb",false);
 pref("extensions.classicthemerestorer.extraurltarget",'tab');
 pref("extensions.classicthemerestorer.locsearchbw10",false);
 
-pref("extensions.classicthemerestorer.lbsbsize",false);
+pref("extensions.classicthemerestorer.lb_width",false);
 pref("extensions.classicthemerestorer.lbsize_minw",200);
 pref("extensions.classicthemerestorer.lbsize_maxw",4000);
+pref("extensions.classicthemerestorer.sb_width",false);
 pref("extensions.classicthemerestorer.sbsize_minw",200);
 pref("extensions.classicthemerestorer.sbsize_maxw",4000);
-pref("extensions.classicthemerestorer.lbsbradius",false);
+pref("extensions.classicthemerestorer.lb_roundness",false);
 pref("extensions.classicthemerestorer.lbradius_left",0);
 pref("extensions.classicthemerestorer.lbradius_right",0);
+pref("extensions.classicthemerestorer.sb_roundness",false);
 pref("extensions.classicthemerestorer.sbradius_left",0);
 pref("extensions.classicthemerestorer.sbradius_right",0);
 
@@ -248,8 +253,13 @@ pref("extensions.classicthemerestorer.nodevtheme2",false);
 pref("extensions.classicthemerestorer.ctr_english",false);
 //pref("extensions.classicthemerestorer.restartapp",true);
 pref("extensions.classicthemerestorer.ctrnewinv",true);
-pref("extensions.classicthemerestorer.pref_actindx",3);
-pref("extensions.classicthemerestorer.pref_actindx2",0);
+pref("extensions.classicthemerestorer.pw_actidx_c",1);
+pref("extensions.classicthemerestorer.pw_actidx_t",0);
+pref("extensions.classicthemerestorer.pw_actidx_tc",0);
+pref("extensions.classicthemerestorer.pw_actidx_g",0);
+pref("extensions.classicthemerestorer.pw_actidx_tb",0);
+pref("extensions.classicthemerestorer.pw_actidx_lb",0);
+pref("extensions.classicthemerestorer.pw_actidx_sb",0);
 
 // Tab color settings
 pref("extensions.classicthemerestorer.tabcolor_def",false);
@@ -360,6 +370,7 @@ pref("extensions.classicthemerestorer.aboutnewtabcustomhighlightcolor","#00adee"
 //Custom about:home style
 pref("extensions.classicthemerestorer.abouthome", "dark");
 pref("extensions.classicthemerestorer.abouthomenobar", false);
+pref("extensions.classicthemerestorer.abouthomenoappsbar", false);
 pref("extensions.classicthemerestorer.abouthomenologo", false);
 pref("extensions.classicthemerestorer.abouthomenoicons", false);
 pref("extensions.classicthemerestorer.abouthomenosnippets", false);

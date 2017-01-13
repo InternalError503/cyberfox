@@ -9,8 +9,6 @@ const XPINSTALL_URL = "chrome://mozapps/content/xpinstall/xpinstallConfirm.xul";
 const PREF_INSTALL_REQUIREBUILTINCERTS = "extensions.install.requireBuiltInCerts";
 const PROGRESS_NOTIFICATION = "addon-progress";
 
-const { REQUIRE_SIGNING } = Cu.import("resource://gre/modules/addons/AddonConstants.jsm", {});
-
 var rootDir = getRootDirectory(gTestPath);
 var path = rootDir.split('/');
 var chromeName = path[0] + '//' + path[2];
@@ -550,9 +548,7 @@ function test_sequential() {
 function test_someunverified() {
   // This test is only relevant if using the new doorhanger UI and allowing
   // unsigned add-ons
-  if (!Preferences.get("xpinstall.customConfirmationUI", false) ||
-      Preferences.get("xpinstall.signatures.required", true) ||
-      REQUIRE_SIGNING) {
+  if (!Preferences.get("xpinstall.customConfirmationUI", false)) {
     runNextTest();
     return;
   }
@@ -607,9 +603,7 @@ function test_someunverified() {
 function test_allunverified() {
   // This test is only relevant if using the new doorhanger UI and allowing
   // unsigned add-ons
-  if (!Preferences.get("xpinstall.customConfirmationUI", false) ||
-      Preferences.get("xpinstall.signatures.required", true) ||
-      REQUIRE_SIGNING) {
+  if (!Preferences.get("xpinstall.customConfirmationUI", false)) {
     runNextTest();
     return;
   }

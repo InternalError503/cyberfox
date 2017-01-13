@@ -1,0 +1,3 @@
+<!-- global informations -->
+<!ENTITY info.plugincheck.label                 "ตรวจสอบว่าโปรแกรมเสริมของคุณปรับรุ่นแล้วหรือยัง">
+<!ENTITY info.plugincheck.tooltip               "ตรวจสอบว่าโปรแกรมเสริมของคุณเป็นรุ่นล่าสุดแล้วหรือยัง">

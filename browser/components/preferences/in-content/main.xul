@@ -132,8 +132,7 @@
       data-category="paneGeneral">
   <image class="header-icon"/>
   <label class="header-name" flex="1">&paneGeneral.title;</label>
-  <button class="help-button"
-          aria-label="&helpButton.label;"/>
+  <html:a class="help-button" target="_blank" aria-label="&helpButton.label;"></html:a>
 </hbox>
 
 <!-- Startup -->

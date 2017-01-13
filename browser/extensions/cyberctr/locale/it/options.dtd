@@ -15,7 +15,8 @@
 <!ENTITY Ctr_windowcontrols	"Pulsanti controllo finestra (A tutto schermo)">
 <!ENTITY Ctr_rr				"Riavviare &brandShortName;!">
 <!ENTITY Ctr_window			"la finestra">
-<!ENTITY Ctr_centered		"Centered">
+<!ENTITY Ctr_centered		"Centrato">
+<!ENTITY Ctr_page			"Pagina">
 
 <!ENTITY Ctr_cuibuttons		"Pulsanti">
 <!ENTITY Ctr_cuibutnormal	"Normali">
@@ -57,6 +58,7 @@
 <!ENTITY Ctr_tabwidthinfo3	"Valori inferiori a 48px provocheranno anomalie nella maggior parte dei casi!">
 <!ENTITY Ctr_square_edges	"Angoli superiori spigolosi">
 <!ENTITY Ctr_tttitlebar		"Titolo scheda nella barra del titolo di &brandShortName;">
+<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
 <!ENTITY Ctr_tabinsertion	"Inserisci la scheda correlata dopo la scheda corrente">
 <!ENTITY Ctr_emptytfavico	"Mostra favicon (quando un sito ne è privo)">
 <!ENTITY Ctr_emptytfavico_n	"Nessuna">
@@ -88,17 +90,18 @@
 <!ENTITY Ctr_paneluibtweak	"Visualizza il pulsante menu come pulsante di &brandShortName;...">
 <!ENTITY Ctr_paneluibtweak2	"Visualizza il pulsante menu come pulsante di &brandShortName; (solo icona)...">
 <!ENTITY Ctr_paneluibtweak3	"...quando è nella barra delle schede">
-<!ENTITY Ctr_appbuttonc_o	"Pulsante arancione (Firefox)">
-<!ENTITY Ctr_appbuttonc_a	"Pulsante blu (Aurora)">
-<!ENTITY Ctr_appbuttonc_n	"Pulsante nero (Nightly)">
-<!ENTITY Ctr_appbuttonc_t	"Pulsante trasparente">
-<!ENTITY Ctr_appbuttonc_p	"Pulsante azzurro (Palemoon)">
-<!ENTITY Ctr_appbuttonc_r	"Pulsante rosso">
-<!ENTITY Ctr_appbuttonc_g	"Pulsante verde">
-<!ENTITY Ctr_appbuttonc_gr	"Pulsante grigio">
-<!ENTITY Ctr_appbuttonc_pu	"Pulsante viola">
-<!ENTITY Ctr_appbuttonc_wh	"Pulsante bianco">
-<!ENTITY Ctr_appbuttonc_cu	"Colore personalizzato">
+<!ENTITY Ctr_appbuttonc		"Pulsante">
+<!ENTITY Ctr_appbuttonc_o	"Arancione (Firefox)">
+<!ENTITY Ctr_appbuttonc_a	"Blu (Aurora)">
+<!ENTITY Ctr_appbuttonc_n	"Nero (Nightly)">
+<!ENTITY Ctr_appbuttonc_t	"Trasparente">
+<!ENTITY Ctr_appbuttonc_p	"Azzurro (Palemoon)">
+<!ENTITY Ctr_appbuttonc_r	"Rosso">
+<!ENTITY Ctr_appbuttonc_g	"Verde">
+<!ENTITY Ctr_appbuttonc_gr	"Grigio">
+<!ENTITY Ctr_appbuttonc_pu	"Viola">
+<!ENTITY Ctr_appbuttonc_wh	"Bianco">
+<!ENTITY Ctr_appbuttonc_cu	"Personalizzato">
 <!ENTITY Ctr_appbuttonct	"Colore personalizzato per il pulsante nella barra degli strumenti">
 <!ENTITY Ctr_appbuttonI1	"Riavvio consigliato">
 <!ENTITY Ctr_appbuttonI1e	"Visibile solo nella barra del titolo di &brandShortName; e non in quella di Windows.">
@@ -123,6 +126,8 @@
 <!ENTITY Ctr_altoptionsd	"Aspetto predefinito">
 <!ENTITY Ctr_altoptionsp	"Aspetto alternativo">
 <!ENTITY Ctr_altoptionsw	"Aprire la pagina Opzioni in una finestra">
+<!ENTITY Ctr_altoptions_hm	"horizontal menu">
+<!ENTITY Ctr_altoptions_vm	"vertical menu">
 <!ENTITY Ctr_altoptionsww	"Larghezza">
 <!ENTITY Ctr_altoptionswh	"Altezza">
 <!ENTITY Ctr_altoptionsi	"La finestra delle opzioni non si presenta più come un dialogo ma come una finestra del browser con tutte le barre degli strumenti nascoste. La caratteristica 'Usa la pagina corrente' aggiunge gli url delle pagine aperte nella finestra corrente, che in questo caso è solo 'about:preferences'. Il pulsante delle 'opzioni' è sostituito da uno nuovo che è in grado di aprire le opzioni in una finestra.">
@@ -194,11 +199,11 @@
 <!ENTITY Ctr_bmbutton		"Menu del pulsante segnalibri">
 <!ENTITY Ctr_hiderecentbm	"Popup segnalibri: nascondi i segnalibri aggiunti di recente">
 <!ENTITY Ctr_hideeditbm		"Stella dei segnalibri: nascondi popup (se la pagina non è nei segnalibri)">
-<!ENTITY Ctr_oldplacesbut	"Bookmark items and folders on toolbar: old appearance">
-<!ENTITY Ctr_dl_pm_drop		"Download buttons panel: show dropmarker">
+<!ENTITY Ctr_oldplacesbut	"Cartelle e voci dei segnalibri sulla barra: aspetto classico">
+<!ENTITY Ctr_dl_pm_drop		"Pulsanti del pannello di download: mostra il dropmarker">
 <!ENTITY Ctr_bmbutpanelm	"Aspetto del menu a pannello">
 <!ENTITY Ctr_bmbunsortbm	"Menu dei 'Segnalibri non catalogati'">
-<!ENTITY Ctr_bmbunsortbm2	"Menu above bookmarks">
+<!ENTITY Ctr_bmbunsortbm2	"Menu sopra i segnalibri">
 <!ENTITY Ctr_bmbviewbmsb	"Mostra 'Visualizza barra laterale segnalibri'">
 <!ENTITY Ctr_bmbviewbmtb	"Mostra 'Visualizza Barra dei segnalibri'">
 <!ENTITY Ctr_bmbnounsort	"Nascondi 'Segnalibri non catalogati'">
@@ -212,7 +217,7 @@
 <!ENTITY Ctr_closegeneral	"Icone generiche di chiusura">
 
 <!ENTITY Ctr_tabsep_def		"Separatori schede predefiniti">
-<!ENTITY Ctr_fxmockup		"Mockup di &brandShortName;">
+<!ENTITY Ctr_fxmockup		"Stile di &brandShortName;">
 <!ENTITY Ctr_tabmokcolor	"Utilizza il colore bianco per i pulsanti delle schede (Chiudi, Nuova, Gruppi, Mostra tutte)">
 <!ENTITY Ctr_tabmokcolor2	"Utilizza testo bianco con ombreggiatura scura nelle schede non attive">
 <!ENTITY Ctr_tabmokcolor4	"Colore bianco per la favicon punteggiata vuota">
@@ -260,9 +265,10 @@
 <!ENTITY Ctr_urlbardropm2	"Dropmarker sempre visibile">
 <!ENTITY Ctr_altreaderico	"Icone alternative della modalità di lettura">
 <!ENTITY Ctr_hideurlzoom	"Nascondi il pulsante dello zoom (se presente)">
+<!ENTITY Ctr_urlbardark		"Dark background color">
 <!ENTITY Ctr_hideprbutton	"Nascondi l’icona di notifica quando un popup viene bloccato">
 <!ENTITY Ctr_locsearchbw10	"Riduci l'altezza delle barre degli indirizzi e di ricerca (sperimentale)">
-<!ENTITY Ctr_urlbar_ib		"Pulsante delle connessioni sicure (riquadro di verifica)">
+<!ENTITY Ctr_urlbar_ib		"Pulsante delle connessioni sicure">
 <!ENTITY Ctr_ib_nohovcolor	"Non mostrare il colore grigio al passaggio del mouse">
 <!ENTITY Ctr_ib_graycolor	"Colore grigio per le identità sconosciute e le pagine chrome">
 <!ENTITY Ctr_verifiedcolors	"Pulsanti colorati per le connessioni ai siti verificati, sicuri e non sicuri">
@@ -277,11 +283,12 @@
 <!ENTITY Ctr_padlock_mod	"moderno">
 <!ENTITY Ctr_padlock_ext	"Icona di '&brandShortName;' per le pagine 'about' valide">
 <!ENTITY Ctr_icopageinfo	"Favicon/icona 'i'/globo: il 'clic' apre la finestra 'Informazioni pagina'">
-<!ENTITY Ctr_lbsbsize		"Larghezza personalizzata per la barra degli indirizzi e di ricerca">
+<!ENTITY Ctr_lbsbsize		"Larghezza personalizzata">
 <!ENTITY Ctr_searchbar		"Barra di ricerca">
 <!ENTITY Ctr_autocomplete	"Completamento automatico">
 <!ENTITY Ctr_altautocompl	"Aspetto alternativo">
 <!ENTITY Ctr_autocompl_it	"Rimuovi le voci 'Cerca con...' e 'Apri' (se presenti)">
+<!ENTITY Ctr_acompl_search	"Mostra i motori di ricerca">
 <!ENTITY Ctr_autocompl_hl	"Evidenziamento del testo dei risultati">
 <!ENTITY Ctr_autocompl_rhl	"Colori Aero per i risultati evidenziati">
 <!ENTITY Ctr_autocompl_not	"Nascondi il titolo della pagina">
@@ -290,7 +297,7 @@
 <!ENTITY Ctr_lbsugresi		"Disattiva il limite di altezza">
 <!ENTITY Ctr_cresultshcb	"Limite di altezza personalizzato: ">
 <!ENTITY Ctr_lbsugres		"Numero di risultati">
-<!ENTITY Ctr_lbsbradius		"Arrotondamento personalizzato della barra degli indirizzi e di ricerca">
+<!ENTITY Ctr_lbsbradius		"Arrotondamento personalizzato">
 
 <!ENTITY Ctr_menubar_items	"Posizione delle voci del menu">
 <!ENTITY Ctr_extrabar		"Barre degli strumenti aggiuntive">
@@ -354,8 +361,7 @@
 <!ENTITY Ctr_lessaddonsbar	"Diminuisci l'altezza">
 <!ENTITY Ctr_addonbarfs		"In modalità tutto schermo">
 
-<!ENTITY Ctr_animation		"Icone animate">
-<!ENTITY Ctr_tabthrobber	"Immagine di caricamento predefinita">
+<!ENTITY Ctr_tabthrobber	"Immagine di caricamento">
 <!ENTITY Ctr_bmanimation	"Icona animata all’aggiunta di un segnalibro">
 <!ENTITY Ctr_pananimation	"Icona animata all’apertura di un pannello">
 <!ENTITY Ctr_tabanimation	"Icona animata all’apertura o alla chiusura di una scheda">
@@ -378,14 +384,13 @@
 <!ENTITY Ctr_fx38pocket2	"Nota: muovendo il pulsante 'Pocket' nella personalizzazione prima di disattivare questa opzione, Pocket viene rimosso dai segnalibri e dal menu di lettura.">
 <!ENTITY Ctr_e_loop			"Chiamate e conversazioni (Hello)">
 <!ENTITY Ctr_e_readermode	"Modalità lettura">
+<!ENTITY Ctr_e_geolocation	"Geolocalizzazione">
 <!ENTITY Ctr_e_pocket		"Pocket">
 <!ENTITY Ctr_e_tabsaudioico	"Icone altoparlanti nelle schede">
 <!ENTITY Ctr_e_containertab	"Schede container">
 <!ENTITY Ctr_e_findbarhl	"Evidenziamento della barra per la ricerca nel testo">
 <!ENTITY Ctr_fx50findbarhl	"Deselezionando queste preferenze vengono rimosse le caratteristiche di evidenziamento della barra per la ricerca nel testo.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_e_oneoffsearch	"Selezione di ricerca dei menu a comparsa di autocompletamento">
-<!ENTITY Ctr_fx51OOSeach	"Deselezionando questa preferenza viene rimossa la selezione di ricerca del menu a comparsa di autocompletamento dalle barre degli indirizzi.">
 
 
 <!ENTITY Ctr_pw_settings	"Impostazioni">
@@ -400,12 +405,12 @@
 <!ENTITY Ctr_special_font	"La modifica del colore di sfondo si applica solo utilizzando il tema predefinito!">
 <!ENTITY Ctr_special_info	"Alcune opzioni si applicano solo in casi particolari">
 <!ENTITY Ctr_special_info2	"Le impostazioni sono pensate per il tema predefinito e potrebbero non funzionare con altri temi">
-<!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
+<!ENTITY Ctr_special_acr	"Segnala i problemi solamente tramite i canali di supporto ufficiale e non con 'Add-on Compatibility Reporter'!">
 <!ENTITY Ctr_support		"Supporto">
 <!ENTITY Ctr_support_forum1	"MozillaZine (forum inglese)">
 <!ENTITY Ctr_support_forum2	"Camp Firefox (forum tedesco)">
 <!ENTITY Ctr_github_issues	"Segnala un problema su Github">
-<!ENTITY Ctr_newversion		"Controlla se c'è una nuova versione">
+<!ENTITY Ctr_newversion		"Controllo aggiornamenti">
 
 <!ENTITY Ctr_addon-bar.accesskey		"B">
 <!ENTITY appMenuGettingStarted.label	"Primi passi">
@@ -432,8 +437,8 @@
 
 <!-- Extra CyberCTR Additions -->
 
-<!ENTITY Ctr_appbuttonc_d	"Cyberfox button color (Default)">
-<!ENTITY Ctr_appbuttonc_s	"Salmon button color">
+<!ENTITY Ctr_appbuttonc_d	"Cyberfox (Default)">
+<!ENTITY Ctr_appbuttonc_s	"Salmon">
 
 <!ENTITY Ctr_alt_newtabpalt	"New tab page: styled appearance">
 <!ENTITY ctr_aboutnewtab.customhighlight "Use custom highlight color">
@@ -474,6 +479,7 @@
 <!ENTITY ctr_abouthome.dark "Dark about:home style">
 <!ENTITY ctr_abouthome.simplicity  "Simplicity about:home style">
 <!ENTITY ctr_abouthome.links "No links on about:home page">
+<!ENTITY ctr_abouthome.apps "No apps on about:home page">
 <!ENTITY ctr_abouthome.logo "No logo on about:home page">
 <!ENTITY ctr_abouthome.icons "No icons on about:home page">
 <!ENTITY ctr_abouthome.snippets "No snippets on about:home page">

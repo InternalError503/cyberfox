@@ -1,0 +1,3 @@
+<!-- global informations -->
+<!ENTITY info.plugincheck.label                 "Zkontrolovat aktuálnost zásuvných modulů">
+<!ENTITY info.plugincheck.tooltip               "Zkontroluje, zda jsou zásuvné moduly aktuální">
