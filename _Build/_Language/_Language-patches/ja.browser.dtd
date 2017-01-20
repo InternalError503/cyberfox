@@ -70,6 +70,7 @@
 <!ENTITY turnonclone.label "タブ複製機能を有効にする">
 <!ENTITY cloneCurrentTab.label "現在のタブを複製">
 <!ENTITY cloneInNewWindow.label "新しいウィンドウに複製">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->

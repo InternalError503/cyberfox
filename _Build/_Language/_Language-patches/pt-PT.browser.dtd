@@ -70,6 +70,7 @@
 <!ENTITY turnonclone.label "Ativar a opção Clonar separador.">
 <!ENTITY cloneCurrentTab.label "Clonar separador atual">
 <!ENTITY cloneInNewWindow.label "Clonar em nova janela">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->

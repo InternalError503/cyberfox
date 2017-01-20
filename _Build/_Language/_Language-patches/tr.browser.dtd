@@ -70,6 +70,7 @@
 <!ENTITY turnonclone.label "Klon Sekme özelliğini aç.">
 <!ENTITY cloneCurrentTab.label "Mevcut sekmeyi klonla">
 <!ENTITY cloneInNewWindow.label "Yeni sekmeye klonla">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->

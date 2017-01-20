@@ -71,6 +71,7 @@
 <!ENTITY turnonclone.label "Включить опцию клонирования вкладки">
 <!ENTITY cloneCurrentTab.label "Клонировать вкладку">
 <!ENTITY cloneInNewWindow.label "Клонировать в новом окне">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->

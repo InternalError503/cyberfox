@@ -78,6 +78,7 @@
 <!ENTITY turnonclone.label          "Activer la fonction Dupliquer l’onglet ».">
 <!ENTITY cloneCurrentTab.label      "Dupliquer cet onglet">
 <!ENTITY cloneInNewWindow.label     "Le dupliquer dans une nouvelle fenêtre">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->

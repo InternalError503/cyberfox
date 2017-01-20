@@ -70,6 +70,7 @@
 <!ENTITY turnonclone.label "Optionen zum duplizieren der Tabs anzeigen.">
 <!ENTITY cloneCurrentTab.label "Tab duplizieren">
 <!ENTITY cloneInNewWindow.label "In ein neues Fenster duplizieren">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->
