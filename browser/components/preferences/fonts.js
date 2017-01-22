@@ -77,11 +77,6 @@ var gFontsDialog = {
 
   onBeforeAccept: function ()
   {
-    // Only care in in-content prefs
-    if (!window.frameElement) {
-      return true;
-    }
-
     let preferences = document.querySelectorAll("preference[id*='font.minimum-size']");
     // It would be good if we could avoid touching languages the pref pages won't use, but
     // unfortunately the language group APIs (deducing language groups from language codes)

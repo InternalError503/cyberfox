@@ -828,8 +828,6 @@ DllBlocklist_Initialize()
   if (GetModuleHandleA("user32.dll")) {
     sUser32BeforeBlocklist = true;
   }
-  // Catch any missing DELAYLOADS for user32.dll
-  MOZ_ASSERT(!sUser32BeforeBlocklist);
 
   NtDllIntercept.Init("ntdll.dll");
 
@@ -877,4 +875,12 @@ DllBlocklist_WriteNotes(HANDLE file)
     WriteFile(file, kUser32BeforeBlocklistParameter,
               kUser32BeforeBlocklistParameterLen, &nBytes, nullptr);
   }
+}
+
+MFBT_API bool
+DllBlocklist_CheckStatus()
+{
+  if (sBlocklistInitFailed || sUser32BeforeBlocklist)
+    return false;
+  return true;
 }

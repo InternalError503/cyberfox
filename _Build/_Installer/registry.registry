@@ -27,14 +27,8 @@ Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode"; ValueType: 
 Root: "HKLM"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -safe-mode"; Flags: uninsdeletekey
 Root: "HKLM"; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppExeNameUC}\Capabilities"; Flags: deletevalue
 
-;Generate update manager information.
-;Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey deletekey uninsdeletekey
-;Remove in next update these values are no longer needed as the cyberfox update manager is being depreciated
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
-Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}86"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
+;Remove update manager information.
+Root: "HKLM"; Subkey: "Software\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey deletekey uninsdeletekey
 
 #elif Arch == "amd64"
 ;Generate Windows default programs information x64.
@@ -63,14 +57,8 @@ Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode"; ValueType
 Root: "HKLM64"; Subkey: "{#RegPath}\{#MyAppExeNameUC}\shell\safemode\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -safe-mode"; Flags: uninsdeletekey
 Root: "HKLM64"; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppExeNameUC}\Capabilities"; Flags: deletevalue
 
-;Generate update manager information.
-;Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey deletekey uninsdeletekey
-;Remove in next update these values are no longer needed as the cyberfox update manager is being depreciated
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: uninsdeletekeyifempty
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "RootDir"; ValueData: "{app}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"; Flags: uninsdeletekey
-Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Package"; ValueData: "{#PackageType}"; Flags: uninsdeletekey
+;Remove update manager information.
+Root: "HKLM64"; Subkey: "Software\Wow6432Node\{#MyAppPublisher}"; ValueType: none; Flags: dontcreatekey deletekey uninsdeletekey
 #endif
 
 ;Remove registered HTML & URL associations on uninstall, Remove generated update manager information.

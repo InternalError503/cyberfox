@@ -16,7 +16,7 @@ var gProvider;
 var gApp = document.getElementById("bundle_brand").getString("brandShortName");
 var gVersion = Services.appinfo.version;
 var gDate = new Date(2010, 7, 1);
-let infoURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
+var infoURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "unsigned-addons";
 
 function open_details(aId, aType, aCallback) {
   requestLongerTimeout(2);

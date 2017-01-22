@@ -3,9 +3,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-# NB: IF YOU ADD ITEMS TO THIS FILE, PLEASE UPDATE THE WHITELIST IN
-# BrowserUITelemetry.jsm. SEE BUG 991757 FOR DETAILS.
-
       <menugroup id="context-navigation">
         <menuitem id="context-back"
                   class="menuitem-iconic"
@@ -84,14 +81,14 @@
                 label="&openLinkCmdInCurrent.label;"
                 accesskey="&openLinkCmdInCurrent.accesskey;"
                 oncommand="gContextMenu.openLinkInCurrent();"/>
-# label and usercontextid are dynamically set.
+# label and data-usercontextid are dynamically set.
       <menuitem id="context-openlinkincontainertab"
                 accesskey="&openLinkCmdInTab.accesskey;"
                 oncommand="gContextMenu.openLinkInTab(event);"/>
       <menuitem id="context-openlinkintab"
                 label="&openLinkCmdInTab.label;"
                 accesskey="&openLinkCmdInTab.accesskey;"
-                usercontextid="0"
+                data-usercontextid="0"
                 oncommand="gContextMenu.openLinkInTab(event);"/>
 
       <menu id="context-openlinkinusercontext-menu"
@@ -125,10 +122,6 @@
                 label="&saveLinkCmd.label;"
                 accesskey="&saveLinkCmd.accesskey;"
                 oncommand="gContextMenu.saveLink();"/>
-      <menu id="context-marklinkMenu" label="&social.marklinkMenu.label;"
-            accesskey="&social.marklinkMenu.accesskey;">
-        <menupopup/>
-      </menu>
       <menuitem id="context-copyemail"
                 label="&copyEmailCmd.label;"
                 accesskey="&copyEmailCmd.accesskey;"
@@ -323,10 +316,6 @@
                 hidden="true">
         <menupopup id="context-sendpagetodevice-popup"
                    onpopupshowing="(() => { let browser = gBrowser || getPanelBrowser(); gFxAccounts.populateSendTabToDevicesMenu(event.target, browser.currentURI.spec, browser.contentTitle); })()"/>
-      </menu>
-      <menu id="context-markpageMenu" label="&social.markpageMenu.label;"
-            accesskey="&social.markpageMenu.accesskey;">
-        <menupopup/>
       </menu>
       <menuitem id="context-sendLink"
 				        class="menuitem-iconic"	  

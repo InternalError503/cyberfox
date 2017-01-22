@@ -54,28 +54,13 @@ this.AppConstants = Object.freeze({
 #endif
 
   MOZ_DEV_EDITION:
-#ifdef MOZ_DEV_EDITION
-  true,
-#else
   false,
-#endif
 
   MOZ_SERVICES_HEALTHREPORT:
   false,
 
   MOZ_DATA_REPORTING:
-#ifdef MOZ_DATA_REPORTING
-  true,
-#else
   false,
-#endif
-
-  MOZ_SAFE_BROWSING:
-#ifdef MOZ_SAFE_BROWSING
-  true,
-#else
-  false,
-#endif
 
   MOZ_SANDBOX:
 #ifdef MOZ_SANDBOX
@@ -116,6 +101,13 @@ this.AppConstants = Object.freeze({
 
   MOZ_WEBRTC:
 #ifdef MOZ_WEBRTC
+  true,
+#else
+  false,
+#endif
+
+  MOZ_WIDGET_GTK:
+#ifdef MOZ_WIDGET_GTK
   true,
 #else
   false,
@@ -175,18 +167,10 @@ this.AppConstants = Object.freeze({
 #endif
 
   MOZ_VERIFY_MAR_SIGNATURE:
-#ifdef MOZ_VERIFY_MAR_SIGNATURE
-  true,
-#else
   false,
-#endif
 
   MOZ_MAINTENANCE_SERVICE:
-#ifdef MOZ_MAINTENANCE_SERVICE
-  true,
-#else
   false,
-#endif
 
   E10S_TESTING_ONLY:
 #ifdef E10S_TESTING_ONLY
@@ -236,9 +220,6 @@ this.AppConstants = Object.freeze({
 #else
   false,
 #endif
-
-  MOZ_REQUIRE_SIGNING:
-  false,
 
   MENUBAR_CAN_AUTOHIDE:
 #ifdef MENUBAR_CAN_AUTOHIDE
@@ -290,12 +271,6 @@ this.AppConstants = Object.freeze({
   MOZ_B2G_VERSION: @MOZ_B2G_VERSION@,
   MOZ_B2G_OS_NAME: @MOZ_B2G_OS_NAME@,
 
-  MOZ_ANDROID_APZ:
-#ifdef MOZ_ANDROID_APZ
-    true,
-#else
-    false,
-#endif
   DEBUG_JS_MODULES: "@DEBUG_JS_MODULES@",
 
   // URL to the hg revision this was built from (e.g.
@@ -306,15 +281,15 @@ this.AppConstants = Object.freeze({
 #endif
   SOURCE_REVISION_URL: "@MOZ_SOURCE_URL@",
 
-  MOZ_NUWA_PROCESS:
-#ifdef MOZ_NUWA_PROCESS
+  HAVE_USR_LIB64_DIR:
+#ifdef HAVE_USR_LIB64_DIR
     true,
 #else
     false,
 #endif
 
-  HAVE_USR_LIB64_DIR:
-#ifdef HAVE_USR_LIB64_DIR
+  HAVE_SHELL_SERVICE:
+#ifdef HAVE_SHELL_SERVICE
     true,
 #else
     false,

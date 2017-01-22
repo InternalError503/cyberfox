@@ -585,13 +585,6 @@ Tester.prototype = {
             sidebar.docShell.createAboutBlankContentViewer(null);
             sidebar.setAttribute("src", "about:blank");
 
-            // Do the same for the social sidebar.
-            let socialSidebar = document.getElementById("social-sidebar-browser");
-            socialSidebar.setAttribute("src", "data:text/html;charset=utf-8,");
-            socialSidebar.docShell.createAboutBlankContentViewer(null);
-            socialSidebar.setAttribute("src", "about:blank");
-
-            SocialFlyout.unload();
             SocialShare.uninit();
           }
 

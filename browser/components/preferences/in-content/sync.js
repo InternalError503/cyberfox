@@ -139,6 +139,11 @@ var gSyncPane = {
     XPCOMUtils.defineLazyGetter(this, '_accountsStringBundle', () => {
       return Services.strings.createBundle("chrome://browser/locale/accounts.properties");
     });
+	
+    document.getElementById("tosPP-small-ToS").setAttribute("href", gSyncUtils.tosURL);
+    document.getElementById("tosPP-normal-ToS").setAttribute("href", gSyncUtils.tosURL);
+    document.getElementById("tosPP-small-PP").setAttribute("href", gSyncUtils.privacyPolicyURL);
+    document.getElementById("tosPP-normal-PP").setAttribute("href", gSyncUtils.privacyPolicyURL);
 
     fxAccounts.promiseAccountsManageURI(this._getEntryPoint()).then(url => {
       document.getElementById("verifiedManage").setAttribute("href", url);
@@ -239,8 +244,6 @@ var gSyncPane = {
       gSyncPane.startOver(true);
       return false;
     });
-    setEventListener("tosPP-normal-ToS", "click", gSyncPane.openToS);
-    setEventListener("tosPP-normal-PP", "click", gSyncPane.openPrivacyPolicy);
     setEventListener("loginErrorUpdatePass", "click", function () {
       gSyncPane.updatePass();
       return false;
@@ -275,8 +278,6 @@ var gSyncPane = {
     setEventListener("rejectUnlinkFxaAccount", "command", function () {
       gSyncPane.unlinkFirefoxAccount(true);
     });
-    setEventListener("tosPP-small-ToS", "click", gSyncPane.openToS);
-    setEventListener("tosPP-small-PP", "click", gSyncPane.openPrivacyPolicy);
     setEventListener("fxaSyncComputerName", "keypress", function (e) {
       if (e.keyCode == KeyEvent.DOM_VK_RETURN) {
         document.getElementById("fxaSaveChangeDeviceName").click();
@@ -520,16 +521,6 @@ var gSyncPane = {
                         .chromeEventHandler;
     // And tell it to load our URL.
     browser.loadURI(url);
-  },
-
-  openPrivacyPolicy: function(aEvent) {
-    aEvent.stopPropagation();
-    gSyncUtils.openPrivacyPolicy();
-  },
-
-  openToS: function(aEvent) {
-    aEvent.stopPropagation();
-    gSyncUtils.openToS();
   },
 
   signUp: function() {

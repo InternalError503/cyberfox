@@ -51,13 +51,6 @@ config = {
         ("browser/config/mozconfigs/whitelist",
          "ac_add_options --with-branding=browser/branding/aurora",
          "ac_add_options --with-branding=browser/branding/nightly"),
-    ] + [
-        ("build/mozconfig.common",
-         "MOZ_REQUIRE_SIGNING=${MOZ_REQUIRE_SIGNING-0}",
-         "MOZ_REQUIRE_SIGNING=${MOZ_REQUIRE_SIGNING-1}"),
-        ("build/mozconfig.common",
-         "# Disable enforcing that add-ons are signed by the trusted root",
-         "# Enable enforcing that add-ons are signed by the trusted root")
     ],
 
     "vcs_share_base": os.path.join(ABS_WORK_DIR, 'hg-shared'),

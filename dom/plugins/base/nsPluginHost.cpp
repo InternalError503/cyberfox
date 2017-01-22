@@ -73,7 +73,7 @@
 #include "nsIDOMWindow.h"
 
 #include "nsNetCID.h"
-#include "mozilla/Snprintf.h"
+#include "mozilla/Sprintf.h"
 #include "nsThreadUtils.h"
 #include "nsIInputStreamTee.h"
 #include "nsQueryObject.h"
@@ -145,6 +145,7 @@ static const char *kPrefPluginsDisabled = "plugins.disabled";
 static const char *kPrefPluginsAllowedWhitelist = "plugin.allowed_whitelist.enabled";
 static const char *kPrefPluginsJavaAllowed = "plugin.java_allowed";
 static const char *kPrefPluginsFlashAllowed = "plugin.flash_allowed";
+static const char *kPrefPluginsSilverlightAllowed = "plugin.silverlight_allowed";
 #endif
 
 // How long we wait before unloading an idle plugin process.
@@ -310,10 +311,8 @@ nsPluginHost::nsPluginHost()
     Preferences::GetBool("plugin.override_internal_types", false);
 
   mPluginsDisabled = Preferences::GetBool("plugin.disable", false);
-  mPluginsClickToPlay = Preferences::GetBool("plugins.click_to_play", false);
 
   Preferences::AddStrongObserver(this, "plugin.disable");
-  Preferences::AddStrongObserver(this, "plugins.click_to_play");
 
   nsCOMPtr<nsIObserverService> obsService =
     mozilla::services::GetObserverService();
@@ -957,12 +956,10 @@ nsPluginHost::TrySetUpPluginInstance(const nsACString &aMimeType,
                                      nsPluginInstanceOwner *aOwner)
 {
 #ifdef PLUGIN_LOGGING
-  nsAutoCString urlSpec;
-  if (aURL != nullptr) aURL->GetSpec(urlSpec);
-
   MOZ_LOG(nsPluginLogging::gPluginLog, PLUGIN_LOG_NORMAL,
-        ("nsPluginHost::TrySetupPluginInstance Begin mime=%s, owner=%p, url=%s\n",
-         PromiseFlatCString(aMimeType).get(), aOwner, urlSpec.get()));
+          ("nsPluginHost::TrySetupPluginInstance Begin mime=%s, owner=%p, url=%s\n",
+           PromiseFlatCString(aMimeType).get(), aOwner,
+           aURL ? aURL->GetSpecOrDefault().get() : ""));
 
   PR_LogFlush();
 #endif
@@ -1021,13 +1018,10 @@ nsPluginHost::TrySetUpPluginInstance(const nsACString &aMimeType,
   }
 
 #ifdef PLUGIN_LOGGING
-  nsAutoCString urlSpec2;
-  if (aURL)
-    aURL->GetSpec(urlSpec2);
-
   MOZ_LOG(nsPluginLogging::gPluginLog, PLUGIN_LOG_BASIC,
         ("nsPluginHost::TrySetupPluginInstance Finished mime=%s, rv=%d, owner=%p, url=%s\n",
-         PromiseFlatCString(aMimeType).get(), rv, aOwner, urlSpec2.get()));
+         PromiseFlatCString(aMimeType).get(), rv, aOwner,
+         aURL ? aURL->GetSpecOrDefault().get() : ""));
 
   PR_LogFlush();
 #endif
@@ -1422,7 +1416,7 @@ class nsPluginUnloadRunnable : public Runnable
 public:
   explicit nsPluginUnloadRunnable(uint32_t aPluginId) : mPluginId(aPluginId) {}
 
-  NS_IMETHOD Run()
+  NS_IMETHOD Run() override
   {
     RefPtr<nsPluginHost> host = nsPluginHost::GetInst();
     if (!host) {
@@ -2117,6 +2111,14 @@ nsPluginHost::ShouldAddPlugin(nsPluginTag* aPluginTag)
 		  if (StringBeginsWith(aPluginTag->FileName(), NS_LITERAL_CSTRING("NPSWF"), nsCaseInsensitiveCStringComparator()) &&
 			  (aPluginTag->HasMimeType(NS_LITERAL_CSTRING("application/x-shockwave-flash")) ||
 			   aPluginTag->HasMimeType(NS_LITERAL_CSTRING("application/x-shockwave-flash-test")))) {
+			return false;
+		  }
+	  }
+	  if (!Preferences::GetBool(kPrefPluginsSilverlightAllowed, false)) {
+		if (StringBeginsWith(aPluginTag->FileName(), NS_LITERAL_CSTRING("npctrl"), nsCaseInsensitiveCStringComparator()) &&
+			  (aPluginTag->HasMimeType(NS_LITERAL_CSTRING("application/x-silverlight-test")) ||
+			   aPluginTag->HasMimeType(NS_LITERAL_CSTRING("application/x-silverlight-2")) ||
+			   aPluginTag->HasMimeType(NS_LITERAL_CSTRING("application/x-silverlight")))) {
 			return false;
 		  }
 	  }
@@ -3700,7 +3702,6 @@ NS_IMETHODIMP nsPluginHost::Observe(nsISupports *aSubject,
   }
   if (!strcmp(NS_PREFBRANCH_PREFCHANGE_TOPIC_ID, aTopic)) {
     mPluginsDisabled = Preferences::GetBool("plugin.disable", false);
-    mPluginsClickToPlay = Preferences::GetBool("plugins.click_to_play", false);
     // Unload or load plugins as needed
     if (mPluginsDisabled) {
       UnloadPlugins();
@@ -4271,7 +4272,7 @@ public:
     PR_REMOVE_LINK(this);
   }
 
-  NS_IMETHOD Run()
+  NS_IMETHOD Run() override
   {
     RefPtr<nsNPAPIPluginInstance> instance;
 

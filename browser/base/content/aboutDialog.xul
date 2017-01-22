@@ -39,8 +39,11 @@
     <hbox id="clientBox">
       <vbox id="leftBox" flex="1"/>
       <vbox id="rightBox" flex="1">
+        <hbox align="baseline">
 #expand <label id="version">__MOZ_APP_VERSION_DISPLAY__</label>
 #expand <label id="releasenotes" class="text-link" href="https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date/?version=__MOZ_APP_VERSION__">&releaseNotes.link;</label>
+        </hbox>
+
         <label id="distribution" class="text-blurb"/>
         <label id="distributionId" class="text-blurb"/>
 

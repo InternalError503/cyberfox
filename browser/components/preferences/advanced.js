@@ -1,7 +1,6 @@
-# -*- indent-tabs-mode: nil; js-indent-level: 4 -*-
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // Load DownloadUtils module for convertByteUnits
 Components.utils.import("resource://gre/modules/DownloadUtils.jsm");
@@ -38,22 +37,23 @@ var gAdvancedPane = {
         advancedPrefs.selectedIndex = preference.value;
     }
 
-#ifdef MOZ_UPDATER
-    let onUnload = function () {
-      window.removeEventListener("unload", onUnload, false);
-      Services.prefs.removeObserver("app.update.", this);
-    }.bind(this);
-    window.addEventListener("unload", onUnload, false);
-    Services.prefs.addObserver("app.update.", this, false);
-    this.updateReadPrefs();
-#endif
+    if (AppConstants.MOZ_UPDATER) {
+      let onUnload = function () {
+        window.removeEventListener("unload", onUnload, false);
+        Services.prefs.removeObserver("app.update.", this);
+      }.bind(this);
+      window.addEventListener("unload", onUnload, false);
+      Services.prefs.addObserver("app.update.", this, false);
+      this.updateReadPrefs();
+    }
     this.updateOfflineApps();
-#ifdef MOZ_CRASHREPORTER
-    this.initSubmitCrashes();
-#endif
-#ifdef MOZ_SERVICES_HEALTHREPORT
-    this.initSubmitHealthReport();
-#endif
+    if (AppConstants.MOZ_CRASHREPORTER) {
+      this.initSubmitCrashes();
+    }
+    this.initTelemetry();
+    if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      this.initSubmitHealthReport();
+    }
     this.updateOnScreenKeyboardVisibility();
     this.updateCacheSizeInputField();
     this.updateActualCacheSize();
@@ -63,6 +63,11 @@ var gAdvancedPane = {
                      gAdvancedPane.updateHardwareAcceleration);
     setEventListener("advancedPrefs", "select",
                      gAdvancedPane.tabSelectionChanged);
+    if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      setEventListener("submitHealthReportBox", "command",
+                       gAdvancedPane.updateSubmitHealthReport);
+    }
+
     setEventListener("connectionSettings", "command",
                      gAdvancedPane.showConnections);
     setEventListener("clearCacheButton", "command",
@@ -78,20 +83,16 @@ var gAdvancedPane = {
             .style.height = bundlePrefs.getString("offlineAppsList.height");
     setEventListener("offlineAppsListRemove", "command",
                      gAdvancedPane.removeOfflineApp);
-#ifdef MOZ_SERVICES_HEALTHREPORT
-    setEventListener("submitHealthReportBox", "command",
-                     gAdvancedPane.updateSubmitHealthReport);
-#endif
-#ifdef MOZ_CRASHREPORTER
-    setEventListener("submitCrashesBox", "command",
+    if (AppConstants.MOZ_CRASHREPORTER) {
+      setEventListener("submitCrashesBox", "command",
                      gAdvancedPane.updateSubmitCrashes);
-#endif
-#ifdef MOZ_UPDATER
-    setEventListener("updateRadioGroup", "command",
-                     gAdvancedPane.updateWritePrefs);
-    setEventListener("showUpdateHistory", "command",
-                     gAdvancedPane.showUpdates);
-#endif
+    }
+    if (AppConstants.MOZ_UPDATER) {
+      setEventListener("updateRadioGroup", "command",
+                       gAdvancedPane.updateWritePrefs);
+      setEventListener("showUpdateHistory", "command",
+                       gAdvancedPane.showUpdates);
+    }
     setEventListener("viewCertificatesButton", "command",
                      gAdvancedPane.showCertificates);
     setEventListener("viewSecurityDevicesButton", "command",
@@ -99,15 +100,14 @@ var gAdvancedPane = {
     setEventListener("cacheSize", "change",
                      gAdvancedPane.updateCacheSizePref);
 
-#ifdef MOZ_WIDGET_GTK
-    // GTK tabbox' allow the scroll wheel to change the selected tab,
-    // but we don't want this behavior for the in-content preferences.
-    let tabsElement = document.getElementById("tabsElement");
-    tabsElement.addEventListener("DOMMouseScroll", event => {
-      event.stopPropagation();
-    }, true);
-#endif
-
+    if (AppConstants.MOZ_WIDGET_GTK) {
+      // GTK tabbox' allow the scroll wheel to change the selected tab,
+      // but we don't want this behavior for the in-content preferences.
+      let tabsElement = document.getElementById("tabsElement");
+      tabsElement.addEventListener("DOMMouseScroll", event => {
+        event.stopPropagation();
+      }, true);
+    }
     // Notify observers that the UI is now ready
     Services.obs.notifyObservers(window, "advanced-pane-loaded", null);
   },
@@ -293,54 +293,58 @@ var gAdvancedPane = {
    */
   initTelemetry: function ()
   {
-#ifdef MOZ_TELEMETRY_REPORTING
-    this._setupLearnMoreLink("toolkit.telemetry.infoURL", "telemetryLearnMore");
-#endif
+    if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      this._setupLearnMoreLink("toolkit.telemetry.infoURL", "telemetryLearnMore");
+    }
   },
-#ifdef MOZ_TELEMETRY_REPORTING
+
   /**
    * Set the status of the telemetry controls based on the input argument.
    * @param {Boolean} aEnabled False disables the controls, true enables them.
    */
   setTelemetrySectionEnabled: function (aEnabled)
   {
-    // If FHR is disabled, additional data sharing should be disabled as well.
-    let disabled = !aEnabled;
-    document.getElementById("submitTelemetryBox").disabled = disabled;
-    if (disabled) {
-      // If we disable FHR, untick the telemetry checkbox.
-      Services.prefs.setBoolPref("toolkit.telemetry.enabled", false);
+    if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      // If FHR is disabled, additional data sharing should be disabled as well.
+      let disabled = !aEnabled;
+      document.getElementById("submitTelemetryBox").disabled = disabled;
+      if (disabled) {
+        // If we disable FHR, untick the telemetry checkbox.
+        Services.prefs.setBoolPref("toolkit.telemetry.enabled", false);
+      }
+      document.getElementById("telemetryDataDesc").disabled = disabled;
     }
-    document.getElementById("telemetryDataDesc").disabled = disabled;
   },
-#endif
-#ifdef MOZ_TELEMETRY_REPORTING
+
   /**
    * Initialize the health report service reference and checkbox.
    */
   initSubmitHealthReport: function () {
-    this._setupLearnMoreLink("datareporting.healthreport.infoURL", "FHRLearnMore");
+    if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      this._setupLearnMoreLink("datareporting.healthreport.infoURL", "FHRLearnMore");
 
-    let checkbox = document.getElementById("submitHealthReportBox");
+      let checkbox = document.getElementById("submitHealthReportBox");
 
-    if (Services.prefs.prefIsLocked(PREF_UPLOAD_ENABLED)) {
-      checkbox.setAttribute("disabled", "true");
-      return;
+      if (Services.prefs.prefIsLocked(PREF_UPLOAD_ENABLED)) {
+        checkbox.setAttribute("disabled", "true");
+        return;
+      }
+
+      checkbox.checked = Services.prefs.getBoolPref(PREF_UPLOAD_ENABLED);
+      this.setTelemetrySectionEnabled(checkbox.checked);
     }
-
-    checkbox.checked = Services.prefs.getBoolPref(PREF_UPLOAD_ENABLED);
-    this.setTelemetrySectionEnabled(checkbox.checked);
   },
 
   /**
    * Update the health report preference with state from checkbox.
    */
   updateSubmitHealthReport: function () {
-    let checkbox = document.getElementById("submitHealthReportBox");
-    Services.prefs.setBoolPref(PREF_UPLOAD_ENABLED, checkbox.checked);
-    this.setTelemetrySectionEnabled(checkbox.checked);
+    if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      let checkbox = document.getElementById("submitHealthReportBox");
+      Services.prefs.setBoolPref(PREF_UPLOAD_ENABLED, checkbox.checked);
+      this.setTelemetrySectionEnabled(checkbox.checked);
+    }
   },
-#endif
 
   updateOnScreenKeyboardVisibility() {
     if (AppConstants.platform == "win") {
@@ -670,7 +674,6 @@ var gAdvancedPane = {
    * - true if updates to search engines are enabled, false otherwise
    */
 
-#ifdef MOZ_UPDATER
   /**
    * Selects the item of the radiogroup based on the pref values and locked
    * states.
@@ -690,43 +693,45 @@ var gAdvancedPane = {
    */
   updateReadPrefs: function ()
   {
-    var enabledPref = document.getElementById("app.update.enabled");
-    var autoPref = document.getElementById("app.update.auto");
-    var radiogroup = document.getElementById("updateRadioGroup");
+    if (AppConstants.MOZ_UPDATER) {
+      var enabledPref = document.getElementById("app.update.enabled");
+      var autoPref = document.getElementById("app.update.auto");
+      var radiogroup = document.getElementById("updateRadioGroup");
 
-    if (!enabledPref.value)   // Don't care for autoPref.value in this case.
-      radiogroup.value="manual";    // 3. Never check for updates.
-    else if (autoPref.value)  // enabledPref.value && autoPref.value
-      radiogroup.value="auto";      // 1. Automatically install updates
-    else                      // enabledPref.value && !autoPref.value
-      radiogroup.value="checkOnly"; // 2. Check, but let me choose
+      if (!enabledPref.value)   // Don't care for autoPref.value in this case.
+        radiogroup.value="manual";    // 3. Never check for updates.
+      else if (autoPref.value)  // enabledPref.value && autoPref.value
+        radiogroup.value="auto";      // 1. Automatically install updates
+      else                      // enabledPref.value && !autoPref.value
+        radiogroup.value="checkOnly"; // 2. Check, but let me choose
 
-    var canCheck = Components.classes["@mozilla.org/updates/update-service;1"].
-                     getService(Components.interfaces.nsIApplicationUpdateService).
-                     canCheckForUpdates;
-    // canCheck is false if the enabledPref is false and locked,
-    // or the binary platform or OS version is not known.
-    // A locked pref is sufficient to disable the radiogroup.
-    radiogroup.disabled = !canCheck || enabledPref.locked || autoPref.locked;
+      var canCheck = Components.classes["@mozilla.org/updates/update-service;1"].
+                       getService(Components.interfaces.nsIApplicationUpdateService).
+                       canCheckForUpdates;
+      // canCheck is false if the enabledPref is false and locked,
+      // or the binary platform or OS version is not known.
+      // A locked pref is sufficient to disable the radiogroup.
+      radiogroup.disabled = !canCheck || enabledPref.locked || autoPref.locked;
 
-#ifdef MOZ_MAINTENANCE_SERVICE
-    // Check to see if the maintenance service is installed.
-    // If it is don't show the preference at all.
-    var installed;
-    try {
-      var wrk = Components.classes["@mozilla.org/windows-registry-key;1"]
-                .createInstance(Components.interfaces.nsIWindowsRegKey);
-      wrk.open(wrk.ROOT_KEY_LOCAL_MACHINE,
-               "SOFTWARE\\Mozilla\\MaintenanceService",
-               wrk.ACCESS_READ | wrk.WOW64_64);
-      installed = wrk.readIntValue("Installed");
-      wrk.close();
-    } catch(e) {
+      if (AppConstants.MOZ_MAINTENANCE_SERVICE) {
+        // Check to see if the maintenance service is installed.
+        // If it is don't show the preference at all.
+        var installed;
+        try {
+          var wrk = Components.classes["@mozilla.org/windows-registry-key;1"]
+                    .createInstance(Components.interfaces.nsIWindowsRegKey);
+          wrk.open(wrk.ROOT_KEY_LOCAL_MACHINE,
+                   "SOFTWARE\\Mozilla\\MaintenanceService",
+                   wrk.ACCESS_READ | wrk.WOW64_64);
+          installed = wrk.readIntValue("Installed");
+          wrk.close();
+        } catch (e) {
+        }
+        if (installed != 1) {
+          document.getElementById("useService").hidden = true;
+        }
+      }
     }
-    if (installed != 1) {
-      document.getElementById("useService").hidden = true;
-    }
-#endif
   },
 
   /**
@@ -734,21 +739,23 @@ var gAdvancedPane = {
    */
   updateWritePrefs: function ()
   {
-    var enabledPref = document.getElementById("app.update.enabled");
-    var autoPref = document.getElementById("app.update.auto");
-    var radiogroup = document.getElementById("updateRadioGroup");
-    switch (radiogroup.value) {
-      case "auto":      // 1. Automatically install updates for Desktop only
-        enabledPref.value = true;
-        autoPref.value = true;
-        break;
-      case "checkOnly": // 2. Check, but let me choose
-        enabledPref.value = true;
-        autoPref.value = false;
-        break;
-      case "manual":    // 3. Never check for updates.
-        enabledPref.value = false;
-        autoPref.value = false;
+    if (AppConstants.MOZ_UPDATER) {
+      var enabledPref = document.getElementById("app.update.enabled");
+      var autoPref = document.getElementById("app.update.auto");
+      var radiogroup = document.getElementById("updateRadioGroup");
+      switch (radiogroup.value) {
+        case "auto":      // 1. Automatically install updates for Desktop only
+          enabledPref.value = true;
+          autoPref.value = true;
+          break;
+        case "checkOnly": // 2. Check, but let me choose
+          enabledPref.value = true;
+          autoPref.value = false;
+          break;
+        case "manual":    // 3. Never check for updates.
+          enabledPref.value = false;
+          autoPref.value = false;
+      }
     }
   },
 
@@ -761,7 +768,6 @@ var gAdvancedPane = {
                              .createInstance(Components.interfaces.nsIUpdatePrompt);
     prompter.showUpdateHistory(window);
   },
-#endif
 
   // ENCRYPTION TAB
 
@@ -797,13 +803,13 @@ var gAdvancedPane = {
                                         "", null);
   },
 
-#ifdef MOZ_UPDATER
   observe: function (aSubject, aTopic, aData) {
-    switch(aTopic) {
-      case "nsPref:changed":
-        this.updateReadPrefs();
-        break;
+    if (AppConstants.MOZ_UPDATER) {
+      switch (aTopic) {
+        case "nsPref:changed":
+          this.updateReadPrefs();
+          break;
+      }
     }
   },
-#endif
 };

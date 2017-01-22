@@ -91,8 +91,6 @@ def build_dict(config, env=os.environ):
     d['telemetry'] = substs.get('MOZ_TELEMETRY_REPORTING') == '1'
     d['tests_enabled'] = substs.get('ENABLE_TESTS') == "1"
     d['bin_suffix'] = substs.get('BIN_SUFFIX', '')
-    d['addon_signing'] = substs.get('MOZ_ADDON_SIGNING') == '1'
-    d['require_signing'] = substs.get('MOZ_REQUIRE_SIGNING') == '1'
     d['official'] = bool(substs.get('MOZILLA_OFFICIAL'))
     d['sm_promise'] = bool(substs.get('SPIDERMONKEY_PROMISE'))
 
@@ -155,7 +153,6 @@ def write_mozinfo(file, config, env=os.environ):
     """
     build_conf = build_dict(config, env)
     if isinstance(file, basestring):
-        with open(file, "w") as f:
-            json.dump(build_conf, f)
-    else:
-        json.dump(build_conf, file)
+        file = open(file, 'wb')
+
+    json.dump(build_conf, file, sort_keys=True, indent=4)

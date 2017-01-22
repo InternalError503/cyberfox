@@ -28,6 +28,18 @@
     <preferences id="mainPreferences">
       <!-- XXX Button preferences -->
 
+#ifdef E10S_TESTING_ONLY
+      <preference id="browser.tabs.remote.autostart"
+                  name="browser.tabs.remote.autostart"
+                  type="bool"/>
+      <preference id="e10sTempPref"
+                  name="browser.tabs.remote.autostart.2"
+                  type="bool"/>
+      <preference id="e10sForceEnable"
+                name="browser.tabs.remote.force-enable"
+                  type="bool"/>
+#endif
+
       <!-- Startup -->
       <preference id="browser.startup.page"
                   name="browser.startup.page"
@@ -86,6 +98,11 @@
           <label id="getStarted" class="text-link">&getStarted.label;</label>
         </hbox>
       </vbox>
+#endif
+
+#ifdef E10S_TESTING_ONLY
+  <checkbox id="e10sAutoStart"
+            label="&e10sEnabled.label;"/>
 #endif
 
 #ifdef HAVE_SHELL_SERVICE

@@ -4,9 +4,9 @@
 
 browser.jar:
 *   content/browser/preferences/advanced.xul
-*   content/browser/preferences/advanced.js
+    content/browser/preferences/advanced.js
     content/browser/preferences/applications.xul
-*   content/browser/preferences/applications.js
+    content/browser/preferences/applications.js
     content/browser/preferences/applicationManager.xul
     content/browser/preferences/applicationManager.js
     content/browser/preferences/blocklists.xul
@@ -26,7 +26,7 @@ browser.jar:
 *   content/browser/preferences/languages.xul
     content/browser/preferences/languages.js
 *   content/browser/preferences/main.xul
-*   content/browser/preferences/main.js
+    content/browser/preferences/main.js
     content/browser/preferences/permissions.xul
     content/browser/preferences/permissions.js
 *   content/browser/preferences/preferences.xul

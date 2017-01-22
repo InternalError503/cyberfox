@@ -27,7 +27,7 @@ var {
   gridPrefs: gGridPrefs
 } = NewTabUtils;
 
-var isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled");
+const isSearchEnabled = Services.prefs.getBoolPref("browser.newtab.search.enabled");
 
 XPCOMUtils.defineLazyGetter(this, "gStringBundle", function() {
   return Services.strings.

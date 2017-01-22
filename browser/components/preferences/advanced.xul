@@ -117,6 +117,9 @@
  	  <preference id="plugin.java_allowed" 
 						   name="plugin.java_allowed" 
 						   type="bool"/>
+ 	  <preference id="plugin.silverlight_allowed" 
+						   name="plugin.silverlight_allowed" 
+						   type="bool"/>
  	  <preference id="plugins.disabled" 
 						   name="plugins.disabled" 
 						   type="bool"/>
@@ -501,6 +504,9 @@
 							tooltiptext="&restartRequiredMSG.label;"/>
 					<checkbox id="plugin.java_allowed" label="&browserpluginsjavaenabled.label;  (&restartRequiredMSG.label;)"
 							preference="plugin.java_allowed"
+							tooltiptext="&restartRequiredMSG.label;"/>
+					<checkbox id="plugin.silverlight_allowed" label="&browserpluginssilverlightenabled.label;  (&restartRequiredMSG.label;)"
+							preference="plugin.silverlight_allowed"
 							tooltiptext="&restartRequiredMSG.label;"/>							
 			</groupbox>
 			

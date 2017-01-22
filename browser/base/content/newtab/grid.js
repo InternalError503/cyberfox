@@ -171,6 +171,7 @@ var gGrid = {
     // Create the site's inner HTML code.
     site.innerHTML =
       '<a class="newtab-link">' +
+      '  <span class="newtab-thumbnail placeholder"/>' +
       '  <span class="newtab-thumbnail"/>' +
       '  <span class="newtab-title"/>' +
       '</a>' +

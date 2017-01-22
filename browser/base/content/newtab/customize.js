@@ -23,6 +23,15 @@ var gCustomize = {
     this._nodes.button.addEventListener("click", e => this.showPanel(e));
     this._nodes.blank.addEventListener("click", this);
     this._nodes.classic.addEventListener("click", this);
+    document.getElementById("newtab-customize-compat").addEventListener("click", function(){
+       Services.prefs.setBoolPref("browser.newtabpage.compact", !Services.prefs.getBoolPref("browser.newtabpage.compact"));
+       location.reload(true);
+    });
+    if (Services.prefs.getBoolPref("browser.newtabpage.compact")){
+        document.getElementById("newtab-customize-compat").setAttribute("selected", true);
+    } else {
+        document.getElementById("newtab-customize-compat").removeAttribute("selected");
+    }
 
     this.updateSelected();
   },

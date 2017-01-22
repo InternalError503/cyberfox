@@ -46,8 +46,6 @@ NS_VISIBILITY_DEFAULT __attribute__((weak));
 
 namespace mozilla {
 
-void RecordShutdownEndTimeStamp();
-
 class StartupTimeline {
 public:
   enum Event {

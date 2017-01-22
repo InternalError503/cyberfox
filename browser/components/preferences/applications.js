@@ -1,9 +1,8 @@
-/*
-# -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+"use strict";
 
 //****************************************************************************//
 // Constants & Enumeration Values
@@ -479,13 +478,7 @@ FeedHandlerInfo.prototype = {
     Cc["@mozilla.org/embeddor.implemented/web-content-handler-registrar;1"].
     getService(Ci.nsIWebContentConverterService),
 
-  _shellSvc:
-#ifdef HAVE_SHELL_SERVICE
-    getShellService(),
-#else
-    null,
-#endif
-
+  _shellSvc: AppConstants.HAVE_SHELL_SERVICE ? getShellService() : null,
 
   //**************************************************************************//
   // nsIHandlerInfo
@@ -607,14 +600,14 @@ FeedHandlerInfo.prototype = {
       return this.__defaultApplicationHandler;
 
     var defaultFeedReader = null;
-#ifdef HAVE_SHELL_SERVICE
-    try {
-      defaultFeedReader = this._shellSvc.defaultFeedReader;
+    if (AppConstants.HAVE_SHELL_SERVICE) {
+      try {
+        defaultFeedReader = this._shellSvc.defaultFeedReader;
+      }
+      catch (ex) {
+        // no default reader or _shellSvc is null
+      }
     }
-    catch(ex) {
-      // no default reader or _shellSvc is null
-    }
-#endif
 
     if (defaultFeedReader) {
       let handlerApp = Cc["@mozilla.org/uriloader/local-handler-app;1"].
@@ -633,15 +626,15 @@ FeedHandlerInfo.prototype = {
   },
 
   get hasDefaultHandler() {
-#ifdef HAVE_SHELL_SERVICE
-    try {
-      if (this._shellSvc.defaultFeedReader)
-        return true;
+    if (AppConstants.HAVE_SHELL_SERVICE) {
+      try {
+        if (this._shellSvc.defaultFeedReader)
+          return true;
+      }
+      catch (ex) {
+        // no default reader or _shellSvc is null
+      }
     }
-    catch(ex) {
-      // no default reader or _shellSvc is null
-    }
-#endif
 
     return false;
   },

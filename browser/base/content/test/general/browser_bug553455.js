@@ -548,7 +548,8 @@ function test_sequential() {
 function test_someunverified() {
   // This test is only relevant if using the new doorhanger UI and allowing
   // unsigned add-ons
-  if (!Preferences.get("xpinstall.customConfirmationUI", false)) {
+  if (!Preferences.get("xpinstall.customConfirmationUI", false) ||
+      Preferences.get("xpinstall.signatures.required", true)) {
     runNextTest();
     return;
   }
@@ -603,7 +604,8 @@ function test_someunverified() {
 function test_allunverified() {
   // This test is only relevant if using the new doorhanger UI and allowing
   // unsigned add-ons
-  if (!Preferences.get("xpinstall.customConfirmationUI", false)) {
+  if (!Preferences.get("xpinstall.customConfirmationUI", false) ||
+      Preferences.get("xpinstall.signatures.required", true)) {
     runNextTest();
     return;
   }
@@ -697,7 +699,7 @@ function test_localfile() {
   try {
     var path = cr.convertChromeURL(makeURI(CHROMEROOT + "corrupt.xpi")).spec;
   } catch (ex) {
-    var path = CHROMEROOT + "corrupt.xpi";
+    path = CHROMEROOT + "corrupt.xpi";
   }
   gBrowser.selectedTab = gBrowser.addTab("about:blank");
   BrowserTestUtils.browserLoaded(gBrowser.selectedBrowser).then(() => {
@@ -1127,7 +1129,7 @@ function runNextTest() {
     gTestStart = Date.now();
     TESTS.shift()();
   });
-};
+}
 
 var XPInstallObserver = {
   observe: function (aSubject, aTopic, aData) {
