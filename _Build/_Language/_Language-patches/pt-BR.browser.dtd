@@ -207,7 +207,7 @@
 <!ENTITY abouthome.google.label "Google">
 <!ENTITY abouthome.google.url "https://www.google.com.br/">
 <!ENTITY abouthome.youtube.label "YouTube">
-<!ENTITY abouthome.youtube.url "https://www.youtube.com/?hl=pt&gl=BR">
+<!ENTITY abouthome.youtube.url "https://www.youtube.com/?hl=pt&amp;gl=BR">
 <!ENTITY abouthome.facebook.label "Facebook">
 <!ENTITY abouthome.facebook.url "https://pt-br.facebook.com/">
 <!ENTITY abouthome.twitter.label "Twitter">

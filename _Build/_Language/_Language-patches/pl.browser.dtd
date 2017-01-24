@@ -70,6 +70,7 @@
 <!ENTITY turnonclone.label "Włącz funkcję klonowania kart">
 <!ENTITY cloneCurrentTab.label "Klonuj w nowej karcie">
 <!ENTITY cloneInNewWindow.label "Klonuj w nowym oknie">
+<!ENTITY cloneInNewPrivate.label "Private">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->
