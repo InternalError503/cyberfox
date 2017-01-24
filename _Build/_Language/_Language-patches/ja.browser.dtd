@@ -182,6 +182,7 @@
 <!ENTITY browserpluginswhitelist.label "プラグインのホワイトリストを有効にする">
 <!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
 <!ENTITY browserpluginsjavaenabled.label "Java ブラウザ プラグインを有効にする">
+<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "システム アドオン">

@@ -190,6 +190,7 @@
 <!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
 <!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
 <!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
+<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "System Addons">

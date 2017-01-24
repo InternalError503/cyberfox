@@ -182,6 +182,7 @@
 <!ENTITY browserpluginswhitelist.label "Ativar lista de permissões para os plugins.">
 <!ENTITY browserpluginsflashenabled.label "Ativar o plugin Flash Player.">
 <!ENTITY browserpluginsjavaenabled.label "Ativar o plugin Java.">
+<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Extras do sistema">
