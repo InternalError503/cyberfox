@@ -290,7 +290,7 @@ var AboutNetAndCertErrorListener = {
     let div = content.document.getElementById("certificateErrorText");
     div.textContent = msg.data.info;
     let learnMoreLink = content.document.getElementById("learnMoreLink");
-    let baseURL = Services.urlFormatter.formatURLPref("app.support.baseURL");
+    let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
 
     switch (msg.data.code) {
       case SEC_ERROR_UNKNOWN_ISSUER:

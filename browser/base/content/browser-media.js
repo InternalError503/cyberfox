@@ -43,7 +43,7 @@ var gEMEHandler = {
   },
   getLearnMoreLink: function(msgId) {
     let text = gNavigatorBundle.getString("emeNotifications." + msgId + ".learnMoreLabel");
-    let baseURL = Services.urlFormatter.formatURLPref("app.support.baseURL");
+    let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
     return "<label class='text-link' href='" + baseURL + "drm-content'>" +
            text + "</label>";
   },
@@ -183,7 +183,7 @@ var gEMEHandler = {
     let options = {
       dismissed: true,
       eventCallback: aTopic => aTopic == "swapping",
-      learnMoreURL: Services.urlFormatter.formatURLPref("app.support.baseURL") + "drm-content",
+      learnMoreURL: Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "drm-content",
     };
     PopupNotifications.show(browser, "drmContentPlaying", message, anchorId, mainAction, null, options);
   },
@@ -325,7 +325,7 @@ let gDecoderDoctorHandler = {
             }
             histogram.add(decoderDoctorReportId, TELEMETRY_DDSTAT_CLICKED);
 
-            let baseURL = Services.urlFormatter.formatURLPref("app.support.baseURL");
+            let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
             openUILinkIn(baseURL + "fix-video-audio-problems-firefox-windows", "tab");
           }
         });

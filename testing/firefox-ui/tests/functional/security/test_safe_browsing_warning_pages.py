@@ -75,7 +75,7 @@ class TestSafeBrowsingWarningPages(FirefoxTestCase):
         with self.marionette.using_context('chrome'):
             url = self.marionette.execute_script("""
               Components.utils.import("resource://gre/modules/Services.jsm");
-              return Services.urlFormatter.formatURLPref("app.support.baseURL")
+              return Services.urlFormatter.formatURLPref("app.helpdoc.baseURI")
                                                          + "phishing-malware";
             """)
 

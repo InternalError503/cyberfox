@@ -345,17 +345,6 @@ BrowserGlue.prototype = {
       case "flash-plugin-hang":
         this._handleFlashHang();
         break;
-      case "xpi-signature-changed":
-        let disabledAddons = JSON.parse(data).disabled;
-        AddonManager.getAddonsByIDs(disabledAddons, (addons) => {
-          for (let addon of addons) {
-            if (addon.type != "experiment") {
-              this._notifyUnsignedAddonsDisabled();
-              break;
-            }
-          }
-        });
-        break;
       case "test-initialize-sanitizer":
         this._sanitizer.onStartup();
         break;
@@ -603,27 +592,6 @@ BrowserGlue.prototype = {
     nb.appendNotification(message, "reset-profile-notification",
                           "chrome://global/skin/icons/question-16.png",
                           nb.PRIORITY_INFO_LOW, buttons);
-  },
-
-  _notifyUnsignedAddonsDisabled: function () {
-    let win = RecentWindow.getMostRecentBrowserWindow();
-    if (!win)
-      return;
-
-    let message = win.gNavigatorBundle.getString("unsignedAddonsDisabled.message");
-    let buttons = [
-      {
-        label:     win.gNavigatorBundle.getString("unsignedAddonsDisabled.learnMore.label"),
-        accessKey: win.gNavigatorBundle.getString("unsignedAddonsDisabled.learnMore.accesskey"),
-        callback: function () {
-          win.BrowserOpenAddonsMgr("addons://list/extension?unsigned=true");
-        }
-      },
-    ];
-
-    let nb = win.document.getElementById("high-priority-global-notificationbox");
-    nb.appendNotification(message, "unsigned-addons-disabled", "",
-                          nb.PRIORITY_WARNING_MEDIUM, buttons);
   },
 
   // the first browser window has finished initializing

@@ -36,7 +36,7 @@ function* test_decoder_doctor_notification(type, notificationMessage, options) {
     is(button.getAttribute("accesskey"), gNavigatorBundle.getString("decoder.noCodecs.accesskey"),
       "notification button should have accesskey");
 
-    let baseURL = Services.urlFormatter.formatURLPref("app.support.baseURL");
+    let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
     let url = baseURL + "fix-video-audio-problems-firefox-windows";
     let awaitNewTab = BrowserTestUtils.waitForNewTab(gBrowser, url);
     button.click();
