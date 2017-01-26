@@ -67,12 +67,11 @@ struct DllBlockInfo {
   enum {
     FLAGS_DEFAULT = 0,
     BLOCK_WIN8PLUS_ONLY = 1,
-    BLOCK_XP_ONLY = 2,
     USE_TIMESTAMP = 4,
   } flags;
 };
 
-static DllBlockInfo sWindowsDllBlocklist[] = {
+static const DllBlockInfo sWindowsDllBlocklist[] = {
   // EXAMPLE:
   // { "uxtheme.dll", ALL_VERSIONS },
   // { "uxtheme.dll", 0x0000123400000000ULL },
@@ -157,9 +156,6 @@ static DllBlockInfo sWindowsDllBlocklist[] = {
   { "spvc32.dll", ALL_VERSIONS },
   { "spvc32loader.dll", ALL_VERSIONS },
   { "sprotector.dll", ALL_VERSIONS },
-
-  // XP topcrash with F-Secure, bug 970362
-  { "fs_ccf_ni_umh32.dll", MAKE_VERSION(1, 42, 101, 0), DllBlockInfo::BLOCK_XP_ONLY },
 
   // Topcrash with V-bates, bug 1002748 and bug 1023239
   { "libinject.dll", UNVERSIONED },
@@ -625,7 +621,6 @@ patched_LdrLoadDll (PWCHAR filePath, PULONG flags, PUNICODE_STRING moduleFileNam
   char dllName[DLLNAME_MAX+1];
   wchar_t *dll_part;
   char *dot;
-  DllBlockInfo *info;
 
   int len = moduleFileName->Length / 2;
   wchar_t *fname = moduleFileName->Buffer;
@@ -711,7 +706,7 @@ patched_LdrLoadDll (PWCHAR filePath, PULONG flags, PUNICODE_STRING moduleFileNam
   }
 
   // then compare to everything on the blocklist
-  info = &sWindowsDllBlocklist[0];
+  const DllBlockInfo* info = &sWindowsDllBlocklist[0];
   while (info->name) {
     if (strcmp(info->name, dllName) == 0)
       break;
@@ -728,11 +723,6 @@ patched_LdrLoadDll (PWCHAR filePath, PULONG flags, PUNICODE_STRING moduleFileNam
 
     if ((info->flags == DllBlockInfo::BLOCK_WIN8PLUS_ONLY) &&
         !IsWin8OrLater()) {
-      goto continue_loading;
-    }
-
-    if ((info->flags == DllBlockInfo::BLOCK_XP_ONLY) &&
-        IsWin2003OrLater()) {
       goto continue_loading;
     }
 
@@ -804,7 +794,7 @@ continue_loading:
       return STATUS_DLL_NOT_FOUND;
     }
 
-    if (IsVistaOrLater() && !CheckASLR(full_fname.get())) {
+    if (!CheckASLR(full_fname.get())) {
       printf_stderr("LdrLoadDll: Blocking load of '%s'.  XPCOM components must support ASLR.\n", dllName);
       return STATUS_DLL_NOT_FOUND;
     }
