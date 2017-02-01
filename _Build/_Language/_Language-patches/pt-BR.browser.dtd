@@ -182,7 +182,7 @@
 <!ENTITY browserpluginswhitelist.label "Habilitar plugins da lista branca.">
 <!ENTITY browserpluginsflashenabled.label "Habilitar plugin flash do navegador.">
 <!ENTITY browserpluginsjavaenabled.label "Habilitar plugin java do navegador.">
-<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
+<!ENTITY browserpluginssilverlightenabled.label "Habilitar o plugin silverlight do navegador.">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Complementos do sistema">

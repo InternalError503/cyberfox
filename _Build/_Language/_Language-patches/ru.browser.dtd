@@ -180,9 +180,9 @@
 <!ENTITY browserplugins.label "Плагины браузера">
 <!ENTITY browserpluginsdisabled.label "Отключить плагины браузера (отключаются все плагины)">
 <!ENTITY browserpluginswhitelist.label "Разрешить белый список плагинов">
-<!ENTITY browserpluginsflashenabled.label "Включить плагин Flash.">
+<!ENTITY browserpluginsflashenabled.label "Включить плагин Flash">
 <!ENTITY browserpluginsjavaenabled.label "Включить плагин Java">
-<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
+<!ENTITY browserpluginssilverlightenabled.label "Включить плагин Silverlight">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Системные дополнения">
