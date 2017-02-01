@@ -191,7 +191,7 @@
 <!ENTITY enablepocket.label "Habilitar pocket.">
 
 <!-- Helpful ToolTips -->
-<!ENTITY restartRequiredMSG.label "Necessário reiniciar o navegador.">
+<!ENTITY restartRequiredMSG.label "Necessário reiniciar o navegador">
 
 <!-- Flashplayer Protect Mode -->
 <!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
