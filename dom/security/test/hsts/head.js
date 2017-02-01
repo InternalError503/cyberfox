@@ -16,6 +16,8 @@
  */
 'use strict';
 
+var { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
+
 var TOP_URI = "https://example.com/browser/dom/security/test/hsts/file_priming-top.html";
 
 var test_servers = {
@@ -138,7 +140,95 @@ var test_settings = {
 // track which test we are on
 var which_test = "";
 
-const Observer = {
+/**
+ * A stream listener that just forwards all calls
+ */
+var StreamListener = function(subject) {
+  let channel = subject.QueryInterface(Ci.nsIHttpChannel);
+  let traceable = subject.QueryInterface(Ci.nsITraceableChannel);
+
+  this.uri = channel.URI.asciiSpec;
+  this.listener = traceable.setNewListener(this);
+  return this;
+};
+
+// Next three methods are part of `nsIStreamListener` interface and are
+// invoked by `nsIInputStreamPump.asyncRead`.
+StreamListener.prototype.onDataAvailable = function(request, context, input, offset, count) {
+  if (request.status == Cr.NS_ERROR_ABORT) {
+    this.listener = null;
+    return Cr.NS_SUCCESS;
+  }
+  let listener = this.listener;
+  if (listener) {
+    try {
+      let rv = listener.onDataAvailable(request, context, input, offset, count);
+      if (rv != Cr.NS_ERROR_ABORT) {
+        // If the channel gets canceled, we sometimes get NS_ERROR_ABORT here.
+        // Anything else is an error.
+        return rv;
+      }
+    } catch (e) {
+      if (e != Cr.NS_ERROR_ABORT) {
+        return e;
+      }
+    }
+  }
+  return Cr.NS_SUCCESS;
+};
+
+// Next two methods implement `nsIRequestObserver` interface and are invoked
+// by `nsIInputStreamPump.asyncRead`.
+StreamListener.prototype.onStartRequest = function(request, context) {
+  if (request.status == Cr.NS_ERROR_ABORT) {
+    this.listener = null;
+    return Cr.NS_SUCCESS;
+  }
+  let listener = this.listener;
+  if (listener) {
+    try {
+      let rv = listener.onStartRequest(request, context);
+      if (rv != Cr.NS_ERROR_ABORT) {
+        // If the channel gets canceled, we sometimes get NS_ERROR_ABORT here.
+        // Anything else is an error.
+        return rv;
+      }
+    } catch (e) {
+      if (e != Cr.NS_ERROR_ABORT) {
+        return e;
+      }
+    }
+  }
+  return Cr.NS_SUCCESS;
+};
+
+// Called to signify the end of an asynchronous request. We only care to
+// discover errors.
+StreamListener.prototype.onStopRequest = function(request, context, status) {
+  if (status == Cr.NS_ERROR_ABORT) {
+    this.listener = null;
+    return Cr.NS_SUCCESS;
+  }
+  let listener = this.listener;
+  if (listener) {
+    try {
+      let rv = listener.onStopRequest(request, context, status);
+      if (rv != Cr.NS_ERROR_ABORT) {
+        // If the channel gets canceled, we sometimes get NS_ERROR_ABORT here.
+        // Anything else is an error.
+        return rv;
+      }
+    } catch (e) {
+      if (e != Cr.NS_ERROR_ABORT) {
+        return e;
+      }
+    }
+  }
+  return Cr.NS_SUCCESS;
+};
+
+var Observer = {
+  listeners: {},
   observe: function (subject, topic, data) {
     switch (topic) {
       case 'console-api-log-event':
@@ -150,10 +240,13 @@ const Observer = {
     }
     throw "Can't handle topic "+topic;
   },
-  add_observers: function (services) {
+  add_observers: function (services, include_on_modify = false) {
     services.obs.addObserver(Observer, "console-api-log-event", false);
     services.obs.addObserver(Observer, "http-on-examine-response", false);
     services.obs.addObserver(Observer, "http-on-modify-request", false);
+  },
+  cleanup: function () {
+    this.listeners = {};
   },
   // When a load is blocked which results in an error event within a page, the
   // test logs to the console.
@@ -253,6 +346,8 @@ function do_cleanup() {
 
   Services.obs.removeObserver(Observer, "console-api-log-event");
   Services.obs.removeObserver(Observer, "http-on-examine-response");
+
+  Observer.cleanup();
 }
 
 function SetupPrefTestEnvironment(which) {
