@@ -1075,7 +1075,7 @@ you can use these alternative items. Otherwise, their values should be empty.  -
 <!ENTITY enablepocket.label "Enable pocket.">
 
 <!-- Helpful ToolTips -->
-<!ENTITY restartRequiredMSG.label "Browser Restart Required.">
+<!ENTITY restartRequiredMSG.label "Browser Restart Required">
 
 <!-- Flashplayer Protect Mode -->
 <!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
