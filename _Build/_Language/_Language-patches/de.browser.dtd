@@ -191,7 +191,7 @@
 <!ENTITY enablepocket.label "Enable pocket.">
 
 <!-- Helpful ToolTips -->
-<!ENTITY restartRequiredMSG.label "Browser Neustart benötigt.">
+<!ENTITY restartRequiredMSG.label "Browser Neustart benötigt">
 
 <!-- Flashplayer Protect Mode -->
 <!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
