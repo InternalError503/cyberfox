@@ -184,6 +184,10 @@
 <!ENTITY browserpluginsjavaenabled.label "Włącz wtyczkę Java">
 <!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
 
+<!-- Language Settings Tweak -->
+<!ENTITY userLanguages.label "Select Language">
+<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Systemowe dodatki">
 <!ENTITY systemaddonsmsg.label "Jeśli zainstalowane są te dodatki systemowe, to możesz je tutaj przełączać.">

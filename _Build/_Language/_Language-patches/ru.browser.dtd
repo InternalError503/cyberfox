@@ -176,6 +176,10 @@
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Включить доступ к about:config в меню">
 
+<!-- Language Settings Tweak -->
+<!ENTITY userLanguages.label "Select Language">
+<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Плагины браузера">
 <!ENTITY browserpluginsdisabled.label "Отключить плагины браузера (отключаются все плагины)">

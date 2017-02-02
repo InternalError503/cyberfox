@@ -176,6 +176,10 @@
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Ativar item de menu about:config.">
 
+<!-- Language Settings Tweak -->
+<!ENTITY userLanguages.label "Select Language">
+<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Plugins do navegador">
 <!ENTITY browserpluginsdisabled.label "Desativar plugins (desativa todos os plugins).">

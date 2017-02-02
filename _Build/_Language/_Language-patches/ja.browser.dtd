@@ -176,6 +176,10 @@
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "メニュー項目 [about:config] を有効にする">
 
+<!-- Language Settings Tweak -->
+<!ENTITY userLanguages.label "Select Language">
+<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "ブラウザ プラグイン">
 <!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
