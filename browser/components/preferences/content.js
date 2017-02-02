@@ -43,7 +43,10 @@ var gContentPane = {
         document.getElementById("bingAttribution").removeAttribute("hidden");
       }
     }
-
+	
+    // Grab current set locale from 'general.useragent.locale'
+    this.updateDefaultLocale();
+	
     let doNotDisturbAlertsEnabled = false;
     if (AlertsServiceDND) {
       let notificationsDoNotDisturbRow =
@@ -78,7 +81,13 @@ var gContentPane = {
       gContentPane.showTranslationExceptions);
     setEventListener("notificationsDoNotDisturb", "command",
       gContentPane.toggleDoNotDisturbNotifications);
-
+    setEventListener("languageMenu", "popuphiding", function () {
+      gContentPane.setDefaultLocale();
+    });
+    setEventListener("languageMenu", "keypress", function (e) {
+      gContentPane._setDefaultLocale(e);
+    });
+	
     let notificationInfoURL =
       Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "push";
     document.getElementById("notificationsPolicyLearnMore").setAttribute("href",
@@ -384,5 +393,20 @@ var gContentPane = {
   toggleDoNotDisturbNotifications: function (event)
   {
     AlertsServiceDND.manualDoNotDisturb = event.target.checked;
+  },
+  
+  // Grab current set locale from 'general.useragent.locale'
+  updateDefaultLocale: function ()
+  {
+	  document.getElementById("languageMenu").value = Services.prefs.getCharPref('general.useragent.locale');
+  },
+  setDefaultLocale: function ()
+  {
+	  Services.prefs.setCharPref('general.useragent.locale', document.getElementById("languageMenu").value);
+  },
+    _setDefaultLocale: function (e)
+  {
+    if (e.which == 13 || e.keyCode == 13)
+		this.setDefaultLocale();
   },
 };

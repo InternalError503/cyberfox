@@ -1060,6 +1060,10 @@ you can use these alternative items. Otherwise, their values should be empty.  -
 <!-- about:config Menu Tweak -->
 <!ENTITY turnoffmenuabout.label "Turn on about:config menu item.">
 
+<!-- Languaage Settings Tweak -->
+<!ENTITY userLanguages.label "Select Language">
+<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Browser Plugins">
 <!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">

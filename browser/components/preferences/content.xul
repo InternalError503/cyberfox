@@ -249,6 +249,107 @@
           </row>
         </rows>
       </grid>
+	  
+		<!-- locales -->
+		<hbox id="userLanguagesBox" align="center">
+		<label flex="1" control="languageMenu">Choose your preferred language for Cyberfox</label>
+			<menulist id="languageMenu" label="Select Language">
+				<menupopup>
+					<menuitem label="Select Language" disabled="true"/>
+					<menuitem label="ach (Acholi)" value="ach"/>
+					<menuitem label="af (Afrikaans)" value="af"/>
+					<menuitem label="an (Aragonés)" value="an"/>
+					<menuitem label="ar (Arabic)" value="ar"/>
+					<menuitem label="as (Assamese)" value="as"/>
+					<menuitem label="ast (Asturianu)" value="ast"/>
+					<menuitem label="az (Azerbaijani)" value="az"/>
+					<menuitem label="be (Belarusian)" value="be"/>
+					<menuitem label="bg (Bulgarian)" value="bg"/>
+					<menuitem label="bn-BD Bengali (Bangladesh)" value="bn-BD"/>
+					<menuitem label="bn-IN Bengali (India)" value="bn-IN"/>
+					<menuitem label="br (Breton)" value="br"/>
+					<menuitem label="bs (Bosanski)" value="bs"/>
+					<menuitem label="ca (Catalan)" value="ca"/>
+					<menuitem label="cak Kaqchikel (Guatemala)" value="cak"/>
+					<menuitem label="cs (Czech)" value="cs"/>
+					<menuitem label="cy (Cymraeg)" value="cy"/>
+					<menuitem label="da (Danish)" value="da"/>
+					<menuitem label="de (German)" value="de"/>
+					<menuitem label="dsb (Dolnoserbšćina)" value="dsb"/>
+					<menuitem label="el (Greek)" value="el"/>
+					<menuitem label="en-GB English (United Kingdom)" value="en-GB"/>
+					<menuitem label="en-US English (United States)" value="en-US"/>
+					<menuitem label="en-ZA English (South Africa)" value="en-ZA"/>
+					<menuitem label="eo (Esperanto)" value="eo"/>
+					<menuitem label="es-AR Spanish (Argentina)" value="es-AR"/>
+					<menuitem label="es-CL Spanish (Chile)" value="es-CL"/>
+					<menuitem label="es-ES Spanish (Spain)" value="es-ES"/>
+					<menuitem label="es-MX Spanish (Mexico)" value="es-MX"/>
+					<menuitem label="et (Estonian)" value="et"/>
+					<menuitem label="eu (Basque)" value="eu"/>
+					<menuitem label="fa (Persian)" value="fa"/>
+					<menuitem label="ff Pulaar (Fulfulde)" value="ff"/>
+					<menuitem label="fi (Finnish)" value="fi"/>
+					<menuitem label="fr (French)" value="fr"/>
+					<menuitem label="fy-NL Frisian (Netherlands)" value="fy-NL"/>
+					<menuitem label="ga-IE Irish (Ireland)" value="ga-IE"/>
+					<menuitem label="gd (Gàidhlig)" value="gd"/>
+					<menuitem label="gl (Galician)" value="gl"/>
+					<menuitem label="gn Guarani (Paraguay)" value="gn"/>
+					<menuitem label="gu-IN Gujarati (India)" value="gu-IN"/>
+					<menuitem label="he (Hebrew)" value="he"/>
+					<menuitem label="hi-IN Hindi (India)" value="hi-IN"/>
+					<menuitem label="hr (Croatian)" value="hr"/>
+					<menuitem label="hsb (Hornjoserbšćina)" value="hsb"/>
+					<menuitem label="hu (Hungarian)" value="hu"/>
+					<menuitem label="hy-AM Armenian (Armenia)" value="hy-AM"/>
+					<menuitem label="id (Indonesian)" value="id"/>
+					<menuitem label="is (Icelandic)" value="is"/>
+					<menuitem label="it (Italian)" value="it"/>
+					<menuitem label="ja (Japanese)" value="ja"/>
+					<menuitem label="kk (Kazakh)" value="kk"/>
+					<menuitem label="km" value="km"/>
+					<menuitem label="kn (Kannada)" value="kn"/>
+					<menuitem label="ko (Korean)" value="ko"/>
+					<menuitem label="lij Ligure (Zenéize)" value="lij"/>
+					<menuitem label="lt (Lithuanian)" value="lt"/>
+					<menuitem label="lv (Latvian)" value="lv"/>
+					<menuitem label="mai (Maithili)" value="mai"/>
+					<menuitem label="mk (Macedonian)" value="mk"/>
+					<menuitem label="ml (Malayalam)" value="ml"/>
+					<menuitem label="mr (Marathi)" value="mr"/>
+					<menuitem label="ms Bahasa Melayu" value="ms"/>
+					<menuitem label="nb-NO Norwegian Bokmål (Norway)" value="nb-NO"/>
+					<menuitem label="nl (Dutch)" value="nl"/>
+					<menuitem label="nn-NO Norwegian Nynorsk (Norway)" value="nn-NO"/>
+					<menuitem label="or (Oriya)" value="or"/>
+					<menuitem label="pa-IN Punjabi (India)" value="pa"/>
+					<menuitem label="pl (Polish)" value="pl"/>
+					<menuitem label="pt-BR Portuguese (Brazil)" value="pt-BR"/>
+					<menuitem label="pt-PT Portuguese (Portugal)" value="pt-PT"/>
+					<menuitem label="rm (Rumantsch)" value="rm"/>
+					<menuitem label="ro (Romanian)" value="ro"/>
+					<menuitem label="ru (Russian)" value="ru"/>
+					<menuitem label="si Sinhala (si-LK)" value="si"/>
+					<menuitem label="sk (Slovak)" value="sk"/>
+					<menuitem label="sl (Slovenian)" value="sl"/>
+					<menuitem label="son (Soŋay)" value="son"/>
+					<menuitem label="sq (Albanian)" value="sq"/>
+					<menuitem label="sr (Serbian)" value="sr"/>
+					<menuitem label="sv-SE Swedish (Sweden)" value="sv-SE"/>
+					<menuitem label="ta (Tamil)" value="ta"/>
+					<menuitem label="te (Telugu)" value="te"/>
+					<menuitem label="th (Thai)" value="th"/>
+					<menuitem label="tr (Turkish)" value="tr"/>
+					<menuitem label="uk (Ukrainian)" value="uk"/>
+					<menuitem label="uz (Uzbek)" value="uz"/>
+					<menuitem label="vi (Vietnamese)" value="vi"/>
+					<menuitem label="xh (Xhosa)" value="xh"/>
+					<menuitem label="zh-CN Chinese (Peoples Republic of China)" value="zh-CN"/>
+					<menuitem label="zh-TW Chinese (Taiwan)" value="zh-TW"/>
+				</menupopup>
+			</menulist>
+		</hbox>
 
     </groupbox>
 
