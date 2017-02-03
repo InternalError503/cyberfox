@@ -83,7 +83,6 @@ var gMainPane = {
     setEventListener("chooseFolder", "command",
                      gMainPane.chooseFolder);
 
-    if (AppConstants.E10S_TESTING_ONLY) {
       setEventListener("e10sAutoStart", "command",
                        gMainPane.enableE10SChange);
       let e10sCheckbox = document.getElementById("e10sAutoStart");
@@ -101,7 +100,6 @@ var gMainPane = {
         // but if it's force disabled, then the checkbox is disabled.
         e10sCheckbox.disabled = !Services.appinfo.browserTabsRemoteAutostart;
       }
-    }
 
     if (AppConstants.MOZ_DEV_EDITION) {
       let uAppData = OS.Constants.Path.userApplicationDataDir;
@@ -123,7 +121,6 @@ var gMainPane = {
 
   enableE10SChange: function ()
   {
-    if (AppConstants.E10S_TESTING_ONLY) {
       let e10sCheckbox = document.getElementById("e10sAutoStart");
       let e10sPref = document.getElementById("browser.tabs.remote.autostart");
       let e10sTempPref = document.getElementById("e10sTempPref");
@@ -152,7 +149,6 @@ var gMainPane = {
 
       // Revert the checkbox in case we didn't quit
       e10sCheckbox.checked = e10sPref.value || e10sTempPref.value;
-    }
   },
 
   separateProfileModeChange: function ()
