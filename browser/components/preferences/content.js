@@ -81,7 +81,7 @@ var gContentPane = {
       gContentPane.showTranslationExceptions);
     setEventListener("notificationsDoNotDisturb", "command",
       gContentPane.toggleDoNotDisturbNotifications);
-    setEventListener("languageMenu", "popuphiding", function () {
+    setEventListener("languageMenu", "popuphidden", function () {
       gContentPane.setDefaultLocale();
     });
     setEventListener("languageMenu", "keypress", function (e) {
@@ -403,13 +403,16 @@ var gContentPane = {
   setDefaultLocale: function ()
   {	  
 	  var languageMenu = document.getElementById("languageMenu");
+	  var currentLocale = Services.prefs.getCharPref('general.useragent.locale');
 		function revertChange(error) {
 			languageMenu.value = Services.prefs.getCharPref('general.useragent.locale');
 			if (error) {
 			  Cu.reportError("Failed to reset localization selection: " + error);
 			}
 		}		
-	  var currentLocale = Services.prefs.getCharPref('general.useragent.locale');
+		// Don't fire on same value
+		if (currentLocale === languageMenu.value) return;
+
 	  var button_index = confirmRestartPrompt(languageMenu.value,
                                               0, false, true);
       switch (button_index) {
