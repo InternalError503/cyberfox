@@ -70,7 +70,7 @@
 <!ENTITY turnonclone.label "Włącz funkcję klonowania kart">
 <!ENTITY cloneCurrentTab.label "Klonuj w nowej karcie">
 <!ENTITY cloneInNewWindow.label "Klonuj w nowym oknie">
-<!ENTITY cloneInNewPrivate.label "Private">
+<!ENTITY cloneInNewPrivate.label "prywatnym">
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->
@@ -182,11 +182,11 @@
 <!ENTITY browserpluginswhitelist.label "Włącz białą listę wtyczek">
 <!ENTITY browserpluginsflashenabled.label "Włącz wtyczkę Flash">
 <!ENTITY browserpluginsjavaenabled.label "Włącz wtyczkę Java">
-<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
+<!ENTITY browserpluginssilverlightenabled.label "Włącz wtyczkę Silverlight.">
 
 <!-- Language Settings Tweak -->
-<!ENTITY userLanguages.label "Select Language">
-<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+<!ENTITY userLanguages.label "Wybierz język">
+<!ENTITY userLanguages.desc "Wybierz preferowany język dla programu &brandShortName;">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Systemowe dodatki">
