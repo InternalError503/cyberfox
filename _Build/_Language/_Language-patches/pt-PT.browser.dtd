@@ -177,8 +177,8 @@
 <!ENTITY turnoffmenuabout.label "Ativar item de menu about:config.">
 
 <!-- Language Settings Tweak -->
-<!ENTITY userLanguages.label "Select Language">
-<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+<!ENTITY userLanguages.label "Selecionar idioma">
+<!ENTITY userLanguages.desc "Escolha o idioma preferencial para o &brandShortName;">
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Plugins do navegador">
