@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=1.2.1
+Version=1.2.2
 Encoding=UTF-8
 Name=Cyberfox Web Browser
 Name[ar]=متصفح الويب فَيَرفُكْس
@@ -68,7 +68,7 @@ Comment[nb]=Surf på nettet
 Comment[nl]=Verken het internet
 Comment[nn]=Surf på nettet
 Comment[no]=Surf på nettet
-Comment[pl]=Przeglądanie stron WWW 
+Comment[pl]=Przeglądaj strony WWW z przeglądarką internetową Cyberfox
 Comment[pt]=Explorar a Internet com o Cyberfox
 Comment[pt_BR]=Navegue na Internet
 Comment[ro]=Navigați pe Internet
@@ -141,6 +141,7 @@ Keywords[is]=Internet;WWW;Vafri;Vefur;Netvafri;Flakk
 Keywords[ja]=Internet;WWW;Web;インターネット;ブラウザ;ウェブ;エクスプローラ
 Keywords[nb]=Internett;WWW;Nettleser;Explorer;Web;Browser;Nettside
 Keywords[nl]=Internet;WWW;Browser;Web;Explorer;Verkenner;Website;Surfen;Online 
+Keywords[pl]=Internet;WWW;Przeglądarka;Sieć;Surfowanie;Strona internetowa;Strona;Przeglądanie
 Keywords[pt]=Internet;WWW;Browser;Web;Explorador;Navegador
 Keywords[pt_BR]=Internet;WWW;Browser;Web;Explorador;Navegador
 Keywords[ru]=Internet;WWW;Browser;Web;Explorer;интернет;браузер;веб;файрфокс;огнелис
