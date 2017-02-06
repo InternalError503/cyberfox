@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>cyberfox</id>
-    <version>49.0.1</version>
+    <version>51.0.1</version>
     <title>Cyberfox</title>
     <authors>8pecxstudios, toady</authors>
     <owners>8pecxstudios, toady</owners>

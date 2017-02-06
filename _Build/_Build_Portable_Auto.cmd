@@ -1,9 +1,12 @@
 @echo Off
-title Build Cyberfox Portable V1.9
+title Build Cyberfox Portable V2.0
 ECHO.
 (set /P Version=
 )<Version\Version.txt
-
+(set /P smallVer=
+)<Version\smver.txt
+::set "signfiles=true"
+set "signfiles=%~1"
 set BuildFolderPath=%~DP0
 set BuildFolderPathIntel=%~DP0_CyberfoxPortable\Intel\CyberfoxPortable\
 set BuildFolderPathAmd=%~DP0_CyberfoxPortable\Amd\CyberfoxPortable\
@@ -38,7 +41,8 @@ GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\intel86\appinfo.
 call %DeleteDir% "%BuildFolderPathIntel%App\Cyberfox" "%BuildFolderPathIntel%App\Cyberfox not found!"
 mkdir "%BuildFolderPathIntel%App\Cyberfox"
 @echo on
-call _Func_GenDirHash.bat "intel86"
+GenUpdateInfo.exe --f="%BuildFolderPath%_Installer\{content}\browser\intel86\update.ini" --v=%smallVer% --t=intel86 --p
+timeout 2 >null
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel86" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\Cyberfox"
 %NSISCompiler% %Argos% "%BuildFolderPathIntel%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel86.log"
 @echo off
@@ -55,13 +59,19 @@ GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\amd86\appinfo.in
 call %DeleteDir% "%BuildFolderPathAmd%App\Cyberfox" "%BuildFolderPathAmd%App\Cyberfox not found!"
 mkdir "%BuildFolderPathAmd%App\Cyberfox"
 @echo on
-call _Func_GenDirHash.bat "amd86"
+GenUpdateInfo.exe --f="%BuildFolderPath%_Installer\{content}\browser\amd86\update.ini" --v=%smallVer% --t=amd86 --p
+timeout 2 >null
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd86" "%BuildFolderPathAmd%App\Cyberfox"
 %NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd86.log"
 @echo off
 echo. Build Amd 86 bit portable package complete!
-echo. Please sign files.
-::SignTool goes here.
+if "%signfiles%" == "true" (
+echo. Sign files please wait.
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%BuildFolderPathIntel%CyberfoxPortable.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%BuildFolderPathIntel%CyberfoxPortable.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%BuildFolderPathAmd%CyberfoxPortable.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%BuildFolderPathAmd%CyberfoxPortable.exe"
+)
 goto :Compile-Package-86-Portable
 
 :Compile-Package-64
@@ -82,7 +92,8 @@ GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\intel64\appinfo.
 call %DeleteDir% "%BuildFolderPathIntel%App\Cyberfox" "%BuildFolderPathIntel%App\Cyberfox not found!"
 mkdir "%BuildFolderPathIntel%App\Cyberfox"
 @echo on
-call _Func_GenDirHash.bat "intel64"
+GenUpdateInfo.exe --f="%BuildFolderPath%_Installer\{content}\browser\intel64\update.ini" --v=%smallVer% --t=intel64 --p
+timeout 2 >null
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\intel64" "%BuildFolderPathIntel%App\Cyberfox"
 %NSISCompiler% %Argos% "%BuildFolderPathIntel%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_intel64.log"
 @echo off
@@ -101,13 +112,19 @@ GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\amd64\appinfo.in
 call %DeleteDir% "%BuildFolderPathAmd%App\Cyberfox" "%BuildFolderPathAmd%App\Cyberfox not found!"
 mkdir "%BuildFolderPathAmd%App\Cyberfox"
 @echo on
-call _Func_GenDirHash.bat "amd64"
+GenUpdateInfo.exe --f="%BuildFolderPath%_Installer\{content}\browser\amd64\update.ini" --v=%smallVer% --t=amd64 --p
+timeout 2 >null
 xcopy /e /v "%BuildFolderPath%_Installer\{content}\browser\amd64" "%BuildFolderPathAmd%App\Cyberfox"
 %NSISCompiler% %Argos% "%BuildFolderPathAmd%Other\Source\CyberfoxPortableU.nsi" > "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" && type "%BuildFolderPath%_CyberfoxPortable\logs\build_amd64.log" 
 @echo off
 echo. Build Amd 64 bit portable package complete!
-echo. Please sign files.
-::SignTool goes here.
+if "%signfiles%" == "true" (
+echo. Sign files please wait.
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%BuildFolderPathIntel%CyberfoxPortable.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%BuildFolderPathIntel%CyberfoxPortable.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%BuildFolderPathAmd%CyberfoxPortable.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%BuildFolderPathAmd%CyberfoxPortable.exe"
+)
 goto :Compile-Package-64-Portable
 
 :Compile-Package-86-Portable
@@ -132,6 +149,13 @@ echo. Build intel 86 bit portable package complete!
 ren "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.paf.exe"  "CyberfoxPortable_%Version%_English.Intel.86.paf.exe"
 copy /y "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.86.paf.exe" "%PortableAppsInstallerOutput%"
 call %Delete% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.86.paf.exe" "CyberfoxPortable_%Version%_English.Intel.86.paf.exe not found!"
+if "%signfiles%" == "true" (
+echo. Sign files please wait.
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Amd.86.paf.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Amd.86.paf.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Intel.86.paf.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Intel.86.paf.exe"
+)
 goto :Compile-Package-86-Zipped
 
 :Compile-Package-64-Portable
@@ -157,6 +181,13 @@ echo. Build intel64 bit portable package complete!
 ren "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.paf.exe"  "CyberfoxPortable_%Version%_English.Intel.paf.exe"
 copy /y "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.paf.exe" "%PortableAppsInstallerOutput%"
 call %Delete% "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable_%Version%_English.Intel.paf.exe" "CyberfoxPortable_%Version%_English.Intel.paf.exe not found!"
+if "%signfiles%" == "true" (
+echo. Sign files please wait.
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Amd.paf.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Amd.paf.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA1 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Intel.paf.exe"
+"%BuildFolderPath%_signtool\csign.exe" /d="Cyberfox Portable" --SHA256 /s="%PortableAppsInstallerOutput%\CyberfoxPortable_%Version%_English.Intel.paf.exe"
+)
 goto :Compile-Package-64-Zipped
 
 :Compile-Package-86-Zipped
@@ -212,7 +243,6 @@ echo.
 echo. 
 echo. 
 echo.Compilation Complete!
-goto :top
 
 :exit
 exit /b %ERRORLEVEL%
