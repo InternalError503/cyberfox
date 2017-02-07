@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.5
+# Version: 2.6
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -260,6 +260,12 @@ select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
+	  	# build localization packages
+			if [ "$IDENTITY" == "Release" ]; then
+				echo "Generating language packs for release"
+				"$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
+			fi;
+
 			# Check if in correct directory if not enter it.
 			if [ "$PWD" != "$WORKDIR/$LDIR" ]; then
 						changeDirectory $LDIR
@@ -279,6 +285,13 @@ echo "Do you wish to package $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
+
+	  # build localization packages
+	  if [ "$IDENTITY" == "Release" ]; then
+			  echo "Generating language packs for release"
+			  "$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
+		fi;
+
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
 	    	changeDirectory "$WORKDIR/$LDIR"
 	    ./mach package
