@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.6
+# Version: 2.7
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -143,6 +143,7 @@ GITURI=""
 IDENTITY=""
 LDIR=""
 VERSION=""
+BUILTLOCALES=false
 
   echo "What package do you wish to build?"
   select answer in "Release" "Beta" "Quit"; do
@@ -260,10 +261,11 @@ select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
-	  	# build localization packages
+	  		# build localization packages
 			if [ "$IDENTITY" == "Release" ]; then
 				echo "Generating language packs for release"
 				"$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
+				BUILTLOCALES=true
 			fi;
 
 			# Check if in correct directory if not enter it.
@@ -286,11 +288,11 @@ select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )
 
-	  # build localization packages
-	  if [ "$IDENTITY" == "Release" ]; then
-			  echo "Generating language packs for release"
-			  "$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
-		fi;
+	# build localization packages
+	if [ "$IDENTITY" == "Release" ] && [ "$BUILTLOCALES" = false ] ; then
+		echo "Generating language packs for release"
+		"$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
+	fi;
 
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
 	    	changeDirectory "$WORKDIR/$LDIR"
@@ -299,7 +301,15 @@ select yn in "Yes" "No" "Quit"; do
 	# Include readme.txt
 	if [ -f "$Dir/README.txt" ]; then
     		cp -r $Dir/README.txt $WORKDIR/obj64/dist/
-  fi
+	fi
+
+	# Include voucher.bin
+	if [ -f "$Dir/voucher.bin" ]; then
+			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/
+    		cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/bin/
+			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/Cyberfox/
+	fi
+
 	  changeDirectory "$WORKDIR/obj64/dist"
            
 	  # Get the current filename with browser version!
