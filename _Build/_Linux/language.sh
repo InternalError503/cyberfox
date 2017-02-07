@@ -1,4 +1,5 @@
 #!/bin/bash
+# Version: 1.1
 # Set working directory default is ~/Documents
 WORKDIR=~/Documents
 cd $WORKDIR
@@ -8,16 +9,16 @@ function buildPacks(){
     for D in *; do
         if [ -d "${D}" ]; then
             cd "${D}"
-            zip -rv "$WORKDIR/languagepacks/langpack-${D%.*}@8pecxstudios.com.xpi" *
+            zip -r "$WORKDIR/languagepacks/langpack-${D%.*}@8pecxstudios.com.xpi" *
             cd ..
         fi
     done
 }
 
 function copyPacks(){
-    cp -rv "$WORKDIR/languagepacks/." "$WORKDIR/obj64/dist/bin/browser/features/"
+    cp -r "$WORKDIR/languagepacks/." "$WORKDIR/obj64/dist/bin/browser/features/"
     if [ -d "$WORKDIR/obj64/dist/Cyberfox" ]; then
-        cp -rv "$WORKDIR/languagepacks/." "$WORKDIR/obj64/dist/Cyberfox/browser/features/"
+        cp -r "$WORKDIR/languagepacks/." "$WORKDIR/obj64/dist/Cyberfox/browser/features/"
     fi;
 }
 
