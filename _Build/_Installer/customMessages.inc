@@ -522,7 +522,7 @@ ru.CleanInstallDescription=Выполнить чистую установку.
 ru.CleanInstallGroupDescription=Настройки установки
 ru.PocketInstallDescription=Установить Firefox pocket (необязательно)
 ru.SystemAddonsGroupDescription=Системные дополнения
-ru.UpdateShortcut=Check for updates
+ru.UpdateShortcut=Проверка обновлений
 ;Localization note must preserve %n this is a new line break.
 ru.SystemCpuUnsupported=На Вашем компьютере установлен старый процессор, не поддерживающий набор инструкций SSE2. %n%nCyberfox 49.0 и более поздних версий не может быть запущен на этом компьютере.
 ;SerbianCyrillic
