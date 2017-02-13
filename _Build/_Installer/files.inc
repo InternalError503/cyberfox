@@ -4,7 +4,7 @@ Source: "{content}\browser\{#PackageType}\browser\components\components.manifest
 Source: "{content}\browser\{#PackageType}\browser\extensions\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi"; DestDir: "{app}\browser\extensions"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\features\CTR@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: cyberctr; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\features\firefox@getpocket.com.xpi"; DestDir: "{app}\browser\features"; Tasks: pocket; Flags: promptifolder replacesameversion
-Source: "{content}\browser\{#PackageType}\browser\features\langpack-*@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Flags: promptifolder replacesameversion
+Source: "{content}\browser\{#PackageType}\browser\features\langpack-*@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: languages; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\VisualElements\VisualElements_70.png"; DestDir: "{app}\browser\VisualElements"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\VisualElements\VisualElements_150.png"; DestDir: "{app}\browser\VisualElements"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\agents.json"; DestDir: "{app}\browser"; Flags: ignoreversion

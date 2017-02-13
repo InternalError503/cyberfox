@@ -5,3 +5,4 @@ Name: "cleaninstall"; Description: "{cm:CleanInstallDescription}"; GroupDescript
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 Name: "cyberctr"; Description: "{cm:CyberCTRInstallDescription}"; GroupDescription: "{cm:SystemAddonsGroupDescription}"
 Name: "pocket"; Description: "{cm:PocketInstallDescription}"; GroupDescription: "{cm:SystemAddonsGroupDescription}"; Flags: unchecked
+Name: "languages"; Description: "{cm:LanguageInstallDescription}"; GroupDescription: "{cm:SystemAddonsGroupDescription}"
