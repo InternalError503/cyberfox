@@ -513,7 +513,7 @@ pl.CleanInstallGroupDescription=Opcje instalacji
 pl.PocketInstallDescription=Zainstaluj Firefox Pocket (Opcjalne)
 pl.SystemAddonsGroupDescription=Dodatki systemowe
 pl.UpdateShortcut=Sprawdź aktualizacje
-pl.LanguageInstallDescription=Install language packs
+pl.LanguageInstallDescription=Zainstaluj paczki językowe
 ;Localization note must preserve %n this is a new line break.
 pl.SystemCpuUnsupported=Ten komputer ma starszy procesor, który nie obsługuje zestawu instrukcji SSE2. %n%nCyberfox 49.0 i późniejsze wersje nie uruchomią się na tym komputerze.
 ;Portuguese
