@@ -2,7 +2,7 @@
 
 set -e
 
-MOZ_APP_NAME=Cyberfox
+MOZ_APP_NAME=cyberfox
 
 if [ "$1" = "remove" ] ; then
     update-alternatives --remove gnome-www-browser /usr/bin/$MOZ_APP_NAME
