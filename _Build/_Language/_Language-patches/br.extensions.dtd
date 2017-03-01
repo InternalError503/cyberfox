@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Gwiriañ mard ez eo hizivaet hoc'h enlugelladoù">
 <!ENTITY info.plugincheck.tooltip               "Gwiriañ mard ez eo hizivaet hoc'h enlugelladoù">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

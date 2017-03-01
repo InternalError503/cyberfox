@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Verifică dacă pluginurile sunt actualizate">
 <!ENTITY info.plugincheck.tooltip               "Verifică dacă pluginurile sunt actualizate">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

@@ -1,4 +1,7 @@
 [Code]
+var
+	UpdateNoStart: String;
+	
 // Setup exit code for check for running function.
 procedure ExitProcess(exitCode:integer);
   external 'ExitProcess@kernel32.dll stdcall';
@@ -107,6 +110,27 @@ var
 			end;
 		end;
 end;
+
+// Check if nost command line argument was set.
+function UpdateNoStInstall(const Count : LongInt): boolean;
+var
+	UpgradeNoStInstallation : Boolean;
+	ii : LongInt;
+	Param : String;	
+	begin
+		UpgradeNoStInstallation := FALSE;
+		for ii := 0 to Count do
+		begin
+			Param := ParamStr(ii)
+			if CompareText(Param,'--nost')=0 then
+			begin
+				UpdateNoStart := ' --nost';
+				UpgradeNoStInstallation := TRUE;
+				log('Do not start after update install set: True');
+				Result := TRUE;
+			end;
+		end;
+end;
 	
 // Get the uninstall string;
 function GetUninstallString: string;
@@ -159,7 +183,7 @@ function wasUpdate : boolean;
 	var
 		iResultCode: Integer;
     begin
-			if ExecAsOriginalUser(ExpandConstant('{app}\updater.exe'), '--upgrade', '', SW_SHOWNORMAL, ewNoWait, iResultCode) then
+			if ExecAsOriginalUser(ExpandConstant('{app}\updater.exe'), '--upgrade' + UpdateNoStart, '', SW_SHOWNORMAL, ewNoWait, iResultCode) then
 			begin
 				log('Program was launched successfully.');
 				Result := True;
@@ -305,7 +329,11 @@ procedure CurStepChanged(CurStep: TSetupStep);
 		end;
 			if CurStep = ssDone then
 	begin
-		if (WasUpdateInstall(ParamCount())) then begin wasUpdate(); end;
+		if (WasUpdateInstall(ParamCount())) then 
+		begin
+			UpdateNoStInstall(ParamCount());
+			wasUpdate(); 
+		end;
 		if (StartAfterInstall(ParamCount())) and not (WasUpdateInstall(ParamCount())) then begin startBrowser(); end;
 	end
 end;

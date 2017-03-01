@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "আপোনাৰ প্লাগিনসমূহ বৰ্তমান তাৰিখলে উন্নত নে চাবলে নীৰিক্ষণ কৰক">
 <!ENTITY info.plugincheck.tooltip               "আপোনাৰ প্লাগিনসমূহ বৰ্তমান তাৰিখলে উন্নত নে চাবলে নীৰিক্ষণ কৰক">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

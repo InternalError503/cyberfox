@@ -156,6 +156,7 @@
 <!ENTITY updatestartupcheck.label "Procurar atualizações ao iniciar o &brandShortName;.">
 <!ENTITY updatecheckenabled.label "Ativar procura de atualizações.">
 <!ENTITY updateverifysha.label "Ativar verificação SHA512 de atualizações.">
+<!ENTITY updatestartbrowser.label "launch browser after successful update.">
 <!ENTITY updatenotificationsenabled.label "Ativar página de notificações ao iniciar o &brandShortName; após a atualização.">
 <!ENTITY updatereleasenotesenabled.label "Ativar página sobre as notas da versão ao iniciar o &brandShortName; após a atualização.">
 

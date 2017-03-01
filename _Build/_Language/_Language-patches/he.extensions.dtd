@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "בדיקה שהתוספים החיצוניים שלך מעודכנים">
 <!ENTITY info.plugincheck.tooltip               "בדיקה שהתוספים החיצוניים שלך מעודכנים">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

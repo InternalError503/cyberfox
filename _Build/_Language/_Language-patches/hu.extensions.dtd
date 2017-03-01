@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Bővítmények frissességének ellenőrzése">
 <!ENTITY info.plugincheck.tooltip               "Bővítmények frissességének ellenőrzése">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

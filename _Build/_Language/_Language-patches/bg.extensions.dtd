@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Проверка дали вашите приставки са с последна версия">
 <!ENTITY info.plugincheck.tooltip               "Проверка дали вашите приставки са с последна версия">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

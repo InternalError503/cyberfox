@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Tarkista ovatko asennetut liitännäiset ajan tasalla">
 <!ENTITY info.plugincheck.tooltip               "Tarkista ovatko asennetut liitännäiset ajan tasalla">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

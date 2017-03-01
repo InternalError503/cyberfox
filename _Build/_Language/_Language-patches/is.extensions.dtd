@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Athuga hvort tengiforrit eru í nýjustu útgáfu">
 <!ENTITY info.plugincheck.tooltip               "Athuga hvort tengiforrit eru í nýjustu útgáfu">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

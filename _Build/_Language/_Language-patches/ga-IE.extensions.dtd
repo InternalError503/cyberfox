@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Seiceáil an bhfuil do chuid forlíontán cothrom le dáta">
 <!ENTITY info.plugincheck.tooltip               "Seiceáil an bhfuil do chuid forlíontán cothrom le dáta">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

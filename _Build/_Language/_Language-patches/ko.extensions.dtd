@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "플러그인이 최신 버전인지 확인">
 <!ENTITY info.plugincheck.tooltip               "설치된 유효한 플러그인이 최신 버전인지 확인합니다.">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Khangela ukuba zihlaziyiwe na iisoftwe ezincedisayo">
 <!ENTITY info.plugincheck.tooltip               "Khangela ukuba zihlaziyiwe na iisoftwe ezincedisayo">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">
