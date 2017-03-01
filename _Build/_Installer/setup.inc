@@ -78,8 +78,4 @@ AllowNoIcons=yes
 WizardImageFile={#PackageBranding}\WizModernImage.bmp
 WizardSmallImageFile={#PackageBranding}\WizModernSmallImage.bmp
 OutputDir={#PackageOutPutPath}
-#if PackageType == "beta86" || PackageType == "beta64"
 MinVersion=0,6.1
-#else
-MinVersion=0,6.0sp2
-#endif
