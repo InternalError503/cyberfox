@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.7
+# Version: 2.8
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -264,7 +264,11 @@ select yn in "Yes" "No" "Quit"; do
 	  		# build localization packages
 			if [ "$IDENTITY" == "Release" ]; then
 				echo "Generating language packs for release"
-				"$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
+				"$WORKDIR/$LDIR/_Build/_Linux/language.sh" $VERSION
+				BUILTLOCALES=true
+			elif [ "$IDENTITY" == "Beta" ]; then
+				echo "Generating language packs for beta"
+				"$WORKDIR/$LDIR/_Build/_Linux/language.sh" $(<$WORKDIR/$LDIR/browser/config/version.txt)
 				BUILTLOCALES=true
 			fi;
 
@@ -291,7 +295,10 @@ select yn in "Yes" "No" "Quit"; do
 	# build localization packages
 	if [ "$IDENTITY" == "Release" ] && [ "$BUILTLOCALES" = false ] ; then
 		echo "Generating language packs for release"
-		"$WORKDIR/$LDIR/_Build/_Linux/language.sh" "$VERSION"
+		"$WORKDIR/$LDIR/_Build/_Linux/language.sh" $VERSION
+	elif [ "$IDENTITY" == "Beta" ] && [ "$BUILTLOCALES" = false ] ; then
+		echo "Generating language packs for beta"
+		"$WORKDIR/$LDIR/_Build/_Linux/language.sh" $(<$WORKDIR/$LDIR/browser/config/version.txt)
 	fi;
 
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
