@@ -392,6 +392,8 @@ These should match what Safari and other Apple applications use on OS X Lion. --
 <!ENTITY openCmd.commandkey           "l">
 <!ENTITY urlbar.placeholder2          "Search or enter address">
 <!ENTITY urlbar.accesskey             "d">
+<!-- LOCALIZATION NOTE (urlbar.extension.label): Used to indicate that a selected autocomplete entry is provided by an extension. -->
+<!ENTITY urlbar.extension.label       "Extension:">
 <!ENTITY urlbar.switchToTab.label     "Switch to tab:">
 
 <!ENTITY urlbar.searchSuggestionsNotification.question "Would you like to improve your search experience with suggestions?">
@@ -1040,6 +1042,7 @@ you can use these alternative items. Otherwise, their values should be empty.  -
 <!ENTITY updatestartupcheck.label "Automatically check for updates when &brandShortName; starts.">
 <!ENTITY updatecheckenabled.label "Enable update check.">
 <!ENTITY updateverifysha.label "Enable SHA512 update verification.">
+<!ENTITY updatestartbrowser.label "launch browser after successful update.">
 <!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
 <!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
 
@@ -1084,9 +1087,6 @@ you can use these alternative items. Otherwise, their values should be empty.  -
 <!-- Flashplayer Protect Mode -->
 <!ENTITY disableflashprotectgroup.label "Adobe Flash Player">
 <!ENTITY disableflashprotect.label "Disable flash player protection mode">
-
-<!-- Toggle JavaScript in tab feature -->
-<!ENTITY togglescriptintab.label "Toggle JavaScript">
 
 <!-- Toggle WebRTC P2P Connection (See:#959893) feature -->
 <!ENTITY webrtcp2group.description "WebRTC peer connection">

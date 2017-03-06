@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Comprobe se os seus engadidos están actualizados">
 <!ENTITY info.plugincheck.tooltip               "Comprobe se os seus engadidos están actualizados">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

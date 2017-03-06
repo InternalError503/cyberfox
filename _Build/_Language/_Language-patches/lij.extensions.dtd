@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Contròlla se ti gh'æ da agiornâ di plugin">
 <!ENTITY info.plugincheck.tooltip               "Contròlla se ti gh'æ da agiornâ di plugin">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

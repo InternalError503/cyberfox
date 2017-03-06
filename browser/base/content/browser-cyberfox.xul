@@ -44,11 +44,6 @@
 									  tooltiptext="&copyAllTabUrls.label;"  
 									  label="&copyAllTabUrls.label;" 
 									  oncommand="gCyberfoxCustom.CopyAllTabUrls();"/>
-        <toolbarbutton id="tbar_javascript" 
-									  class="toolbarbutton-1 chromeclass-toolbar-additional"							  
-									  tooltiptext="&togglescriptintab.label;"  
-									  label="&togglescriptintab.label;" 
-									  oncommand="gCyberfoxCustom.toggleTabJavascript();"/>
     </toolbarpalette>
     <hbox id="PanelUI-footer-inner">
         <toolbarbutton id="panelUI_menu_restartBrowser"

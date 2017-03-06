@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label               "Kontrolli, kas kasutusel on viimased versioonid pluginatest">
 <!ENTITY info.plugincheck.tooltip             "Kontrolli, kas kasutusel on viimased versioonid pluginatest">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

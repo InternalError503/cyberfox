@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+	<ShortName>Privatelee  (SSL)</ShortName>
+		<Description>Privatelee learn more: https://privatelee.com/docs/privatelee/privacy.htm</Description>
+			<InputEncoding>UTF-8</InputEncoding>
+				<OutputEncoding>utf-8</OutputEncoding>  
+				
+	<!-- Get Favicon of engine (Data URI) -->	
+	<Image height="16" width="16">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAClklEQVQ4jcWTvW9TZxTGf+9533vtBCOHUAEiaahAQqUIIaQyUALNgFo6dCCCjh3Kh1S1K39AFyp1YemMBBJDh84tiCIYCBISaQNNZKixhYNDEvv6276+9r3v2yGEoVK79hmOdIbz09F5ngP/t9Q/egHs9FcTh03K+z7qJg8f3li+AnDs/NSMb+QH65xeK7S+fX6n/hiIzFvQOWR629SsiFwWpT5EEa3m2mXgk48v7ZkVIxeUUlYlTjKZ9FXga2DRABz+cnL32Ki+rY3+IEmcNb6ooBR2ojCZPDK767th7FzSHt7buiM1gwI/Y/YD00BJADJGz8RDl/9rLvipvd4vaU/ot+L2zr2ZE1uyvp67VrpeKXbqSr/dNwW8B6QMwINrL38G/tz1/uiZLVn/1KAXM/5ueiKOXa0433gNtLSR+1E3+dR4MjoIkyHgASIAzBADC3uPvTOhfRlzDkaynl8tdIPyQusFUBjJ6nkFZRs7usGgDnSAZANwD8tnpLy0HNe+aOOLrRQ7zdVcKwCeA/MmrZoo1R9EiV191s4DZaC/6YKd3j31hULtcNZhLbKy2CkhavnkxT3feCPmRxs7nHX92sve782V6BmGJ8R0ZTMLouUsju3aE9bz7Xo3iAr7Pho/lNpqDtihtdY5u5pvr+TuVpcQ/iBmCYgEcAfPTY6LVke1JyTDxFaLvbVeI370erF1pbkW/hrHVl49bS7n7lSfijCP5RZQA6wBGNsmnztHRmlF9UXYaFeiV0CuUgt/q9wMnwC/APuAJbsxXAZiALNR1CkFoy6xVIvdoNeIF4A8dVpAD1gH0kAINIFkM/sGwEImKHRu5+dq4aCTdIFHwDLggCEQvLmV+7dnygKngRSQA/JAY4P93/obzxQzcfNAYcUAAAAASUVORK5CYII=</Image>
+	
+	<Url type="text/html" method="POST" 
+		   template="https://privatelee.qrobe.it/search/?q={searchTerms}"/>
+	<!-- Have to use client output or privatelee sends a empty response -->	   
+	<Url type="application/x-suggestions+json" 
+		   method="POST" 
+		   template="https://qrobe.it/data/ski.axd?t=ac&amp;client=cyberfox&amp;q={searchTerms}"/>
+  
+</OpenSearchDescription>

@@ -92,9 +92,6 @@ var gViewSourceUtils = {
    *          The line number to focus on once the source is loaded.
    */
   viewSourceInBrowser: function(aArgs) {
-    Services.telemetry
-            .getHistogramById("VIEW_SOURCE_IN_BROWSER_OPENED_BOOLEAN")
-            .add(true);
     let viewSourceBrowser = new ViewSourceBrowser(aArgs.viewSourceBrowser);
     viewSourceBrowser.loadViewSource(aArgs);
   },
@@ -127,7 +124,6 @@ var gViewSourceUtils = {
                                                       message.data.baseURI);
       }
       else {
-        let docUrl = null;
         window.openDialog("chrome://global/content/viewPartialSource.xul",
                           "_blank", "all,dialog=no",
                           {
@@ -163,9 +159,6 @@ var gViewSourceUtils = {
       } catch (ex) {
       }
     }
-    Services.telemetry
-            .getHistogramById("VIEW_SOURCE_IN_WINDOW_OPENED_BOOLEAN")
-            .add(true);
     openDialog("chrome://global/content/viewSource.xul",
                "_blank",
                "all,dialog=no",
@@ -354,9 +347,6 @@ var gViewSourceUtils = {
   // Calls the callback, keeping in mind undefined or null values.
   handleCallBack: function(aCallBack, result, data)
   {
-    Services.telemetry
-            .getHistogramById("VIEW_SOURCE_EXTERNAL_RESULT_BOOLEAN")
-            .add(result);
     // if callback is undefined, default to the internal viewer
     if (aCallBack === undefined) {
       this.internalViewerFallback(result, data);

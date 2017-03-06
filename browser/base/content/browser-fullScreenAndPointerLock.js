@@ -299,6 +299,7 @@ var FullScreen = {
       this._fullScrToggler = document.getElementById("fullscr-toggler");
       this._fullScrToggler.addEventListener("mouseover", this._expandCallback, false);
       this._fullScrToggler.addEventListener("dragenter", this._expandCallback, false);
+      this._fullScrToggler.addEventListener("touchmove", this._expandCallback, {passive: true});
     }
 
     if (enterFS) {
@@ -335,11 +336,6 @@ var FullScreen = {
       // TabsInTitlebar._update() and bug 1173768.
       TabsInTitlebar.updateAppearance(true);
     }
-
-    if (enterFS && !document.fullscreenElement) {
-      Services.telemetry.getHistogramById("FX_BROWSER_FULLSCREEN_USED")
-                        .add(1);
-    }
   },
 
   exitDomFullScreen : function() {
@@ -366,12 +362,10 @@ var FullScreen = {
           let topWin = event.target.ownerGlobal.top;
           browser = gBrowser.getBrowserForContentWindow(topWin);
         }
-        TelemetryStopwatch.start("FULLSCREEN_CHANGE_MS");
         this.enterDomFullscreen(browser);
         break;
       }
       case "MozDOMFullscreen:Exited":
-        TelemetryStopwatch.start("FULLSCREEN_CHANGE_MS");
         this.cleanupDomFullscreen();
         break;
     }
@@ -397,7 +391,6 @@ var FullScreen = {
       }
       case "DOMFullscreen:Painted": {
         Services.obs.notifyObservers(window, "fullscreen-painted", "");
-        TelemetryStopwatch.finish("FULLSCREEN_CHANGE_MS");
         break;
       }
     }

@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 Components.utils.import("resource://gre/modules/Downloads.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/Task.jsm");
@@ -92,7 +91,6 @@ var gMainPane = {
         // but if it's force disabled, then the checkbox is disabled.
         e10sCheckbox.disabled = !Services.appinfo.browserTabsRemoteAutostart;
       }
-
 
     if (AppConstants.MOZ_DEV_EDITION) {
       let uAppData = OS.Constants.Path.userApplicationDataDir;

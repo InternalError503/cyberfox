@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Preverite, ali so vsi vaši vtičniki posodobljeni">
 <!ENTITY info.plugincheck.tooltip               "Preverite, ali so vsi vaši vtičniki posodobljeni">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

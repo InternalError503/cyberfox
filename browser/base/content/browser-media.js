@@ -94,11 +94,9 @@ var gEMEHandler = {
       case "cdm-not-supported":
         // Not to pop up user-level notification because they cannot do anything
         // about it.
-      case "error":
-        // Fall through and do the same for unknown messages:
+        return;
       default:
-        let typeOfIssue = status == "error" ? "error" : "message ('" + status + "')";
-        Cu.reportError("Unknown " + typeOfIssue + " dealing with EME key request: " + data);
+        Cu.reportError(new Error("Unknown message ('" + status + "') dealing with EME key request: " + data));
         return;
     }
 
@@ -145,7 +143,6 @@ var gEMEHandler = {
     // We're playing EME content! Remove any "we can't play because..." messages.
     var box = gBrowser.getNotificationBox(browser);
     ["drmContentDisabled",
-     "drmContentCDMInsufficientVersion",
      "drmContentCDMInstalling"
      ].forEach(function (value) {
         var notification = box.getNotificationWithValue(value);
@@ -194,17 +191,7 @@ XPCOMUtils.defineLazyGetter(gEMEHandler, "_brandShortName", function() {
   return document.getElementById("bundle_brand").getString("brandShortName");
 });
 
-const TELEMETRY_DDSTAT_SHOWN = 0;
-const TELEMETRY_DDSTAT_SHOWN_FIRST = 1;
-const TELEMETRY_DDSTAT_CLICKED = 2;
-const TELEMETRY_DDSTAT_CLICKED_FIRST = 3;
-const TELEMETRY_DDSTAT_SOLVED = 4;
-
 let gDecoderDoctorHandler = {
-  shouldShowLearnMoreButton() {
-    return AppConstants.platform == "win";
-  },
-
   getLabelForNotificationBox(type) {
     if (type == "adobe-cdm-not-found" &&
         AppConstants.platform == "win") {
@@ -235,11 +222,22 @@ let gDecoderDoctorHandler = {
         return gNavigatorBundle.getString("decoder.noCodecsLinux.message");
       }
     }
+    if (type == "cannot-initialize-pulseaudio") {
+      return gNavigatorBundle.getString("decoder.noPulseAudio.message");
+    }
     if (type == "unsupported-libavcodec" &&
         AppConstants.platform == "linux") {
-      // Note: Hard-coded string in aurora and beta because translation cannot
-      // be achieved in time.
-      return "libavcodec may be vulnerable or is not supported, and should be updated to play video.";
+      return gNavigatorBundle.getString("decoder.unsupportedLibavcodec.message");
+    }
+    return "";
+  },
+
+  getSumoForLearnHowButton(type) {
+    if (AppConstants.platform == "win") {
+      return "fix-video-audio-problems-firefox-windows";
+    }
+    if (type == "cannot-initialize-pulseaudio") {
+      return "fix-common-audio-and-video-issues";
     }
     return "";
   },
@@ -283,8 +281,6 @@ let gDecoderDoctorHandler = {
     // (Writing prefs from e10s content is now allowed.)
     let formatsPref = "media.decoder-doctor." + decoderDoctorReportId + ".formats";
     let buttonClickedPref = "media.decoder-doctor." + decoderDoctorReportId + ".button-clicked";
-    let histogram =
-      Services.telemetry.getKeyedHistogramById("DECODER_DOCTOR_INFOBAR_STATS");
 
     let formatsInPref = Services.prefs.getPrefType(formatsPref) &&
                         Services.prefs.getCharPref(formatsPref);
@@ -296,23 +292,22 @@ let gDecoderDoctorHandler = {
       }
       if (!formatsInPref) {
         Services.prefs.setCharPref(formatsPref, formats);
-        histogram.add(decoderDoctorReportId, TELEMETRY_DDSTAT_SHOWN_FIRST);
       } else {
         // Split existing formats into an array of strings.
         let existing = formatsInPref.split(",").map(String.trim);
         // Keep given formats that were not already recorded.
         let newbies = formats.split(",").map(String.trim)
-                      .filter(x => existing.includes(x));
+                      .filter(x => !existing.includes(x));
         // And rewrite pref with the added new formats (if any).
         if (newbies.length) {
           Services.prefs.setCharPref(formatsPref,
                                      existing.concat(newbies).join(", "));
         }
       }
-      histogram.add(decoderDoctorReportId, TELEMETRY_DDSTAT_SHOWN);
 
       let buttons = [];
-      if (gDecoderDoctorHandler.shouldShowLearnMoreButton()) {
+      let sumo = gDecoderDoctorHandler.getSumoForLearnHowButton(type);
+      if (sumo) {
         buttons.push({
           label: gNavigatorBundle.getString("decoder.noCodecs.button"),
           accessKey: gNavigatorBundle.getString("decoder.noCodecs.accesskey"),
@@ -321,12 +316,10 @@ let gDecoderDoctorHandler = {
                                 Services.prefs.getBoolPref(buttonClickedPref);
             if (!clickedInPref) {
               Services.prefs.setBoolPref(buttonClickedPref, true);
-              histogram.add(decoderDoctorReportId, TELEMETRY_DDSTAT_CLICKED_FIRST);
             }
-            histogram.add(decoderDoctorReportId, TELEMETRY_DDSTAT_CLICKED);
 
             let baseURL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
-            openUILinkIn(baseURL + "fix-video-audio-problems-firefox-windows", "tab");
+            openUILinkIn(baseURL + sumo, "tab");
           }
         });
       }
@@ -343,14 +336,13 @@ let gDecoderDoctorHandler = {
       // first time we get this resolution -> Clear prefs and report telemetry.
       Services.prefs.clearUserPref(formatsPref);
       Services.prefs.clearUserPref(buttonClickedPref);
-      histogram.add(decoderDoctorReportId, TELEMETRY_DDSTAT_SOLVED);
     }
   },
 }
 
-window.messageManager.addMessageListener("DecoderDoctor:Notification", gDecoderDoctorHandler);
-window.messageManager.addMessageListener("EMEVideo:ContentMediaKeysRequest", gEMEHandler);
+window.getGroupMessageManager("browsers").addMessageListener("DecoderDoctor:Notification", gDecoderDoctorHandler);
+window.getGroupMessageManager("browsers").addMessageListener("EMEVideo:ContentMediaKeysRequest", gEMEHandler);
 window.addEventListener("unload", function() {
-  window.messageManager.removeMessageListener("EMEVideo:ContentMediaKeysRequest", gEMEHandler);
-  window.messageManager.removeMessageListener("DecoderDoctor:Notification", gDecoderDoctorHandler);
+  window.getGroupMessageManager("browsers").removeMessageListener("EMEVideo:ContentMediaKeysRequest", gEMEHandler);
+  window.getGroupMessageManager("browsers").removeMessageListener("DecoderDoctor:Notification", gDecoderDoctorHandler);
 }, false);

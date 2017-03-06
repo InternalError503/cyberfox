@@ -156,6 +156,7 @@
 <!ENTITY updatestartupcheck.label "Automatycznie sprawdzaj aktualizacje, gdy &brandShortName; startuje">
 <!ENTITY updatecheckenabled.label "Włącz sprawdzanie aktualizacji">
 <!ENTITY updateverifysha.label "Włącz weryfikację aktualizacji poprzez sprawdzanie SHA512.">
+<!ENTITY updatestartbrowser.label "Uruchom przeglądarkę po ukończonej aktualizacji.">
 <!ENTITY updatenotificationsenabled.label "Włącz stronę z powiadomieniami przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;.">
 <!ENTITY updatereleasenotesenabled.label "Włącz stronę z listą zmian przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;.">
 

@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Plaginlar yangilanganini tekshirib koʻrish">
 <!ENTITY info.plugincheck.tooltip               "Agar plaginlaringiz yangilangan boʻlsa tekshirish">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

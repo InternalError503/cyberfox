@@ -145,10 +145,6 @@ const gXPInstallObserver = {
             for (let install of installInfo.installs)
               install.install();
             installInfo = null;
-
-            Services.telemetry
-                    .getHistogramById("SECURITY_UI")
-                    .add(Ci.nsISecurityUITelemetry.WARNING_CONFIRM_ADDON_INSTALL_CLICK_THROUGH);
           };
           break;
       }
@@ -208,10 +204,6 @@ const gXPInstallObserver = {
                                         options);
 
     removeNotificationOnEnd(popup, installInfo.installs);
-
-    Services.telemetry
-            .getHistogramById("SECURITY_UI")
-            .add(Ci.nsISecurityUITelemetry.WARNING_CONFIRM_ADDON_INSTALL);
   },
 
   observe: function (aSubject, aTopic, aData)
@@ -262,8 +254,6 @@ const gXPInstallObserver = {
       messageString = gNavigatorBundle.getFormattedString("xpinstallPromptMessage",
                         [brandShortName]);
 
-      let secHistogram = Components.classes["@mozilla.org/base/telemetry;1"].getService(Ci.nsITelemetry).getHistogramById("SECURITY_UI");
-      secHistogram.add(Ci.nsISecurityUITelemetry.WARNING_ADDON_ASKING_PREVENTED);
       let popup = PopupNotifications.show(browser, notificationID,
                                           messageString, anchorID,
                                           null, null, options);
@@ -272,18 +262,14 @@ const gXPInstallObserver = {
     case "addon-install-blocked": {
       messageString = gNavigatorBundle.getFormattedString("xpinstallPromptMessage",
                         [brandShortName]);
-
-      let secHistogram = Components.classes["@mozilla.org/base/telemetry;1"].getService(Ci.nsITelemetry).getHistogramById("SECURITY_UI");
       action = {
         label: gNavigatorBundle.getString("xpinstallPromptAllowButton"),
         accessKey: gNavigatorBundle.getString("xpinstallPromptAllowButton.accesskey"),
         callback: function() {
-          secHistogram.add(Ci.nsISecurityUITelemetry.WARNING_ADDON_ASKING_PREVENTED_CLICK_THROUGH);
           installInfo.install();
         }
       };
 
-      secHistogram.add(Ci.nsISecurityUITelemetry.WARNING_ADDON_ASKING_PREVENTED);
       let popup = PopupNotifications.show(browser, notificationID,
                                           messageString, anchorID,
                                           action, null, options);
@@ -496,8 +482,27 @@ var LightWeightThemeWebInstaller = {
       return;
     }
 
+    let uri = makeURI(baseURI);
+
+    // A notification bar with the option to undo is normally shown after a
+    // theme is installed.  But the discovery pane served from the url(s)
+    // below has its own toggle switch for quick undos, so don't show the
+    // notification in that case.
+    let notify = uri.prePath != "https://discovery.addons.mozilla.org";
+    if (notify) {
+      try {
+        if (Services.prefs.getBoolPref("extensions.webapi.testing")
+            && (uri.prePath == "https://discovery.addons.allizom.org"
+                || uri.prePath == "https://discovery.addons-dev.allizom.org")) {
+          notify = false;
+        }
+      } catch (e) {
+        // getBoolPref() throws if the testing pref isn't set.  ignore it.
+      }
+    }
+
     if (this._isAllowed(baseURI)) {
-      this._install(data);
+      this._install(data, notify);
       return;
     }
 
@@ -507,12 +512,12 @@ var LightWeightThemeWebInstaller = {
       gNavigatorBundle.getString("lwthemeInstallRequest.allowButton.accesskey");
     let message =
       gNavigatorBundle.getFormattedString("lwthemeInstallRequest.message",
-                                          [makeURI(baseURI).host]);
+                                          [uri.host]);
     let buttons = [{
       label: allowButtonText,
       accessKey: allowButtonAccesskey,
       callback: function () {
-        LightWeightThemeWebInstaller._install(data);
+        LightWeightThemeWebInstaller._install(data, notify);
       }
     }];
 
@@ -526,7 +531,7 @@ var LightWeightThemeWebInstaller = {
     notificationBar.persistence = 1;
   },
 
-  _install: function (newLWTheme) {
+  _install: function (newLWTheme, notify) {
     let previousLWTheme = this._manager.currentTheme;
 
     let listener = {
@@ -556,7 +561,9 @@ var LightWeightThemeWebInstaller = {
       },
 
       onEnabled: function(aAddon) {
-        LightWeightThemeWebInstaller._postInstallNotification(newLWTheme, previousLWTheme);
+        if (notify) {
+          LightWeightThemeWebInstaller._postInstallNotification(newLWTheme, previousLWTheme);
+        }
       }
     };
 
@@ -633,8 +640,8 @@ var LightWeightThemeWebInstaller = {
     try {
       uri = makeURI(srcURIString);
     }
-    catch(e) {
-      //makeURI fails if srcURIString is a nonsense URI
+    catch (e) {
+      // makeURI fails if srcURIString is a nonsense URI
       return false;
     }
 

@@ -440,6 +440,7 @@ var gPrivacyPane = {
                                              true, false);
       if (buttonIndex == CONFIRM_RESTART_PROMPT_RESTART_NOW) {
         pref.value = autoStart.hasAttribute('checked');
+        document.documentElement.acceptDialog();
         let appStartup = Cc["@mozilla.org/toolkit/app-startup;1"]
                            .getService(Ci.nsIAppStartup);
         appStartup.quit(Ci.nsIAppStartup.eAttemptQuit |  Ci.nsIAppStartup.eRestart);
@@ -671,21 +672,23 @@ var gPrivacyPane = {
    * Displays a dialog from which individual parts of private data may be
    * cleared.
    */
-  clearPrivateDataNow: function (aClearEverything)
-  {
+  clearPrivateDataNow: function (aClearEverything) {
     var ts = document.getElementById("privacy.sanitize.timeSpan");
     var timeSpanOrig = ts.value;
-    if (aClearEverything)
+
+    if (aClearEverything) {
       ts.value = 0;
+    }
 
     const Cc = Components.classes, Ci = Components.interfaces;
     var glue = Cc["@mozilla.org/browser/browserglue;1"]
                  .getService(Ci.nsIBrowserGlue);
     glue.sanitize(window);
 
-    // reset the timeSpan pref
-    if (aClearEverything)
-      ts.value = timeSpanOrig;
+      // reset the timeSpan pref
+      if (aClearEverything) {
+        ts.value = timeSpanOrig;
+      }
     Services.obs.notifyObservers(null, "clear-private-data", null);
   },
 

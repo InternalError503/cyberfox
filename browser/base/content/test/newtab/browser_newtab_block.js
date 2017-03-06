@@ -21,8 +21,6 @@ gDirectorySource = "data:application/json," + JSON.stringify({
 });
 
 add_task(function* () {
-  let origGetFrecentSitesName = DirectoryLinksProvider.getFrecentSitesName;
-  DirectoryLinksProvider.getFrecentSitesName = () => "";
   let origIsTopPlacesSite = NewTabUtils.isTopPlacesSite;
   NewTabUtils.isTopPlacesSite = (site) => false;
 
@@ -91,5 +89,4 @@ add_task(function* () {
   yield blockCell(1);
   yield* addNewTabPageTab();
   yield* checkGrid("1,2,3,4,5,6,7,8,9");
-  DirectoryLinksProvider.getFrecentSitesName = origGetFrecentSitesName;
 });

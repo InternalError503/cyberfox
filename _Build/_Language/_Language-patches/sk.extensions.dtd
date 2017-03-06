@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Skontrolovať aktualizácie zásuvných modulov">
 <!ENTITY info.plugincheck.tooltip               "Skontrolovať aktualizácie zásuvných modulov">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

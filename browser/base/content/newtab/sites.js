@@ -4,6 +4,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 #endif
 
+const THUMBNAIL_PLACEHOLDER_ENABLED =
+  Services.prefs.getBoolPref("browser.newtabpage.thumbnailPlaceholder");
+
 /**
  * This class represents a site that is contained in a cell and can be pinned,
  * moved around or deleted.
@@ -181,14 +184,26 @@ Site.prototype = {
     // Only enhance tiles if that feature is turned on
     let link = this.link;
 
-    let thumbnail = this._querySelector(".newtab-thumbnail");
+    let thumbnail = this._querySelector(".newtab-thumbnail.thumbnail");
     if (link.bgColor) {
       thumbnail.style.backgroundColor = link.bgColor;
     }
-
     let uri = link.imageURI || PageThumbs.getThumbnailURL(this.url);
     thumbnail.style.backgroundImage = 'url("' + uri + '")';
 
+    if (THUMBNAIL_PLACEHOLDER_ENABLED &&
+        link.type == "history" &&
+        link.baseDomain) {
+      let placeholder = this._querySelector(".newtab-thumbnail.placeholder");
+      let charCodeSum = 0;
+      for (let c of link.baseDomain) {
+        charCodeSum += c.charCodeAt(0);
+      }
+      const COLORS = 16;
+      let hue = Math.round((charCodeSum % COLORS) / COLORS * 360);
+      placeholder.style.backgroundColor = "hsl(" + hue + ",80%,40%)";
+      placeholder.textContent = link.baseDomain.substr(0,1).toUpperCase();
+    }
   },
 
   /**

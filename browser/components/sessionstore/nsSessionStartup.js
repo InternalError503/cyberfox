@@ -37,7 +37,6 @@ const Cr = Components.results;
 const Cu = Components.utils;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/TelemetryStopwatch.jsm");
 Cu.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 Cu.import("resource://gre/modules/Promise.jsm");
 
@@ -200,11 +199,6 @@ SessionStartup.prototype = {
             (this._initialState.session.state == STATE_RUNNING_STR);
         }
       }
-
-      // Report shutdown success via telemetry. Shortcoming here are
-      // being-killed-by-OS-shutdown-logic, shutdown freezing after
-      // session restore was written, etc.
-      Services.telemetry.getHistogramById("SHUTDOWN_OK").add(!this._previousSessionCrashed);
 
       // set the startup type
       if (this._previousSessionCrashed && resumeFromCrash)

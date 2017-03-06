@@ -78,4 +78,4 @@ AllowNoIcons=yes
 WizardImageFile={#PackageBranding}\WizModernImage.bmp
 WizardSmallImageFile={#PackageBranding}\WizModernSmallImage.bmp
 OutputDir={#PackageOutPutPath}
-MinVersion=0,6.0sp2
+MinVersion=0,6.1

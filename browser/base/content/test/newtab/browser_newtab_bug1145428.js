@@ -21,8 +21,6 @@ gDirectorySource = "data:application/json," + JSON.stringify({
 });
 
 add_task(function* () {
-  let origGetFrecentSitesName = DirectoryLinksProvider.getFrecentSitesName;
-  DirectoryLinksProvider.getFrecentSitesName = () => "";
 
   function getData(cellNum) {
     return performOnCell(cellNum, cell => {
@@ -82,6 +80,4 @@ add_task(function* () {
   is(tileData.thumbnail.indexOf("moz-page-thumb") != -1, true, "thumbnail contains moz-page-thumb");
   is(tileData.enhanced, "", "no enhanced image");
   is(tileData.url, "http://example.com/", "url points to baseDomian");
-
-  DirectoryLinksProvider.getFrecentSitesName = origGetFrecentSitesName;
 });

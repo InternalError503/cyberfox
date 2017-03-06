@@ -40,7 +40,7 @@
 <!ENTITY openLocationCmd.label         "Открыть адрес…">
 <!ENTITY openLocationCmd.accesskey     "L">
 <!ENTITY bookmarksMenuButton.tooltip   "Показать Ваши закладки">
-<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY restoreTabsOnDemand.label        "Не загружать вкладки без запроса">
 <!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
@@ -71,7 +71,7 @@
 <!ENTITY turnonclone.label "Включить опцию клонирования вкладки">
 <!ENTITY cloneCurrentTab.label "Клонировать вкладку">
 <!ENTITY cloneInNewWindow.label "Клонировать в новом окне">
-<!ENTITY cloneInNewPrivate.label "Private">
+<!ENTITY cloneInNewPrivate.label "Клонировать приватно"><!-- Note: Need shorter translation for Private -->
 <!-- End Clone Current Tab Tweak -->
 
 <!-- Features Tab Tweak -->
@@ -156,6 +156,7 @@
 <!ENTITY updatestartupcheck.label "Автоматически проверять наличие обновлений при запуске &brandShortName;">
 <!ENTITY updatecheckenabled.label "Разрешить проверку обновлений">
 <!ENTITY updateverifysha.label "Разрешить проверку обновлений по SHA512.">
+<!ENTITY updatestartbrowser.label "launch browser after successful update.">
 <!ENTITY updatenotificationsenabled.label "Разрешить отображение страницы уведомлений при первом запуске или после обновления &brandShortName;.">
 <!ENTITY updatereleasenotesenabled.label "Разрешить отображение страницы 'Что нового' при первом запуске или после обновления &brandShortName;.">
 
@@ -177,8 +178,8 @@
 <!ENTITY turnoffmenuabout.label "Включить доступ к about:config в меню">
 
 <!-- Language Settings Tweak -->
-<!ENTITY userLanguages.label "Select Language">
-<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+<!ENTITY userLanguages.label "Выбор языка">
+<!ENTITY userLanguages.desc "Выберите предпочитаемый язык локализации &brandShortName;">
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Плагины браузера">

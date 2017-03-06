@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
-                                  "resource://gre/modules/AppConstants.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
                                   "resource://gre/modules/PlacesUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Task",
@@ -46,10 +44,6 @@ var gSearchPane = {
     window.addEventListener("unload", () => {
       Services.obs.removeObserver(this, "browser-search-engine-modified", false);
     });
-
-  if (!AppConstants.isPlatformAndVersionAtLeast("win", "10")) {
-    document.getElementById("redirectSearchCheckbox").hidden = true;
-  }
 
     this._initAutocomplete();
 
@@ -200,9 +194,14 @@ var gSearchPane = {
     }
   },
 
-  onInputBlur: function() {
+  onInputBlur: function(aEvent) {
     let tree = document.getElementById("engineList");
-    tree.stopEditing(false);
+    if (!tree.hasAttribute("editing"))
+      return;
+
+    // Accept input unless discarded.
+    let accept = aEvent.charCode != KeyEvent.DOM_VK_ESCAPE;
+    tree.stopEditing(accept);
   },
 
   onTreeSelect: function() {

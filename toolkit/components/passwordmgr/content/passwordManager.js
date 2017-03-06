@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*** =================== SAVED SIGNONS CODE =================== ***/
+/** * =================== SAVED SIGNONS CODE =================== ***/
 const { classes: Cc, interfaces: Ci, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/AppConstants.jsm");
@@ -89,21 +89,9 @@ function Startup() {
     }
 
     SignonColumnSort(sortField);
-    Services.telemetry.getKeyedHistogramById("PWMGR_MANAGE_SORTED").add(sortField);
   });
 
   LoadSignons();
-
-  // filter the table if requested by caller
-  if (window.arguments &&
-      window.arguments[0] &&
-      window.arguments[0].filterString) {
-    setFilter(window.arguments[0].filterString);
-    Services.telemetry.getHistogramById("PWMGR_MANAGE_OPENED").add(1);
-  } else {
-    Services.telemetry.getHistogramById("PWMGR_MANAGE_OPENED").add(0);
-  }
-
   FocusFilterBox();
 }
 
@@ -433,7 +421,6 @@ function DeleteAllSignons() {
   removeButton.setAttribute("disabled", "true");
   removeAllButton.setAttribute("disabled", "true");
   FinalizeSignonDeletions(syncNeeded);
-  Services.telemetry.getHistogramById("PWMGR_MANAGE_DELETED_ALL").add(1);
 }
 
 function TogglePasswordVisible() {
@@ -448,7 +435,6 @@ function TogglePasswordVisible() {
   // Notify observers that the password visibility toggling is
   // completed.  (Mostly useful for tests)
   Services.obs.notifyObservers(null, "passwordmgr-password-toggle-complete", null);
-  Services.telemetry.getHistogramById("PWMGR_MANAGE_VISIBILITY_TOGGLED").add(showingPasswords);
 }
 
 function AskUserShowPasswords() {
@@ -465,7 +451,6 @@ function AskUserShowPasswords() {
 function FinalizeSignonDeletions(syncNeeded) {
   for (let s = 0; s < deletedSignons.length; s++) {
     Services.logins.removeLogin(deletedSignons[s]);
-    Services.telemetry.getHistogramById("PWMGR_MANAGE_DELETED").add(1);
   }
   // If the deletion has been performed in a filtered view, reflect the deletion in the unfiltered table.
   // See bug 405389.
@@ -636,7 +621,6 @@ function CopyPassword() {
   let row = signonsTree.currentIndex;
   let password = signonsTreeView.getCellText(row, {id : "passwordCol" });
   clipboard.copyString(password);
-  Services.telemetry.getHistogramById("PWMGR_MANAGE_COPIED_PASSWORD").add(1);
 }
 
 function CopyUsername() {
@@ -646,7 +630,6 @@ function CopyUsername() {
   let row = signonsTree.currentIndex;
   let username = signonsTreeView.getCellText(row, {id : "userCol" });
   clipboard.copyString(username);
-  Services.telemetry.getHistogramById("PWMGR_MANAGE_COPIED_USERNAME").add(1);
 }
 
 function EditCellInSelectedRow(columnName) {

@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label			"プラグインが最新バージョンであるか確認する">
 <!ENTITY info.plugincheck.tooltip		"インストールされた有効なプラグインが最新バージョンであるか確認します">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Kontroller om programtillegga dine er oppdaterte">
 <!ENTITY info.plugincheck.tooltip               "Kontroller om programtillegga dine er oppdaterte">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

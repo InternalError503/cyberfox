@@ -19,7 +19,7 @@ try {
   // process. We're used in the child process (for now), so guard against
   // this.
   Components.utils.import("resource://gre/modules/AddonManager.jsm");
-  /*globals AddonManagerPrivate*/
+  /* globals AddonManagerPrivate*/
 } catch (e) {
 }
 
@@ -33,8 +33,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "ServiceRequest",
                                   "resource://gre/modules/ServiceRequest.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Task",
                                   "resource://gre/modules/Task.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "DOMApplicationRegistry",
-                                  "resource://gre/modules/Webapps.jsm");
 
 const TOOLKIT_ID                      = "toolkit@mozilla.org";
 const KEY_PROFILEDIR                  = "ProfD";
@@ -792,10 +790,7 @@ Blocklist.prototype = {
       return;
     }
 
-    let telemetry = Services.telemetry;
-
     if (this._isBlocklistPreloaded()) {
-      telemetry.getHistogramById("BLOCKLIST_SYNC_FILE_LOAD").add(false);
       this._loadBlocklistFromString(this._preloadedBlocklistContent);
       delete this._preloadedBlocklistContent;
       return;
@@ -805,8 +800,6 @@ Blocklist.prototype = {
       LOG("Blocklist::_loadBlocklistFromFile: XML File does not exist " + file.path);
       return;
     }
-
-    telemetry.getHistogramById("BLOCKLIST_SYNC_FILE_LOAD").add(true);
 
     let text = "";
     let fstream = null;
@@ -916,13 +909,6 @@ Blocklist.prototype = {
           continue;
         switch (element.localName) {
         case "emItems":
-          // Special case for b2g, since we don't use the addon manager.
-          if (AppConstants.MOZ_B2G) {
-            let extensions = this._processItemNodes(element.childNodes, "emItem",
-                                                    this._handleEmItemNode);
-            DOMApplicationRegistry.blockExtensions(extensions);
-            return;
-          }
           this._addonEntries = this._processItemNodes(element.childNodes, "emItem",
                                                       this._handleEmItemNode);
           break;

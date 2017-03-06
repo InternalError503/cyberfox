@@ -66,11 +66,10 @@ onload = function() {
     ["browser.send_pings", true],
     ["browser.send_pings.max_per_link", -1],
     ["dom.caches.enabled", true],
-    ["dom.image.picture.enabled", true],
-    ["dom.image.srcset.enabled", true],
     ["dom.requestcontext.enabled", true],
     ["dom.serviceWorkers.exemptFromPerDomainMax", true],
     ["dom.serviceWorkers.enabled", true],
+    ["dom.serviceWorkers.openWindow.enabled", true],
     ["dom.serviceWorkers.testing.enabled", true],
   ]}, runTest);
 };

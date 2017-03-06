@@ -19,6 +19,8 @@ add_task(function* () {
   yield new Promise(done => {
     let options = { "set": [
       // Accept workers from mochitest's http.
+      ["dom.serviceWorkers.enabled", true],
+      ["dom.serviceWorkers.openWindow.enabled", true],
       ["dom.serviceWorkers.testing.enabled", true],
     ]};
     SpecialPowers.pushPrefEnv(options, done);
@@ -62,11 +64,15 @@ add_task(function* () {
   yield waitForServiceWorkerRegistered(swTab);
   ok(true, "Service worker registration resolved");
 
+  yield waitForServiceWorkerActivation(SERVICE_WORKER, document);
+
   // Retrieve the Push button for the worker.
   let names = [...document.querySelectorAll("#service-workers .target-name")];
   let name = names.filter(element => element.textContent === SERVICE_WORKER)[0];
   ok(name, "Found the service worker in the list");
+
   let targetElement = name.parentNode.parentNode;
+
   let pushBtn = targetElement.querySelector(".push-button");
   ok(pushBtn, "Found its push button");
 
@@ -88,7 +94,7 @@ add_task(function* () {
 
   // Finally, unregister the service worker itself.
   try {
-    yield unregisterServiceWorker(swTab);
+    yield unregisterServiceWorker(swTab, serviceWorkersElement);
     ok(true, "Service worker registration unregistered");
   } catch (e) {
     ok(false, "SW not unregistered; " + e);

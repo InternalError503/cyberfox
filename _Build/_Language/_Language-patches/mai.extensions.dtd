@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "देखबाक लेल जाँचू जे अहाँक प्लगइन अद्यतन अछि अथवा नहि">
 <!ENTITY info.plugincheck.tooltip               "देखबाक लेल जाँचू जे अहाँक प्लगइन अद्यतन अछि अथवा नहि">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

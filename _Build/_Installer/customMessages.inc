@@ -539,7 +539,7 @@ pt.SystemCpuUnsupported=This computer has an older CPU that lacks SSE2 instructi
 ru.ProcessName={#MyAppName}
 ru.IsAppRunning= уже запущен, закройте {#MyAppName} и запустите программу установки повторно.
 ru.IsAppRunningUninstall= уже запущен, закройте {#MyAppName} и запустите программу удаления повторно.
-ru.IsAppRunningOnVista=Внимание: Windows Vista больше не поддерживается, но мы можете запустить программу в этой системе - нажмите ОК для продолжения!
+ru.IsAppRunningOnVista=Внимание: Windows Vista больше не поддерживается, но Вы можете запустить программу в этой системе - нажмите ОК для продолжения!
 ru.Isx64BitOS=Простите, но Вы не можете установить 64-битную версию {#MyAppName} в 32-битной ОС.
 ru.CyberCTRInstallDescription=Установить CyberCTR [рекомендуется] (необязательно)
 ru.CreateStartMenuIcons=Создать ярлыки в меню «Пуск»
@@ -551,7 +551,7 @@ ru.CleanInstallGroupDescription=Настройки установки
 ru.PocketInstallDescription=Установить Firefox pocket (необязательно)
 ru.SystemAddonsGroupDescription=Системные дополнения
 ru.UpdateShortcut=Проверка обновлений
-ru.LanguageInstallDescription=Install language packs
+ru.LanguageInstallDescription=Установка пакетов локализации
 ;Localization note must preserve %n this is a new line break.
 ru.SystemCpuUnsupported=На Вашем компьютере установлен старый процессор, не поддерживающий набор инструкций SSE2. %n%nCyberfox 49.0 и более поздних версий не может быть запущен на этом компьютере.
 ;SerbianCyrillic

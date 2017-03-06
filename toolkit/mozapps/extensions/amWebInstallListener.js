@@ -178,10 +178,6 @@ Installer.prototype = {
     args.wrappedJSObject = args;
 
     try {
-      Cc["@mozilla.org/base/telemetry;1"].
-            getService(Ci.nsITelemetry).
-            getHistogramById("SECURITY_UI").
-            add(Ci.nsISecurityUITelemetry.WARNING_CONFIRM_ADDON_INSTALL);
       let parentWindow = null;
       if (this.browser) {
         parentWindow = this.browser.ownerDocument.defaultView;

@@ -349,15 +349,26 @@
         </setter>
       </property>
 
-      <field name="tabbox" readonly="true"><![CDATA[
-        var parent = this.parentNode;
-        while (parent) {
-          if (parent.localName == "tabbox")
-            break;
-          parent = parent.parentNode;
-        }
-        parent;
-      ]]></field>
+      <field name="_tabbox">null</field>
+      <property name="tabbox" readonly="true">
+        <getter><![CDATA[
+          // Memoize the result in a field rather than replacing this property,
+          // so that it can be reset along with the binding.
+          if (this._tabbox) {
+            return this._tabbox;
+          }
+
+          let parent = this.parentNode;
+          while (parent) {
+            if (parent.localName == "tabbox") {
+              break;
+            }
+            parent = parent.parentNode;
+          }
+
+          return this._tabbox = parent;
+        ]]></getter>
+      </property>
 
       <!-- _tabbox is deprecated, it exists only for backwards compatibility. -->
       <field name="_tabbox" readonly="true"><![CDATA[
@@ -633,15 +644,26 @@
       </method>
 
       <!-- public -->
-      <field name="tabbox" readonly="true"><![CDATA[
-        var parent = this.parentNode;
-        while (parent) {
-          if (parent.localName == "tabbox")
-            break;
-          parent = parent.parentNode;
-        }
-        parent;
-      ]]></field>
+      <field name="_tabbox">null</field>
+      <property name="tabbox" readonly="true">
+        <getter><![CDATA[
+          // Memoize the result in a field rather than replacing this property,
+          // so that it can be reset along with the binding.
+          if (this._tabbox) {
+            return this._tabbox;
+          }
+
+          let parent = this.parentNode;
+          while (parent) {
+            if (parent.localName == "tabbox") {
+              break;
+            }
+            parent = parent.parentNode;
+          }
+
+          return this._tabbox = parent;
+        ]]></getter>
+      </property>
 
       <field name="_selectedPanel">this.childNodes.item(this.selectedIndex)</field>
 
@@ -770,13 +792,6 @@
       <field name="arrowKeysShouldWrap" readonly="true">
         /Mac/.test(navigator.platform)
       </field>
-      <field name="TelemetryStopwatch" readonly="true">
-        {
-          let tmp = {};
-          Cu.import("resource://gre/modules/TelemetryStopwatch.jsm", tmp);
-          tmp.TelemetryStopwatch;
-        }
-      </field>
     </implementation>
 
     <handlers>
@@ -786,11 +801,6 @@
           return;
 
         if (this != this.parentNode.selectedItem) { // Not selected yet
-          let stopwatchid = this.parentNode.getAttribute("stopwatchid");
-          if (stopwatchid) {
-            this.TelemetryStopwatch.start(stopwatchid);
-          }
-
           // Call this before setting the 'ignorefocus' attribute because this
           // will pass on focus if the formerly selected tab was focused as well.
           this.parentNode._selectNewTab(this);
@@ -809,9 +819,6 @@
             setTimeout(tab => tab.removeAttribute("ignorefocus"), 0, this);
           }
 
-          if (stopwatchid) {
-            this.TelemetryStopwatch.finish(stopwatchid);
-          }
         }
         // Otherwise this tab is already selected and we will fall
         // through to mousedown behavior which sets focus on the current tab,

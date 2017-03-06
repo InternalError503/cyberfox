@@ -55,6 +55,7 @@ MOZ_APP_STATIC_INI=1
 MOZ_WEBGL_CONFORMANT=1
 MOZ_JSDOWNLOADS=1
 MOZ_RUST_MP4PARSE=1
+MOZ_RUST_URLPARSE=1
 
 # Include the DevTools client, not just the server (which is the default)
 MOZ_DEVTOOLS=all

@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "Gwirio os yw eich ategion yn rhai diweddar">
 <!ENTITY info.plugincheck.tooltip               "Gwirio os yw eich ategion yn rhai diweddar">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">

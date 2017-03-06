@@ -1,8 +1,7 @@
 [Files]
-Source: "{content}\browser\{#PackageType}\browser\components\browsercomps.dll"; DestDir: "{app}\browser\components"; Flags: ignoreversion signonce
-Source: "{content}\browser\{#PackageType}\browser\components\components.manifest"; DestDir: "{app}\browser\components"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\extensions\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi"; DestDir: "{app}\browser\extensions"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\browser\features\CTR@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: cyberctr; Flags: promptifolder replacesameversion
+Source: "{content}\browser\{#PackageType}\browser\features\disableSHA1rollout@mozilla.org.xpi"; DestDir: "{app}\browser\features"; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\features\firefox@getpocket.com.xpi"; DestDir: "{app}\browser\features"; Tasks: pocket; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\features\langpack-*@8pecxstudios.com.xpi"; DestDir: "{app}\browser\features"; Tasks: languages; Flags: promptifolder replacesameversion
 Source: "{content}\browser\{#PackageType}\browser\VisualElements\VisualElements_70.png"; DestDir: "{app}\browser\VisualElements"; Flags: ignoreversion
@@ -46,7 +45,6 @@ Source: "{content}\browser\{#PackageType}\omni.ja"; DestDir: "{app}"; Flags: ign
 Source: "{content}\browser\{#PackageType}\platform.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\plugin-container.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
 Source: "{content}\browser\{#PackageType}\plugin-hang-ui.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
-Source: "{content}\browser\{#PackageType}\precomplete"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\removed-files"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\softokn3.chk"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\softokn3.dll"; DestDir: "{app}"; Flags: ignoreversion signonce

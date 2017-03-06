@@ -46,8 +46,7 @@ var gContentPane = {
 	
     // Grab current set locale from 'general.useragent.locale'
     this.updateDefaultLocale();
-	
-    let doNotDisturbAlertsEnabled = false;
+
     if (AlertsServiceDND) {
       let notificationsDoNotDisturbRow =
         document.getElementById("notificationsDoNotDisturbRow");
@@ -254,7 +253,7 @@ var gContentPane = {
     document.documentElement.openSubDialog("chrome://browser/content/preferences/advanced-scripts.xul",
                                            "", null);  
   },
-// End Disable Javascript & Block Images Feature Dont Remove
+//End Disable Javascript & Block Images Feature Dont Remove
   // FONTS
 
   /**
@@ -273,7 +272,7 @@ var gContentPane = {
   },
 
   /**
-   * 
+   *
    */
   _selectDefaultLanguageGroup: function (aLanguageGroup, aIsSerif)
   {

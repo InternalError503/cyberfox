@@ -254,10 +254,10 @@
 
 	<!-- locales -->
   <hbox id="userLanguagesBox" align="center">
-  <description flex="1" control="languageMenu">Choose your preferred language for Cyberfox</description>
-	<menulist id="languageMenu" label="Select Language">
+  <description flex="1" control="languageMenu">&userLanguages.desc;</description>
+	<menulist id="languageMenu" label="&userLanguages.label;">
 		<menupopup>
-			<menuitem label="Select Language" disabled="true"/>
+			<menuitem label="&userLanguages.label;" disabled="true"/>
 			<menuitem label="ach (Acholi)" value="ach"/>
 			<menuitem label="af (Afrikaans)" value="af"/>
 			<menuitem label="an (Aragonés)" value="an"/>

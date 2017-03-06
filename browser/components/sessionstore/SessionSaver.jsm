@@ -13,7 +13,6 @@ const Ci = Components.interfaces;
 Cu.import("resource://gre/modules/Timer.jsm", this);
 Cu.import("resource://gre/modules/Services.jsm", this);
 Cu.import("resource://gre/modules/XPCOMUtils.jsm", this);
-Cu.import("resource://gre/modules/TelemetryStopwatch.jsm", this);
 
 XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
   "resource://gre/modules/AppConstants.jsm");
@@ -52,18 +51,6 @@ function notify(subject, topic) {
   Services.obs.notifyObservers(subject, topic, "");
 }
 
-// TelemetryStopwatch helper functions.
-function stopWatch(method) {
-  return function (...histograms) {
-    for (let hist of histograms) {
-      TelemetryStopwatch[method]("FX_SESSION_RESTORE_" + hist);
-    }
-  };
-}
-
-var stopWatchStart = stopWatch("start");
-var stopWatchCancel = stopWatch("cancel");
-var stopWatchFinish = stopWatch("finish");
 
 /**
  * The external API implemented by the SessionSaver module.
@@ -182,7 +169,6 @@ var SessionSaverInternal = {
       return Promise.resolve();
     }
 
-    stopWatchStart("COLLECT_DATA_MS", "COLLECT_DATA_LONGEST_OP_MS");
     let state = SessionStore.getCurrentState(forceUpdateAllWindows);
     PrivacyFilter.filterPrivateWindowsAndTabs(state);
 
@@ -226,7 +212,6 @@ var SessionSaverInternal = {
       }
     }
 
-    stopWatchFinish("COLLECT_DATA_MS", "COLLECT_DATA_LONGEST_OP_MS");
     return this._writeState(state);
   },
 

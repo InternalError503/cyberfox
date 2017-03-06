@@ -43,12 +43,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "PromiseUtils",
   "resource://gre/modules/PromiseUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "RunState",
   "resource:///modules/sessionstore/RunState.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "TelemetryStopwatch",
-  "resource://gre/modules/TelemetryStopwatch.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Task",
   "resource://gre/modules/Task.jsm");
-XPCOMUtils.defineLazyServiceGetter(this, "Telemetry",
-  "@mozilla.org/base/telemetry;1", "nsITelemetry");
 XPCOMUtils.defineLazyServiceGetter(this, "sessionStartup",
   "@mozilla.org/browser/sessionstartup;1", "nsISessionStartup");
 XPCOMUtils.defineLazyModuleGetter(this, "SessionWorker",
@@ -221,7 +217,6 @@ var SessionFileInternal = {
       let exists = true;
       try {
         let path = this.Paths[key];
-        let startMs = Date.now();
 
         let source = yield OS.File.read(path, { encoding: "utf-8" });
         let parsed = JSON.parse(source);
@@ -236,10 +231,7 @@ var SessionFileInternal = {
           source: source,
           parsed: parsed
         };
-        Telemetry.getHistogramById("FX_SESSION_RESTORE_CORRUPT_FILE").
-          add(false);
-        Telemetry.getHistogramById("FX_SESSION_RESTORE_READ_FILE_MS").
-          add(Date.now() - startMs);
+
         break;
       } catch (ex if ex instanceof OS.File.Error && ex.becauseNoSuchFile) {
         exists = false;
@@ -255,16 +247,12 @@ var SessionFileInternal = {
       } finally {
         if (exists) {
           noFilesFound = false;
-          Telemetry.getHistogramById("FX_SESSION_RESTORE_CORRUPT_FILE").
-            add(corrupted);
         }
       }
     }
 
     // All files are corrupted if files found but none could deliver a result.
     let allCorrupt = !noFilesFound && !result;
-    Telemetry.getHistogramById("FX_SESSION_RESTORE_ALL_FILES_CORRUPT").
-      add(allCorrupt);
 
     if (!result) {
       // If everything fails, start with an empty session.
@@ -332,8 +320,6 @@ var SessionFileInternal = {
 
     // Wait until the write is done.
     promise = promise.then(msg => {
-      // Record how long the write took.
-      this._recordTelemetry(msg.telemetry);
       this._successes++;
       if (msg.result.upgradeBackup) {
         // We have just completed a backup-on-upgrade, store the information
@@ -379,21 +365,5 @@ var SessionFileInternal = {
 
   wipe: function () {
     return this._postToWorker("wipe");
-  },
-
-  _recordTelemetry: function(telemetry) {
-    for (let id of Object.keys(telemetry)){
-      let value = telemetry[id];
-      let samples = [];
-      if (Array.isArray(value)) {
-        samples.push(...value);
-      } else {
-        samples.push(value);
-      }
-      let histogram = Telemetry.getHistogramById(id);
-      for (let sample of samples) {
-        histogram.add(sample);
-      }
-    }
   }
 };

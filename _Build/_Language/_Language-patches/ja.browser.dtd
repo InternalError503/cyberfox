@@ -156,6 +156,7 @@
 <!ENTITY updatestartupcheck.label "&brandShortName; の起動時に更新を自動的に確認する">
 <!ENTITY updatecheckenabled.label "更新の確認を有効にする">
 <!ENTITY updateverifysha.label "Enable SHA512 update verification.">
+<!ENTITY updatestartbrowser.label "launch browser after successful update.">
 <!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
 <!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
 

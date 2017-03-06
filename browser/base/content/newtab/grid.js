@@ -18,6 +18,7 @@ var gGrid = {
    * The DOM node of the grid.
    */
   _node: null,
+  _gridDefaultContent: null,
   get node() { return this._node; },
 
   /**
@@ -48,6 +49,7 @@ var gGrid = {
    */
   init: function Grid_init() {
     this._node = document.getElementById("newtab-grid");
+    this._gridDefaultContent = this._node.lastChild;
     this._createSiteFragment();
 
     gLinks.populateCache(() => {
@@ -146,7 +148,9 @@ var gGrid = {
     }
 
     this._cells = cells;
-    this._node.innerHTML = "";
+    while (this._gridDefaultContent.nextSibling) {
+      this._gridDefaultContent.nextSibling.remove();
+    }
     this._node.appendChild(fragment);
   },
 
@@ -172,7 +176,7 @@ var gGrid = {
     site.innerHTML =
       '<a class="newtab-link">' +
       '  <span class="newtab-thumbnail placeholder"/>' +
-      '  <span class="newtab-thumbnail"/>' +
+      '  <span class="newtab-thumbnail thumbnail"/>' +
       '  <span class="newtab-title"/>' +
       '</a>' +
       '<input type="button" title="' + newTabString("pin") + '"' +

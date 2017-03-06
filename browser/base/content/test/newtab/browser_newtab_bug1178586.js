@@ -19,8 +19,6 @@ gDirectorySource = "data:application/json," + JSON.stringify({
 });
 
 add_task(function* () {
-  let origGetFrecentSitesName = DirectoryLinksProvider.getFrecentSitesName;
-  DirectoryLinksProvider.getFrecentSitesName = () => "";
 
   function getData(cellNum) {
     return performOnCell(cellNum, cell => {
@@ -78,6 +76,4 @@ add_task(function* () {
   tileData = yield getData(0);
   is(tileData.type, "history", "pinned type");
   is(tileData.suggested, null, "no suggested attribute");
-
-  DirectoryLinksProvider.getFrecentSitesName = origGetFrecentSitesName;
 });

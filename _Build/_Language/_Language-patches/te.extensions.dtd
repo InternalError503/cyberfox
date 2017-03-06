@@ -1,3 +1,6 @@
 <!-- global informations -->
 <!ENTITY info.plugincheck.label                 "మీ చొప్పింతలు తాజాగా వున్నాయో లేదో చూడుము">
 <!ENTITY info.plugincheck.tooltip               "మీ చొప్పింతలు తాజాగా వున్నాయో లేదో చూడుము">
+
+<!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
+<!ENTITY pluginDisabled.learnMore "Learn More.">
