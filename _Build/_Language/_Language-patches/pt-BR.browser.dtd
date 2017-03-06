@@ -6,46 +6,46 @@
      for mozilla-aurora. -->
 
 <!ENTITY navbarCmd.accesskey           "N">
-<!ENTITY addonBarCmd.label             "Add-on Bar">
+<!ENTITY addonBarCmd.label             "Barra Adicional">
 <!ENTITY addonBarCmd.accesskey         "A">
-<!ENTITY throbberItem.title            "Activity Indicator">
+<!ENTITY throbberItem.title            "Indicador de atividade">
 <!ENTITY appMenuButton.label           "Menu">
-<!ENTITY appMenuButton.tooltip         "Open &brandShortName; menu">
-<!ENTITY feedButton.label              "Subscribe">
-<!ENTITY feedButton.tooltip            "Subscribe to this page…">
-<!ENTITY bookmarksButton.tooltip       "Display your bookmarks">
-<!ENTITY historyButton.tooltip         "Display pages you've viewed recently">
-<!ENTITY viewTabsOnTop.label           "Tabs on Top">
+<!ENTITY appMenuButton.tooltip         "Abrir &brandShortName; menu">
+<!ENTITY feedButton.label              "Se inscrever">
+<!ENTITY feedButton.tooltip            "Subscrever esta página…">
+<!ENTITY bookmarksButton.tooltip       "Exibir seus favoritos">
+<!ENTITY historyButton.tooltip         "Mostrar páginas que visualizou recentemente">
+<!ENTITY viewTabsOnTop.label           "Abas no Topo">
 <!ENTITY viewTabsOnTop.accesskey       "T">
-<!ENTITY appMenuEdit.label             "Edit">
-<!ENTITY appMenuToolbarLayout.label    "Toolbar Layout…">
-<!ENTITY appMenuFind.label             "Find…">
-<!ENTITY appMenuUnsorted.label         "Unsorted Bookmarks">
-<!ENTITY appMenuWebDeveloper.label     "Web Developer">
-<!ENTITY appMenuGettingStarted.label   "Getting Started">
-<!ENTITY appMenuSafeMode.label         "Restart with Add-ons Disabled…">
+<!ENTITY appMenuEdit.label             "Editar">
+<!ENTITY appMenuToolbarLayout.label    "Layout da Barra de Ferramentas…">
+<!ENTITY appMenuFind.label             "Encontrar…">
+<!ENTITY appMenuUnsorted.label         "Marcadores não ordenados">
+<!ENTITY appMenuWebDeveloper.label     "Desenvolvedor Web">
+<!ENTITY appMenuGettingStarted.label   "Começando">
+<!ENTITY appMenuSafeMode.label         "Reiniciar com complementos desativados…">
 <!ENTITY appMenuSafeMode.accesskey     "R">
-<!ENTITY cutButton.tooltip             "Cut">
-<!ENTITY copyButton.tooltip            "Copy">
-<!ENTITY pasteButton.tooltip           "Paste">
-<!ENTITY zoomOutButton.tooltip         "Zoom out">
-<!ENTITY zoomInButton.tooltip          "Zoom in">
-<!ENTITY zoomControls.label            "Zoom Controls">
-<!ENTITY addonBarCloseButton.tooltip   "Close Add-on Bar">
+<!ENTITY cutButton.tooltip             "Cortar">
+<!ENTITY copyButton.tooltip            "Copiar">
+<!ENTITY pasteButton.tooltip           "Colar">
+<!ENTITY zoomOutButton.tooltip         "Reduzir o zoom">
+<!ENTITY zoomInButton.tooltip          "Aumentar o zoom">
+<!ENTITY zoomControls.label            "Controles de zoom">
+<!ENTITY addonBarCloseButton.tooltip   "Fechar Barra de Complementos">
 <!ENTITY toggleAddonBarCmd.key         "/">
-<!ENTITY backForwardItem.title         "Back/Forward">
-<!ENTITY viewBookmarksSidebar.label    "Show in Sidebar">
-<!ENTITY bookmarksItem.title           "Bookmarks">
-<!ENTITY openLocationCmd.label         "Open Location…">
+<!ENTITY backForwardItem.title         "Voltar/Avançar">
+<!ENTITY viewBookmarksSidebar.label    "Mostrar na barra lateral">
+<!ENTITY bookmarksItem.title           "Favoritos">
+<!ENTITY openLocationCmd.label         "Abrir Localização…">
 <!ENTITY openLocationCmd.accesskey     "L">
-<!ENTITY bookmarksMenuButton.tooltip   "Display your bookmarks">
-<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY bookmarksMenuButton.tooltip   "Exibir seus favoritos">
+<!ENTITY restoreTabsOnDemand.label        "Não coloque as abas até selecionar">
 <!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
-<!ENTITY tabGroupsButton.tooltip       "Group your tabs">
+<!ENTITY tabGroupsButton.tooltip       "Agrupe as abas">
 <!-- end of strings to be removed post-Australis -->
-<!ENTITY mixedContentBlocked.helplink "Learn more">
+<!ENTITY mixedContentBlocked.helplink "Saber mais">
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Limpar Cache da Ram">
 <!ENTITY turnOnCleanRam.label "Adicionar 'limpar cache da ram' ao contexto de menu.">
@@ -81,7 +81,7 @@
 <!ENTITY newtabsearch.label "Habilitar barra de pesquisa em nova aba. (Recarregue a página)">
 <!ENTITY newtabpage.label "Página de Nova Aba:">
 <!ENTITY newtabthumbnail.label "Desabilitar captura de miniatura na página da nova aba.">
-<!ENTITY aboutnewtab.pageTitle "About:NewTab">
+<!ENTITY aboutnewtab.pageTitle "Sobre:Nova aba">
 <!ENTITY incontent.label "Exibir preferências na aba.">
 <!-- End Features Tab Tweak -->
 
@@ -91,7 +91,7 @@
 <!-- End Tabs Features -->
 
 <!-- Click 2 Play Via Checkbox Tweak -->
-<!ENTITY  enableClickToPlay.label     "Enable click to play">
+<!ENTITY  enableClickToPlay.label     "Ativar clique para jogar">
 <!-- End Click 2 Play Via Checkbox Tweak -->
 
 <!-- Geo Location Via Checkbox Tweak -->
@@ -125,13 +125,13 @@
 
 <!ENTITY  enableJava.label            "Habilitar Java">
 <!ENTITY  enableJava.accesskey        "n">
-<!ENTITY showTabBar.label             "Always show the tab bar">
+<!ENTITY showTabBar.label             "Sempre mostrar a barra de abas">
 <!ENTITY showTabBar.accesskey         "b">
 
-<!ENTITY advancedJSDialog.title         "Advanced JavaScript Settings">
+<!ENTITY advancedJSDialog.title         "Definições avançadas de JavaScript">
 <!ENTITY window.width                   "37em">
 
-<!ENTITY allowScripts.label             "Allow scripts to:">
+<!ENTITY allowScripts.label             "Permitir scripts para:">
 
 <!ENTITY moveResizePopupWindows.label     "Mover ou redimensionar janelas pop-up">
 <!ENTITY moveResizePopupWindows.accesskey "M">
@@ -142,13 +142,13 @@
 <!-- End Disable Javascript & Block Images Feature Dont Remove -->
 
 <!-- User Agent Feature -->
-<!ENTITY userAgentOverride.label     "User-agent Override Options">
-<!ENTITY selectUserAgentMenuItem.label     "Select UserAgent Item">
-<!ENTITY clearUserAgentButton.label     "Clear User-agent">
-<!ENTITY enterAgentManually.label     "Enter Agent Manually:">
-<!ENTITY enterAgentApplyButton.label "Apply">
-<!ENTITY enterAgentClearButton.label "Clear">
-<!ENTITY showOptionsAgentOverride.label "Show Options">
+<!ENTITY userAgentOverride.label     "Opções de substituição de agente de usuário">
+<!ENTITY selectUserAgentMenuItem.label     "Selecionar Item do Agente do Usuário">
+<!ENTITY clearUserAgentButton.label     "Limpar agente do usuário">
+<!ENTITY enterAgentManually.label     "Inserir agente manualmente:">
+<!ENTITY enterAgentApplyButton.label "Aplicar">
+<!ENTITY enterAgentClearButton.label "Limpar">
+<!ENTITY showOptionsAgentOverride.label "Mostrar Opções">
 
 <!-- Update check options -->
 <!ENTITY updateoptions.label "Opções de atualização do &brandShortName;">
@@ -178,8 +178,8 @@
 <!ENTITY turnoffmenuabout.label "Adicionar 'about:config' ao menu.">
 
 <!-- Language Settings Tweak -->
-<!ENTITY userLanguages.label "Select Language">
-<!ENTITY userLanguages.desc "Choose your preferred language for &brandShortName;">
+<!ENTITY userLanguages.label "Selecione o idioma">
+<!ENTITY userLanguages.desc "Escolha o idioma preferido para &brandShortName;">
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Plugins do navegador">
