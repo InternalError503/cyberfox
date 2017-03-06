@@ -19,6 +19,8 @@ add_task(function* () {
   yield new Promise(done => {
     let options = { "set": [
       // Accept workers from mochitest's http.
+      ["dom.serviceWorkers.enabled", true],
+      ["dom.serviceWorkers.openWindow.enabled", true],
       ["dom.serviceWorkers.testing.enabled", true],
       // Reduce the timeout to accelerate service worker freezing
       ["dom.serviceWorkers.idle_timeout", SW_TIMEOUT],
@@ -46,6 +48,8 @@ add_task(function* () {
     "the service worker.");
   yield waitForServiceWorkerRegistered(swTab);
   ok(true, "Service worker registration resolved");
+
+  yield waitForServiceWorkerActivation(SERVICE_WORKER, document);
 
   // Retrieve the Target element corresponding to the service worker.
   let names = [...document.querySelectorAll("#service-workers .target-name")];
@@ -82,7 +86,7 @@ add_task(function* () {
 
   // Finally, unregister the service worker itself.
   try {
-    yield unregisterServiceWorker(swTab);
+    yield unregisterServiceWorker(swTab, serviceWorkersElement);
     ok(true, "Service worker registration unregistered");
   } catch (e) {
     ok(false, "SW not unregistered; " + e);

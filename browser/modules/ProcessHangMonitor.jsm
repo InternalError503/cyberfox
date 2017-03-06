@@ -213,7 +213,7 @@ var ProcessHangMonitor = {
    */
   findPausedReport: function(browser) {
     let frameLoader = browser.QueryInterface(Ci.nsIFrameLoaderOwner).frameLoader;
-    for (let [report, timer] of this._pausedReports) {
+    for (let [report, ] of this._pausedReports) {
       if (report.isReportForBrowser(frameLoader)) {
         return report;
       }
@@ -288,7 +288,6 @@ var ProcessHangMonitor = {
     }
 
     let bundle = win.gNavigatorBundle;
-    let brandBundle = win.document.getElementById("bundle_brand");
 
     let buttons = [{
         label: bundle.getString("processHang.button_stop.label"),
@@ -373,17 +372,6 @@ var ProcessHangMonitor = {
     // If this hang was already reported and paused by the user ignore it.
     if (this._pausedReports.has(report)) {
       return;
-    }
-
-    // On e10s this counts slow-script/hanged-plugin notice only once.
-    // This code is not reached on non-e10s.
-    if (report.hangType == report.SLOW_SCRIPT) {
-      // On non-e10s, SLOW_SCRIPT_NOTICE_COUNT is probed at nsGlobalWindow.cpp
-      Services.telemetry.getHistogramById("SLOW_SCRIPT_NOTICE_COUNT").add();
-    } else if (report.hangType == report.PLUGIN_HANG) {
-      // On non-e10s we have sufficient plugin telemetry probes,
-      // so PLUGIN_HANG_NOTICE_COUNT is only probed on e10s.
-      Services.telemetry.getHistogramById("PLUGIN_HANG_NOTICE_COUNT").add();
     }
 
     this._activeReports.add(report);

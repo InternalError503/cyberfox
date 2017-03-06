@@ -30,34 +30,34 @@ function* expectFocusOnF6(backward, expectedDocument, expectedElement, onContent
     messageManager.addMessageListener("BrowserTest:FocusChanged", focusChangedListener);
 
     yield ContentTask.spawn(gBrowser.selectedBrowser, { expectedElementId: expectedElement }, function* (arg) {
-      let expectedElement = content.document.getElementById(arg.expectedElementId);
-      if (!expectedElement) {
+      let contentExpectedElement = content.document.getElementById(arg.expectedElementId);
+      if (!contentExpectedElement) {
         // Element not found, so look in the child frames.
         for (let f = 0; f < content.frames.length; f++) {
           if (content.frames[f].document.getElementById(arg.expectedElementId)) {
-            expectedElement = content.frames[f].document;
+            contentExpectedElement = content.frames[f].document;
             break;
           }
         }
       }
-      else if (expectedElement.localName == "html") {
-        expectedElement = expectedElement.ownerDocument;
+      else if (contentExpectedElement.localName == "html") {
+        contentExpectedElement = contentExpectedElement.ownerDocument;
       }
 
-      if (!expectedElement) {
+      if (!contentExpectedElement) {
         sendSyncMessage("BrowserTest:FocusChanged",
                         { details : "expected element " + arg.expectedElementId + " not found" });
         return;
       }
 
-      expectedElement.addEventListener("focus", function focusReceived() {
-        expectedElement.removeEventListener("focus", focusReceived, true);
+      contentExpectedElement.addEventListener("focus", function focusReceived() {
+        contentExpectedElement.removeEventListener("focus", focusReceived, true);
 
-        const fm = Components.classes["@mozilla.org/focus-manager;1"].
-                              getService(Components.interfaces.nsIFocusManager);
-        let details = fm.focusedWindow.document.documentElement.id;
-        if (fm.focusedElement) {
-          details += "," + fm.focusedElement.id;
+        const contentFM = Components.classes["@mozilla.org/focus-manager;1"].
+                            getService(Components.interfaces.nsIFocusManager);
+        let details = contentFM.focusedWindow.document.documentElement.id;
+        if (contentFM.focusedElement) {
+          details += "," + contentFM.focusedElement.id;
         }
 
         sendSyncMessage("BrowserTest:FocusChanged", { details : details });
@@ -85,7 +85,7 @@ function* expectFocusOnF6(backward, expectedDocument, expectedElement, onContent
   }
 }
 
-// Load a page and navigate between it and the chrome window. 
+// Load a page and navigate between it and the chrome window.
 add_task(function* ()
 {
   let page1Promise = BrowserTestUtils.browserLoaded(gBrowser.selectedBrowser);
@@ -156,7 +156,7 @@ add_task(function* ()
   SidebarUI.toggle('viewBookmarksSidebar');
   yield loadPromise;
 
-  
+
   gURLBar.focus();
   yield* expectFocusOnF6(false, "bookmarksPanel",
                                 sidebar.contentDocument.getElementById("search-box").inputField,

@@ -19,7 +19,10 @@ add_task(function* () {
   yield new Promise(done => {
     let options = { "set": [
       // Accept workers from mochitest's http.
+      ["dom.serviceWorkers.enabled", true],
+      ["dom.serviceWorkers.openWindow.enabled", true],
       ["dom.serviceWorkers.testing.enabled", true],
+      ["dom.ipc.processCount", 1],
     ]};
     SpecialPowers.pushPrefEnv(options, done);
   });
@@ -38,6 +41,8 @@ add_task(function* () {
 
   // Check that the service worker appears in the UI.
   assertHasTarget(true, document, "service-workers", SERVICE_WORKER);
+
+  yield waitForServiceWorkerActivation(SERVICE_WORKER, document);
 
   info("Ensure that the registration resolved before trying to interact with " +
     "the service worker.");

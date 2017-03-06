@@ -209,7 +209,7 @@ var gAdvancedPane = {
    */
   updateHardwareAcceleration: function()
   {
-    if (AppConstants.platform = "win") {
+    if (AppConstants.platform == "win") {
       var fromPref = document.getElementById("layers.acceleration.disabled");
       var toPref = document.getElementById("gfx.direct2d.disabled");
       toPref.value = fromPref.value;

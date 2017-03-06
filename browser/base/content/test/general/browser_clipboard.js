@@ -32,12 +32,11 @@ add_task(function*() {
     const utils = content.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
                          .getInterface(Components.interfaces.nsIDOMWindowUtils);
 
-    const modifier = arg.modifier;
     function sendKey(key) {
-      if (utils.sendKeyEvent("keydown", key, 0, modifier)) {
-        utils.sendKeyEvent("keypress", key, key.charCodeAt(0), modifier);
+      if (utils.sendKeyEvent("keydown", key, 0, arg.modifier)) {
+        utils.sendKeyEvent("keypress", key, key.charCodeAt(0), arg.modifier);
       }
-      utils.sendKeyEvent("keyup", key, 0, modifier);
+      utils.sendKeyEvent("keyup", key, 0, arg.modifier);
     }
 
     // Select an area of the text.
@@ -65,7 +64,7 @@ add_task(function*() {
     yield new Promise((resolve, reject) => {
       addEventListener("paste", function copyEvent(event) {
         removeEventListener("paste", copyEvent, true);
-        let clipboardData = event.clipboardData; 
+        let clipboardData = event.clipboardData;
         Assert.equal(clipboardData.mozItemCount, 1, "One item on clipboard");
         Assert.equal(clipboardData.types.length, 2, "Two types on clipboard");
         Assert.equal(clipboardData.types[0], "text/html", "text/html on clipboard");
@@ -101,7 +100,7 @@ add_task(function*() {
     yield new Promise((resolve, reject) => {
       addEventListener("paste", function copyEvent(event) {
         removeEventListener("paste", copyEvent, true);
-        let clipboardData = event.clipboardData; 
+        let clipboardData = event.clipboardData;
         Assert.equal(clipboardData.mozItemCount, 1, "One item on clipboard 2");
         Assert.equal(clipboardData.types.length, 2, "Two types on clipboard 2");
         Assert.equal(clipboardData.types[0], "text/html", "text/html on clipboard 2");
@@ -158,11 +157,10 @@ add_task(function*() {
       const utils = content.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
                            .getInterface(Components.interfaces.nsIDOMWindowUtils);
 
-      const modifier = arg.modifier;
-      if (utils.sendKeyEvent("keydown", "v", 0, modifier)) {
-        utils.sendKeyEvent("keypress", "v", "v".charCodeAt(0), modifier);
+      if (utils.sendKeyEvent("keydown", "v", 0, arg.modifier)) {
+        utils.sendKeyEvent("keypress", "v", "v".charCodeAt(0), arg.modifier);
       }
-      utils.sendKeyEvent("keyup", "v", 0, modifier);
+      utils.sendKeyEvent("keyup", "v", 0, arg.modifier);
     });
 
     // The new content should now include an image.

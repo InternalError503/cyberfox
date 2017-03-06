@@ -46,7 +46,6 @@ var gContentPane = {
     // Grab current set locale from 'general.useragent.locale'
     this.updateDefaultLocale();
 
-    let doNotDisturbAlertsEnabled = false;
     if (AlertsServiceDND) {
       let notificationsDoNotDisturbRow =
         document.getElementById("notificationsDoNotDisturbRow");
@@ -235,7 +234,7 @@ var gContentPane = {
   },
 
   /**
-   * 
+   *
    */
   _selectDefaultLanguageGroup: function (aLanguageGroup, aIsSerif)
   {

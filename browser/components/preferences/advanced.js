@@ -50,8 +50,8 @@ var gAdvancedPane = {
     if (AppConstants.MOZ_CRASHREPORTER) {
       this.initSubmitCrashes();
     }
-    this.initTelemetry();
     if (AppConstants.MOZ_TELEMETRY_REPORTING) {
+      this.initTelemetry();
       this.initSubmitHealthReport();
     }
     this.updateOnScreenKeyboardVisibility();
@@ -222,7 +222,7 @@ var gAdvancedPane = {
    */
   updateHardwareAcceleration: function()
   {
-    if (AppConstants.platform = "win") {
+    if (AppConstants.platform == "win") {
       var fromPref = document.getElementById("layers.acceleration.disabled");
       var toPref = document.getElementById("gfx.direct2d.disabled");
       toPref.value = fromPref.value;

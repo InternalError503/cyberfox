@@ -13,7 +13,9 @@ const SW_TIMEOUT = 1000;
 add_task(function* () {
   yield new Promise(done => {
     let options = {"set": [
-      // Accept workers from mochitest's http
+      // Accept workers from mochitest's http.
+      ["dom.serviceWorkers.enabled", true],
+      ["dom.serviceWorkers.openWindow.enabled", true],
       ["dom.serviceWorkers.testing.enabled", true],
       // Reduce the timeout to expose issues when service worker
       // freezing is broken
@@ -77,15 +79,12 @@ add_task(function* () {
 
   // Finally, unregister the service worker itself.
   try {
-    yield unregisterServiceWorker(swTab);
+    yield unregisterServiceWorker(swTab, serviceWorkersElement);
     ok(true, "Service worker registration unregistered");
   } catch (e) {
     ok(false, "SW not unregistered; " + e);
   }
 
-  // Now ensure that the worker registration is correctly removed.
-  // The list should update once the registration is destroyed.
-  yield waitForMutation(serviceWorkersElement, { childList: true });
   assertHasTarget(false, document, "service-workers", SERVICE_WORKER);
 
   yield removeTab(swTab);

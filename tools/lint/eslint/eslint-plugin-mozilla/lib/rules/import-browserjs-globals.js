@@ -28,7 +28,6 @@ const SCRIPTS = [
   "browser/components/downloads/content/downloads.js",
   "browser/components/downloads/content/indicator.js",
   "browser/components/customizableui/content/panelUI.js",
-  "toolkit/obsolete/content/inlineSpellCheckUI.js",
   "toolkit/components/viewsource/content/viewSourceUtils.js",
   "browser/base/content/browser-addons.js",
   "browser/base/content/browser-ctrlTab.js",
@@ -49,19 +48,19 @@ const SCRIPTS = [
   "browser/base/content/browser-tabsintitlebar.js",
   "browser/base/content/browser-thumbnails.js",
   "browser/base/content/browser-trackingprotection.js",
-  "browser/base/content/browser-data-submission-info-bar.js",
   "browser/base/content/browser-fxaccounts.js"
 ];
 
 module.exports = function(context) {
   return {
     Program: function(node) {
-      if (!helpers.getIsBrowserMochitest(this) &&
+      if (helpers.getTestType(this) != "browser" &&
           !helpers.getIsHeadFile(this)) {
         return;
       }
 
-      let root = helpers.getRootDir(context);
+      let filepath = helpers.getAbsoluteFilePath(context);
+      let root = helpers.getRootDir(filepath);
       for (let script of SCRIPTS) {
         let fileName = path.join(root, script);
         try {

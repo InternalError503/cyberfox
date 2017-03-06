@@ -34,12 +34,12 @@ function getDocHeader()
 {
   return "<html><head><meta charset='utf-8'></head><body>" + getEmptyFrame();
 }
- 
+
 function getDocFooter()
 {
   return "</body></html>";
 }
- 
+
 function getEmptyFrame()
 {
   return "<iframe style='width:100px; height:30px; margin:3px; border:1px solid lightgray;' " +
@@ -74,7 +74,7 @@ function* blurChildElement(browser)
 function* checkChildFocus(browser, message)
 {
   yield ContentTask.spawn(browser, [message, testId], function* (args) {
-    let [msg, testId] = args;
+    let [msg, id] = args;
     var focused = content.document.activeElement == content.document.getElementById('i');
 
     var validMsg = true;
@@ -82,8 +82,8 @@ function* checkChildFocus(browser, message)
       validMsg = (msg == content.document.getElementById('i').validationMessage);
     }
 
-    Assert.equal(focused, true, "Test " + testId + " First invalid element should be focused");
-    Assert.equal(validMsg, true, "Test " + testId + " The panel should show the message from validationMessage");
+    Assert.equal(focused, true, "Test " + id + " First invalid element should be focused");
+    Assert.equal(validMsg, true, "Test " + id + " The panel should show the message from validationMessage");
   });
 }
 

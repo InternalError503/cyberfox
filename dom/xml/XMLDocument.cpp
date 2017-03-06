@@ -128,12 +128,6 @@ NS_NewDOMDocument(nsIDOMDocument** aInstancePtrResult,
     return rv;
   }
 
-  if (nsCOMPtr<nsIScriptGlobalObject> sgo = do_QueryInterface(aEventObject)) {
-    d->SetScriptHandlingObject(sgo);
-  } else if (aEventObject){
-    d->SetScopeObject(aEventObject);
-  }
-
   if (isHTML) {
     nsCOMPtr<nsIHTMLDocument> htmlDoc = do_QueryInterface(d);
     NS_ASSERTION(htmlDoc, "HTML Document doesn't implement nsIHTMLDocument?");
@@ -146,6 +140,14 @@ NS_NewDOMDocument(nsIDOMDocument** aInstancePtrResult,
   // Must set the principal first, since SetBaseURI checks it.
   doc->SetPrincipal(aPrincipal);
   doc->SetBaseURI(aBaseURI);
+
+  // We need to set the script handling object after we set the principal such
+  // that the doc group is assigned correctly.
+  if (nsCOMPtr<nsIScriptGlobalObject> sgo = do_QueryInterface(aEventObject)) {
+    d->SetScriptHandlingObject(sgo);
+  } else if (aEventObject){
+    d->SetScopeObject(aEventObject);
+  }
 
   // XMLDocuments and documents "created in memory" get to be UTF-8 by default,
   // unlike the legacy HTML mess
@@ -266,29 +268,6 @@ XMLDocument::ResetToURI(nsIURI *aURI, nsILoadGroup *aLoadGroup,
   nsDocument::ResetToURI(aURI, aLoadGroup, aPrincipal);
 }
 
-NS_IMETHODIMP
-XMLDocument::GetAsync(bool *aAsync)
-{
-  NS_ENSURE_ARG_POINTER(aAsync);
-  *aAsync = mAsync;
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-XMLDocument::SetAsync(bool aAsync)
-{
-  mAsync = aAsync;
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-XMLDocument::Load(const nsAString& aUrl, bool *aReturn)
-{
-  ErrorResult rv;
-  *aReturn = Load(aUrl, rv);
-  return rv.StealNSResult();
-}
-
 bool
 XMLDocument::Load(const nsAString& aUrl, ErrorResult& aRv)
 {
@@ -299,8 +278,6 @@ XMLDocument::Load(const nsAString& aUrl, ErrorResult& aRv)
     aRv.Throw(NS_ERROR_UNEXPECTED);
     return false;
   }
-
-  WarnOnceAbout(nsIDocument::eUseOfDOM3LoadMethod);
 
   nsCOMPtr<nsIDocument> callingDoc = GetEntryDocument();
   nsCOMPtr<nsIPrincipal> principal = NodePrincipal();
@@ -315,6 +292,19 @@ XMLDocument::Load(const nsAString& aUrl, ErrorResult& aRv)
     aRv.Throw(NS_ERROR_UNEXPECTED);
     return false;
   }
+
+  // Reporting a warning on ourselves is rather pointless, because we probably
+  // have no window id (and hence the warning won't show up in any web console)
+  // and probably aren't considered a "content document" because we're not
+  // loaded in a docshell, so won't accumulate telemetry for use counters.  Try
+  // warning on our entry document, if any, since that should have things like
+  // window ids and associated docshells.
+  nsIDocument* docForWarning = callingDoc ? callingDoc.get() : this;
+  if (nsContentUtils::IsCallerChrome()) {
+    docForWarning->WarnOnceAbout(nsIDocument::eChromeUseOfDOM3LoadMethod);
+  } else {
+    docForWarning->WarnOnceAbout(nsIDocument::eUseOfDOM3LoadMethod);
+  } 
 
   nsIURI *baseURI = mDocumentURI;
   nsAutoCString charset;
@@ -497,6 +487,18 @@ bool
 XMLDocument::SuppressParserErrorElement()
 {
   return mSuppressParserErrorElement;
+}
+
+void
+XMLDocument::SetSuppressParserErrorConsoleMessages(bool aSuppress)
+{
+  mSuppressParserErrorConsoleMessages = aSuppress;
+}
+
+bool
+XMLDocument::SuppressParserErrorConsoleMessages()
+{
+  return mSuppressParserErrorConsoleMessages;
 }
 
 nsresult

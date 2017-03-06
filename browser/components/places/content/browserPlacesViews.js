@@ -980,9 +980,6 @@ function PlacesToolbar(aPlace) {
   }
 
   PlacesViewBase.call(this, aPlace);
-
-  Services.telemetry.getHistogramById("FX_BOOKMARKS_TOOLBAR_INIT_MS")
-                    .add(Date.now() - startTime);
 }
 
 PlacesToolbar.prototype = {
@@ -1402,7 +1399,6 @@ PlacesToolbar.prototype = {
    * - folderElt: the folder to drop into, if applicable.
    */
   _getDropPoint: function PT__getDropPoint(aEvent) {
-    let result = this.result;
     if (!PlacesUtils.nodeIsFolder(this._resultNode))
       return null;
 

@@ -6,10 +6,7 @@ add_task(function* test_switchtab_override() {
   let testURL = "http://example.org/browser/browser/base/content/test/urlbar/dummy_page.html";
 
   info("Opening first tab");
-  let tab = gBrowser.addTab(testURL);
-  let deferred = Promise.defer();
-  whenTabLoaded(tab, deferred.resolve);
-  yield deferred.promise;
+  let tab = yield BrowserTestUtils.openNewForegroundTab(gBrowser, testURL);
 
   info("Opening and selecting second tab");
   let secondTab = gBrowser.selectedTab = gBrowser.addTab();
@@ -17,11 +14,11 @@ add_task(function* test_switchtab_override() {
     try {
       gBrowser.removeTab(tab);
       gBrowser.removeTab(secondTab);
-    } catch(ex) { /* tabs may have already been closed in case of failure */ }
+    } catch (ex) { /* tabs may have already been closed in case of failure */ }
   });
 
   info("Wait for autocomplete")
-  deferred = Promise.defer();
+  let deferred = Promise.defer();
   let onSearchComplete = gURLBar.onSearchComplete;
   registerCleanupFunction(() => {
     gURLBar.onSearchComplete = onSearchComplete;
@@ -34,11 +31,11 @@ add_task(function* test_switchtab_override() {
 
   gURLBar.focus();
   gURLBar.value = "dummy_pag";
-  EventUtils.synthesizeKey("e" , {});
+  EventUtils.synthesizeKey("e", {});
   yield deferred.promise;
 
   info("Select second autocomplete popup entry");
-  EventUtils.synthesizeKey("VK_DOWN" , {});
+  EventUtils.synthesizeKey("VK_DOWN", {});
   ok(/moz-action:switchtab/.test(gURLBar.value), "switch to tab entry found");
 
   info("Override switch-to-tab");
@@ -52,12 +49,12 @@ add_task(function* test_switchtab_override() {
     gBrowser.tabContainer.removeEventListener("TabSelect", onTabSelect, false);
   });
   // Otherwise it would load the page.
-  whenTabLoaded(secondTab, deferred.resolve);
+  BrowserTestUtils.browserLoaded(secondTab.linkedBrowser).then(deferred.resolve);
 
-  EventUtils.synthesizeKey("VK_SHIFT" , { type: "keydown" });
-  EventUtils.synthesizeKey("VK_RETURN" , { });
+  EventUtils.synthesizeKey("VK_SHIFT", { type: "keydown" });
+  EventUtils.synthesizeKey("VK_RETURN", { });
   info(`gURLBar.value = ${gURLBar.value}`);
-  EventUtils.synthesizeKey("VK_SHIFT" , { type: "keyup" });
+  EventUtils.synthesizeKey("VK_SHIFT", { type: "keyup" });
   yield deferred.promise;
 
   yield PlacesTestUtils.clearHistory();

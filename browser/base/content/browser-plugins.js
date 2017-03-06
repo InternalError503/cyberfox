@@ -116,18 +116,7 @@ var gPluginHandler = {
   },
 
   _clickToPlayNotificationEventCallback: function PH_ctpEventCallback(event) {
-    if (event == "showing") {
-      Services.telemetry.getHistogramById("PLUGINS_NOTIFICATION_SHOWN")
-        .add(!this.options.primaryPlugin);
-      // Histograms always start at 0, even though our data starts at 1
-      let histogramCount = this.options.pluginData.size - 1;
-      if (histogramCount > 4) {
-        histogramCount = 4;
-      }
-      Services.telemetry.getHistogramById("PLUGINS_NOTIFICATION_PLUGIN_COUNT")
-        .add(histogramCount);
-    }
-    else if (event == "dismissed") {
+    if (event == "dismissed") {
       // Once the popup is dismissed, clicking the icon should show the full
       // list again
       this.options.primaryPlugin = null;
@@ -143,8 +132,6 @@ var gPluginHandler = {
     let permission;
     let expireType;
     let expireTime;
-    let histogram =
-      Services.telemetry.getHistogramById("PLUGINS_NOTIFICATION_USER_ACTION");
 
     // Update the permission manager.
     // Also update the current state of pluginInfo.fallbackType so that
@@ -154,7 +141,6 @@ var gPluginHandler = {
         permission = Ci.nsIPermissionManager.ALLOW_ACTION;
         expireType = Ci.nsIPermissionManager.EXPIRE_SESSION;
         expireTime = Date.now() + Services.prefs.getIntPref(this.PREF_SESSION_PERSIST_MINUTES) * 60 * 1000;
-        histogram.add(0);
         aPluginInfo.fallbackType = Ci.nsIObjectLoadingContent.PLUGIN_ACTIVE;
         break;
 
@@ -163,7 +149,6 @@ var gPluginHandler = {
         expireType = Ci.nsIPermissionManager.EXPIRE_TIME;
         expireTime = Date.now() +
           Services.prefs.getIntPref(this.PREF_PERSISTENT_DAYS) * 24 * 60 * 60 * 1000;
-        histogram.add(1);
         aPluginInfo.fallbackType = Ci.nsIObjectLoadingContent.PLUGIN_ACTIVE;
         break;
 
@@ -171,7 +156,6 @@ var gPluginHandler = {
         permission = Ci.nsIPermissionManager.PROMPT_ACTION;
         expireType = Ci.nsIPermissionManager.EXPIRE_NEVER;
         expireTime = 0;
-        histogram.add(2);
         switch (aPluginInfo.blocklistState) {
           case Ci.nsIBlocklistService.STATE_VULNERABLE_UPDATE_AVAILABLE:
             aPluginInfo.fallbackType = Ci.nsIObjectLoadingContent.PLUGIN_VULNERABLE_UPDATABLE;
@@ -195,7 +179,6 @@ var gPluginHandler = {
     }
 
     let browser = aNotification.browser;
-    let contentWindow = browser.contentWindow;
     if (aNewState != "continue") {
       let principal = aNotification.options.principal;
       Services.perms.addFromPrincipal(principal, aPluginInfo.permissionString,
@@ -352,10 +335,7 @@ var gPluginHandler = {
         // If something is already shown, just keep it
         return;
       }
-
-      Services.telemetry.getHistogramById("PLUGINS_INFOBAR_SHOWN").
-        add(true);
-
+	  
       let message;
       // Icons set directly cannot be manipulated using moz-image-region, so
       // we use CSS classes instead.
@@ -392,8 +372,6 @@ var gPluginHandler = {
           label: gNavigatorBundle.getString("pluginContinueBlocking.label"),
           accessKey: gNavigatorBundle.getString("pluginContinueBlocking.accesskey"),
           callback: function() {
-            Services.telemetry.getHistogramById("PLUGINS_INFOBAR_BLOCK").
-              add(true);
 
             Services.perms.addFromPrincipal(principal,
                                             "plugin-hidden-notification",
@@ -404,8 +382,6 @@ var gPluginHandler = {
           label: gNavigatorBundle.getString("pluginActivateTrigger.label"),
           accessKey: gNavigatorBundle.getString("pluginActivateTrigger.accesskey"),
           callback: function() {
-            Services.telemetry.getHistogramById("PLUGINS_INFOBAR_ALLOW").
-              add(true);
 
             let curNotification =
               PopupNotifications.getNotification("click-to-play-plugins",

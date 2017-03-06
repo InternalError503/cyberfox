@@ -1,4 +1,6 @@
-let AutoMigrateBackstage = Cu.import("resource:///modules/AutoMigrate.jsm");
+"use strict";
+
+let AutoMigrateBackstage = Cu.import("resource:///modules/AutoMigrate.jsm"); /* globals AutoMigrate */
 
 let gShimmedMigratorKeyPicker = null;
 let gShimmedMigrator = null;
@@ -141,6 +143,7 @@ add_task(function* checkIntegration() {
  * Test the undo preconditions and a no-op undo in the automigrator.
  */
 add_task(function* checkUndoPreconditions() {
+  let shouldAddData = false;
   gShimmedMigrator = {
     get sourceProfiles() {
       do_print("Read sourceProfiles");
@@ -152,6 +155,15 @@ add_task(function* checkUndoPreconditions() {
     },
     migrate(types, startup, profileToMigrate) {
       this._migrateArgs = [types, startup, profileToMigrate];
+      if (shouldAddData) {
+        // Insert a login and check that that worked.
+        MigrationUtils.insertLoginWrapper({
+          hostname: "www.mozilla.org",
+          formSubmitURL: "http://www.mozilla.org",
+          username: "user",
+          password: "pass",
+        });
+      }
       TestUtils.executeSoon(function() {
         Services.obs.notifyObservers(null, "Migration:Ended", undefined);
       });
@@ -174,10 +186,35 @@ add_task(function* checkUndoPreconditions() {
   yield migrationFinishedPromise;
   Assert.ok(Preferences.has("browser.migrate.automigrate.browser"),
             "Should have set browser pref");
-  Assert.ok((yield AutoMigrate.canUndo()), "Should be able to undo migration");
+  Assert.ok(!(yield AutoMigrate.canUndo()), "Should not be able to undo migration, as there's no data");
+  gShimmedMigrator._migrateArgs = null;
+  gShimmedMigrator._getMigrateDataArgs = null;
+  Preferences.reset("browser.migrate.automigrate.browser");
+  shouldAddData = true;
+
+  AutoMigrate.migrate("startup");
+  migrationFinishedPromise = TestUtils.topicObserved("Migration:Ended");
+  Assert.strictEqual(gShimmedMigrator._getMigrateDataArgs, null,
+                     "getMigrateData called with 'null' as a profile");
+  Assert.deepEqual(gShimmedMigrator._migrateArgs, [expectedTypes, "startup", null],
+                   "migrate called with 'null' as a profile");
+
+  yield migrationFinishedPromise;
+  let storedLogins = Services.logins.findLogins({}, "www.mozilla.org",
+                                                "http://www.mozilla.org", null);
+  Assert.equal(storedLogins.length, 1, "Should have 1 login");
+
+  Assert.ok(Preferences.has("browser.migrate.automigrate.browser"),
+            "Should have set browser pref");
+  Assert.ok((yield AutoMigrate.canUndo()), "Should be able to undo migration, as now there's data");
 
   yield AutoMigrate.undo();
   Assert.ok(true, "Should be able to finish an undo cycle.");
+
+  // Check that the undo removed the passwords:
+  storedLogins = Services.logins.findLogins({}, "www.mozilla.org",
+                                                "http://www.mozilla.org", null);
+  Assert.equal(storedLogins.length, 0, "Should have no logins");
 });
 
 /**
@@ -185,6 +222,7 @@ add_task(function* checkUndoPreconditions() {
  */
 add_task(function* checkUndoRemoval() {
   MigrationUtils.initializeUndoData();
+  Preferences.set("browser.migrate.automigrate.browser", "automationbrowser");
   // Insert a login and check that that worked.
   MigrationUtils.insertLoginWrapper({
     hostname: "www.mozilla.org",
@@ -608,3 +646,28 @@ add_task(function* checkUndoVisitsState() {
   yield PlacesTestUtils.clearHistory();
 });
 
+add_task(function* checkHistoryRemovalCompletion() {
+  AutoMigrate._errorMap = {bookmarks: 0, visits: 0, logins: 0};
+  yield AutoMigrate._removeSomeVisits([{url: "http://www.example.com/", limit: -1}]);
+  ok(true, "Removing visits should complete even if removing some visits failed.");
+  Assert.equal(AutoMigrate._errorMap.visits, 1, "Should have logged the error for visits.");
+
+  // Unfortunately there's not a reliable way to make removing bookmarks be
+  // unhappy unless the DB is messed up (e.g. contains children but has
+  // parents removed already).
+  yield AutoMigrate._removeUnchangedBookmarks([
+    {guid: PlacesUtils.bookmarks, lastModified: new Date(0), parentGuid: 0},
+    {guid: "gobbledygook", lastModified: new Date(0), parentGuid: 0},
+  ]);
+  ok(true, "Removing bookmarks should complete even if some items are gone or bogus.");
+  Assert.equal(AutoMigrate._errorMap.bookmarks, 0,
+               "Should have ignored removing non-existing (or builtin) bookmark.");
+
+
+  yield AutoMigrate._removeUnchangedLogins([
+    {guid: "gobbledygook", timePasswordChanged: new Date(0)},
+  ]);
+  ok(true, "Removing logins should complete even if logins don't exist.");
+  Assert.equal(AutoMigrate._errorMap.logins, 0,
+               "Should have ignored removing non-existing logins.");
+});
