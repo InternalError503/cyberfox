@@ -345,7 +345,7 @@
 					<menuitem label="vi (Vietnamese)" value="vi"/>
 					<menuitem label="xh (Xhosa)" value="xh"/>
 					<menuitem label="zh-CN Chinese (Peoples Republic of China)" value="zh-CN"/>
-					<menuitem label="zh-TW Chinese (Taiwan)" value="zh-TW"/>
+					<menuitem label="zh-TW Chinese (Traditional)" value="zh-TW"/>
 				</menupopup>
 			</menulist>
 		</hbox>
