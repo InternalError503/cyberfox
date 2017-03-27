@@ -11,7 +11,7 @@
 	<Description rdf:about="urn:mozilla:install-manifest">
 		<em:id>CTR@8pecxstudios.com</em:id>
 		<em:name>CyberCTR</em:name>
-		<em:version>1.6.1</em:version>
+		<em:version>1.6.2</em:version>
 		<em:type>2</em:type>
 		<em:multiprocessCompatible>true</em:multiprocessCompatible>
 
@@ -33,6 +33,7 @@
 		<em:contributor>George M.</em:contributor>
 		
 		<em:translator>MichalS (cs) - Czech</em:translator>
+		<em:translator>poljos (cs) - Czech</em:translator>
 		<em:translator>scootergrisen (da) - Danish</em:translator>
 		<em:translator>Aris (de) - German</em:translator>
 		<em:translator>milupo (dsb) - Lower Sorbian</em:translator>

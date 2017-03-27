@@ -273,7 +273,7 @@
 	  background:url("chrome://classic_theme_restorer/content/images/toolbarbutton-dropdown-arrow.png") center no-repeat;
 	}
 	
-	#customization-palette #ctraddon_window-controls{
+	#main-window #customization-palette #ctraddon_window-controls{
 	  background: url("chrome://classic_theme_restorer/content/images/windowControls.png") center no-repeat;
 	  border:none;
 	  min-width:100px;
@@ -588,6 +588,38 @@
 	#ctraddon_preferences-button {
 	  visibility: collapse; 
 	  display: none;
+	}
+	
+	/* private mask item */
+	#ctraddon_pmask-item {
+	  background:url("chrome://classic_theme_restorer/content/images/private_browsing-mask.png") center no-repeat;
+	}
+
+	toolbar #ctraddon_pmask-item{
+	  width: 26px;
+	  min-height: 16px;
+	  margin: 0 3px;
+	}
+	#ctraddon_pmask-item[cui-areatype="menu-panel"],
+	toolbarpaletteitem[place="palette"] > #ctraddon_pmask-item{
+	  background:url("chrome://classic_theme_restorer/content/images/private_browsing-mask.png") center no-repeat;
+	  border:none;
+	  min-width:100px;
+	  width:100px;
+	  max-width:100px;
+	  min-height:0px;
+	  height:50px;
+	}
+	#ctraddon_pmask-item[cui-areatype="menu-panel"]{
+	  margin-top:-30px !important;
+	}
+	
+	#main-window:not([privatebrowsingmode=temporary]):not([customizing]) #ctraddon_pmask-item{
+	  visibility: collapse;
+	}
+	
+	toolbar:-moz-lwtheme-brighttext #ctraddon_pmask-item{
+	  filter: brightness(1.5);
 	}
 	
 	/* Firefox 44 large mode fix */

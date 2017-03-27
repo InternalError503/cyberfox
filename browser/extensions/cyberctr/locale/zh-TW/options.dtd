@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"視窗">
 <!ENTITY Ctr_centered		"文字置中">
 <!ENTITY Ctr_page			"分項">
+<!ENTITY Ctr_position		"Position">
+<!ENTITY Ctr_appearance		"Appearance">
+<!ENTITY Ctr_left			"Left">
+<!ENTITY Ctr_right			"Right">
+<!ENTITY Ctr_privmode		"(private window)">
 
 <!ENTITY Ctr_cuibuttons		"按鈕">
 <!ENTITY Ctr_cuibutnormal	"標準圖示">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"分頁外觀由目前的佈景主題控制">
 <!ENTITY Ctr_coltabsinfo	"分頁外觀設定並不完全相容於 ColorfulTabs 擴充套件!">
 <!ENTITY Ctr_tabsontop0		"分頁列置頂 (預設值)">
-<!ENTITY Ctr_tabsontop1		"分頁列置頂 --- 設定 [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"分頁列不置頂 (v1) --- 設定 [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"分頁列不置頂 (v2) --- 設定 [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"分頁列置頂 - 設定 [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"分頁列不置頂 (v1) - 設定 [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"分頁列不置頂 (v2) - 設定 [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"對於某些擴充套件和佈景主題，若 v1 無效，可嘗試 v2!">
 <!ENTITY Ctr_tabsontopI1	"加入 [tabsontop=true/false] 屬性到">
 <!ENTITY Ctr_tabsintitlebar	"分頁列併入標題列">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"小於 48px 的值有可能導致故障!">
 <!ENTITY Ctr_square_edges	"使分頁標籤四角為嚴格直角">
 <!ENTITY Ctr_tttitlebar		"將分頁標題文字顯示於 &brandShortName; 標題列">
-<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
+<!ENTITY Ctr_ttoverflow		"Long tab titles">
+<!ENTITY Ctr_ttoverfl_def	"Default overflow effect">
+<!ENTITY Ctr_ttoverfl_no	"No overflow effect">
+<!ENTITY Ctr_tabtitle		"Tab title position">
 <!ENTITY Ctr_tabinsertion	"在網頁上點選連結時，將新分頁開啟於目前分頁的旁邊，即把預設行為 [a][b][c][1][2][3] 改為 [a][1][2][3][b][c]">
 <!ENTITY Ctr_emptytfavico	"(當網站未提供圖示時)顯示替代網站圖示">
 <!ENTITY Ctr_emptytfavico_n	"無">
@@ -105,7 +113,6 @@
 <!ENTITY Ctr_appbuttonct	"自訂按鈕顏色〈當其位於工具列時〉">
 <!ENTITY Ctr_appbuttonI1	"建議重啟瀏覽器!">
 <!ENTITY Ctr_appbuttonI1e	"在作業系統標題列上不可見">
-<!ENTITY Ctr_appbuttonI2	"此項設定僅生效於標題列與分頁列!">
 <!ENTITY Ctr_appbutmhi		"提高位置 (當顯示於分頁列時)">
 <!ENTITY Ctr_appbautocol	"依據 default / Aurora / Nightly 的版本，自動設定顏色">
 <!ENTITY Ctr_appbutbdl		"隱藏邊框和背景顏色">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"右側">
 <!ENTITY Ctr_html5warning	"HTML5 全螢幕警告">
 <!ENTITY Ctr_oldtoplevimg	"「頂層網域」圖示: 經典外觀">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"「警示方塊」: 換個外觀">
 <!ENTITY Ctr_emptygfavico	"〈原網站未提供圖示時〉所使用的替代書籤圖示">
 <!ENTITY Ctr_mstatusbar		"使狀態列可移動">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"緊湊的面板選單(書籤、歷史等等.)">
 <!ENTITY Ctr_hidezoomres	"當縮放控制按鈕置於工具列上時，隱藏工具列上的縮放重設按鈕">
 <!ENTITY Ctr_alt_newtabp	"新分頁(九宮頁面) (about:newtab): 換個外觀">
-<!ENTITY Ctr_nosnippets		"首頁 (about:home): 隱藏連向 addons.mozilla.org 的連結與敘述">
 <!ENTITY Ctr_search_ui		"搜尋">
 <!ENTITY Ctr_ctroldsearch	"傳統搜尋列">
+<!ENTITY Ctr_ctroldsearchd	"Not compatible to other search add-ons!">
 <!ENTITY Ctr_ctroldsearchc	"搜尋後，清除搜尋列">
 <!ENTITY Ctr_ctroldsearchr	"搜尋後，搜尋列歸位至第一個搜尋引擎">
 <!ENTITY Ctr_ctrosearchdel	"延時">
 <!ENTITY Ctr_search_oit		"於新分頁開啟搜尋結果">
 <!ENTITY Ctr_osearch_meoit	"中鍵點擊: 於前景新分頁開啟搜尋結果">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"自動調整搜尋建議框的寬度">
 <!ENTITY Ctr_osearch_cwidth	"自訂搜尋建議框的寬度">
 <!ENTITY Ctr_osearch_dm		"縮小下拉式三角按鈕">
@@ -206,7 +216,9 @@
 <!ENTITY Ctr_bmbunsortbm2	"改變其位置至書籤之上">
 <!ENTITY Ctr_bmbviewbmsb	"彈出式書籤選單: 顯示「檢視書籤欄」">
 <!ENTITY Ctr_bmbviewbmtb	"彈出式書籤選單: 顯示「檢視書籤工具列」項目">
+<!ENTITY Ctr_bmbutnotb		"Popup: hide 'Bookmarks Toolbar' menu">
 <!ENTITY Ctr_bmbnounsort	"彈出式書籤選單: 隱藏「未排序書籤」項目">
+<!ENTITY Ctr_bmbutclpopup	"Popup: only show 'Bookmark this page' and bookmarks">
 <!ENTITY Ctr_bmbutnotext	"當此按鈕位於書籤列時，隱藏按鈕文字標籤">
 <!ENTITY Ctr_skipprintpr	"列印按鈕: 跳過列印預覽">
 <!ENTITY Ctr_tbconmenu		"工具列右鍵選單: 隱藏 「移動至選單」、「自工具列移除」、「重新載入所有分頁」、「將所有分頁加入書籤」和「復原已關閉分頁」項目">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"按下進度指示器，則開啟指定網址:">
 <!ENTITY Ctr_navthrobber2	"填入網址或留空">
-<!ENTITY Ctr_anewtaburl		"新分頁網址">
-<!ENTITY Ctr_anewtaburlcb	"自訂新分頁網址 (預設值: 「about:newtab」)">
-<!ENTITY Ctr_anewtaburlpcb	"自訂隱私新分頁網址 (預設值: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"可使用色彩名稱, hexcodes, rgb(a) 和 hsl(a) 值.">
 <!ENTITY Ctr_tab_tf_info2	"沒有防呆機制（輸入無效值，不會有警告）!">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"尋找列著色強調">
 <!ENTITY Ctr_fx50findbarhl	"取消勾選這個核取方塊，則可移除尋找列「著色強調」功能。">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Old font rendering">
 
 
 <!ENTITY Ctr_pw_settings	"設定值">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"部份選項僅在某些情況下提供視覺上的變化!">
 <!ENTITY Ctr_special_info2	"設定僅在 &brandShortName; 的預設佈景主題下測試，因此可能不生效於第三方佈景主題!">
 <!ENTITY Ctr_special_acr	"請通過官方渠道回報問題，不要用「Add-on Compatibility Reporter」！">
-<!ENTITY Ctr_support		"支援">
-<!ENTITY Ctr_support_forum1	"MozillaZine (英文論壇)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (德文論壇)">
-<!ENTITY Ctr_github_issues	"在 Github 回報問題">
-<!ENTITY Ctr_newversion		"檢查新版本">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Getting started">
 <!ENTITY goCmd.label					"Go">
-<!ENTITY Ctr_menu_restart.label			"重啟">
-<!ENTITY Ctr_restartapp					"&brandShortName;-選單和「檔案」選單裡顯示「重啟」按鈕">
-<!ENTITY Ctr_ctrnewinv					"為目前 &brandShortName; 版本的新設定項畫上底線">
 
 <!ENTITY Ctr_openInCurrentTab			"在目前分頁開啟輸入結果">
 <!ENTITY Ctr_openInNewTab				"在新分頁開啟輸入結果">

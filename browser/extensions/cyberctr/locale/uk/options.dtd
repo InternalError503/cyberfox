@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"вікно">
 <!ENTITY Ctr_centered		"По центру">
 <!ENTITY Ctr_page			"Сторінка">
+<!ENTITY Ctr_position		"Позиція">
+<!ENTITY Ctr_appearance		"Вигляд">
+<!ENTITY Ctr_left			"Зліва">
+<!ENTITY Ctr_right			"Зправа">
+<!ENTITY Ctr_privmode		"(приватне вікно)">
 
 <!ENTITY Ctr_cuibuttons		"Кнопки">
 <!ENTITY Ctr_cuibutnormal	"Нормальні">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"Вигляд вкладки контролюється поточною темою.">
 <!ENTITY Ctr_coltabsinfo	"Вигляд вкладки не повністю сумісний з додатком ColorfulTabs!">
 <!ENTITY Ctr_tabsontop0		"Вкладки нагорі (типово)">
-<!ENTITY Ctr_tabsontop1		"Вкладки нагорі --- встановлено [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Вкладки не нагорі (v1) --- встановлено [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Вкладки не нагорі (v2) --- встановлено [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Вкладки нагорі - встановлено [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Вкладки не нагорі (v1) - встановлено [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Вкладки не нагорі (v2) - встановлено [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 - тільки для деяких додатків і повних тем!">
 <!ENTITY Ctr_tabsontopI1	"Додає атрибут [tabsontop=true/false] для">
 <!ENTITY Ctr_tabsintitlebar	"Панель заголовку &brandShortName;">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Значення нижче 48пікс викличе збої в більшості випадків!">
 <!ENTITY Ctr_square_edges	"Квадратні верхні кути">
 <!ENTITY Ctr_tttitlebar		"Заголовок вкладки на панелі заголовку &brandShortName;">
-<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
+<!ENTITY Ctr_ttoverflow		"Довгі назви вкладок">
+<!ENTITY Ctr_ttoverfl_def	"Ефект переповнення за замовчуванням">
+<!ENTITY Ctr_ttoverfl_no	"Без ефекту переповнення">
+<!ENTITY Ctr_tabtitle		"Позиція заголовку вкладки">
 <!ENTITY Ctr_tabinsertion	"Вставити відповідну вкладку після поточної вкладки">
 <!ENTITY Ctr_emptytfavico	"Показувати іконку сайту (якщо сайт не пропонує його)">
 <!ENTITY Ctr_emptytfavico_n	"Немає">
@@ -105,7 +113,6 @@
 <!ENTITY Ctr_appbuttonct	"Налаштовуваний колір кнопки на панелі">
 <!ENTITY Ctr_appbuttonI1	"рекомендовано перезапуск">
 <!ENTITY Ctr_appbuttonI1e	"Не видно в рядку заголовку Windows OS, тільки в &brandShortName; заголовку!">
-<!ENTITY Ctr_appbuttonI2	"Кольори кнопок видимі тільки на панелях заголовку і вкладок!">
 <!ENTITY Ctr_appbutmhi		"Вища позиція (якщо на панелі вкладок)">
 <!ENTITY Ctr_appbautocol	"Встановити типово / Aurora / Nightly колір автоматично">
 <!ENTITY Ctr_appbutbdl		"Сховати рамки та кольори тла">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Зправа">
 <!ENTITY Ctr_html5warning	"HTML5 повноекранне попередження">
 <!ENTITY Ctr_oldtoplevimg	"Зображення «домену верхнього рівня»: класичний вигляд">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"«Вікно попереджень»: альтернативний вигляд">
 <!ENTITY Ctr_emptygfavico	"Замінити типову іконку сайту">
 <!ENTITY Ctr_mstatusbar		"Рухомий рядок стану">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Панель меню: компактний вигляд (закладки, історія тощо)">
 <!ENTITY Ctr_hidezoomres	"Управління масштабом на панелі: приховати кнопку скидання масштабу">
 <!ENTITY Ctr_alt_newtabp	"Сторінка нової вкладки (about:newtab): альтернативний вигляд">
-<!ENTITY Ctr_nosnippets		"Домашня сторінка (about:home): приховати фрагменти">
 <!ENTITY Ctr_search_ui		"Пошук">
 <!ENTITY Ctr_ctroldsearch	"Старий пошук">
+<!ENTITY Ctr_ctroldsearchd	"Несумісне з іншими пошуковими додатками!">
 <!ENTITY Ctr_ctroldsearchc	"Очистити пошукове поле після пошуку">
 <!ENTITY Ctr_ctroldsearchr	"Відкотити до першої пошукової системи в списку після пошуку">
 <!ENTITY Ctr_ctrosearchdel	"Затримка виконання">
 <!ENTITY Ctr_search_oit		"Відкрити пошук у новій вкладці">
 <!ENTITY Ctr_osearch_meoit	"Середні-кліки: пошук в новій «передньоплановій вкладці»">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"Автоматично налаштовувати ширину спливаючого вікна">
 <!ENTITY Ctr_osearch_cwidth	"Налаштовувана ширина для пошукових спливаючих вікон">
 <!ENTITY Ctr_osearch_dm		"Мала позначка випадного списку">
@@ -206,7 +216,9 @@
 <!ENTITY Ctr_bmbunsortbm2	"Меню над закладками">
 <!ENTITY Ctr_bmbviewbmsb	"Спливаюче вікно: показати «Огляд в бічній панелі»">
 <!ENTITY Ctr_bmbviewbmtb	"Спливаюче вікно: показати «Огляд панелі»">
+<!ENTITY Ctr_bmbutnotb		"Спливаюче вікно: приховати меню «Панель закладок»">
 <!ENTITY Ctr_bmbnounsort	"Спливаюче вікно: приховати «несортовані закладки»">
+<!ENTITY Ctr_bmbutclpopup	"Спливаюче вікно: показати тільки «Закласти цю сторінку» та закладки">
 <!ENTITY Ctr_bmbutnotext	"Приховати ярлик на панелі закладок">
 <!ENTITY Ctr_skipprintpr	"Кнопка «Друк»: пропустити передогляд друку">
 <!ENTITY Ctr_tbconmenu		"Контекстне меню панелей: приховати «Перенести в меню», «Вилучити з панелі», «Оновити/закласти всі вкладки» та «Повернути закриту вкладку»">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Клік на індикаторі активності відкриває визначену адресу:">
 <!ENTITY Ctr_navthrobber2	"Додати адресу або залишити порожнім">
-<!ENTITY Ctr_anewtaburl		"Адреса сторінки в новій вкладці">
-<!ENTITY Ctr_anewtaburlcb	"Налаштовувана адреса сторінки в новій вкладці (за замовчуванням: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Налаштовувана адреса в приватній новій вкладці (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Назви кольорів, hex коди, rgb(a) та hsl(a) величини підтримуються.">
 <!ENTITY Ctr_tab_tf_info2	"Введене не буде перевірятися!">
@@ -265,7 +274,7 @@
 <!ENTITY Ctr_urlbardropm2	"Зробити позначку випадного списку завжди видимою">
 <!ENTITY Ctr_altreaderico	"Альтернативні іконки «Читача»">
 <!ENTITY Ctr_hideurlzoom	"Приховати кнопку зміни розміру (якщо є)">
-<!ENTITY Ctr_urlbardark		"Dark background color">
+<!ENTITY Ctr_urlbardark		"Темний колір тла">
 <!ENTITY Ctr_hideprbutton	"Приховати інфо кнопку «спливаюче вікно блоковано»">
 <!ENTITY Ctr_locsearchbw10	"Зменшити висоту панелей рядку адреси та пошуку (експериментальне)">
 <!ENTITY Ctr_urlbar_ib		"Індикатори справжності панелі рядку адреси">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"Підсвічування в пошуковій панелі">
 <!ENTITY Ctr_fx50findbarhl	"Вимкнення цього параметру усуває «підсвічувальні» особливості пошукової панелі.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Надання старого шрифту">
 
 
 <!ENTITY Ctr_pw_settings	"Налаштування">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Деякі параметри не можуть запропонувати візуальні зміни в усіх випадках">
 <!ENTITY Ctr_special_info2	"Налаштування зроблені для типової теми &brandShortName; і не можуть працювати з усіма сторонніми темами!">
 <!ENTITY Ctr_special_acr	"Доповідайте про проблеми тільки через офіційні канали підтримки і не використовуйте «Доповідач сумісності додатків»!">
-<!ENTITY Ctr_support		"Підтримка">
-<!ENTITY Ctr_support_forum1	"MozillaZine (форум англійською мовою)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (форум німецькою мовою)">
-<!ENTITY Ctr_github_issues	"Доповісти про проблему на Github">
-<!ENTITY Ctr_newversion		"Перевірити на нову версію">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Початок роботи">
 <!ENTITY goCmd.label					"Перейти">
-<!ENTITY Ctr_menu_restart.label			"Рестарт">
-<!ENTITY Ctr_restartapp					"«Рестарт» в кнопці програми та в меню «Файл»">
-<!ENTITY Ctr_ctrnewinv					"Підкреслені нові опції для поточної версії &brandShortName;">
 
 <!ENTITY Ctr_openInCurrentTab			"Відкрити вхідні дані в поточній вкладці">
 <!ENTITY Ctr_openInNewTab				"Відкрити вхідні дані в новій вкладці">

@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"wokno">
 <!ENTITY Ctr_centered		"Centrěrowano">
 <!ENTITY Ctr_page			"Bok">
+<!ENTITY Ctr_position		"Pozicija">
+<!ENTITY Ctr_appearance		"Naglěd">
+<!ENTITY Ctr_left			"Nalěwo">
+<!ENTITY Ctr_right			"Napšawo">
+<!ENTITY Ctr_privmode		"(priwatne wokno)">
 
 <!ENTITY Ctr_cuibuttons		"Tłocaški">
 <!ENTITY Ctr_cuibutnormal	"Normalny">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"Naglěd rejtarkow wótwisujo wót aktualneje drastwy.">
 <!ENTITY Ctr_coltabsinfo	"Naglěd rejtarka njejo połnje kompatibelny z rozšěrjenim 'ColorfulTabs'!">
 <!ENTITY Ctr_tabsontop0		"Rejtarki górjejce (standard)">
-<!ENTITY Ctr_tabsontop1		"Rejtarki górjejce --- stajśo [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Rejtarki nic górjejce (v1) --- stajśo [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Rejtarki nic górjejce (v2) --- stajśo [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Rejtarki górjejce - stajśo [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Rejtarki nic górjejce (v1) - stajśo [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Rejtarki nic górjejce (v2) - stajśo [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 jo jano za někotare dodanki a dopołne drastwy!">
 <!ENTITY Ctr_tabsontopI1	"Pśidawa atribut [tabsontop=true/false] na">
 <!ENTITY Ctr_tabsintitlebar	"Titelowu rědku &brandShortName; město titeloweje rědki źěłowego systema wužywaś">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Gódnoty pód 48px zawinuju zwětšego zmólki w pśedstajenju!">
 <!ENTITY Ctr_square_edges	"Kwadratiske górne rožki">
 <!ENTITY Ctr_tttitlebar		"Rejtarkowy titel w titelowej rědce &brandShortName;">
-<!ENTITY Ctr_ttnooverfl		"Woběžkowy efekt z dłujkich rejtarkowych titelow wótpóraś">
+<!ENTITY Ctr_ttoverflow		"Dłujke rejtarkowe titele">
+<!ENTITY Ctr_ttoverfl_def	"Standardne pśeblendowanje">
+<!ENTITY Ctr_ttoverfl_no	"Žedno pśeblendowanje">
+<!ENTITY Ctr_tabtitle		"Pozicija rejtarkowego titela">
 <!ENTITY Ctr_tabinsertion	"Pśiswójźbny rejtark za aktualnym rejtarkom zasunuś">
 <!ENTITY Ctr_emptytfavico	"Faworitowy symbol pokazaś (jolic sedło žeden njama)">
 <!ENTITY Ctr_emptytfavico_n	"Žeden">
@@ -104,8 +112,7 @@
 <!ENTITY Ctr_appbuttonc_cu	"Swójska">
 <!ENTITY Ctr_appbuttonct	"Swójska barwa za tłocašk na symbolowej rědce">
 <!ENTITY Ctr_appbuttonI1	"Nowy start dopórucony">
-<!ENTITY Ctr_appbuttonI1e	"Jano widobny w titelnej rědce &brandShortName;, nic na titelnej rědce źěłowego systema Windows!">
-<!ENTITY Ctr_appbuttonI2	"Tłocaškowe barwy su jano widobne, jolic tłocašk jo na titelnej rědce abo rejtarkowej rědce!">
+<!ENTITY Ctr_appbuttonI1e	"Tłošask &brandShortName; jo jano widobny na titelowej rědce &brandShortName; a nic na titelowej rědce źěłowego systema!">
 <!ENTITY Ctr_appbutmhi		"Wuša pozicija (jolic jo na rejtarkowej rědce)">
 <!ENTITY Ctr_appbautocol	"Barwu wobglědowakowego kanala awtomatiski nastajiś (standard/Aurora/Nightly)">
 <!ENTITY Ctr_appbutbdl		"Ramiki a slězynowe barwy schowaś">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Napšawo">
 <!ENTITY Ctr_html5warning	"Warnowanje połneje wobrazowki HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Klasiski wenkowny naglěd na běłej slězynje">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"'Warnowański kašćik': Alternatiwny wenkowny naglěd">
 <!ENTITY Ctr_emptygfavico	"Powšykny fawority symbol wuměniś">
 <!ENTITY Ctr_mstatusbar		"Pśesuwajobny wobcerk statusoweje rědki">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Menijowe wuskokujuce wokna (cytańske znamjenja, historija atd.): Kompaktny naglěd">
 <!ENTITY Ctr_hidezoomres	"Skalěrowańske elementy na symbolowej rědce: Tłocašk za slědkstajenje skalěrowanja schowaś">
 <!ENTITY Ctr_alt_newtabp	"Bok nowego rejtarka (about:newtab): Alternatiwne wuglědanje">
-<!ENTITY Ctr_nosnippets		"Startowy bok (about:home): kusacki schowaś">
 <!ENTITY Ctr_search_ui		"Pytanje">
 <!ENTITY Ctr_ctroldsearch	"Stare pytanje">
+<!ENTITY Ctr_ctroldsearchd	"Njejo z drugimi pytańskimi dodankami kompatibelny!">
 <!ENTITY Ctr_ctroldsearchc	"Pó pytanju pytańske pólo wuprozniś">
 <!ENTITY Ctr_ctroldsearchr	"Pó pytanju so k prědnej pytnicy w lisćinje wrośiś">
 <!ENTITY Ctr_ctrosearchdel	"wokomuźenje">
 <!ENTITY Ctr_search_oit		"Pytanje w nowem rejtarku wócyniś">
 <!ENTITY Ctr_osearch_meoit	"Srjejźne kliknjenja: Pytanje w nowem 'prědkowem rejtarku'">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"Šyrokosć wuskokujucego wokna awtomatiski pśiměriś">
 <!ENTITY Ctr_osearch_cwidth	"Swójska šyrokosć za wuskokujuce wokna">
 <!ENTITY Ctr_osearch_dm		"Mały wuběrański tłocašk">
@@ -202,11 +212,13 @@
 <!ENTITY Ctr_oldplacesbut	"Zapiski a zarědniki na symbolowej rědce: stary naglěd">
 <!ENTITY Ctr_dl_pm_drop		"Wobcerk ześěgnjeńskich tłocaškow: tłocašk špica šypki pokazaś">
 <!ENTITY Ctr_bmbutpanelm	"Wuskokujucy meni: Naglěd menijowego wuskokujucego wokna">
-<!ENTITY Ctr_bmbunsortbm	"Wuskokujucy meni: Meni 'Druge cytańske znamjenja'">
+<!ENTITY Ctr_bmbunsortbm	"Wuskokujucy meni: Meni 'Druge cytańske znamjenja' pokazaś">
 <!ENTITY Ctr_bmbunsortbm2	"Meni nad cytańskimi znamjenjami">
-<!ENTITY Ctr_bmbviewbmsb	"Wuskokujucy meni: 'Bocnicu cytańskich znamjenjow pokazaś' pokazaś">
-<!ENTITY Ctr_bmbviewbmtb	"Wuskokujucy meni: 'Rědku cytańskich znamjenjow pokazaś' pokazaś">
-<!ENTITY Ctr_bmbnounsort	"Wuskokujucy meni: 'Druge cytańske znamjenja' schowaś">
+<!ENTITY Ctr_bmbviewbmsb	"Wuskokujucy meni: Menijowy zapisk 'Bocnicu cytańskich znamjenjow pokazaś' pokazaś">
+<!ENTITY Ctr_bmbviewbmtb	"Wuskokujucy meni: Menijowy zapisk 'Rědku cytańskich znamjenjow pokazaś' pokazaś">
+<!ENTITY Ctr_bmbutnotb		"Wuskokujucy meni:: Meni 'Rědka cytańskich znamjenjow' schowaś">
+<!ENTITY Ctr_bmbnounsort	"Wuskokujucy meni: Meni a menijowy zapisk 'Druge cytańske znamjenja' schowaś">
+<!ENTITY Ctr_bmbutclpopup	"Wuskokujucy meni: jano 'Toś ten bok ako cytańske znamjo składowaś' a cytańske znamjenja pokazaś">
 <!ENTITY Ctr_bmbutnotext	"Tekst na rědce cytańskich znamjenjow schowaś">
 <!ENTITY Ctr_skipprintpr	"Śišćarski tłocašk: Śišćarski pśeglěd pśeskócyś">
 <!ENTITY Ctr_tbconmenu		"Kontekstowy meni symboloweje rědki: 'Do menija pśesunuś', 'ze symboloweje rědki wótpóraś', 'wšykne rejtaki znowego zacytaś/ako cytańske znamje składowaś' a 'rejtark zacyniś anulěrowaś' schowaś">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Kliknjenje na pokazku aktiwity wócynja slědujucy URL:">
 <!ENTITY Ctr_navthrobber2	"URL pśidaś abo prozne wóstajiś">
-<!ENTITY Ctr_anewtaburl		"Bokowy URL nowego rejtarka">
-<!ENTITY Ctr_anewtaburlcb	"URL swójskego boka nowego rejtarka (standard: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Swójski URL boka nowego rejtarka priwatnego modusa (standard: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Barwowe mjenja, heksadecimalne kody, rgb(a)- a hsl(a)-gódnoty se pódpěraju.">
 <!ENTITY Ctr_tab_tf_info2	"Zapódaśa se njepśespytuju!">
@@ -389,8 +398,9 @@
 <!ENTITY Ctr_e_tabsaudioico	"Symbol za awdiowótgrawanje">
 <!ENTITY Ctr_e_containertab	"Kontejnerowe rejtarki">
 <!ENTITY Ctr_e_findbarhl	"Wuzwignjenje pytańskego póla">
-<!ENTITY Ctr_fx50findbarhl	"Gaž se toś te nastajenja znjemóžniju, se 'wuzwignjeńske' funkcije wótpóraju.">
+<!ENTITY Ctr_fx50findbarhl	"Gaž se toś te nastajenja znjemóžniju, se nowe 'wuzwignjeńske' funkcije wótpóraju.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Kreslenje starych pismow">
 
 
 <!ENTITY Ctr_pw_settings	"Nastajenja">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Někotare nastajenja njepóbituju wizuelne změny we wšych padach!">
 <!ENTITY Ctr_special_info2	"Drastwa tśeśego póbitowarja jo se namakała! Někotare nastajenja njefunkcioněruju z drastwami tśeśich póbitowarjow!">
 <!ENTITY Ctr_special_acr	"Dajśo problemy jano pśez oficielne pódpěrowańske kanale a nic pśez 'Add-on Compatibility Reporter' k wěsći!">
-<!ENTITY Ctr_support		"Pomoc">
-<!ENTITY Ctr_support_forum1	"MozillaZine (engelski forum)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (nimski forum)">
-<!ENTITY Ctr_github_issues	"Problem na Github k wěsći daś">
-<!ENTITY Ctr_newversion		"Za noweju wersiju pytaś">
 
 <!ENTITY Ctr_addon-bar.accesskey		"R">
 <!ENTITY appMenuGettingStarted.label	"Prědne kšace">
 <!ENTITY goCmd.label					"Start">
-<!ENTITY Ctr_menu_restart.label			"Znowego startowaś">
-<!ENTITY Ctr_restartapp					"Znowego startowaś w meniju '&brandShortName;' a w meniju Dataja pokazaś">
-<!ENTITY Ctr_ctrnewinv					"Nowe nastajenja za aktualnu wersiju &brandShortName; pódšmarnuś">
 
 <!ENTITY Ctr_openInCurrentTab			"Zapódaśa w aktualnem rejtarku wócyniś">
 <!ENTITY Ctr_openInNewTab				"Zapódaśa w nowem rejtarku wócyniś">

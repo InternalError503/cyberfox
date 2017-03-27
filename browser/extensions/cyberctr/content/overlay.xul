@@ -137,14 +137,6 @@
 	
 	<menuitem id="menu_preferences" oncommand="classicthemerestorerjs.ctr.openContentPrefsInWin();"/>
 	
-	<!--<menupopup id="menu_FilePopup">
-	  <menuitem id="ctraddon_restart-menu"
-				label="&Ctr_menu_restart.label;"
-				oncommand="classicthemerestorerjs.ctr.restartBrowser()"
-				insertbefore="menu_FileQuitItem"
-				class="menuitem-iconic"/>
-	</menupopup>-->
-	
 	<menupopup id="toolbar-context-menu">
 	  <menuitem id="toggle_nav-bar"
                 label="&navbarCmd.label;"
@@ -435,10 +427,6 @@
 					  observes="sync-setup-state"
 					  oncommand="gSyncUI.openSetup()"
 					  class="menuitem-iconic"/>
-<!--			<menuitem id="ctraddon_restart-appmenu"
-					  label="&Ctr_menu_restart.label;"
-					  oncommand="classicthemerestorerjs.ctr.restartBrowser()"
-					  class="menuitem-iconic"/>-->
 <!--- CyberCTR customization settings -->
 	  <menuitem id="appmenu_restartBrowser"
 				        label="&restartBrowser.label;"
@@ -881,6 +869,12 @@
                    title="&brandShortName;">
       </toolbaritem>
 
+	  <!--### creates a movable private browsing item ###-->
+	  <toolbaritem id="ctraddon_pmask-item"
+                   class="chromeclass-toolbar-additional"
+                   removable="true"
+				   overflows="false">
+      </toolbaritem>
 
 	  <!--### navigation throbber / animation button ###-->			   
 	  <toolbaritem id="ctraddon_navigator-throbber"
@@ -950,12 +944,6 @@
                      label="&goCmd.label;" removable="true"
                      onclick="gURLBar.handleCommand(event);"
                      tooltiptext="&goEndCap.tooltip;"/>
-					 
-      <!--### creates a movable restart button ###-->
-<!--	  <toolbarbutton id="ctraddon_restart-button" class="toolbarbutton-1 chromeclass-toolbar-additional ctraddon-toolbarbutton"
-                     label="&Ctr_menu_restart.label;" removable="true"
-					 oncommand="classicthemerestorerjs.ctr.restartBrowser()"
-                     tooltiptext="&Ctr_menu_restart.label;"/>   -->
   
 	  <!--### creates clone of fullscreen window control buttons ###-->
 	  <toolbaritem id="ctraddon_window-controls" class="chromeclass-toolbar-additional"

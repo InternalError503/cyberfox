@@ -1,5 +1,4 @@
 @import url(chrome://ctraddon_os_special/skin/alt_optionswindow2extra.css);
-@import url(chrome://ctraddon_os_special/skin/alt_optionswindow2extra.css);
 
 @-moz-document url(about:preferences),url-prefix(about:preferences){
  	
@@ -27,7 +26,7 @@
 	
 	#dialogBox {
 	  min-width: unset !important;
-	  min-height: unset !important;
+	  /*min-height: unset !important;*/
 	}
 
 	/* main colors category items */
@@ -120,6 +119,10 @@
 	description,
 	.main-content label{
 	  font-size:80% !important;
+	}
+	
+	.main-content .textbox-contextmenu label{
+	  font-size:100% !important;
 	}
 	
 	.main-content {
@@ -463,6 +466,17 @@
 	#advancedPrefs #tabsElement tab,
 	#advancedPrefs #tabsElement {
 	  min-height: unset !important;
+	}
+	
+	/* 'Data choices' items - width*/
+	#telemetryDataDesc{
+	  min-width: 0px !important;
+	  width: 400px !important;
+	  max-width: 400px !important;
+	}
+	#dataChoicesPanel label {
+	  min-width: 0px !important;
+	  max-width: 400px !important;
 	}
 
 	@media all and (-moz-windows-classic) {

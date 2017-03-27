@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"ウィンドウ">
 <!ENTITY Ctr_centered		"中央揃え">
 <!ENTITY Ctr_page			"ページ ">
+<!ENTITY Ctr_position		"配置">
+<!ENTITY Ctr_appearance		"スタイル">
+<!ENTITY Ctr_left			"左揃え">
+<!ENTITY Ctr_right			"右揃え">
+<!ENTITY Ctr_privmode		"(プライベートウィンドウ)">
 
 <!ENTITY Ctr_cuibuttons		"ボタン">
 <!ENTITY Ctr_cuibutnormal	"通常">
@@ -37,12 +42,12 @@
 <!ENTITY Ctr_tabs1m			"四角いタブ (Australis化)">
 <!ENTITY Ctr_tabs2			"丸いタブ (別バージョン)">
 <!ENTITY Ctr_tabs3			"丸いタブ (別バージョン Aero)">
-<!ENTITY Ctr_tabforminfo	"タブの見栄えは現在のテーマで制御されます。">
-<!ENTITY Ctr_coltabsinfo	"タブの見栄えは ColorfulTabs とは完全な互換性はありません！">
+<!ENTITY Ctr_tabforminfo	"タブのスタイルは現在のテーマで制御されます。">
+<!ENTITY Ctr_coltabsinfo	"タブのスタイルは ColorfulTabs とは完全な互換性はありません！">
 <!ENTITY Ctr_tabsontop0		"タブを上にする (デフォルト)">
-<!ENTITY Ctr_tabsontop1		"タブを上にする --- [tabsontop=true] 属性">
-<!ENTITY Ctr_tabsontop2		"タブを下にする (v1) --- [tabsontop=false] 属性">
-<!ENTITY Ctr_tabsontop3		"タブを下にする (v2) --- [tabsontop=false] 属性">
+<!ENTITY Ctr_tabsontop1		"タブを上にする - [tabsontop=true] 属性">
+<!ENTITY Ctr_tabsontop2		"タブを下にする (v1) - [tabsontop=false] 属性">
+<!ENTITY Ctr_tabsontop3		"タブを下にする (v2) - [tabsontop=false] 属性">
 <!ENTITY Ctr_tabsontopW1	"v2 はいくつかのアドオンと完全なテーマ以外に互換性はありません！">
 <!ENTITY Ctr_tabsontopI1	"以下の項目に属性 [tabsontop=true/false] 属性 を加える">
 <!ENTITY Ctr_tabsintitlebar	"&brandShortName; タイトルバー">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"48px未満の値は、ほとんどの場合、不具合の原因となります！">
 <!ENTITY Ctr_square_edges	"上部の角を四角くする">
 <!ENTITY Ctr_tttitlebar		"タブタイトルを &brandShortName; タイトルバーに表示する">
-<!ENTITY Ctr_ttnooverfl		"R長いタブタイトルの溢れた際の表記（...）を除去">
+<!ENTITY Ctr_ttoverflow		"長いタブタイトル">
+<!ENTITY Ctr_ttoverfl_def	"デフォルトの省略表示">
+<!ENTITY Ctr_ttoverfl_no	"省略表示なし">
+<!ENTITY Ctr_tabtitle		"タブタイトルの配置">
 <!ENTITY Ctr_tabinsertion	"現在のタブの後ろに関連するタブを開く">
 <!ENTITY Ctr_emptytfavico	"ファビコンの表示（サイトのファビコンが存在しないとき）">
 <!ENTITY Ctr_emptytfavico_n	"なし">
@@ -105,7 +113,6 @@
 <!ENTITY Ctr_appbuttonct	"ツールバー上のボタンの任意の色">
 <!ENTITY Ctr_appbuttonI1	"再起動を推奨">
 <!ENTITY Ctr_appbuttonI1e	"WindowsのOSタイトルバーには表示されません。&brandShortName; タイトルバー上のみです。">
-<!ENTITY Ctr_appbuttonI2	"ボタンの色はタイトルバーとタブバーのみで表示されます。">
 <!ENTITY Ctr_appbutmhi		"高い位置に表示 (タブバーに表示した時のみ)">
 <!ENTITY Ctr_appbautocol	"自動的に色を変更する (デフォルト / Aurora / Nightly)">
 <!ENTITY Ctr_appbutbdl		"枠線と背景色を隠す">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"右">
 <!ENTITY Ctr_html5warning	"HTML5 フルスクリーン警告を表示する">
 <!ENTITY Ctr_oldtoplevimg	"トップレベルドメインイメージ: 古い外観で置き換える">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"ダイアログ: 替わりの外観で置き換える">
 <!ENTITY Ctr_emptygfavico	"空ファビコンを置き換える">
 <!ENTITY Ctr_mstatusbar		"ステータスバーパネルを移動可能にする">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"メニューボタンパネル：コンパクトビュー (ブックマーク、履歴など)">
 <!ENTITY Ctr_hidezoomres	"ズームボタン: リセットボタンを隠す（ツールバー上にある時のみ）">
 <!ENTITY Ctr_alt_newtabp	"新しいタブページ (about:newtab): 替わりの外観で置き換える">
-<!ENTITY Ctr_nosnippets		"スタートページ (about:home): スニペットを隠す">
 <!ENTITY Ctr_search_ui		"検索バー">
 <!ENTITY Ctr_ctroldsearch	"古い検索スタイル">
+<!ENTITY Ctr_ctroldsearchd	"Not compatible to other search add-ons!">
 <!ENTITY Ctr_ctroldsearchc	"検索後に検索ボックスを消去する">
 <!ENTITY Ctr_ctroldsearchr	"検索後にリスト最上位の検索エンジンに変更する">
 <!ENTITY Ctr_ctrosearchdel	"検索後も保持する">
 <!ENTITY Ctr_search_oit		"検索結果を新しいタブで開く">
 <!ENTITY Ctr_osearch_meoit	"中クリック: 検索結果を新しい新しいタブで開く">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"ポップアップの幅を合わせる">
 <!ENTITY Ctr_osearch_cwidth	"ポップアップの幅を指定する">
 <!ENTITY Ctr_osearch_dm		"小さなドロップマーカー">
@@ -202,11 +212,13 @@
 <!ENTITY Ctr_oldplacesbut	"ツールバー上のブックマーク: 古い外観で置き換える">
 <!ENTITY Ctr_dl_pm_drop		"ダウンロードボタンパネル: ドロップマーカーを表示する">
 <!ENTITY Ctr_bmbutpanelm	"ポップアップ: パネルメニューで表示する">
-<!ENTITY Ctr_bmbunsortbm	"ポップアップ: 未整理のブックマークをメニューとして表示">
+<!ENTITY Ctr_bmbunsortbm	"ポップアップ: 「他のブックマーク」を表示する">
 <!ENTITY Ctr_bmbunsortbm2	"メニュー上部に表示">
-<!ENTITY Ctr_bmbviewbmsb	"ポップアップ: 「ブックマークサイドバーを表示」をメニューに表示">
-<!ENTITY Ctr_bmbviewbmtb	"ポップアップ: 「ブックマークツールバーを表示」をメニューに表示">
-<!ENTITY Ctr_bmbnounsort	"ポップアップ: 「未整理のブックマーク」を隠す">
+<!ENTITY Ctr_bmbviewbmsb	"ポップアップ: 「ブックマークサイドバーを表示」を表示する">
+<!ENTITY Ctr_bmbviewbmtb	"ポップアップ: 「ブックマークツールバーを表示」を表示する">
+<!ENTITY Ctr_bmbutnotb		"Popup: hide 'Bookmarks Toolbar' menu">
+<!ENTITY Ctr_bmbnounsort	"ポップアップ: 「他のブックマーク」を隠す">
+<!ENTITY Ctr_bmbutclpopup	"ポップアップ: 「このページをブックマーク」とブックマークのみを表示する">
 <!ENTITY Ctr_bmbutnotext	"ブックマークツールバーのテキストを隠す">
 <!ENTITY Ctr_skipprintpr	"印刷ボタン: 印刷プレビューをスキップ">
 <!ENTITY Ctr_tbconmenu		"ツールバーの右クリック：メニューに移動、ツールバーから削除、すべてのタブを再読み込み、閉じたタブを元に戻すのメニューを表示しない">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"アクティビティインジケーターをクリックした時、指定したURLを開く:">
 <!ENTITY Ctr_navthrobber2	"URL を入力するか、空欄のままにしてください">
-<!ENTITY Ctr_anewtaburl		"新しいタブの URL">
-<!ENTITY Ctr_anewtaburlcb	"新しいタブを以下の URL で開く (デフォルト値: about:newtab)">
-<!ENTITY Ctr_anewtaburlpcb	"新しいプライベートタブを以下の URL で開く (デフォルト値: about:privatebrowsing)">
 
 <!ENTITY Ctr_tab_tf_info1	"色名、16 進コード、RGB(A)、HSL(A) の値をサポートします。">
 <!ENTITY Ctr_tab_tf_info2	"入力値は検証されません。">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"検索バーハイライト">
 <!ENTITY Ctr_fx50findbarhl	"この設定をオフにすると、検索バーのハイライト機能を無効にします。">
 <!ENTITY Ctr_e_flyweb		"FlyWeb">
+<!ENTITY Ctr_e_oldfontgfx	"Old font rendering">
 
 
 <!ENTITY Ctr_pw_settings	"設定">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"一部オプションは特定の条件でのみ動作します。">
 <!ENTITY Ctr_special_info2	"設定は &brandShortName; デフォルトテーマ用に作成されたもので、サードパーティのテーマで動作しない可能性があります。">
 <!ENTITY Ctr_special_acr	"Add-on Compatibility Reporter を使用して問題を報告しないでください!　問題の報告は公式サポートチャンネルを使用してください。">
-<!ENTITY Ctr_support		"サポート">
-<!ENTITY Ctr_support_forum1	"MozillaZine (英語フォーラム)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (ドイツ語フォーラム)">
-<!ENTITY Ctr_github_issues	"Githubで問題を報告">
-<!ENTITY Ctr_newversion		"更新を確認">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"入門">
 <!ENTITY goCmd.label					"移動">
-<!ENTITY Ctr_menu_restart.label			"リスタート">
-<!ENTITY Ctr_restartapp					"&brandShortName; メニューとファイルメニューにリスタートを追加する">
-<!ENTITY Ctr_ctrnewinv					"現在のバージョンの &brandShortName; 用の新しいオプションに下線を引く">
 
 <!ENTITY Ctr_openInCurrentTab			"入力後に現在のタブで開く">
 <!ENTITY Ctr_openInNewTab				"入力後に新しいタブで開く">

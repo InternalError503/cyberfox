@@ -162,7 +162,6 @@
 <!ENTITY Ctr_cpanelmenus	"Panel menu: tümleşik görünüm (yerimleri, geçmiş vb.)">
 <!ENTITY Ctr_hidezoomres	"Araç çubuğunda zoom kontrolü: zoom-reset butonu gizle">
 <!ENTITY Ctr_alt_newtabp	"Yeni sekme sayfası (about:newtab): alternatif görünüm">
-<!ENTITY Ctr_nosnippets		"Start page (about:home): hide snippets">
 <!ENTITY Ctr_search_ui		"Search">
 <!ENTITY Ctr_ctroldsearch	"Old search">
 <!ENTITY Ctr_ctroldsearchc	"Clear searchbox after search">
@@ -209,8 +208,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Etkinlik göstergesine tıklamak beliritilen bağlantıyı açar:">
 <!ENTITY Ctr_navthrobber2	"Bağlantı ekle ve ya boş bırakın:">
-<!ENTITY Ctr_anewtaburl		"New tab page url">
-<!ENTITY Ctr_anewtaburlcb	"Custom new tab page url (default: 'about:newtab')">
 
 <!ENTITY Ctr_tab_tf_info1	"Renk isimleri, hexcodes, rgb(a) ve hsl(a) değerleri desteklenir.">
 <!ENTITY Ctr_tab_tf_info2	"Girişler doğrulanamayacak!">
@@ -387,17 +384,10 @@
 <!ENTITY Ctr_special_info	"Bazı seçenekler, yalnızca belirli durumlarda görsel değişiklikler yapabilir!">
 <!ENTITY Ctr_special_info2	"Ayarlar &brandShortName; varsayılan teması için yapılmıştır ve diğer üçüncü parti temalar ile çalışmayabilir!">
 <!ENTITY Ctr_special_acr	"Only report issues through official support channels and not by using 'Add-on Compatibility Reporter'!">
-<!ENTITY Ctr_support		"Support">
-<!ENTITY Ctr_support_forum1	"MozillaZine (English forum)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (German forum)">
-<!ENTITY Ctr_github_issues	"Report issue on Github">
-<!ENTITY Ctr_newversion		"Check for new version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Başlarken">
 <!ENTITY goCmd.label					"Go">
-<!ENTITY Ctr_menu_restart.label			"Restart">
-<!ENTITY Ctr_restartapp					"'Restart' in &brandShortName;-menu and file menu">
 
 <!ENTITY Ctr_openInCurrentTab			"Open inputs in current tab">
 <!ENTITY Ctr_openInNewTab				"Open inputs in a new tab">

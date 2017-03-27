@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"aken">
 <!ENTITY Ctr_centered		"Keskele joondatud">
 <!ENTITY Ctr_page			"Leht">
+<!ENTITY Ctr_position		"Asukoht">
+<!ENTITY Ctr_appearance		"Välimus">
+<!ENTITY Ctr_left			"Vasakule">
+<!ENTITY Ctr_right			"Paremale">
+<!ENTITY Ctr_privmode		"(privaatne aken)">
 
 <!ENTITY Ctr_cuibuttons		"Nupud">
 <!ENTITY Ctr_cuibutnormal	"Tavalised">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"Kaartide välimust kontrollib praegune välimus.">
 <!ENTITY Ctr_coltabsinfo	"Kaartide välimus ei ole lisaga 'ColorfulTabs' täielikult ühilduv!">
 <!ENTITY Ctr_tabsontop0		"Kaardid kõige peal (vaikimisi)">
-<!ENTITY Ctr_tabsontop1		"Kaardid kõige peal --- atribuut [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Kaardid pole kõige peal (v1) --- atribuut [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Kaardid pole kõige peal (v2) --- atribuut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Kaardid kõige peal - atribuut [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Kaardid pole kõige peal (v1) - atribuut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Kaardid pole kõige peal (v2) - atribuut [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 on ainult mõnede lisade ja täielike välimuste jaoks!">
 <!ENTITY Ctr_tabsontopI1	"Atribuut [tabsontop=true/false] lisatakse nendele:">
 <!ENTITY Ctr_tabsintitlebar	"Opsüsteemi tiitliriba asemel kasuta &brandShortName;i tiitliriba">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Väiksemad väärtused kui 48px põhjustavad enamusel juhtudel vigu!">
 <!ENTITY Ctr_square_edges	"Kandilised ülemised nurgad">
 <!ENTITY Ctr_tttitlebar		"Kaardi pealkiri &brandShortName;i tiitliribal">
-<!ENTITY Ctr_ttnooverfl		"Eemalda pikkadest kaardi pealkirjadest ületäite efekt">
+<!ENTITY Ctr_ttoverflow		"Pikad kaardi pealkirjad">
+<!ENTITY Ctr_ttoverfl_def	"Vaikimisi ületäite efekt">
+<!ENTITY Ctr_ttoverfl_no	"Ületäite efekti ei kasutata">
+<!ENTITY Ctr_tabtitle		"Kaardi pealkirja joondus">
 <!ENTITY Ctr_tabinsertion	"Pane seotud kaardid praeguse järele">
 <!ENTITY Ctr_emptytfavico	"Näita lehe ikooni (kui sait seda ei paku)">
 <!ENTITY Ctr_emptytfavico_n	"Pole">
@@ -92,20 +100,19 @@
 <!ENTITY Ctr_paneluibtweak3	"...kui see asub kaartide ribal">
 <!ENTITY Ctr_appbuttonc		"Värvi nupp">
 <!ENTITY Ctr_appbuttonc_o	"Oranži (Firefox)">
-<!ENTITY Ctr_appbuttonc_a	"Sinist(Aurora)">
-<!ENTITY Ctr_appbuttonc_n	"Musta (Nightly)">
+<!ENTITY Ctr_appbuttonc_a	"Sinine (Aurora)">
+<!ENTITY Ctr_appbuttonc_n	"Must (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Läbipaistev">
-<!ENTITY Ctr_appbuttonc_p	"Sinist(Palemoon)">
-<!ENTITY Ctr_appbuttonc_r	"Punast">
-<!ENTITY Ctr_appbuttonc_g	"Rohelist">
-<!ENTITY Ctr_appbuttonc_gr	"Halli">
-<!ENTITY Ctr_appbuttonc_pu	"Lillat">
-<!ENTITY Ctr_appbuttonc_wh	"Valget">
+<!ENTITY Ctr_appbuttonc_p	"Sinine (Palemoon)">
+<!ENTITY Ctr_appbuttonc_r	"Punane">
+<!ENTITY Ctr_appbuttonc_g	"Roheline">
+<!ENTITY Ctr_appbuttonc_gr	"Hall">
+<!ENTITY Ctr_appbuttonc_pu	"Lilla">
+<!ENTITY Ctr_appbuttonc_wh	"Valge">
 <!ENTITY Ctr_appbuttonc_cu	"Kohandatud">
 <!ENTITY Ctr_appbuttonct	"Kohandatud värvi nupp, kui see asub tööriistaribal">
 <!ENTITY Ctr_appbuttonI1	"Taaskäivitamine soovitatav">
-<!ENTITY Ctr_appbuttonI1e	"Nähtav ainult &brandShortName;i tiitliribal, mitte Windows OS-i tiitliribal!">
-<!ENTITY Ctr_appbuttonI2	"Nupuvärvid on nähtavad ainult siis, kui see asub tiitliribal või kaartide ribal!">
+<!ENTITY Ctr_appbuttonI1e	"Nähtav ainult &brandShortName;i tiitliribal ja mitte Windows OS-i tiitliribal!">
 <!ENTITY Ctr_appbutmhi		"Kõrgem asukoht (kui asub kaartide ribal)">
 <!ENTITY Ctr_appbautocol	"Määra brauseri uuendustekanali värvid (vaikimisi/Aurora/Nightly) automaatselt">
 <!ENTITY Ctr_appbutbdl		"Peida piirjooned ja taustavärvid">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Paremal">
 <!ENTITY Ctr_html5warning	"HTML5 täisekraani hoiatus">
 <!ENTITY Ctr_oldtoplevimg	"Klassikaline pildi välimus valgel taustal">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"'Teavituskast': alternatiivne välimus">
 <!ENTITY Ctr_emptygfavico	"Asenda üldine lehe ikoon">
 <!ENTITY Ctr_mstatusbar		"Liigutatav olekupaneel">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Paneelimenüüd (järjehoidjad, ajalugu jms.): kompaktne vaade">
 <!ENTITY Ctr_hidezoomres	"Suurendamise juhtnupud tööriistaribal: peida suurendamise lähtestamise nupp">
 <!ENTITY Ctr_alt_newtabp	"Uue kaardi leht (about:newtab): alternatiivne välimus">
-<!ENTITY Ctr_nosnippets		"Avaleht (about:home): peida katked">
 <!ENTITY Ctr_search_ui		"Otsing">
 <!ENTITY Ctr_ctroldsearch	"Vana otsing">
+<!ENTITY Ctr_ctroldsearchd	"Not compatible to other search add-ons!">
 <!ENTITY Ctr_ctroldsearchc	"Pärast otsingu teostamist tühjenda otsingukast">
 <!ENTITY Ctr_ctroldsearchr	"Pärast otsingu teostamist taasta vaikimisi otsingumootor">
 <!ENTITY Ctr_ctrosearchdel	"viivitusega">
 <!ENTITY Ctr_search_oit		"Ava otsingutulemuste leht uuel kaardil">
 <!ENTITY Ctr_osearch_meoit	"Hiire keskmise nupuga klõpsamine: otsi uuel esiplaanil oleval kaardil">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"Automaatselt kohanda hüpiku laiust">
 <!ENTITY Ctr_osearch_cwidth	"Otsingu hüpikute kohandatud laius">
 <!ENTITY Ctr_osearch_dm		"Väike rippmenüü avamise nupp">
@@ -206,7 +216,9 @@
 <!ENTITY Ctr_bmbunsortbm2	"Menüü järjehoidjate kohal">
 <!ENTITY Ctr_bmbviewbmsb	"Menüühüpik: näita kirjet 'Kuva järjehoidjate külgriba'">
 <!ENTITY Ctr_bmbviewbmtb	"Menüühüpik: näita kirjet 'Kuva järjehoidjariba'">
+<!ENTITY Ctr_bmbutnotb		"Popup: hide 'Bookmarks Toolbar' menu">
 <!ENTITY Ctr_bmbnounsort	"Menüühüpik: peida kirje 'Muud järjehoidjad'">
+<!ENTITY Ctr_bmbutclpopup	"Menüühüpik: näita ainult 'Lisa see leht järjehoidjatesse' ja järjehoidjaid">
 <!ENTITY Ctr_bmbutnotext	"Peida järjehoidjaribal sildid">
 <!ENTITY Ctr_skipprintpr	"Printimise nupp: jäta vahele printimise eelvaade">
 <!ENTITY Ctr_tbconmenu		"Tööriistariba kontekstimenüü: peida kirjed 'liiguta menüüsse', 'eemalda tööriistamenüült', 'laadi uuesti/lisa järjehoidjatesse kõik kaardid' ja 'võta kaardi sulgemine tagasi'">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Aktiivsuse näidikul klõpsamine avab uuel kaardil selle aadressi:">
 <!ENTITY Ctr_navthrobber2	"Sisesta URL või jäta tühjaks">
-<!ENTITY Ctr_anewtaburl		"Uue kaardi lehe aadress">
-<!ENTITY Ctr_anewtaburlcb	"Uue kaardi lehe kohandatud aadress (vaikimisi: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Uue privaatse kaardi lehe kohandatud aadress (vaikimisi: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Sisestada saab: värvinimed, kuuskoodid (hexcodes), rgb(a) ja hsl(a).">
 <!ENTITY Ctr_tab_tf_info2	"Sisendeid ei valideerita!">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"Leidmisribal esiletõstmine">
 <!ENTITY Ctr_fx50findbarhl	"Nendelt eelistustelt märke eemaldamine keelab leidmisribal esiletõstmise võimalused.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Old font rendering">
 
 
 <!ENTITY Ctr_pw_settings	"Sätted">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Mõned sätted ei pruugi alati nähtavaid muudatusi pakkuda">
 <!ENTITY Ctr_special_info2	"Tuvastati kolmanda osapoole välimus! Mõned sätted ei tööta kolmandate osapoolte välimustega!">
 <!ENTITY Ctr_special_acr	"Teavita vigadest ainult ametlike kasutajatoe kanalite kaudu ja mitte lisaga 'Add-on Compatibility Reporter'!">
-<!ENTITY Ctr_support		"Kasutajatugi">
-<!ENTITY Ctr_support_forum1	"MozillaZine (ingliskeelne foorum)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (saksakeelne foorum)">
-<!ENTITY Ctr_github_issues	"Teavita veast teenuse Github kaudu">
-<!ENTITY Ctr_newversion		"Vaata, kas on uut versiooni">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Alustamine">
 <!ENTITY goCmd.label					"Mine">
-<!ENTITY Ctr_menu_restart.label			"Taaskäivita">
-<!ENTITY Ctr_restartapp					"Näita &brandShortName;i nupu menüüs ja menüüs Fail kirjet 'Taaskäivita'">
-<!ENTITY Ctr_ctrnewinv					"Jooni alla sätted, mis on &brandShortName;i praeguses versioonis uued">
 
 <!ENTITY Ctr_openInCurrentTab			"Ava sisestused praegusel kaardil">
 <!ENTITY Ctr_openInNewTab				"Ava sisestused uuel kaardil">

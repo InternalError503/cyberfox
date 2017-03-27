@@ -15,8 +15,13 @@
 <!ENTITY Ctr_windowcontrols	"Réduire/Restaurer/Fermer (plein écran)">
 <!ENTITY Ctr_rr				"Redémarrage nécessaire !">
 <!ENTITY Ctr_window			"fenêtre">
-<!ENTITY Ctr_centered		"Centrer ce titre">
+<!ENTITY Ctr_centered		"Centrée">
 <!ENTITY Ctr_page			"Page">
+<!ENTITY Ctr_position		"Position :">
+<!ENTITY Ctr_appearance		"Apparence :">
+<!ENTITY Ctr_left			"À gauche">
+<!ENTITY Ctr_right			"À droite">
+<!ENTITY Ctr_privmode		"(fenêtre de navigation privée)">
 
 <!ENTITY Ctr_cuibuttons		"Boutons :">
 <!ENTITY Ctr_cuibutnormal	"Taille normale">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"L'apparence des onglets est contrôlée par le thème actuel.">
 <!ENTITY Ctr_coltabsinfo	"L'apparence des onglets n'est pas totalement compatible avec le module « ColorfulTabs » !">
 <!ENTITY Ctr_tabsontop0		"Onglets au-dessus (réglage par défaut)">
-<!ENTITY Ctr_tabsontop1		"Onglets au-dessus --- attribut [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Onglets pas au-dessus (v1) --- attribut [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Onglets pas au-dessus (v2) --- attribut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Onglets au-dessus - attribut [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Onglets pas au-dessus (v1) - attribut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Onglets pas au-dessus (v2) - attribut [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 est uniquement destiné à certains modules et thèmes complets !">
 <!ENTITY Ctr_tabsontopI1	"Assigne l'attribut [tabsontop=true/false] à :">
 <!ENTITY Ctr_tabsintitlebar	"Utiliser la barre de titre de &brandShortName; au lieu de celle du système">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Les valeurs au-dessous de 48px causeront des erreurs dans la plupart des cas !">
 <!ENTITY Ctr_square_edges	"Coins supérieurs carrés">
 <!ENTITY Ctr_tttitlebar		"Afficher le titre de l'onglet actuel dans la barre de titre de &brandShortName;">
-<!ENTITY Ctr_ttnooverfl		"Supprimer l'effet de débordement des titres d'onglets longs">
+<!ENTITY Ctr_ttoverflow		"Titres d'onglets longs">
+<!ENTITY Ctr_ttoverfl_def	"Effet de débordement par défaut">
+<!ENTITY Ctr_ttoverfl_no	"Pas d'effet de débordement">
+<!ENTITY Ctr_tabtitle		"Position des titres :">
 <!ENTITY Ctr_tabinsertion	"Insérer les onglets liés à la suite de l'onglet actuel">
 <!ENTITY Ctr_emptytfavico	"Afficher un Favicon (pour les pages qui n'en proposent pas) :">
 <!ENTITY Ctr_emptytfavico_n	"Non">
@@ -66,7 +74,7 @@
 <!ENTITY Ctr_noemptypticon	"Enlever le Favicon « vide » des onglets épinglés">
 <!ENTITY Ctr_closetab_0		"Bouton de fermeture">
 <!ENTITY Ctr_closetab_1		"Sur l'onglet actif uniquement">
-<!ENTITY Ctr_closetab_2		"Aucun">
+<!ENTITY Ctr_closetab_2		"Aucune (désactiver le bouton)">
 <!ENTITY Ctr_closetab_3		"À la fin de la barre des onglets">
 <!ENTITY Ctr_closetab_4		"Au début de la barre des onglets">
 <!ENTITY Ctr_closetab_5		"Sur tous les onglets (forcer)">
@@ -81,7 +89,7 @@
 <!ENTITY Ctr_tobainfotab	"Le module « Tabs on Bottom » n'est pas compatible avec « &Ctr_title; » et devrait être désactivé. Utilisez les paramètres « &Ctr_cuitabsnontop; » disponibles à la place !">
 
 <!ENTITY Ctr_appbutton		"Ancien bouton &brandShortName;">
-<!ENTITY Ctr_appbutton0		"Désactivé">
+<!ENTITY Ctr_appbutton0		"Aucune (désactiver le bouton)">
 <!ENTITY Ctr_appbutton1		"Afficher sur une barre d'outils">
 <!ENTITY Ctr_appbutton1wt	"Afficher sur une barre d'outils (texte seul)">
 <!ENTITY Ctr_appbutton2		"Afficher sur la barre de titre de &brandShortName;">
@@ -102,10 +110,9 @@
 <!ENTITY Ctr_appbuttonc_pu	"Violet">
 <!ENTITY Ctr_appbuttonc_wh	"Blanc">
 <!ENTITY Ctr_appbuttonc_cu	"De couleur personnalisée">
-<!ENTITY Ctr_appbuttonct	"Personnaliser la couleur du bouton s'il est sur une barre d'outils">
+<!ENTITY Ctr_appbuttonct	"Personnaliser la couleur du bouton (s'il est sur une barre d'outils)">
 <!ENTITY Ctr_appbuttonI1	"Redémarrage recommandé">
-<!ENTITY Ctr_appbuttonI1e	"Uniquement visible sur la barre de titre de &brandShortName;, pas sur la barre de titre de Windows !">
-<!ENTITY Ctr_appbuttonI2	"Les couleurs du bouton sont visibles uniquement s'il est sur la barre de titre ou la barre des onglets !">
+<!ENTITY Ctr_appbuttonI1e	"Le bouton &brandShortName; est uniquement visible sur la barre de titre de &brandShortName;, pas sur celle de Windows !">
 <!ENTITY Ctr_appbutmhi		"Position plus élevée (sur la barre des onglets)">
 <!ENTITY Ctr_appbautocol	"Définir automatiquement la couleur du canal (par défaut/Aurora/Nightly) du navigateur">
 <!ENTITY Ctr_appbutbdl		"Masquer les bordures et la couleur d'arrière-plan">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"À droite">
 <!ENTITY Ctr_html5warning	"Afficher l'avertissement de passage en plein écran pour les vidéos HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Apparence classique des images, avec un arrière-plan blanc">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"Boites de notification : apparence alternative">
 <!ENTITY Ctr_emptygfavico	"Remplacer le Favicon générique :">
 <!ENTITY Ctr_mstatusbar		"Rendre mobile le panneau de la barre d'état">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Menus de type « panneau » (marque-pages, historique, etc.) : vue compacte">
 <!ENTITY Ctr_hidezoomres	"Boutons de zoom sur une barre d'outils : masquer « Réinitialiser le niveau »">
 <!ENTITY Ctr_alt_newtabp	"Page « Nouvel onglet » (about:newtab) : apparence alternative">
-<!ENTITY Ctr_nosnippets		"Page de démarrage par défaut (about:home) : masquer les astuces">
 <!ENTITY Ctr_search_ui		"Barre de recherche">
 <!ENTITY Ctr_ctroldsearch	"Ancienne interface de barre de recherche">
+<!ENTITY Ctr_ctroldsearchd	"Incompatible avec les autres modules de recherche !">
 <!ENTITY Ctr_ctroldsearchc	"Suite à une recherche, effacer le contenu de la barre après...">
 <!ENTITY Ctr_ctroldsearchr	"Suite à une recherche, revenir au premier moteur de la liste après...">
 <!ENTITY Ctr_ctrosearchdel	"">
 <!ENTITY Ctr_search_oit		"Ouvrir la recherche dans un nouvel onglet">
-<!ENTITY Ctr_osearch_meoit	"Clic milieu : rechercher dans un nouvel « onglet au premier plan »">
+<!ENTITY Ctr_osearch_meoit	"Clic milieu : ouvrir la recherche dans un nouvel onglet au premier plan">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"Ajuster automatiquement la largeur de la fenêtre surgissante">
 <!ENTITY Ctr_osearch_cwidth	"Largeur personnalisée pour la fenêtre surgissante">
 <!ENTITY Ctr_osearch_dm		"Réduire la taille du bouton de liste déroulante">
@@ -202,11 +212,13 @@
 <!ENTITY Ctr_oldplacesbut	"Éléments et dossiers de marque-pages sur une barre d'outil : ancienne apparence">
 <!ENTITY Ctr_dl_pm_drop		"Panneau du bouton d'état du téléchargement : afficher la flèche de menu déroulant">
 <!ENTITY Ctr_bmbutpanelm	"Menu déroulant : apparence de menu de type « panneau »">
-<!ENTITY Ctr_bmbunsortbm	"Menu déroulant : menu « Autres marque-pages »">
+<!ENTITY Ctr_bmbunsortbm	"Menu déroulant : afficher le menu « Autres marque-pages »">
 <!ENTITY Ctr_bmbunsortbm2	"Menu au-dessus des marque-pages">
-<!ENTITY Ctr_bmbviewbmsb	"Menu déroulant : afficher « Afficher panneau des marque-pages »">
-<!ENTITY Ctr_bmbviewbmtb	"Menu déroulant : afficher « Afficher la barre personnelle »">
-<!ENTITY Ctr_bmbnounsort	"Menu déroulant : masquer « Autres marque-pages »">
+<!ENTITY Ctr_bmbviewbmsb	"Menu déroulant : afficher l'élément « Afficher panneau des marque-pages »">
+<!ENTITY Ctr_bmbviewbmtb	"Menu déroulant : afficher l'élément « Afficher la barre personnelle »">
+<!ENTITY Ctr_bmbutnotb		"Menu déroulant : masquer le menu « Barre personnelle »">
+<!ENTITY Ctr_bmbnounsort	"Menu déroulant : masquer le menu et les élements « Autres marque-pages »">
+<!ENTITY Ctr_bmbutclpopup	"Menu déroulant : afficher uniquement « Marquer cette page » ainsi que les onglets">
 <!ENTITY Ctr_bmbutnotext	"Masquer le texte sur la barre personnelle">
 <!ENTITY Ctr_skipprintpr	"Bouton « Imprimer » : sauter l'aperçu avant impression">
 <!ENTITY Ctr_tbconmenu		"Menu contextuel de barre d'outils : masquer « Déplacer vers le menu », « Retirer de la barre d'outils », « Actualiser/Marquer tous les onglets » et « Annuler la fermeture de l'onglet »">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Cliquer sur l'indicateur d'activité ouvre l'URL suivante dans un nouvel onglet :">
 <!ENTITY Ctr_navthrobber2	"Saisir une URL ou bien laisser vide">
-<!ENTITY Ctr_anewtaburl		"URL de nouvel onglet et de page d'accueil privée">
-<!ENTITY Ctr_anewtaburlcb	"Modifier l'URL de nouvel onglet (« about:newtab » par défaut) :">
-<!ENTITY Ctr_anewtaburlpcb	"Modifier l'URL d'accueil de navigation privée (« about:privatebrowsing » par défaut) :">
 
 <!ENTITY Ctr_tab_tf_info1	"Les noms de couleurs, les codes hexadécimaux, les valeurs RVB(A) et TSL(A) sont pris en charge.">
 <!ENTITY Ctr_tab_tf_info2	"Les saisies ne seront pas vérifiées !">
@@ -285,7 +294,6 @@
 <!ENTITY Ctr_icopageinfo	"Favicon/globe/icône « i » : ouvrir la fenêtre « Informations sur la page » en cliquant sur l'icône">
 <!ENTITY Ctr_lbsbsize		"Personnaliser la largeur">
 <!ENTITY Ctr_searchbar		"Barre de recherche">
-<!ENTITY Ctr_urlbar_uc		"Désactiver la fonctionnalité « Autocomplétion unifiée »">
 <!ENTITY Ctr_autocomplete	"Fenêtre surgissante d'autocomplétion">
 <!ENTITY Ctr_altautocompl	"Apparence alternative">
 <!ENTITY Ctr_autocompl_it	"Supprimer les éléments « Rechercher avec » et « Consulter » (si présents)">
@@ -294,6 +302,7 @@
 <!ENTITY Ctr_autocompl_rhl	"Utiliser des couleurs Aero pour les résultats surlignés">
 <!ENTITY Ctr_autocompl_not	"Masquer les titres des pages">
 <!ENTITY Ctr_autocompl_sep	"Afficher un séparateur entre les résultats">
+<!ENTITY Ctr_urlbar_uc		"Désactiver la fonctionnalité « Autocomplétion unifiée »">
 <!ENTITY Ctr_lbsugresi		"Désactiver la limite de hauteur">
 <!ENTITY Ctr_cresultshcb	"Limite de hauteur personnalisée :">
 <!ENTITY Ctr_lbsugres		"Nombre de résultats :">
@@ -361,7 +370,7 @@
 <!ENTITY Ctr_lessaddonsbar	"Réduire la hauteur">
 <!ENTITY Ctr_addonbarfs		"Afficher également en mode « Plein écran »">
 
-<!ENTITY Ctr_tabthrobber	"Image de chargement">
+<!ENTITY Ctr_tabthrobber	"Image de chargement :">
 <!ENTITY Ctr_bmanimation	"Animation du bouton étoile lors de l'ajout d'un nouveau marque-page">
 <!ENTITY Ctr_pananimation	"Animation d'ouverture des panneaux">
 <!ENTITY Ctr_tabanimation	"Animation d'ouverture et de fermeture des onglets">
@@ -389,8 +398,9 @@
 <!ENTITY Ctr_e_tabsaudioico	"Icône de lecture audio">
 <!ENTITY Ctr_e_containertab	"Onglets conteneurs">
 <!ENTITY Ctr_e_findbarhl	"Surlignage avancé de la barre de recherche">
-<!ENTITY Ctr_fx50findbarhl	"Décocher ces paramètres désactive les fonctionnalités de surlignage avancées de la barre de recherche.">
+<!ENTITY Ctr_fx50findbarhl	"Décocher ces paramètres désactive les nouvelles fonctionnalités de surlignage avancées de la barre de recherche.">
 <!ENTITY Ctr_e_flyweb		"FlyWeb">
+<!ENTITY Ctr_e_oldfontgfx	"Ancien rendu des polices">
 
 
 <!ENTITY Ctr_pw_settings	"Paramètres">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Certaines options peuvent ne pas toujours offrir de changements visibles.">
 <!ENTITY Ctr_special_info2	"Thème de tierce partie détecté ! Certains paramètres ne fonctionnent pas avec de tels thèmes !">
 <!ENTITY Ctr_special_acr	"Ne signalez des problèmes qu'en utilisant les canaux d'assistance officiels, et non à l'aide de « Add-on Compatibility Reporter » !">
-<!ENTITY Ctr_support		"Assistance">
-<!ENTITY Ctr_support_forum1	"MozillaZine (forum anglais)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (forum allemand)">
-<!ENTITY Ctr_github_issues	"Signaler des problèmes via Github">
-<!ENTITY Ctr_newversion		"Vérifier s'il y a une nouvelle version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"U">
 <!ENTITY appMenuGettingStarted.label	"Commencer">
 <!ENTITY goCmd.label					"Se rendre à la page indiquée dans la barre d'adresse">
-<!ENTITY Ctr_menu_restart.label			"Redémarrer">
-<!ENTITY Ctr_restartapp					"Afficher « Redémarrer » dans le menu « Fichier » et dans celui de l'ancien bouton &brandShortName;">
-<!ENTITY Ctr_ctrnewinv					"Souligner les nouvelles options de la version actuelle de &brandShortName;">
 
 <!ENTITY Ctr_openInCurrentTab			"Ouvrir les entrées dans l'onglet actuel">
 <!ENTITY Ctr_openInNewTab				"Ouvrir les entrées dans un nouvel onglet">

@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"Fenster">
 <!ENTITY Ctr_centered		"Zentriert">
 <!ENTITY Ctr_page			"Seite">
+<!ENTITY Ctr_position		"Position">
+<!ENTITY Ctr_appearance		"Aussehen">
+<!ENTITY Ctr_left			"Links">
+<!ENTITY Ctr_right			"Rechts">
+<!ENTITY Ctr_privmode		"(Privates Fenster)">
 
 <!ENTITY Ctr_cuibuttons		"Schaltflächen">
 <!ENTITY Ctr_cuibutnormal	"Normal">
@@ -40,10 +45,10 @@
 <!ENTITY Ctr_tabforminfo	"Das aktive Thema bestimmt die Tabdarstellung.">
 <!ENTITY Ctr_coltabsinfo	"Tabdarstellung ist zur Erweiterung 'ColorfulTabs' nicht vollständig kompatibel!">
 <!ENTITY Ctr_tabsontop0		"Tabs oben (Standard)">
-<!ENTITY Ctr_tabsontop1		"Tabs oben --- '[tabsontop=true]'-Attribut gesetzt">
-<!ENTITY Ctr_tabsontop2		"Tabs unten (v1) --- '[tabsontop=false]'-Attribut gesetzt">
-<!ENTITY Ctr_tabsontop3		"Tabs unten (v2) --- '[tabsontop=false]'-Attribut gesetzt">
-<!ENTITY Ctr_tabsontopW1	"v2 ist nur für einige Erweiterungen und vollständige Themen sinnvoll!">
+<!ENTITY Ctr_tabsontop1		"Tabs oben - [tabsontop=true]-Attribut gesetzt">
+<!ENTITY Ctr_tabsontop2		"Tabs unten (v1) - [tabsontop=false]-Attribut gesetzt">
+<!ENTITY Ctr_tabsontop3		"Tabs unten (v2) - [tabsontop=false]-Attribut gesetzt *">
+<!ENTITY Ctr_tabsontopW1	"* nur für einige Erweiterungen und vollständige Themes!">
 <!ENTITY Ctr_tabsontopI1	"[tabsontop=true/false]-Attribut wird gesetzt für">
 <!ENTITY Ctr_tabsintitlebar	"&brandShortName;-Titelleiste anstatt der Betriebssystem-Titelleiste verwenden">
 <!ENTITY Ctr_tabwidthdef	"(Standard)">
@@ -58,9 +63,12 @@
 <!ENTITY Ctr_tabwidthinfo3	"Werte unter 48 px sorgen meistens für eine fehlerhafte Darstellung!">
 <!ENTITY Ctr_square_edges	"Eckige obere Tabränder">
 <!ENTITY Ctr_tttitlebar		"Tabtitel in der &brandShortName;-Titelleiste">
-<!ENTITY Ctr_ttnooverfl		"Überblendeffekt von langen Tabtiteln entfernen">
+<!ENTITY Ctr_ttoverflow		"Lange Tabtitel">
+<!ENTITY Ctr_ttoverfl_def	"Standard Überblendeffekt">
+<!ENTITY Ctr_ttoverfl_no	"Kein Überblendeffekt">
+<!ENTITY Ctr_tabtitle		"Position des Tabtitels">
 <!ENTITY Ctr_tabinsertion	"Verwandten Tab nach aktivem Tab einfügen">
-<!ENTITY Ctr_emptytfavico	"Lesezeichensymbol auf Tabs zeigen (falls keines vorhanden ist)">
+<!ENTITY Ctr_emptytfavico	"Lesezeichensymbol auf Tabs anzeigen (falls keines vorhanden ist)">
 <!ENTITY Ctr_emptytfavico_n	"Kein Symbol">
 <!ENTITY Ctr_emptytfavico_g	"Allgemein">
 <!ENTITY Ctr_noemptypticon	"Leeres Lesezeichensymbol auf angehefteten Tabs verstecken">
@@ -90,8 +98,8 @@
 <!ENTITY Ctr_paneluibtweak	"Menüschaltfläche visuell als &brandShortName;-Schaltfläche …">
 <!ENTITY Ctr_paneluibtweak2	"Menüschaltfläche visuell als &brandShortName;-Schaltfläche (nur Symbol) …">
 <!ENTITY Ctr_paneluibtweak3	"… darstellen, wenn sie sich auf der Tableiste befindet.">
-<!ENTITY Ctr_appbuttonc		"Schaltflächenfarbe">
-<!ENTITY Ctr_appbuttonc_o	"Orange  (Firefox)">
+<!ENTITY Ctr_appbuttonc		"Farbe">
+<!ENTITY Ctr_appbuttonc_o	"Orange  (Standard)">
 <!ENTITY Ctr_appbuttonc_a	"Blau (Aurora)">
 <!ENTITY Ctr_appbuttonc_n	"Schwarz (Nightly)">
 <!ENTITY Ctr_appbuttonc_t	"Transparent">
@@ -99,13 +107,12 @@
 <!ENTITY Ctr_appbuttonc_r	"Rot">
 <!ENTITY Ctr_appbuttonc_g	"Grün">
 <!ENTITY Ctr_appbuttonc_gr	"Grau">
-<!ENTITY Ctr_appbuttonc_pu	"Violett (Privater Modus)">
+<!ENTITY Ctr_appbuttonc_pu	"Violett (Privates Fenster)">
 <!ENTITY Ctr_appbuttonc_wh	"Weiß">
-<!ENTITY Ctr_appbuttonc_cu	"Eigene">
-<!ENTITY Ctr_appbuttonct	"Eigene Farbe für Schaltfläche auf Symbolleisten">
+<!ENTITY Ctr_appbuttonc_cu	"Eigene Farbwahl">
+<!ENTITY Ctr_appbuttonct	"Eigene Farbe (falls Schaltfläche auf einer Symbolleiste)">
 <!ENTITY Ctr_appbuttonI1	"Nach einer Änderung wird ein Neustart empfohlen.">
-<!ENTITY Ctr_appbuttonI1e	"Die &brandShortName;-Schaltfläche ist auf der Windows-Titelleiste nicht sichtbar!">
-<!ENTITY Ctr_appbuttonI2	"Die Farbe ist nur auf der Titelleiste und der Tableiste sichtbar!">
+<!ENTITY Ctr_appbuttonI1e	"Die &brandShortName;-Schaltfläche ist nur auf der &brandShortName;-Titelleiste sichtbar!">
 <!ENTITY Ctr_appbutmhi		"Höhere Position (falls auf der Tableiste)">
 <!ENTITY Ctr_appbautocol	"Browserkanalfarben automatisch setzen (Standard/Aurora/Nightly)">
 <!ENTITY Ctr_appbutbdl		"Rand und Hintergrundfarbe entfernen">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Trennlinie rechts">
 <!ENTITY Ctr_html5warning	"HTML5-Vollbildwarnung">
 <!ENTITY Ctr_oldtoplevimg	"Klassische 'Bilddarstellung' auf weißem Hintergrund">
+<!ENTITY Ctr_altdlprogbar	"Alternative Darstellung für die Downloadprogressleiste">
 <!ENTITY Ctr_altalertbox	"Benachrichtigungs-Box: alternative Darstellung">
 <!ENTITY Ctr_emptygfavico	"Allgemeines Lesezeichensymbol ersetzen">
 <!ENTITY Ctr_mstatusbar		"Statusbereich: sichtbar und verschiebbar">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Kompakte 'Panel-Aufklappmenüs' (Lesezeichen, Chronik etc.)">
 <!ENTITY Ctr_hidezoomres	"Zoom-Schaltflächen auf Leisten: 'Normalgröße'-Schaltfläche verstecken">
 <!ENTITY Ctr_alt_newtabp	"Seite 'Neuer Tab' (about:newtab): alternative Darstellung">
-<!ENTITY Ctr_nosnippets		"Startseite (about:home): Snippets verstecken">
 <!ENTITY Ctr_search_ui		"Suche">
 <!ENTITY Ctr_ctroldsearch	"Alte Suche">
+<!ENTITY Ctr_ctroldsearchd	"Nicht kompatibel zu anderen Sucherweiterungen!">
 <!ENTITY Ctr_ctroldsearchc	"Eingabefeld nach der Suche leeren">
 <!ENTITY Ctr_ctroldsearchr	"Nach der Suche zur ersten Suchmaschine in der Liste wechseln">
 <!ENTITY Ctr_ctrosearchdel	"Ausführungsverzögerung">
 <!ENTITY Ctr_search_oit		"Suche in neuem Tab öffnen">
 <!ENTITY Ctr_osearch_meoit	"Mittelklick: Suche im Vordergrund-Tab öffnen">
+<!ENTITY Ctr_osearch_meoit1	"Suchmaschine">
+<!ENTITY Ctr_osearch_meoit2	"Lupe">
 <!ENTITY Ctr_osearch_iwidth	"Pop-up-Breite automatisch der Suchfeldbreite anpassen">
 <!ENTITY Ctr_osearch_cwidth	"Eigene Breite für Such-Pop-ups">
 <!ENTITY Ctr_osearch_dm		"Kleinere Aufklapp-Schaltfläche">
@@ -202,11 +212,13 @@
 <!ENTITY Ctr_oldplacesbut	"Lesezeichen-Schaltflächen: Alte Darstellung">
 <!ENTITY Ctr_dl_pm_drop		"Download-Panel: Aufklappmenüschaltfläche anzeigen">
 <!ENTITY Ctr_bmbutpanelm	"Aufklappmenü: 'Panel'-Darstellung">
-<!ENTITY Ctr_bmbunsortbm	"Aufklappmenü: 'Weitere Lesezeichen'-Menü anzeigen">
+<!ENTITY Ctr_bmbunsortbm	"Aufklappmenü: 'Weitere Lesezeichen' als Menü anzeigen">
 <!ENTITY Ctr_bmbunsortbm2	"Menü über den Lesezeichen">
-<!ENTITY Ctr_bmbviewbmsb	"Aufklappmenü: 'Lesezeichen-Seitenleiste' anzeigen">
-<!ENTITY Ctr_bmbviewbmtb	"Aufklappmenü: 'Lesezeichen-Symbolleiste' anzeigen">
-<!ENTITY Ctr_bmbnounsort	"Aufklappmenü: 'Weitere Lesezeichen' verstecken">
+<!ENTITY Ctr_bmbviewbmsb	"Aufklappmenü: 'Lesezeichen-Seitenleiste'-Eintrag anzeigen">
+<!ENTITY Ctr_bmbviewbmtb	"Aufklappmenü: 'Lesezeichen-Symbolleiste anzeigen'-Eintrag anzeigen">
+<!ENTITY Ctr_bmbutnotb		"Aufklappmenü: 'Lesezeichen-Symbolleiste'-Menü verstecken">
+<!ENTITY Ctr_bmbnounsort	"Aufklappmenü: 'Weitere Lesezeichen'-Menü und -Eintrag verstecken">
+<!ENTITY Ctr_bmbutclpopup	"Aufklappmenü: nur 'Lesezeichen hinzufügen' und Lesezeichen anzeigen">
 <!ENTITY Ctr_bmbutnotext	"Text auch auf der Lesezeichen-Symbolleiste verstecken">
 <!ENTITY Ctr_skipprintpr	"Drucken-Schaltfläche: Druckvorschau überspringen">
 <!ENTITY Ctr_tbconmenu		"Leistenkontextmenü: 'In Menü verschieben', 'Aus Symbolleiste entfernen', 'Alle Tabs neu laden', 'Lesezeichen für alle Tabs hinzufügen …' und 'Geschlossenen Tab wiederherstellen' verstecken">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Ein Klick auf die Aktivitätsanzeige öffnet folgende Adresse:">
 <!ENTITY Ctr_navthrobber2	"Adresse eintragen oder leer lassen">
-<!ENTITY Ctr_anewtaburl		"Seite 'Neuer Tab'">
-<!ENTITY Ctr_anewtaburlcb	"Eigene Seite 'Neuer Tab' (Standard: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Eigene private Seite 'Neuer Tab' (Standard: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Textfelder erlauben Farbnamen sowie hexadezimale, RGB(A)- und HSL(A)-Werte.">
 <!ENTITY Ctr_tab_tf_info2	"Eingegebene Werte werden nicht auf Korrektheit überprüft!">
@@ -317,7 +326,7 @@
 
 <!ENTITY Ctr_toolbars		"Leisten">
 <!ENTITY Ctr_dblclnewtab	"Doppelklick auf Leiste öffnet einen neuen Tab">
-<!ENTITY Ctr_dblclnewtabdes	"Nicht geignet für alle vollständigen Themen bei aktiver Windows Titelleiste!">
+<!ENTITY Ctr_dblclnewtabdes	"Nicht geignet für alle vollständigen Themes bei aktiver Windows Titelleiste!">
 <!ENTITY Ctr_hidetbwot		"Leiste mit nur einem sichtbaren Tab verstecken">
 <!ENTITY Ctr_hidetbwote		"Verzögerung beim Start reduzieren">
 <!ENTITY Ctr_hidetbwote_i	"Hintergrundfarbe der Tableiste könnte fehlerhaft sein.">
@@ -337,7 +346,7 @@
 <!ENTITY Ctr_aerocolors		"Blaue 'Aero'-Farben für Leisten (und Tabs)">
 <!ENTITY Ctr_aerocolorsg	"Grau-blaue 'Aero'-Farben">
 <!ENTITY Ctr_transpttbw10	"Titel-/Menü-/Tableiste: Hintergrundfarbe entfernen">
-<!ENTITY Ctr_transpttbew10	"Weitere Anpassungen für einige OS-Themen">
+<!ENTITY Ctr_transpttbew10	"Weitere Anpassungen für einige OS-Themes">
 <!ENTITY Ctr_transptcw10	"Standardschaltflächen 'Minimieren/Maximieren/Schließen' verstecken">
 <!ENTITY Ctr_hidenavbar		"Leiste verstecken">
 <!ENTITY Ctr_navbarpad		"Zusätzliche Abstände links und rechts">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"Seitensuchhervorhebung">
 <!ENTITY Ctr_fx50findbarhl	"Das Deaktivieren dieser Optionen entfernt die 'Seitensuchhervorhebung'.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Alte Schriftdarstellung">
 
 
 <!ENTITY Ctr_pw_settings	"Einstellungen">
@@ -404,20 +414,12 @@
 
 <!ENTITY Ctr_special_font	"Hintergrundfarbeinstellungen sind nur für das Standard-Thema vorhanden!">
 <!ENTITY Ctr_special_info	"Einige Optionen haben nur in bestimmten Fällen sichtbare Auswirkungen!">
-<!ENTITY Ctr_special_info2	"Vollständiges 'Thema' erkannt! Einige Einstellungen funktionieren nicht mit Themen!">
+<!ENTITY Ctr_special_info2	"'Vollständiges Theme' erkannt! Einige Einstellungen funktionieren nicht mit Themes!">
 <!ENTITY Ctr_special_acr	"Probleme nur über offizielle Hilfskanäle melden und nicht über 'Add-on Compatibility Reporter'!">
-<!ENTITY Ctr_support		"Hilfe">
-<!ENTITY Ctr_support_forum1	"MozillaZine (Englisches Forum)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (Deutsches Forum)">
-<!ENTITY Ctr_github_issues	"Problem melden auf Github">
-<!ENTITY Ctr_newversion		"Neue Version suchen">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Erste Schritte">
 <!ENTITY goCmd.label					"Los">
-<!ENTITY Ctr_menu_restart.label			"Neustarten">
-<!ENTITY Ctr_restartapp					"'Neustarten'-Eintrag im '&brandShortName;'- und 'Datei-Menü'">
-<!ENTITY Ctr_ctrnewinv					"Einstellungen für diese &brandShortName; Version 'unterstreichen'">
 
 <!ENTITY Ctr_openInCurrentTab			"Eingabe im aktiven Tab öffnen">
 <!ENTITY Ctr_openInNewTab				"Eingabe in neuem Tab öffnen">

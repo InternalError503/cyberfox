@@ -15,8 +15,13 @@
 <!ENTITY Ctr_windowcontrols	"Minimalizuj, Maksymalizuj, Zamknij (pełny ekran)">
 <!ENTITY Ctr_rr				"Wymagany restart!">
 <!ENTITY Ctr_window			"okno">
-<!ENTITY Ctr_centered		"Wyśrodkowany">
+<!ENTITY Ctr_centered		"Wyśrodkowana">
 <!ENTITY Ctr_page			"Strona">
+<!ENTITY Ctr_position		"Pozycja">
+<!ENTITY Ctr_appearance		"Wygląd">
+<!ENTITY Ctr_left			"Lewa">
+<!ENTITY Ctr_right			"Prawa">
+<!ENTITY Ctr_privmode		"(okno prywatne)">
 
 <!ENTITY Ctr_cuibuttons		"Przyciski">
 <!ENTITY Ctr_cuibutnormal	"Normalne">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"Wygląd karty jest kontrolowany przez bieżący motyw.">
 <!ENTITY Ctr_coltabsinfo	"Wygląd karty nie jest w pełni kompatybilny z dodatkiem 'ColorfulTabs'!">
 <!ENTITY Ctr_tabsontop0		"Karty na górze (domyślne)">
-<!ENTITY Ctr_tabsontop1		"Karty na górze --- atrybut [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Karty nie na górze (v1) --- atrybut [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Karty nie na górze (v2) --- atrybut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Karty na górze - atrybut [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Karty nie na górze (v1) - atrybut [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Karty nie na górze (v2) - atrybut [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"v2 jest tylko dla niektórych dodatków i kompletnych motywów!">
 <!ENTITY Ctr_tabsontopI1	"Dodaje atrybut [tabsontop=true/false] do">
 <!ENTITY Ctr_tabsintitlebar	"Użyj paska tytułu programu &brandShortName; zamiast systemowego">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Wartości poniżej 48 pikseli w większości przypadków spowodują usterki!">
 <!ENTITY Ctr_square_edges	"Kwadratowe górne rogi">
 <!ENTITY Ctr_tttitlebar		"Tytuł karty na pasku tytułu programu &brandShortName;">
-<!ENTITY Ctr_ttnooverfl		"Usuń efekt przepełnienia z długich tytułów kart">
+<!ENTITY Ctr_ttoverflow		"Długie tytuły karty">
+<!ENTITY Ctr_ttoverfl_def	"Domyślny efekt przepełnienia">
+<!ENTITY Ctr_ttoverfl_no	"Bez efektu przepełnienia">
+<!ENTITY Ctr_tabtitle		"Pozycja tytułu karty">
 <!ENTITY Ctr_tabinsertion	"Wstaw powiązaną kartę za kartą bieżącą">
 <!ENTITY Ctr_emptytfavico	"Pokaż ikonę ulubionych (jeżeli strona nie zaoferuje żadnej)">
 <!ENTITY Ctr_emptytfavico_n	"Brak">
@@ -102,10 +110,9 @@
 <!ENTITY Ctr_appbuttonc_pu	"Fioletowy">
 <!ENTITY Ctr_appbuttonc_wh	"Biały">
 <!ENTITY Ctr_appbuttonc_cu	"Niestandardowy">
-<!ENTITY Ctr_appbuttonct	"Niestandardowy kolor przycisku dla przycisku na pasku narzędzi">
+<!ENTITY Ctr_appbuttonct	"Niestandardowy kolor przycisku (jeżeli przycisk na pasku narzędzi)">
 <!ENTITY Ctr_appbuttonI1	"Zalecany restart">
-<!ENTITY Ctr_appbuttonI1e	"Tylko widoczny na pasku tytułu programu &brandShortName;, nie na systemowym pasku tytułu!">
-<!ENTITY Ctr_appbuttonI2	"Kolory przycisku są tylko widoczne, jeżeli przycisk jest na pasku tytułu albo na pasku kart!">
+<!ENTITY Ctr_appbuttonI1e	"Przycisk programu &brandShortName; jest tylko widoczny na pasku tytułu programu &brandShortName;, a nie na systemowym pasku tytułu!">
 <!ENTITY Ctr_appbutmhi		"Wyższa pozycja (jeżeli na pasku kart)">
 <!ENTITY Ctr_appbautocol	"Ustaw automatycznie kolor kanału przeglądarki (domyślny/Aurora/Nightly)">
 <!ENTITY Ctr_appbutbdl		"Ukryj kolory obramowań i tła">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Po prawej">
 <!ENTITY Ctr_html5warning	"Ostrzeżenie o pełnym ekranie HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Klasyczny wygląd obrazu na białym tle">
+<!ENTITY Ctr_altdlprogbar	"Alternatywny wygląd paska postępu pobierania">
 <!ENTITY Ctr_altalertbox	"'Pole powiadomień': alternatywny wygląd">
 <!ENTITY Ctr_emptygfavico	"Zamień standardową ikonę ulubionych">
 <!ENTITY Ctr_mstatusbar		"Ruchomy panel paska statusu">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Menu podręczne panelu (zakładki, historia itp.): widok kompaktowy">
 <!ENTITY Ctr_hidezoomres	"Kontrolki powiększenia na pasku narzędzi: ukryj przycisk resetu powiększenia">
 <!ENTITY Ctr_alt_newtabp	"Strona nowej karty (about:newtab): alternatywny wygląd">
-<!ENTITY Ctr_nosnippets		"Strona startowa (about:home): ukryj fragmenty">
 <!ENTITY Ctr_search_ui		"Wyszukiwanie">
 <!ENTITY Ctr_ctroldsearch	"Stara wyszukiwarka">
+<!ENTITY Ctr_ctroldsearchd	"Brak kompatybilności z innymi dodatkami wyszukiwarki!">
 <!ENTITY Ctr_ctroldsearchc	"Czyść pole wyszukiwania po wyszukaniu">
 <!ENTITY Ctr_ctroldsearchr	"Przywracaj pierwszą wyszukiwarkę na liście po wyszukaniu">
 <!ENTITY Ctr_ctrosearchdel	"opóźnienia">
 <!ENTITY Ctr_search_oit		"Otwórz wyszukiwanie w nowej karcie">
-<!ENTITY Ctr_osearch_meoit	"Kliknięcia środkowym przyciskiem: wyszukaj w nowej 'karcie pierwszoplanowej'">
+<!ENTITY Ctr_osearch_meoit	"Kliknięcie środkowym przyciskiem: otwórz wyszukiwanie w nowej 'karcie pierwszoplanowej'">
+<!ENTITY Ctr_osearch_meoit1	"Wyszukiwarka">
+<!ENTITY Ctr_osearch_meoit2	"Lupa">
 <!ENTITY Ctr_osearch_iwidth	"Automatycznie dostosuj szerokość menu podręcznego">
 <!ENTITY Ctr_osearch_cwidth	"Niestandardowa szerokość menu podręcznego wyszukiwania">
 <!ENTITY Ctr_osearch_dm		"Mały przycisk podręczny">
@@ -202,11 +212,13 @@
 <!ENTITY Ctr_oldplacesbut	"Elementy i foldery zakładek na pasku: stary wygląd">
 <!ENTITY Ctr_dl_pm_drop		"Panel przycisków pobierania: pokaż znacznik rozwinięcia">
 <!ENTITY Ctr_bmbutpanelm	"Menu podręczne: wygląd menu panelu">
-<!ENTITY Ctr_bmbunsortbm	"Menu podręczne: podmenu 'Pozostałe zakładki'">
+<!ENTITY Ctr_bmbunsortbm	"Menu podręczne: pokaż menu 'Pozostałe zakładki'">
 <!ENTITY Ctr_bmbunsortbm2	"Menu ponad zakładkami">
-<!ENTITY Ctr_bmbviewbmsb	"Menu podręczne: pokaż 'Wyświetl panel zakładek'">
-<!ENTITY Ctr_bmbviewbmtb	"Menu podręczne: pokaż 'Wyświetl pasek zakładek'">
-<!ENTITY Ctr_bmbnounsort	"Menu podręczne: ukryj 'Pozostałe zakładki'">
+<!ENTITY Ctr_bmbviewbmsb	"Menu podręczne: pokaż w menu element 'Wyświetl panel zakładek'">
+<!ENTITY Ctr_bmbviewbmtb	"Menu podręczne: pokaż w menu element 'Wyświetl pasek zakładek'">
+<!ENTITY Ctr_bmbutnotb		"Menu podręczne: ukryj menu 'Pasek zakładek'">
+<!ENTITY Ctr_bmbnounsort	"Menu podręczne: ukryj menu 'Pozostałe zakładki' oraz element w menu">
+<!ENTITY Ctr_bmbutclpopup	"Menu podręczne: pokaż tylko 'Dodaj zakładkę' oraz zakładki">
 <!ENTITY Ctr_bmbutnotext	"Ukryj etykietę na pasku zakładek">
 <!ENTITY Ctr_skipprintpr	"Przycisk drukowania: pomiń podgląd wydruku">
 <!ENTITY Ctr_tbconmenu		"Menu kontekstowe paska narzędzi: ukryj 'Przenieś do menu', 'Usuń z paska narzędzi', 'Odśwież wszystkie karty', 'Dodaj zakładki do wszystkich kart...' oraz 'Przywróć zamkniętą kartę'">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Kliknięcie wskaźnika aktywności otwiera określony adres w nowej karcie:">
 <!ENTITY Ctr_navthrobber2	"Dodaj adres albo pozostaw puste">
-<!ENTITY Ctr_anewtaburl		"Adres strony nowej karty">
-<!ENTITY Ctr_anewtaburlcb	"Niestandardowy adres strony nowej karty (domyślny: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Niestandardowy adres strony nowej prywatnej karty (domyślny: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Nazwy kolorów, kod szesnastkowy, wartości rgb(a) i hsl(a) są obsługiwane.">
 <!ENTITY Ctr_tab_tf_info2	"Wejścia nie będą zatwierdzane!">
@@ -389,8 +398,9 @@
 <!ENTITY Ctr_e_tabsaudioico	"Ikona odtwarzania dźwięku">
 <!ENTITY Ctr_e_containertab	"Karty z kontekstem">
 <!ENTITY Ctr_e_findbarhl	"Podświetlanie paska wyszukiwania">
-<!ENTITY Ctr_fx50findbarhl	"Odznaczenie tych ustawień usuwa funkcje 'podświetlania' paska wyszukiwania.">
+<!ENTITY Ctr_fx50findbarhl	"Odznaczenie tych ustawień usuwa nowe funkcje 'podświetlania' paska wyszukiwania.">
 <!ENTITY Ctr_e_flyweb		"FlyWeb">
+<!ENTITY Ctr_e_oldfontgfx	"Stare renderowanie czcionek">
 
 
 <!ENTITY Ctr_pw_settings	"Ustawienia">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Niektóre opcje mogą nie zawsze oferować widoczne zmiany">
 <!ENTITY Ctr_special_info2	"Wykryto motyw autorstwa osób trzecich! Niektóre opcje nie działają z motywami autorstwa osób trzecich!">
 <!ENTITY Ctr_special_acr	"Zgłaszaj problemy tylko za pomocą oficjalnych kanałów wsparcia, a nie korzystając z 'Reportera kompatybilności dodatków'!">
-<!ENTITY Ctr_support		"Pomoc">
-<!ENTITY Ctr_support_forum1	"MozillaZine (forum w języku angielskim)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (forum w języku niemieckim)">
-<!ENTITY Ctr_github_issues	"Zgłoś problem na GitHubie">
-<!ENTITY Ctr_newversion		"Sprawdź, czy jest nowa wersja">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"Pierwsze kroki">
 <!ENTITY goCmd.label					"Przejdź">
-<!ENTITY Ctr_menu_restart.label			"Zrestartuj">
-<!ENTITY Ctr_restartapp					"Pokaż 'Zrestartuj' w menu programu &brandShortName; oraz w menu Plik">
-<!ENTITY Ctr_ctrnewinv					"Podkreśl nowe opcje dla bieżącej wersji programu &brandShortName;">
 
 <!ENTITY Ctr_openInCurrentTab			"Otwórz dane wejściowe w bieżącej karcie">
 <!ENTITY Ctr_openInNewTab				"Otwórz dane wejściowe w nowej karcie">
@@ -479,7 +481,7 @@
 <!ENTITY ctr_abouthome.dark "Ciemny styl strony startowej">
 <!ENTITY ctr_abouthome.simplicity  "Uproszczony styl strony startowej">
 <!ENTITY ctr_abouthome.links "Usuń linki ze strony startowej">
-<!ENTITY ctr_abouthome.apps "No apps on about:home page">
+<!ENTITY ctr_abouthome.apps "Usuń aplikacje ze strony startowej">
 <!ENTITY ctr_abouthome.logo "Usuń logo ze strony startowej">
 <!ENTITY ctr_abouthome.icons "Usuń ikony ze strony startowej">
 <!ENTITY ctr_abouthome.snippets "Usuń fragmenty dotyczące informacji ze strony startowej">

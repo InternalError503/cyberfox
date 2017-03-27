@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"vindue">
 <!ENTITY Ctr_centered		"Centreret">
 <!ENTITY Ctr_page			"Side">
+<!ENTITY Ctr_position		"Position">
+<!ENTITY Ctr_appearance		"Appearance">
+<!ENTITY Ctr_left			"Left">
+<!ENTITY Ctr_right			"Right">
+<!ENTITY Ctr_privmode		"(private window)">
 
 <!ENTITY Ctr_cuibuttons		"Knapper">
 <!ENTITY Ctr_cuibutnormal	"Standard">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"Fanebladenes udseende styres af det nuværende tema.">
 <!ENTITY Ctr_coltabsinfo	"Fanebladenes udseende er ikke fuldtud kompatible med tilføjelsen 'ColorfulTabs'!">
 <!ENTITY Ctr_tabsontop0		"Faneblade øverst (standard)">
-<!ENTITY Ctr_tabsontop1		"Faneblade øverst --- [tabsontop=true] attribut">
-<!ENTITY Ctr_tabsontop2		"Faneblade skal ikke være øverst (v1) --- [tabsontop=false] attribut">
-<!ENTITY Ctr_tabsontop3		"Faneblade skal ikke være øverst (v2) --- [tabsontop=false] attribut">
+<!ENTITY Ctr_tabsontop1		"Faneblade øverst - [tabsontop=true] attribut">
+<!ENTITY Ctr_tabsontop2		"Faneblade skal ikke være øverst (v1) - [tabsontop=false] attribut">
+<!ENTITY Ctr_tabsontop3		"Faneblade skal ikke være øverst (v2) - [tabsontop=false] attribut">
 <!ENTITY Ctr_tabsontopW1	"v2 er kun til nogle tilføjelser og komplette temaer!">
 <!ENTITY Ctr_tabsontopI1	"Attributten [tabsontop=true/false] bliver tilføjet">
 <!ENTITY Ctr_tabsintitlebar	"Brug &brandShortName; i titellinjen i stedet for OS titellinje">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Værdier under 48 px vil for det meste give fejl i grafikken!">
 <!ENTITY Ctr_square_edges	"Firkantede øverste hjørner">
 <!ENTITY Ctr_tttitlebar		"Fanebladstitel i &brandShortName;-titellinje">
-<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
+<!ENTITY Ctr_ttoverflow		"Long tab titles">
+<!ENTITY Ctr_ttoverfl_def	"Default overflow effect">
+<!ENTITY Ctr_ttoverfl_no	"No overflow effect">
+<!ENTITY Ctr_tabtitle		"Tab title position">
 <!ENTITY Ctr_tabinsertion	"Indsæt relaterede faneblad efter aktive faneblad">
 <!ENTITY Ctr_emptytfavico	"Vis favicon (hvis stedet ikke tilbyder et)">
 <!ENTITY Ctr_emptytfavico_n	"Intet">
@@ -105,7 +113,6 @@
 <!ENTITY Ctr_appbuttonct	"Brugerdefineret knapfarve for knap på værktøjslinje">
 <!ENTITY Ctr_appbuttonI1	"Genstart anbefales">
 <!ENTITY Ctr_appbuttonI1e	"Kun synlig på &brandShortName;-titellinjen, ikke Windows OS-titellinjen!">
-<!ENTITY Ctr_appbuttonI2	"Farverne på knapperne er kun synlige hvis knapperne er på titellinjen og fanebladslinjen!">
 <!ENTITY Ctr_appbutmhi		"Højere placering (hvis den er på fanebladslinje)">
 <!ENTITY Ctr_appbautocol	"Indstil automatisk browser-kanalfarve (standard/Aurora/Nightly)">
 <!ENTITY Ctr_appbutbdl		"Skjul kanter og baggrundsfarver">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Højre">
 <!ENTITY Ctr_html5warning	"HTML5 fuldskærm-advarsel">
 <!ENTITY Ctr_oldtoplevimg	"Standard billed-udseende på hvid baggrund">
+<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
 <!ENTITY Ctr_altalertbox	"'Alert-boks': alternativt udseende">
 <!ENTITY Ctr_emptygfavico	"Erstat generisk favicon">
 <!ENTITY Ctr_mstatusbar		"Flytbare statuspanel">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Panelmenu-pop-op'er (bogmærker, historik, osv.): kompakt visning">
 <!ENTITY Ctr_hidezoomres	"Zoom-knapper på værktøjslinje: skjul zoom-nulstil-knapper">
 <!ENTITY Ctr_alt_newtabp	"Nyt faneblad-side (about:newtab): alternativt udseende">
-<!ENTITY Ctr_nosnippets		"Startside (about:home): skjul snippets">
 <!ENTITY Ctr_search_ui		"Søg">
 <!ENTITY Ctr_ctroldsearch	"Gamle søgning">
+<!ENTITY Ctr_ctroldsearchd	"Not compatible to other search add-ons!">
 <!ENTITY Ctr_ctroldsearchc	"Ryd søgeboks efter søgning">
 <!ENTITY Ctr_ctroldsearchr	"Fald tilbage til første søgetjeneste i liste, efter søgning">
 <!ENTITY Ctr_ctrosearchdel	"forsinkelse">
 <!ENTITY Ctr_search_oit		"Åbn søgning i nyt faneblad">
 <!ENTITY Ctr_osearch_meoit	"Mellemklik: søg i nyt 'forgrundsfaneblad'">
+<!ENTITY Ctr_osearch_meoit1	"Search engine">
+<!ENTITY Ctr_osearch_meoit2	"Search glass">
 <!ENTITY Ctr_osearch_iwidth	"Automatisk justering af pop-op-bredde">
 <!ENTITY Ctr_osearch_cwidth	"Brugerdefineret bredde for søge-pop-op'er">
 <!ENTITY Ctr_osearch_dm		"Lille rullegardinsmenu-pil">
@@ -206,7 +216,9 @@
 <!ENTITY Ctr_bmbunsortbm2	"Menu over bogmærker">
 <!ENTITY Ctr_bmbviewbmsb	"Pop-op: vis 'Vis bogmærker i sidepanel'">
 <!ENTITY Ctr_bmbviewbmtb	"Pop-op: vis 'Vis bogmærkelinjen'">
+<!ENTITY Ctr_bmbutnotb		"Popup: hide 'Bookmarks Toolbar' menu">
 <!ENTITY Ctr_bmbnounsort	"Pop-op: skjul 'Usorterede bogmærker'">
+<!ENTITY Ctr_bmbutclpopup	"Popup: only show 'Bookmark this page' and bookmarks">
 <!ENTITY Ctr_bmbutnotext	"Skjul etiket på bogmærkelinje">
 <!ENTITY Ctr_skipprintpr	"Udskriv-knap: spring vis udskrift over">
 <!ENTITY Ctr_tbconmenu		"Værktøjslinjens genvejsmenu: skjul 'flyt til menu', 'fjern fra værktøjslinje', 'genindlæs/bogmærk alle faneblade' og 'fortryd lukning af faneblade">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Klik på aktivitetsindikatoren åbner følgende URL i et nyt faneblad:">
 <!ENTITY Ctr_navthrobber2	"Tilføj URL eller lad være tom">
-<!ENTITY Ctr_anewtaburl		"Nyt faneblad-URL-side">
-<!ENTITY Ctr_anewtaburlcb	"Brugerdefineret nyt faneblad-URL-side (standard: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"Brugerdefineret privat nyt faneblad side url (standard: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"Farvenavne, heks-koder, rgb(a), og hsl(a) værdier er understøttet.">
 <!ENTITY Ctr_tab_tf_info2	"Indtastede værdier valideres ikke!">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"Findlinje fremhævning">
 <!ENTITY Ctr_fx50findbarhl	"Deaktivér disse indstillinger for at fjerne findlinjens 'fremhæv'-funktioner.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Old font rendering">
 
 
 <!ENTITY Ctr_pw_settings	"Indstillinger">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Nogle indstillinger giver måske ikke altid synlige ændringer">
 <!ENTITY Ctr_special_info2	"Tredjeparts temaer registreret! Nogle indstillinger virker ikke med tredjeparts temaer!">
 <!ENTITY Ctr_special_acr	"Rapportér kun problemer gennem officielle support-kanaler og ikke ved brug af 'Add-on Compatibility Reporter'!">
-<!ENTITY Ctr_support		"Support">
-<!ENTITY Ctr_support_forum1	"MozillaZine (engelsk forum)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (tysk forum)">
-<!ENTITY Ctr_github_issues	"Rapportér problem på Github">
-<!ENTITY Ctr_newversion		"Tjek om der er en ny version">
 
 <!ENTITY Ctr_addon-bar.accesskey		"A">
 <!ENTITY appMenuGettingStarted.label	"I gang">
 <!ENTITY goCmd.label					"Gå">
-<!ENTITY Ctr_menu_restart.label			"Genstart">
-<!ENTITY Ctr_restartapp					"Vis 'Genstart' i &brandShortName;-menu og Filer-menu">
-<!ENTITY Ctr_ctrnewinv					"Understreg nye indstillinger for nuværende &brandShortName; version">
 
 <!ENTITY Ctr_openInCurrentTab			"Åbn inputs i nuværende faneblad">
 <!ENTITY Ctr_openInNewTab				"Åbn inputs i et nyt faneblad">

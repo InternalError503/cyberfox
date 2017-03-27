@@ -848,7 +848,6 @@
         </body>
       </method>
 
-
       <method name="_generateEmphasisPairs">
         <parameter name="aSourceString"/>
         <parameter name="aReplacements"/>
@@ -920,6 +919,8 @@
           ]]>
         </body>
       </method>
+
+
 
       <method name="_adjustAcItem">
         <body>
@@ -1042,7 +1043,6 @@
             title = displayUrl;
             try {
               let uri = Services.io.newURI(originalUrl, null, null);
-              // Not all valid URLs have a domain.
               if (uri.host)
                 title = uri.host;
             } catch (e) {}
@@ -1115,6 +1115,7 @@
           ]]>
         </body>
       </method>
+
       <method name="adjustSiteIconStart">
         <parameter name="newStart"/>
         <body>
@@ -1139,7 +1140,6 @@
         </body>
       </method>
 
-      <!-- This method truncates the displayed strings as necessary. -->
       <method name="_handleOverflow">
         <body><![CDATA[
           let itemRect = this.parentNode.getBoundingClientRect();
@@ -1151,10 +1151,6 @@
           let separatorURLActionWidth =
             separatorRect.width + Math.max(urlRect.width, actionRect.width);
 
-          // Total width for the title and URL/action is the width of the item
-          // minus the start of the title text minus a little extra padding.
-          // This extra padding amount is basically arbitrary but keeps the text
-          // from getting too close to the popup's edge.
           let extraPadding = 30;
           let dir = this.getAttribute("dir");
           let titleStart = dir == "rtl" ? itemRect.right - titleRect.right
@@ -1168,7 +1164,6 @@
           let titleTagsWidth = titleRect.width + tagsRect.width;
           if (titleTagsWidth + separatorURLActionWidth > itemWidth) {
 
-            // The percentage of the item width allocated to the title and tags.
             let titleTagsPct = 0.66;
 
             let titleTagsAvailable = itemWidth - separatorURLActionWidth;
@@ -1231,7 +1226,6 @@
               action.params[key] = decodeURIComponent(action.params[key]);
             }
           } catch (e) {
-
             action.params = {
               url: params,
             }
@@ -1242,5 +1236,4 @@
       </method>
     </implementation>
   </binding>
-
   </bindings>

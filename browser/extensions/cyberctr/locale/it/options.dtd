@@ -17,6 +17,11 @@
 <!ENTITY Ctr_window			"la finestra">
 <!ENTITY Ctr_centered		"Centrato">
 <!ENTITY Ctr_page			"Pagina">
+<!ENTITY Ctr_position		"Posizione">
+<!ENTITY Ctr_appearance		"Aspetto">
+<!ENTITY Ctr_left			"Sinistra">
+<!ENTITY Ctr_right			"Destra">
+<!ENTITY Ctr_privmode		"(fiestra anonima)">
 
 <!ENTITY Ctr_cuibuttons		"Pulsanti">
 <!ENTITY Ctr_cuibutnormal	"Normali">
@@ -40,9 +45,9 @@
 <!ENTITY Ctr_tabforminfo	"L’aspetto delle schede è definito dal tema in uso.">
 <!ENTITY Ctr_coltabsinfo	"L’aspetto delle schede non è del tutto compatibile con il componente aggiuntivo 'ColorfulTabs'.">
 <!ENTITY Ctr_tabsontop0		"Schede in alto (predefinito)">
-<!ENTITY Ctr_tabsontop1		"Schede in alto --- attivata [tabsontop=true]">
-<!ENTITY Ctr_tabsontop2		"Schede in basso (v1) --- attivata [tabsontop=false]">
-<!ENTITY Ctr_tabsontop3		"Schede in basso (v2) --- attivata [tabsontop=false]">
+<!ENTITY Ctr_tabsontop1		"Schede in alto - attivata [tabsontop=true]">
+<!ENTITY Ctr_tabsontop2		"Schede in basso (v1) - attivata [tabsontop=false]">
+<!ENTITY Ctr_tabsontop3		"Schede in basso (v2) - attivata [tabsontop=false]">
 <!ENTITY Ctr_tabsontopW1	"La versione v2 è solo per alcuni componenti aggiuntivi e temi completi!">
 <!ENTITY Ctr_tabsontopI1	"Aggiunge l’attributo [tabsontop=true/false] a">
 <!ENTITY Ctr_tabsintitlebar	"Schede nella barra del titolo">
@@ -58,7 +63,10 @@
 <!ENTITY Ctr_tabwidthinfo3	"Valori inferiori a 48px provocheranno anomalie nella maggior parte dei casi!">
 <!ENTITY Ctr_square_edges	"Angoli superiori spigolosi">
 <!ENTITY Ctr_tttitlebar		"Titolo scheda nella barra del titolo di &brandShortName;">
-<!ENTITY Ctr_ttnooverfl		"Remove overflow effect from long tab titles">
+<!ENTITY Ctr_ttoverflow		"Titoli delle schede estesi">
+<!ENTITY Ctr_ttoverfl_def	"Effetto di overflow predefinito">
+<!ENTITY Ctr_ttoverfl_no	"Nessun effetto di overflow">
+<!ENTITY Ctr_tabtitle		"Posizione del titolo della scheda">
 <!ENTITY Ctr_tabinsertion	"Inserisci la scheda correlata dopo la scheda corrente">
 <!ENTITY Ctr_emptytfavico	"Mostra favicon (quando un sito ne è privo)">
 <!ENTITY Ctr_emptytfavico_n	"Nessuna">
@@ -105,7 +113,6 @@
 <!ENTITY Ctr_appbuttonct	"Colore personalizzato per il pulsante nella barra degli strumenti">
 <!ENTITY Ctr_appbuttonI1	"Riavvio consigliato">
 <!ENTITY Ctr_appbuttonI1e	"Visibile solo nella barra del titolo di &brandShortName; e non in quella di Windows.">
-<!ENTITY Ctr_appbuttonI2	"Colorato solo nella barra del titolo e nella barra delle schede.">
 <!ENTITY Ctr_appbutmhi		"In cima a tutto (se nella barra delle schede)">
 <!ENTITY Ctr_appbautocol	"Imposta in automatico i colori default / Aurora / Nightly">
 <!ENTITY Ctr_appbutbdl		"Nascondi bordi e colori di sfondo">
@@ -126,8 +133,8 @@
 <!ENTITY Ctr_altoptionsd	"Aspetto predefinito">
 <!ENTITY Ctr_altoptionsp	"Aspetto alternativo">
 <!ENTITY Ctr_altoptionsw	"Aprire la pagina Opzioni in una finestra">
-<!ENTITY Ctr_altoptions_hm	"horizontal menu">
-<!ENTITY Ctr_altoptions_vm	"vertical menu">
+<!ENTITY Ctr_altoptions_hm	"menu orizzontale">
+<!ENTITY Ctr_altoptions_vm	"menu verticale">
 <!ENTITY Ctr_altoptionsww	"Larghezza">
 <!ENTITY Ctr_altoptionswh	"Altezza">
 <!ENTITY Ctr_altoptionsi	"La finestra delle opzioni non si presenta più come un dialogo ma come una finestra del browser con tutte le barre degli strumenti nascoste. La caratteristica 'Usa la pagina corrente' aggiunge gli url delle pagine aperte nella finestra corrente, che in questo caso è solo 'about:preferences'. Il pulsante delle 'opzioni' è sostituito da uno nuovo che è in grado di aprire le opzioni in una finestra.">
@@ -141,6 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Destra">
 <!ENTITY Ctr_html5warning	"Avviso per HTML5 a tutto schermo">
 <!ENTITY Ctr_oldtoplevimg	"Sfondo bianco classico per la visualizzazione degli URL immagine">
+<!ENTITY Ctr_altdlprogbar	"Aspetto alternativo della barra di avanzamento del download">
 <!ENTITY Ctr_altalertbox	"Avvisi di notifiche: aspetto alternativo">
 <!ENTITY Ctr_emptygfavico	"Sostituisci la favicon generica">
 <!ENTITY Ctr_mstatusbar		"Barra di stato mobile">
@@ -173,14 +181,16 @@
 <!ENTITY Ctr_cpanelmenus	"Pannello menu unificato (Segnalibri, Cronologia, ecc.)">
 <!ENTITY Ctr_hidezoomres	"Nascondi il pulsante per ripristinare il livello di zoom dalla barra degli strumenti">
 <!ENTITY Ctr_alt_newtabp	"Nuova scheda (about:newtab): aspetto alternativo">
-<!ENTITY Ctr_nosnippets		"Pagina iniziale (about:home): nascondi gli snippet">
 <!ENTITY Ctr_search_ui		"Ricerca">
 <!ENTITY Ctr_ctroldsearch	"Ricerca vecchio stile">
+<!ENTITY Ctr_ctroldsearchd	"Non compatibile con altri componenti di ricerca!">
 <!ENTITY Ctr_ctroldsearchc	"Pulisci la casella di ricerca dopo aver effettuato la ricerca">
 <!ENTITY Ctr_ctroldsearchr	"Ripristina il primo motore di ricerca dell'elenco dopo aver effettuato la ricerca">
 <!ENTITY Ctr_ctrosearchdel	"Ritardo esecuzione in ms">
 <!ENTITY Ctr_search_oit		"Apri la ricerca in una nuova scheda">
 <!ENTITY Ctr_osearch_meoit	"Clic sul tasto centrale: ricerca in una nuova scheda attiva">
+<!ENTITY Ctr_osearch_meoit1	"Motore di ricerca">
+<!ENTITY Ctr_osearch_meoit2	"Lente di ricerca">
 <!ENTITY Ctr_osearch_iwidth	"Regola automaticamente la larghezza del menu a discesa">
 <!ENTITY Ctr_osearch_cwidth	"Larghezza personalizzata per i risultati di ricerca">
 <!ENTITY Ctr_osearch_dm		"Freccia verso il basso piccola">
@@ -206,7 +216,9 @@
 <!ENTITY Ctr_bmbunsortbm2	"Menu sopra i segnalibri">
 <!ENTITY Ctr_bmbviewbmsb	"Mostra 'Visualizza barra laterale segnalibri'">
 <!ENTITY Ctr_bmbviewbmtb	"Mostra 'Visualizza Barra dei segnalibri'">
+<!ENTITY Ctr_bmbutnotb		"Nascondi il menu 'Barra dei segnalibri'">
 <!ENTITY Ctr_bmbnounsort	"Nascondi 'Segnalibri non catalogati'">
+<!ENTITY Ctr_bmbutclpopup	"Mostra solamente 'Aggiungi pagina ai segnalibri' e i segnalibri">
 <!ENTITY Ctr_bmbutnotext	"Nascondi etichetta della barra dei segnalibri">
 <!ENTITY Ctr_skipprintpr	"Pulsante stampa: salta l’anteprima di stampa">
 <!ENTITY Ctr_tbconmenu		"Menu contestuale della barra degli strumenti: nascondi 'Sposta nel menu', 'Rimuovi dalla barra degli strumenti', 'Ricarica/ tutte le schede nei segnalibri' e 'Riapri scheda chiusa'">
@@ -224,9 +236,6 @@
 
 <!ENTITY Ctr_navthrobber1	"Cliccando l’indicatore di attività si apre l’url specificato:">
 <!ENTITY Ctr_navthrobber2	"Aggiungi URL o lascia vuoto">
-<!ENTITY Ctr_anewtaburl		"URL della pagina Nuova scheda">
-<!ENTITY Ctr_anewtaburlcb	"URL personalizzato della pagina Nuova scheda (predefinito: 'about:newtab')">
-<!ENTITY Ctr_anewtaburlpcb	"URL personalizzato della pagina Nuova scheda in incognito (default: 'about:privatebrowsing')">
 
 <!ENTITY Ctr_tab_tf_info1	"È possibile usare nomi di colori (in inglese), valori esadecimali e i formati rgb(a) e hsl(a).">
 <!ENTITY Ctr_tab_tf_info2	"Nessuna validazione dell’input.">
@@ -265,7 +274,7 @@
 <!ENTITY Ctr_urlbardropm2	"Dropmarker sempre visibile">
 <!ENTITY Ctr_altreaderico	"Icone alternative della modalità di lettura">
 <!ENTITY Ctr_hideurlzoom	"Nascondi il pulsante dello zoom (se presente)">
-<!ENTITY Ctr_urlbardark		"Dark background color">
+<!ENTITY Ctr_urlbardark		"Colore di sfondo scuro">
 <!ENTITY Ctr_hideprbutton	"Nascondi l’icona di notifica quando un popup viene bloccato">
 <!ENTITY Ctr_locsearchbw10	"Riduci l'altezza delle barre degli indirizzi e di ricerca (sperimentale)">
 <!ENTITY Ctr_urlbar_ib		"Pulsante delle connessioni sicure">
@@ -350,7 +359,7 @@
 <!ENTITY Ctr_nonavbarbg2	"Ha effetto su tutte le barre del componente 'Beyond Australis' di Slim Chrome.">
 <!ENTITY Ctr_nonavborder	"Aggiungi bordo superiore alla barra dei segnalibri">
 <!ENTITY Ctr_nonavtbborder	"Rimuovi i bordi alle barre degli strumenti posizionate in alto">
-<!ENTITY Ctr_toptb_oldpad	"Top toolbars: old left and right padding">
+<!ENTITY Ctr_toptb_oldpad	"Barre in alto: margini destro e sinistro classici">
 <!ENTITY Ctr_hidesbclose	"Barre laterali: nascondi il pulsante di chiusura">
 <!ENTITY Ctr_notextshadow	"Barre degli strumenti: nascondi ombreggiatura del testo delle barre e delle schede">
 <!ENTITY Ctr_chevronfix		"Barra di navigazione: nascondi la doppia freccia ('Altri strumenti') all’estremità ">
@@ -391,6 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"Evidenziamento della barra per la ricerca nel testo">
 <!ENTITY Ctr_fx50findbarhl	"Deselezionando queste preferenze vengono rimosse le caratteristiche di evidenziamento della barra per la ricerca nel testo.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
+<!ENTITY Ctr_e_oldfontgfx	"Rendering classico dei caratteri">
 
 
 <!ENTITY Ctr_pw_settings	"Impostazioni">
@@ -406,18 +416,10 @@
 <!ENTITY Ctr_special_info	"Alcune opzioni si applicano solo in casi particolari">
 <!ENTITY Ctr_special_info2	"Le impostazioni sono pensate per il tema predefinito e potrebbero non funzionare con altri temi">
 <!ENTITY Ctr_special_acr	"Segnala i problemi solamente tramite i canali di supporto ufficiale e non con 'Add-on Compatibility Reporter'!">
-<!ENTITY Ctr_support		"Supporto">
-<!ENTITY Ctr_support_forum1	"MozillaZine (forum inglese)">
-<!ENTITY Ctr_support_forum2	"Camp Firefox (forum tedesco)">
-<!ENTITY Ctr_github_issues	"Segnala un problema su Github">
-<!ENTITY Ctr_newversion		"Controllo aggiornamenti">
 
 <!ENTITY Ctr_addon-bar.accesskey		"B">
 <!ENTITY appMenuGettingStarted.label	"Primi passi">
 <!ENTITY goCmd.label					"Vai">
-<!ENTITY Ctr_menu_restart.label			"Riavvia">
-<!ENTITY Ctr_restartapp					"'Riavvia' nel menu del Pulsante &brandShortName; e nel menu File">
-<!ENTITY Ctr_ctrnewinv					"Sottolinea le nuove opzioni della versione corrente di &brandShortName;">
 
 <!ENTITY Ctr_openInCurrentTab			"Apri l'indirizzo nella scheda corrente">
 <!ENTITY Ctr_openInNewTab				"Apri l'indirizzo in una nuova scheda">

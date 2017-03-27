@@ -11,12 +11,8 @@
 	  -moz-binding: url("chrome://classic_theme_restorer/content/ctr_oldsearch.xml#searchbar-textbox") !important;
 	}
 	
-	#main-window[fx52plus="true"] searchbar {
-	  -moz-binding: url("chrome://classic_theme_restorer/content/ctr_oldsearch52.xml#searchbar") !important;
-	}
-	
-	#main-window[fx52plus="true"]:not([searchwp-moz-platform]) searchbar .searchbar-textbox {
-	  -moz-binding: url("chrome://classic_theme_restorer/content/ctr_oldsearch52.xml#searchbar-textbox") !important;
+	#main-window searchbar {
+	  -moz-binding: url("chrome://classic_theme_restorer/content/ctr_oldsearch.xml#searchbar") !important;
 	}
 	
 	.searchbar-engine-button {
@@ -130,14 +126,16 @@
 	  margin-bottom: -4px !important;
 	}
 	
-	#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell(fromhistory),
-	#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell-text(fromhistory){
-	  opacity: .4 !important;
-	}
+	@media (-moz-windows-theme:aero) {
+		
+		#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell(fromhistory),
+		#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell-text(fromhistory){
+		  opacity: .5 !important;
+		}
 
-	#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell(fromhistory,selected),
-	#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell-text(fromhistory,selected){
-	  opacity: 1.0 !important;
+		#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell(fromhistory,selected),
+		#main-window[fx52plus="true"] #PopupSearchAutoComplete .search-panel-tree .autocomplete-treebody::-moz-tree-cell-text(fromhistory,selected){
+		  opacity: 1.0 !important;
+		}
 	}
-	
 }
