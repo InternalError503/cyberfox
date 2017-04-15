@@ -2196,8 +2196,7 @@ var gDiscoverView = {
           isBlocklisted: addon.blocklistState == Ci.nsIBlocklistService.STATE_BLOCKED
         }
       }
-
-      setURL(url + "#" + JSON.stringify(list));
+      setURL(url);
     });
   },
 
