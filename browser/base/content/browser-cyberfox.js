@@ -386,7 +386,8 @@
 		},
 			
 		// Update notification notify
-		updateNotification: function () {
+		updateNotification: function (version) {
+			if (version == null) version = "";
 			if (Services.prefs.getBoolPref("app.update.autocheck") &&
 				Services.prefs.getBoolPref("app.update.available") &&
 				Services.prefs.getBoolPref("app.update.check.enabled")) {
@@ -397,18 +398,23 @@
 					getService(Ci.nsIAlertsService);
 
 				// Set button text by platform
-				var buttonText = "";
+				var buttonText = "",
+					accessKey = "";
 				if (AppConstants.platform == "win") {
 					buttonText = this.UplodateLocal.GetStringFromName("update.notification.button.win");
+					accessKey = this.UplodateLocal.GetStringFromName("update.notification.button.accesskey.win");
 				} else {
 					buttonText = this.UplodateLocal.GetStringFromName("update.notification.button");
+					accessKey = this.UplodateLocal.GetStringFromName("update.notification.button.accesskey");
 				}
 
 				// Set notification bar button.
-				var button = [];
-				button = [{
+				var buttons = [];
+				var buttonDownload = {
 					label: buttonText,
-					accessKey: "v",
+					accessKey: accessKey,
+					isDefault: true,
+					type: "",
 					callback: function () {
 						if (AppConstants.platform == "win") {
 							Services.prefs.setBoolPref("app.update.available", false);
@@ -418,24 +424,42 @@
 							openUILinkIn(Services.prefs.getCharPref("app.update.url.manual"), 'tab');
 						}
 					}
-				}];
+				};
+				var buttonViewNotes = {
+					label: this.UplodateLocal.GetStringFromName("update.notification.button.notes"),
+					accessKey: "N",
+					type: "",
+					isDefault: false,
+					callback: function () {
+							if (Services.prefs.getCharPref("app.update.channel.type") == "release"){
+								openUILinkIn(Services.prefs.getCharPref("app.releaseNotesURL").replace("%VERSION%", version), 'tab');
+							}else if (Services.prefs.getCharPref("app.update.channel.type") == "beta"){
+								console.log(Services.prefs.getCharPref("app.releaseNotesURL") + version);
+								openUILinkIn(Services.prefs.getCharPref("app.releaseNotesURL") + version, 'tab');
+							}
+						}
+				};
+				if (Services.prefs.getCharPref("app.update.channel.type") == "release"){
+					buttons.push(buttonViewNotes);
+				}
+				buttons.push(buttonDownload);
 
 				if (Services.prefs.getBoolPref("app.update.notification-new")) {
 
 					if (AppConstants.platform == "win") {
 						alertsService.showAlertNotification('chrome://branding/content/icon48.png', this.UplodateLocal.formatStringFromName("update.notification.new.title", [this.Branding], 1),
-							this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding], 1), false, '', null, '');
+							this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding + " " + version], 1), false, '', null, '');
 					} else if (AppConstants.platform == "linux") {
 						try {
 							var nb = gBrowser.getNotificationBox();
-							nb.appendNotification(this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding], 1), 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
+							nb.appendNotification(this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding + " " + version], 1), 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, buttons);
 						} catch (e) { }
 					}
 
 				} else {
 					try {
 						var nb = gBrowser.getNotificationBox();
-						nb.appendNotification(this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding], 1), 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, button);
+						nb.appendNotification(this.UplodateLocal.formatStringFromName("update.notification.message", [this.Branding + " " + version], 1), 'cyberfoxupdate', 'chrome://branding/content/icon16.png', nb.PRIORITY_WARNING_HIGH, buttons);
 					} catch (e) { }
 				}
 				Services.prefs.setBoolPref("app.update.available", false);
@@ -500,7 +524,7 @@
 										try {
 											// Set update available
 											Services.prefs.setBoolPref("app.update.available", true);
-											gCyberfoxCustom.updateNotification();
+											gCyberfoxCustom.updateNotification(currentVersion.toString());
 										} catch (e) {
 											// Prevents runtime error on platforms that don't implement nsIAlertsService
 										}

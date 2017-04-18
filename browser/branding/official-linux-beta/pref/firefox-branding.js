@@ -21,7 +21,7 @@ pref("app.update.channel.type", "beta");
 pref("app.update.available", false);
 
  //Since the beta does not have a release notes page we will disable this.
-pref("app.releaseNotesURL", "");
+pref("app.releaseNotesURL", "https://github.com/InternalError503/cyberfox-beta/releases");
 pref("app.vendorURL", "https://8pecxstudios.com/");
 
 //Disable default browser we don't want beta versions as default browser!.
