@@ -812,6 +812,10 @@ wasapi_stream_render_loop(LPVOID stream)
     LOG("Unable to use mmcss to bump the render thread priority: %x", GetLastError());
   }
 
+  // This has already been nulled out, simply exit.
+  if (!emergency_bailout) {
+    is_playing = false;
+  }
 
   /* WaitForMultipleObjects timeout can trigger in cases where we don't want to
      treat it as a timeout, such as across a system sleep/wake cycle.  Trigger
@@ -820,6 +824,13 @@ wasapi_stream_render_loop(LPVOID stream)
   unsigned timeout_count = 0;
   const unsigned timeout_limit = 5;
   while (is_playing) {
+    // We want to check the emergency bailout variable before a
+    // and after the WaitForMultipleObject, because the handles WaitForMultipleObjects
+    // is going to wait on might have been closed already.
+    if (*emergency_bailout) {
+      delete emergency_bailout;
+      return 0;
+    }
     DWORD waitResult = WaitForMultipleObjects(ARRAY_LENGTH(wait_array),
                                               wait_array,
                                               FALSE,
@@ -1151,6 +1162,12 @@ bool stop_and_join_render_thread(cubeb_stream * stm)
     return true;
   }
 
+  // If we've already leaked the thread, just return,
+  // there is not much we can do.
+  if (!stm->emergency_bailout.load()) {
+    return false;
+  }
+
   BOOL ok = SetEvent(stm->shutdown_event);
   if (!ok) {
     LOG("Destroy SetEvent failed: %d", GetLastError());
@@ -1163,12 +1180,16 @@ bool stop_and_join_render_thread(cubeb_stream * stm)
     /* Something weird happened, leak the thread and continue the shutdown
      * process. */
     *(stm->emergency_bailout) = true;
+    // We give the ownership to the rendering thread.
+    stm->emergency_bailout = nullptr;
     LOG("Destroy WaitForSingleObject on thread timed out,"
         " leaking the thread: %d", GetLastError());
     rv = false;
   }
   if (r == WAIT_FAILED) {
     *(stm->emergency_bailout) = true;
+    // We give the ownership to the rendering thread.
+    stm->emergency_bailout = nullptr;
     LOG("Destroy WaitForSingleObject on thread failed: %d", GetLastError());
     rv = false;
   }
@@ -1803,9 +1824,6 @@ void wasapi_stream_destroy(cubeb_stream * stm)
   if (stop_and_join_render_thread(stm)) {
     delete stm->emergency_bailout.load();
     stm->emergency_bailout = nullptr;
-  } else {
-    // If we're leaking, it must be that this is true.
-    assert(*(stm->emergency_bailout));
   }
 
   unregister_notification_client(stm);
@@ -1870,10 +1888,10 @@ int stream_start_one_side(cubeb_stream * stm, StreamDirection dir)
 
 int wasapi_stream_start(cubeb_stream * stm)
 {
+  auto_lock lock(stm->stream_reset_lock);
+
   XASSERT(stm && !stm->thread && !stm->shutdown_event);
   XASSERT(stm->output_client || stm->input_client);
-
-  auto_lock lock(stm->stream_reset_lock);
 
   stm->emergency_bailout = new std::atomic<bool>(false);
 
@@ -1937,6 +1955,7 @@ int wasapi_stream_stop(cubeb_stream * stm)
   }
 
   if (stop_and_join_render_thread(stm)) {
+    // This is null if we've given the pointer to the other thread
     if (stm->emergency_bailout.load()) {
       delete stm->emergency_bailout.load();
       stm->emergency_bailout = nullptr;

@@ -39,13 +39,27 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--dep', action='store_true',
                     help='do not clobber the objdir before building')
 parser.add_argument('--platform', '-p', type=str, metavar='PLATFORM',
-                    default='', help='build platform')
+                    default='', help='build platform, including a suffix ("-debug" or "") used by buildbot to override the variant\'s "debug" setting. The platform can be used to specify 32 vs 64 bits.')
 parser.add_argument('--timeout', '-t', type=int, metavar='TIMEOUT',
                     default=10800,
                     help='kill job after TIMEOUT seconds')
 parser.add_argument('--objdir', type=str, metavar='DIR',
                     default=env.get('OBJDIR', 'obj-spider'),
                     help='object directory')
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--optimize', action='store_true',
+                   help='generate an optimized build. Overrides variant setting.')
+group.add_argument('--no-optimize', action='store_false',
+                   dest='optimize',
+                   help='generate a non-optimized build. Overrides variant setting.')
+group.set_defaults(optimize=None)
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--debug', action='store_true',
+                   help='generate a debug build. Overrides variant setting.')
+group.add_argument('--no-debug', action='store_false',
+                   dest='debug',
+                   help='generate a non-debug build. Overrides variant setting.')
+group.set_defaults(debug=None)
 parser.add_argument('--run-tests', '--tests', type=str, metavar='TESTSUITE',
                     default='',
                     help="comma-separated set of test suites to add to the variant's default set")
@@ -133,8 +147,24 @@ POBJDIR = posixpath.join(PDIR.source, args.objdir)
 AUTOMATION = env.get('AUTOMATION', False)
 MAKE = env.get('MAKE', 'make')
 MAKEFLAGS = env.get('MAKEFLAGS', '-j6')
-CONFIGURE_ARGS = variant['configure-args']
 UNAME_M = subprocess.check_output(['uname', '-m']).strip()
+
+CONFIGURE_ARGS = variant['configure-args']
+
+opt = args.optimize
+if opt is None:
+    opt = variant.get('optimize')
+if opt is not None:
+    CONFIGURE_ARGS += (" --enable-optimize" if opt else " --disable-optimize")
+
+opt = args.debug
+if opt is None and args.platform:
+    # Override variant['debug'].
+    opt = ('-debug' in args.platform)
+if opt is None:
+    opt = variant.get('debug')
+if opt is not None:
+    CONFIGURE_ARGS += (" --enable-debug" if opt else " --disable-debug")
 
 # Any jobs that wish to produce additional output can save them into the upload
 # directory if there is such a thing, falling back to OBJDIR.

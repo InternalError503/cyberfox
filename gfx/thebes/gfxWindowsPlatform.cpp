@@ -736,6 +736,7 @@ gfxWindowsPlatform::GetCommonFallbackFonts(uint32_t aCh, uint32_t aNextCh,
             break;
         case 0x0e:
             aFontList.AppendElement(kFontLaoUI);
+            aFontList.AppendElement(kFontLeelawadeeUI);
             break;
         case 0x10:
             aFontList.AppendElement(kFontMyanmarText);
@@ -756,6 +757,7 @@ gfxWindowsPlatform::GetCommonFallbackFonts(uint32_t aCh, uint32_t aNextCh,
             break;
         case 0x17:
             aFontList.AppendElement(kFontKhmerUI);
+            aFontList.AppendElement(kFontLeelawadeeUI);
             break;
         case 0x18:  // Mongolian
             aFontList.AppendElement(kFontMongolianBaiti);
@@ -765,7 +767,7 @@ gfxWindowsPlatform::GetCommonFallbackFonts(uint32_t aCh, uint32_t aNextCh,
             aFontList.AppendElement(kFontMicrosoftTaiLe);
             aFontList.AppendElement(kFontMicrosoftNewTaiLue);
             aFontList.AppendElement(kFontKhmerUI);
-            break;
+            aFontList.AppendElement(kFontLeelawadeeUI);
             break;
         case 0x1a:
             aFontList.AppendElement(kFontLeelawadeeUI);
@@ -841,6 +843,7 @@ gfxWindowsPlatform::GetCommonFallbackFonts(uint32_t aCh, uint32_t aNextCh,
         case 0xa9:
              aFontList.AppendElement(kFontMalgunGothic);
              aFontList.AppendElement(kFontJavaneseText);
+             aFontList.AppendElement(kFontLeelawadeeUI);
              break;
         case 0xaa:
              aFontList.AppendElement(kFontMyanmarText);
@@ -1176,8 +1179,10 @@ gfxWindowsPlatform::FontsPrefsChanged(const char *aPref)
     }
 }
 
-#define ENHANCED_CONTRAST_REGISTRY_KEY \
-    HKEY_CURRENT_USER, "Software\\Microsoft\\Avalon.Graphics\\DISPLAY1\\EnhancedContrastLevel"
+#define DISPLAY1_REGISTRY_KEY \
+    HKEY_CURRENT_USER, L"Software\\Microsoft\\Avalon.Graphics\\DISPLAY1"
+
+#define ENHANCED_CONTRAST_VALUE_NAME L"EnhancedContrastLevel"
 
 void
 gfxWindowsPlatform::SetupClearTypeParams()
@@ -1240,18 +1245,30 @@ gfxWindowsPlatform::SetupClearTypeParams()
         GetDWriteFactory()->CreateRenderingParams(getter_AddRefs(defaultRenderingParams));
         // For EnhancedContrast, we override the default if the user has not set it
         // in the registry (by using the ClearType Tuner).
-        if (contrast >= 0.0 && contrast <= 10.0) {
-            contrast = contrast;
-        } else {
+        if (contrast < 0.0 || contrast > 10.0) {
             HKEY hKey;
-            if (RegOpenKeyExA(ENHANCED_CONTRAST_REGISTRY_KEY,
-                              0, KEY_READ, &hKey) == ERROR_SUCCESS)
-            {
-                contrast = defaultRenderingParams->GetEnhancedContrast();
+            LONG res = RegOpenKeyExW(DISPLAY1_REGISTRY_KEY,
+                                     0, KEY_READ, &hKey);
+            if (res == ERROR_SUCCESS) {
+                res = RegQueryValueExW(hKey, ENHANCED_CONTRAST_VALUE_NAME,
+                                       nullptr, nullptr, nullptr, nullptr);
+                if (res == ERROR_SUCCESS) {
+                    contrast = defaultRenderingParams->GetEnhancedContrast();
+                }
                 RegCloseKey(hKey);
-            } else {
+            }
+
+            if (contrast < 0.0 || contrast > 10.0) {
                 contrast = 1.0;
             }
+        }
+
+        if (GetDefaultContentBackend() == BackendType::SKIA) {
+          // Skia doesn't support a contrast value outside of 0-1, so default to 1.0
+          if (contrast < 0.0 || contrast > 1.0) {
+            NS_WARNING("Custom dwrite contrast not supported in Skia. Defaulting to 1.0.");
+            contrast = 1.0;
+          }
         }
 
         // For parameters that have not been explicitly set,
@@ -1281,13 +1298,21 @@ gfxWindowsPlatform::SetupClearTypeParams()
 
         mRenderingParams[TEXT_RENDERING_NO_CLEARTYPE] = defaultRenderingParams;
 
-        GetDWriteFactory()->CreateCustomRenderingParams(gamma, contrast, level,
-            dwriteGeometry, renderMode,
+        HRESULT hr = GetDWriteFactory()->CreateCustomRenderingParams(
+            gamma, contrast, level, dwriteGeometry, renderMode,
             getter_AddRefs(mRenderingParams[TEXT_RENDERING_NORMAL]));
+        if (FAILED(hr) || !mRenderingParams[TEXT_RENDERING_NORMAL]) {
+            mRenderingParams[TEXT_RENDERING_NORMAL] = defaultRenderingParams;
+        }
 
-        GetDWriteFactory()->CreateCustomRenderingParams(gamma, contrast, level,
+        hr = GetDWriteFactory()->CreateCustomRenderingParams(
+            gamma, contrast, level,
             dwriteGeometry, DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC,
             getter_AddRefs(mRenderingParams[TEXT_RENDERING_GDI_CLASSIC]));
+        if (FAILED(hr) || !mRenderingParams[TEXT_RENDERING_GDI_CLASSIC]) {
+            mRenderingParams[TEXT_RENDERING_GDI_CLASSIC] =
+                defaultRenderingParams;
+        }
     }
 }
 

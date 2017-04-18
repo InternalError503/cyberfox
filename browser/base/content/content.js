@@ -736,38 +736,41 @@ addMessageListener("ContextMenu:SaveVideoFrameAsImage", (message) => {
 });
 
 addMessageListener("ContextMenu:MediaCommand", (message) => {
-  let media = message.objects.element;
-
-  switch (message.data.command) {
-    case "play":
-      media.play();
-      break;
-    case "pause":
-      media.pause();
-      break;
-    case "loop":
-      media.loop = !media.loop;
-      break;
-    case "mute":
-      media.muted = true;
-      break;
-    case "unmute":
-      media.muted = false;
-      break;
-    case "playbackRate":
-      media.playbackRate = message.data.data;
-      break;
-    case "hidecontrols":
-      media.removeAttribute("controls");
-      break;
-    case "showcontrols":
-      media.setAttribute("controls", "true");
-      break;
-    case "fullscreen":
-      if (content.document.fullscreenEnabled)
-        media.requestFullscreen();
-      break;
-  }
+  E10SUtils.wrapHandlingUserInput(
+    content, message.data.handlingUserInput,
+    () => {
+      let media = message.objects.element;
+      switch (message.data.command) {
+        case "play":
+          media.play();
+          break;
+        case "pause":
+          media.pause();
+          break;
+        case "loop":
+          media.loop = !media.loop;
+          break;
+        case "mute":
+          media.muted = true;
+          break;
+        case "unmute":
+          media.muted = false;
+          break;
+        case "playbackRate":
+          media.playbackRate = message.data.data;
+          break;
+        case "hidecontrols":
+          media.removeAttribute("controls");
+          break;
+        case "showcontrols":
+          media.setAttribute("controls", "true");
+          break;
+        case "fullscreen":
+          if (content.document.fullscreenEnabled)
+            media.requestFullscreen();
+          break;
+      }
+    });
 });
 
 addMessageListener("ContextMenu:Canvas:ToBlobURL", (message) => {
@@ -1197,8 +1200,10 @@ var PageInfoListener = {
       try {
         // Note: makeURLAbsolute will throw if either the baseURI is not a valid URI
         //       or the URI formed from the baseURI and the URL is not a valid URI.
-        let href = makeURLAbsolute(elem.baseURI, elem.href.baseVal);
-        addImage(href, strings.mediaImg, "", elem, false);
+        if (elem.href.baseVal) {
+          let href = Services.io.newURI(elem.href.baseVal, null, Services.io.newURI(elem.baseURI)).spec;
+          addImage(href, strings.mediaImg, "", elem, false);
+        }
       } catch (e) { }
     }
     else if (elem instanceof content.HTMLVideoElement) {

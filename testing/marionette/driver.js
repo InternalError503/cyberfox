@@ -829,7 +829,7 @@ GeckoDriver.prototype.executeScript = function*(cmd, resp) {
  * @throws JavaScriptError
  *     If an Error was thrown whilst evaluating the script.
  */
-GeckoDriver.prototype.executeAsyncScript = function (cmd, resp) {
+GeckoDriver.prototype.executeAsyncScript = function* (cmd, resp) {
   let {script, args, scriptTimeout} = cmd.parameters;
   scriptTimeout = scriptTimeout || this.timeouts.script;
 
@@ -879,7 +879,7 @@ GeckoDriver.prototype.execute_ = function (script, args, timeout, opts = {}) {
  *
  * Scripts are expected to call the {@code finish} global when done.
  */
-GeckoDriver.prototype.executeJSScript = function (cmd, resp) {
+GeckoDriver.prototype.executeJSScript = function* (cmd, resp) {
   let {script, args, scriptTimeout} = cmd.parameters;
   scriptTimeout = scriptTimeout || this.timeouts.script;
 
@@ -944,18 +944,20 @@ GeckoDriver.prototype.get = function*(cmd, resp) {
   let url = cmd.parameters.url;
 
   let get = this.listener.get({url: url, pageTimeout: this.timeouts.pageLoad});
-  // TODO(ato): Bug 1242595
-  let id = this.listener.activeMessageId;
 
   // If a remoteness update interrupts our page load, this will never return
   // We need to re-issue this request to correctly poll for readyState and
   // send errors.
   this.curBrowser.pendingCommands.push(() => {
-    cmd.parameters.command_id = id;
-    cmd.parameters.pageTimeout = this.timeouts.pageLoad;
+    let parameters = {
+      // TODO(ato): Bug 1242595
+      command_id: this.listener.activeMessageId,
+      pageTimeout: this.timeouts.pageLoad,
+      startTime: new Date().getTime(),
+    };
     this.mm.broadcastAsyncMessage(
         "Marionette:pollForReadyState" + this.curBrowser.curFrameId,
-        cmd.parameters);
+        parameters);
   });
 
   yield get;
@@ -1018,18 +1020,86 @@ GeckoDriver.prototype.getPageSource = function* (cmd, resp) {
   }
 };
 
-/** Go back in history. */
-GeckoDriver.prototype.goBack = function*(cmd, resp) {
+/**
+ * Cause the browser to traverse one step backward in the joint history
+ * of the current browsing context.
+ */
+GeckoDriver.prototype.goBack = function* (cmd, resp) {
   assert.content(this.context);
 
-  yield this.listener.goBack();
+  if (!this.curBrowser.tab) {
+    // Navigation does not work for non-browser windows
+    return;
+  }
+
+  let contentBrowser = browser.getBrowserForTab(this.curBrowser.tab)
+  if (!contentBrowser.webNavigation.canGoBack) {
+    return;
+  }
+
+  let currentURL = yield this.listener.getCurrentUrl();
+  let goBack = this.listener.goBack({pageTimeout: this.timeouts.pageLoad});
+
+  // If a remoteness update interrupts our page load, this will never return
+  // We need to re-issue this request to correctly poll for readyState and
+  // send errors.
+  this.curBrowser.pendingCommands.push(() => {
+    let parameters = {
+      // TODO(ato): Bug 1242595
+      command_id: this.listener.activeMessageId,
+      lastSeenURL: currentURL,
+      pageTimeout: this.timeouts.pageLoad,
+      startTime: new Date().getTime(),
+    };
+    this.mm.broadcastAsyncMessage(
+        // TODO: combine with
+        // "Marionette:pollForReadyState" + this.curBrowser.curFrameId,
+        "Marionette:pollForReadyState" + this.curBrowser.curFrameId,
+        parameters);
+  });
+
+  yield goBack;
 };
 
-/** Go forward in history. */
-GeckoDriver.prototype.goForward = function*(cmd, resp) {
+/**
+ * Cause the browser to traverse one step forward in the joint history
+ * of the current browsing context.
+ */
+GeckoDriver.prototype.goForward = function* (cmd, resp) {
   assert.content(this.context);
 
-  yield this.listener.goForward();
+  if (!this.curBrowser.tab) {
+    // Navigation does not work for non-browser windows
+    return;
+  }
+
+  let contentBrowser = browser.getBrowserForTab(this.curBrowser.tab)
+  if (!contentBrowser.webNavigation.canGoForward) {
+    return;
+  }
+
+  let currentURL = yield this.listener.getCurrentUrl();
+  let goForward = this.listener.goForward({pageTimeout: this.timeouts.pageLoad});
+
+  // If a remoteness update interrupts our page load, this will never return
+  // We need to re-issue this request to correctly poll for readyState and
+  // send errors.
+  this.curBrowser.pendingCommands.push(() => {
+    let parameters = {
+      // TODO(ato): Bug 1242595
+      command_id: this.listener.activeMessageId,
+      lastSeenURL: currentURL,
+      pageTimeout: this.timeouts.pageLoad,
+      startTime: new Date().getTime(),
+    };
+    this.mm.broadcastAsyncMessage(
+        // TODO: combine with
+        // "Marionette:pollForReadyState" + this.curBrowser.curFrameId,
+        "Marionette:pollForReadyState" + this.curBrowser.curFrameId,
+        parameters);
+  });
+
+  yield goForward;
 };
 
 /** Refresh the page. */
@@ -2473,7 +2543,8 @@ GeckoDriver.prototype.sendKeysToDialog = function (cmd, resp) {
   // see toolkit/components/prompts/content/commonDialog.js
   let {loginContainer, loginTextbox} = this.dialog.ui;
   if (loginContainer.hidden) {
-    throw new ElementNotVisibleError("This prompt does not accept text input");
+    throw new ElementNotInteractableError(
+        "This prompt does not accept text input");
   }
 
   let win = this.dialog.window ? this.dialog.window : this.getCurrentWindow();

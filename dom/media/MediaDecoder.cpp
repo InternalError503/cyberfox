@@ -449,7 +449,7 @@ MediaDecoder::MediaDecoder(MediaDecoderOwner* aOwner)
 
   mWatchManager.Watch(mIsAudioDataAudible, &MediaDecoder::NotifyAudibleStateChanged);
 
-  MediaShutdownManager::Instance().Register(this);
+  MediaShutdownManager::InitStatics();
 }
 
 #undef INIT_MIRROR
@@ -505,6 +505,22 @@ MediaDecoder::Shutdown()
 
   ChangeState(PLAY_STATE_SHUTDOWN);
   mOwner = nullptr;
+}
+
+void
+MediaDecoder::NotifyXPCOMShutdown()
+{
+  MOZ_ASSERT(NS_IsMainThread());
+  if (auto owner = GetOwner()) {
+    owner->NotifyXPCOMShutdown();
+  }
+  MOZ_DIAGNOSTIC_ASSERT(IsShutdown());
+
+  // Don't cause grief to release builds by ensuring Shutdown()
+  // is always called during shutdown phase.
+  if (!IsShutdown()) {
+    Shutdown();
+  }
 }
 
 MediaDecoder::~MediaDecoder()
@@ -600,7 +616,12 @@ MediaDecoder::Load(nsIStreamListener** aStreamListener)
   MOZ_ASSERT(NS_IsMainThread());
   MOZ_ASSERT(mResource, "Can't load without a MediaResource");
 
-  nsresult rv = OpenResource(aStreamListener);
+  nsresult rv = MediaShutdownManager::Instance().Register(this);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  rv = OpenResource(aStreamListener);
   NS_ENSURE_SUCCESS(rv, rv);
 
   SetStateMachine(CreateStateMachine());

@@ -7,14 +7,16 @@
 const {interfaces: Ci, utils: Cu} = Components;
 
 const ERRORS = new Set([
+  "ElementClickInterceptedError",
   "ElementNotAccessibleError",
-  "ElementNotVisibleError",
+  "ElementNotInteractableError",
   "InsecureCertificateError",
   "InvalidArgumentError",
   "InvalidElementStateError",
   "InvalidSelectorError",
   "InvalidSessionIDError",
   "JavaScriptError",
+  "MoveTargetOutOfBoundsError",
   "NoAlertOpenError",
   "NoSuchElementError",
   "NoSuchFrameError",
@@ -124,22 +126,60 @@ error.stringify = function (err) {
  *
  * Usage:
  *
- *     let input = {value: true};
- *     error.pprint`Expected boolean, got ${input}`;
- *     => "Expected boolean, got [object Object] {"value": true}"
+ *     let bool = {value: true};
+ *     error.pprint`Expected boolean, got ${bool}`;
+ *     => 'Expected boolean, got [object Object] {"value": true}'
+ *
+ *     let htmlElement = document.querySelector("input#foo");
+ *     error.pprint`Expected element ${htmlElement}`;
+ *     => 'Expected element <input id="foo" class="bar baz">'
  */
-error.pprint = function (strings, ...values) {
+error.pprint = function (ss, ...values) {
+  function prettyObject (obj) {
+    let proto = Object.prototype.toString.call(obj);
+    let s = "";
+    try {
+      s = JSON.stringify(obj);
+    } catch (e if e instanceof TypeError) {
+      s = `<${e.message}>`;
+    }
+    return proto + " " + s;
+  }
+
+  function prettyElement (el) {
+    let ident = [];
+    if (el.id) {
+      ident.push(`id="${el.id}"`);
+    }
+    if (el.classList.length > 0) {
+      ident.push(`class="${el.className}"`);
+    }
+
+    let idents = "";
+    if (ident.length > 0) {
+      idents = " " + ident.join(" ");
+    }
+
+    return `<${el.localName}${idents}>`;
+  }
+
   let res = [];
-  for (let i = 0; i < strings.length; i++) {
-    res.push(strings[i]);
+  for (let i = 0; i < ss.length; i++) {
+    res.push(ss[i]);
     if (i < values.length) {
       let val = values[i];
-      res.push(Object.prototype.toString.call(val));
-      let s = JSON.stringify(val);
-      if (s && s.length > 0) {
-        res.push(" ");
-        res.push(s);
+      let typ = Object.prototype.toString.call(val);
+      let s;
+      try {
+        if (val && val.nodeType === 1) {
+          s = prettyElement(val);
+        } else {
+          s = prettyObject(val);
+        }
+      } catch (e) {
+        s = typeof val;
       }
+      res.push(s);
     }
   }
   return res.join("");
@@ -203,10 +243,38 @@ class ElementNotAccessibleError extends WebDriverError {
   }
 }
 
-class ElementNotVisibleError extends WebDriverError {
+/**
+ * An element click could not be completed because the element receiving
+ * the events is obscuring the element that was requested clicked.
+ *
+ * @param {Element=} obscuredEl
+ *     Element obscuring the element receiving the click.  Providing this
+ *     is not required, but will produce a nicer error message.
+ * @param {Map.<string, number>} coords
+ *     Original click location.  Providing this is not required, but
+ *     will produce a nicer error message.
+ */
+class ElementClickInterceptedError extends WebDriverError {
+  constructor (obscuredEl = undefined, coords = undefined) {
+    let msg = "";
+    if (obscuredEl && coords) {
+      const doc = obscuredEl.ownerDocument;
+      const overlayingEl = doc.elementFromPoint(coords.x, coords.y);
+      msg = error.pprint`Element ${obscuredEl} is not clickable ` +
+          `at point (${coords.x},${coords.y}) ` +
+          error.pprint`because another element ${overlayingEl} ` +
+          `obscures it`;
+    }
+
+    super(msg);
+    this.status = "element click intercepted";
+  }
+}
+
+class ElementNotInteractableError extends WebDriverError {
   constructor (message) {
     super(message);
-    this.status = "element not visible";
+    this.status = "element not interactable";
   }
 }
 
@@ -301,6 +369,13 @@ class JavaScriptError extends WebDriverError {
   }
 }
 
+class MoveTargetOutOfBoundsError extends WebDriverError {
+  constructor (message) {
+    super(message);
+    this.status = "move target out of bounds";
+  }
+}
+
 class NoAlertOpenError extends WebDriverError {
   constructor (message) {
     super(message);
@@ -387,13 +462,15 @@ class UnsupportedOperationError extends WebDriverError {
 
 const STATUSES = new Map([
   ["element not accessible", ElementNotAccessibleError],
-  ["element not visible", ElementNotVisibleError],
+  ["element not interactable", ElementNotInteractableError],
+  ["element click intercepted", ElementClickInterceptedError],
   ["insecure certificate", InsecureCertificateError],
   ["invalid argument", InvalidArgumentError],
   ["invalid element state", InvalidElementStateError],
   ["invalid selector", InvalidSelectorError],
   ["invalid session id", InvalidSessionIDError],
   ["javascript error", JavaScriptError],
+  ["move target out of bounds", MoveTargetOutOfBoundsError],
   ["no alert open", NoAlertOpenError],
   ["no such element", NoSuchElementError],
   ["no such frame", NoSuchFrameError],

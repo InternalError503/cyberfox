@@ -188,8 +188,8 @@ protected:
   AllocPFileSystemRequestParent(const FileSystemParams&) override;
 
   virtual bool
-  RecvPFileSystemRequestConstructor(PFileSystemRequestParent* aActor,
-                                    const FileSystemParams& aParams) override;
+  RecvPFileSystemRequestConstructor(PFileSystemRequestParent* actor,
+                                    const FileSystemParams& params) override;
 
   virtual bool
   DeallocPFileSystemRequestParent(PFileSystemRequestParent*) override;
