@@ -156,7 +156,7 @@
 <!ENTITY updatestartupcheck.label "Автоматически проверять наличие обновлений при запуске &brandShortName;">
 <!ENTITY updatecheckenabled.label "Разрешить проверку обновлений">
 <!ENTITY updateverifysha.label "Разрешить проверку обновлений по SHA512.">
-<!ENTITY updatestartbrowser.label "launch browser after successful update.">
+<!ENTITY updatestartbrowser.label "Запустить браузер по окончании обновления.">
 <!ENTITY updatenotificationsenabled.label "Разрешить отображение страницы уведомлений при первом запуске или после обновления &brandShortName;.">
 <!ENTITY updatereleasenotesenabled.label "Разрешить отображение страницы 'Что нового' при первом запуске или после обновления &brandShortName;.">
 
