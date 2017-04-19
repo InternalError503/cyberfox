@@ -189,7 +189,7 @@
 				throw new Error("Were sorry but something has gone wrong with 'restartBrowser' " + e);
 			}
 		},
-		
+
 		// Clones current tab into new tab or window.
 		CloneCurrent: function (type, isprivate) {
 			try {
@@ -200,7 +200,7 @@
 				throw new Error("Were sorry but something has gone wrong with 'CloneCurrent' " + type + " " + e);
 			}
 		},
-		
+
 		// Copies current tab url to clipboard	
 		CopyCurrentTabUrl: function (uri) {
 			try {
@@ -215,7 +215,7 @@
 				throw new Error("Were sorry but something has gone wrong with 'CopyCurrentTabUrl' " + e);
 			}
 		},
-		
+
 		// Get all the tab urls into a json array.
 		getAllUrls: function () {
 			// We don't want to copy about uri's
@@ -234,7 +234,7 @@
 				}
 			}
 		},
-		
+
 		// Copies all tab urls to clipboard	
 		CopyAllTabUrls: function () {
 			//Get all urls
@@ -276,7 +276,7 @@
 				throw new Error("Were sorry but something has gone wrong with 'toggleState' " + e);
 			}
 		},
-		
+
 		// Always open about:config a new tab.
 		openAboutConfig: function () {
 			try {
@@ -285,7 +285,7 @@
 				throw new Error("Were sorry but something has gone wrong with 'openAboutConfig' " + e);
 			}
 		},
-		
+
 		// Download window style helper
 		toolsDownloads: function (tools) {
 			try {
@@ -306,7 +306,7 @@
 				throw new Error("Were sorry but something has gone wrong with 'toolsDownloads' " + e);
 			}
 		},
-		
+
 		// Version comparison
 		compareVersions: function (_Installed, _Required) {
 			try {
@@ -332,7 +332,7 @@
 				Cu.reportError(rv);
 			}
 		},
-		
+
 		// Version build comparison
 		compareBuildVersions: function (_Installed, _Required) {
 			try {
@@ -346,7 +346,7 @@
 				Cu.reportError(rv);
 			}
 		},
-		
+
 		getUpdates: function () {
 			try {
 				var appDir = Cc["@mozilla.org/file/directory_service;1"]
@@ -373,7 +373,7 @@
 					if (!Services.prefs.getBoolPref("app.update.verifysha")) {
 						args.push("--nosha");
 					}
-					if (!Services.prefs.getBoolPref("app.update.startbrowser")) { 
+					if (!Services.prefs.getBoolPref("app.update.startbrowser")) {
 						args.push("--nost");
 					}
 					process.run(false, args, args.length);
@@ -384,7 +384,7 @@
 				Cu.reportError(rv);
 			}
 		},
-			
+
 		// Update notification notify
 		updateNotification: function (version) {
 			if (version == null) version = "";
@@ -431,17 +431,15 @@
 					type: "",
 					isDefault: false,
 					callback: function () {
-							if (Services.prefs.getCharPref("app.update.channel.type") == "release"){
-								openUILinkIn(Services.prefs.getCharPref("app.releaseNotesURL").replace("%VERSION%", version), 'tab');
-							}else if (Services.prefs.getCharPref("app.update.channel.type") == "beta"){
-								console.log(Services.prefs.getCharPref("app.releaseNotesURL") + version);
-								openUILinkIn(Services.prefs.getCharPref("app.releaseNotesURL") + version, 'tab');
-							}
+						if (Services.prefs.getCharPref("app.update.channel.type") == "release") {
+							openUILinkIn(Services.prefs.getCharPref("app.releaseNotesURL").replace("%VERSION%", version), 'tab');
+						} else {
+							openUILinkIn(Services.prefs.getCharPref("app.releaseNotesURL") + "/tag/" + version, 'tab');
 						}
+					}
 				};
-				if (Services.prefs.getCharPref("app.update.channel.type") == "release"){
-					buttons.push(buttonViewNotes);
-				}
+
+				buttons.push(buttonViewNotes);
 				buttons.push(buttonDownload);
 
 				if (Services.prefs.getBoolPref("app.update.notification-new")) {
@@ -524,7 +522,11 @@
 										try {
 											// Set update available
 											Services.prefs.setBoolPref("app.update.available", true);
-											gCyberfoxCustom.updateNotification(currentVersion.toString());
+											if (Services.prefs.getCharPref("app.update.channel.type") == "release") {
+												gCyberfoxCustom.updateNotification(currentVersion.toString());
+											} else {
+												gCyberfoxCustom.updateNotification(AppConstants.MOZ_APP_VERSION_DISPLAY.toString());
+											}
 										} catch (e) {
 											// Prevents runtime error on platforms that don't implement nsIAlertsService
 										}
@@ -565,7 +567,7 @@
 			}
 		}
 	}
-	
+
 	window.addEventListener("load", function () {
 		gCyberfoxCustom.init();
 		Services.prefs.setBoolPref("app.update.available", false);
@@ -574,6 +576,6 @@
 			gCyberfoxCustom.startupUpdateCheck(true);
 		}, Services.prefs.getIntPref("app.update.startup-delay"));
 	}, false);
-	
+
 	global.gCyberfoxCustom = gCyberfoxCustom;
-} (this));
+}(this));
