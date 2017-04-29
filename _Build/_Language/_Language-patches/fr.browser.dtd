@@ -48,7 +48,7 @@
 <!ENTITY mixedContentBlocked.helplink "En apprendre davantage">
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label  "Nettoyer le cache mémoire">
-<!ENTITY turnOnCleanRam.label       "Activer la fonction « Nettoyer le cache mémoire ».">
+<!ENTITY turnOnCleanRam.label       "Activer la fonction « Nettoyer le cache mémoire »">
 <!-- End Purge RAM browser tweak -->
 
 <!-- Restart Browser Tweak -->
@@ -62,12 +62,12 @@
 
 <!ENTITY restartBrowser.label       "Redémarrer &brandShortName;">
 <!ENTITY restartBrowserButton.label "Redémarrer Cyberfox">
-<!ENTITY turnOnRestart.label        "Activer la fonction « Redémarrer &brandShortName; ».">
-<!ENTITY cleanFastRestartCache.label 	"Effacer le cache de redémarrage rapide au redémarrage du navigateur.">
+<!ENTITY turnOnRestart.label        "Activer la fonction « Redémarrer &brandShortName; »">
+<!ENTITY cleanFastRestartCache.label 	"Effacer le cache de redémarrage rapide au redémarrage du navigateur">
 <!ENTITY restartOptions.label 			"Options de redémarrage">
 <!ENTITY restart_paneluibtn.label 		"Ajouter le bouton au panneau de personnalisation">
-<!ENTITY restart_panelbtnsmall.label 	"Utiliser un petit bouton dans le panneau de personnalisation.">
-<!ENTITY restart_reqconfirmation.label 	"Confirmer le redémarrage.">
+<!ENTITY restart_panelbtnsmall.label 	"Utiliser un petit bouton dans le panneau de personnalisation">
+<!ENTITY restart_reqconfirmation.label 	"Confirmer le redémarrage">
 <!-- End Restart Browser Tweak -->
 
 <!ENTITY FeaturesTabLabel 			"Fonctions spécifiques">
@@ -75,7 +75,7 @@
 <!ENTITY menuFeaturesTab.label "Contexte et menus">
 
 <!-- Clone Current Tab Tweak -->
-<!ENTITY turnonclone.label          "Activer la fonction Dupliquer l’onglet ».">
+<!ENTITY turnonclone.label          "Activer la fonction Dupliquer l’onglet »">
 <!ENTITY cloneCurrentTab.label      "Dupliquer cet onglet">
 <!ENTITY cloneInNewWindow.label     "Le dupliquer dans une nouvelle fenêtre">
 <!ENTITY cloneInNewPrivate.label "Private">
@@ -84,13 +84,13 @@
 <!-- Features Tab Tweak -->
 <!ENTITY warnOnQuit.label         	"M’avertir avant de fermer la fenêtre">
 <!ENTITY newtabsoptions.label     	"Options des nouveaux onglets">
-<!ENTITY newtabenabled.label      	"Active la page de mosaïque pour les nouveaux onglets.">
-<!ENTITY newtabpreload.label      	"Active le préchargement des nouveaux onglets.">
-<!ENTITY newtabsearch.label 		"Activer le champ de recherche sur la page des nouveaux onglets (rafraîchir la page).">
+<!ENTITY newtabenabled.label      	"Active la page de mosaïque pour les nouveaux onglets">
+<!ENTITY newtabpreload.label      	"Active le préchargement des nouveaux onglets">
+<!ENTITY newtabsearch.label 		"Activer le champ de recherche sur la page des nouveaux onglets (rafraîchir la page)">
 <!ENTITY newtabpage.label         	"Page chargée :">
-<!ENTITY newtabthumbnail.label 		"Empêcher la capture des vignettes sur la page des nouveaux onglets.">
+<!ENTITY newtabthumbnail.label 		"Empêcher la capture des vignettes sur la page des nouveaux onglets">
 <!ENTITY aboutnewtab.pageTitle "About:NewTab">
-<!ENTITY incontent.label 			"Afficher les préférences dans un onglet.">
+<!ENTITY incontent.label 			"Afficher les préférences dans un onglet">
 <!-- End Features Tab Tweak -->
 
 <!-- Tabs Features -->
@@ -160,29 +160,29 @@
 <!-- Update check options -->
 <!ENTITY updateoptions.label "Options de mise à jour de &brandShortName;">
 <!ENTITY updateautocheck.label "Vérifier automatiquement les mises à jour dans « À propos de &brandShortName; »">
-<!ENTITY updatestartupcheck.label "Vérifier automatiquement les mises à jour au démarrage de &brandShortName;.">
-<!ENTITY updatecheckenabled.label "Permettre la vérification des mises à jour.">
-<!ENTITY updateverifysha.label "Enable SHA512 update verification.">
-<!ENTITY updatestartbrowser.label "launch browser after successful update.">
-<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
-<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
+<!ENTITY updatestartupcheck.label "Vérifier automatiquement les mises à jour au démarrage de &brandShortName;">
+<!ENTITY updatecheckenabled.label "Permettre la vérification des mises à jour">
+<!ENTITY updateverifysha.label "Enable SHA512 update verification">
+<!ENTITY updatestartbrowser.label "launch browser after successful update">
+<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update">
+<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Copier l’URL de l’onglet">
-<!ENTITY copyTabURLOptions.label "Ajouter Copier l’URL de l’onglet au menu contextuel.">
+<!ENTITY copyTabURLOptions.label "Ajouter Copier l’URL de l’onglet au menu contextuel">
 <!ENTITY copyAllTabUrls.label "Copier l’URL de tous les onglets">
-<!ENTITY copyAllTabUrlsOptions.label "Activer l’élément de menu  « Copier l’URL de tous les onglets ».">
+<!ENTITY copyAllTabUrlsOptions.label "Activer l’élément de menu  « Copier l’URL de tous les onglets »">
 
 <!-- Classic Context Menu Tweak -->
-<!ENTITY contextNavigationClassic.label "Utiliser le menu contextuel classique.">
+<!ENTITY contextNavigationClassic.label "Utiliser le menu contextuel classique">
 
 <!-- Email Link Context Menu Tweak -->
-<!ENTITY turnoffemaillink.label "Ajouter « Envoyer un lien par courriel » au menu contextuel.">
+<!ENTITY turnoffemaillink.label "Ajouter « Envoyer un lien par courriel » au menu contextuel">
 
 <!-- about:config Context Menu Tweak -->
-<!ENTITY turnoffcontextabout.label "Activer l’élément de menu contextuel about:config.">
+<!ENTITY turnoffcontextabout.label "Activer l’élément de menu contextuel about:config">
 <!-- about:config Menu Tweak -->
-<!ENTITY turnoffmenuabout.label "Activer l’élément de menu about:config.">
+<!ENTITY turnoffmenuabout.label "Activer l’élément de menu about:config">
 
 <!-- Language Settings Tweak -->
 <!ENTITY userLanguages.label "Select Language">
@@ -191,17 +191,17 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Browser Plugins">
-<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
-<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
-<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
-<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
-<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
+<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins)">
+<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist">
+<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin">
+<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin">
+<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "System Addons">
-<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
-<!ENTITY enablehellochat.label "Activer les conversations Hello.">
-<!ENTITY enablepocket.label "Enable pocket.">
+<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here">
+<!ENTITY enablehellochat.label "Activer les conversations Hello">
+<!ENTITY enablepocket.label "Enable pocket">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Redémarrage du navigateur nécessaire">

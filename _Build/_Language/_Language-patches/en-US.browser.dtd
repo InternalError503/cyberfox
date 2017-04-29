@@ -48,18 +48,18 @@
 <!ENTITY mixedContentBlocked.helplink "Learn more">
 <!-- Purge RAM browser tweak -->
 <!ENTITY minimizeMemoryCache.label "Clean Ram Cache">
-<!ENTITY turnOnCleanRam.label "Turn on clean ram cache menu item.">
+<!ENTITY turnOnCleanRam.label "Turn on clean ram cache menu item">
 <!-- End Purge RAM browser tweak -->
 
 <!-- Restart Browser Tweak -->
 <!ENTITY restartBrowser.label "Restart Browser">
 <!ENTITY restartBrowserButton.label "Restart Browser">
-<!ENTITY turnOnRestart.label "Turn on restart browser menu item.">
-<!ENTITY cleanFastRestartCache.label "Clear fast restart cache on browser restart.">
+<!ENTITY turnOnRestart.label "Turn on restart browser menu item">
+<!ENTITY cleanFastRestartCache.label "Clear fast restart cache on browser restart">
 <!ENTITY restartOptions.label "Restart Options">
 <!ENTITY restart_paneluibtn.label "Add button to PanelUI">
-<!ENTITY restart_panelbtnsmall.label "Use small button on panel UI.">
-<!ENTITY restart_reqconfirmation.label "Require restart confirmation.">
+<!ENTITY restart_panelbtnsmall.label "Use small button on panel UI">
+<!ENTITY restart_reqconfirmation.label "Require restart confirmation">
 <!-- End Restart Browser Tweak -->
 
 <!ENTITY FeaturesTabLabel "Features">
@@ -67,7 +67,7 @@
 <!ENTITY menuFeaturesTab.label "Context \ Menus">
 
 <!-- Clone Current Tab Tweak -->
-<!ENTITY turnonclone.label "Turn on clone tab feature.">
+<!ENTITY turnonclone.label "Turn on clone tab feature">
 <!ENTITY cloneCurrentTab.label "Clone Current Tab">
 <!ENTITY cloneInNewWindow.label "Clone In New Window">
 <!ENTITY cloneInNewPrivate.label "Private">
@@ -76,13 +76,13 @@
 <!-- Features Tab Tweak -->
 <!ENTITY warnOnQuit.label "Warn me when quitting window">
 <!ENTITY newtabsoptions.label "New tab options">
-<!ENTITY newtabenabled.label "Enable newtab page.">
-<!ENTITY newtabpreload.label "Enable preload newtab.">
+<!ENTITY newtabenabled.label "Enable newtab page">
+<!ENTITY newtabpreload.label "Enable preload newtab">
 <!ENTITY newtabsearch.label "Enable search bar on NewTab. (Reload Page)">
 <!ENTITY newtabpage.label "NewTab Page:">
-<!ENTITY newtabthumbnail.label "Disable thumbnail capturing on newtab page.">
+<!ENTITY newtabthumbnail.label "Disable thumbnail capturing on newtab page">
 <!ENTITY aboutnewtab.pageTitle "About:NewTab">
-<!ENTITY incontent.label "Show preferences in tab.">
+<!ENTITY incontent.label "Show preferences in tab">
 <!-- End Features Tab Tweak -->
 
 <!-- Tabs Features -->
@@ -153,29 +153,29 @@
 <!-- Update check options -->
 <!ENTITY updateoptions.label "&brandShortName; Update Options">
 <!ENTITY updateautocheck.label "Automatically check for updates in about &brandShortName;">
-<!ENTITY updatestartupcheck.label "Automatically check for updates when &brandShortName; starts.">
-<!ENTITY updatecheckenabled.label "Enable update check.">
-<!ENTITY updateverifysha.label "Enable SHA512 update verification.">
-<!ENTITY updatestartbrowser.label "launch browser after successful update.">
-<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
-<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
+<!ENTITY updatestartupcheck.label "Automatically check for updates when &brandShortName; starts">
+<!ENTITY updatecheckenabled.label "Enable update check">
+<!ENTITY updateverifysha.label "Enable SHA512 update verification">
+<!ENTITY updatestartbrowser.label "launch browser after successful update">
+<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update">
+<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Copy Tab URL">
-<!ENTITY copyTabURLOptions.label "Turn on copy tab url menu item.">
+<!ENTITY copyTabURLOptions.label "Turn on copy tab url menu item">
 <!ENTITY copyAllTabUrls.label "Copy All Tab URLS">
-<!ENTITY copyAllTabUrlsOptions.label "Turn on copy all tab urls menu item.">
+<!ENTITY copyAllTabUrlsOptions.label "Turn on copy all tab urls menu item">
 
 <!-- Classic Context Menu Tweak -->
-<!ENTITY contextNavigationClassic.label "Use classic context menu.">
+<!ENTITY contextNavigationClassic.label "Use classic context menu">
 
 <!-- Email Link Context Menu Tweak -->
-<!ENTITY turnoffemaillink.label "Turn on email link context menu item.">
+<!ENTITY turnoffemaillink.label "Turn on email link context menu item">
 
 <!-- about:config Context Menu Tweak -->
-<!ENTITY turnoffcontextabout.label "Turn on about:config context menu item.">
+<!ENTITY turnoffcontextabout.label "Turn on about:config context menu item">
 <!-- about:config Menu Tweak -->
-<!ENTITY turnoffmenuabout.label "Turn on about:config menu item.">
+<!ENTITY turnoffmenuabout.label "Turn on about:config menu item">
 
 <!-- Language Settings Tweak -->
 <!ENTITY userLanguages.label "Select Language">
@@ -183,17 +183,17 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Browser Plugins">
-<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
-<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist.">
-<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
-<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin.">
-<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
+<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins)">
+<!ENTITY browserpluginswhitelist.label "Enable plugin whitelist">
+<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin">
+<!ENTITY browserpluginsjavaenabled.label "Enable java browser plugin">
+<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "System Addons">
-<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here.">
-<!ENTITY enablehellochat.label "Enable hello chat.">
-<!ENTITY enablepocket.label "Enable pocket.">
+<!ENTITY systemaddonsmsg.label "If these system addons are installed you can toggle them here">
+<!ENTITY enablehellochat.label "Enable hello chat">
+<!ENTITY enablepocket.label "Enable pocket">
 
 <!-- Helpful ToolTips -->
 <!ENTITY restartRequiredMSG.label "Browser Restart Required">

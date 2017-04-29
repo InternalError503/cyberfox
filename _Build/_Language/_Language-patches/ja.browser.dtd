@@ -115,12 +115,12 @@
 <!-- Disable Javascript & Block Images Feature Dont Remove -->
 <!ENTITY  loadImages.label            "画像を自動的に読み込む">
 <!ENTITY  loadImages.accesskey        "I">
-<!ENTITY  exceptions.label            "例外サイト...">
+<!ENTITY  exceptions.label            "例外サイト..">
 <!ENTITY  exceptions.accesskey        "x">
 
 <!ENTITY  enableJavaScript.label      "JavaScript を有効にする">
 <!ENTITY  enableJavaScript.accesskey  "J">
-<!ENTITY  advancedJS.label            "詳細設定...">
+<!ENTITY  advancedJS.label            "詳細設定..">
 <!ENTITY  advancedJS.accesskey        "v">
 
 <!ENTITY  enableJava.label            "Java を有効にする">
@@ -155,10 +155,10 @@
 <!ENTITY updateautocheck.label "&brandShortName; についての更新を自動的に確認する">
 <!ENTITY updatestartupcheck.label "&brandShortName; の起動時に更新を自動的に確認する">
 <!ENTITY updatecheckenabled.label "更新の確認を有効にする">
-<!ENTITY updateverifysha.label "Enable SHA512 update verification.">
-<!ENTITY updatestartbrowser.label "launch browser after successful update.">
-<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update.">
-<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update.">
+<!ENTITY updateverifysha.label "Enable SHA512 update verification">
+<!ENTITY updatestartbrowser.label "launch browser after successful update">
+<!ENTITY updatenotificationsenabled.label "Enable notifications page on first run or after &brandShortName; update">
+<!ENTITY updatereleasenotesenabled.label "Enable release notes page on first run or after &brandShortName; update">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "タブの URL をコピー">
@@ -183,11 +183,11 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "ブラウザ プラグイン">
-<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins).">
+<!ENTITY browserpluginsdisabled.label "Disable browser plugins (Disable all plugins)">
 <!ENTITY browserpluginswhitelist.label "プラグインのホワイトリストを有効にする">
-<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin.">
+<!ENTITY browserpluginsflashenabled.label "Enable flash browser plugin">
 <!ENTITY browserpluginsjavaenabled.label "Java ブラウザ プラグインを有効にする">
-<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin.">
+<!ENTITY browserpluginssilverlightenabled.label "Enable silverlight browser plugin">
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "システム アドオン">

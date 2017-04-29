@@ -155,10 +155,10 @@
 <!ENTITY updateautocheck.label "Automatycznie sprawdzaj aktualizacje w 'o programie &brandShortName;' ">
 <!ENTITY updatestartupcheck.label "Automatycznie sprawdzaj aktualizacje, gdy &brandShortName; startuje">
 <!ENTITY updatecheckenabled.label "Włącz sprawdzanie aktualizacji">
-<!ENTITY updateverifysha.label "Włącz weryfikację aktualizacji poprzez sprawdzanie SHA512.">
-<!ENTITY updatestartbrowser.label "Uruchom przeglądarkę po ukończonej aktualizacji.">
-<!ENTITY updatenotificationsenabled.label "Włącz stronę z powiadomieniami przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;.">
-<!ENTITY updatereleasenotesenabled.label "Włącz stronę z listą zmian przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;.">
+<!ENTITY updateverifysha.label "Włącz weryfikację aktualizacji poprzez sprawdzanie SHA512">
+<!ENTITY updatestartbrowser.label "Uruchom przeglądarkę po ukończonej aktualizacji">
+<!ENTITY updatenotificationsenabled.label "Włącz stronę z powiadomieniami przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;">
+<!ENTITY updatereleasenotesenabled.label "Włącz stronę z listą zmian przy pierwszym uruchomieniu lub po aktualizacji &brandShortName;">
 
 <!-- Copy tab URL Tweak -->
 <!ENTITY copyTabURL.label "Kopiuj adres karty">
@@ -183,7 +183,7 @@
 <!ENTITY browserpluginswhitelist.label "Włącz białą listę wtyczek">
 <!ENTITY browserpluginsflashenabled.label "Włącz wtyczkę Flash">
 <!ENTITY browserpluginsjavaenabled.label "Włącz wtyczkę Java">
-<!ENTITY browserpluginssilverlightenabled.label "Włącz wtyczkę Silverlight.">
+<!ENTITY browserpluginssilverlightenabled.label "Włącz wtyczkę Silverlight">
 
 <!-- Language Settings Tweak -->
 <!ENTITY userLanguages.label "Wybierz język">
@@ -191,7 +191,7 @@
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Systemowe dodatki">
-<!ENTITY systemaddonsmsg.label "Jeśli zainstalowane są te dodatki systemowe, to możesz je tutaj przełączać.">
+<!ENTITY systemaddonsmsg.label "Jeśli zainstalowane są te dodatki systemowe, to możesz je tutaj przełączać">
 <!ENTITY enablehellochat.label "Włącz czat Hello">
 <!ENTITY enablepocket.label "Włącz Pocket">
 
