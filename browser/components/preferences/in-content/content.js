@@ -355,6 +355,7 @@ var gContentPane = {
   updateDefaultLocale: function ()
   {
 	  document.getElementById("languageMenu").value = Services.prefs.getCharPref('general.useragent.locale');
+      Services.prefs.setBoolPref('intl.locale.matchOS', false);
   },
   setDefaultLocale: function ()
   {	  
