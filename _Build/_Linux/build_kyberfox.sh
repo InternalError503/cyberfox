@@ -1,6 +1,7 @@
-# Cyberfox quick build script
-# Version: 2.9
-# Release, Beta channels linux
+# Cyberfox KDE Plasma Edition quick build script
+# Version: 1
+# Release, Beta channels Linux
+# This is only for Cyberfox 52. For Cyberfox 53+ something should be changed...
 
 #!/bin/bash
 
@@ -107,32 +108,37 @@ function GenerateBuildInfo(){
 	fi
 }
 
-# Apply unity patch to locally downloaded repository.
-function ApplyUnity(){
+# Apply KDE Plasma patch to locally downloaded repository.
+function ApplyKDE(){
 
-	# Download pacth if not exist
-	if [ ! -f "$WORKDIR/unity-menubar-$1.patch" ]; then
-		# Check url mext release for changes.	
-		if [ "$2" == "Release" ]; then	
-			wget -O $WORKDIR/unity-menubar-$1.patch 'https://bazaar.launchpad.net/~mozillateam/firefox/firefox.trusty/download/head:/unitymenubar.patch-20130215095938-1n6mqqau8tdfqwhg-1/unity-menubar.patch'
-		elif [ "$2" == "Beta" ]; then
-			wget -O $WORKDIR/unity-menubar-$1.patch 'https://bazaar.launchpad.net/~mozillateam/firefox/firefox-beta.trusty/download/head:/unitymenubar.patch-20130215095938-1n6mqqau8tdfqwhg-1/unity-menubar.patch'
-		fi
+	# Download patch if not exist and replace some words
+	if [ ! -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch" ]; then
+		# Check url next release for changes.	
+			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/firefox52/mozilla-kde.patch'
+			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/firefox52/firefox-kde.patch'
+			sed -i 's/Firefox/Cyberfox/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's/KMOZILLAHELPER/KYBERFOXHELPER/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's|/usr/lib/mozilla/kmozillahelper|./kyberfoxhelper|g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's/kmozillahelper/kyberfoxhelper/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's/firefox/cyberfox/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch
 	fi
 
-	# Apply patch if exists
-    if [ -f "$WORKDIR/unity-menubar-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/unitylock" ]; then		
-        git apply $WORKDIR/unity-menubar-$1.patch
+	# Apply patches if exists
+    if [  -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch" ] && [  -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/KDE_lock" ]; then
         cd $WORKDIR/$LDIR
-        patch -Np1 -i $WORKDIR/cyberfox/_Build/_Linux/all/fix-wifi-scanner.diff
-				echo >> "$WORKDIR/$LDIR/unitylock"
+        patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+        patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch
+        patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/fix_kde_jar.mn.patch
+        patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/fix_browser_kde.xul.patch
+        patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/pgo_fix_missing_kdejs.patch
+        patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/all/fix-wifi-scanner.diff
+				echo >> "$WORKDIR/$LDIR/KDE_lock"
         changeDirectory $WORKDIR
         setPerms $LDIR
     else
-        echo "Unable to find '$WORKDIR/unity-menubar-$1.patch' unity patch! or patch has already been applied!"
+        echo "Unable to find KDE patches or patches has already been applied!"
     fi; 
 }
-
 
 # Set working directory default is ~/Documents
 WORKDIR=~/Documents
@@ -140,11 +146,12 @@ WORKDIR=~/Documents
 # Set repository url.
 # Set identity.
 # Set local repository directory name.
-# Set Unity patch bool.
+# Set KDE patch bool.
 GITURI=""
 IDENTITY=""
 LDIR=""
 VERSION=""
+VERSION_HELPER=""
 BUILTLOCALES=false
 
   echo "What package do you wish to build?"
@@ -228,9 +235,9 @@ if [ -z "$VERSION" ] || [ ! -n "$VERSION" ]; then
     VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)
 fi
 
-# Set unity patch
-echo "Applying unity patch"
-ApplyUnity $VERSION $IDENTITY
+# Set KDE Plasma patches
+echo "Applying KDE patches"
+ApplyKDE $VERSION $IDENTITY
 
 echo "Do you wish to build $LDIR now?"
 select yn in "Yes" "No" "Quit"; do
@@ -302,6 +309,27 @@ select yn in "Yes" "No" "Quit"; do
 		echo "Generating language packs for beta"
 		"$WORKDIR/$LDIR/_Build/_Linux/language.sh" $(<$WORKDIR/$LDIR/browser/config/version.txt)
 	fi;
+	
+    # Get kyberfoxhelper version
+    if [ ! -d "$WORKDIR/tmp/version/latest_version.txt" ]; then 
+    mkdir -p $WORKDIR/tmp/version
+    wget -O $WORKDIR/tmp/version/latest_version.txt 'https://github.com/hawkeye116477/kyberfoxhelper/raw/master/latest_version.txt'
+    fi
+    
+    if [ -f "$WORKDIR/tmp/version/latest_version.txt" ]; then
+    VERSION_HELPER=$(<$WORKDIR/tmp/version/latest_version.txt)
+else
+    echo "Unable to get current helper version!"
+    exit 1    
+fi
+
+	# Include kyberfoxhelper
+	wget -O $WORKDIR/obj64/dist/bin/kyberfoxhelper 'https://github.com/hawkeye116477/kyberfoxhelper/releases/download/v${VERSION_HELPER}/kyberfoxhelper'
+	rm -rf $WORKDIR/tmp/
+	
+	# Include kde.js
+	cp -R $WORKDIR/$LDIR/_Build/_Linux/KDE/kde.js $WORKDIR/obj64/dist/bin/defaults/pref/
+	
 
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
 	    	changeDirectory "$WORKDIR/$LDIR"
@@ -311,6 +339,9 @@ select yn in "Yes" "No" "Quit"; do
 	if [ -f "$Dir/README.txt" ]; then
     		cp -r $Dir/README.txt $WORKDIR/obj64/dist/
 	fi
+	
+	# Include LICENSE-kyberfoxhelper
+	wget -O $WORKDIR/obj64/dist/LICENSE-kyberfoxhelper 'https://raw.githubusercontent.com/hawkeye116477/kyberfoxhelper/master/LICENSE'
 
 	# Include voucher.bin
 	if [ -f "$Dir/voucher.bin" ]; then
@@ -319,10 +350,11 @@ select yn in "Yes" "No" "Quit"; do
 			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/Cyberfox/
 	fi
 
+
 	  changeDirectory "$WORKDIR/obj64/dist"
            
 	  # Get the current filename with browser version!
-	  FILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
+	  FILENAME=$(basename Cyberfox_KDE_Plasma_Edition-*.en-US.linux-x86_64.tar.bz2)
 	  
 	    if [ -f "$FILENAME" ]; then
 	      echo "Packaging: Found $FILENAME removing file!"
@@ -344,21 +376,9 @@ select yn in "Yes" "No" "Quit"; do
 
 	  if [ "$IDENTITY" == "Beta" ]; then
 	    echo "Packaging: Renaming beta package!"	
-	  	mv $FILENAME "Cyberfox-$VERSION.en-US.linux-x86_64.beta.tar.bz2";
+	  	mv $FILENAME "Cyberfox_KDE_Plasma_Edition-$VERSION.en-US.linux-x86_64.beta.tar.bz2";
 
-		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then
-		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI;
 
-				# Get the current deb filename with browser version to rename it!
-	  			DEBFILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.deb)
-				mv $DEBFILENAME "Cyberfox-$VERSION.en-US.linux-x86_64.beta.deb";
-		  fi
-
-	  else
-
-		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then
-		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI;
-		  fi 
 
 	  fi
 
