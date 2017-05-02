@@ -1,6 +1,4 @@
-usr
-vendor-gre.js /usr/lib/Cyberfox/defaults/pref
-vendor-cyberfox.js /usr/lib/Cyberfox/browser/defaults/preferences
-Cyberfox.sh /usr/lib/Cyberfox
-Cyberfox.png /usr/share/pixmaps
-cyberfox /usr/bin
+Cyberfox /usr/lib
+debian/vendor-gre.js /usr/lib/Cyberfox/defaults/pref
+debian/Cyberfox.sh /usr/lib/Cyberfox
+debian/cyberfox.desktop /usr/share/applications

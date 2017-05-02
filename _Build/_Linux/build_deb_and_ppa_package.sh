@@ -1,7 +1,7 @@
 #!/bin/bash
 # Built from template by hawkeye116477
 # Full repo https://github.com/hawkeye116477/cyberfox-deb
-# Script Version: 1.1
+# Script Version: 1.2
 # Set current directory to script directory.
 Dir=$(cd "$(dirname "$0")" && pwd)
 cd $Dir
@@ -38,20 +38,8 @@ fi
 if [ ! -d "$Dir/deb_ppa" ]; then 
     mkdir $Dir/deb_ppa
     mkdir $Dir/deb_ppa/cyberfox-$VERSION
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/debian 
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr/lib
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr/lib/Cyberfox
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr/share
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr/share/applications
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr/share/lintian
-    mkdir $Dir/deb_ppa/cyberfox-$VERSION/usr/share/lintian/overrides
-    # Create folder where put locales.xpi
-    if [ "$IDENTITY" == "Release" ]; then
-        mkdir $Dir/deb_ppa/cyberfox-$VERSION/locales
-    fi    
-fi
-
+	mkdir $Dir/deb_ppa/cyberfox-$VERSION/debian
+  
 
 # Set current directory to directory of package.
 cd $Dir/deb_ppa/cyberfox-$VERSION
@@ -95,56 +83,41 @@ else
 fi
 
 
-# Copy template for copyright
-if [ -f "$Dir/deb_and_ppa_templates/copyright" ]; then
-    cp $Dir/deb_and_ppa_templates/copyright $Dir/deb_ppa/cyberfox-$VERSION/debian
-else
-    echo "Unable to locate copyright template!"
-    exit 1 
-fi
-
 # Copy latest build
 if [ -d "../../../../../obj64/dist/Cyberfox" ]; then
-    cp -r ../../../../../obj64/dist/Cyberfox/* $Dir/deb_ppa/cyberfox-$VERSION/usr/lib/Cyberfox
-	cp $Dir/deb_and_ppa_templates/cyberfox.desktop $Dir/deb_ppa/cyberfox-$VERSION/usr/share/applications
-	cp $Dir/deb_and_ppa_templates/Cyberfox $Dir/deb_ppa/cyberfox-$VERSION/usr/share/lintian/overrides
-    cp $Dir/deb_and_ppa_templates/Cyberfox.sh $Dir/deb_ppa/cyberfox-$VERSION
-	cp $Dir/deb_and_ppa_templates/vendor-gre.js $Dir/deb_ppa/cyberfox-$VERSION
-	cp $Dir/deb_and_ppa_templates/vendor-cyberfox.js $Dir/deb_ppa/cyberfox-$VERSION
+    cp -r ../../../../../obj64/dist/Cyberfox/* $Dir/deb_ppa/cyberfox-$VERSION/Cyberfox
+	mv $Dir/deb_ppa/cyberfox-$VERSION/Cyberfox/browser/features $Dir/deb_ppa/cyberfox-$VERSION
 else
     echo "Unable to Cyberfox package files, Please check the build was created and packaged successfully!"
     exit 1     
 fi
 
-# Copy language packs. Copy .xpi to $Dir/deb_ppa/cyberfox-$VERSION/locales. Need to add commands here.
-if [ ! "$IDENTITY" == "Release" ]; then
-    # ToDo: Pull latest applicable language packs when release package, Don't package for beta.
-    rm -f $Dir/deb_ppa/cyberfox-$VERSION/debian/cyberfox-locale-pl.install
+#This is probably needed if beta won't have languagepacks. If language packs will be with every beta, this is not needed.
+mkdir $Dir/deb_ppa/cyberfox-$VERSION/Cyberfox/browser/features
+mv $Dir/deb_ppa/cyberfox-$VERSION/langpack-*@8pecxstudios.com.xpi $Dir/deb_ppa/cyberfox-$VERSION/Cyberfox/browser/features
 fi
 
 # Make sure correct permissions are set
-chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/control
 chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/cyberfox.prerm
 chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/cyberfox.postinst
-chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/copyright
 chmod  755 $Dir/deb_ppa/cyberfox-$VERSION/debian/rules
+chmod 755 $Dir/deb_ppa/cyberfox-$VERSION/debian/Cyberfox.sh
 
-# Make symlinks
-ln -s /usr/lib/Cyberfox/Cyberfox.sh $Dir/deb_ppa/cyberfox-$VERSION/cyberfox
-ln -s /usr/lib/Cyberfox/browser/icons/mozicon128.png $Dir/deb_ppa/cyberfox-$VERSION/Cyberfox.png
+
 
 # Linux has hunspell dictionaries, so we can remove Cyberfox dictionaries and make symlink to Linux dictionaries. 
 # Thanks to this, we don't have to download dictionary from AMO for our language.
-rm -rf $Dir/deb_ppa/cyberfox-$VERSION/usr/lib/Cyberfox/dictionaries
-ln -s /usr/share/hunspell $Dir/deb_ppa/cyberfox-$VERSION/usr/lib/Cyberfox/dictionaries
+# Symlinks are now in cyberfox.links file, so this fixes "Unsafe symlink" message.
+rm -rf $Dir/deb_ppa/cyberfox-$VERSION/Cyberfox/dictionaries
 
 # Build .deb package (Requires devscripts to be installed sudo apt install devscripts)
 notify-send "Building deb package!"
 debuild -us -uc #throws error
-if [ -f "$Dir/deb_ppa/cyberfox_$VERSION_amd64.deb" ]; then
-    cp $Dir/deb_ppa/cyberfox_$VERSION_amd64.deb ../../../obj64/dist/Cyberfox-$VERSION.en-US.linux-x86_64.deb
+if [ -f "$Dir/deb_ppa/cyberfox_*_amd64.deb" ]; then
+	mkdir $Dir/debs
+    mv $Dir/deb_ppa/*.deb $Dir/debs
 else
-    echo "Unable to move $Dir/deb_ppa/cyberfox_$VERSION_amd64.deb the file maybe missing or had errors during creation!"
+    echo "Unable to move deb packages, files maybe missing or had errors during creation!"
     exit 1
 fi
 

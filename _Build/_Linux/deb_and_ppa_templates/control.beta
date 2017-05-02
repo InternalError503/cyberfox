@@ -17,9 +17,24 @@ Recommends: libcanberra0,
 	libdbusmenu-gtk4
 Provides: www-browser,
 	gnome-www-browser,
-Suggests: fonts-lyx,
-Description: Fast, stable & reliable x64-bit web browser
- Cyberfox is designed by 8pecxstudios, 
- Taking over where Mozilla left off, 
- Working to make a fast, stable & reliable x64-bit web browser accessible to all.
+Suggests: fonts-lyx, cyberfox-ext-cyberctr, cyberfox-ext-pocket
+Description: Fast, stable & reliable 64-bit web browser
+ Cyberfox is designed by 8pecxstudios, taking over where Mozilla left off, working to make a fast, stable & reliable 64-bit web browser accessible to all.
+ .
  Cyberfox is powered by Mozilla Firefox source code.
+ .
+ Note: Pocket and CyberCTR are available as separate packages to install.
+
+Package: cyberfox-ext-cyberctr
+Architecture: amd64
+Depends: ${misc:Depends}, cyberfox
+Description: Heavily (modified) version of 'Classic Theme Restorer' by Aris
+ CyberCTR has all the feature CTR has and many additional for Cyberfox Web Browser.
+
+Package: cyberfox-ext-pocket
+Architecture: amd64
+Depends: ${misc:Depends}, cyberfox
+Description: Pocket integration for Cyberfox Web Browser
+ The Pocket for Cyberfox button lets you save web pages and videos to Pocket in just one click.
+ Pocket strips away clutter and saves the page in a clean, distraction-free view and lets you access them on the go through the Pocket app.
+ All you need is a free account, an Internet connection and the Pocket button.

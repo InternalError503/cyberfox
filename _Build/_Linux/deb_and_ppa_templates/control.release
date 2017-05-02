@@ -3,7 +3,7 @@ Section: web
 Priority: optional
 Maintainer: 8pecxstudios <support@8pecxstudios.com>
 Uploaders: hawkeye116477 <hawkeye116477@gmail.com>
-Build-Depends:debhelper (>= 7),
+Build-Depends:debhelper (>= 9),
 Standards-Version: 3.9.7
 Homepage: https://cyberfox.8pecxstudios.com/
 
@@ -17,513 +17,486 @@ Recommends: libcanberra0,
 	libdbusmenu-gtk4
 Provides: www-browser,
 	gnome-www-browser,
-Suggests: fonts-lyx,
-Description: Fast, stable & reliable x64-bit web browser
- Cyberfox is designed by 8pecxstudios, 
- Taking over where Mozilla left off, 
- Working to make a fast, stable & reliable x64-bit web browser accessible to all.
+Suggests: fonts-lyx, cyberfox-ext-cyberctr, cyberfox-ext-pocket
+Description: Fast, stable & reliable 64-bit web browser
+ Cyberfox is designed by 8pecxstudios, taking over where Mozilla left off, working to make a fast, stable & reliable 64-bit web browser accessible to all.
+ .
  Cyberfox is powered by Mozilla Firefox source code.
+ .
+ Note: Pocket, CyberCTR and language packs are available as separate packages to install.
+
+Package: cyberfox-ext-cyberctr
+Architecture: amd64
+Depends: ${misc:Depends}, cyberfox
+Description: Heavily (modified) version of 'Classic Theme Restorer' by Aris
+ CyberCTR has all the feature CTR has and many additional for Cyberfox Web Browser.
+
+Package: cyberfox-ext-pocket
+Architecture: amd64
+Depends: ${misc:Depends}, cyberfox
+Description: Pocket integration for Cyberfox Web Browser
+ The Pocket for Cyberfox button lets you save web pages and videos to Pocket in just one click.
+ Pocket strips away clutter and saves the page in a clean, distraction-free view and lets you access them on the go through the Pocket app.
+ All you need is a free account, an Internet connection and the Pocket button.
 
 Package: cyberfox-locale-af
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Afrikaans language pack for Cyberfox
  This package contains Afrikaans translations for Cyberfox
 
 Package: cyberfox-locale-an
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Aragonese language pack for Cyberfox
  This package contains Aragonese translations for Cyberfox
 
 Package: cyberfox-locale-ar
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Arabic language pack for Cyberfox
  This package contains Arabic translations for Cyberfox
 
 Package: cyberfox-locale-as
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Assamese language pack for Cyberfox
  This package contains Assamese translations for Cyberfox
 
 Package: cyberfox-locale-ast
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Asturian language pack for Cyberfox
  This package contains Asturian translations for Cyberfox
 
 Package: cyberfox-locale-az
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Azerbaijani language pack for Cyberfox
  This package contains Azerbaijani translations for Cyberfox
 
-Package: cyberfox-locale-be
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: Belarusian language pack for Cyberfox
- This package contains Belarusian translations for Cyberfox
-
 Package: cyberfox-locale-bg
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Bulgarian language pack for Cyberfox
  This package contains Bulgarian translations for Cyberfox
 
-Package: cyberfox-locale-bn-bd
+Package: cyberfox-locale-bn
 Architecture: amd64
-Depends: ${misc:Depends}
-Description: Bengali (Bangladesh) language pack for Cyberfox
- This package contains Bengali (Bangladesh) translations for Cyberfox
- 
-Package: cyberfox-locale-bn-in
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: Bengali (India) language pack for Cyberfox
- This package contains Bengali (India) translations for Cyberfox
+Depends: ${misc:Depends}, cyberfox
+Description: Bengali language pack for Cyberfox
+ This package contains Bengali translations for Cyberfox
 
 Package: cyberfox-locale-br
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Breton language pack for Cyberfox
  This package contains Breton translations for Cyberfox
 
 Package: cyberfox-locale-bs
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Bosnian language pack for Cyberfox
  This package contains Bosnian translations for Cyberfox
 
 Package: cyberfox-locale-ca
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Catalan; Valencian language pack for Cyberfox
  This package contains Catalan; Valencian translations for Cyberfox
 
 Package: cyberfox-locale-cak
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Kaqchikel language pack for Cyberfox
  This package contains Kaqchikel translations for Cyberfox
 
 Package: cyberfox-locale-cs
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Czech language pack for Cyberfox
  This package contains Czech translations for Cyberfox
 
 Package: cyberfox-locale-cy
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Welsh language pack for Cyberfox
  This package contains Welsh translations for Cyberfox
 
 Package: cyberfox-locale-da
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Danish language pack for Cyberfox
  This package contains Danish translations for Cyberfox
 
 Package: cyberfox-locale-de
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: German language pack for Cyberfox
  This package contains German translations for Cyberfox
 
 Package: cyberfox-locale-el
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Greek language pack for Cyberfox
  This package contains Greek translations for Cyberfox
 
-Package: cyberfox-locale-en-gb
+Package: cyberfox-locale-en
 Architecture: amd64
-Depends: ${misc:Depends}
-Description: English (GB) language pack for Cyberfox
- This package contains English (Great Britain) translations for Cyberfox
- 
-Package: cyberfox-locale-en-za
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: English (South Africa) language pack for Cyberfox
- This package contains English (South Africa) translations for Cyberfox
+Depends: ${misc:Depends}, cyberfox
+Description: English language pack for Cyberfox
+ This package contains English translations for Cyberfox
 
 Package: cyberfox-locale-eo
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Esperanto language pack for Cyberfox
  This package contains Esperanto translations for Cyberfox
 
-Package: cyberfox-locale-es-ar
+Package: cyberfox-locale-es
 Architecture: amd64
-Depends: ${misc:Depends}
-Description: Spanish (Argentina) language pack for Cyberfox
- This package contains Spanish (Argentina) translations for Cyberfox
-
-Package: cyberfox-locale-es-cl
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: Spanish (Chile) language pack for Cyberfox
- This package contains Spanish (Chile) translations for Cyberfox
-
-Package: cyberfox-locale-es-es
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: Spanish (Spain) language pack for Cyberfox
- This package contains Spanish (Spain) translations for Cyberfox
- 
-Package: cyberfox-locale-es-mx
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: Spanish (Mexico) language pack for Cyberfox
- This package contains Spanish (Mexico) translations for Cyberfox
+Depends: ${misc:Depends}, cyberfox
+Description: Spanish; Castilian language pack for Cyberfox
+ This package contains Spanish; Castilian translations for Cyberfox
 
 Package: cyberfox-locale-et
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Estonian language pack for Cyberfox
  This package contains Estonian translations for Cyberfox
 
 Package: cyberfox-locale-eu
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Basque language pack for Cyberfox
  This package contains Basque translations for Cyberfox
 
 Package: cyberfox-locale-fa
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Persian language pack for Cyberfox
  This package contains Persian translations for Cyberfox
 
 Package: cyberfox-locale-fi
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Finnish language pack for Cyberfox
  This package contains Finnish translations for Cyberfox
 
 Package: cyberfox-locale-fr
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: French language pack for Cyberfox
  This package contains French translations for Cyberfox
 
-Package: cyberfox-locale-fy-nl
+Package: cyberfox-locale-fy
 Architecture: amd64
-Depends: ${misc:Depends}
-Description: Frisian (Netherlands) language pack for Cyberfox
- This package contains Frisian (Netherlands) translations for Cyberfox
+Depends: ${misc:Depends}, cyberfox
+Description: Western Frisian language pack for Cyberfox
+ This package contains Western Frisian translations for Cyberfox
 
-Package: cyberfox-locale-ga-ie
+Package: cyberfox-locale-ga
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Irish (Ireland) language pack for Cyberfox
  This package contains Irish (Ireland) translations for Cyberfox
 
 Package: cyberfox-locale-gd
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Gaelic; Scottish Gaelic language pack for Cyberfox
  This package contains Gaelic; Scottish Gaelic translations for Cyberfox
 
 Package: cyberfox-locale-gl
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Galician language pack for Cyberfox
  This package contains Galician translations for Cyberfox
 
 Package: cyberfox-locale-gn
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Guarani language pack for Cyberfox
  This package contains Guarani translations for Cyberfox
 
-Package: cyberfox-locale-gu-in
+Package: cyberfox-locale-gu
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Gujarati (India) language pack for Cyberfox
  This package contains Gujarati (India) translations for Cyberfox
 
 Package: cyberfox-locale-he
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Hebrew language pack for Cyberfox
  This package contains Hebrew translations for Cyberfox
 
-Package: cyberfox-locale-hi-in
+Package: cyberfox-locale-hi
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Hindi (India) language pack for Cyberfox
  This package contains Hindi (India) translations for Cyberfox
 
 Package: cyberfox-locale-hr
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Croatian language pack for Cyberfox
  This package contains Croatian translations for Cyberfox
 
 Package: cyberfox-locale-hsb
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Sorbian, Upper language pack for Cyberfox
  This package contains Sorbian, Upper translations for Cyberfox
 
 Package: cyberfox-locale-hu
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Hungarian language pack for Cyberfox
  This package contains Hungarian translations for Cyberfox
 
-Package: cyberfox-locale-hy-am
+Package: cyberfox-locale-hy
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Armenian (Armenia) language pack for Cyberfox
  This package contains Armenian (Armenia) translations for Cyberfox
 
 Package: cyberfox-locale-id
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Indonesian language pack for Cyberfox
  This package contains Indonesian translations for Cyberfox
 
 Package: cyberfox-locale-is
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Icelandic language pack for Cyberfox
  This package contains Icelandic translations for Cyberfox
 
 Package: cyberfox-locale-it
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Italian language pack for Cyberfox
  This package contains Italian translations for Cyberfox
 
 Package: cyberfox-locale-ja
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Japanese language pack for Cyberfox
  This package contains Japanese translations for Cyberfox
 
 Package: cyberfox-locale-kk
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Kazakh language pack for Cyberfox
  This package contains Kazakh translations for Cyberfox
 
 Package: cyberfox-locale-km
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Central Khmer language pack for Cyberfox
  This package contains Central Khmer translations for Cyberfox
 
 Package: cyberfox-locale-kn
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Kannada language pack for Cyberfox
  This package contains Kannada translations for Cyberfox
 
 Package: cyberfox-locale-ko
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Korean language pack for Cyberfox
  This package contains Korean translations for Cyberfox
 
 Package: cyberfox-locale-lt
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Lithuanian language pack for Cyberfox
  This package contains Lithuanian translations for Cyberfox
 
 Package: cyberfox-locale-lv
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Latvian language pack for Cyberfox
  This package contains Latvian translations for Cyberfox
 
 Package: cyberfox-locale-mai
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Maithili language pack for Cyberfox
  This package contains Maithili translations for Cyberfox
 
 Package: cyberfox-locale-mk
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Macedonian language pack for Cyberfox
  This package contains Macedonian translations for Cyberfox
 
 Package: cyberfox-locale-ml
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Malayalam language pack for Cyberfox
  This package contains Malayalam translations for Cyberfox
 
 Package: cyberfox-locale-mr
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Marathi language pack for Cyberfox
  This package contains Marathi translations for Cyberfox
 
 Package: cyberfox-locale-ms
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Malay language pack for Cyberfox
  This package contains Malay translations for Cyberfox
 
-Package: cyberfox-locale-nb-no
+Package: cyberfox-locale-nb
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Bokmål, Norwegian; Norwegian Bokmål language pack for Cyberfox
  This package contains Bokmål, Norwegian; Norwegian Bokmål translations for Cyberfox
 
 Package: cyberfox-locale-nl
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Dutch; Flemish language pack for Cyberfox
  This package contains Dutch; Flemish translations for Cyberfox
 
-Package: cyberfox-locale-nn-no
+Package: cyberfox-locale-nn
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Norwegian Nynorsk; Nynorsk, Norwegian language pack for Cyberfox
  This package contains Norwegian Nynorsk; Nynorsk, Norwegian translations for Cyberfox
 
 Package: cyberfox-locale-or
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Oriya language pack for Cyberfox
  This package contains Oriya translations for Cyberfox
 
-Package: cyberfox-locale-pa-in
+Package: cyberfox-locale-pa
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Panjabi; Punjabi (India) language pack for Cyberfox
  This package contains Panjabi; Punjabi (India) translations for Cyberfox
 
 Package: cyberfox-locale-pl
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Polish language pack for Cyberfox
  This package contains Polish translations for Cyberfox
 
-Package: cyberfox-locale-pt-br
+Package: cyberfox-locale-pt
 Architecture: amd64
-Depends: ${misc:Depends}
-Description: Portuguese (Brasil) language pack for Cyberfox
- This package contains Portuguese (Brasil) translations for Cyberfox
- 
-Package: cyberfox-locale-pt-pt
-Architecture: amd64
-Depends: ${misc:Depends}
-Description: Portuguese (Portugal) language pack for Cyberfox
- This package contains Portuguese (Portugal) translations for Cyberfox
+Depends: ${misc:Depends}, cyberfox
+Description: Portuguese language pack for Cyberfox
+ This package contains Portuguese translations for Cyberfox
 
 Package: cyberfox-locale-ro
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Romanian language pack for Cyberfox
  This package contains Romanian translations for Cyberfox
 
 Package: cyberfox-locale-ru
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Russian language pack for Cyberfox
  This package contains Russian translations for Cyberfox
 
 Package: cyberfox-locale-si
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Sinhala; Sinhalese language pack for Cyberfox
  This package contains Sinhala; Sinhalese translations for Cyberfox
 
 Package: cyberfox-locale-sk
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Slovak language pack for Cyberfox
  This package contains Slovak translations for Cyberfox
 
 Package: cyberfox-locale-sl
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Slovenian language pack for Cyberfox
  This package contains Slovenian translations for Cyberfox
 
 Package: cyberfox-locale-sq
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Albanian language pack for Cyberfox
  This package contains Albanian translations for Cyberfox
 
 Package: cyberfox-locale-sr
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Serbian language pack for Cyberfox
  This package contains Serbian translations for Cyberfox
 
-Package: cyberfox-locale-sv-se
+Package: cyberfox-locale-sv
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Swedish (Sweden) language pack for Cyberfox
  This package contains Swedish (Sweden) translations for Cyberfox
 
 Package: cyberfox-locale-ta
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Tamil language pack for Cyberfox
  This package contains Tamil translations for Cyberfox
 
 Package: cyberfox-locale-te
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Telugu language pack for Cyberfox
  This package contains Telugu translations for Cyberfox
 
 Package: cyberfox-locale-th
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Thai language pack for Cyberfox
  This package contains Thai translations for Cyberfox
 
 Package: cyberfox-locale-tr
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Turkish language pack for Cyberfox
  This package contains Turkish translations for Cyberfox
 
 Package: cyberfox-locale-uk
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Ukrainian language pack for Cyberfox
  This package contains Ukrainian translations for Cyberfox
 
 Package: cyberfox-locale-uz
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Uzbek language pack for Cyberfox
  This package contains Uzbek translations for Cyberfox
 
 Package: cyberfox-locale-vi
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Vietnamese language pack for Cyberfox
  This package contains Vietnamese translations for Cyberfox
 
 Package: cyberfox-locale-xh
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Xhosa language pack for Cyberfox
  This package contains Xhosa translations for Cyberfox
 
-Package: cyberfox-locale-zh-cn
+Package: cyberfox-locale-zh-hans
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Simplified Chinese language pack for Cyberfox
  This package contains Simplified Chinese translations for Cyberfox
 
-Package: cyberfox-locale-zh-tw
+Package: cyberfox-locale-zh-hant
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cyberfox
 Description: Traditional Chinese language pack for Cyberfox
  This package contains Traditional Chinese translations for Cyberfox
