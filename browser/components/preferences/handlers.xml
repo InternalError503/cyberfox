@@ -79,7 +79,7 @@
         <xul:hbox flex="1" align="right">
           <xul:button anonid="preferencesButton"
                       xbl:inherits="value=userContextId"
-                      onclick="gContainersPane.onPeferenceClick(event.originalTarget)">
+                      onclick="gContainersPane.onPreferenceClick(event.originalTarget)">
             Preferences
           </xul:button>
           <xul:button anonid="removeButton"
