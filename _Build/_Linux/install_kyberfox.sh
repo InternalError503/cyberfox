@@ -1,5 +1,5 @@
-# Cyberfox Installation, Shortcut Menu, (Optional) Shortcut Desktop, Cyberfox Uninstall
-# Version: 1.5
+# Cyberfox KDE Plasma Edition Installation, Shortcut Menu, (Optional) Shortcut Desktop,  Cyberfox KDE Plasma Edition Uninstall
+# Version: 1.0
 # Release, Beta channels Linux
 
 #!/bin/bash
@@ -11,12 +11,12 @@ Dir=$(cd "$(dirname "$0")" && pwd)
 cd $Dir
 
 # Count how many packages in the directory, If there is more then one the script may break or have undesired effect.
-PackageCount=`ls Cyberfox*.tar.bz2 | awk 'END { print NR }'` 
+PackageCount=`ls Cyberfox_KDE_Plasma_Edition-*.tar.bz2 | awk 'END { print NR }'` 
 
 # Make package name editable in single place in the event of file naming change.
-Package=$Dir/Cyberfox-*.tar.bz2
+Package=$Dir/Cyberfox_KDE_Plasma_Edition-*.tar.bz2
 
-# Desktop shortcut path, Applications shortcut path, Cyberfox install path.
+# Desktop shortcut path, Applications shortcut path, Kyberfox install path.
 # We need to know path to Desktop for not English operating systems
 : ${XDG_CONFIG_HOME:=~/.config}
 [ -f "${XDG_CONFIG_HOME}/user-dirs.dirs" ] && . "${XDG_CONFIG_HOME}/user-dirs.dirs"
@@ -26,7 +26,7 @@ Applications=/usr/share/applications
 InstallDirectory=$HOME/Apps
 
 # Check if the script is in the right place before checking file hashes.
-echo "Do you wish to install Cyberfox now?"
+echo "Do you wish to install Cyberfox KDE Plasma Edition now?"
 select yn in "Install" "Uninstall" "Quit"; do
     case $yn in
         Install )
@@ -39,7 +39,7 @@ select yn in "Install" "Uninstall" "Quit"; do
         fi;
 
 
-        if [ -f $Dir/Cyberfox*.tar.bz2 ]; then
+        if [ -f $Dir/Cyberfox_KDE_Plasma_Edition-*.tar.bz2 ]; then
 		
             # Make directory if not already exist
             if ! [ -d $InstallDirectory ]; then
@@ -64,7 +64,8 @@ select yn in "Install" "Uninstall" "Quit"; do
             if [ -f $InstallDirectory/README.txt ]; then
                 rm -rvf $InstallDirectory/README.txt;
             fi
-            
+
+            # Create desktop shortcut
             # Create symlinks
             echo "Creating symlinks (Root priveleges are required)..."
             sudo ln -sf $InstallDirectory/Cyberfox/Cyberfox /usr/bin/cyberfox
@@ -278,6 +279,19 @@ EOF
             chmod +x $InstallDirectory/Cyberfox/tmp/cyberfox.desktop
             sudo cp $InstallDirectory/Cyberfox/tmp/cyberfox.desktop $Applications/
 
+            # Add KDE Plasma notification integration
+            echo "Do you wish to add a KDE Plasma notification integration (Requires root privileges)?"
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes )
+                        echo "Adding KDE Plasma notification integration"
+                        # Requires admin permissions to write the file to /usr/share/knotifications5 directory.
+                        sudo wget -O /usr/share/knotifications5/kyberfoxhelper.notifyrc  https://raw.githubusercontent.com/hawkeye116477/kyberfoxhelper/master/kyberfoxhelper.notifyrc
+                    break;;
+                    No ) break;;
+                esac
+            done
+                
             # Install optional desktop shortcut
             echo "Do you wish to add a desktop shortcut (Root priveleges are required)?"
             select yn in "Yes" "No"; do
@@ -289,10 +303,10 @@ EOF
                     No ) break;;
                 esac
             done
-            echo "Cyberfox is now ready for use!"
+            echo "Cyberfox KDE Plasma Edition is now ready for use!"
             notify-send "Installation Complete!"
         else
-            echo "You must place this script next to the 'Cyberfox' tar.bz2 package."
+            echo "You must place this script next to the 'Cyberfox_KDE_Plasma_Edition' tar.bz2 package."
         fi; 
         rm -rf $InstallDirectory/Cyberfox/tmp
         break;;
@@ -332,6 +346,11 @@ EOF
             # Remove ~/Apps if is empty
             if [ ! "$(ls -A $InstallDirectory)" ]; then
                 rmdir $InstallDirectory;
+            fi
+            
+            # Remove KDE Plasma notification integration
+             if [ -f /usr/share/knotifications5/kyberfoxhelper.notifyrc ]; then
+                sudo rm -vf /usr/share/knotifications5/kyberfoxhelper.notifyrc;
             fi
             
 			notify-send "Uninstall Complete"

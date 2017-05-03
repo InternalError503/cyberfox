@@ -1,0 +1,70 @@
+diff --git a/browser/base/content/browser-kde.xul b/browser/base/content/browser-kde.xul
+index 7c0a4b7243..66d7e5469a 100644
+--- a/browser/base/content/browser-kde.xul
++++ b/browser/base/content/browser-kde.xul
+@@ -111,9 +111,28 @@
+                    onpopupshowing="gFxAccounts.populateSendTabToDevicesMenu(event.target, TabContextMenu.contextTab.linkedBrowser.currentURI.spec, TabContextMenu.contextTab.linkedBrowser.contentTitle);"/>
+       </menu>
+       <menuseparator/>
++      <menuitem id="context_CopyCurrentTabUrl" 
++					        label="&copyTabURL.label;" 
++					        oncommand="gCyberfoxCustom.CopyCurrentTabUrl(TabContextMenu.contextTab.linkedBrowser.currentURI.spec);"/>
++	    <menuitem id="context_CopyAllTabUrls" 
++					        label="&copyAllTabUrls.label;" 
++					        oncommand="gCyberfoxCustom.CopyAllTabUrls();"/>                  		  
++		  <menuitem id="context_CloneCurrentTab" 
++					        label="&cloneCurrentTab.label;" 
++					        oncommand="gCyberfoxCustom.CloneCurrent('tab');"/>					
++	    <menuitem id="context_CloneCurrentTabNewWindow" 
++					        label="&cloneInNewWindow.label;" 
++					        oncommand="gCyberfoxCustom.CloneCurrent('window');"/>
++	    <menuitem id="context_CloneCurrentTabNewWindowpb" 
++					        label="&cloneInNewWindow.label; (&cloneInNewPrivate.label;)" 
++					        oncommand="gCyberfoxCustom.CloneCurrent('window', true);"/>							
+       <menuitem id="context_reloadAllTabs" label="&reloadAllTabs.label;" accesskey="&reloadAllTabs.accesskey;"
+                 tbattr="tabbrowser-multiple-visible"
+                 oncommand="gBrowser.reloadAllTabs();"/>
++      <menuitem id="context_bookmarkThisPage"
++                observes="bookmarkThisPageBroadcaster"
++                label="&bookmarkThisPageCmd.label;"
++                command="Browser:AddBookmarkAs"/>      
+       <menuitem id="context_bookmarkAllTabs"
+                 label="&bookmarkAllTabs.label;"
+                 accesskey="&bookmarkAllTabs.accesskey;"
+@@ -332,6 +351,9 @@
+                 class="viewCustomizeToolbar"
+                 label="&viewCustomizeToolbar.label;"
+                 accesskey="&viewCustomizeToolbar.accesskey;"/>
++			<menuitem id="menu-aboutconfig"
++				        label="About:Config"
++				        oncommand="gCyberfoxCustom.openAboutConfig();"/>
+     </menupopup>
+ 
+     <menupopup id="blockedPopupOptions"
+@@ -625,6 +647,15 @@
+         </menupopup>
+       </toolbarbutton>
+ 
++<!-- /* Tab Close Button Don't remove */ -->
++      <toolbarbutton id="tabs-closebutton"
++                     class="close-button tabs-closebutton close-icon"
++                     command="cmd_close"
++                     label="&closeTab.label;"
++                     cui-areatype="toolbar"
++                     tooltiptext="&closeTab.label;"/>
++<!-- /* End Tab Close Button Don't remove */ -->
++
+ #if !defined(MOZ_WIDGET_GTK)
+       <hbox class="private-browsing-indicator" skipintoolbarset="true"/>
+ #endif
+@@ -1053,7 +1084,9 @@
+         <sidebarheader id="sidebar-header" align="center">
+           <label id="sidebar-title" persist="value" flex="1" crop="end" control="sidebar"/>
+           <image id="sidebar-throbber"/>
+-          <toolbarbutton class="close-icon tabbable" tooltiptext="&sidebarCloseButton.tooltip;" oncommand="SidebarUI.hide();"/>
++          <!-- /* Tab Close Button Don't remove */ -->
++          <toolbarbutton class="close-icon tabbable tabs-closebutton" tooltiptext="&sidebarCloseButton.tooltip;" oncommand="SidebarUI.hide();"/>
++          <!-- /* End Tab Close Button Don't remove */ -->
+         </sidebarheader>
+         <browser id="sidebar" flex="1" autoscroll="false" disablehistory="true" disablefullscreen="true"
+                   style="min-width: 14em; width: 18em; max-width: 36em;" tooltip="aHTMLTooltip"/>
