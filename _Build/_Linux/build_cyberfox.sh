@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.8
+# Version: 2.9
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -345,7 +345,7 @@ select yn in "Yes" "No" "Quit"; do
 	  	mv $FILENAME "Cyberfox-$VERSION.en-US.linux-x86_64.beta.tar.bz2";
 
 		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then
-		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI;
+		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI $VERSION;
 
 				# Get the current deb filename with browser version to rename it!
 	  			DEBFILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.deb)
@@ -355,7 +355,7 @@ select yn in "Yes" "No" "Quit"; do
 	  else
 
 		  if [ -f "$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" ]; then
-		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI;
+		  		"$WORKDIR/$LDIR/_Build/_Linux/build_deb_package.sh" $GITURI $VERSION;
 		  fi 
 
 	  fi
