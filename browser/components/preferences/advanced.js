@@ -56,7 +56,9 @@ var gAdvancedPane = {
     this.updateCacheSizeInputField();
     this.updateActualCacheSize();
     this.updateActualAppCacheSize();
-    this.togglePlugins();
+    if (AppConstants.platform == "win") {
+      this.togglePlugins();
+    }
 
     setEventListener("layers.acceleration.disabled", "change",
                      gAdvancedPane.updateHardwareAcceleration);
@@ -98,9 +100,10 @@ var gAdvancedPane = {
                      gAdvancedPane.showSecurityDevices);
     setEventListener("cacheSize", "change",
                      gAdvancedPane.updateCacheSizePref);
-    setEventListener("plugins_disabled", "command",
-                     gAdvancedPane.togglePlugins);
-
+    if (AppConstants.platform == "win") {
+      setEventListener("plugins_disabled", "command",
+                       gAdvancedPane.togglePlugins);
+    }				 
     if (AppConstants.MOZ_WIDGET_GTK) {
       // GTK tabbox' allow the scroll wheel to change the selected tab,
       // but we don't want this behavior for the in-content preferences.
@@ -778,11 +781,13 @@ var gAdvancedPane = {
    * Disables/enables other browser plugins based on plugins.disabled perference
    */
   togglePlugins: function() {
-	var toggle = document.getElementById("plugins_disabled").checked ? 1 : 0;
-    document.getElementById("plugin_allowed_whitelist").disabled = toggle;
-    document.getElementById("plugin_flash_allowed").disabled = toggle;
-    document.getElementById("plugin_java_allowed").disabled= toggle;
-    document.getElementById("plugin_silverlight_allowed").disabled = toggle;
+    if (AppConstants.platform == "win") {  
+      var toggle = document.getElementById("plugins_disabled").checked ? 1 : 0;
+      document.getElementById("plugin_allowed_whitelist").disabled = toggle;
+      document.getElementById("plugin_flash_allowed").disabled = toggle;
+      document.getElementById("plugin_java_allowed").disabled= toggle;
+      document.getElementById("plugin_silverlight_allowed").disabled = toggle;
+    }
   },
 
   observe: function(aSubject, aTopic, aData) {
