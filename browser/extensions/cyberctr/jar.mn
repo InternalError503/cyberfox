@@ -44,9 +44,6 @@
 % overlay about:newtab												 chrome://classic_theme_restorer/content/aboutnewtab.xul
 % overlay about:preferences											 chrome://classic_theme_restorer/content/aboutprefs.xul
 
-% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlay45.xul appversion>=45.0 platformversion<48.0
-% overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlay48.xul appversion>=48.0
-
 % overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayWin.xul os=WINNT
 % overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=Linux
 % overlay chrome://browser/content/browser.xul			chrome://classic_theme_restorer/content/overlayLin.xul os=FreeBSD
