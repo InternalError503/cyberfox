@@ -4,8 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var gConnectionsDialog = {
-  beforeAccept: function ()
-  {
+  beforeAccept: function() {
     var proxyTypePref = document.getElementById("network.proxy.type");
     if (proxyTypePref.value == 2) {
       this.doAutoconfigURLFixup();
@@ -52,14 +51,12 @@ var gConnectionsDialog = {
     return true;
   },
 
-  checkForSystemProxy: function ()
-  {
+  checkForSystemProxy: function() {
     if ("@mozilla.org/system-proxy-settings;1" in Components.classes)
       document.getElementById("systemPref").removeAttribute("hidden");
   },
 
-  proxyTypeChanged: function ()
-  {
+  proxyTypeChanged: function() {
     var proxyTypePref = document.getElementById("network.proxy.type");
 
     // Update http
@@ -84,8 +81,7 @@ var gConnectionsDialog = {
     this.updateReloadButton();
   },
 
-  updateDNSPref: function ()
-  {
+  updateDNSPref: function() {
     var socksVersionPref = document.getElementById("network.proxy.socks_version");
     var socksDNSPref = document.getElementById("network.proxy.socks_remote_dns");
     var proxyTypePref = document.getElementById("network.proxy.type");
@@ -94,8 +90,7 @@ var gConnectionsDialog = {
     return undefined;
   },
 
-  updateReloadButton: function ()
-  {
+  updateReloadButton: function() {
     // Disable the "Reload PAC" button if the selected proxy type is not PAC or
     // if the current value of the PAC textbox does not match the value stored
     // in prefs.  Likewise, disable the reload button if PAC is not configured
@@ -116,14 +111,12 @@ var gConnectionsDialog = {
         (proxyTypeCur != 2 || proxyType != 2 || typedURL != pacURL);
   },
 
-  readProxyType: function ()
-  {
+  readProxyType: function() {
     this.proxyTypeChanged();
     return undefined;
   },
 
-  updateProtocolPrefs: function ()
-  {
+  updateProtocolPrefs: function() {
     var proxyTypePref = document.getElementById("network.proxy.type");
     var shareProxiesPref = document.getElementById("network.proxy.share_proxy_settings");
     var proxyPrefs = ["ssl", "ftp", "socks"];
@@ -156,8 +149,7 @@ var gConnectionsDialog = {
     return undefined;
   },
 
-  readProxyProtocolPref: function (aProtocol, aIsPort)
-  {
+  readProxyProtocolPref: function(aProtocol, aIsPort) {
     var shareProxiesPref = document.getElementById("network.proxy.share_proxy_settings");
     if (shareProxiesPref.value) {
       var pref = document.getElementById("network.proxy.http" + (aIsPort ? "_port" : ""));
@@ -168,14 +160,12 @@ var gConnectionsDialog = {
     return backupPref.hasUserValue ? backupPref.value : undefined;
   },
 
-  reloadPAC: function ()
-  {
+  reloadPAC: function() {
     Components.classes["@mozilla.org/network/protocol-proxy-service;1"].
         getService().reloadPAC();
   },
 
-  doAutoconfigURLFixup: function ()
-  {
+  doAutoconfigURLFixup: function() {
     var autoURL = document.getElementById("networkProxyAutoconfigURL");
     var autoURLPref = document.getElementById("network.proxy.autoconfig_url");
     var URIFixup = Components.classes["@mozilla.org/docshell/urifixup;1"]
@@ -185,26 +175,23 @@ var gConnectionsDialog = {
     } catch (ex) {}
   },
 
-  sanitizeNoProxiesPref: function()
-  {
+  sanitizeNoProxiesPref: function() {
     var noProxiesPref = document.getElementById("network.proxy.no_proxies_on");
     // replace substrings of ; and \n with commas if they're neither immediately
     // preceded nor followed by a valid separator character
-    noProxiesPref.value = noProxiesPref.value.replace(/([^, \n;])[;\n]+(?![,\n;])/g, '$1,');
+    noProxiesPref.value = noProxiesPref.value.replace(/([^, \n;])[;\n]+(?![,\n;])/g, "$1,");
     // replace any remaining ; and \n since some may follow commas, etc.
-    noProxiesPref.value = noProxiesPref.value.replace(/[;\n]/g, '');
+    noProxiesPref.value = noProxiesPref.value.replace(/[;\n]/g, "");
   },
 
-  readHTTPProxyServer: function ()
-  {
+  readHTTPProxyServer: function() {
     var shareProxiesPref = document.getElementById("network.proxy.share_proxy_settings");
     if (shareProxiesPref.value)
       this.updateProtocolPrefs();
     return undefined;
   },
 
-  readHTTPProxyPort: function ()
-  {
+  readHTTPProxyPort: function() {
     var shareProxiesPref = document.getElementById("network.proxy.share_proxy_settings");
     if (shareProxiesPref.value)
       this.updateProtocolPrefs();

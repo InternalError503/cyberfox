@@ -17,19 +17,18 @@ var gSearchPane = {
   /**
    * Initialize autocomplete to ensure prefs are in sync.
    */
-  _initAutocomplete: function () {
+  _initAutocomplete: function() {
     Components.classes["@mozilla.org/autocomplete/search;1?name=unifiedcomplete"]
               .getService(Components.interfaces.mozIPlacesAutoComplete);
   },
 
-  init: function ()
-  {
+  init: function() {
     gEngineView = new EngineView(new EngineStore());
     document.getElementById("engineList").view = gEngineView;
     this.buildDefaultEngineDropDown();
 
     let addEnginesLink = document.getElementById("addEngines");
-    let searchEnginesURL = Services.wm.getMostRecentWindow('navigator:browser')
+    let searchEnginesURL = Services.wm.getMostRecentWindow("navigator:browser")
                                       .BrowserSearch.searchEnginesURL;
     addEnginesLink.setAttribute("href", searchEnginesURL);
 
@@ -222,8 +221,7 @@ var gSearchPane = {
                                newValue.toString());
       // Prevent page from scrolling on the space key.
       aEvent.preventDefault();
-    }
-    else {
+    } else {
       let isMac = Services.appinfo.OS == "Darwin";
       if ((isMac && aEvent.keyCode == KeyEvent.DOM_VK_RETURN) ||
           (!isMac && aEvent.keyCode == KeyEvent.DOM_VK_F2)) {
@@ -345,15 +343,15 @@ EngineStore.prototype = {
     return val;
   },
 
-  _getIndexForEngine: function ES_getIndexForEngine(aEngine) {
+  _getIndexForEngine: function(aEngine) {
     return this._engines.indexOf(aEngine);
   },
 
-  _getEngineByName: function ES_getEngineByName(aName) {
+  _getEngineByName: function(aName) {
     return this._engines.find(engine => engine.name == aName);
   },
 
-  _cloneEngine: function ES_cloneEngine(aEngine) {
+  _cloneEngine: function(aEngine) {
     var clonedObj={};
     for (var i in aEngine)
       clonedObj[i] = aEngine[i];
@@ -363,15 +361,15 @@ EngineStore.prototype = {
   },
 
   // Callback for Array's some(). A thisObj must be passed to some()
-  _isSameEngine: function ES_isSameEngine(aEngineClone) {
+  _isSameEngine: function(aEngineClone) {
     return aEngineClone.originalEngine == this.originalEngine;
   },
 
-  addEngine: function ES_addEngine(aEngine) {
+  addEngine: function(aEngine) {
     this._engines.push(this._cloneEngine(aEngine));
   },
 
-  moveEngine: function ES_moveEngine(aEngine, aNewIndex) {
+  moveEngine: function(aEngine, aNewIndex) {
     if (aNewIndex < 0 || aNewIndex > this._engines.length - 1)
       throw new Error("ES_moveEngine: invalid aNewIndex!");
     var index = this._getIndexForEngine(aEngine);
@@ -388,7 +386,7 @@ EngineStore.prototype = {
     Services.search.moveEngine(aEngine.originalEngine, aNewIndex);
   },
 
-  removeEngine: function ES_removeEngine(aEngine) {
+  removeEngine: function(aEngine) {
     if (this._engines.length == 1) {
       throw new Error("Cannot remove last engine!");
     }
@@ -399,15 +397,15 @@ EngineStore.prototype = {
     if (index == -1)
       throw new Error("invalid engine?");
 
-    this._engines.splice(index, 1);
+    let removedEngine = this._engines.splice(index, 1)[0];
 
-    if (this._defaultEngines.some(this._isSameEngine, this._engines[index]))
+    if (this._defaultEngines.some(this._isSameEngine, removedEngine))
       gSearchPane.showRestoreDefaults(true);
     gSearchPane.buildDefaultEngineDropDown();
     return index;
   },
 
-  restoreDefaultEngines: function ES_restoreDefaultEngines() {
+  restoreDefaultEngines: function() {
     var added = 0;
 
     for (var i = 0; i < this._defaultEngines.length; ++i) {
@@ -436,7 +434,7 @@ EngineStore.prototype = {
     return added;
   },
 
-  changeEngine: function ES_changeEngine(aEngine, aProp, aNewValue) {
+  changeEngine: function(aEngine, aProp, aNewValue) {
     var index = this._getIndexForEngine(aEngine);
     if (index == -1)
       throw new Error("invalid engine?");
@@ -445,8 +443,8 @@ EngineStore.prototype = {
     aEngine.originalEngine[aProp] = aNewValue;
   },
 
-  reloadIcons: function ES_reloadIcons() {
-    this._engines.forEach(function (e) {
+  reloadIcons: function() {
+    this._engines.forEach(function(e) {
       e.uri = e.originalEngine.uri;
     });
   }
@@ -476,19 +474,19 @@ EngineView.prototype = {
   },
 
   // Helpers
-  rowCountChanged: function (index, count) {
+  rowCountChanged: function(index, count) {
     this.tree.rowCountChanged(index, count);
   },
 
-  invalidate: function () {
+  invalidate: function() {
     this.tree.invalidate();
   },
 
-  ensureRowIsVisible: function (index) {
+  ensureRowIsVisible: function(index) {
     this.tree.ensureRowIsVisible(index);
   },
 
-  getSourceIndexFromDrag: function (dataTransfer) {
+  getSourceIndexFromDrag: function(dataTransfer) {
     return parseInt(dataTransfer.getData(ENGINE_FLAVOR));
   },
 

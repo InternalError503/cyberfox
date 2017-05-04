@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-XPCOMUtils.defineLazyGetter(this, "AlertsServiceDND", function () {
+XPCOMUtils.defineLazyGetter(this, "AlertsServiceDND", function() {
   var {interfaces: Ci, utils: Cu, classes: Cc, results: Cr} = Components;
   try {
     let alertsService = Cc["@mozilla.org/alerts-service;1"]
@@ -17,10 +17,8 @@ XPCOMUtils.defineLazyGetter(this, "AlertsServiceDND", function () {
 });
 
 var gContentPane = {
-  init: function ()
-  {
-    function setEventListener(aId, aEventType, aCallback)
-    {
+  init: function() {
+    function setEventListener(aId, aEventType, aCallback) {
       document.getElementById(aId)
               .addEventListener(aEventType, aCallback.bind(gContentPane));
     }
@@ -80,10 +78,10 @@ var gContentPane = {
       gContentPane.showTranslationExceptions);
     setEventListener("notificationsDoNotDisturb", "command",
       gContentPane.toggleDoNotDisturbNotifications);
-    setEventListener("languageMenu", "popuphidden", function () {
+    setEventListener("languageMenu", "popuphidden", function() {
       gContentPane.setDefaultLocale();
     });
-    setEventListener("languageMenu", "keypress", function (e) {
+    setEventListener("languageMenu", "keypress", function(e) {
       gContentPane._setDefaultLocale(e);
     });
 	
@@ -113,8 +111,7 @@ var gContentPane = {
    * Utility function to enable/disable the button specified by aButtonID based
    * on the value of the Boolean preference specified by aPreferenceID.
    */
-  updateButtons: function (aButtonID, aPreferenceID)
-  {
+  updateButtons: function(aButtonID, aPreferenceID) {
     var button = document.getElementById(aButtonID);
     var preference = document.getElementById(aPreferenceID);
     button.disabled = preference.value != true;
@@ -133,8 +130,7 @@ var gContentPane = {
    * Displays the exceptions dialog of the given type, where types map onto the
    * the fields in this._exceptionsParams.
    */  
-  _showExceptions: function (aPermissionType)
-  {
+  _showExceptions: function(aPermissionType) {
     var bundlePreferences = document.getElementById("bundlePreferences");
     var params = this._exceptionsParams[aPermissionType];
     params.windowTitle = bundlePreferences.getString(aPermissionType + "permissionstitle");
@@ -168,8 +164,7 @@ var gContentPane = {
    * Displays the notifications exceptions dialog where specific site notification
    * preferences can be set.
    */
-  showNotificationExceptions()
-  {
+  showNotificationExceptions() {
     let bundlePreferences = document.getElementById("bundlePreferences");
     let params = { permissionType: "desktop-notification" };
     params.windowTitle = bundlePreferences.getString("notificationspermissionstitle");
@@ -188,8 +183,7 @@ var gContentPane = {
    * can be set.
    */
 // Disable Javascript & Block Images Feature Dont Remove
-  showPopupExceptions: function ()
-  {
+  showPopupExceptions: function() {
     var bundlePreferences = document.getElementById("bundlePreferences");
     var params = { blockVisible: false, sessionVisible: false, allowVisible: true,
                    prefilledHost: "", permissionType: "popup" }
@@ -207,8 +201,7 @@ var gContentPane = {
    * Boolean value for use in determining the state of the "load images"
    * checkbox, returning true if images should be loaded and false otherwise.
    */
-  readLoadImages: function ()
-  {
+  readLoadImages: function() {
     var pref = document.getElementById("permissions.default.image");
     return (pref.value == 1 || pref.value == 3);
   },
@@ -217,8 +210,7 @@ var gContentPane = {
    * Returns the "load images" preference value which maps to the state of the
    * preferences UI.
    */
-  writeLoadImages: function ()
-  { 
+  writeLoadImages: function() { 
     return (document.getElementById("loadImages").checked) ? 1 : 2;
   },
 
@@ -226,8 +218,7 @@ var gContentPane = {
    * Displays image exception preferences for which websites can and cannot
    * load images.
    */
-  showImageExceptions: function ()
-  {
+  showImageExceptions: function() {
     var bundlePreferences = document.getElementById("bundlePreferences");
     var params = { 
 					blockVisible: true, 
@@ -248,8 +239,7 @@ var gContentPane = {
    * Displays the advanced JavaScript preferences for enabling or disabling
    * various annoying behaviors.
    */
-  showAdvancedJS: function ()
-  {
+  showAdvancedJS: function() {
     document.documentElement.openSubDialog("chrome://browser/content/preferences/advanced-scripts.xul",
                                            "", null);  
   },
@@ -259,8 +249,7 @@ var gContentPane = {
   /**
    * Populates the default font list in UI.
    */
-  _rebuildFonts: function ()
-  {
+  _rebuildFonts: function() {
     var preferences = document.getElementById("contentPreferences");
     // Ensure preferences are "visible" to ensure bindings work.
     preferences.hidden = false;
@@ -274,8 +263,7 @@ var gContentPane = {
   /**
    *
    */
-  _selectDefaultLanguageGroup: function (aLanguageGroup, aIsSerif)
-  {
+  _selectDefaultLanguageGroup: function(aLanguageGroup, aIsSerif) {
     const kFontNameFmtSerif         = "font.name.serif.%LANG%";
     const kFontNameFmtSansSerif     = "font.name.sans-serif.%LANG%";
     const kFontNameListFmtSerif     = "font.name-list.serif.%LANG%";
@@ -325,8 +313,7 @@ var gContentPane = {
    * Returns the type of the current default font for the language denoted by
    * aLanguageGroup.
    */
-  _readDefaultFontTypeForLanguage: function (aLanguageGroup)
-  {
+  _readDefaultFontTypeForLanguage: function(aLanguageGroup) {
     const kDefaultFontType = "font.default.%LANG%";
     var defaultFontTypePref = kDefaultFontType.replace(/%LANG%/, aLanguageGroup);
     var preference = document.getElementById(defaultFontTypePref);
@@ -345,8 +332,7 @@ var gContentPane = {
    * Displays the fonts dialog, where web page font names and sizes can be
    * configured.
    */
-  configureFonts: function ()
-  {
+  configureFonts: function() {
     document.documentElement.openSubDialog("chrome://browser/content/preferences/fonts.xul",
                                            "", null);
   },
@@ -355,8 +341,7 @@ var gContentPane = {
    * Displays the colors dialog, where default web page/link/etc. colors can be
    * configured.
    */
-  configureColors: function ()
-  {
+  configureColors: function() {
     document.documentElement.openSubDialog("chrome://browser/content/preferences/colors.xul",
                                            "", null);  
   },
@@ -366,8 +351,7 @@ var gContentPane = {
   /**
    * Shows a dialog in which the preferred language for web content may be set.
    */
-  showLanguages: function ()
-  {
+  showLanguages: function() {
     document.documentElement.openSubDialog("chrome://browser/content/preferences/languages.xul",
                                            "", null);
   },
@@ -376,32 +360,27 @@ var gContentPane = {
    * Displays the translation exceptions dialog where specific site and language
    * translation preferences can be set.
    */
-  showTranslationExceptions: function ()
-  {
+  showTranslationExceptions: function() {
     document.documentElement.openWindow("Browser:TranslationExceptions",
                                         "chrome://browser/content/preferences/translation.xul",
                                         "resizable", null);
   },
 
-  openTranslationProviderAttribution: function ()
-  {
+  openTranslationProviderAttribution: function() {
     Components.utils.import("resource:///modules/translation/Translation.jsm");
     Translation.openProviderAttribution();
   },
 
-  toggleDoNotDisturbNotifications: function (event)
-  {
+  toggleDoNotDisturbNotifications: function(event) {
     AlertsServiceDND.manualDoNotDisturb = event.target.checked;
   },
   
   // Grab current set locale from 'general.useragent.locale'
-  updateDefaultLocale: function ()
-  {
+  updateDefaultLocale: function() {
 	  document.getElementById("languageMenu").value = Services.prefs.getCharPref('general.useragent.locale');
       Services.prefs.setBoolPref('intl.locale.matchOS', false);
   },
-  setDefaultLocale: function ()
-  {	  
+  setDefaultLocale: function() {	  
 	  var languageMenu = document.getElementById("languageMenu");
 	  var currentLocale = Services.prefs.getCharPref('general.useragent.locale');
 		function revertChange(error) {
@@ -438,8 +417,7 @@ var gContentPane = {
           return;
       }  
   },
-    _setDefaultLocale: function (e)
-  {
+    _setDefaultLocale: function(e) {
     if (e.which == 13 || e.keyCode == 13)
 		this.setDefaultLocale();
   },

@@ -43,7 +43,8 @@ let gContainersPane = {
     ContextualIdentityService.remove(userContextId);
     this._rebuildView();
   },
-  onPeferenceClick(button) {
+  
+  onPreferenceClick(button) {
     this.openPreferenceDialog(button.getAttribute("value"));
   },
 

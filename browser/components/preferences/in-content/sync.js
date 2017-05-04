@@ -5,7 +5,7 @@
 Components.utils.import("resource://services-sync/main.js");
 Components.utils.import("resource://gre/modules/Services.jsm");
 
-XPCOMUtils.defineLazyGetter(this, "FxAccountsCommon", function () {
+XPCOMUtils.defineLazyGetter(this, "FxAccountsCommon", function() {
   return Components.utils.import("resource://gre/modules/FxAccountsCommon.js", {});
 });
 
@@ -42,14 +42,14 @@ var gSyncPane = {
     return Weave.Svc.Prefs.isSet("serverURL");
   },
 
-  needsUpdate: function () {
+  needsUpdate: function() {
     this.page = PAGE_NEEDS_UPDATE;
     let label = document.getElementById("loginError");
     label.textContent = Weave.Utils.getErrorString(Weave.Status.login);
     label.className = "error";
   },
 
-  init: function () {
+  init: function() {
     this._setupEventListeners();
 
     // If the Service hasn't finished initializing, wait for it.
@@ -66,14 +66,14 @@ var gSyncPane = {
     // and the state of that provider, so show the "please wait" page.
     this._showLoadPage(xps);
 
-    let onUnload = function () {
+    let onUnload = function() {
       window.removeEventListener("unload", onUnload, false);
       try {
         Services.obs.removeObserver(onReady, "weave:service:ready");
       } catch (e) {}
     };
 
-    let onReady = function () {
+    let onReady = function() {
       Services.obs.removeObserver(onReady, "weave:service:ready");
       window.removeEventListener("unload", onUnload, false);
       this._init();
@@ -85,7 +85,7 @@ var gSyncPane = {
     xps.ensureLoaded();
   },
 
-  _showLoadPage: function (xps) {
+  _showLoadPage: function(xps) {
     let username;
     try {
       username = Services.prefs.getCharPref("services.sync.username");
@@ -97,8 +97,7 @@ var gSyncPane = {
       let cachedComputerName;
       try {
         cachedComputerName = Services.prefs.getCharPref("services.sync.client.name");
-      }
-      catch (e) {
+      } catch (e) {
         cachedComputerName = "";
       }
       document.getElementById("fxaEmailAddress1").textContent = username;
@@ -109,7 +108,7 @@ var gSyncPane = {
     }
   },
 
-  _init: function () {
+  _init: function() {
     let topics = ["weave:service:login:error",
                   "weave:service:login:finish",
                   "weave:service:start-over:finish",
@@ -122,31 +121,31 @@ var gSyncPane = {
     // Add the observers now and remove them on unload
     // XXXzpao This should use Services.obs.* but Weave's Obs does nice handling
     //        of `this`. Fix in a followup. (bug 583347)
-    topics.forEach(function (topic) {
+    topics.forEach(function(topic) {
       Weave.Svc.Obs.add(topic, this.updateWeavePrefs, this);
     }, this);
 
     window.addEventListener("unload", function() {
-      topics.forEach(function (topic) {
+      topics.forEach(function(topic) {
         Weave.Svc.Obs.remove(topic, this.updateWeavePrefs, this);
       }, gSyncPane);
     }, false);
 
-    XPCOMUtils.defineLazyGetter(this, '_stringBundle', () => {
+    XPCOMUtils.defineLazyGetter(this, "_stringBundle", () => {
       return Services.strings.createBundle("chrome://browser/locale/preferences/preferences.properties");
     });
 
-    XPCOMUtils.defineLazyGetter(this, '_accountsStringBundle', () => {
+    XPCOMUtils.defineLazyGetter(this, "_accountsStringBundle", () => {
       return Services.strings.createBundle("chrome://browser/locale/accounts.properties");
     });
-	
+
     document.getElementById("tosPP-small-ToS").setAttribute("href", gSyncUtils.tosURL);
     document.getElementById("tosPP-normal-ToS").setAttribute("href", gSyncUtils.tosURL);
     document.getElementById("tosPP-small-PP").setAttribute("href", gSyncUtils.privacyPolicyURL);
     document.getElementById("tosPP-normal-PP").setAttribute("href", gSyncUtils.privacyPolicyURL);
 
-    fxAccounts.promiseAccountsManageURI(this._getEntryPoint()).then(url => {
-      document.getElementById("verifiedManage").setAttribute("href", url);
+    fxAccounts.promiseAccountsManageURI(this._getEntryPoint()).then(accountsManageURI => {
+      document.getElementById("verifiedManage").setAttribute("href", accountsManageURI);
     });
 
     this.updateWeavePrefs();
@@ -189,41 +188,40 @@ var gSyncPane = {
   },
 
   _setupEventListeners: function() {
-    function setEventListener(aId, aEventType, aCallback)
-    {
+    function setEventListener(aId, aEventType, aCallback) {
       document.getElementById(aId)
               .addEventListener(aEventType, aCallback.bind(gSyncPane));
     }
 
-    setEventListener("noAccountSetup", "click", function (aEvent) {
+    setEventListener("noAccountSetup", "click", function(aEvent) {
       aEvent.stopPropagation();
       gSyncPane.openSetup(null);
     });
-    setEventListener("noAccountPair", "click", function (aEvent) {
+    setEventListener("noAccountPair", "click", function(aEvent) {
       aEvent.stopPropagation();
-      gSyncPane.openSetup('pair');
+      gSyncPane.openSetup("pair");
     });
     setEventListener("syncChangePassword", "command",
       () => gSyncUtils.changePassword());
     setEventListener("syncResetPassphrase", "command",
       () => gSyncUtils.resetPassphrase());
     setEventListener("syncReset", "command", gSyncPane.resetSync);
-    setEventListener("syncAddDeviceLabel", "click", function () {
+    setEventListener("syncAddDeviceLabel", "click", function() {
       gSyncPane.openAddDevice();
       return false;
     });
-    setEventListener("syncEnginesList", "select", function () {
+    setEventListener("syncEnginesList", "select", function() {
       if (this.selectedCount)
         this.clearSelection();
     });
-    setEventListener("syncComputerName", "change", function (e) {
+    setEventListener("syncComputerName", "change", function(e) {
       gSyncUtils.changeName(e.target);
     });
-    setEventListener("fxaChangeDeviceName", "command", function () {
+    setEventListener("fxaChangeDeviceName", "command", function() {
       this._toggleComputerNameControls(true);
       this._focusComputerNameTextbox();
     });
-    setEventListener("fxaCancelChangeDeviceName", "command", function () {
+    setEventListener("fxaCancelChangeDeviceName", "command", function() {
       // We explicitly blur the textbox because of bug 75324, then after
       // changing the state of the buttons, force focus to whatever the focus
       // manager thinks should be next (which on the mac, depends on an OSX
@@ -233,52 +231,52 @@ var gSyncPane = {
       this._updateComputerNameValue(false);
       this._focusAfterComputerNameTextbox();
     });
-    setEventListener("fxaSaveChangeDeviceName", "command", function () {
+    setEventListener("fxaSaveChangeDeviceName", "command", function() {
       // Work around bug 75324 - see above.
       this._blurComputerNameTextbox();
       this._toggleComputerNameControls(false);
       this._updateComputerNameValue(true);
       this._focusAfterComputerNameTextbox();
     });
-    setEventListener("unlinkDevice", "click", function () {
+    setEventListener("unlinkDevice", "click", function() {
       gSyncPane.startOver(true);
       return false;
     });
-    setEventListener("loginErrorUpdatePass", "click", function () {
+    setEventListener("loginErrorUpdatePass", "click", function() {
       gSyncPane.updatePass();
       return false;
     });
-    setEventListener("loginErrorResetPass", "click", function () {
+    setEventListener("loginErrorResetPass", "click", function() {
       gSyncPane.resetPass();
       return false;
     });
-    setEventListener("loginErrorStartOver", "click", function () {
+    setEventListener("loginErrorStartOver", "click", function() {
       gSyncPane.startOver(true);
       return false;
     });
-    setEventListener("noFxaSignUp", "command", function () {
+    setEventListener("noFxaSignUp", "command", function() {
       gSyncPane.signUp();
       return false;
     });
-    setEventListener("noFxaSignIn", "command", function () {
+    setEventListener("noFxaSignIn", "command", function() {
       gSyncPane.signIn();
       return false;
     });
-    setEventListener("fxaUnlinkButton", "command", function () {
+    setEventListener("fxaUnlinkButton", "command", function() {
       gSyncPane.unlinkFirefoxAccount(true);
     });
     setEventListener("verifyFxaAccount", "command",
       gSyncPane.verifyFirefoxAccount);
-    setEventListener("unverifiedUnlinkFxaAccount", "command", function () {
+    setEventListener("unverifiedUnlinkFxaAccount", "command", function() {
       /* no warning as account can't have previously synced */
       gSyncPane.unlinkFirefoxAccount(false);
     });
     setEventListener("rejectReSignIn", "command",
       gSyncPane.reSignIn);
-    setEventListener("rejectUnlinkFxaAccount", "command", function () {
+    setEventListener("rejectUnlinkFxaAccount", "command", function() {
       gSyncPane.unlinkFirefoxAccount(true);
     });
-    setEventListener("fxaSyncComputerName", "keypress", function (e) {
+    setEventListener("fxaSyncComputerName", "keypress", function(e) {
       if (e.keyCode == KeyEvent.DOM_VK_RETURN) {
         document.getElementById("fxaSaveChangeDeviceName").click();
       } else if (e.keyCode == KeyEvent.DOM_VK_ESCAPE) {
@@ -287,7 +285,7 @@ var gSyncPane = {
     });
   },
 
-  _initProfileImageUI: function () {
+  _initProfileImageUI: function() {
     try {
       if (Services.prefs.getBoolPref("identity.fxaccounts.profile_image.enabled")) {
         document.getElementById("fxaProfileImage").hidden = false;
@@ -295,7 +293,7 @@ var gSyncPane = {
     } catch (e) { }
   },
 
-  updateWeavePrefs: function () {
+  updateWeavePrefs: function() {
     let service = Components.classes["@mozilla.org/weave/service;1"]
                   .getService(Components.interfaces.nsISupports)
                   .wrappedJSObject;
@@ -420,7 +418,7 @@ var gSyncPane = {
     }
   },
 
-  startOver: function (showDialog) {
+  startOver: function(showDialog) {
     if (showDialog) {
       let flags = Services.prompt.BUTTON_POS_0 * Services.prompt.BUTTON_TITLE_IS_STRING +
                   Services.prompt.BUTTON_POS_1 * Services.prompt.BUTTON_TITLE_CANCEL +
@@ -442,21 +440,21 @@ var gSyncPane = {
     this.updateWeavePrefs();
   },
 
-  updatePass: function () {
+  updatePass: function() {
     if (Weave.Status.login == Weave.LOGIN_FAILED_LOGIN_REJECTED)
       gSyncUtils.changePassword();
     else
       gSyncUtils.updatePassphrase();
   },
 
-  resetPass: function () {
+  resetPass: function() {
     if (Weave.Status.login == Weave.LOGIN_FAILED_LOGIN_REJECTED)
       gSyncUtils.resetPassword();
     else
       gSyncUtils.resetPassphrase();
   },
 
-  _getEntryPoint: function () {
+  _getEntryPoint: function() {
     let params = new URLSearchParams(document.URL.split("#")[0].split("?")[1] || "");
     return params.get("entrypoint") || "preferences";
   },
@@ -481,7 +479,7 @@ var gSyncPane = {
    *          "pair"  -- pair a device first
    *          "reset" -- reset sync
    */
-  openSetup: function (wizardType) {
+  openSetup: function(wizardType) {
     let service = Components.classes["@mozilla.org/weave/service;1"]
                   .getService(Components.interfaces.nsISupports)
                   .wrappedJSObject;
@@ -639,7 +637,7 @@ var gSyncPane = {
     });
   },
 
-  openAddDevice: function () {
+  openAddDevice: function() {
     if (!Weave.Utils.ensureMPUnlocked())
       return;
 
@@ -651,7 +649,7 @@ var gSyncPane = {
                         "syncAddDevice", "centerscreen,chrome,resizable=no");
   },
 
-  resetSync: function () {
+  resetSync: function() {
     this.openSetup("reset");
   },
 

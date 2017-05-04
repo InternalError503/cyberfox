@@ -13,10 +13,8 @@ var gSecurityPane = {
   /**
    * Initializes master password UI.
    */
-  init: function ()
-  {
-    function setEventListener(aId, aEventType, aCallback)
-    {
+  init: function() {
+    function setEventListener(aId, aEventType, aCallback) {
       document.getElementById(aId)
               .addEventListener(aEventType, aCallback.bind(gSecurityPane));
     }
@@ -52,8 +50,7 @@ var gSecurityPane = {
    * Enables/disables the add-ons Exceptions button depending on whether
    * or not add-on installation warnings are displayed.
    */
-  readWarnAddonInstall: function ()
-  {
+  readWarnAddonInstall: function() {
     var warn = document.getElementById("xpinstall.whitelist.required");
     var exceptions = document.getElementById("addonExceptions");
 
@@ -66,8 +63,7 @@ var gSecurityPane = {
   /**
    * Displays the exceptions lists for add-on installation warnings.
    */
-  showAddonExceptions: function ()
-  {
+  showAddonExceptions: function() {
     var bundlePrefs = document.getElementById("bundlePreferences");
 
     var params = this._addonParams;
@@ -107,8 +103,7 @@ var gSecurityPane = {
    * passwords are never saved. When browser is set to start in Private
    * Browsing mode, the "Remember passwords" UI is useless, so we disable it.
    */
-  readSavePasswords: function ()
-  {
+  readSavePasswords: function() {
     var pref = document.getElementById("signon.rememberSignons");
     var excepts = document.getElementById("passwordExceptions");
 
@@ -126,8 +121,7 @@ var gSecurityPane = {
    * Displays a dialog in which the user can view and modify the list of sites
    * where passwords are never saved.
    */
-  showPasswordExceptions: function ()
-  {
+  showPasswordExceptions: function() {
     var bundlePrefs = document.getElementById("bundlePreferences");
     var params = {
       blockVisible: true,
@@ -151,8 +145,7 @@ var gSecurityPane = {
    * The master password is controlled by various bits of NSS functionality, so
    * the UI for it can't be controlled by the normal preference bindings.
    */
-  _initMasterPasswordUI: function ()
-  {
+  _initMasterPasswordUI: function() {
     var noMP = !LoginHelper.isMasterPasswordSet();
 
     var button = document.getElementById("changeMasterPassword");
@@ -240,8 +233,7 @@ var gSecurityPane = {
    * "use master password" checkbox, and prompts for master password removal if
    * one is set.
    */
-  updateMasterPasswordButton: function ()
-  {
+  updateMasterPasswordButton: function() {
     var checkbox = document.getElementById("useMasterPassword");
     var button = document.getElementById("changeMasterPassword");
     button.disabled = !checkbox.checked;
@@ -264,8 +256,7 @@ var gSecurityPane = {
    * the current master password.  When the dialog is dismissed, master password
    * UI is automatically updated.
    */
-  _removeMasterPassword: function ()
-  {
+  _removeMasterPassword: function() {
     var secmodDB = Cc["@mozilla.org/security/pkcs11moduledb;1"].
                    getService(Ci.nsIPKCS11ModuleDB);
     if (secmodDB.isFIPSEnabled) {
@@ -276,8 +267,7 @@ var gSecurityPane = {
                           bundle.getString("pw_change_failed_title"),
                           bundle.getString("pw_change2empty_in_fips_mode"));
       this._initMasterPasswordUI();
-    }
-    else {
+    } else {
       document.documentElement.openSubDialog("chrome://mozapps/content/preferences/removemp.xul",
                                              null, null, this._initMasterPasswordUI.bind(this));
     }
@@ -286,8 +276,7 @@ var gSecurityPane = {
   /**
    * Displays a dialog in which the master password may be changed.
    */
-  changeMasterPassword: function ()
-  {
+  changeMasterPassword: function() {
     document.documentElement.openSubDialog("chrome://mozapps/content/preferences/changemp.xul",
                                            "", null, this._initMasterPasswordUI.bind(this));
   },
@@ -296,8 +285,7 @@ var gSecurityPane = {
    * Shows the sites where the user has saved passwords and the associated login
    * information.
    */
-  showPasswords: function ()
-  {
+  showPasswords: function() {
     document.documentElement.openWindow("Toolkit:PasswordManager",
                                         "chrome://passwordmgr/content/passwordManager.xul",
                                         "resizable", null);

@@ -14,3 +14,5 @@ if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-remov
     update-alternatives --install /usr/bin/x-www-browser \
         x-www-browser /usr/bin/$MOZ_APP_NAME 40
 fi
+
+#DEBHELPER#

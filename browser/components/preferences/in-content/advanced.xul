@@ -546,22 +546,47 @@
 			
 			<!-- Plugin Settings -->
 			<groupbox id="alternateOptionsPlugins" orient="vertical">
-				<caption label="&browserplugins.label;"/>
-					<checkbox id="plugins.disabled" label="&browserpluginsdisabled.label; (&restartRequiredMSG.label;)"
-							preference="plugins.disabled"
-							tooltiptext="&restartRequiredMSG.label;"/>				
-					<checkbox id="plugin.allowed_whitelist.enabled" label="&browserpluginswhitelist.label; (&restartRequiredMSG.label;)"
-							preference="plugin.allowed_whitelist.enabled"
-							tooltiptext="&restartRequiredMSG.label;"/>
-					<checkbox id="plugin.flash_allowed" label="&browserpluginsflashenabled.label;  (&restartRequiredMSG.label;)"
-							preference="plugin.flash_allowed"
-							tooltiptext="&restartRequiredMSG.label;"/>
-					<checkbox id="plugin.java_allowed" label="&browserpluginsjavaenabled.label;  (&restartRequiredMSG.label;)"
-							preference="plugin.java_allowed"
-							tooltiptext="&restartRequiredMSG.label;"/>
-					<checkbox id="plugin.silverlight_allowed" label="&browserpluginssilverlightenabled.label;  (&restartRequiredMSG.label;)"
-							preference="plugin.silverlight_allowed"
-							tooltiptext="&restartRequiredMSG.label;"/>							
+				<caption label="&browserplugins.label; (&restartRequiredMSG.label;)"/>
+					<hbox>
+						<checkbox id="plugins_disabled" label="&browserpluginsdisabled.label;"
+								preference="plugins.disabled"
+								tooltiptext="&restartRequiredMSG.label;"/>
+						<label class="text-link"
+								href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&amp;t=1490"
+								value="&identity.learnMore;"/>
+					</hbox>
+					<hbox>
+						<checkbox id="plugin_allowed_whitelist" label="&browserpluginswhitelist.label;"
+								preference="plugin.allowed_whitelist.enabled"
+								tooltiptext="&restartRequiredMSG.label;"/>
+						<label class="text-link"
+								href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&amp;t=1451"
+								value="&identity.learnMore;"/>
+					</hbox>
+					<hbox>
+						<checkbox id="plugin_flash_allowed" label="&browserpluginsflashenabled.label;"
+								preference="plugin.flash_allowed"
+								tooltiptext="&restartRequiredMSG.label;"/>
+						<label class="text-link"
+								href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&amp;t=1614"
+								value="&identity.learnMore;"/>
+					</hbox>
+					<hbox>
+						<checkbox id="plugin_java_allowed" label="&browserpluginsjavaenabled.label;"
+								preference="plugin.java_allowed"
+								tooltiptext="&restartRequiredMSG.label;"/>
+						<label class="text-link"
+								href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&amp;t=1452"
+								value="&identity.learnMore;"/>
+					</hbox>
+					<hbox>
+						<checkbox id="plugin_silverlight_allowed" label="&browserpluginssilverlightenabled.label;"
+								preference="plugin.silverlight_allowed"
+								tooltiptext="&restartRequiredMSG.label;"/>
+						<label class="text-link"
+								href="https://8pecxstudios.com/Forums/viewtopic.php?f=8&amp;t=1702"
+								value="&identity.learnMore;"/>
+					</hbox>							
 			</groupbox>
 			
 #endif

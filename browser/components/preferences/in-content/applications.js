@@ -6,8 +6,8 @@
 
 // Constants & Enumeration Values
 
-Components.utils.import('resource://gre/modules/Services.jsm');
-Components.utils.import('resource://gre/modules/AppConstants.jsm');
+Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/AppConstants.jsm");
 const TYPE_MAYBE_FEED = "application/vnd.mozilla.maybe.feed";
 const TYPE_MAYBE_VIDEO_FEED = "application/vnd.mozilla.maybe.video.feed";
 const TYPE_MAYBE_AUDIO_FEED = "application/vnd.mozilla.maybe.audio.feed";
@@ -503,8 +503,7 @@ FeedHandlerInfo.prototype = {
     if (aNewValue instanceof Ci.nsILocalHandlerApp) {
       this.element(this._prefSelectedApp).value = aNewValue.executable;
       this.element(this._prefSelectedReader).value = "client";
-    }
-    else if (aNewValue instanceof Ci.nsIWebContentHandlerInfo) {
+    } else if (aNewValue instanceof Ci.nsIWebContentHandlerInfo) {
       this.element(this._prefSelectedWeb).value = aNewValue.uri;
       this.element(this._prefSelectedReader).value = "web";
       // Make the web handler be the new "auto handler" for feeds.
@@ -591,8 +590,7 @@ FeedHandlerInfo.prototype = {
     if (AppConstants.HAVE_SHELL_SERVICE) {
       try {
         defaultFeedReader = this._shellSvc.defaultFeedReader;
-      }
-      catch (ex) {
+      } catch (ex) {
         // no default reader or _shellSvc is null
       }
     }
@@ -605,8 +603,7 @@ FeedHandlerInfo.prototype = {
       handlerApp.executable = defaultFeedReader;
 
       this.__defaultApplicationHandler = handlerApp;
-    }
-    else {
+    } else {
       this.__defaultApplicationHandler = null;
     }
 
@@ -618,8 +615,7 @@ FeedHandlerInfo.prototype = {
       try {
         if (this._shellSvc.defaultFeedReader)
           return true;
-      }
-      catch (ex) {
+      } catch (ex) {
         // no default reader or _shellSvc is null
       }
     }
@@ -735,8 +731,7 @@ FeedHandlerInfo.prototype = {
           if (app.equals(preferredApp))
             pref.reset();
         }
-      }
-      else {
+      } else {
         app.QueryInterface(Ci.nsIWebContentHandlerInfo);
         this._converterSvc.removeContentHandler(app.contentType, app.uri);
       }
@@ -874,8 +869,7 @@ var gApplicationsPane = {
   // Initialization & Destruction
 
   init: function() {
-    function setEventListener(aId, aEventType, aCallback)
-    {
+    function setEventListener(aId, aEventType, aCallback) {
       document.getElementById(aId)
               .addEventListener(aEventType, aCallback.bind(gApplicationsPane));
     }
@@ -928,8 +922,7 @@ var gApplicationsPane = {
       // from the xul file was used.  If we are sorting on the other
       // column, we should remove it.
       document.getElementById("typeColumn").removeAttribute("sortDirection");
-    }
-    else
+    } else
       this._sortColumn = document.getElementById("typeColumn");
 
     // Load the data and build the list of handlers.
@@ -1355,9 +1348,10 @@ var gApplicationsPane = {
     while (menuPopup.hasChildNodes())
       menuPopup.removeChild(menuPopup.lastChild);
 
+    let internalMenuItem;
     // Add the "Preview in Firefox" option for optional internal handlers.
     if (handlerInfo instanceof InternalHandlerInfoWrapper) {
-      let internalMenuItem = document.createElement("menuitem");
+      internalMenuItem = document.createElement("menuitem");
       internalMenuItem.setAttribute("action", Ci.nsIHandlerInfo.handleInternally);
       let label = this._prefsBundle.getFormattedString("previewInApp",
                                                        [this._brandShortName]);
@@ -1399,7 +1393,7 @@ var gApplicationsPane = {
 
     // If this is the feed type, add a Live Bookmarks item.
     if (isFeedType(handlerInfo.type)) {
-      let internalMenuItem = document.createElement("menuitem");
+      internalMenuItem = document.createElement("menuitem");
       internalMenuItem.setAttribute("action", Ci.nsIHandlerInfo.handleInternally);
       let label = this._prefsBundle.getFormattedString("addLiveBookmarksInApp",
                                                        [this._brandShortName]);
@@ -1411,8 +1405,8 @@ var gApplicationsPane = {
 
     // Add a separator to distinguish these items from the helper app items
     // that follow them.
-    let menuItem = document.createElement("menuseparator");
-    menuPopup.appendChild(menuItem);
+    let menuseparator = document.createElement("menuseparator");
+    menuPopup.appendChild(menuseparator);
 
     // Create a menu item for the OS default application, if any.
     if (handlerInfo.hasDefaultHandler) {
@@ -1478,8 +1472,7 @@ var gApplicationsPane = {
                                                     .getTypeFromExtension("exe");
       canOpenWithOtherApp = handlerInfo.type != executableType;
     }
-    if (canOpenWithOtherApp)
-    {
+    if (canOpenWithOtherApp) {
       let menuItem = document.createElement("menuitem");
       menuItem.className = "choose-app-item";
       menuItem.addEventListener("command", function(e) {
@@ -1512,7 +1505,11 @@ var gApplicationsPane = {
       menu.selectedItem = askMenuItem;
     else switch (handlerInfo.preferredAction) {
       case Ci.nsIHandlerInfo.handleInternally:
-        menu.selectedItem = internalMenuItem;
+        if (internalMenuItem) {
+          menu.selectedItem = internalMenuItem;
+        } else {
+          Cu.reportError("No menu item defined to set!")
+        }
         break;
       case Ci.nsIHandlerInfo.useSystemDefault:
         menu.selectedItem = defaultMenuItem;
@@ -1611,8 +1608,7 @@ var gApplicationsPane = {
 
     try {
       this._storeAction(aActionItem);
-    }
-    finally {
+    } finally {
       this._storingAction = false;
     }
   },
@@ -1760,8 +1756,8 @@ var gApplicationsPane = {
           handlerApp.executable = fp.file;
 
           // Add the app to the type's list of possible handlers.
-          let handlerInfo = this._handledTypes[this._list.selectedItem.type];
-          handlerInfo.addPossibleApplicationHandler(handlerApp);
+          let handler = this._handledTypes[this._list.selectedItem.type];
+          handler.addPossibleApplicationHandler(handlerApp);
 
           chooseAppCallback(handlerApp);
         }
@@ -1886,8 +1882,7 @@ var gApplicationsPane = {
           let url = wrappedHandlerInfo.getProperty("defaultApplicationIconURL");
           if (url)
             return url + "?size=16";
-        }
-        catch (ex) {}
+        } catch (ex) {}
       }
     }
 
