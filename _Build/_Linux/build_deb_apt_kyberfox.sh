@@ -1,0 +1,110 @@
+#!/bin/bash
+# Built from template by hawkeye116477
+# Full repo https://github.com/hawkeye116477/cyberfox-deb
+# Script Version: 1.3
+# Set current directory to script directory.
+Dir=$(cd "$(dirname "$0")" && pwd)
+cd $Dir
+
+# Init vars
+VERSION=""
+IDENTITY=$1
+
+# Check if IDENTITY was passed to script
+if [ -z "$IDENTITY" ] || [ ! -n "$IDENTITY" ]; then
+    echo "IDENTITY type must be passed to the script build_deb_and_ppa_package.sh 'IDENTITY'"
+    exit 1
+fi
+
+function finalCleanUp(){
+    if [ -d "$Dir/tmp_kde" ]; then
+        echo "Clean: $Dir/tmp_kde"
+        rm -rf $Dir/tmp_kde
+    fi
+}
+
+# Temp while testing
+finalCleanUp
+
+# Get package version.
+if [ -f "../../browser/config/version_display.txt" ]; then
+    VERSION=$(<../../browser/config/version_display.txt)
+else
+    echo "Unable to get current build version!"
+    exit 1    
+fi
+
+# Generate template directories
+if [ ! -d "$Dir/tmp_kde/cyberfox-kde-$VERSION" ]; then
+    mkdir $Dir/tmp_kde/cyberfox-kde-$VERSION
+fi
+  
+# Copy deb templates
+if [ -d "$Dir/deb_apt/cf-kde/debian" ]; then
+	cp -r $Dir/deb_apt/cf-kde/debian/ $Dir/tmp_kde/cyberfox-kde-$VERSION/
+else
+    echo "Unable to locate deb templates!"
+    exit 1 
+fi
+
+# Generate change log template
+CHANGELOGDIR=$Dir/tmp_kde/cyberfox-kde-$VERSION/debian/changelog
+if grep -q -E "__VERSION__|__CHANGELOG__|__TIMESTAMP__" "$CHANGELOGDIR" ; then
+    sed -i "s|__VERSION__|$VERSION|" "$CHANGELOGDIR"
+
+    if [ "$IDENTITY" == "Release" ]; then
+        sed -i "s|__CHANGELOG__|https://cyberfox.8pecxstudios.com/hooray-your-cyberfox-is-up-to-date/?version=$VERSION|" "$CHANGELOGDIR"
+    elif [ "$IDENTITY" == "Beta" ]; then
+        sed -i "s|__CHANGELOG__|https://github.com/InternalError503/cyberfox-beta/releases/tag/$VERSION|" "$CHANGELOGDIR"  
+    else
+        sed -i "s|__CHANGELOG__|N/A|" "$CHANGELOGDIR"
+    fi
+    DATE=$(date --rfc-2822)
+    sed -i "s|__TIMESTAMP__|$DATE|" "$CHANGELOGDIR"
+
+else
+    echo "An error occured when trying to generate $CHANGELOGDIR information!"
+    exit 1  
+fi
+
+
+# Copy latest build
+if [ -d "../../../../../obj64/dist/Cyberfox" ]; then
+    cp -r ../../../../../obj64/dist/Cyberfox/* $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox
+    mv $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/Cyberfox $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/cyberfox
+    mv $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/Cyberfox-bin $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/cyberfox-bin
+    
+    # Features are in packages cyberfox-locale-*, cyberfox-ext-*, so are not needed
+	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/browser/features
+else
+    echo "Unable to Cyberfox KDE Plasma Edition package files, Please check the build was created and packaged successfully!"
+    exit 1     
+fi
+
+
+# Make sure correct permissions are set
+chmod  755 $Dir/tmp_kde/cyberfox-kde-$VERSION/debian/cyberfox.prerm
+chmod  755 $Dir/tmp_kde/cyberfox-kde-$VERSION/debian/cyberfox.postinst
+chmod  755 $Dir/tmp_kde/cyberfox-kde-$VERSION/debian/rules
+chmod 755 $Dir/tmp_kde/cyberfox-kde-$VERSION/debian/cyberfox.sh
+
+# Linux has hunspell dictionaries, so we can remove Cyberfox dictionaries and make symlink to Linux dictionaries. 
+# Thanks to this, we don't have to download dictionary from AMO for our language.
+# Symlinks are now in cyberfox.links file, so this fixes "Unsafe symlink" message.
+rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/dictionaries
+
+# Build .deb package (Requires devscripts to be installed sudo apt install devscripts)
+notify-send "Building deb package!"
+debuild -us -uc 
+
+if [ -f "$Dir/deb_ppa/cyberfox-kde_*_amd64.deb" ]; then
+	mkdir $Dir/debs
+    mv $Dir/tmp_kde/*.deb $Dir/debs
+else
+    echo "Unable to move deb packages, files maybe missing or had errors during creation!"
+    exit 1
+fi
+
+# Clean up
+notify-send "Deb package for APT repository complete!"
+finalCleanUp
