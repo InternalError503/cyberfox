@@ -183,7 +183,7 @@
 
 <!-- Plugin Settings Tweak -->
 <!ENTITY browserplugins.label "Плагины браузера">
-<!ENTITY browserpluginsdisabled.label "Отключить плагины браузера (отключаются все плагины)">
+<!ENTITY browserpluginsdisabled.label "Отключить плагины браузера (отключаются все плагины, включая Flash)">
 <!ENTITY browserpluginswhitelist.label "Разрешить белый список плагинов">
 <!ENTITY browserpluginsflashenabled.label "Включить плагин Flash">
 <!ENTITY browserpluginsjavaenabled.label "Включить плагин Java">

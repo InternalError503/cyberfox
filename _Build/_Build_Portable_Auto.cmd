@@ -33,7 +33,6 @@ mkdir "%BuildFolderPath%_CyberfoxPortable\logs"
 echo. Building Intel 86 bit portable package
 call %Delete% "%BuildFolderPathIntel%Other\Source\win64.txt" "win64.txt not found!"
 call %Delete% "%BuildFolderPathIntel%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel86\UpdateConfig.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
 
 copy /y "%BuildFolderPath%_CyberfoxPortable\Shared\intel86\appinfo.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
 GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\intel86\appinfo.ini --version=%Version% --rsum=%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\appinfo.ini
@@ -51,7 +50,6 @@ echo. Build Intel 86 bit portable package complete!
 echo. Building Amd 86 bit portable package!
 call %Delete% "%BuildFolderPathAmd%Other\Source\win64.txt" "win64.txt not found!"
 call %Delete% "%BuildFolderPathAmd%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd86\UpdateConfig.ini" "%BuildFolderPathAmd%App\AppInfo\"
 
 copy /y "%BuildFolderPath%_CyberfoxPortable\Shared\amd86\appinfo.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\"
 GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\amd86\appinfo.ini --version=%Version% --rsum=%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\appinfo.ini
@@ -84,7 +82,6 @@ if not exist "%BuildFolderPathIntel%Other\Source\win64.txt" (
 break>"%BuildFolderPathIntel%Other\Source\win64.txt"
 )
 call %Delete% "%BuildFolderPathIntel%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\intel64\UpdateConfig.ini" "%BuildFolderPathIntel%App\AppInfo\"
 
 copy /y "%BuildFolderPath%_CyberfoxPortable\Shared\intel64\appinfo.ini" "%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\"
 GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\intel64\appinfo.ini --version=%Version% --rsum=%BuildFolderPath%_CyberfoxPortable\Intel\CyberfoxPortable\App\AppInfo\appinfo.ini
@@ -104,7 +101,6 @@ if not exist "%BuildFolderPathAmd%Other\Source\win64.txt" (
 break>"%BuildFolderPathAmd%Other\Source\win64.txt"
 )
 call %Delete% "%BuildFolderPathAmd%CyberfoxPortable.exe" "CyberfoxPortable.exe not found!"
-copy /y "%BuildFolderPath%_CyberfoxPortable\BlankConfig\amd64\UpdateConfig.ini" "%BuildFolderPathAmd%App\AppInfo\"
 
 copy /y "%BuildFolderPath%_CyberfoxPortable\Shared\amd64\appinfo.ini" "%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\"
 GetHash-CL.exe --file=%BuildFolderPath%_CyberfoxPortable\Shared\amd64\appinfo.ini --version=%Version% --rsum=%BuildFolderPath%_CyberfoxPortable\Amd\CyberfoxPortable\App\AppInfo\appinfo.ini

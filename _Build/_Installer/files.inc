@@ -20,7 +20,7 @@ Source: "{content}\browser\{#PackageType}\uninstall\helper.exe"; DestDir: "{app}
 Source: "{content}\browser\{#PackageType}\api-ms-win-*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\application.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\Cyberfox.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
-Source: "{content}\browser\{#PackageType}\Cyberfox.VisualElementsManifest.xml"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{content}\browser\{#PackageType}\cyberfox.VisualElementsManifest.xml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{content}\browser\{#PackageType}\d3dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
 #if Arch == "i368"
 Source: "{content}\browser\{#PackageType}\D3DCompiler_43.dll"; DestDir: "{app}"; Flags: ignoreversion
