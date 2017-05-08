@@ -76,10 +76,14 @@ if [ -d "../../../../../obj64/dist/Cyberfox" ]; then
     
     # Features are in packages cyberfox-locale-*, cyberfox-ext-*, so are not needed
 	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/browser/features
+	# Remove kyberfoxhelper. We will move it to another package
+	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/kyberfoxhelper
+	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/LICENSE-kyberfoxhelper
 else
     echo "Unable to Cyberfox KDE Plasma Edition package files, Please check the build was created and packaged successfully!"
     exit 1     
 fi
+
 
 
 # Make sure correct permissions are set

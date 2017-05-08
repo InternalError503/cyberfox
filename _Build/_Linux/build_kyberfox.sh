@@ -311,25 +311,17 @@ select yn in "Yes" "No" "Quit"; do
 	fi;
 	
     # Get kyberfoxhelper version
-    if [ ! -d "$WORKDIR/tmp/version/latest_version.txt" ]; then 
-    mkdir -p $WORKDIR/tmp/version
-    wget -O $WORKDIR/tmp/version/latest_version.txt 'https://github.com/hawkeye116477/kyberfoxhelper/raw/master/latest_version.txt'
+    if [ ! -d "$WORKDIR/tmp/latest_version.txt" ]; then 
+    mkdir $WORKDIR/tmp
+    wget -O $WORKDIR/tmp/latest_version.txt 'https://github.com/hawkeye116477/kyberfoxhelper/raw/master/latest_version.txt'
     fi
     
-    if [ -f "$WORKDIR/tmp/version/latest_version.txt" ]; then
-    VERSION_HELPER=$(<$WORKDIR/tmp/version/latest_version.txt)
+    if [ -f "$WORKDIR/tmp/latest_version.txt" ]; then
+    VERSION_HELPER=$(<$WORKDIR/tmp/latest_version.txt)
 else
     echo "Unable to get current helper version!"
     exit 1    
 fi
-
-	# Include kyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/bin/kyberfoxhelper 'https://github.com/hawkeye116477/kyberfoxhelper/releases/download/v${VERSION_HELPER}/kyberfoxhelper'
-	rm -rf $WORKDIR/tmp/
-	
-	# Include kde.js
-	cp -R $WORKDIR/$LDIR/_Build/_Linux/KDE/kde.js $WORKDIR/obj64/dist/bin/defaults/pref/
-	
 
 	  if [ -d "$WORKDIR/obj64/dist/bin" ]; then
 	    	changeDirectory "$WORKDIR/$LDIR"
@@ -341,7 +333,7 @@ fi
 	fi
 	
 	# Include LICENSE-kyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/LICENSE-kyberfoxhelper 'https://raw.githubusercontent.com/hawkeye116477/kyberfoxhelper/master/LICENSE'
+	wget -O $WORKDIR/obj64/dist/Cyberfox/LICENSE-kyberfoxhelper "https://raw.githubusercontent.com/hawkeye116477/kyberfoxhelper/master/LICENSE"
 
 	# Include voucher.bin
 	if [ -f "$Dir/voucher.bin" ]; then
@@ -349,12 +341,20 @@ fi
     		cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/bin/
 			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/Cyberfox/
 	fi
+	
+    # Include kyberfoxhelper
+	wget -O $WORKDIR/obj64/dist/Cyberfox/kyberfoxhelper "https://github.com/hawkeye116477/kyberfoxhelper/releases/download/v$VERSION_HELPER/kyberfoxhelper"
+	chmod +x $WORKDIR/obj64/dist/Cyberfox/kyberfoxhelper
+	rm -rf $WORKDIR/tmp/
+	
+	# Include kde.js
+	cp -R $WORKDIR/$LDIR/_Build/_Linux/KDE/kde.js $WORKDIR/obj64/dist/Cyberfox/defaults/pref/
 
 
 	  changeDirectory "$WORKDIR/obj64/dist"
            
 	  # Get the current filename with browser version!
-	  FILENAME=$(basename Cyberfox_KDE_Plasma_Edition-*.en-US.linux-x86_64.tar.bz2)
+	  FILENAME=$(basename Cyberfox_KDE_Plasma_Edition-$VERSION.en-US.linux-x86_64.tar.bz2)
 	  
 	    if [ -f "$FILENAME" ]; then
 	      echo "Packaging: Found $FILENAME removing file!"
