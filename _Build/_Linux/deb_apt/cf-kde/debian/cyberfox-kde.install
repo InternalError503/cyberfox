@@ -4,4 +4,3 @@ debian/vendor-cyberfox.js /opt/cyberfox/browser/defaults/preferences
 debian/cyberfox.sh /opt/cyberfox
 debian/cyberfox.desktop /usr/share/applications
 debian/distribution.ini /opt/cyberfox/distribution
-debian/kde.js /opt/cyberfox/browser/defaults/preferences

@@ -33,6 +33,12 @@ Description: Pocket integration for Cyberfox Web Browser
  The Pocket for Cyberfox button lets you save web pages and videos to Pocket in just one click.
  Pocket strips away clutter and saves the page in a clean, distraction-free view and lets you access them on the go through the Pocket app.
  All you need is a free account, an Internet connection and the Pocket button.
+  
+Package: cyberfox-locale-ach 
+Architecture: amd64 
+Depends: ${misc:Depends}
+Description: Acholi language pack for Cyberfox 
+ This package contains Acholi translations for Cyberfox
 
 Package: cyberfox-locale-af
 Architecture: amd64
@@ -129,6 +135,12 @@ Architecture: amd64
 Depends: ${misc:Depends}
 Description: German language pack for Cyberfox
  This package contains German translations for Cyberfox
+ 
+Package: cyberfox-locale-dsb 
+Architecture: amd64 
+Depends: ${misc:Depends} 
+Description: Lower Sorbian language pack for Cyberfox 
+ This package contains Lower Sorbian translations for Cyberfox 
 
 Package: cyberfox-locale-el
 Architecture: amd64
@@ -171,6 +183,12 @@ Architecture: amd64
 Depends: ${misc:Depends}
 Description: Persian language pack for Cyberfox
  This package contains Persian translations for Cyberfox
+ 
+Package: cyberfox-locale-ff 
+Architecture: amd64 
+Depends: ${misc:Depends}
+Description: Fulah language pack for Cyberfox 
+ This package contains Fulah translations for Cyberfox 
 
 Package: cyberfox-locale-fi
 Architecture: amd64
@@ -304,6 +322,12 @@ Depends: ${misc:Depends}
 Description: Korean language pack for Cyberfox
  This package contains Korean translations for Cyberfox
 
+Package: cyberfox-locale-lij 
+Architecture: amd64 
+Depends: 
+Description: Ligurian language pack for Cyberfox 
+ This package contains Ligurian translations for Cyberfox 
+
 Package: cyberfox-locale-lt
 Architecture: amd64
 Depends: ${misc:Depends}
@@ -387,6 +411,12 @@ Architecture: amd64
 Depends: ${misc:Depends}
 Description: Portuguese language pack for Cyberfox
  This package contains Portuguese translations for Cyberfox
+ 
+Package: cyberfox-locale-rm 
+Architecture: amd64 
+Depends: ${misc:Depends} 
+Description: Romansh language pack for Cyberfox 
+ This package contains Romansh translations for Cyberfox
 
 Package: cyberfox-locale-ro
 Architecture: amd64
@@ -417,6 +447,12 @@ Architecture: amd64
 Depends: ${misc:Depends}
 Description: Slovenian language pack for Cyberfox
  This package contains Slovenian translations for Cyberfox
+
+Package: cyberfox-locale-son 
+Architecture: amd64 
+Depends: ${misc:Depends}
+Description: Songhai language pack for Cyberfox 
+ This package contains Songhai translations for Cyberfox
 
 Package: cyberfox-locale-sq
 Architecture: amd64
