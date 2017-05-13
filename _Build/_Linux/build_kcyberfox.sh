@@ -124,6 +124,7 @@ function ApplyKDE(){
 	fi
 
 	# Apply patches if exists
+	# Apply patches if exists
     if [  -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch" ] && [  -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/KDE_lock" ]; then
         cd $WORKDIR/$LDIR
         patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
@@ -141,7 +142,7 @@ function ApplyKDE(){
 }
 
 # Set working directory default is ~/Documents
-WORKDIR=~/Documents
+WORKDIR=~/git
 
 # Set repository url.
 # Set identity.
@@ -216,7 +217,7 @@ select yn in "Yes" "No" "Quit"; do
 	    fi;
 	  fi; break;;
         No ) 
-                    if [ ! -f $WORKDIR/$LDIR/mozconfig]; then
+                    if [ ! -f "$WORKDIR/$LDIR/mozconfig"]; then
                         echo "mozconfig does not exist copying pre-configured to $LDIR root"
                         cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
                     fi;
