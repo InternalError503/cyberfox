@@ -1,0 +1,7 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Cyberfox Web Browser
+Source: https://github.com/InternalError503/cyberfox
+
+Files: *
+Copyright: Copyright 2017 8pecxstudios <8pecxstudios.com>
+License: MPL-2.0

@@ -1,0 +1,3 @@
+cyberfox-kde binary: embedded-library opt/cyberfox/libxul.so: libjpeg
+cyberfox-kde binary: embedded-library opt/cyberfox/libmozsqlite3.so: sqlite
+cyberfox-kde binary: image-file-in-opt

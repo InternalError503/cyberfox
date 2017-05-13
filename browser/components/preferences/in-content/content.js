@@ -336,7 +336,6 @@ var gContentPane = {
   // Grab current set locale from 'general.useragent.locale'
   updateDefaultLocale: function() {
 	  document.getElementById("languageMenu").value = Services.prefs.getCharPref('general.useragent.locale');
-      Services.prefs.setBoolPref('intl.locale.matchOS', false);
   },
   setDefaultLocale: function() {	  
 	  var languageMenu = document.getElementById("languageMenu");
@@ -371,6 +370,7 @@ var gContentPane = {
           revertChange();
           return;
         case CONFIRM_RESTART_PROMPT_RESTART_LATER:
+          Services.prefs.setBoolPref('intl.locale.matchOS', false);
           Services.prefs.setCharPref('general.useragent.locale', languageMenu.value);
           return;
       }  

@@ -1,8 +1,0 @@
-# System dictionaries
-usr/share/hunspell usr/lib/Cyberfox/dictionaries
-
-# Cyberfox launcher
-usr/lib/Cyberfox/Cyberfox.sh usr/bin/cyberfox
-
-# Cyberfox icon
-usr/lib/Cyberfox/browser/icons/mozicon128.png usr/share/pixmaps/Cyberfox.png
