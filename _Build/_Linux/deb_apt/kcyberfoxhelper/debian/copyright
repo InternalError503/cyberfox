@@ -1,8 +1,8 @@
 This is modified OpenSuse's kmozillahelper to make KDE Cyberfox integration. This package was debianized by 8pecxstudios <support@8pecxstudios.com>.
 
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: kyberfoxhelper
-Source: https://github.com/hawkeye116477/kyberfoxhelper
+Upstream-Name: kcyberfoxhelper
+Source: https://github.com/hawkeye116477/kcyberfoxhelper
 
 Files: *
 Copyright: 2009, Lubos Lunak <l.lunak@suse.cz>

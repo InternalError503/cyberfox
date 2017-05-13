@@ -1,5 +1,5 @@
 # Cyberfox KDE Plasma Edition quick build script
-# Version: 1
+# Version: 1.1
 # Release, Beta channels Linux
 # This is only for Cyberfox 52. For Cyberfox 53+ something should be changed...
 
@@ -117,9 +117,9 @@ function ApplyKDE(){
 			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/firefox52/mozilla-kde.patch'
 			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/firefox52/firefox-kde.patch'
 			sed -i 's/Firefox/Cyberfox/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
-			sed -i 's/KMOZILLAHELPER/KYBERFOXHELPER/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
-			sed -i 's|/usr/lib/mozilla/kmozillahelper|./kyberfoxhelper|g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
-			sed -i 's/kmozillahelper/kyberfoxhelper/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's/KMOZILLAHELPER/KCYBERFOXHELPER/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's|/usr/lib/mozilla/kmozillahelper|/opt/cyberfox/kcyberfoxhelper|g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
+			sed -i 's/kmozillahelper/kcyberfoxhelper/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
 			sed -i 's/firefox/cyberfox/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch
 	fi
 
@@ -216,8 +216,12 @@ select yn in "Yes" "No" "Quit"; do
 	    fi;
 	  fi; break;;
         No ) 
+                    if [ ! -f $WORKDIR/$LDIR/mozconfig]; then
+                        echo "mozconfig does not exist copying pre-configured to $LDIR root"
+                        cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
+                    fi;
 					setIdentity $IDENTITY
-					VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)	
+					VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)
 					GenerateBuildInfo $LDIR "https://ftp.mozilla.org/pub/firefox/candidates/$VERSION-candidates/build1/source/firefox-$VERSION.source.tar.xz" "firefox-$VERSION.source.tar.xz" $GITURI
 		  break;;
 	  "Quit" )
@@ -310,10 +314,10 @@ select yn in "Yes" "No" "Quit"; do
 		"$WORKDIR/$LDIR/_Build/_Linux/language.sh" $(<$WORKDIR/$LDIR/browser/config/version.txt)
 	fi;
 	
-    # Get kyberfoxhelper version
+    # Get kcyberfoxhelper version
     if [ ! -d "$WORKDIR/tmp/latest_version.txt" ]; then 
     mkdir $WORKDIR/tmp
-    wget -O $WORKDIR/tmp/latest_version.txt 'https://github.com/hawkeye116477/kyberfoxhelper/raw/master/latest_version.txt'
+    wget -O $WORKDIR/tmp/latest_version.txt 'https://github.com/hawkeye116477/kcyberfoxhelper/raw/master/latest_version.txt'
     fi
     
     if [ -f "$WORKDIR/tmp/latest_version.txt" ]; then
@@ -332,8 +336,8 @@ fi
     		cp -r $Dir/README.txt $WORKDIR/obj64/dist/
 	fi
 	
-	# Include LICENSE-kyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/Cyberfox/LICENSE-kyberfoxhelper "https://raw.githubusercontent.com/hawkeye116477/kyberfoxhelper/master/LICENSE"
+	# Include LICENSE-kcyberfoxhelper
+	wget -O $WORKDIR/obj64/dist/Cyberfox/LICENSE-kcyberfoxhelper "https://raw.githubusercontent.com/hawkeye116477/kcyberfoxhelper/master/LICENSE"
 
 	# Include voucher.bin
 	if [ -f "$Dir/voucher.bin" ]; then
@@ -342,9 +346,9 @@ fi
 			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/Cyberfox/
 	fi
 	
-    # Include kyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/Cyberfox/kyberfoxhelper "https://github.com/hawkeye116477/kyberfoxhelper/releases/download/v$VERSION_HELPER/kyberfoxhelper"
-	chmod +x $WORKDIR/obj64/dist/Cyberfox/kyberfoxhelper
+    # Include kcyberfoxhelper
+	wget -O $WORKDIR/obj64/dist/Cyberfox/kcyberfoxhelper "https://github.com/hawkeye116477/kcyberfoxhelper/releases/download/v$VERSION_HELPER/kcyberfoxhelper"
+	chmod +x $WORKDIR/obj64/dist/Cyberfox/kcyberfoxhelper
 	rm -rf $WORKDIR/tmp/
 	
 	# Include kde.js

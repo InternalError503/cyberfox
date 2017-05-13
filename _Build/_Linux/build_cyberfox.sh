@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.9
+# Version: 2.9.1
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -209,6 +209,10 @@ select yn in "Yes" "No" "Quit"; do
 	    fi;
 	  fi; break;;
         No ) 
+                    if [ ! -f $LDIR/mozconfig]; then
+                        echo "mozconfig does not exist copying pre-configured to $LDIR root"
+                        cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
+                    fi;
 					setIdentity $IDENTITY
 					VERSION=$(<$WORKDIR/$LDIR/browser/config/version_display.txt)	
 					GenerateBuildInfo $LDIR "https://ftp.mozilla.org/pub/firefox/candidates/$VERSION-candidates/build1/source/firefox-$VERSION.source.tar.xz" "firefox-$VERSION.source.tar.xz" $GITURI

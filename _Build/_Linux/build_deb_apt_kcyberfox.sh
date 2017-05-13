@@ -1,7 +1,7 @@
 #!/bin/bash
 # Built from template by hawkeye116477
 # Full repo https://github.com/hawkeye116477/cyberfox-deb
-# Script Version: 1.3
+# Script Version: 1.4
 # Set current directory to script directory.
 Dir=$(cd "$(dirname "$0")" && pwd)
 cd $Dir
@@ -76,9 +76,8 @@ if [ -d "../../../../../obj64/dist/Cyberfox" ]; then
     
     # Features are in packages cyberfox-locale-*, cyberfox-ext-*, so are not needed
 	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/browser/features
-	# Remove kyberfoxhelper. We will move it to another package
-	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/kyberfoxhelper
-	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/LICENSE-kyberfoxhelper
+	# Remove kcyberfoxhelper. We will move it to another package
+	rm -rf $Dir/tmp_kde/cyberfox-kde-$VERSION/cyberfox/kcyberfoxhelper
 else
     echo "Unable to Cyberfox KDE Plasma Edition package files, Please check the build was created and packaged successfully!"
     exit 1     

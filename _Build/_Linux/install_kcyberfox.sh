@@ -286,7 +286,7 @@ EOF
                     Yes )
                         echo "Adding KDE Plasma notification integration"
                         # Requires admin permissions to write the file to /usr/share/knotifications5 directory.
-                        sudo wget -O /usr/share/knotifications5/kyberfoxhelper.notifyrc  https://raw.githubusercontent.com/hawkeye116477/kyberfoxhelper/master/kyberfoxhelper.notifyrc
+                        sudo wget -O /usr/share/knotifications5/kcyberfoxhelper.notifyrc  https://raw.githubusercontent.com/hawkeye116477/kcyberfoxhelper/master/kcyberfoxhelper.notifyrc
                     break;;
                     No ) break;;
                 esac
@@ -349,8 +349,8 @@ EOF
             fi
             
             # Remove KDE Plasma notification integration
-             if [ -f /usr/share/knotifications5/kyberfoxhelper.notifyrc ]; then
-                sudo rm -vf /usr/share/knotifications5/kyberfoxhelper.notifyrc;
+             if [ -f /usr/share/knotifications5/kcyberfoxhelper.notifyrc ]; then
+                sudo rm -vf /usr/share/knotifications5/kcyberfoxhelper.notifyrc;
             fi
             
 			notify-send "Uninstall Complete"
