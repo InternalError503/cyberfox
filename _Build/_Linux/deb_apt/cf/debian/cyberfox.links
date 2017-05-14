@@ -6,3 +6,6 @@ opt/cyberfox/cyberfox.sh usr/bin/cyberfox
 
 # Cyberfox icon
 opt/cyberfox/browser/icons/mozicon128.png usr/share/pixmaps/cyberfox.png
+
+# Replace duplicate binary with symlink to launcher
+opt/cyberfox/cyberfox.sh opt/cyberfox/cyberfox-bin

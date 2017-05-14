@@ -124,7 +124,6 @@ function ApplyKDE(){
 	fi
 
 	# Apply patches if exists
-	# Apply patches if exists
     if [  -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch" ] && [  -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/KDE_lock" ]; then
         cd $WORKDIR/$LDIR
         patch -Np1 -i $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
@@ -142,7 +141,7 @@ function ApplyKDE(){
 }
 
 # Set working directory default is ~/Documents
-WORKDIR=~/git
+WORKDIR=~/Documents
 
 # Set repository url.
 # Set identity.
@@ -336,9 +335,6 @@ fi
 	if [ -f "$Dir/README.txt" ]; then
     		cp -r $Dir/README.txt $WORKDIR/obj64/dist/
 	fi
-	
-	# Include LICENSE-kcyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/Cyberfox/LICENSE-kcyberfoxhelper "https://raw.githubusercontent.com/hawkeye116477/kcyberfoxhelper/master/LICENSE"
 
 	# Include voucher.bin
 	if [ -f "$Dir/voucher.bin" ]; then
