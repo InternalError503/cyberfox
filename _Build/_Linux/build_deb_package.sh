@@ -1,7 +1,7 @@
 #!/bin/bash
 # Built from template by hawkeye116477
 # Full repo https://github.com/hawkeye116477/cyberfox-deb
-# Script Version: 1.0.7
+# Script Version: 1.0.8
 # Set current directory to script directory.
 Dir=$(cd "$(dirname "$0")" && pwd)
 cd $Dir
@@ -45,13 +45,13 @@ fi
 # Generate lib & cyberfox folder if not already created
 if [ ! -d "$Dir/deb/usr/lib" ]; then
     mkdir $Dir/deb/usr/lib
-    mkdir $Dir/deb/usr/lib/Cyberfox
+    mkdir $Dir/deb/usr/lib/cyberfox
 fi
 
 # Copy latest build
-if [ -d "../../../obj64/dist/Cyberfox" ]; then
-    cp -R ../../../obj64/dist/Cyberfox/* $Dir/deb/usr/lib/Cyberfox
-    cp $Dir/_Templates/Cyberfox.sh $Dir/deb/usr/lib/Cyberfox
+if [ -d "../../../obj64/dist/cyberfox" ]; then
+    cp -R ../../../obj64/dist/cyberfox/* $Dir/deb/usr/lib/cyberfox
+    cp $Dir/_Templates/cyberfox.sh $Dir/deb/usr/lib/cyberfox
 else
     echo "Unable to Cyberfox package files, Please check the build was created and packaged successfully!"
     exit 1     
@@ -97,14 +97,14 @@ if [ ! -d "$Dir/deb/usr/share/pixmaps" ]; then
     mkdir $Dir/deb/usr/share/pixmaps
 fi
 
-ln -s /usr/lib/Cyberfox/Cyberfox.sh $Dir/deb/usr/bin/cyberfox
-ln -s /usr/lib/Cyberfox/browser/icons/mozicon128.png $Dir/deb/usr/share/pixmaps/Cyberfox.png
+ln -sf /usr/lib/cyberfox/cyberfox.sh $Dir/deb/usr/bin/cyberfox
+ln -sf /usr/lib/cyberfox/browser/icons/mozicon128.png $Dir/deb/usr/share/pixmaps/cyberfox.png
 
 # Linux has hunspell dictionaries, so we can remove Cyberfox dictionaries and make symlink to Linux dictionaries. 
 # Just like Ubuntu Mozilla Team did
 # Thanks to this, we don't have to download dictionary from AMO for our language.
-rm -rf $Dir/deb/usr/lib/Cyberfox/dictionaries
-ln -s /usr/share/hunspell $Dir/deb/usr/lib/Cyberfox/dictionaries
+rm -rf $Dir/deb/usr/lib/cyberfox/dictionaries
+ln -sf /usr/share/hunspell $Dir/deb/usr/lib/cyberfox/dictionaries
 
 # Build debian package
 dpkg -b $Dir/deb ../../../obj64/dist/Cyberfox-$VERSION.en-US.linux-x86_64.deb

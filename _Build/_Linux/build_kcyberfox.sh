@@ -1,5 +1,5 @@
 # Cyberfox KDE Plasma Edition quick build script
-# Version: 1.1
+# Version: 1.1.1
 # Release, Beta channels Linux
 # This is only for Cyberfox 52. For Cyberfox 53+ something should be changed...
 
@@ -216,7 +216,7 @@ select yn in "Yes" "No" "Quit"; do
 	    fi;
 	  fi; break;;
         No ) 
-                    if [ ! -f "$WORKDIR/$LDIR/mozconfig"]; then
+                    if [ ! -f "$WORKDIR/$LDIR/mozconfig" ]; then
                         echo "mozconfig does not exist copying pre-configured to $LDIR root"
                         cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
                     fi;
@@ -331,25 +331,30 @@ fi
 	    	changeDirectory "$WORKDIR/$LDIR"
 	    ./mach package
 
-	# Include readme.txt
-	if [ -f "$Dir/README.txt" ]; then
-    		cp -r $Dir/README.txt $WORKDIR/obj64/dist/
+	
+	#Include README_CYBERFOX_KDE.txt
+	if [ -f "$WORKDIR/$LDIR/_Build/_Linux/README_CYBERFOX_KDE.txt" ]; then
+    		cp -r $WORKDIR/$LDIR/_Build/_Linux/README_CYBERFOX_KDE.txt $WORKDIR/obj64/dist/
+    elif [! -f "$WORKDIR/$LDIR/_Build/_Linux/README_CYBERFOX_KDE.txt" ]; then
+    echo "README_CYBERFOX_KDE.txt not found. You should include this important file!"
 	fi
+	
 
 	# Include voucher.bin
 	if [ -f "$Dir/voucher.bin" ]; then
 			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/
     		cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/bin/
-			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/Cyberfox/
+			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/cyberfox/
 	fi
 	
     # Include kcyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/Cyberfox/kcyberfoxhelper "https://github.com/hawkeye116477/kcyberfoxhelper/releases/download/v$VERSION_HELPER/kcyberfoxhelper"
-	chmod +x $WORKDIR/obj64/dist/Cyberfox/kcyberfoxhelper
+	wget -O $WORKDIR/obj64/dist/cyberfox/kcyberfoxhelper "https://github.com/hawkeye116477/kcyberfoxhelper/releases/download/v$VERSION_HELPER/kcyberfoxhelper"
+	chmod +x $WORKDIR/obj64/dist/cyberfox/kcyberfoxhelper
 	rm -rf $WORKDIR/tmp/
 	
 	# Include kde.js
-	cp -R $WORKDIR/$LDIR/_Build/_Linux/KDE/kde.js $WORKDIR/obj64/dist/Cyberfox/defaults/pref/
+	mkdir -p $WORKDIR/obj64/dist/cyberfox/browser/defaults/preferences/
+	cp -R $WORKDIR/$LDIR/_Build/_Linux/KDE/kde.js $WORKDIR/obj64/dist/cyberfox/browser/defaults/preferences/
 
 
 	  changeDirectory "$WORKDIR/obj64/dist"
@@ -364,15 +369,15 @@ fi
         
 	  	# Generate compiled files hashsums (SHA512).  
         echo "Generating file hashes, Please wait!"
-        find Cyberfox -type f -print0 | xargs -0 sha512sum  > Cyberfox/SHA512SUMS.chk
+        find cyberfox -type f -print0 | xargs -0 sha512sum  > cyberfox/SHA512SUMS.chk
 
         echo "Packaging: Now re-packaging Cyberfox into $FILENAME!"
-		if [ -f "README.txt" ]; then
+		if [ -f "README_CYBERFOX_KDE.txt" ]; then
 			echo "Packaging: Adding README into $FILENAME!"
-		  	tar cvfj $FILENAME Cyberfox README.txt; 
+		  	tar cvfj $FILENAME cyberfox README_CYBERFOX_KDE.txt; 
 		else
 			echo "Packaging: README not added into $FILENAME!"
-			tar cvfj $FILENAME Cyberfox;
+			tar cvfj $FILENAME cyberfox;
 		fi
 
 	  if [ "$IDENTITY" == "Beta" ]; then

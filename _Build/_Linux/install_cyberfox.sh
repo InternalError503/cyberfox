@@ -1,5 +1,5 @@
 # Cyberfox Installation, Shortcut Menu, (Optional) Shortcut Desktop, Cyberfox Uninstall
-# Version: 1.5
+# Version: 1.5.2
 # Release, Beta channels Linux
 
 #!/bin/bash
@@ -52,6 +52,11 @@ select yn in "Install" "Uninstall" "Quit"; do
             cd $InstallDirectory
 			
             # Unpack cyberfox in to apps directory, Remove existing cyberfox folder.
+            if [ -d $InstallDirectory/cyberfox ]; then
+                echo "Removing older install $InstallDirectory/Cyberfox"
+                rm -rvf $InstallDirectory/cyberfox;
+            fi
+            
             if [ -d $InstallDirectory/Cyberfox ]; then
                 echo "Removing older install $InstallDirectory/Cyberfox"
                 rm -rvf $InstallDirectory/Cyberfox;
@@ -67,16 +72,16 @@ select yn in "Install" "Uninstall" "Quit"; do
             
             # Create symlinks
             echo "Creating symlinks (Root priveleges are required)..."
-            sudo ln -sf $InstallDirectory/Cyberfox/Cyberfox /usr/bin/cyberfox
-            sudo ln -sf $InstallDirectory/Cyberfox/browser/icons/mozicon128.png /usr/share/pixmaps/cyberfox.png
+            sudo ln -sf $InstallDirectory/cyberfox/cyberfox /usr/bin/cyberfox
+            sudo ln -sf $InstallDirectory/cyberfox/browser/icons/mozicon128.png /usr/share/pixmaps/cyberfox.png
             
             echo "Do you wish to add symlink to system's hunspell dictionaries for Cyberfox (Root priveleges are required)?"
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes )
                         echo "Adding symlink to hunspell..."
-                        rm -rf $InstallDirectory/Cyberfox/dictionaries
-                        sudo ln -sf /usr/share/hunspell $InstallDirectory/Cyberfox/dictionaries
+                        rm -rf $InstallDirectory/cyberfox/dictionaries
+                        sudo ln -sf /usr/share/hunspell $InstallDirectory/cyberfox/dictionaries
                     break;;
                     No ) break;;
                     esac
@@ -85,8 +90,8 @@ select yn in "Install" "Uninstall" "Quit"; do
             
             # Create start menu shortcut
             echo "Generating start menu shortcut..."
-            mkdir $InstallDirectory/Cyberfox/tmp
-            cat > $InstallDirectory/Cyberfox/tmp/cyberfox.desktop <<EOF
+            mkdir $InstallDirectory/cyberfox/tmp
+            cat > $InstallDirectory/cyberfox/tmp/cyberfox.desktop <<EOF
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
@@ -275,8 +280,8 @@ Name[zh_TW]=開啟新隱私瀏覽視窗
 Exec=cyberfox -private-window
 EOF
             echo "Installing start menu shortcut..."
-            chmod +x $InstallDirectory/Cyberfox/tmp/cyberfox.desktop
-            sudo cp $InstallDirectory/Cyberfox/tmp/cyberfox.desktop $Applications/
+            chmod +x $InstallDirectory/cyberfox/tmp/cyberfox.desktop
+            sudo cp $InstallDirectory/cyberfox/tmp/cyberfox.desktop $Applications/
 
             # Install optional desktop shortcut
             echo "Do you wish to add a desktop shortcut (Root priveleges are required)?"
@@ -294,7 +299,7 @@ EOF
         else
             echo "You must place this script next to the 'Cyberfox' tar.bz2 package."
         fi; 
-        rm -rf $InstallDirectory/Cyberfox/tmp
+        rm -rf $InstallDirectory/cyberfox/tmp
         break;;
         Uninstall )
 
@@ -303,6 +308,12 @@ EOF
             cd $InstallDirectory
 
             # Remove cyberfox installation folder
+            if [ -d $InstallDirectory/cyberfox ]; then
+                echo "Removing older install $InstallDirectory/Cyberfox"
+                rm -rvf $InstallDirectory/cyberfox;
+            fi
+            
+            # Remove Cyberfox installation folder
             if [ -d $InstallDirectory/Cyberfox ]; then
                 echo "Removing older install $InstallDirectory/Cyberfox"
                 rm -rvf $InstallDirectory/Cyberfox;
@@ -312,6 +323,11 @@ EOF
             if [ -f $Desktop/cyberfox.desktop ]; then
                 rm -vrf $Desktop/cyberfox.desktop;
             fi
+            
+            # Remove Cyberfox desktop icon if exists.
+            if [ -f $Desktop/Cyberfox.desktop ]; then
+                rm -vrf $DesktopCcyberfox.desktop;
+            fi
 			
             # Remove menu icon if exists.
             # Requires admin permissions to write the file to /usr/share/applications directory.
@@ -320,8 +336,15 @@ EOF
                 sudo rm -vrf $Applications/cyberfox.desktop;
             fi
             
+            if [ -f $Applications/Cyberfox.desktop ]; then
+                sudo rm -vrf $Applications/Cyberfox.desktop;
+            fi
             # Remove symlinks
             if [ -L /usr/bin/cyberfox ]; then
+                sudo rm -vrf /usr/bin/cyberfox;
+            fi
+            
+            if [ -L /usr/bin/Cyberfox ]; then
                 sudo rm -vrf /usr/bin/cyberfox;
             fi
             
@@ -329,6 +352,10 @@ EOF
                 sudo rm -vrf /usr/share/pixmaps/cyberfox.png;
             fi
             
+            if [ -L /usr/share/pixmaps/Cyberfox.png ]; then
+                sudo rm -vrf /usr/share/pixmaps/Cyberfox.png;
+            fi
+
             # Remove ~/Apps if is empty
             if [ ! "$(ls -A $InstallDirectory)" ]; then
                 rmdir $InstallDirectory;
