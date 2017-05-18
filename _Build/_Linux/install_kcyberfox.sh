@@ -1,5 +1,5 @@
 # Cyberfox KDE Plasma Edition Installation, Shortcut Menu, (Optional) Shortcut Desktop,  Cyberfox KDE Plasma Edition Uninstall
-# Version: 1.0
+# Version: 1.1
 # Release, Beta channels Linux
 
 #!/bin/bash
@@ -23,14 +23,14 @@ Package=$Dir/Cyberfox_KDE_Plasma_Edition-*.tar.bz2
 
 Desktop="${XDG_DESKTOP_DIR:-~/Desktop}"
 Applications=/usr/share/applications
-InstallDirectory=$HOME/Apps
+InstallDirectory=/opt
 
 # Check if the script is in the right place before checking file hashes.
 echo "Do you wish to install Cyberfox KDE Plasma Edition now?"
 select yn in "Install" "Uninstall" "Quit"; do
     case $yn in
         Install )
-
+        echo "To install KCyberfox, root priveleges are required!"
         # Check if more than 1 package exist.
         if [ $PackageCount -gt 1 ]; then  
             echo "You have to many packages [$PackageCount] in this directory, I am unable to compute what package to install, Please remove the other packages so i no longer get confused!"
@@ -40,44 +40,36 @@ select yn in "Install" "Uninstall" "Quit"; do
 
 
         if [ -f $Dir/Cyberfox_KDE_Plasma_Edition-*.tar.bz2 ]; then
-		
-            # Make directory if not already exist
-            if ! [ -d $InstallDirectory ]; then
-                echo "Making $InstallDirectory directory!"
-                mkdir $InstallDirectory
-            fi
 			
-            # Navigate in to apps directory
+            # Navigate in to /opt directory
             echo "Entering $InstallDirectory directory"
             cd $InstallDirectory
-			
-            # Unpack cyberfox in to apps directory, Remove existing cyberfox folder.
-            if [ -d $InstallDirectory/Cyberfox ]; then
-                echo "Removing older install $InstallDirectory/Cyberfox"
-                rm -rvf $InstallDirectory/Cyberfox;
+            
+            # Unpack cyberfox in to /opt directory, Remove existing cyberfox folder.
+            if [ -d $InstallDirectory/cyberfox ]; then
+                echo "Removing older install $InstallDirectory/cyberfox"
+                sudo rm -rvf $InstallDirectory/cyberfox;
             fi
-			
             echo "Unpacking $Package in to $InstallDirectory directory"
-            tar xjfv $Package
+            sudo tar xjfv $Package
 
             # Remove readme.txt it has no place in apps directory.
             if [ -f $InstallDirectory/README.txt ]; then
-                rm -rvf $InstallDirectory/README.txt;
+                sudo rm -rvf $InstallDirectory/README.txt;
             fi
 
-            # Create desktop shortcut
             # Create symlinks
-            echo "Creating symlinks (Root priveleges are required)..."
-            sudo ln -sf $InstallDirectory/Cyberfox/Cyberfox /usr/bin/cyberfox
-            sudo ln -sf $InstallDirectory/Cyberfox/browser/icons/mozicon128.png /usr/share/pixmaps/cyberfox.png
+            echo "Creating symlinks..."
+            sudo ln -sf $InstallDirectory/cyberfox/cyberfox /usr/bin/cyberfox
+            sudo ln -sf $InstallDirectory/cyberfox/browser/icons/mozicon128.png /usr/share/pixmaps/cyberfox.png
             
-            echo "Do you wish to add symlink to system's hunspell dictionaries for Cyberfox (Root priveleges are required)?"
+            echo "Do you wish to add symlink to system's hunspell dictionaries for Cyberfox?"
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes )
                         echo "Adding symlink to hunspell..."
-                        rm -rf $InstallDirectory/Cyberfox/dictionaries
-                        sudo ln -sf /usr/share/hunspell $InstallDirectory/Cyberfox/dictionaries
+                        sudo rm -rf $InstallDirectory/cyberfox/dictionaries
+                        sudo ln -sf /usr/share/hunspell $InstallDirectory/cyberfox/dictionaries
                     break;;
                     No ) break;;
                     esac
@@ -86,8 +78,8 @@ select yn in "Install" "Uninstall" "Quit"; do
             
             # Create start menu shortcut
             echo "Generating start menu shortcut..."
-            mkdir $InstallDirectory/Cyberfox/tmp
-            cat > $InstallDirectory/Cyberfox/tmp/cyberfox.desktop <<EOF
+            sudo mkdir $InstallDirectory/cyberfox/tmp
+            sudo tee -a $InstallDirectory/cyberfox/tmp/cyberfox.desktop <<EOF
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
@@ -276,11 +268,11 @@ Name[zh_TW]=開啟新隱私瀏覽視窗
 Exec=cyberfox -private-window
 EOF
             echo "Installing start menu shortcut..."
-            chmod +x $InstallDirectory/Cyberfox/tmp/cyberfox.desktop
-            sudo cp $InstallDirectory/Cyberfox/tmp/cyberfox.desktop $Applications/
+            sudo chmod +x $InstallDirectory/cyberfox/tmp/cyberfox.desktop
+            sudo cp $InstallDirectory/cyberfox/tmp/cyberfox.desktop $Applications/
 
             # Add KDE Plasma notification integration
-            echo "Do you wish to add a KDE Plasma notification integration (Requires root privileges)?"
+            echo "Do you wish to add a KDE Plasma notification integration?"
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes )
@@ -293,7 +285,7 @@ EOF
             done
                 
             # Install optional desktop shortcut
-            echo "Do you wish to add a desktop shortcut (Root priveleges are required)?"
+            echo "Do you wish to add a desktop shortcut?"
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes )
@@ -308,7 +300,7 @@ EOF
         else
             echo "You must place this script next to the 'Cyberfox_KDE_Plasma_Edition' tar.bz2 package."
         fi; 
-        rm -rf $InstallDirectory/Cyberfox/tmp
+        sudo rm -rf $InstallDirectory/cyberfox/tmp
         break;;
         Uninstall )
 
@@ -317,14 +309,14 @@ EOF
             cd $InstallDirectory
 
             # Remove cyberfox installation folder
-            if [ -d $InstallDirectory/Cyberfox ]; then
-                echo "Removing older install $InstallDirectory/Cyberfox"
-                rm -rvf $InstallDirectory/Cyberfox;
+            if [ -d $InstallDirectory/cyberfox ]; then
+                echo "Removing older install $InstallDirectory/cyberfox"
+                sudo rm -rvf $InstallDirectory/cyberfox;
             fi
 
             # Remove cyberfox desktop icon if exists.
             if [ -f $Desktop/cyberfox.desktop ]; then
-                rm -vrf $Desktop/cyberfox.desktop;
+                sudo rm -vrf $Desktop/cyberfox.desktop;
             fi
 			
             # Remove menu icon if exists.
@@ -342,12 +334,7 @@ EOF
             if [ -L /usr/share/pixmaps/cyberfox.png ]; then
                 sudo rm -vrf /usr/share/pixmaps/cyberfox.png;
             fi
-            
-            # Remove ~/Apps if is empty
-            if [ ! "$(ls -A $InstallDirectory)" ]; then
-                rmdir $InstallDirectory;
-            fi
-            
+
             # Remove KDE Plasma notification integration
              if [ -f /usr/share/knotifications5/kcyberfoxhelper.notifyrc ]; then
                 sudo rm -vf /usr/share/knotifications5/kcyberfoxhelper.notifyrc;

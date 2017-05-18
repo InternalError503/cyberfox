@@ -1,5 +1,5 @@
 # Cyberfox build validation script
-# Version: 1.0
+# Version: 1.1
 # Release, Beta channels linux
 
 # Set current directory to script directory.
@@ -13,10 +13,10 @@ echo "Do you wish to validate Cyberfox file hashes now?"
 select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )        
-        if [ -d $Dir/Cyberfox ]; then
+        if [ -d $Dir/cyberfox ]; then
             echo "Now check file hashes please wait!"
             echo "The file SHA512SUMS.chk will fail the check, This is ok, All other files however should pass."
-            sha512sum -c $Dir/Cyberfox/SHA512SUMS.chk
+            sha512sum -c $Dir/cyberfox/SHA512SUMS.chk
         else
             echo "You must place this script outside or next to the 'Cyberfox' folder."
         fi; 
@@ -35,13 +35,13 @@ echo "Do you wish to generate Cyberfox file hashes now?"
 select yn in "Yes" "No" "Quit"; do
     case $yn in
         Yes )        
-        if [ -d $Dir/Cyberfox ]; then
+        if [ -d $Dir/cyberfox ]; then
             # Generate compiled files hashsums (SHA512).  
             echo "Generating file hashes, Please wait!"
-            find Cyberfox -type f -print0 | xargs -0 sha512sum > $Dir/SHA512SUMS.chk
+            find cyberfox -type f -print0 | xargs -0 sha512sum > $Dir/SHA512SUMS.chk
             echo "Your newly created file hashes can be found $Dir/SHA512SUMS.chk"        
         else
-            echo "You must place this script outside or next to the 'Cyberfox' folder."
+            echo "You must place this script outside or next to the 'cyberfox' folder."
         fi; break;;
         No ) break;;
 	  "Quit" )

@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.9.1
+# Version: 2.9.2
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -209,7 +209,7 @@ select yn in "Yes" "No" "Quit"; do
 	    fi;
 	  fi; break;;
         No ) 
-                    if [ ! -f $LDIR/mozconfig]; then
+                    if [ ! -f "$WORKDIR/$LDIR/mozconfig" ]; then
                         echo "mozconfig does not exist copying pre-configured to $LDIR root"
                         cp -r $WORKDIR/$LDIR/_Build/_Linux/mozconfig $WORKDIR/$LDIR/
                     fi;
@@ -320,7 +320,7 @@ select yn in "Yes" "No" "Quit"; do
 	if [ -f "$Dir/voucher.bin" ]; then
 			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/
     		cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/bin/
-			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/Cyberfox/
+			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/cyberfox/
 	fi
 
 	  changeDirectory "$WORKDIR/obj64/dist"
@@ -335,15 +335,15 @@ select yn in "Yes" "No" "Quit"; do
         
 	  	# Generate compiled files hashsums (SHA512).  
         echo "Generating file hashes, Please wait!"
-        find Cyberfox -type f -print0 | xargs -0 sha512sum  > Cyberfox/SHA512SUMS.chk
+        find cyberfox -type f -print0 | xargs -0 sha512sum  > cyberfox/SHA512SUMS.chk
 
         echo "Packaging: Now re-packaging Cyberfox into $FILENAME!"
 		if [ -f "README.txt" ]; then
 			echo "Packaging: Adding README into $FILENAME!"
-		  	tar cvfj $FILENAME Cyberfox README.txt; 
+		  	tar cvfj $FILENAME cyberfox README.txt; 
 		else
 			echo "Packaging: README not added into $FILENAME!"
-			tar cvfj $FILENAME Cyberfox;
+			tar cvfj $FILENAME cyberfox;
 		fi
 
 	  if [ "$IDENTITY" == "Beta" ]; then
