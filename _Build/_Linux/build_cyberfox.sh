@@ -1,5 +1,5 @@
 # Cyberfox quick build script
-# Version: 2.9.2
+# Version: 2.9.3
 # Release, Beta channels linux
 
 #!/bin/bash
@@ -326,7 +326,7 @@ select yn in "Yes" "No" "Quit"; do
 	  changeDirectory "$WORKDIR/obj64/dist"
            
 	  # Get the current filename with browser version!
-	  FILENAME=$(basename Cyberfox-*.en-US.linux-x86_64.tar.bz2)
+	  FILENAME="Cyberfox-$VERSION.en-US.linux-x86_64.tar.bz2"
 	  
 	    if [ -f "$FILENAME" ]; then
 	      echo "Packaging: Found $FILENAME removing file!"
@@ -337,7 +337,7 @@ select yn in "Yes" "No" "Quit"; do
         echo "Generating file hashes, Please wait!"
         find cyberfox -type f -print0 | xargs -0 sha512sum  > cyberfox/SHA512SUMS.chk
 
-        echo "Packaging: Now re-packaging Cyberfox into $FILENAME!"
+        echo "Packaging: Now re-packaging cyberfox into $FILENAME!"
 		if [ -f "README.txt" ]; then
 			echo "Packaging: Adding README into $FILENAME!"
 		  	tar cvfj $FILENAME cyberfox README.txt; 

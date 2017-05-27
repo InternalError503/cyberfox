@@ -10,7 +10,7 @@
 <!ENTITY addonBarCmd.accesskey         "A">
 <!ENTITY throbberItem.title            "Wskaźnik aktywności">
 <!ENTITY appMenuButton.label           "Menu">
-<!ENTITY appMenuButton.tooltip         "Otwórz &brandShortName; menu">
+<!ENTITY appMenuButton.tooltip         "Otwórz menu &brandShortName;">
 <!ENTITY feedButton.label              "Subskrybuj">
 <!ENTITY feedButton.tooltip            "Subskrybuj tę stronę…">
 <!ENTITY bookmarksButton.tooltip       "Wyświetl zakładki">
@@ -39,7 +39,7 @@
 <!ENTITY openLocationCmd.label         "Otwórz lokalizację…">
 <!ENTITY openLocationCmd.accesskey     "L">
 <!ENTITY bookmarksMenuButton.tooltip   "Wyświetl zakładki">
-<!ENTITY restoreTabsOnDemand.label        "Don’t load tabs until selected">
+<!ENTITY restoreTabsOnDemand.label        "Nie wczytuj kart, dopóki nie zostaną wybrane">
 <!ENTITY restoreTabsOnDemand.accesskey    "u">
 
 <!-- cyberfox -->
@@ -171,7 +171,7 @@
 
 <!-- Email Link Context Menu Tweak -->
 
-<!ENTITY turnoffemaillink.label "Włącz przycisk menu kontekstowego 'link e-mail'">
+<!ENTITY turnoffemaillink.label "Włącz przycisk menu kontekstowego 'wyślij odnośnik'">
 <!-- about:config Context Menu Tweak -->
 <!ENTITY turnoffcontextabout.label "Włącz przycisk menu kontekstowego 'about:config'">
 <!-- about:config Menu Tweak -->
@@ -191,7 +191,7 @@
 
 <!-- System Addons Tweak -->
 <!ENTITY systemaddons.label "Systemowe dodatki">
-<!ENTITY systemaddonsmsg.label "Jeśli zainstalowane są te dodatki systemowe, to możesz je tutaj przełączać">
+<!ENTITY systemaddonsmsg.label "Jeśli te dodatki systemowe są zainstalowane, to możesz je tutaj włączać/wyłączać">
 <!ENTITY enablehellochat.label "Włącz czat Hello">
 <!ENTITY enablepocket.label "Włącz Pocket">
 
