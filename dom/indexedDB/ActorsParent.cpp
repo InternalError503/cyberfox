@@ -23,6 +23,7 @@
 #include "mozilla/AutoRestore.h"
 #include "mozilla/Casting.h"
 #include "mozilla/EndianUtils.h"
+#include "mozilla/ErrorNames.h"
 #include "mozilla/LazyIdleThread.h"
 #include "mozilla/Maybe.h"
 #include "mozilla/Preferences.h"
@@ -7578,6 +7579,7 @@ protected:
   virtual nsresult
   DispatchToWorkThread() = 0;
 
+  // Should only be called by Run().
   virtual void
   SendResults() = 0;
 
@@ -9394,6 +9396,7 @@ class Maintenance final
   RefPtr<DirectoryLock> mDirectoryLock;
   nsTArray<DirectoryInfo> mDirectoryInfos;
   nsDataHashtable<nsStringHashKey, DatabaseMaintenance*> mDatabaseMaintenances;
+  nsresult mResultCode;
   Atomic<bool> mAborted;
   State mState;
 
@@ -9401,6 +9404,7 @@ public:
   explicit Maintenance(QuotaClient* aQuotaClient)
     : mQuotaClient(aQuotaClient)
     , mStartTime(PR_Now())
+    , mResultCode(NS_OK)
     , mAborted(false)
     , mState(State::Initial)
   {
@@ -18499,21 +18503,32 @@ Maintenance::DirectoryWork()
   QuotaManager* quotaManager = QuotaManager::Get();
   MOZ_ASSERT(quotaManager);
 
-  if (NS_WARN_IF(NS_FAILED(quotaManager->EnsureStorageIsInitialized()))) {
-    return NS_ERROR_FAILURE;
+  nsresult rv = quotaManager->EnsureStorageIsInitialized();
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
   }
 
   nsCOMPtr<nsIFile> storageDir = GetFileForPath(quotaManager->GetStoragePath());
-  MOZ_ASSERT(storageDir);
+  if (NS_WARN_IF(!storageDir)) {
+    return NS_ERROR_FAILURE;
+  }
 
   bool exists;
-  MOZ_ALWAYS_SUCCEEDS(storageDir->Exists(&exists));
+  rv = storageDir->Exists(&exists);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
   if (!exists) {
     return NS_ERROR_NOT_AVAILABLE;
   }
 
   bool isDirectory;
-  MOZ_ALWAYS_SUCCEEDS(storageDir->IsDirectory(&isDirectory));
+  rv = storageDir->IsDirectory(&isDirectory);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
   if (NS_WARN_IF(!isDirectory)) {
     return NS_ERROR_FAILURE;
   }
@@ -18548,25 +18563,41 @@ Maintenance::DirectoryWork()
     }
 
     nsCOMPtr<nsIFile> persistenceDir;
-    MOZ_ALWAYS_SUCCEEDS(
-      storageDir->Clone(getter_AddRefs(persistenceDir)));
-    MOZ_ALWAYS_SUCCEEDS(
-      persistenceDir->Append(NS_ConvertASCIItoUTF16(persistenceTypeString)));
+    rv = storageDir->Clone(getter_AddRefs(persistenceDir));
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
 
-    MOZ_ALWAYS_SUCCEEDS(persistenceDir->Exists(&exists));
+    rv = persistenceDir->Append(NS_ConvertASCIItoUTF16(persistenceTypeString));
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
+    rv = persistenceDir->Exists(&exists);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
     if (!exists) {
       continue;
     }
 
-    MOZ_ALWAYS_SUCCEEDS(persistenceDir->IsDirectory(&isDirectory));
+    rv = persistenceDir->IsDirectory(&isDirectory);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
     if (NS_WARN_IF(!isDirectory)) {
       continue;
     }
 
     nsCOMPtr<nsISimpleEnumerator> persistenceDirEntries;
-    MOZ_ALWAYS_SUCCEEDS(
-      persistenceDir->GetDirectoryEntries(
-        getter_AddRefs(persistenceDirEntries)));
+    rv = persistenceDir->GetDirectoryEntries(
+                                         getter_AddRefs(persistenceDirEntries));
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
     if (!persistenceDirEntries) {
       continue;
     }
@@ -18578,46 +18609,76 @@ Maintenance::DirectoryWork()
       }
 
       bool persistenceDirHasMoreEntries;
-      MOZ_ALWAYS_SUCCEEDS(
-        persistenceDirEntries->HasMoreElements(&persistenceDirHasMoreEntries));
+      rv = persistenceDirEntries->HasMoreElements(
+                                                 &persistenceDirHasMoreEntries);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
 
       if (!persistenceDirHasMoreEntries) {
         break;
       }
 
       nsCOMPtr<nsISupports> persistenceDirEntry;
-      MOZ_ALWAYS_SUCCEEDS(
-        persistenceDirEntries->GetNext(getter_AddRefs(persistenceDirEntry)));
+      rv = persistenceDirEntries->GetNext(getter_AddRefs(persistenceDirEntry));
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
 
       nsCOMPtr<nsIFile> originDir = do_QueryInterface(persistenceDirEntry);
       MOZ_ASSERT(originDir);
 
-      MOZ_ASSERT(NS_SUCCEEDED(originDir->Exists(&exists)));
+      rv = originDir->Exists(&exists);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
+
       MOZ_ASSERT(exists);
 
-      MOZ_ALWAYS_SUCCEEDS(originDir->IsDirectory(&isDirectory));
+      rv = originDir->IsDirectory(&isDirectory);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
+
       if (!isDirectory) {
         continue;
       }
 
       nsCOMPtr<nsIFile> idbDir;
-      MOZ_ALWAYS_SUCCEEDS(originDir->Clone(getter_AddRefs(idbDir)));
+      rv = originDir->Clone(getter_AddRefs(idbDir));
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
 
-      MOZ_ALWAYS_SUCCEEDS(idbDir->Append(idbDirName));
+      rv = idbDir->Append(idbDirName);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
 
-      MOZ_ALWAYS_SUCCEEDS(idbDir->Exists(&exists));
+      rv = idbDir->Exists(&exists);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
+
       if (!exists) {
         continue;
       }
 
-      MOZ_ALWAYS_SUCCEEDS(idbDir->IsDirectory(&isDirectory));
+      rv = idbDir->IsDirectory(&isDirectory);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
+
       if (NS_WARN_IF(!isDirectory)) {
         continue;
       }
 
       nsCOMPtr<nsISimpleEnumerator> idbDirEntries;
-      MOZ_ALWAYS_SUCCEEDS(
-        idbDir->GetDirectoryEntries(getter_AddRefs(idbDirEntries)));
+      rv = idbDir->GetDirectoryEntries(getter_AddRefs(idbDirEntries));
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
+
       if (!idbDirEntries) {
         continue;
       }
@@ -18633,31 +18694,46 @@ Maintenance::DirectoryWork()
         }
 
         bool idbDirHasMoreEntries;
-        MOZ_ALWAYS_SUCCEEDS(
-          idbDirEntries->HasMoreElements(&idbDirHasMoreEntries));
+        rv = idbDirEntries->HasMoreElements(&idbDirHasMoreEntries);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return rv;
+        }
 
         if (!idbDirHasMoreEntries) {
           break;
         }
 
         nsCOMPtr<nsISupports> idbDirEntry;
-        MOZ_ALWAYS_SUCCEEDS(
-          idbDirEntries->GetNext(getter_AddRefs(idbDirEntry)));
+        rv = idbDirEntries->GetNext(getter_AddRefs(idbDirEntry));
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return rv;
+        }
 
         nsCOMPtr<nsIFile> idbDirFile = do_QueryInterface(idbDirEntry);
         MOZ_ASSERT(idbDirFile);
 
         nsString idbFilePath;
-        MOZ_ALWAYS_SUCCEEDS(idbDirFile->GetPath(idbFilePath));
+        rv = idbDirFile->GetPath(idbFilePath);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return rv;
+        }
 
         if (!StringEndsWith(idbFilePath, sqliteExtension)) {
           continue;
         }
 
-        MOZ_ASSERT(NS_SUCCEEDED(idbDirFile->Exists(&exists)));
+        rv = idbDirFile->Exists(&exists);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return rv;
+        }
+
         MOZ_ASSERT(exists);
 
-        MOZ_ALWAYS_SUCCEEDS(idbDirFile->IsDirectory(&isDirectory));
+        rv = idbDirFile->IsDirectory(&isDirectory);
+        if (NS_WARN_IF(NS_FAILED(rv))) {
+          return rv;
+        }
+
         if (isDirectory) {
           continue;
         }
@@ -18786,7 +18862,18 @@ Maintenance::Finish()
   AssertIsOnBackgroundThread();
   MOZ_ASSERT(mState == State::Finishing);
 
+  if (NS_FAILED(mResultCode)) {
+    nsCString errorName;
+    GetErrorName(mResultCode, errorName);
+
+    IDB_WARNING("Maintenance finished with error: %s", errorName.get());
+  }
+
   mDirectoryLock = nullptr;
+
+  // It can happen that we are only referenced by mCurrentMaintenance which is
+  // cleared in NoteFinishedMaintenance()
+  RefPtr<Maintenance> kungFuDeathGrip = this;
 
   mQuotaClient->NoteFinishedMaintenance(this);
 
@@ -18832,6 +18919,10 @@ Maintenance::Run()
   }
 
   if (NS_WARN_IF(NS_FAILED(rv)) && mState != State::Finishing) {
+    if (NS_SUCCEEDED(mResultCode)) {
+      mResultCode = rv;
+    }
+
     // Must set mState before dispatching otherwise we will race with the owning
     // thread.
     mState = State::Finishing;
@@ -18858,6 +18949,10 @@ Maintenance::DirectoryLockAcquired(DirectoryLock* aLock)
 
   nsresult rv = DirectoryOpen();
   if (NS_WARN_IF(NS_FAILED(rv))) {
+    if (NS_SUCCEEDED(mResultCode)) {
+      mResultCode = rv;
+    }
+
     mState = State::Finishing;
     Finish();
 
@@ -18871,6 +18966,10 @@ Maintenance::DirectoryLockFailed()
   AssertIsOnBackgroundThread();
   MOZ_ASSERT(mState == State::DirectoryOpenPending);
   MOZ_ASSERT(!mDirectoryLock);
+
+  if (NS_SUCCEEDED(mResultCode)) {
+    mResultCode = NS_ERROR_FAILURE;
+  }
 
   mState = State::Finishing;
   Finish();
@@ -21380,6 +21479,11 @@ FactoryOp::NoteDatabaseBlocked(Database* aDatabase)
 
 NS_IMPL_ISUPPORTS_INHERITED0(FactoryOp, DatabaseOperationBase)
 
+// Run() assumes that the caller holds a strong reference to the object that
+// can't be cleared while Run() is being executed.
+// So if you call Run() directly (as opposed to dispatching to an event queue)
+// you need to make sure there's such a reference.
+// See bug 1356824 for more details.
 NS_IMETHODIMP
 FactoryOp::Run()
 {
@@ -21464,8 +21568,11 @@ FactoryOp::DirectoryLockAcquired(DirectoryLock* aLock)
       mResultCode = rv;
     }
 
+    // The caller holds a strong reference to us, no need for a self reference
+    // before calling Run().
+
     mState = State::SendingResults;
-    SendResults();
+    MOZ_ALWAYS_SUCCEEDS(Run());
 
     return;
   }
@@ -21483,8 +21590,11 @@ FactoryOp::DirectoryLockFailed()
     mResultCode = NS_ERROR_DOM_INDEXEDDB_UNKNOWN_ERR;
   }
 
+  // The caller holds a strong reference to us, no need for a self reference
+  // before calling Run().
+
   mState = State::SendingResults;
-  SendResults();
+  MOZ_ALWAYS_SUCCEEDS(Run());
 }
 
 void
@@ -22277,12 +22387,18 @@ OpenDatabaseOp::NoteDatabaseClosed(Database* aDatabase)
     rv = NS_OK;
   }
 
+  // We are being called with an assuption that mWaitingFactoryOp holds a strong
+  // reference to us.
+  RefPtr<OpenDatabaseOp> kungFuDeathGrip;
+
   if (mMaybeBlockedDatabases.RemoveElement(aDatabase) &&
       mMaybeBlockedDatabases.IsEmpty()) {
     if (actorDestroyed) {
       DatabaseActorInfo* info;
       MOZ_ALWAYS_TRUE(gLiveDatabaseHashtable->Get(mDatabaseId, &info));
       MOZ_ASSERT(info->mWaitingFactoryOp == this);
+      kungFuDeathGrip =
+        static_cast<OpenDatabaseOp*>(info->mWaitingFactoryOp.get());
       info->mWaitingFactoryOp = nullptr;
     } else {
       WaitForTransactions();
@@ -22293,6 +22409,9 @@ OpenDatabaseOp::NoteDatabaseClosed(Database* aDatabase)
     if (NS_SUCCEEDED(mResultCode)) {
       mResultCode = rv;
     }
+
+    // A strong reference is held in kungFuDeathGrip, so it's safe to call Run()
+    // directly.
 
     mState = State::SendingResults;
     MOZ_ALWAYS_SUCCEEDS(Run());
@@ -22413,17 +22532,15 @@ OpenDatabaseOp::SendResults()
 
   mMaybeBlockedDatabases.Clear();
 
-  // Only needed if we're being called from within NoteDatabaseDone() since this
-  // OpenDatabaseOp is only held alive by the gLiveDatabaseHashtable.
-  RefPtr<OpenDatabaseOp> kungFuDeathGrip;
-
   DatabaseActorInfo* info;
   if (gLiveDatabaseHashtable &&
       gLiveDatabaseHashtable->Get(mDatabaseId, &info) &&
       info->mWaitingFactoryOp) {
     MOZ_ASSERT(info->mWaitingFactoryOp == this);
-    kungFuDeathGrip =
-      static_cast<OpenDatabaseOp*>(info->mWaitingFactoryOp.get());
+    // SendResults() should only be called by Run() and Run() should only be
+    // called if there's a strong reference to the object that can't be cleared
+    // here, so it's safe to clear mWaitingFactoryOp without adding additional
+    // strong reference.
     info->mWaitingFactoryOp = nullptr;
   }
 
@@ -23097,12 +23214,18 @@ DeleteDatabaseOp::NoteDatabaseClosed(Database* aDatabase)
     rv = NS_OK;
   }
 
+  // We are being called with an assuption that mWaitingFactoryOp holds a strong
+  // reference to us.
+  RefPtr<OpenDatabaseOp> kungFuDeathGrip;
+
   if (mMaybeBlockedDatabases.RemoveElement(aDatabase) &&
       mMaybeBlockedDatabases.IsEmpty()) {
     if (actorDestroyed) {
       DatabaseActorInfo* info;
       MOZ_ALWAYS_TRUE(gLiveDatabaseHashtable->Get(mDatabaseId, &info));
       MOZ_ASSERT(info->mWaitingFactoryOp == this);
+      kungFuDeathGrip =
+        static_cast<OpenDatabaseOp*>(info->mWaitingFactoryOp.get());
       info->mWaitingFactoryOp = nullptr;
     } else {
       WaitForTransactions();
@@ -23113,6 +23236,9 @@ DeleteDatabaseOp::NoteDatabaseClosed(Database* aDatabase)
     if (NS_SUCCEEDED(mResultCode)) {
       mResultCode = rv;
     }
+
+    // A strong reference is held in kungFuDeathGrip, so it's safe to call Run()
+    // directly.
 
     mState = State::SendingResults;
     MOZ_ALWAYS_SUCCEEDS(Run());
@@ -23439,6 +23565,8 @@ VersionChangeOp::RunOnOwningThread()
     }
   }
 
+  // We hold a strong ref to the deleteOp, so it's safe to call Run() directly.
+
   deleteOp->mState = State::SendingResults;
   MOZ_ALWAYS_SUCCEEDS(deleteOp->Run());
 
@@ -23653,6 +23781,11 @@ TransactionDatabaseOperationBase::NoteContinueReceived()
 
   mInternalState = InternalState::SendingResults;
 
+  // This TransactionDatabaseOperationBase can only be held alive by the IPDL.
+  // Run() can end up with clearing that last reference. So we need to add
+  // a self reference here.
+  RefPtr<TransactionDatabaseOperationBase> kungFuDeathGrip = this;
+
   Unused << this->Run();
 }
 
@@ -23698,11 +23831,6 @@ TransactionDatabaseOperationBase::SendPreprocessInfoOrResults(
              mInternalState == InternalState::SendingResults);
   MOZ_ASSERT(mTransaction);
 
-  // Only needed if we're being called from within NoteContinueReceived() since
-  // this TransactionDatabaseOperationBase is only held alive by the IPDL.
-  // SendSuccessResult/SendFailureResult releases that last reference.
-  RefPtr<TransactionDatabaseOperationBase> kungFuDeathGrip;
-
   if (NS_WARN_IF(IsActorDestroyed())) {
     // Don't send any notifications if the actor was destroyed already.
     if (NS_SUCCEEDED(mResultCode)) {
@@ -23710,10 +23838,6 @@ TransactionDatabaseOperationBase::SendPreprocessInfoOrResults(
       mResultCode = NS_ERROR_DOM_INDEXEDDB_UNKNOWN_ERR;
     }
   } else {
-    if (!aSendPreprocessInfo) {
-      kungFuDeathGrip = this;
-    }
-
     if (mTransaction->IsInvalidated() || mTransaction->IsAborted()) {
       // Aborted transactions always see their requests fail with ABORT_ERR,
       // even if the request succeeded or failed with another error.

@@ -5410,11 +5410,16 @@ nsDocShell::Reload(uint32_t aReloadFlags)
 
     MOZ_ASSERT(triggeringPrincipal, "Need a valid triggeringPrincipal");
 
-    rv = InternalLoad(mCurrentURI,
+    // Stack variables to ensure changes to the member variables don't affect to
+    // the call.
+    nsCOMPtr<nsIURI> currentURI = mCurrentURI;
+    nsCOMPtr<nsIURI> referrerURI = mReferrerURI;
+    uint32_t referrerPolicy = mReferrerPolicy;
+    rv = InternalLoad(currentURI,
                       originalURI,
                       loadReplace,
-                      mReferrerURI,
-                      mReferrerPolicy,
+                      referrerURI,
+                      referrerPolicy,
                       triggeringPrincipal,
                       triggeringPrincipal,
                       flags,
@@ -9737,8 +9742,12 @@ nsDocShell::InternalLoad(nsIURI* aURI,
   if (!aWindowTarget.IsEmpty()) {
     // Locate the target DocShell.
     nsCOMPtr<nsIDocShellTreeItem> targetItem;
-    // Only _self, _parent, and _top are supported in noopener case.
-    if (!(aFlags & INTERNAL_LOAD_FLAGS_NO_OPENER) ||
+    // Only _self, _parent, and _top are supported in noopener case.  But we
+    // have to be careful to not apply that to the noreferrer case.  See bug
+    // 1358469.
+    bool allowNamedTarget = !(aFlags & INTERNAL_LOAD_FLAGS_NO_OPENER) ||
+                            (aFlags & INTERNAL_LOAD_FLAGS_DONT_SEND_REFERRER);
+    if (allowNamedTarget ||
         aWindowTarget.LowerCaseEqualsLiteral("_self") ||
         aWindowTarget.LowerCaseEqualsLiteral("_parent") ||
         aWindowTarget.LowerCaseEqualsLiteral("_top")) {

@@ -270,6 +270,7 @@ nsHttpChannel::nsHttpChannel()
     , mIsCorsPreflightDone(0)
     , mStronglyFramed(false)
     , mUsedNetwork(0)
+    , mAuthConnectionRestartable(0)
     , mPushedStream(nullptr)
     , mLocalBlocklist(false)
     , mWarningReporter(nullptr)
@@ -2304,7 +2305,7 @@ nsHttpChannel::ContinueProcessResponse3(nsresult rv)
     }
 
     LOG(("ContinueProcessResponse3 got failure result [rv=%x]\n", rv));
-    if (mTransaction->ProxyConnectFailed()) {
+    if (mTransaction && mTransaction->ProxyConnectFailed()) {
         return ProcessFailedProxyConnect(mRedirectType);
     }
     return ProcessNormal();
@@ -5586,6 +5587,14 @@ NS_IMETHODIMP nsHttpChannel::CloseStickyConnection()
     return NS_OK;
 }
 
+NS_IMETHODIMP nsHttpChannel::ConnectionRestartable(bool aRestartable)
+{
+    LOG(("nsHttpChannel::ConnectionRestartable this=%p, restartable=%d",
+         this, aRestartable));
+    mAuthConnectionRestartable = aRestartable;
+    return NS_OK;
+}
+
 //-----------------------------------------------------------------------------
 // nsHttpChannel::nsISupports
 //-----------------------------------------------------------------------------
@@ -5954,6 +5963,52 @@ nsHttpChannel::BeginConnect()
     CallOnModifyRequestObservers();
 
     SetLoadGroupUserAgentOverride();
+
+    // Check if request was cancelled during on-modify-request or on-useragent.
+    if (mCanceled) {
+        return mStatus;
+    }
+
+    if (mSuspendCount) {
+        LOG(("Waiting until resume BeginConnect [this=%p]\n", this));
+        MOZ_ASSERT(!mCallOnResume);
+        mCallOnResume = &nsHttpChannel::HandleBeginConnectContinue;
+        return NS_OK;
+    }
+
+    return BeginConnectContinue();
+}
+
+void
+nsHttpChannel::HandleBeginConnectContinue()
+{
+    NS_PRECONDITION(!mCallOnResume, "How did that happen?");
+    nsresult rv;
+
+    if (mSuspendCount) {
+        LOG(("Waiting until resume BeginConnect [this=%p]\n", this));
+        mCallOnResume = &nsHttpChannel::HandleBeginConnectContinue;
+        return;
+    }
+
+    LOG(("nsHttpChannel::HandleBeginConnectContinue [this=%p]\n", this));
+    rv = BeginConnectContinue();
+    if (NS_FAILED(rv)) {
+        CloseCacheEntry(false);
+        Unused << AsyncAbort(rv);
+    }
+}
+
+nsresult
+nsHttpChannel::BeginConnectContinue()
+{
+    nsresult rv;
+
+    // Check if request was cancelled during suspend AFTER on-modify-request or
+    // on-useragent.
+    if (mCanceled) {
+        return mStatus;
+    }
 
     // Check to see if we should redirect this channel elsewhere by
     // nsIHttpChannel.redirectTo API request
@@ -7465,9 +7520,17 @@ nsHttpChannel::DoAuthRetry(nsAHttpConnection *conn)
             seekable->Seek(nsISeekableStream::NS_SEEK_SET, 0);
     }
 
-    // set sticky connection flag and disable pipelining.
-    mCaps |=  NS_HTTP_STICKY_CONNECTION;
-    mCaps &= ~NS_HTTP_ALLOW_PIPELINING;
+    // always set sticky connection flag
+    mCaps |= NS_HTTP_STICKY_CONNECTION;
+    // and when needed, allow restart regardless the sticky flag
+    if (mAuthConnectionRestartable) {
+        LOG(("  connection made restartable"));
+        mCaps |= NS_HTTP_CONNECTION_RESTARTABLE;
+        mAuthConnectionRestartable = false;
+    } else {
+        LOG(("  connection made non-restartable"));
+        mCaps &= ~NS_HTTP_CONNECTION_RESTARTABLE;
+    }
 
     // and create a new one...
     rv = SetupTransaction();
