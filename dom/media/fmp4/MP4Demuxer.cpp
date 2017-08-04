@@ -55,6 +55,8 @@ public:
 
   void BreakCycles() override;
 
+  void NotifyDataRemoved();
+
 private:
   friend class MP4Demuxer;
   void NotifyDataArrived();
@@ -197,7 +199,7 @@ void
 MP4Demuxer::NotifyDataRemoved()
 {
   for (uint32_t i = 0; i < mDemuxers.Length(); i++) {
-    mDemuxers[i]->NotifyDataArrived();
+    mDemuxers[i]->NotifyDataRemoved();
   }
 }
 
@@ -294,21 +296,10 @@ MP4TrackDemuxer::Seek(media::TimeUnit aTime)
   mIterator->Seek(seekTime);
 
   // Check what time we actually seeked to.
-  RefPtr<MediaRawData> sample;
-  do {
-    sample = GetNextSample();
-    if (!sample) {
-      return SeekPromise::CreateAndReject(NS_ERROR_DOM_MEDIA_END_OF_STREAM, __func__);
-    }
-    if (!sample->Size()) {
-      // This sample can't be decoded, continue searching.
-      continue;
-    }
-    if (sample->mKeyframe) {
-      mQueuedSample = sample;
-      seekTime = mQueuedSample->mTime;
-    }
-  } while (!mQueuedSample);
+  mQueuedSample = GetNextSample();
+  if (mQueuedSample) {
+    seekTime = mQueuedSample->mTime;
+  }
 
   SetNextKeyFrameTime();
 
@@ -485,6 +476,19 @@ void
 MP4TrackDemuxer::NotifyDataArrived()
 {
   mNeedReIndex = true;
+}
+
+void
+MP4TrackDemuxer::NotifyDataRemoved()
+{
+  AutoPinned<MediaResource> resource(mParent->mResource);
+  MediaByteRangeSet byteRanges;
+  nsresult rv = resource->GetCachedRanges(byteRanges);
+  if (NS_FAILED(rv)) {
+    return;
+  }
+  mIndex->UpdateMoofIndex(byteRanges, true /* can evict */);
+  mNeedReIndex = false;
 }
 
 void

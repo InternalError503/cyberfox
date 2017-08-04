@@ -482,7 +482,17 @@ DocAccessible::Shutdown()
 
   mDependentIDsHash.Clear();
   mNodeToAccessibleMap.Clear();
-  ClearCache(mAccessibleCache);
+
+  for (auto iter = mAccessibleCache.Iter(); !iter.Done(); iter.Next()) {
+    Accessible* accessible = iter.Data();
+    MOZ_ASSERT(accessible);
+    if (accessible && !accessible->IsDefunct()) {
+      // Unlink parent to avoid its cleaning overhead in shutdown.
+      accessible->mParent = nullptr;
+      accessible->Shutdown();
+    }
+    iter.Remove();
+  }
 
   HyperTextAccessibleWrap::Shutdown();
 
@@ -1955,7 +1965,12 @@ DocAccessible::UpdateTreeOnRemoval(Accessible* aContainer, nsIContent* aChildNod
 
   TreeMutation mt(aContainer);
   if (child) {
+    RefPtr<Accessible> kungFuDeathGripChild(child);
     mt.BeforeRemoval(child);
+    if (child->IsDefunct()) {
+      return; // event coalescence may kill us
+    }
+
     MOZ_ASSERT(aContainer == child->Parent(), "Wrong parent");
     aContainer->RemoveChild(child);
     UncacheChildrenInSubtree(child);
@@ -1965,7 +1980,12 @@ DocAccessible::UpdateTreeOnRemoval(Accessible* aContainer, nsIContent* aChildNod
 
   TreeWalker walker(aContainer, aChildNode, TreeWalker::eWalkCache);
   while (Accessible* child = walker.Next()) {
+    RefPtr<Accessible> kungFuDeathGripChild(child);
     mt.BeforeRemoval(child);
+    if (child->IsDefunct()) {
+      return; // event coalescence may kill us
+    }
+
     MOZ_ASSERT(aContainer == child->Parent(), "Wrong parent");
     aContainer->RemoveChild(child);
     UncacheChildrenInSubtree(child);
@@ -2042,8 +2062,6 @@ DocAccessible::ValidateARIAOwned()
 void
 DocAccessible::DoARIAOwnsRelocation(Accessible* aOwner)
 {
-  nsTArray<RefPtr<Accessible> >* children = mARIAOwnsHash.LookupOrAdd(aOwner);
-
   MOZ_ASSERT(aOwner, "aOwner must be a valid pointer");
   MOZ_ASSERT(aOwner->Elm(), "aOwner->Elm() must be a valid pointer");
 
@@ -2051,10 +2069,12 @@ DocAccessible::DoARIAOwnsRelocation(Accessible* aOwner)
   logging::TreeInfo("aria owns relocation", logging::eVerbose, aOwner);
 #endif
 
+  nsTArray<RefPtr<Accessible> >* owned = mARIAOwnsHash.LookupOrAdd(aOwner);
   IDRefsIterator iter(this, aOwner->Elm(), nsGkAtoms::aria_owns);
-  uint32_t arrayIdx = 0, insertIdx = aOwner->ChildCount() - children->Length();
+  uint32_t idx = 0;
   while (nsIContent* childEl = iter.NextElem()) {
     Accessible* child = GetAccessible(childEl);
+    auto insertIdx = aOwner->ChildCount() - owned->Length() + idx;
 
     // Make an attempt to create an accessible if it wasn't created yet.
     if (!child) {
@@ -2067,15 +2087,13 @@ DocAccessible::DoARIAOwnsRelocation(Accessible* aOwner)
           imut.Done();
 
           child->SetRelocated(true);
-          children->InsertElementAt(arrayIdx, child);
+          owned->InsertElementAt(idx, child);
+          idx++;
 
           // Create subtree before adjusting the insertion index, since subtree
           // creation may alter children in the container.
           CreateSubtree(child);
           FireEventsOnInsertion(aOwner);
-
-          insertIdx = child->IndexInParent() + 1;
-          arrayIdx++;
         }
       }
       continue;
@@ -2089,15 +2107,13 @@ DocAccessible::DoARIAOwnsRelocation(Accessible* aOwner)
     // Same child on same position, no change.
     if (child->Parent() == aOwner &&
         child->IndexInParent() == static_cast<int32_t>(insertIdx)) {
-      NS_ASSERTION(child == children->ElementAt(arrayIdx), "Not in sync!");
-      insertIdx++; arrayIdx++;
+      MOZ_ASSERT(owned->ElementAt(idx) == child, "Not in sync!");
+      idx++;
       continue;
     }
 
-    NS_ASSERTION(children->SafeElementAt(arrayIdx) != child, "Already in place!");
-
-    nsTArray<RefPtr<Accessible> >::index_type idx = children->IndexOf(child);
-    if (idx < arrayIdx) {
+    MOZ_ASSERT(owned->SafeElementAt(idx) != child, "Already in place!");
+    if (owned->IndexOf(child) < idx) {
       continue; // ignore second entry of same ID
     }
 
@@ -2115,15 +2131,14 @@ DocAccessible::DoARIAOwnsRelocation(Accessible* aOwner)
 
     if (MoveChild(child, aOwner, insertIdx)) {
       child->SetRelocated(true);
-      children->InsertElementAt(arrayIdx, child);
-      arrayIdx++;
-      insertIdx = child->IndexInParent() + 1;
+      owned->InsertElementAt(idx, child);
+      idx++;
     }
   }
 
   // Put back children that are not seized anymore.
-  PutChildrenBack(children, arrayIdx);
-  if (children->Length() == 0) {
+  PutChildrenBack(owned, idx);
+  if (owned->Length() == 0) {
     mARIAOwnsHash.Remove(aOwner);
   }
 }
@@ -2132,6 +2147,8 @@ void
 DocAccessible::PutChildrenBack(nsTArray<RefPtr<Accessible> >* aChildren,
                                uint32_t aStartIdx)
 {
+  MOZ_ASSERT(aStartIdx <= aChildren->Length(), "Wrong removal index");
+
   nsTArray<RefPtr<Accessible> > containers;
   for (auto idx = aStartIdx; idx < aChildren->Length(); idx++) {
     Accessible* child = aChildren->ElementAt(idx);
@@ -2182,6 +2199,8 @@ DocAccessible::MoveChild(Accessible* aChild, Accessible* aNewParent,
 {
   MOZ_ASSERT(aChild, "No child");
   MOZ_ASSERT(aChild->Parent(), "No parent");
+  MOZ_ASSERT(aIdxInParent <= static_cast<int32_t>(aNewParent->ChildCount()),
+             "Wrong insertion point for a moving child");
 
   Accessible* curParent = aChild->Parent();
 
@@ -2191,8 +2210,10 @@ DocAccessible::MoveChild(Accessible* aChild, Accessible* aNewParent,
                     "child", aChild, nullptr);
 #endif
 
-  // If the child was taken from from an ARIA owns element.
+  // Forget aria-owns info in case of ARIA owned element. The caller is expected
+  // to update it if needed.
   if (aChild->IsRelocated()) {
+    aChild->SetRelocated(false);
     nsTArray<RefPtr<Accessible> >* children = mARIAOwnsHash.Get(curParent);
     children->RemoveElement(aChild);
   }

@@ -1313,6 +1313,11 @@ IonBuilder::addOsrValueTypeBarrier(uint32_t slot, MInstruction** def_,
         osrBlock->insertBefore(osrBlock->lastIns(), barrier);
         osrBlock->rewriteSlot(slot, barrier);
         def = barrier;
+
+        // If the TypeSet is more precise than |type|, adjust |type| for the
+        // code below.
+        if (type == MIRType::Value)
+            type = barrier->type();
     } else if (type == MIRType::Null ||
                type == MIRType::Undefined ||
                type == MIRType::MagicOptimizedArguments)
@@ -6117,9 +6122,9 @@ IonBuilder::inlineCalls(CallInfo& callInfo, const ObjectVector& targets, BoolVec
         InlinePropertyTable* propTable = maybeCache->propTable();
         propTable->trimTo(targets, choiceSet);
 
-        if (propTable->numEntries() == 0) {
-            // If all paths were vetoed, output only a generic fallback path.
-            MOZ_ASSERT(dispatch->numCases() == 0);
+        if (propTable->numEntries() == 0 || !propTable->hasPriorResumePoint()) {
+            // Output a generic fallback path.
+            MOZ_ASSERT_IF(propTable->numEntries() == 0, dispatch->numCases() == 0);
             maybeCache = nullptr;
             useFallback = true;
         } else {

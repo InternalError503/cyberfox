@@ -78,7 +78,7 @@ public:
   void Destroy();
   void DestroyPrintingData();
 
-  nsresult Initialize(nsIDocumentViewerPrint* aDocViewerPrint, 
+  nsresult Initialize(nsIDocumentViewerPrint* aDocViewerPrint,
                       nsIDocShell*            aContainer,
                       nsIDocument*            aDocument,
                       float                   aScreenDPI,
@@ -176,7 +176,7 @@ public:
 
   float GetPrintPreviewScale() { return mPrtPreview->mPrintObject->
                                         mPresContext->GetPrintPreviewScale(); }
-  
+
   static nsIPresShell* GetPresShellFor(nsIDocShell* aDocShell);
 
   // These calls also update the DocViewer
@@ -260,14 +260,20 @@ protected:
   nsCOMPtr<nsIDocumentViewerPrint> mDocViewerPrint;
   nsWeakPtr               mContainer;
   float                   mScreenDPI;
-  
-  mozilla::UniquePtr<nsPrintData> mPrt;
+
+  // We are the primary owner of our nsPrintData member vars.  These vars
+  // are refcounted so that functions (e.g. nsPrintData methods) can create
+  // temporary owning references when they need to fire a callback that
+  // could conceivably destroy this nsPrintEngine owner object and all its
+  // member-data.
+  RefPtr<nsPrintData> mPrt;
+
   nsPagePrintTimer*       mPagePrintTimer;
   nsWeakFrame             mPageSeqFrame;
 
   // Print Preview
-  mozilla::UniquePtr<nsPrintData> mPrtPreview;
-  mozilla::UniquePtr<nsPrintData> mOldPrtPreview;
+  RefPtr<nsPrintData> mPrtPreview;
+  RefPtr<nsPrintData> mOldPrtPreview;
 
   nsCOMPtr<nsIDocument>   mDocument;
 
