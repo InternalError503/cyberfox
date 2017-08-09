@@ -487,7 +487,7 @@ DesktopNotificationPermissionPrompt.prototype = {
 
   get popupOptions() {
     let learnMoreURL =
-      Services.urlFormatter.formatURLPref("app.support.baseURL") + "push";
+      Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "push";
 
     // The eventCallback is bound to the Notification that's being
     // shown. We'll stash a reference to this in the closure so that

@@ -535,7 +535,7 @@ function prompt(aBrowser, aRequest) {
             let learnMoreText =
               bundle.getString("getUserMedia.shareScreen.learnMoreLabel");
             let baseURL =
-              Services.urlFormatter.formatURLPref("app.support.baseURL");
+              Services.urlFormatter.formatURLPref("app.helpdoc.baseURI");
             let learnMore =
               "<label class='text-link' href='" + baseURL + "screenshare-safety'>" +
               learnMoreText + "</label>";
