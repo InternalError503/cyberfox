@@ -16,7 +16,7 @@ PackageCount=`ls Cyberfox_KDE_Plasma_Edition-*.tar.bz2 | awk 'END { print NR }'`
 # Make package name editable in single place in the event of file naming change.
 Package=$Dir/Cyberfox_KDE_Plasma_Edition-*.tar.bz2
 
-# Desktop shortcut path, Applications shortcut path, Kyberfox install path.
+# Desktop shortcut path, Applications shortcut path, KCyberfox install path.
 # We need to know path to Desktop for not English operating systems
 : ${XDG_CONFIG_HOME:=~/.config}
 [ -f "${XDG_CONFIG_HOME}/user-dirs.dirs" ] && . "${XDG_CONFIG_HOME}/user-dirs.dirs"
