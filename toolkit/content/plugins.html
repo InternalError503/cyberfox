@@ -79,7 +79,7 @@
     deprecation.textContent = pluginsbundle.GetStringFromName("deprecation_description") + " \u00A0 ";
     var deprecationLink = document.createElement("a");
     deprecationLink.textContent = pluginsbundle.GetStringFromName("deprecation_learn_more");
-    deprecationLink.href = Services.urlFormatter.formatURLPref("app.support.baseURL") + "npapi";
+    deprecationLink.href = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "npapi";
     deprecation.appendChild(deprecationLink);
     fragment.appendChild(deprecation);
 

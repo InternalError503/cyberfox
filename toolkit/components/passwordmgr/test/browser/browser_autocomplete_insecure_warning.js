@@ -1,6 +1,6 @@
 "use strict";
 
-const EXPECTED_SUPPORT_URL = Services.urlFormatter.formatURLPref("app.support.baseURL") +
+const EXPECTED_SUPPORT_URL = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") +
                              "insecure-password";
 
 add_task(function* test_clickInsecureFieldWarning() {
