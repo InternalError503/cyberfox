@@ -159,7 +159,33 @@ Object.defineProperty(this, "gIsInitializing", {
   get: () => gPendingInitializations > 0
 });
 
+
+function cancel(requestDetails) {
+  return {cancel: true};
+}
+
+var gObservers = {
+    'http-on-modify-request': {
+        observe: function (aSubject, aTopic, aData) {
+            let httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+            let requestUrl = httpChannel.URI.spec
+            if (requestUrl.indexOf('google-analytics.com') > -1) {
+               httpChannel.cancel(Cr.NS_BINDING_ABORTED); //this aborts the load
+            }
+        },
+        reg: function () {
+            Services.obs.addObserver(gObservers['http-on-modify-request'], 'http-on-modify-request', false);
+        },
+        unreg: function () {
+            Services.obs.removeObserver(gObservers['http-on-modify-request'], 'http-on-modify-request');
+        }
+    }
+};
+
 function initialize(event) {
+  for (var i in gObservers) {
+    gObservers[i].reg();
+  }
   // XXXbz this listener gets _all_ load events for all nodes in the
   // document... but relies on not being called "too early".
   if (event.target instanceof XMLStylesheetProcessingInstruction) {
@@ -254,6 +280,9 @@ function shutdown() {
   gEventManager.shutdown();
   gViewController.shutdown();
   Services.obs.removeObserver(sendEMPong, "EM-ping");
+  for (var i in gObservers) {
+    gObservers[i].unreg();
+  }
 }
 
 function sendEMPong(aSubject, aTopic, aData) {
