@@ -1,0 +1,7 @@
+dist: trusty
+sudo: required
+before_script:
+- sudo apt-get update -qq
+- sudo apt-get install -y fakeroot autoconf2.13 devscripts build-essential ubuntu-dev-tools packaging-dev libfile-fcntllock-perl debhelper
+script:
+- "./_Build/_Linux/deb_apt/build_deb_apt_cyberfox_travis.sh"

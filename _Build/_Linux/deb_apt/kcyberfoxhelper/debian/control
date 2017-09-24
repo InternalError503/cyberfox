@@ -9,7 +9,7 @@ Homepage: https://github.com/hawkeye116477/kcyberfoxhelper
 Package: kcyberfoxhelper
 Architecture: amd64
 Pre-Depends: apt-transport-https
-Depends: libc6 (>= 2.23), libkf5configcore5 (>= 5.18), libkf5coreaddons5 (>= 5.18), libkf5i18n5 (>= 5.18), libkf5kiocore5 (>= 5.18), libkf5kiowidgets5 (>= 5.18), libkf5notifications5 (>= 5.18), libkf5service-bin, libkf5service5 (>= 5.18), libkf5windowsystem5 (>= 5.18), libqt5core5a (>= 5.6.1), libqt5gui5 (>= 5.6.1) | libqt5gui5-gles (>= 5.6.1), libqt5widgets5 (>= 5.6.1), libstdc++6 (>= 5.3), cyberfox-kde
+Depends: libc6, libkf5configcore5, libkf5coreaddons5, libkf5i18n5, libkf5kiocore5, libkf5kiowidgets5, libkf5notifications5, libkf5service-bin, libkf5service5, libkf5windowsystem5, libqt5core5a, libqt5gui5 | libqt5gui5-gles, libqt5widgets5, libstdc++6, cmake, extra-cmake-modules, libkf5kio-dev, libkf5i18n-dev, libkf5notifications-dev, libkf5windowsystem-dev, python, g++
 Description: Integration of Cyberfox with KDE Plasma
   This is a helper application that allows Cyberfox to use
   KDE file dialogs, file associations, protocol handlers and

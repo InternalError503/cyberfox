@@ -1,5 +1,5 @@
 # Cyberfox KDE Plasma Edition quick build script
-# Version: 1.1.1
+# Version: 1.1.2
 # Release, Beta channels Linux
 # This is only for Cyberfox 52. For Cyberfox 53+ something should be changed...
 
@@ -114,8 +114,8 @@ function ApplyKDE(){
 	# Download patch if not exist and replace some words
 	if [ ! -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch" ] && [ ! -f "$WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch" ]; then
 		# Check url next release for changes.	
-			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/firefox52/mozilla-kde.patch'
-			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/firefox52/firefox-kde.patch'
+			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/a72735108dbe/mozilla-kde.patch'
+			wget -O $WORKDIR/$LDIR/_Build/_Linux/KDE/firefox-kde-$1.patch 'http://www.rosenauer.org/hg/mozilla/raw-file/a72735108dbe/firefox-kde.patch'
 			sed -i 's/Firefox/Cyberfox/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
 			sed -i 's/KMOZILLAHELPER/KCYBERFOXHELPER/g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
 			sed -i 's|/usr/lib/mozilla/kmozillahelper|/opt/cyberfox/kcyberfoxhelper|g' $WORKDIR/$LDIR/_Build/_Linux/KDE/mozilla-kde-$1.patch
@@ -347,10 +347,17 @@ fi
 			cp -r $Dir/voucher.bin $WORKDIR/obj64/dist/cyberfox/
 	fi
 	
-    # Include kcyberfoxhelper
-	wget -O $WORKDIR/obj64/dist/cyberfox/kcyberfoxhelper "https://github.com/hawkeye116477/kcyberfoxhelper/releases/download/v$VERSION_HELPER/kcyberfoxhelper"
-	chmod +x $WORKDIR/obj64/dist/cyberfox/kcyberfoxhelper
-	rm -rf $WORKDIR/tmp/
+    # Build & include kcyberfoxhelper
+    wget -O $WORKDIR/tmp/v$VERSION_HELPER.tar.gz "https://github.com/hawkeye116477/kcyberfoxhelper/archive/v$VERSION_HELPER.tar.gz"
+    tar xzf v$VERSION_HELPER.tar.gz
+    cmake $WORKDIR/tmp/kcyberfoxhelper-$VERSION_HELPER \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    make
+    cp -rf $WORKDIR/tmp/kcyberfoxhelper $WORKDIR/obj64/dist/cyberfox/
+    #cp -rf $WORKDIR/tmp/kcyberfoxhelper-$VERSION/kcyberfoxhelper.notifyrc /usr/share/knotifications5/
+    rm -rf $WORKDIR/tmp
+    chmod +x $WORKDIR/obj64/dist/cyberfox/kcyberfoxhelper
 	
 	# Include kde.js
 	mkdir -p $WORKDIR/obj64/dist/cyberfox/browser/defaults/preferences/
