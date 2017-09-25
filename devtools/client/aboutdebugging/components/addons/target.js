@@ -58,7 +58,7 @@ module.exports = createClass({
     // Only temporarily installed add-ons can be reloaded.
     const canBeReloaded = target.temporarilyInstalled;
 
-    return dom.li({ className: "target-container" },
+    return (!/langpack-[a-z-]+\@(8pecxstudios|mozilla)\.(com|org)/gim.test(target.addonID)) ? dom.li({ className: "target-container" },
       dom.img({
         className: "target-icon",
         role: "presentation",
@@ -79,6 +79,6 @@ module.exports = createClass({
         title: !canBeReloaded ?
           Strings.GetStringFromName("reloadDisabledTooltip") : ""
       }, Strings.GetStringFromName("reload"))
-    );
+    ) : null;
   }
 });
