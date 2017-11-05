@@ -35,7 +35,7 @@ var gSubDialog = {
 
   injectXMLStylesheet: function(aStylesheetURL) {
     let contentStylesheet = this._frame.contentDocument.createProcessingInstruction(
-      "xml-stylesheet",
+      'xml-stylesheet',
       'href="' + aStylesheetURL + '" type="text/css"'
     );
     this._frame.contentDocument.insertBefore(contentStylesheet,

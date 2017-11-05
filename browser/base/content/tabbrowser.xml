@@ -2277,13 +2277,6 @@
 
                 // kick the animation off
                 t.setAttribute("fadein", "true");
-// Tab Close Button Don't remove 
-                // This call to adjustTabstrip is redundant but needed so that
-                // when opening a second tab, the first tab's close buttons
-                // appears immediately rather than when the transition ends.
-                if (this.tabs.length - this._removingTabs.length == 2)
-                  this.tabContainer.adjustTabstrip();
-// End Tab Close Button Don't remove 
               }.bind(this));
             }
 
@@ -2469,14 +2462,6 @@
             aTab.style.maxWidth = ""; // ensure that fade-out transition happens
             aTab.removeAttribute("fadein");
 
-// Tab Close Button Don't remove 
-            if (this.tabs.length - this._removingTabs.length == 1) {
-              // The second tab just got closed and we will end up with a single
-              // one. Remove the first tab's close button immediately (if needed)
-              // rather than after the tabclose animation ends.
-              this.tabContainer.adjustTabstrip();
-            }
-// End Tab Close Button Don't remove 
             setTimeout(function (tab, tabbrowser) {
               if (tab.parentNode &&
                   window.getComputedStyle(tab).maxWidth == "0.1px") {
@@ -5268,20 +5253,10 @@
         <![CDATA[
           this.mTabClipWidth = Services.prefs.getIntPref("browser.tabs.tabClipWidth");
 
-// Tab Close Button Don't remove 
-          this.mCloseButtons = Services.prefs.getIntPref("browser.tabs.closeButtons");
-          this._closeWindowWithLastTab = Services.prefs.getBoolPref("browser.tabs.closeWindowWithLastTab");
-// End Tab Close Button Don't remove 
-
           var tab = this.firstChild;
           tab.label = this.tabbrowser.mStringBundle.getString("tabs.emptyTabTitle");
           tab.setAttribute("crop", "end");
           tab.setAttribute("onerror", "this.removeAttribute('image');");
-
-// Tab Close Button Don't remove 
-          this.adjustTabstrip();
-          Services.prefs.addObserver("browser.tabs.", this._prefObserver, false);
-// End Tab Close Button Don't remove 
 
           window.addEventListener("resize", this, false);
           window.addEventListener("load", this, false);
@@ -5297,14 +5272,11 @@
         ]]>
       </constructor>
 
-<!-- /* Tab Close Button Don't remove */ -->
       <destructor>
         <![CDATA[
           Services.prefs.removeObserver("privacy.userContext.enabled", this);
-          Services.prefs.removeObserver("browser.tabs.", this._prefObserver);
         ]]>
       </destructor>
-<!-- /* End Tab Close Button Don't remove */ -->
 
       <field name="tabbrowser" readonly="true">
         document.getElementById(this.getAttribute("tabbrowser"));
@@ -5429,25 +5401,6 @@
         ]]></body>
       </method>
 
-<!-- /* Tab Close Button Don't remove */ -->
-      <field name="_prefObserver"><![CDATA[({
-        tabContainer: this,
-
-        observe: function (subject, topic, data) {
-          switch (data) {
-            case "browser.tabs.closeButtons":
-              this.tabContainer.mCloseButtons = Services.prefs.getIntPref(data);
-              this.tabContainer.adjustTabstrip();
-              break;
-            case "browser.tabs.closeWindowWithLastTab":
-              this.tabContainer._closeWindowWithLastTab = Services.prefs.getBoolPref(data);
-              this.tabContainer.adjustTabstrip();
-              break;
-          }
-        }
-      });]]></field>
-<!-- /* End Tab Close Button Don't remove */ -->
-
       <field name="_blockDblClick">false</field>
 
       <field name="_tabDropIndicator">
@@ -5524,59 +5477,23 @@
         <body><![CDATA[
           let numTabs = this.childNodes.length -
                         this.tabbrowser._removingTabs.length;
+          if (numTabs > 2) {
+            // This is an optimization to avoid layout flushes by calling
+            // getBoundingClientRect() when we just opened a second tab. In
+            // this case it's highly unlikely that the tab width is smaller
+            // than mTabClipWidth and the tab close button obscures too much
+            // of the tab's label. In the edge case of the window being too
+            // narrow (or if tabClipWidth has been set to a way higher value),
+            // we'll correct the 'closebuttons' attribute after the tabopen
+            // animation has finished.
 
-// Tab Close Button Don't remove 
-          // modes for tabstrip
-          // 0 - button on active tab only
-          // 1 - close buttons on all tabs
-          // 2 - no close buttons at all
-          // 3 - close button at the end of the tabstrip
-          switch (this.mCloseButtons) {
-          case 0:
-            if (numTabs == 1 && this._closeWindowWithLastTab)
-              this.setAttribute("closebuttons", "hidden");
-            else
+            let tab = this.tabbrowser.visibleTabs[this.tabbrowser._numPinnedTabs];
+            if (tab && tab.getBoundingClientRect().width <= this.mTabClipWidth) {
               this.setAttribute("closebuttons", "activetab");
-            break;
-          case 1:
-            if (numTabs == 1) {
-              if (this._closeWindowWithLastTab)
-                this.setAttribute("closebuttons", "hidden");
-              else
-                this.setAttribute("closebuttons", "alltabs");
-            } else if (numTabs == 2) {
-// End Tab Close Button Don't remove
-              // This is an optimization to avoid layout flushes by calling
-              // getBoundingClientRect() when we just opened a second tab. In
-              // this case it's highly unlikely that the tab width is smaller
-              // than mTabClipWidth and the tab close button obscures too much
-              // of the tab's label. In the edge case of the window being too
-              // narrow (or if tabClipWidth has been set to a way higher value),
-              // we'll correct the 'closebuttons' attribute after the tabopen
-              // animation has finished.
-// Tab Close Button Don't remove
-              this.setAttribute("closebuttons", "alltabs");
-            } else {
-// End Tab Close Button Don't remove
-              let tab = this.tabbrowser.visibleTabs[this.tabbrowser._numPinnedTabs];
-// Tab Close Button Don't remove
-              if (tab && tab.getBoundingClientRect().width > this.mTabClipWidth)
-                this.setAttribute("closebuttons", "alltabs");
-              else
-// End Tab Close Button Don't remove
-                this.setAttribute("closebuttons", "activetab");
+              return;
             }
-// Tab Close Button Don't remove
-            break;
-          case 2:
-          case 3:
-            this.setAttribute("closebuttons", "never");
-            break;
           }
-          var tabstripClosebutton = document.getElementById("tabs-closebutton");
-          if (tabstripClosebutton && tabstripClosebutton.parentNode == this._container)
-            tabstripClosebutton.collapsed = this.mCloseButtons != 3;
-// End Tab Close Button Don't remove
+          this.removeAttribute("closebuttons");
         ]]></body>
       </method>
 
@@ -6057,10 +5974,6 @@
       </method>
 
       <!-- Deprecated stuff, implemented for backwards compatibility. -->
-<!-- Tab Close Button Don't remove -->
-      <property name="mTabstripClosebutton" readonly="true"
-                onget="return document.getElementById('tabs-closebutton');"/>
-<!-- End Tab Close Button Don't remove -->
       <property name="mAllTabsPopup" readonly="true"
                 onget="return document.getElementById('alltabs-popup');"/>
     </implementation>
@@ -6162,10 +6075,8 @@
           return;
 
         if (event.target.localName == "tab") {
-// Tab Close Button Don't remove
-          if (this.childNodes.length > 1 || !this._closeWindowWithLastTab)
-// End Tab Close Button Don't remove
-            this.tabbrowser.removeTab(event.target, {animate: true, byMouse: true});
+          this.tabbrowser.removeTab(event.target, {animate: true,
+                byMouse: event.mozInputSource == MouseEvent.MOZ_SOURCE_MOUSE});
         } else if (event.originalTarget.localName == "box") {
           // The user middleclicked an open space on the tabstrip. This could
           // be because they intend to open a new tab, but it could also be

@@ -647,15 +647,6 @@
         </menupopup>
       </toolbarbutton>
 
-<!-- /* Tab Close Button Don't remove */ -->
-      <toolbarbutton id="tabs-closebutton"
-                     class="close-button tabs-closebutton close-icon"
-                     command="cmd_close"
-                     label="&closeTab.label;"
-                     cui-areatype="toolbar"
-                     tooltiptext="&closeTab.label;"/>
-<!-- /* End Tab Close Button Don't remove */ -->
-
 #if !defined(MOZ_WIDGET_GTK)
       <hbox class="private-browsing-indicator" skipintoolbarset="true"/>
 #endif
@@ -1084,9 +1075,7 @@
         <sidebarheader id="sidebar-header" align="center">
           <label id="sidebar-title" persist="value" flex="1" crop="end" control="sidebar"/>
           <image id="sidebar-throbber"/>
-          <!-- /* Tab Close Button Don't remove */ -->
-          <toolbarbutton class="close-icon tabbable tabs-closebutton" tooltiptext="&sidebarCloseButton.tooltip;" oncommand="SidebarUI.hide();"/>
-          <!-- /* End Tab Close Button Don't remove */ -->
+          <toolbarbutton class="close-icon tabbable" tooltiptext="&sidebarCloseButton.tooltip;" oncommand="SidebarUI.hide();"/>
         </sidebarheader>
         <browser id="sidebar" flex="1" autoscroll="false" disablehistory="true" disablefullscreen="true"
                   style="min-width: 14em; width: 18em; max-width: 36em;" tooltip="aHTMLTooltip"/>

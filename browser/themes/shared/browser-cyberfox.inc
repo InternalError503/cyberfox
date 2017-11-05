@@ -1,22 +1,5 @@
 /* Cyberfox Config */
 
-/* Tab Close Button Don't remove */
-/* Tabstrip close button */
-.tabs-closebutton {
-  -moz-appearance: none;
-  padding: 4px 2px;
-  margin: 0px;
-  border: none;
-}
-
-.tabs-closebutton > .toolbarbutton-icon {
-  -moz-margin-end: 0px !important;
-  -moz-padding-end: 2px !important;
-  -moz-padding-start: 2px !important;
-}
-/* End Tab Close Button Don't remove */
-
-
 #appmenu_print,
 #menu_print,
 #appmenu_print_popup,

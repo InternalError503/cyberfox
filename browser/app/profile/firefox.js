@@ -1391,7 +1391,7 @@ pref("experiments.enabled", false);
 pref("experiments.manifest.fetchIntervalSeconds", 86400);
 pref("experiments.manifest.uri", "");
 // Whether experiments are supported by the current application profile.
-pref("experiments.supported", true);
+pref("experiments.supported", false);
 
 // Enable GMP support in the addon manager.
 pref("media.gmp-provider.enabled", true);
@@ -1620,14 +1620,6 @@ pref("app.learn.more.plugins_disabled", "https://8pecxstudios.com/Forums/viewtop
 
 //NewTab page search feature
 pref("browser.newtab.search.enabled", true);
-
-// Tab Close Button feature
-// Where to show tab close buttons:
-// 0  on active tab only
-// 1  on all tabs until tabClipWidth is reached, then active tab only
-// 2  no close buttons at all
-// 3  at the end of the tabstrip
-pref("browser.tabs.closeButtons", 1);
 
 //New tab toggle thumbnail capture
 // State true no thumbnails will be captured

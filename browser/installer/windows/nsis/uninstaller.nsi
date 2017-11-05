@@ -318,6 +318,7 @@ Section "Uninstall"
   ; removed if it refers to this install location.
   ${If} "$INSTDIR" == "$R1"
     DeleteRegKey HKLM "Software\Clients\StartMenuInternet\${FileMainEXE}"
+    DeleteRegValue HKLM "Software\RegisteredApplications" "$R9"
     DeleteRegValue HKLM "Software\RegisteredApplications" "${AppRegName}"
   ${EndIf}
 
@@ -334,6 +335,7 @@ Section "Uninstall"
   ; removed if it refers to this install location.
   ${If} "$INSTDIR" == "$R1"
     DeleteRegKey HKCU "Software\Clients\StartMenuInternet\${FileMainEXE}"
+    DeleteRegValue HKLM "Software\RegisteredApplications" "$R9"
     DeleteRegValue HKCU "Software\RegisteredApplications" "${AppRegName}"
   ${EndIf}
 

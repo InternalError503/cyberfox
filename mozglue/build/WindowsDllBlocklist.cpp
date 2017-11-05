@@ -67,6 +67,7 @@ struct DllBlockInfo {
   enum {
     FLAGS_DEFAULT = 0,
     BLOCK_WIN8PLUS_ONLY = 1,
+    BLOCK_WIN8_ONLY = 2,
     USE_TIMESTAMP = 4,
   } flags;
 };
@@ -167,7 +168,7 @@ static const DllBlockInfo sWindowsDllBlocklist[] = {
   { "rf-firefox-40.dll", ALL_VERSIONS },
 
   // Crashes with DesktopTemperature, bug 1046382
-  { "dtwxsvc.dll", ALL_VERSIONS },
+  { "dtwxsvc.dll", 0x53153234, DllBlockInfo::USE_TIMESTAMP },
 
   // Must block www.aztecmedia.com browser malware & highjack1005563   
   { "systemk.dll", ALL_VERSIONS },
@@ -288,6 +289,24 @@ static const DllBlockInfo sWindowsDllBlocklist[] = {
   // smci*.dll - goobzo crashware (bug 1339908)
   { "smci32.dll", ALL_VERSIONS },
   { "smci64.dll", ALL_VERSIONS },
+
+  // Nahimic 2 breaks applicaton update (bug 1356637)
+  { "nahimic2devprops.dll", MAKE_VERSION(2, 5, 19, 0xffff) },
+  // Nahimic is causing crashes, bug 1233556
+  { "nahimicmsiosd.dll", UNVERSIONED },
+  // Nahimic is causing crashes, bug 1360029
+  { "nahimicvrdevprops.dll", UNVERSIONED },
+  { "nahimic2osd.dll", MAKE_VERSION(2, 5, 19, 0xffff) },
+  { "nahimicmsidevprops.dll", UNVERSIONED },
+
+  // Bug 1268470 - crashes with Kaspersky Lab on Windows 8
+  { "klsihk64.dll", MAKE_VERSION(14, 0, 456, 0xffff), DllBlockInfo::BLOCK_WIN8_ONLY },
+  
+  // Bug 1407337, crashes with OpenSC < 0.16.0
+  { "onepin-opensc-pkcs11.dll", MAKE_VERSION(0, 15, 0xffff, 0xffff) },
+  
+  // Avecto Privilege Guard causes crashes, bug 1385542
+  { "pghook.dll", ALL_VERSIONS },
 
   { nullptr, 0 }
 };
@@ -732,8 +751,13 @@ patched_LdrLoadDll (PWCHAR filePath, PULONG flags, PUNICODE_STRING moduleFileNam
     printf_stderr("LdrLoadDll: info->name: '%s'\n", info->name);
 #endif
 
-    if ((info->flags == DllBlockInfo::BLOCK_WIN8PLUS_ONLY) &&
+    if ((info->flags & DllBlockInfo::BLOCK_WIN8PLUS_ONLY) &&
         !IsWin8OrLater()) {
+      goto continue_loading;
+    }
+
+    if ((info->flags & DllBlockInfo::BLOCK_WIN8_ONLY) &&
+        (!IsWin8OrLater() || IsWin8Point1OrLater())) {
       goto continue_loading;
     }
 
@@ -850,6 +874,14 @@ DllBlocklist_Initialize()
     printf_stderr("LdrLoadDll hook failed, no dll blocklisting active\n");
 #endif
   }
+
+  // If someone injects a thread early that causes user32.dll to load off the
+  // main thread this causes issues, so load it as soon as we've initialized
+  // the block-list. (See bug 1400637)
+  if (!sUser32BeforeBlocklist) {
+    ::LoadLibraryW(L"user32.dll");
+  }
+
 }
 
 MFBT_API void

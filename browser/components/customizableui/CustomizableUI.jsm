@@ -290,9 +290,6 @@ var CustomizableUIInternal = {
         "tabbrowser-tabs",
         "new-tab-button",
         "alltabs-button",
-        // Tab Close Button Don't remove
-        "tabs-closebutton",
-        // End Tab Close Button Don't remove
       ],
       defaultCollapsed: null,
     }, true);
