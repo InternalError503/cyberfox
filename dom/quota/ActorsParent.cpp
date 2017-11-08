@@ -875,6 +875,7 @@ class NormalOriginOperationBase
 protected:
   Nullable<PersistenceType> mPersistenceType;
   OriginScope mOriginScope;
+  mozilla::Atomic<bool> mCanceled;
   const bool mExclusive;
 
 public:
@@ -1002,50 +1003,105 @@ private:
   RecvStopIdleMaintenance() override;
 };
 
-class GetUsageOp final
+class QuotaUsageRequestBase
   : public NormalOriginOperationBase
   , public PQuotaUsageRequestParent
+{
+public:
+  // May be overridden by subclasses if they need to perform work on the
+  // background thread before being run.
+  virtual bool
+  Init(Quota* aQuota);
+
+protected:
+  QuotaUsageRequestBase()
+    : NormalOriginOperationBase(Nullable<PersistenceType>(),
+                                OriginScope::FromNull(),
+                                /* aExclusive */ false)
+  { }
+
+  nsresult
+  GetUsageForOrigin(QuotaManager* aQuotaManager,
+                    PersistenceType aPersistenceType,
+                    const nsACString& aGroup,
+                    const nsACString& aOrigin,
+                    bool aIsApp,
+                    UsageInfo* aUsageInfo);
+
+  // Subclasses use this override to set the IPDL response value.
+  virtual void
+  GetResponse(UsageRequestResponse& aResponse) = 0;
+
+private:
+  void
+  SendResults() override;
+
+  // IPDL methods.
+  void
+  ActorDestroy(ActorDestroyReason aWhy) override;
+
+  bool
+  RecvCancel() override;
+};
+
+class GetUsageOp final
+  : public QuotaUsageRequestBase
+{
+  nsTArray<OriginUsage> mOriginUsages;
+  nsDataHashtable<nsCStringHashKey, uint32_t> mOriginUsagesIndex;
+
+  bool mGetAll;
+
+public:
+  explicit GetUsageOp(const UsageRequestParams& aParams);
+
+private:
+  ~GetUsageOp()
+  { }
+
+  nsresult
+  TraverseRepository(QuotaManager* aQuotaManager,
+                     PersistenceType aPersistenceType);
+
+  nsresult
+  DoDirectoryWork(QuotaManager* aQuotaManager) override;
+
+  void
+  GetResponse(UsageRequestResponse& aResponse) override;
+};
+
+class GetOriginUsageOp final
+  : public QuotaUsageRequestBase
 {
   // If mGetGroupUsage is false, we use mUsageInfo to record the origin usage
   // and the file usage. Otherwise, we use it to record the group usage and the
   // limit.
   UsageInfo mUsageInfo;
 
-  const UsageParams mParams;
+  const OriginUsageParams mParams;
   nsCString mSuffix;
   nsCString mGroup;
   bool mIsApp;
   bool mGetGroupUsage;
 
 public:
-  explicit GetUsageOp(const UsageRequestParams& aParams);
+  explicit GetOriginUsageOp(const UsageRequestParams& aParams);
 
   MOZ_IS_CLASS_INIT bool
-  Init(Quota* aQuota);
+  Init(Quota* aQuota) override;
 
 private:
-  ~GetUsageOp()
+  ~GetOriginUsageOp()
   { }
 
   MOZ_IS_CLASS_INIT virtual nsresult
   DoInitOnMainThread() override;
 
-  nsresult
-  AddToUsage(QuotaManager* aQuotaManager,
-             PersistenceType aPersistenceType);
-
   virtual nsresult
   DoDirectoryWork(QuotaManager* aQuotaManager) override;
 
-  virtual void
-  SendResults() override;
-
-  // IPDL methods.
-  virtual void
-  ActorDestroy(ActorDestroyReason aWhy) override;
-
-  virtual bool
-  RecvCancel() override;
+  void
+  GetResponse(UsageRequestResponse& aResponse) override;
 };
 
 class QuotaRequestBase
@@ -3839,7 +3895,11 @@ QuotaManager::InitializeOrigin(PersistenceType aPersistenceType,
       return NS_ERROR_UNEXPECTED;
     }
 
-    rv = mClients[clientType]->InitOrigin(aPersistenceType, aGroup, aOrigin,
+    Atomic<bool> dummy(false);
+    rv = mClients[clientType]->InitOrigin(aPersistenceType,
+                                          aGroup,
+                                          aOrigin,
+                                          /* aCanceled */ dummy,
                                           usageInfo);
     NS_ENSURE_SUCCESS(rv, rv);
   }
@@ -4779,10 +4839,9 @@ QuotaManager::GetInfoForChrome(nsACString* aSuffix,
 
 // static
 bool
-QuotaManager::IsOriginWhitelistedForPersistentStorage(const nsACString& aOrigin)
+QuotaManager::IsOriginInternal(const nsACString& aOrigin)
 {
-  // The first prompt and quota tracking is not required for these origins in
-  // persistent storage.
+  // The first prompt is not required for these origins.
   if (aOrigin.EqualsLiteral(kChromeOrigin) ||
       StringBeginsWith(aOrigin, nsDependentCString(kAboutHomeOriginPrefix)) ||
       StringBeginsWith(aOrigin, nsDependentCString(kIndexedDBOriginPrefix)) ||
@@ -4803,7 +4862,7 @@ QuotaManager::IsFirstPromptRequired(PersistenceType aPersistenceType,
     return false;
   }
 
-  return !IsOriginWhitelistedForPersistentStorage(aOrigin);
+  return !IsOriginInternal(aOrigin);
 }
 
 // static
@@ -5658,7 +5717,25 @@ Quota::ActorDestroy(ActorDestroyReason aWhy)
 PQuotaUsageRequestParent*
 Quota::AllocPQuotaUsageRequestParent(const UsageRequestParams& aParams)
 {
-  RefPtr<GetUsageOp> actor = new GetUsageOp(aParams);
+  AssertIsOnBackgroundThread();
+  MOZ_ASSERT(aParams.type() != UsageRequestParams::T__None);
+
+  RefPtr<QuotaUsageRequestBase> actor;
+
+  switch (aParams.type()) {
+    case UsageRequestParams::TAllUsageParams:
+      actor = new GetUsageOp(aParams);
+      break;
+
+    case UsageRequestParams::TOriginUsageParams:
+      actor = new GetOriginUsageOp(aParams);
+      break;
+
+    default:
+      MOZ_CRASH("Should never get here!");
+  }
+
+  MOZ_ASSERT(actor);
 
   // Transfer ownership to IPDL.
   return actor.forget().take();
@@ -5672,7 +5749,7 @@ Quota::RecvPQuotaUsageRequestConstructor(PQuotaUsageRequestParent* aActor,
   MOZ_ASSERT(aActor);
   MOZ_ASSERT(aParams.type() != UsageRequestParams::T__None);
 
-  auto* op = static_cast<GetUsageOp*>(aActor);
+  auto* op = static_cast<QuotaUsageRequestBase*>(aActor);
 
   if (NS_WARN_IF(!op->Init(this))) {
     return false;
@@ -5689,8 +5766,8 @@ Quota::DeallocPQuotaUsageRequestParent(PQuotaUsageRequestParent* aActor)
   MOZ_ASSERT(aActor);
 
   // Transfer ownership back from IPDL.
-  RefPtr<GetUsageOp> actor =
-    dont_AddRef(static_cast<GetUsageOp*>(aActor));
+  RefPtr<QuotaUsageRequestBase> actor =
+    dont_AddRef(static_cast<QuotaUsageRequestBase*>(aActor));
   return true;
 }
 
@@ -5745,6 +5822,7 @@ Quota::RecvPQuotaRequestConstructor(PQuotaRequestParent* aActor,
   MOZ_ASSERT(aParams.type() != RequestParams::T__None);
 
   auto* op = static_cast<QuotaRequestBase*>(aActor);
+
   if (NS_WARN_IF(!op->Init(this))) {
     return false;
   }
@@ -5823,67 +5901,33 @@ Quota::RecvStopIdleMaintenance()
   return true;
 }
 
-GetUsageOp::GetUsageOp(const UsageRequestParams& aParams)
-  : NormalOriginOperationBase(Nullable<PersistenceType>(),
-                              OriginScope::FromNull(),
-                              /* aExclusive */ false)
-  , mParams(aParams.get_UsageParams())
-  , mGetGroupUsage(aParams.get_UsageParams().getGroupUsage())
-{
-  AssertIsOnOwningThread();
-  MOZ_ASSERT(aParams.type() == UsageRequestParams::TUsageParams);
-}
-
 bool
-GetUsageOp::Init(Quota* aQuota)
+QuotaUsageRequestBase::Init(Quota* aQuota)
 {
   AssertIsOnOwningThread();
   MOZ_ASSERT(aQuota);
 
-  mNeedsMainThreadInit = true;
   mNeedsQuotaManagerInit = true;
 
   return true;
 }
 
 nsresult
-GetUsageOp::DoInitOnMainThread()
-{
-  MOZ_ASSERT(NS_IsMainThread());
-  MOZ_ASSERT(GetState() == State_Initializing);
-  MOZ_ASSERT(mNeedsMainThreadInit);
-
-  const PrincipalInfo& principalInfo = mParams.principalInfo();
-
-  nsresult rv;
-  nsCOMPtr<nsIPrincipal> principal =
-    PrincipalInfoToPrincipal(principalInfo, &rv);
-  if (NS_WARN_IF(NS_FAILED(rv))) {
-    return rv;
-  }
-
-  // Figure out which origin we're dealing with.
-  nsCString origin;
-  rv = QuotaManager::GetInfoFromPrincipal(principal, &mSuffix, &mGroup, &origin,
-                                          &mIsApp);
-  if (NS_WARN_IF(NS_FAILED(rv))) {
-    return rv;
-  }
-
-  mOriginScope.SetFromOrigin(origin);
-
-  return NS_OK;
-}
-
-nsresult
-GetUsageOp::AddToUsage(QuotaManager* aQuotaManager,
-                       PersistenceType aPersistenceType)
+QuotaUsageRequestBase::GetUsageForOrigin(QuotaManager* aQuotaManager,
+                                         PersistenceType aPersistenceType,
+                                         const nsACString& aGroup,
+                                         const nsACString& aOrigin,
+                                         bool aIsApp,
+                                         UsageInfo* aUsageInfo)
 {
   AssertIsOnIOThread();
+  MOZ_ASSERT(aQuotaManager);
+  MOZ_ASSERT(aUsageInfo);
+  MOZ_ASSERT(aUsageInfo->TotalUsage() == 0);
 
   nsCOMPtr<nsIFile> directory;
   nsresult rv = aQuotaManager->GetDirectoryForOrigin(aPersistenceType,
-                                                     mOriginScope.GetOrigin(),
+                                                     aOrigin,
                                                      getter_AddRefs(directory));
   NS_ENSURE_SUCCESS(rv, rv);
 
@@ -5893,12 +5937,11 @@ GetUsageOp::AddToUsage(QuotaManager* aQuotaManager,
 
   // If the directory exists then enumerate all the files inside, adding up
   // the sizes to get the final usage statistic.
-  if (exists && !mUsageInfo.Canceled()) {
+  if (exists && !mCanceled) {
     bool initialized;
 
-    if (IsTreatedAsPersistent(aPersistenceType, mIsApp)) {
-      nsCString originKey =
-        OriginKey(aPersistenceType, mOriginScope.GetOrigin());
+    if (IsTreatedAsPersistent(aPersistenceType, aIsApp)) {
+      nsCString originKey = OriginKey(aPersistenceType, aOrigin);
       initialized = aQuotaManager->IsOriginInitialized(originKey);
     } else {
       initialized = aQuotaManager->IsTemporaryStorageInitialized();
@@ -5910,7 +5953,7 @@ GetUsageOp::AddToUsage(QuotaManager* aQuotaManager,
 
     bool hasMore;
     while (NS_SUCCEEDED((rv = entries->HasMoreElements(&hasMore))) &&
-           hasMore && !mUsageInfo.Canceled()) {
+           hasMore && !mCanceled) {
       nsCOMPtr<nsISupports> entry;
       rv = entries->GetNext(getter_AddRefs(entry));
       NS_ENSURE_SUCCESS(rv, rv);
@@ -5958,18 +6001,204 @@ GetUsageOp::AddToUsage(QuotaManager* aQuotaManager,
 
       if (initialized) {
         rv = client->GetUsageForOrigin(aPersistenceType,
-                                       mGroup,
-                                       mOriginScope.GetOrigin(),
-                                       &mUsageInfo);
+                                       aGroup,
+                                       aOrigin,
+                                       mCanceled,
+                                       aUsageInfo);
       }
       else {
         rv = client->InitOrigin(aPersistenceType,
-                                mGroup,
-                                mOriginScope.GetOrigin(),
-                                &mUsageInfo);
+                                aGroup,
+                                aOrigin,
+                                mCanceled,
+                                aUsageInfo);
       }
       NS_ENSURE_SUCCESS(rv, rv);
     }
+  }
+
+  return NS_OK;
+}
+
+void
+QuotaUsageRequestBase::SendResults()
+{
+  AssertIsOnOwningThread();
+
+  if (IsActorDestroyed()) {
+    if (NS_SUCCEEDED(mResultCode)) {
+      mResultCode = NS_ERROR_FAILURE;
+    }
+  } else {
+    if (mCanceled) {
+      mResultCode = NS_ERROR_FAILURE;
+    }
+
+    UsageRequestResponse response;
+
+    if (NS_SUCCEEDED(mResultCode)) {
+      GetResponse(response);
+    } else {
+      response = mResultCode;
+    }
+
+    Unused << PQuotaUsageRequestParent::Send__delete__(this, response);
+  }
+}
+
+void
+QuotaUsageRequestBase::ActorDestroy(ActorDestroyReason aWhy)
+{
+  AssertIsOnOwningThread();
+
+  NoteActorDestroyed();
+}
+
+bool
+QuotaUsageRequestBase::RecvCancel()
+{
+  AssertIsOnOwningThread();
+
+  if (mCanceled.exchange(true)) {
+    NS_WARNING("Canceled more than once?!");
+    return false;
+  }
+
+  return true;
+}
+
+GetUsageOp::GetUsageOp(const UsageRequestParams& aParams)
+  : mGetAll(aParams.get_AllUsageParams().getAll())
+{
+  AssertIsOnOwningThread();
+  MOZ_ASSERT(aParams.type() == UsageRequestParams::TAllUsageParams);
+}
+
+nsresult
+GetUsageOp::TraverseRepository(QuotaManager* aQuotaManager,
+                               PersistenceType aPersistenceType)
+{
+  AssertIsOnIOThread();
+  MOZ_ASSERT(aQuotaManager);
+
+  nsresult rv;
+
+  nsCOMPtr<nsIFile> directory =
+    do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  rv = directory->InitWithPath(aQuotaManager->GetStoragePath(aPersistenceType));
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  bool exists;
+  rv = directory->Exists(&exists);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  if (!exists) {
+    return NS_OK;
+  }
+
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = directory->GetDirectoryEntries(getter_AddRefs(entries));
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  bool persistent = aPersistenceType == PERSISTENCE_TYPE_PERSISTENT;
+
+  bool hasMore;
+  while (NS_SUCCEEDED((rv = entries->HasMoreElements(&hasMore))) &&
+         hasMore && !mCanceled) {
+    nsCOMPtr<nsISupports> entry;
+    rv = entries->GetNext(getter_AddRefs(entry));
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
+    nsCOMPtr<nsIFile> originDir = do_QueryInterface(entry);
+    MOZ_ASSERT(originDir);
+
+    bool isDirectory;
+    rv = originDir->IsDirectory(&isDirectory);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
+    if (!isDirectory) {
+      nsString leafName;
+      rv = originDir->GetLeafName(leafName);
+      if (NS_WARN_IF(NS_FAILED(rv))) {
+        return rv;
+      }
+
+      if (!leafName.EqualsLiteral(DSSTORE_FILE_NAME)) {
+        QM_WARNING("Something (%s) in the repository that doesn't belong!",
+                   NS_ConvertUTF16toUTF8(leafName).get());
+      }
+      continue;
+    }
+
+    int64_t timestamp;
+    nsCString suffix;
+    nsCString group;
+    nsCString origin;
+    bool isApp;
+    rv = aQuotaManager->GetDirectoryMetadata2WithRestore(originDir,
+                                                         persistent,
+                                                         &timestamp,
+                                                         suffix,
+                                                         group,
+                                                         origin,
+                                                         &isApp);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
+    if (!mGetAll && aQuotaManager->IsOriginInternal(origin)) {
+      continue;
+    }
+
+    OriginUsage* originUsage;
+
+    // We can't store pointers to OriginUsage objects in the hashtable
+    // since AppendElement() reallocates its internal array buffer as number
+    // of elements grows.
+    uint32_t index;
+    if (mOriginUsagesIndex.Get(origin, &index)) {
+      originUsage = &mOriginUsages[index];
+    } else {
+      index = mOriginUsages.Length();
+
+      originUsage = mOriginUsages.AppendElement();
+
+      originUsage->origin() = origin;
+      originUsage->persisted() = false;
+      originUsage->usage() = 0;
+
+      mOriginUsagesIndex.Put(origin, index);
+    }
+
+    UsageInfo usageInfo;
+    rv = GetUsageForOrigin(aQuotaManager,
+                           aPersistenceType,
+                           group,
+                           origin,
+                           isApp,
+                           &usageInfo);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+
+    originUsage->usage() = originUsage->usage() + usageInfo.TotalUsage();
+  }
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
   }
 
   return NS_OK;
@@ -5979,9 +6208,96 @@ nsresult
 GetUsageOp::DoDirectoryWork(QuotaManager* aQuotaManager)
 {
   AssertIsOnIOThread();
-  MOZ_ASSERT(mUsageInfo.TotalUsage() == 0);
 
   PROFILER_LABEL("Quota", "GetUsageOp::DoDirectoryWork",
+                 js::ProfileEntry::Category::OTHER);
+
+  nsresult rv;
+
+  for (const PersistenceType type : kAllPersistenceTypes) {
+    rv = TraverseRepository(aQuotaManager, type);
+    if (NS_WARN_IF(NS_FAILED(rv))) {
+      return rv;
+    }
+  }
+
+  return NS_OK;
+}
+
+void
+GetUsageOp::GetResponse(UsageRequestResponse& aResponse)
+{
+  AssertIsOnOwningThread();
+
+  aResponse = AllUsageResponse();
+
+  if (!mOriginUsages.IsEmpty()) {
+    nsTArray<OriginUsage>& originUsages =
+      aResponse.get_AllUsageResponse().originUsages();
+
+    mOriginUsages.SwapElements(originUsages);
+  }
+}
+
+GetOriginUsageOp::GetOriginUsageOp(const UsageRequestParams& aParams)
+  : mParams(aParams.get_OriginUsageParams())
+  , mGetGroupUsage(aParams.get_OriginUsageParams().getGroupUsage())
+{
+  AssertIsOnOwningThread();
+  MOZ_ASSERT(aParams.type() == UsageRequestParams::TOriginUsageParams);
+}
+
+bool
+GetOriginUsageOp::Init(Quota* aQuota)
+{
+  AssertIsOnOwningThread();
+  MOZ_ASSERT(aQuota);
+
+  if (NS_WARN_IF(!QuotaUsageRequestBase::Init(aQuota))) {
+    return false;
+  }
+
+  mNeedsMainThreadInit = true;
+
+  return true;
+}
+
+nsresult
+GetOriginUsageOp::DoInitOnMainThread()
+{
+  MOZ_ASSERT(NS_IsMainThread());
+  MOZ_ASSERT(GetState() == State_Initializing);
+  MOZ_ASSERT(mNeedsMainThreadInit);
+
+  const PrincipalInfo& principalInfo = mParams.principalInfo();
+
+  nsresult rv;
+  nsCOMPtr<nsIPrincipal> principal =
+    PrincipalInfoToPrincipal(principalInfo, &rv);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  // Figure out which origin we're dealing with.
+  nsCString origin;
+  rv = QuotaManager::GetInfoFromPrincipal(principal, &mSuffix, &mGroup,
+                                          &origin, &mIsApp);
+  if (NS_WARN_IF(NS_FAILED(rv))) {
+    return rv;
+  }
+
+  mOriginScope.SetFromOrigin(origin);
+
+  return NS_OK;
+}
+
+nsresult
+GetOriginUsageOp::DoDirectoryWork(QuotaManager* aQuotaManager)
+{
+  AssertIsOnIOThread();
+  MOZ_ASSERT(mUsageInfo.TotalUsage() == 0);
+
+  PROFILER_LABEL("Quota", "GetOriginUsageOp::DoDirectoryWork",
                  js::ProfileEntry::Category::OTHER);
 
   nsresult rv;
@@ -6008,72 +6324,41 @@ GetUsageOp::DoDirectoryWork(QuotaManager* aQuotaManager)
 
   // Add all the persistent/temporary/default storage files we care about.
   for (const PersistenceType type : kAllPersistenceTypes) {
-    rv = AddToUsage(aQuotaManager, type);
+    UsageInfo usageInfo;
+    rv = GetUsageForOrigin(aQuotaManager,
+                           type,
+                           mGroup,
+                           mOriginScope.GetOrigin(),
+                           mIsApp,
+                           &usageInfo);
     if (NS_WARN_IF(NS_FAILED(rv))) {
       return rv;
     }
+
+    mUsageInfo.Append(usageInfo);
   }
 
   return NS_OK;
 }
 
 void
-GetUsageOp::SendResults()
+GetOriginUsageOp::GetResponse(UsageRequestResponse& aResponse)
 {
   AssertIsOnOwningThread();
 
-  if (IsActorDestroyed()) {
-    if (NS_SUCCEEDED(mResultCode)) {
-      mResultCode = NS_ERROR_FAILURE;
-    }
+  OriginUsageResponse usageResponse;
+
+  // We'll get the group usage when mGetGroupUsage is true and get the
+  // origin usage when mGetGroupUsage is false.
+  usageResponse.usage() = mUsageInfo.TotalUsage();
+
+  if (mGetGroupUsage) {
+    usageResponse.limit() = mUsageInfo.Limit();
   } else {
-    if (mUsageInfo.Canceled()) {
-      mResultCode = NS_ERROR_FAILURE;
-    }
-
-    UsageRequestResponse response;
-
-    if (NS_SUCCEEDED(mResultCode)) {
-      UsageResponse usageResponse;
-
-      // We'll get the group usage when mGetGroupUsage is true and get the
-      // origin usage when mGetGroupUsage is false.
-      usageResponse.usage() = mUsageInfo.TotalUsage();
-
-      if (mGetGroupUsage) {
-        usageResponse.limit() = mUsageInfo.Limit();
-      } else {
-        usageResponse.fileUsage() = mUsageInfo.FileUsage();
-      }
-
-      response = usageResponse;
-    } else {
-      response = mResultCode;
-    }
-
-    Unused << PQuotaUsageRequestParent::Send__delete__(this, response);
-  }
-}
-
-void
-GetUsageOp::ActorDestroy(ActorDestroyReason aWhy)
-{
-  AssertIsOnOwningThread();
-
-  NoteActorDestroyed();
-}
-
-bool
-GetUsageOp::RecvCancel()
-{
-  AssertIsOnOwningThread();
-
-  nsresult rv = mUsageInfo.Cancel();
-  if (NS_WARN_IF(NS_FAILED(rv))) {
-    return false;
+    usageResponse.fileUsage() = mUsageInfo.FileUsage();
   }
 
-  return true;
+  aResponse = usageResponse;
 }
 
 bool
@@ -7061,8 +7346,7 @@ CreateOrUpgradeDirectoryMetadataHelper::CreateOrUpgradeMetadataFiles()
         originProps->mIgnore = true;
       }
     }
-    else if (!QuotaManager::IsOriginWhitelistedForPersistentStorage(
-                                                          originProps->mSpec)) {
+    else if (!QuotaManager::IsOriginInternal(originProps->mSpec)) {
       int64_t timestamp = INT64_MIN;
       rv = GetLastModifiedTime(originDir, &timestamp);
       if (NS_WARN_IF(NS_FAILED(rv))) {
@@ -7267,9 +7551,8 @@ CreateOrUpgradeDirectoryMetadataHelper::DoProcessOriginDirectories()
         return rv;
       }
 
-      // Move whitelisted origins to new persistent storage.
-      if (QuotaManager::IsOriginWhitelistedForPersistentStorage(
-                                                           originProps.mSpec)) {
+      // Move internal origins to new persistent storage.
+      if (QuotaManager::IsOriginInternal(originProps.mSpec)) {
         if (!permanentStorageDir) {
           permanentStorageDir =
             do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);

@@ -220,10 +220,10 @@ function verifyWasmModule(module1, module2)
 
 function grabFileUsageAndContinueHandler(request)
 {
-  testGenerator.send(request.fileUsage);
+  testGenerator.send(request.result.fileUsage);
 }
 
-function getUsage(usageHandler)
+function getCurrentUsage(usageHandler)
 {
   let qms = SpecialPowers.Services.qms;
   let principal = SpecialPowers.wrap(document).nodePrincipal;
