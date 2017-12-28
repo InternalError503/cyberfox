@@ -191,7 +191,7 @@
       <tabs id="tabsElement">
         <tab id="generalTab" label="&generalTab.label;" helpTopic="prefs-advanced-general"/>
 #ifdef MOZ_DATA_REPORTING
-        <tab id="dataChoicesTab" label="&dataChoicesTab.label;" hidden="true" helpTopic="prefs-advanced-data-choices"/>
+        <tab id="dataChoicesTab" label="&dataChoicesTab.label;" helpTopic="prefs-advanced-data-choices"/>
 #endif
         <tab id="networkTab" label="&networkTab.label;"  helpTopic="prefs-advanced-network"/>
         <tab id="updateTab" label="&updateTab.label;" helpTopic="prefs-advanced-update"/>
@@ -295,16 +295,14 @@
 #ifdef MOZ_CRASHREPORTER
           <groupbox>
             <caption>
-              <checkbox id="submitCrashesBox" label="&enableCrashReporter.label;"
-                        accesskey="&enableCrashReporter.accesskey;"/>
+              <checkbox id="submitCrashesBox" label="&alwaysSubmitCrashReports.label;"
+                        accesskey="&alwaysSubmitCrashReports.accesskey;"/>
             </caption>
             <hbox class="indent">
-              <label flex="1">&crashReporterDesc.label;</label>
+              <label flex="1">&crashReporterDesc2.label;</label>
               <spacer flex="10"/>
-              <label id="crashReporterLearnMore"
-                     class="text-link"
-                     value="&crashReporterLearnMore.label;"
-                     onclick="gAdvancedPane.openTextLink(event)"/>
+			  <label id="crashReporterLearnMore"
+					 class="text-link">&crashReporterLearnMore.label;</label>
             </hbox>
           </groupbox>
 #endif
