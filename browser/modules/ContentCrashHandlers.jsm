@@ -327,8 +327,14 @@ this.TabCrashHandler = {
    *        even if they are empty.
    */
   maybeSendCrashReport(message) {
-    if (!AppConstants.MOZ_CRASHREPORTER)
+    if (!AppConstants.MOZ_CRASHREPORTER) {
       return;
+    }
+
+    if (!message.data.hasReport) {
+      // There was no report, so nothing to do.
+      return;
+    }
 
     let browser = message.target.browser;
 
@@ -340,8 +346,9 @@ this.TabCrashHandler = {
 
     let childID = this.browserMap.get(browser.permanentKey);
     let dumpID = this.childMap.get(childID);
-    if (!dumpID)
-      return
+    if (!dumpID) {
+      return;
+    }
 
     if (!message.data.sendReport) {
       this.prefs.setBoolPref("sendReport", false);
@@ -847,11 +854,11 @@ this.UnsubmittedCrashHandler = {
 
   get autoSubmit() {
     return Services.prefs
-                   .getBoolPref("browser.crashReports.unsubmittedCheck.autoSubmit");
+                   .getBoolPref("browser.crashReports.unsubmittedCheck.autoSubmit2");
   },
 
   set autoSubmit(val) {
-    Services.prefs.setBoolPref("browser.crashReports.unsubmittedCheck.autoSubmit",
+    Services.prefs.setBoolPref("browser.crashReports.unsubmittedCheck.autoSubmit2",
                                val);
   },
 

@@ -147,8 +147,8 @@
 
   <!-- Data Choices tab -->
 #ifdef MOZ_CRASHREPORTER
-  <preference id="browser.crashReports.unsubmittedCheck.autoSubmit"
-              name="browser.crashReports.unsubmittedCheck.autoSubmit"
+  <preference id="browser.crashReports.unsubmittedCheck.autoSubmit2"
+              name="browser.crashReports.unsubmittedCheck.autoSubmit2"
               type="bool"/>
 #endif
 
