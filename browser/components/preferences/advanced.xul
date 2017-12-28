@@ -269,9 +269,8 @@
               <hbox class="indent">
                 <label flex="1">&healthReportDesc.label;</label>
                 <spacer flex="10"/>
-                <label id="FHRLearnMore" class="text-link"
-                       value="&healthReportLearnMore.label;"
-                       onclick="gAdvancedPane.openTextLink(event)"/>
+				<label id="FHRLearnMore"
+					   class="text-link">&healthReportLearnMore.label;</label>
               </hbox>
 #ifdef MOZ_TELEMETRY_REPORTING
               <hbox class="indent">
@@ -282,9 +281,8 @@
                   <hbox class="indent">
                     <label id="telemetryDataDesc" flex="1">&telemetryDesc.label;</label>
                     <spacer flex="10"/>
-                    <label id="telemetryLearnMore" class="text-link"
-                           value="&telemetryLearnMore.label;"
-                           onclick="gAdvancedPane.openTextLink(event)"/>
+					<label id="telemetryLearnMore"
+						   class="text-link">&telemetryLearnMore.label;</label>
                   </hbox>
                 </vbox>
               </hbox>
