@@ -30,8 +30,7 @@ function removeNotificationOnEnd(notification, installs) {
 }
 
 const gXPInstallObserver = {
-  _findChildShell: function (aDocShell, aSoughtShell)
-  {
+  _findChildShell: function (aDocShell, aSoughtShell) {
     if (aDocShell == aSoughtShell)
       return aDocShell;
 
@@ -45,8 +44,7 @@ const gXPInstallObserver = {
     return null;
   },
 
-  _getBrowser: function (aDocShell)
-  {
+  _getBrowser: function (aDocShell) {
     for (let browser of gBrowser.browsers) {
       if (this._findChildShell(browser.docShell, aDocShell))
         return browser;
@@ -159,14 +157,12 @@ const gXPInstallObserver = {
       messageString = gNavigatorBundle.getString("addonConfirmInstallUnsigned.message");
       notification.setAttribute("warning", "true");
       options.learnMoreURL += "unsigned-addons";
-    }
-    else if (unsigned.length == 0) {
+    } else if (unsigned.length == 0) {
       // All add-ons are verified or don't need to be verified
       messageString = gNavigatorBundle.getString("addonConfirmInstall.message");
       notification.removeAttribute("warning");
       options.learnMoreURL += "find-and-install-add-ons";
-    }
-    else {
+    } else {
       // Some of the add-ons are unverified, the list of names will indicate
       // which
       messageString = gNavigatorBundle.getString("addonConfirmInstallSomeUnsigned.message");
@@ -206,8 +202,7 @@ const gXPInstallObserver = {
     removeNotificationOnEnd(popup, installInfo.installs);
   },
 
-  observe: function (aSubject, aTopic, aData)
-  {
+  observe: function (aSubject, aTopic, aData) {
     var brandBundle = document.getElementById("bundle_brand");
     var installInfo = aSubject.QueryInterface(Components.interfaces.amIWebInstallInfo);
     var browser = installInfo.browser;
@@ -234,8 +229,7 @@ const gXPInstallObserver = {
       if (gPrefService.prefIsLocked("xpinstall.enabled")) {
         messageString = gNavigatorBundle.getString("xpinstallDisabledMessageLocked");
         buttons = [];
-      }
-      else {
+      } else {
         messageString = gNavigatorBundle.getString("xpinstallDisabledMessage");
 
         action = {
@@ -410,7 +404,7 @@ const gXPInstallObserver = {
       messageString = messageString.replace("#2", installInfo.installs.length);
       messageString = messageString.replace("#3", brandShortName);
 
-      // Remove notificaion on dismissal, since it's possible to cancel the
+      // Remove notification on dismissal, since it's possible to cancel the
       // install through the addons manager UI, making the "restart" prompt
       // irrelevant.
       options.removeOnDismissal = true;
@@ -468,7 +462,7 @@ var LightWeightThemeWebInstaller = {
     }
   },
 
-  get _manager () {
+  get _manager() {
     let temp = {};
     Cu.import("resource://gre/modules/LightweightThemeManager.jsm", temp);
     delete this._manager;
@@ -608,7 +602,7 @@ var LightWeightThemeWebInstaller = {
     let box = gBrowser.getNotificationBox();
 
     ["lwtheme-install-request",
-     "lwtheme-install-notification"].forEach(function (value) {
+     "lwtheme-install-notification"].forEach(function(value) {
         let notification = box.getNotificationWithValue(value);
         if (notification)
           box.removeNotification(notification);
@@ -639,8 +633,7 @@ var LightWeightThemeWebInstaller = {
     let uri;
     try {
       uri = makeURI(srcURIString);
-    }
-    catch (e) {
+    } catch (e) {
       // makeURI fails if srcURIString is a nonsense URI
       return false;
     }

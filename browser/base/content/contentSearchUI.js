@@ -4,7 +4,7 @@
 
 "use strict";
 
-this.ContentSearchUIController = (function () {
+this.ContentSearchUIController = (function() {
 
 const MAX_DISPLAYED_SUGGESTIONS = 6;
 const SUGGESTION_ID_PREFIX = "searchSuggestion";
@@ -38,7 +38,7 @@ const HTML_NS = "http://www.w3.org/1999/xhtml";
  *        string.
  */
 function ContentSearchUIController(inputElement, tableParent, healthReportKey,
-                                   searchPurpose, idPrefix="") {
+                                   searchPurpose, idPrefix = "") {
   this.input = inputElement;
   this._idPrefix = idPrefix;
   this._healthReportKey = healthReportKey;
@@ -87,8 +87,7 @@ ContentSearchUIController.prototype = {
     let icon;
     if (engine.iconBuffer) {
       icon = this._getFaviconURIFromBuffer(engine.iconBuffer);
-    }
-    else {
+    } else {
       icon = this._getImageURIForCurrentResolution(
         "chrome://mozapps/skin/places/defaultFavicon.png");
     }
@@ -146,8 +145,7 @@ ContentSearchUIController.prototype = {
         elt.classList.add("selected");
         ariaSelectedElt.setAttribute("aria-selected", "true");
         this.input.setAttribute("aria-activedescendant", ariaSelectedElt.id);
-      }
-      else if (i != excludeIndex) {
+      } else if (i != excludeIndex) {
         elt.classList.remove("selected");
         ariaSelectedElt.setAttribute("aria-selected", "false");
       }
@@ -173,8 +171,7 @@ ContentSearchUIController.prototype = {
       if (i == idx) {
         elt.classList.add("selected");
         elt.setAttribute("aria-selected", "true");
-      }
-      else {
+      } else {
         elt.classList.remove("selected");
         elt.setAttribute("aria-selected", "false");
       }
@@ -257,8 +254,7 @@ ContentSearchUIController.prototype = {
         aEvent.originalTarget.id == "contentSearchDefaultEngineHeader" ||
         aEvent instanceof KeyboardEvent) {
       searchTerms = searchText.value;
-    }
-    else {
+    } else {
       searchTerms = this.suggestionAtIndex(this.selectedIndex) || searchText.value;
     }
     // Send an event that will perform a search and Firefox Health Report will
@@ -299,8 +295,7 @@ ContentSearchUIController.prototype = {
     if (!this.input.value) {
       this._stickyInputValue = "";
       this._hideSuggestions();
-    }
-    else if (this.input.value != this._stickyInputValue) {
+    } else if (this.input.value != this._stickyInputValue) {
       // Only fetch new suggestions if the input value has changed.
       this._getSuggestions();
       this.selectAndUpdateInput(-1);
@@ -413,33 +408,27 @@ ContentSearchUIController.prototype = {
         this.selectedButtonIndex = -1;
       }
       this.selectAndUpdateInput(newSelectedIndex);
-    }
-
-    else if (selectedSuggestionDelta) {
+    } else if (selectedSuggestionDelta) {
       let newSelectedIndex;
       if (currentIndex >= this.numSuggestions || currentIndex == -1) {
         // No suggestion already selected, select the first/last one appropriately.
         newSelectedIndex = selectedSuggestionDelta == 1 ?
                            0 : this.numSuggestions - 1;
-      }
-      else {
+      } else {
         newSelectedIndex = currentIndex + selectedSuggestionDelta;
       }
       if (newSelectedIndex >= this.numSuggestions) {
         newSelectedIndex = -1;
       }
       this.selectAndUpdateInput(newSelectedIndex);
-    }
-
-    else if (selectedOneOffDelta) {
+    } else if (selectedOneOffDelta) {
       let newSelectedIndex;
       let currentButton = this.selectedButtonIndex;
       if (currentButton == -1 || currentButton == this._oneOffButtons.length) {
         // No one-off already selected, select the first/last one appropriately.
         newSelectedIndex = selectedOneOffDelta == 1 ?
                            0 : this._oneOffButtons.length - 1;
-      }
-      else {
+      } else {
         newSelectedIndex = currentButton + selectedOneOffDelta;
       }
       // Allow selection of the settings button via the tab key.
@@ -554,13 +543,11 @@ ContentSearchUIController.prototype = {
       let type, idx;
       if (i < suggestions.formHistory.length) {
         [type, idx] = ["formHistory", i];
-      }
-      else {
+      } else {
         let j = i - suggestions.formHistory.length;
         if (j < suggestions.remote.length) {
           [type, idx] = ["remote", j];
-        }
-        else {
+        } else {
           break;
         }
       }
@@ -866,8 +853,7 @@ ContentSearchUIController.prototype = {
       let uri;
       if (engine.iconBuffer) {
         uri = this._getFaviconURIFromBuffer(engine.iconBuffer);
-      }
-      else {
+      } else {
         uri = this._getImageURIForCurrentResolution(
           "chrome://browser/skin/search-engine-placeholder.png");
       }
@@ -901,7 +887,7 @@ ContentSearchUIController.prototype = {
     this._oneOffsTable.hidden = false;
   },
 
-  _sendMsg: function (type, data=null) {
+  _sendMsg: function (type, data = null) {
     dispatchEvent(new CustomEvent("ContentSearchClient", {
       detail: {
         type: type,

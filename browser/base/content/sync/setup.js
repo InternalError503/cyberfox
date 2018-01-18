@@ -83,7 +83,7 @@ var gSyncSetup = {
     addRem(true);
     window.addEventListener("unload", () => addRem(false), false);
 
-    window.setTimeout(function () {
+    window.setTimeout(function() {
       // Force Service to be loaded so that engines are registered.
       // See Bug 670082.
       Weave.Service;
@@ -725,8 +725,7 @@ var gSyncSetup = {
           ns.setJSEnabled(site, true); // allow site
         }
       }, this);
-    }
-    else {
+    } else {
       this._disabledSites.forEach(function(site) {
         ns.setJSEnabled(site, false);
       });
@@ -801,8 +800,7 @@ var gSyncSetup = {
       valid = this._validateServer(el);
       let str = valid ? "" : "serverInvalid.label";
       this._setFeedbackMessage(feedback, valid, str);
-    }
-    else
+    } else
       this._setFeedbackMessage(feedback, true);
 
     // Recheck account against the new server.
@@ -825,8 +823,8 @@ var gSyncSetup = {
       uri = Weave.Utils.makeURI("https://" + val);
 
     if (uri && this._settingUpNew) {
-      function isValid(uri) {
-        Weave.Service.serverURL = uri.spec;
+      function isValid(validUri) {
+        Weave.Service.serverURL = validUri.spec;
         let check = Weave.Service.checkAccount("a");
         return (check == "available" || check == "notAvailable");
       }
@@ -845,8 +843,7 @@ var gSyncSetup = {
       if (valid) {
         this.loadCaptcha();
       }
-    }
-    else if (uri) {
+    } else if (uri) {
       valid = true;
       Weave.Service.serverURL = uri.spec;
     }
@@ -1045,12 +1042,12 @@ var gSyncSetup = {
  "pin2",
  "pin3",
  "pairDeviceErrorRow",
- "pairDeviceThrobber"].forEach(function (id) {
+ "pairDeviceThrobber"].forEach(function(id) {
   XPCOMUtils.defineLazyGetter(gSyncSetup, id, function() {
     return document.getElementById(id);
   });
 });
-XPCOMUtils.defineLazyGetter(gSyncSetup, "nextFocusEl", function () {
+XPCOMUtils.defineLazyGetter(gSyncSetup, "nextFocusEl", function() {
   return {pin1: this.pin2,
           pin2: this.pin3,
           pin3: this.wizard.getButton("next")};

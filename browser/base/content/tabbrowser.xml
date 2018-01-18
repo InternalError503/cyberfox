@@ -601,8 +601,8 @@
             },
 
             onProgressChange: function (aWebProgress, aRequest,
-                                        aCurSelfProgress, aMaxSelfProgress,
-                                        aCurTotalProgress, aMaxTotalProgress) {
+                             aCurSelfProgress, aMaxSelfProgress,
+                             aCurTotalProgress, aMaxTotalProgress) {
               this.mTotalProgress = aMaxTotalProgress ? aCurTotalProgress / aMaxTotalProgress : 0;
 
               if (!this._shouldShowProgress(aRequest))
@@ -618,8 +618,8 @@
             },
 
             onProgressChange64: function (aWebProgress, aRequest,
-                                          aCurSelfProgress, aMaxSelfProgress,
-                                          aCurTotalProgress, aMaxTotalProgress) {
+                               aCurSelfProgress, aMaxSelfProgress,
+                               aCurTotalProgress, aMaxTotalProgress) {
               return this.onProgressChange(aWebProgress, aRequest,
                 aCurSelfProgress, aMaxSelfProgress, aCurTotalProgress,
                 aMaxTotalProgress);
@@ -652,8 +652,7 @@
 
               if (aStateFlags & nsIWebProgressListener.STATE_START) {
                 this.mRequestCount++;
-              }
-              else if (aStateFlags & nsIWebProgressListener.STATE_STOP) {
+              } else if (aStateFlags & nsIWebProgressListener.STATE_STOP) {
                 const NS_ERROR_UNKNOWN_HOST = 2152398878;
                 if (--this.mRequestCount > 0 && aStatus == NS_ERROR_UNKNOWN_HOST) {
                   // to prevent bug 235825: wait for the request handled
@@ -705,9 +704,8 @@
                   if (this.mTab.selected)
                     this.mTabBrowser.mIsBusy = true;
                 }
-              }
-              else if (aStateFlags & nsIWebProgressListener.STATE_STOP &&
-                       aStateFlags & nsIWebProgressListener.STATE_IS_NETWORK) {
+              } else if (aStateFlags & nsIWebProgressListener.STATE_STOP &&
+                         aStateFlags & nsIWebProgressListener.STATE_IS_NETWORK) {
 
                 if (this.mTab.hasAttribute("busy")) {
                   this.mTab.removeAttribute("busy");
@@ -774,7 +772,7 @@
             },
 
             onLocationChange: function (aWebProgress, aRequest, aLocation,
-                                        aFlags) {
+                             aFlags) {
               // OnLocationChange is called for both the top-level content
               // and the subframes.
               let topLevel = aWebProgress.isTopLevel;
@@ -925,8 +923,7 @@
                     this.serializationHelper.serializeToString(loadingPrincipal));
                   browser.mIconLoadingPrincipal = loadingPrincipal;
                 }
-              }
-              else {
+              } else {
                 aTab.removeAttribute("image");
                 aTab.removeAttribute("iconLoadingPrincipal");
                 delete browser.mIconLoadingPrincipal;
@@ -1642,8 +1639,7 @@
             if (firstTabAdded) {
               // .selectedTab setter focuses the content area
               this.selectedTab = firstTabAdded;
-            }
-            else
+            } else
               this.selectedBrowser.focus();
           }
         ]]></body>
@@ -2171,7 +2167,7 @@
                           Services.prefs.getBoolPref("browser.tabs.animate");
             if (!animate) {
               t.setAttribute("fadein", "true");
-              setTimeout(function (tabContainer) {
+              setTimeout(function(tabContainer) {
                 tabContainer._handleNewTab(t);
               }, 0, this.tabContainer);
             }
@@ -2273,7 +2269,7 @@
             }
 
             if (animate) {
-              requestAnimationFrame(function () {
+              requestAnimationFrame(function() {
 
                 // kick the animation off
                 t.setAttribute("fadein", "true");
@@ -2462,7 +2458,7 @@
             aTab.style.maxWidth = ""; // ensure that fade-out transition happens
             aTab.removeAttribute("fadein");
 
-            setTimeout(function (tab, tabbrowser) {
+            setTimeout(function(tab, tabbrowser) {
               if (tab.parentNode &&
                   window.getComputedStyle(tab).maxWidth == "0.1px") {
                 NS_ASSERT(false, "Giving up waiting for the tab closing animation to finish (bug 608589)");
@@ -3232,7 +3228,7 @@
 
           let wasFocused = (document.activeElement == this.mCurrentTab);
 
-          aIndex = aIndex < aTab._tPos ? aIndex: aIndex+1;
+          aIndex = aIndex < aTab._tPos ? aIndex : aIndex + 1;
 
           // invalidate cache
           this._visibleTabs = null;
@@ -3889,8 +3885,7 @@
                     !this.maybeVisibleTabs.has(tab) &&
                     tab !== this.lastVisibleTab &&
                     tab !== this.loadingTab &&
-                    tab !== this.requestedTab)
-                {
+                    tab !== this.requestedTab) {
                   this.setTabState(tab, this.STATE_UNLOADING);
                 }
 
@@ -4480,9 +4475,9 @@
 
             var offset = 1;
             switch (aEvent.charCode) {
-              case '}'.charCodeAt(0):
+              case "}".charCodeAt(0):
                 offset = -1;
-              case '{'.charCodeAt(0):
+              case "{".charCodeAt(0):
                 if (window.getComputedStyle(this, null).direction == "ltr")
                   offset *= -1;
                 this.tabContainer.advanceSelectedTab(offset, true);
@@ -4730,10 +4725,11 @@
                 }
               }
               break;
-            case "nsPref:changed":
+            case "nsPref:changed": {
               // This is the only pref observed.
               this._findAsYouType = Services.prefs.getBoolPref("accessibility.typeaheadfind");
               break;
+            }
           }
         ]]></body>
       </method>
@@ -5536,7 +5532,7 @@
           if (!tabs.length)
             return;
 
-          var isEndTab = (aTab._tPos > tabs[tabs.length-1]._tPos);
+          var isEndTab = (aTab._tPos > tabs[tabs.length - 1]._tPos);
           var tabWidth = aTab.getBoundingClientRect().width;
 
           if (!this._tabDefaultMaxWidth)
@@ -5636,7 +5632,7 @@
             for (let i = numPinned - 1; i >= 0; i--) {
               let tab = this.childNodes[i];
               width += tab.getBoundingClientRect().width;
-              tab.style.marginInlineStart = - (width + scrollButtonWidth + paddingStart) + "px";
+              tab.style.marginInlineStart = -(width + scrollButtonWidth + paddingStart) + "px";
             }
 
             this.style.paddingInlineStart = width + paddingStart + "px";
@@ -5859,7 +5855,7 @@
 
           if (!this._animateElement.hasAttribute("notifybgtab")) {
             this._animateElement.setAttribute("notifybgtab", "true");
-            setTimeout(function (ele) {
+            setTimeout(function(ele) {
               ele.removeAttribute("notifybgtab");
             }, 150, this._animateElement);
           }
@@ -6037,7 +6033,7 @@
          * close many tabs at once.
          */
         let target = event.originalTarget;
-        if (target.classList.contains('tab-close-button')) {
+        if (target.classList.contains("tab-close-button")) {
           // We preemptively set this to allow the closing-multiple-tabs-
           // in-a-row case.
           if (this._blockDblClick) {
@@ -6295,17 +6291,15 @@
             [minMargin, maxMargin] = [this.clientWidth - maxMargin,
                                       this.clientWidth - minMargin];
           newMargin = (pixelsToScroll > 0) ? maxMargin : minMargin;
-        }
-        else {
+        } else {
           let newIndex = this._getDropIndex(event, effects == "link");
           if (newIndex == this.childNodes.length) {
-            let tabRect = this.childNodes[newIndex-1].getBoundingClientRect();
+            let tabRect = this.childNodes[newIndex - 1].getBoundingClientRect();
             if (ltr)
               newMargin = tabRect.right - rect.left;
             else
               newMargin = rect.right - tabRect.left;
-          }
-          else {
+          } else {
             let tabRect = this.childNodes[newIndex].getBoundingClientRect();
             if (ltr)
               newMargin = tabRect.left - rect.left;
@@ -6818,12 +6812,12 @@
         this._mouseleave();
       ]]></handler>
       <handler event="dragstart" phase="capturing">
-        this.style.MozUserFocus = '';
+        this.style.MozUserFocus = "";
       </handler>
       <handler event="mousedown" phase="capturing">
       <![CDATA[
         if (this.selected) {
-          this.style.MozUserFocus = 'ignore';
+          this.style.MozUserFocus = "ignore";
           this.clientTop; // just using this to flush style updates
         } else if (this.mOverCloseButton ||
                    this._overPlayingIcon) {
@@ -6833,7 +6827,7 @@
       ]]>
       </handler>
       <handler event="mouseup">
-        this.style.MozUserFocus = '';
+        this.style.MozUserFocus = "";
       </handler>
       <handler event="click">
       <![CDATA[

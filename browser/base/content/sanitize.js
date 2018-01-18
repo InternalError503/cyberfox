@@ -46,15 +46,13 @@ function Sanitizer() {
 }
 Sanitizer.prototype = {
   // warning to the caller: this one may raise an exception (e.g. bug #265028)
-  clearItem: function (aItemName)
-  {
+  clearItem: function (aItemName) {
     this.items[aItemName].clear();
   },
 
   prefDomain: "",
 
-  getNameFromPreference: function (aPreferenceName)
-  {
+  getNameFromPreference: function (aPreferenceName) {
     return aPreferenceName.substr(this.prefDomain.length);
   },
 
@@ -256,8 +254,7 @@ Sanitizer.prototype = {
                 }
               }
             }
-          }
-          else {
+          } else {
             // Remove everything
             cookieMgr.removeAll();
             yield new Promise(resolve => setTimeout(resolve, 0)); // Don't block the main thread too long
@@ -427,7 +424,7 @@ Sanitizer.prototype = {
       clear: Task.async(function* (range) {
         let seenException;
         try {
-          // Clear undo history of all searchBars
+          // Clear undo history of all search bars.
           let windows = Services.wm.getEnumerator("navigator:browser");
           while (windows.hasMoreElements()) {
             let currentWindow = windows.getNext();
@@ -435,6 +432,7 @@ Sanitizer.prototype = {
             let searchBar = currentDocument.getElementById("searchbar");
             if (searchBar)
               searchBar.textbox.reset();
+
             let tabBrowser = currentWindow.gBrowser;
             if (!tabBrowser) {
               // No tab browser? This means that it's too early during startup (typically,
@@ -732,7 +730,7 @@ Sanitizer.TIMESPAN_24HOURS    = 6;
 // in the uSec-since-epoch format that PRTime likes.  If we should
 // clear everything, return null.  Use ts if it is defined; otherwise
 // use the timeSpan pref.
-Sanitizer.getClearRange = function (ts) {
+Sanitizer.getClearRange = function(ts) {
   if (ts === undefined)
     ts = Sanitizer.prefs.getIntPref("timeSpan");
   if (ts === Sanitizer.TIMESPAN_EVERYTHING)
@@ -770,8 +768,7 @@ Sanitizer.getClearRange = function (ts) {
 };
 
 Sanitizer._prefs = null;
-Sanitizer.__defineGetter__("prefs", function()
-{
+Sanitizer.__defineGetter__("prefs", function() {
   return Sanitizer._prefs ? Sanitizer._prefs
     : Sanitizer._prefs = Components.classes["@mozilla.org/preferences-service;1"]
                          .getService(Components.interfaces.nsIPrefService)
@@ -779,10 +776,9 @@ Sanitizer.__defineGetter__("prefs", function()
 });
 
 // Shows sanitization UI
-Sanitizer.showUI = function(aParentWindow)
-{
+Sanitizer.showUI = function(aParentWindow) {
   let win = AppConstants.platform == "macosx" ?
-    null: // make this an app-modal window on Mac
+    null : // make this an app-modal window on Mac
     aParentWindow;
   Services.ww.openWindow(win,
                          "chrome://browser/content/sanitize.xul",
@@ -795,8 +791,7 @@ Sanitizer.showUI = function(aParentWindow)
  * Deletes privacy sensitive data in a batch, optionally showing the
  * sanitize UI, according to user preferences
  */
-Sanitizer.sanitize = function(aParentWindow)
-{
+Sanitizer.sanitize = function(aParentWindow) {
   Sanitizer.showUI(aParentWindow);
 };
 

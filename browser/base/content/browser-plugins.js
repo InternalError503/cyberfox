@@ -193,7 +193,7 @@ var gPluginHandler = {
   },
 
   showClickToPlayNotification: function (browser, plugins, showNow,
-                                         principal, location) {
+                                        principal, location) {
     // It is possible that we've received a message from the frame script to show
     // a click to play notification for a principal that no longer matches the one
     // that the browser's content now has assigned (ie, the browser has browsed away
@@ -235,8 +235,7 @@ var gPluginHandler = {
         if (!url) {
           url = Services.blocklist.getPluginBlocklistURL(pluginInfo.pluginTag);
         }
-      }
-      else {
+      } else {
         url = Services.urlFormatter.formatURLPref("app.helpdoc.baseURI") + "clicktoplay";
       }
       pluginInfo.detailsLink = url;
@@ -287,7 +286,7 @@ var gPluginHandler = {
   },
 
   updateHiddenPluginUI: function (browser, haveInsecure, actions,
-                                  principal, location) {
+                                 principal, location) {
     let origin = principal.originNoSuffix;
 
     // It is possible that we've received a message from the frame script to show
@@ -335,7 +334,7 @@ var gPluginHandler = {
         // If something is already shown, just keep it
         return;
       }
-	  
+
       let message;
       // Icons set directly cannot be manipulated using moz-image-region, so
       // we use CSS classes instead.
@@ -396,7 +395,7 @@ var gPluginHandler = {
         appendNotification(message, "plugin-hidden", null,
                            notificationBox.PRIORITY_INFO_HIGH, buttons);
       if (haveInsecure) {
-        n.classList.add('pluginVulnerable');
+        n.classList.add("pluginVulnerable");
       }
     }
 

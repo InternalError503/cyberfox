@@ -83,7 +83,7 @@ addEventListener("blur", function(event) {
   LoginManagerContent.onUsernameInput(event);
 });
 
-var handleContentContextMenu = function (event) {
+var handleContentContextMenu = function(event) {
   let defaultPrevented = event.defaultPrevented;
   if (!Services.prefs.getBoolPref("dom.event.contextmenu.enabled")) {
     let plugin = null;
@@ -190,8 +190,7 @@ var handleContentContextMenu = function (event) {
                      frameOuterWindowID, selectionInfo, disableSetDesktopBg,
                      loginFillInfo, parentAllowsMixedContent, userContextId },
                    { event, popupNode: event.target });
-  }
-  else {
+  } else {
     // Break out to the parent window and pass the add-on info along
     let browser = docShell.chromeEventHandler;
     let mainWin = browser.ownerGlobal;
@@ -259,11 +258,11 @@ var AboutNetAndCertErrorListener = {
   init: function(chromeGlobal) {
     addMessageListener("CertErrorDetails", this);
     addMessageListener("Browser:CaptivePortalFreed", this);
-    chromeGlobal.addEventListener('AboutNetErrorLoad', this, false, true);
-    chromeGlobal.addEventListener('AboutNetErrorOpenCaptivePortal', this, false, true);
-    chromeGlobal.addEventListener('AboutNetErrorSetAutomatic', this, false, true);
-    chromeGlobal.addEventListener('AboutNetErrorOverride', this, false, true);
-    chromeGlobal.addEventListener('AboutNetErrorResetPreferences', this, false, true);
+    chromeGlobal.addEventListener("AboutNetErrorLoad", this, false, true);
+    chromeGlobal.addEventListener("AboutNetErrorOpenCaptivePortal", this, false, true);
+    chromeGlobal.addEventListener("AboutNetErrorSetAutomatic", this, false, true);
+    chromeGlobal.addEventListener("AboutNetErrorOverride", this, false, true);
+    chromeGlobal.addEventListener("AboutNetErrorResetPreferences", this, false, true);
   },
 
   get isAboutNetError() {
@@ -297,7 +296,7 @@ var AboutNetAndCertErrorListener = {
 
     switch (msg.data.code) {
       case SEC_ERROR_UNKNOWN_ISSUER:
-        learnMoreLink.href = baseURL  + "security-error";
+        learnMoreLink.href = baseURL + "security-error";
         break;
 
       // in case the certificate expired we make sure the system clock
@@ -313,27 +312,27 @@ var AboutNetAndCertErrorListener = {
         if (Services.prefs.getPrefType(PREF_BLOCKLIST_CLOCK_SKEW_SECONDS)) {
           let difference = Services.prefs.getIntPref(PREF_BLOCKLIST_CLOCK_SKEW_SECONDS);
 
-          // if the difference is more than a day
-          if (Math.abs(difference) > 60 * 60 * 24) {
-            let formatter = new Intl.DateTimeFormat();
-            let systemDate = formatter.format(new Date());
-            // negative difference means local time is behind server time
-            let actualDate = formatter.format(new Date(Date.now() - difference * 1000));
+        // If the difference is more than a day.
+        if (Math.abs(difference) > 60 * 60 * 24) {
+          let formatter = new Intl.DateTimeFormat();
+          let systemDate = formatter.format(new Date());
+          // negative difference means local time is behind server time
+          let actualDate = formatter.format(new Date(Date.now() - difference * 1000));
 
-            content.document.getElementById("wrongSystemTime_URL")
-              .textContent = content.document.location.hostname;
-            content.document.getElementById("wrongSystemTime_systemDate")
-              .textContent = systemDate;
-            content.document.getElementById("wrongSystemTime_actualDate")
-              .textContent = actualDate;
+          content.document.getElementById("wrongSystemTime_URL")
+            .textContent = content.document.location.hostname;
+          content.document.getElementById("wrongSystemTime_systemDate")
+            .textContent = systemDate;
+          content.document.getElementById("wrongSystemTime_actualDate")
+            .textContent = actualDate;
 
-            content.document.getElementById("errorShortDesc")
-              .style.display = "none";
-            content.document.getElementById("wrongSystemTimePanel")
+          content.document.getElementById("errorShortDesc")
+            .style.display = "none";
+          content.document.getElementById("wrongSystemTimePanel")
               .style.display = "block";
           }
         }
-        learnMoreLink.href = baseURL  + "time-errors";
+        learnMoreLink.href = baseURL + "time-errors";
         break;
     }
   },
@@ -540,11 +539,11 @@ var ClickEventHandler = {
   },
 
   onAboutBlocked: function (targetElement, ownerDoc) {
-    var reason = 'phishing';
+    var reason = "phishing";
     if (/e=malwareBlocked/.test(ownerDoc.documentURI)) {
-      reason = 'malware';
+      reason = "malware";
     } else if (/e=unwantedBlocked/.test(ownerDoc.documentURI)) {
-      reason = 'unwanted';
+      reason = "unwanted";
     }
     sendAsyncMessage("Browser:SiteBlockedError", {
       location: ownerDoc.location.href,
@@ -691,7 +690,7 @@ var PageMetadataMessenger = {
 }
 PageMetadataMessenger.init();
 
-addEventListener("ActivateSocialFeature", function (aEvent) {
+addEventListener("ActivateSocialFeature", function(aEvent) {
   let document = content.document;
   let dwu = content.QueryInterface(Ci.nsIInterfaceRequestor)
                    .getInterface(Ci.nsIDOMWindowUtils);
@@ -846,7 +845,7 @@ addMessageListener("ContextMenu:SearchFieldBookmarkData", (message) => {
         ((type == "checkbox" || type == "radio") && el.checked)) {
       formData.push(escapeNameValuePair(el.name, el.value, isURLEncoded));
     } else if (el instanceof content.HTMLSelectElement && el.selectedIndex >= 0) {
-      for (let j=0; j < el.options.length; j++) {
+      for (let j = 0; j < el.options.length; j++) {
         if (el.options[j].selected)
           formData.push(escapeNameValuePair(el.name, el.options[j].value,
                                             isURLEncoded));
@@ -964,8 +963,7 @@ addMessageListener("ContextMenu:SetAsDesktopBackground", (message) => {
       let dataUrl = canvas.toDataURL();
       sendAsyncMessage("ContextMenu:SetAsDesktopBackground:Result",
                        { dataUrl });
-    }
-    catch (e) {
+    } catch (e) {
       Cu.reportError(e);
       disable = true;
     }
@@ -992,8 +990,7 @@ var PageInfoListener = {
     if (frameOuterWindowID) {
       window = Services.wm.getOuterWindowWithId(frameOuterWindowID);
       document = window.document;
-    }
-    else {
+    } else {
       window = content.window;
       document = content.document;
     }
@@ -1046,8 +1043,7 @@ var PageInfoListener = {
     let hostName = null;
     try {
       hostName = window.location.host;
-    }
-    catch (exception) { }
+    } catch (exception) { }
 
     windowInfo.hostName = hostName;
     return windowInfo;
@@ -1105,14 +1101,12 @@ var PageInfoListener = {
   },
 
   // Only called once to get the media tab's media elements from the content page.
-  getMediaInfo: function(document, window, strings)
-  {
+  getMediaInfo: function(document, window, strings) {
     let frameList = this.goThroughFrames(document, window);
     Task.spawn(() => this.processFrames(document, frameList, strings));
   },
 
-  goThroughFrames: function(document, window)
-  {
+  goThroughFrames: function(document, window) {
     let frameList = [document];
     if (window && window.frames.length > 0) {
       let num = window.frames.length;
@@ -1125,8 +1119,7 @@ var PageInfoListener = {
     return frameList;
   },
 
-  processFrames: function*(document, frameList, strings)
-  {
+  processFrames: function*(document, frameList, strings) {
     let nodeCount = 0;
     for (let doc of frameList) {
       let iterator = doc.createTreeWalker(doc, content.NodeFilter.SHOW_ELEMENT);
@@ -1150,8 +1143,7 @@ var PageInfoListener = {
     sendAsyncMessage("PageInfo:mediaData", {isComplete: true});
   },
 
-  getMediaItems: function(document, strings, elem)
-  {
+  getMediaItems: function(document, strings, elem) {
     // Check for images defined in CSS (e.g. background, borders)
     let computedStyle = elem.ownerGlobal.getComputedStyle(elem);
     // A node can have multiple media items associated with it - for example,
@@ -1167,8 +1159,7 @@ var PageInfoListener = {
       let addImgFunc = (label, val) => {
         if (val.primitiveType == content.CSSPrimitiveValue.CSS_URI) {
           addImage(val.getStringValue(), label, strings.notSet, elem, true);
-        }
-        else if (val.primitiveType == content.CSSPrimitiveValue.CSS_STRING) {
+        } else if (val.primitiveType == content.CSSPrimitiveValue.CSS_STRING) {
           // This is for -moz-image-rect.
           // TODO: Reimplement once bug 714757 is fixed.
           let strVal = val.getStringValue();
@@ -1176,8 +1167,7 @@ var PageInfoListener = {
             let url = strVal.replace(/^.*url\(\"?/, "").replace(/\"?\).*$/, "");
             addImage(url, label, strings.notSet, elem, true);
           }
-        }
-        else if (val.cssValueType == content.CSSValue.CSS_VALUE_LIST) {
+        } else if (val.cssValueType == content.CSSValue.CSS_VALUE_LIST) {
           // Recursively resolve multiple nested CSS value lists.
           for (let i = 0; i < val.length; i++) {
             addImgFunc(label, val.item(i));
@@ -1195,8 +1185,7 @@ var PageInfoListener = {
     if (elem instanceof content.HTMLImageElement) {
       addImage(elem.src, strings.mediaImg,
                (elem.hasAttribute("alt")) ? elem.alt : strings.notSet, elem, false);
-    }
-    else if (elem instanceof content.SVGImageElement) {
+    } else if (elem instanceof content.SVGImageElement) {
       try {
         // Note: makeURLAbsolute will throw if either the baseURI is not a valid URI
         //       or the URI formed from the baseURI and the URL is not a valid URI.
@@ -1205,28 +1194,22 @@ var PageInfoListener = {
           addImage(href, strings.mediaImg, "", elem, false);
         }
       } catch (e) { }
-    }
-    else if (elem instanceof content.HTMLVideoElement) {
+    } else if (elem instanceof content.HTMLVideoElement) {
       addImage(elem.currentSrc, strings.mediaVideo, "", elem, false);
-    }
-    else if (elem instanceof content.HTMLAudioElement) {
+    } else if (elem instanceof content.HTMLAudioElement) {
       addImage(elem.currentSrc, strings.mediaAudio, "", elem, false);
-    }
-    else if (elem instanceof content.HTMLLinkElement) {
+    } else if (elem instanceof content.HTMLLinkElement) {
       if (elem.rel && /\bicon\b/i.test(elem.rel)) {
         addImage(elem.href, strings.mediaLink, "", elem, false);
       }
-    }
-    else if (elem instanceof content.HTMLInputElement || elem instanceof content.HTMLButtonElement) {
+    } else if (elem instanceof content.HTMLInputElement || elem instanceof content.HTMLButtonElement) {
       if (elem.type.toLowerCase() == "image") {
         addImage(elem.src, strings.mediaInput,
                  (elem.hasAttribute("alt")) ? elem.alt : strings.notSet, elem, false);
       }
-    }
-    else if (elem instanceof content.HTMLObjectElement) {
+    } else if (elem instanceof content.HTMLObjectElement) {
       addImage(elem.data, strings.mediaObject, this.getValueText(elem), elem, false);
-    }
-    else if (elem instanceof content.HTMLEmbedElement) {
+    } else if (elem instanceof content.HTMLEmbedElement) {
       addImage(elem.src, strings.mediaEmbed, "", elem, false);
     }
 
@@ -1238,8 +1221,7 @@ var PageInfoListener = {
    * makePreview in pageInfo.js uses to figure out how to display the preview.
    */
 
-  serializeElementInfo: function(document, url, type, alt, item, isBG)
-  {
+  serializeElementInfo: function(document, url, type, alt, item, isBG) {
     let result = {};
 
     let imageText;
@@ -1319,8 +1301,7 @@ var PageInfoListener = {
   // Other Misc Stuff
   // Modified from the Links Panel v2.3, http://segment7.net/mozilla/links/links.html
   // parse a node to extract the contents of the node
-  getValueText: function(node)
-  {
+  getValueText: function(node) {
 
     let valueText = "";
 
@@ -1341,14 +1322,12 @@ var PageInfoListener = {
       // Text nodes are where the goods are.
       if (nodeType == content.Node.TEXT_NODE) {
         valueText += " " + childNode.nodeValue;
-      }
-      // And elements can have more text inside them.
-      else if (nodeType == content.Node.ELEMENT_NODE) {
+      } else if (nodeType == content.Node.ELEMENT_NODE) {
+        // And elements can have more text inside them.
         // Images are special, we want to capture the alt text as if the image weren't there.
         if (childNode instanceof content.HTMLImageElement) {
           valueText += " " + this.getAltText(childNode);
-        }
-        else {
+        } else {
           valueText += " " + this.getValueText(childNode);
         }
       }
@@ -1359,8 +1338,7 @@ var PageInfoListener = {
 
   // Copied from the Links Panel v2.3, http://segment7.net/mozilla/links/links.html.
   // Traverse the tree in search of an img or area element and grab its alt tag.
-  getAltText: function(node)
-  {
+  getAltText: function(node) {
     let altText = "";
 
     if (node.alt) {
@@ -1377,8 +1355,7 @@ var PageInfoListener = {
 
   // Copied from the Links Panel v2.3, http://segment7.net/mozilla/links/links.html.
   // Strip leading and trailing whitespace, and replace multiple consecutive whitespace characters with a single space.
-  stripWS: function(text)
-  {
+  stripWS: function(text) {
     let middleRE = /\s+/g;
     let endRE = /(^\s+)|(\s+$)/g;
 

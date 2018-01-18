@@ -64,8 +64,7 @@ function getDataFolder(subfoldersWin, subfoldersOSX, subfoldersUnix) {
  * @note    Google Chrome uses FILETIME / 10 as time.
  *          FILETIME is based on same structure of Windows.
  */
-function chromeTimeToDate(aTime)
-{
+function chromeTimeToDate(aTime) {
   return new Date((aTime * S100NS_PER_MS - S100NS_FROM1601TO1970) / 10000);
 }
 
@@ -233,8 +232,7 @@ Object.defineProperty(ChromeProfileMigrator.prototype, "sourceHomePageURL", {
           NetUtil.readInputStreamToString(fstream, fstream.available(),
                                           { charset: "UTF-8" })
             ).homepage;
-      }
-      catch (e) {
+      } catch (e) {
         Cu.reportError("Error parsing Chrome's preferences file: " + e);
       }
     }
@@ -308,7 +306,7 @@ function GetBookmarksResource(aProfileFolder) {
           throw new Error("The migration included errors.");
         }
       }.bind(this)).then(() => aCallback(true),
-                         () => aCallback(false));
+              () => aCallback(false));
     }
   };
 }

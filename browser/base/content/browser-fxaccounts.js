@@ -383,10 +383,9 @@ var gFxAccounts = {
     const fragment = document.createDocumentFragment();
 
     const onTargetDeviceCommand = (event) => {
-      const clientId = event.target.getAttribute("clientId");
-      const clients = clientId
-                      ? [clientId]
-                      : this.remoteClients.map(client => client.id);
+      let clients = event.target.getAttribute("clientId") ?
+        [event.target.getAttribute("clientId")] :
+        this.remoteClients.map(client => client.id);
 
       clients.forEach(clientId => this.sendTabToDevice(url, clientId, title));
     }
@@ -433,8 +432,8 @@ var gFxAccounts = {
 
     const remoteClientPresent = this.remoteClients.length > 0;
     // showSendLink and showSendPage are mutually exclusive
-    const showSendLink = remoteClientPresent
-                         && (contextMenu.onSaveableLink || contextMenu.onPlainTextLink);
+    let showSendLink = remoteClientPresent
+                       && (contextMenu.onSaveableLink || contextMenu.onPlainTextLink);
     const showSendPage = !showSendLink && remoteClientPresent
                          && !(contextMenu.isContentSelected ||
                               contextMenu.onImage || contextMenu.onCanvas ||
@@ -448,7 +447,7 @@ var gFxAccounts = {
   }
 };
 
-XPCOMUtils.defineLazyGetter(gFxAccounts, "FxAccountsCommon", function () {
+XPCOMUtils.defineLazyGetter(gFxAccounts, "FxAccountsCommon", function() {
   return Cu.import("resource://gre/modules/FxAccountsCommon.js", {});
 });
 

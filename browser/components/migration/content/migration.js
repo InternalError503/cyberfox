@@ -149,11 +149,9 @@ var MigrationWizard = { /* exported MigrationWizard */
     var sourceProfiles = this._migrator.sourceProfiles;
     if (this._skipImportSourcePage) {
       this._wiz.currentPage.next = "homePageImport";
-    }
-    else if (sourceProfiles && sourceProfiles.length > 1) {
+    } else if (sourceProfiles && sourceProfiles.length > 1) {
       this._wiz.currentPage.next = "selectProfile";
-    }
-    else {
+    } else {
       if (this._autoMigrate)
         this._wiz.currentPage.next = "homePageImport";
       else
@@ -287,8 +285,7 @@ var MigrationWizard = { /* exported MigrationWizard */
       pageTitle = brandBundle.getString("homePageMigrationPageTitle");
       pageDesc = brandBundle.getString("homePageMigrationDescription");
       mainStr = brandBundle.getString("homePageSingleStartMain");
-    }
-    catch (e) {
+    } catch (e) {
       this._wiz.advance();
       return;
     }
@@ -316,8 +313,7 @@ var MigrationWizard = { /* exported MigrationWizard */
       oldHomePage.setAttribute("label", oldHomePageLabel);
       oldHomePage.setAttribute("value", oldHomePageURL);
       oldHomePage.removeAttribute("hidden");
-    }
-    else {
+    } else {
       // if we don't have at least two options, just advance
       this._wiz.advance();
     }
@@ -378,8 +374,7 @@ var MigrationWizard = { /* exported MigrationWizard */
           label.setAttribute("value",
             MigrationUtils.getLocalizedString(itemID + "_" + this._source));
           items.appendChild(label);
-        }
-        catch (e) {
+        } catch (e) {
           // if the block above throws, we've enumerated all the import data types we
           // currently support and are now just wasting time, break.
           break;
@@ -415,8 +410,7 @@ var MigrationWizard = { /* exported MigrationWizard */
 
               if (this._newHomePage == "DEFAULT") {
                 prefBranch.clearUserPref("browser.startup.homepage");
-              }
-              else {
+              } else {
                 var str = Components.classes["@mozilla.org/supports-string;1"]
                                   .createInstance(Components.interfaces.nsISupportsString);
                 str.data = this._newHomePage;
@@ -440,8 +434,7 @@ var MigrationWizard = { /* exported MigrationWizard */
           this._wiz.advance();
 
           setTimeout(close, 5000);
-        }
-        else {
+        } else {
           this._wiz.canAdvance = true;
           var nextButton = this._wiz.getButton("next");
           nextButton.click();

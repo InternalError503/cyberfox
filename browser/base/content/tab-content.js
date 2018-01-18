@@ -52,7 +52,7 @@ addEventListener("MozDOMPointerLock:Exited", function(aEvent) {
 });
 
 
-addMessageListener("Browser:HideSessionRestoreButton", function (message) {
+addMessageListener("Browser:HideSessionRestoreButton", function(message) {
   // Hide session restore button on about:home
   let doc = content.document;
   let container;
@@ -105,7 +105,7 @@ addMessageListener("SecondScreen:tab-mirror", function(message) {
 
 var AboutHomeListener = {
   init: function(chromeGlobal) {
-    chromeGlobal.addEventListener('AboutHomeLoad', this, false, true);
+    chromeGlobal.addEventListener("AboutHomeLoad", this, false, true);
   },
 
   get isAboutHome() {
@@ -429,14 +429,14 @@ var ContentSearchMediator = {
     return this.whitelist.has(content.document.documentURI);
   },
 
-  _sendMsg: function (type, data=null) {
+  _sendMsg: function (type, data = null) {
     sendAsyncMessage("ContentSearch", {
       type: type,
       data: data,
     });
   },
 
-  _fireEvent: function (type, data=null) {
+  _fireEvent: function (type, data = null) {
     let event = Cu.cloneInto({
       detail: {
         type: type,

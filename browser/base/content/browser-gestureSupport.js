@@ -134,9 +134,9 @@ var gGestureSupport = {
     let isLatched = false;
 
     // Create the update function here to capture closure state
-    this._doUpdate = function GS__doUpdate(aEvent) {
+    this._doUpdate = function GS__doUpdate(updateEvent) {
       // Update the offset with new event data
-      offset += aEvent.delta;
+      offset += updateEvent.delta;
 
       // Check if the cumulative deltas exceed the threshold
       if (Math.abs(offset) > aPref["threshold"]) {
@@ -145,7 +145,7 @@ var gGestureSupport = {
         // initial motion; or we're latched and going the opposite way
         let sameDir = (latchDir ^ offset) >= 0;
         if (!aPref["latched"] || (isLatched ^ sameDir)) {
-          this._doAction(aEvent, [aGesture, offset > 0 ? aInc : aDec]);
+          this._doAction(updateEvent, [aGesture, offset > 0 ? aInc : aDec]);
 
           // We must be getting latched or leaving it, so just toggle
           isLatched = !isLatched;
@@ -260,7 +260,7 @@ var gGestureSupport = {
     let num = 1 << aArray.length;
     while (--num >= 0) {
       // Only select array elements where the current bit is set
-      yield aArray.reduce(function (aPrev, aCurr, aIndex) {
+      yield aArray.reduce(function(aPrev, aCurr, aIndex) {
         if (num & 1 << aIndex)
           aPrev.push(aCurr);
         return aPrev;
@@ -338,8 +338,7 @@ var gGestureSupport = {
         node.dispatchEvent(cmdEvent);
       }
 
-    }
-    else {
+    } else {
       goDoCommand(aCommand);
     }
   },
@@ -405,8 +404,7 @@ var gGestureSupport = {
     if ((gHistorySwipeAnimation.isAnimationRunning()) &&
         (aDir == "RIGHT" || aDir == "LEFT")) {
       gHistorySwipeAnimation.processSwipeEvent(aEvent, aDir);
-    }
-    else {
+    } else {
       this.processSwipeEvent(aEvent, aDir);
     }
   },
@@ -432,8 +430,7 @@ var gGestureSupport = {
       else if (type == "number")
         getFunc = "Int";
       return gPrefService["get" + getFunc + "Pref"](branch + aPref);
-    }
-    catch (e) {
+    } catch (e) {
       return aDef;
     }
   },
@@ -649,8 +646,7 @@ var gHistorySwipeAnimation = {
         this._handleFastSwiping();
       }
       this.updateAnimation(0);
-    }
-    else {
+    } else {
       // Get the session history from SessionStore.
       let updateSessionHistory = sessionHistory => {
         this._startingIndex = sessionHistory.index;
@@ -850,8 +846,7 @@ var gHistorySwipeAnimation = {
   _doesIndexExistInHistory: function HSA__doesIndexExistInHistory(aIndex) {
     try {
       return SessionStore.getSessionHistory(gBrowser.selectedTab).entries[aIndex] != null;
-    }
-    catch (ex) {
+    } catch (ex) {
       return false;
     }
   },
@@ -1148,11 +1143,10 @@ var gHistorySwipeAnimation = {
       img.onload = function() {
         URL.revokeObjectURL(url);
       };
-    }
-    finally {
+    } finally {
       img.src = url;
-      return img;
     }
+    return img;
   },
 
   /**

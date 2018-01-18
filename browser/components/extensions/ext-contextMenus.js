@@ -266,6 +266,7 @@ function MenuItem(extension, createProperties, isRoot = false) {
 
   this.setDefaults();
   this.setProps(createProperties);
+
   if (!this.hasOwnProperty("_id")) {
     this.id = gNextMenuItemID++;
   }

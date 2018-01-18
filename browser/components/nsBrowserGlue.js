@@ -75,11 +75,11 @@ if (AppConstants.MOZ_CRASHREPORTER) {
 }
 
 XPCOMUtils.defineLazyGetter(this, "gBrandBundle", function() {
-  return Services.strings.createBundle('chrome://branding/locale/brand.properties');
+  return Services.strings.createBundle("chrome://branding/locale/brand.properties");
 });
 
 XPCOMUtils.defineLazyGetter(this, "gBrowserBundle", function() {
-  return Services.strings.createBundle('chrome://browser/locale/browser.properties');
+  return Services.strings.createBundle("chrome://browser/locale/browser.properties");
 });
 
 // Seconds of idle before trying to create a bookmarks backup.
@@ -263,19 +263,15 @@ BrowserGlue.prototype = {
         if (data == "post-update-notification") {
           if (Services.prefs.prefHasUserValue("app.update.postupdate"))
             this._showUpdateNotification();
-        }
-        else if (data == "force-ui-migration") {
+        } else if (data == "force-ui-migration") {
           this._migrateUI();
-        }
-        else if (data == "force-distribution-customization") {
+        } else if (data == "force-distribution-customization") {
           this._distributionCustomizer.applyPrefDefaults();
           this._distributionCustomizer.applyCustomizations();
           // To apply distribution bookmarks use "places-init-complete".
-        }
-        else if (data == "force-places-init") {
+        } else if (data == "force-places-init") {
           this._initPlaces(false);
-        }
-        else if (data == "smart-bookmarks-init") {
+        } else if (data == "smart-bookmarks-init") {
           this.ensurePlacesDefaultQueriesInitialized().then(() => {
             Services.obs.notifyObservers(null, "test-smart-bookmarks-done", null);
           });
@@ -620,12 +616,12 @@ BrowserGlue.prototype = {
     channel.listen((id, data, target) => {
       if (data.command == "request") {
         let {Troubleshoot} = Cu.import("resource://gre/modules/Troubleshoot.jsm", {});
-        Troubleshoot.snapshot(data => {
+        Troubleshoot.snapshot(snapshotData => {
           // for privacy we remove crash IDs and all preferences (but bug 1091944
           // exists to expose prefs once we are confident of privacy implications)
-          delete data.crashes;
-          delete data.modifiedPreferences;
-          channel.send(data, target);
+          delete snapshotData.crashes;
+          delete snapshotData.modifiedPreferences;
+          channel.send(snapshotData, target);
         });
       }
     });
@@ -784,8 +780,7 @@ BrowserGlue.prototype = {
                  getService(Ci.nsISessionStartup);
         willRecoverSession =
           (ss.sessionType == Ci.nsISessionStartup.RECOVER_SESSION);
-      }
-      catch (ex) { /* never mind; suppose SessionStore is broken */ }
+      } catch (ex) { /* never mind; suppose SessionStore is broken */ }
 
       // startup check, check all assoc
       let isDefault = false;
@@ -1005,8 +1000,7 @@ BrowserGlue.prototype = {
     try {
       // If the updates.xml file is deleted then getUpdateAt will throw.
       var update = um.getUpdateAt(0).QueryInterface(Ci.nsIPropertyBag);
-    }
-    catch (e) {
+    } catch (e) {
       // This should never happen.
       Cu.reportError("Unable to find update: " + e);
       return;
@@ -1090,8 +1084,7 @@ BrowserGlue.prototype = {
       // be displayed per the idl.
       AlertsService.showAlertNotification(null, title, text,
                                           true, url, clickCallback);
-    }
-    catch (e) {
+    } catch (e) {
       Cu.reportError(e);
     }
   },
@@ -1176,15 +1169,13 @@ BrowserGlue.prototype = {
           // restore from JSON backup
           yield BookmarkJSONUtils.importFromFile(lastBackupFile, true);
           importBookmarks = false;
-        }
-        else {
+        } else {
           // We have created a new database but we don't have any backup available
           importBookmarks = true;
           if (yield OS.File.exists(BookmarkHTMLUtils.defaultPath)) {
             // If bookmarks.html is available in current profile import it...
             importBookmarksHTML = true;
-          }
-          else {
+          } else {
             // ...otherwise we will restore defaults
             restoreDefaultBookmarks = true;
           }
@@ -1205,8 +1196,7 @@ BrowserGlue.prototype = {
         } catch (e) {
           Cu.reportError(e);
         }
-      }
-      else {
+      } else {
         // An import operation is about to run.
         // Don't try to recreate smart bookmarks if autoExportHTML is true or
         // smart bookmarks are disabled.
@@ -1221,8 +1211,7 @@ BrowserGlue.prototype = {
         if (restoreDefaultBookmarks) {
           // User wants to restore bookmarks.html file from default profile folder
           bookmarksUrl = "chrome://browser/locale/bookmarks.html";
-        }
-        else if (yield OS.File.exists(BookmarkHTMLUtils.defaultPath)) {
+        } else if (yield OS.File.exists(BookmarkHTMLUtils.defaultPath)) {
           bookmarksUrl = OS.Path.toFileURI(BookmarkHTMLUtils.defaultPath);
         }
 
@@ -1244,8 +1233,7 @@ BrowserGlue.prototype = {
             Cu.reportError(e);
           }
 
-        }
-        else {
+        } else {
           Cu.reportError(new Error("Unable to find bookmarks.html file."));
         }
 
@@ -1267,8 +1255,7 @@ BrowserGlue.prototype = {
           lastBackupFile = yield PlacesBackups.getMostRecentBackup();
         if (!lastBackupFile) {
             this._bookmarksBackupIdleTime /= 2;
-        }
-        else {
+        } else {
           let lastBackupTime = PlacesBackups.getDateForFile(lastBackupFile);
           let profileLastUse = Services.appinfo.replacedLockTime || Date.now();
 
@@ -1550,8 +1537,7 @@ BrowserGlue.prototype = {
           Services.prefs.clearUserPref("privacy.donottrackheader.enabled");
           Services.prefs.clearUserPref("privacy.donottrackheader.value");
         }
-      }
-      catch (ex) {}
+      } catch (ex) {}
     }
 
     if (currentUIVersion < 26) {
@@ -1823,8 +1809,7 @@ BrowserGlue.prototype = {
           let bm = yield PlacesUtils.bookmarks.fetch(smartBookmark.guid);
           smartBookmark.parentGuid = bm.parentGuid;
           smartBookmark.index = bm.index;
-        }
-        else {
+        } else {
           // We don't remove old Smart Bookmarks because user could still
           // find them useful, or could have personalized them.
           // Instead we remove the Smart Bookmark annotation.
@@ -1966,8 +1951,8 @@ BrowserGlue.prototype = {
         body = body.replace("#2", deviceName);
       }
 
-      const clickCallback = (subject, topic, data) => {
-        if (topic == "alertclickcallback") {
+      const clickCallback = (obsSubject, obsTopic, obsData) => {
+        if (obsTopic == "alertclickcallback") {
           win.gBrowser.selectedTab = firstTab;
         }
       }

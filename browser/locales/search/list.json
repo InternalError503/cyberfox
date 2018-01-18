@@ -23,7 +23,7 @@
       },
       "experimental-hidden": {
         "visibleDefaultEngines": [
-          "yahoo-en-CA", "yandex-en"
+          "yahoo-en-CA", "yandex-en", "google-2018"
         ]
       }
     },

@@ -445,6 +445,7 @@ class ViewPopup extends BasePopup {
 
       this.attached = true;
 
+
       // Store the initial height of the view, so that we never resize menu panel
       // sub-views smaller than the initial height of the menu.
       this.viewHeight = this.viewNode.boxObject.height;

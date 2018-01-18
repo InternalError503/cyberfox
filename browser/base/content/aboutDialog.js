@@ -11,11 +11,8 @@ Cu.import("resource://gre/modules/AppConstants.jsm");
 
 const PREF_EM_HOTFIX_ID = "extensions.hotfix.id";
 
-// Setup Localised Messages.
-var aboutDialogLocal = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
 
-function init(aEvent)
-{
+function init(aEvent) {
   if (aEvent.target != document)
     return;
 
@@ -35,28 +32,37 @@ function init(aEvent)
         var distroField = document.getElementById("distribution");
         distroField.value = distroAbout;
         distroField.style.display = "block";
-      }
-      catch (ex) {
+      } catch (ex) {
         // Pref is unset
         Cu.reportError(ex);
       }
     }
-  }
-  catch (e) {
+  } catch (e) {
     // Pref is unset
   }
 
   // Include the build ID and display warning if this is an "a#" (nightly or aurora) build
-  var version = Services.appinfo.version;
+  let versionField = document.getElementById("version");
+  let version = Services.appinfo.version;
   if (/a\d+$/.test(version)) {
-    var buildID = Services.appinfo.appBuildID;
-    var buildDate = buildID.slice(0,4) + "-" + buildID.slice(4,6) + "-" + buildID.slice(6,8);
-    document.getElementById("version").textContent += " (" + buildDate + ")";
+    let buildID = Services.appinfo.appBuildID;
+    let year = buildID.slice(0, 4);
+    let month = buildID.slice(4, 6);
+    let day = buildID.slice(6, 8);
+    versionField.textContent += ` (${year}-${month}-${day})`;
     document.getElementById("communityDesc").hidden = true;
   }
 
+  // Append "(32-bit)" or "(64-bit)" build architecture to the version number:
+  let bundle = Services.strings.createBundle("chrome://browser/locale/browser.properties");
+  let archResource = Services.appinfo.is64Bit
+                     ? "aboutDialog.architecture.sixtyFourBit"
+                     : "aboutDialog.architecture.thirtyTwoBit";
+  let arch = bundle.GetStringFromName(archResource);
+  versionField.textContent += ` (${arch})`;
+
   if (AppConstants.platform == "macosx") {
-    // It may not be sized at this point, and we need its width to calculate its position
+    // it may not be sized at this point, and we need its width to calculate its position
     window.sizeToContent();
     window.moveTo((screen.availWidth / 2) - (window.outerWidth / 2), screen.availHeight / 5);
   }
@@ -88,12 +94,24 @@ function checkForUpdates(){
 
          document.getElementById(element).hidden = state;
     }
+	function ErrorOn(){
+        // Hide update buttons		  
+        ElementState("update-button-checkNow", true);
+        ElementState("update-button-checking-throbber", true);
+        ElementState("update-button-checking", true);
+        ElementState("noUpdatesFound", true);
+        ElementState("update-button-download", true);
+    }
+
 
     ElementState("update-button-checkNow", true);
     ElementState("update-button-checking", false);
     ElementState("update-button-checking-throbber", false);
     ElementState("noUpdatesFound", true);
     ElementState("update-button-download", true);
+
+    // Setup Localised Messages.
+    let aboutDialogLocal = Services.strings.createBundle("chrome://browser/locale/aboutDialog.properties");
 
     // Clear any previous set urls
     Services.prefs.clearUserPref("app.update.url.manual");
@@ -180,34 +198,31 @@ function checkForUpdates(){
 				};
 
                 request.ontimeout = function(aEvent) {
-                    // Log return failed check message for request time-out!
-                    throw new Error(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateCheckError"));
                     ElementState("update-button-checkNow", true);
                     ElementState("update-button-checking-throbber", true);
                     ElementState("update-button-checking", true);
                     ElementState("noUpdatesFound", true);
                     ElementState("update-button-download", false);
+                    // Log return failed check message for request time-out!
+                    throw new Error(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateCheckError"));
                 };
 
                 request.onerror = function(aEvent) {
 
                     // Marked to add better error handling and messages.
                     switch (aEvent.target.status) {
-                        case 0:// Log return failed request message for status 0 unsent
-                        throw new Error(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateRequestError"));
-                        break;
-                        case 1:throw new Error("Error Status: " + aEvent.target.status);break;
-                        case 2:throw new Error("Error Status: " + aEvent.target.status);break;
-                        case 3:throw new Error("Error Status: " + aEvent.target.status);break;
-                        case 4:throw new Error("Error Status: " + aEvent.target.status);break;
-                        default:throw new Error("Error Status: " + aEvent.target.status);break;
+                        case 0: {
+                            // Log return failed request message for status 0 unsent
+                            ErrorOn();
+                            throw new Error(aboutDialogLocal.GetStringFromName("updateCheckErrorTitle") + " " + aboutDialogLocal.GetStringFromName("updateRequestError"));
+                            break;
+                        }
+                        case 1: { ErrorOn(); throw new Error("Error Status: " + aEvent.target.status);break; }
+                        case 2: { ErrorOn(); throw new Error("Error Status: " + aEvent.target.status);break; }
+                        case 3: { ErrorOn(); throw new Error("Error Status: " + aEvent.target.status);break; }
+                        case 4: { ErrorOn(); throw new Error("Error Status: " + aEvent.target.status);break; }
+                        default: { ErrorOn(); throw new Error("Error Status: " + aEvent.target.status);break; }
                     }
-                     // Hide update buttons		  
-                    ElementState("update-button-checkNow", true);
-                    ElementState("update-button-checking-throbber", true);
-                    ElementState("update-button-checking", true);
-                    ElementState("noUpdatesFound", true);
-                    ElementState("update-button-download", true);
                 };
 
                 // Only send async POST requests, Must declare the request header forcing the request to only be for content type json.

@@ -280,11 +280,9 @@ var PlacesOrganizer = {
     if (PlacesUtils.nodeIsHistoryContainer(aNode) ||
         itemId == PlacesUIUtils.leftPaneQueries["History"]) {
       PlacesQueryBuilder.setScope("history");
-    }
-    else if (itemId == PlacesUIUtils.leftPaneQueries["Downloads"]) {
+    } else if (itemId == PlacesUIUtils.leftPaneQueries["Downloads"]) {
       PlacesQueryBuilder.setScope("downloads");
-    }
-    else {
+    } else {
       // Default to All Bookmarks for all other nodes, per bug 469437.
       PlacesQueryBuilder.setScope("bookmarks");
     }
@@ -332,8 +330,7 @@ var PlacesOrganizer = {
     if (aContainer.itemId != -1) {
       PlacesUtils.asContainer(this._places.selectedNode).containerOpen = true;
       this._places.selectItems([aContainer.itemId], false);
-    }
-    else if (PlacesUtils.nodeIsQuery(aContainer)) {
+    } else if (PlacesUtils.nodeIsQuery(aContainer)) {
       this._places.selectPlaceURI(aContainer.uri);
     }
   },
@@ -411,7 +408,7 @@ var PlacesOrganizer = {
     const locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
                    .getService(Ci.nsIXULChromeRegistry)
                    .getSelectedLocale("global", true);
-    const dtOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dtOptions = { year: "numeric", month: "long", day: "numeric" };
     let dateFormatter = new Intl.DateTimeFormat(locale, dtOptions);
 
     // Remove existing menu items.  Last item is the restoreFromFile item.
@@ -500,7 +497,7 @@ var PlacesOrganizer = {
   restoreBookmarksFromFile: function PO_restoreBookmarksFromFile(aFilePath) {
     // check file extension
     if (!aFilePath.toLowerCase().endsWith("json") &&
-        !aFilePath.toLowerCase().endsWith("jsonlz4"))  {
+        !aFilePath.toLowerCase().endsWith("jsonlz4")) {
       this._showErrorAlert(PlacesUIUtils.getString("bookmarksRestoreFormatError"));
       return;
     }
@@ -582,8 +579,7 @@ var PlacesOrganizer = {
         infoBox.setAttribute("wasminimal", "true");
       infoBox.removeAttribute("minimal");
       infoBoxExpanderWrapper.hidden = true;
-    }
-    else {
+    } else {
       if (infoBox.getAttribute("wasminimal") == "true")
         infoBox.setAttribute("minimal", "true");
       infoBox.removeAttribute("wasminimal");
@@ -646,8 +642,7 @@ var PlacesOrganizer = {
                                  , hiddenRows: ["folderPicker"] });
 
       this._detectAndSetDetailsPaneMinimalState(selectedNode);
-    }
-    else if (!selectedNode && aNodeList[0]) {
+    } else if (!selectedNode && aNodeList[0]) {
       if (aNodeList.every(PlacesUtils.nodeIsURI)) {
         let uris = aNodeList.map(node => PlacesUtils._uri(node.uri));
         detailsDeck.selectedIndex = 1;
@@ -659,8 +654,7 @@ var PlacesOrganizer = {
                                                   "description",
                                                   "name"]});
         this._detectAndSetDetailsPaneMinimalState(selectedNode);
-      }
-      else {
+      } else {
         detailsDeck.selectedIndex = 0;
         let selectItemDesc = document.getElementById("selectItemDescription");
         let itemsCountLabel = document.getElementById("itemsCountText");
@@ -670,8 +664,7 @@ var PlacesOrganizer = {
                                         aNodeList.length, [aNodeList.length]);
         infoBox.hidden = true;
       }
-    }
-    else {
+    } else {
       detailsDeck.selectedIndex = 0;
       infoBox.hidden = true;
       let selectItemDesc = document.getElementById("selectItemDescription");
@@ -685,8 +678,7 @@ var PlacesOrganizer = {
       if (itemsCount == 0) {
         selectItemDesc.hidden = true;
         itemsCountLabel.value = PlacesUIUtils.getString("detailsPane.noItems");
-      }
-      else {
+      } else {
         selectItemDesc.hidden = false;
         itemsCountLabel.value =
           PlacesUIUtils.getPluralString("detailsPane.itemsCountLabel",
@@ -702,17 +694,17 @@ var PlacesOrganizer = {
     var height = bo.height;
 
     var canvas = document.getElementById("itemThumbnail");
-    var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext("2d");
     var notAvailableText = canvas.getAttribute("notavailabletext");
     ctx.save();
     ctx.fillStyle = "-moz-Dialog";
     ctx.fillRect(0, 0, width, height);
-    ctx.translate(width/2, height/2);
+    ctx.translate(width / 2, height / 2);
 
     ctx.fillStyle = "GrayText";
     ctx.mozTextStyle = "12pt sans serif";
     var len = ctx.mozMeasureText(notAvailableText);
-    ctx.translate(-len/2, 0);
+    ctx.translate(-len / 2, 0);
     ctx.mozDrawText(notAvailableText);
     ctx.restore();
   },
@@ -729,8 +721,7 @@ var PlacesOrganizer = {
       infoBoxExpanderLabel.accessKey = infoBoxExpanderLabel.getAttribute("lessaccesskey");
       infoBoxExpander.className = "expander-up";
       additionalInfoBroadcaster.removeAttribute("hidden");
-    }
-    else {
+    } else {
       infoBox.setAttribute("minimal", "true");
       infoBoxExpanderLabel.value = infoBoxExpanderLabel.getAttribute("morelabel");
       infoBoxExpanderLabel.accessKey = infoBoxExpanderLabel.getAttribute("moreaccesskey");
@@ -796,22 +787,22 @@ var PlacesSearchBox = {
       case "bookmarks":
         currentView.applyFilter(filterString, this.folders);
         break;
-      case "history":
+      case "history": {
         if (currentOptions.queryType != Ci.nsINavHistoryQueryOptions.QUERY_TYPE_HISTORY) {
-          var query = PlacesUtils.history.getNewQuery();
+          let query = PlacesUtils.history.getNewQuery();
           query.searchTerms = filterString;
-          var options = currentOptions.clone();
+          let options = currentOptions.clone();
           // Make sure we're getting uri results.
           options.resultType = currentOptions.RESULTS_AS_URI;
           options.queryType = Ci.nsINavHistoryQueryOptions.QUERY_TYPE_HISTORY;
           options.includeHidden = true;
           currentView.load([query], options);
-        }
-        else {
+        } else {
           currentView.applyFilter(filterString, null, true);
         }
         break;
-      case "downloads":
+      }
+      case "downloads": {
         if (currentView == ContentTree.view) {
           let query = PlacesUtils.history.getNewQuery();
           query.searchTerms = filterString;
@@ -822,12 +813,12 @@ var PlacesSearchBox = {
           options.queryType = Ci.nsINavHistoryQueryOptions.QUERY_TYPE_HISTORY;
           options.includeHidden = true;
           currentView.load([query], options);
-        }
-        else {
+        } else {
           // The new downloads view doesn't use places for searching downloads.
           currentView.searchTerm = filterString;
         }
         break;
+      }
       default:
         throw "Invalid filterCollection on search";
     }
@@ -1064,8 +1055,7 @@ var ViewMenu = {
         if (column.getAttribute("sortDirection") != "") {
           menuitem.setAttribute("checked", "true");
         }
-      }
-      else if (type == "checkbox") {
+      } else if (type == "checkbox") {
         menuitem.setAttribute("type", "checkbox");
         // Cannot uncheck the primary column.
         if (column.getAttribute("primary") == "true")
@@ -1098,13 +1088,11 @@ var ViewMenu = {
       viewSortAscending.removeAttribute("checked");
       viewSortDescending.removeAttribute("checked");
       viewUnsorted.setAttribute("checked", "true");
-    }
-    else if (sortColumn.getAttribute("sortDirection") == "ascending") {
+    } else if (sortColumn.getAttribute("sortDirection") == "ascending") {
       viewSortAscending.setAttribute("checked", "true");
       viewSortDescending.removeAttribute("checked");
       viewUnsorted.removeAttribute("checked");
-    }
-    else if (sortColumn.getAttribute("sortDirection") == "descending") {
+    } else if (sortColumn.getAttribute("sortDirection") == "descending") {
       viewSortDescending.setAttribute("checked", "true");
       viewSortAscending.removeAttribute("checked");
       viewUnsorted.removeAttribute("checked");
@@ -1127,8 +1115,7 @@ var ViewMenu = {
       column.setAttribute("hidden", "false");
       if (splitter)
         splitter.removeAttribute("hidden");
-    }
-    else {
+    } else {
       column.setAttribute("hidden", "true");
       if (splitter)
         splitter.setAttribute("hidden", "true");
@@ -1177,8 +1164,7 @@ var ViewMenu = {
         if (sortColumn)
           aDirection = sortColumn.getAttribute("sortDirection");
       }
-    }
-    else {
+    } else {
       let sortColumn = this._getSortColumn();
       columnId = sortColumn ? sortColumn.getAttribute("anonid") : "title";
     }
@@ -1248,8 +1234,7 @@ var ContentArea = {
         }
         return view;
       }
-    }
-    catch (ex) {
+    } catch (ex) {
       Components.utils.reportError(ex);
     }
     return ContentTree.view;
@@ -1326,8 +1311,7 @@ var ContentArea = {
         for (let menuElt of elt.childNodes) {
           menuElt.hidden = !options.toolbarSet.includes(menuElt.id);
         }
-      }
-      else {
+      } else {
         elt.hidden = !options.toolbarSet.includes(elt.id);
       }
     }
@@ -1384,8 +1368,7 @@ var ContentTree = {
       if (PlacesUtils.nodeIsURI(node) && (doubleClick || middleClick)) {
         // Open associated uri in the browser.
         this.openSelectedNode(aEvent);
-      }
-      else if (middleClick && PlacesUtils.nodeIsContainer(node)) {
+      } else if (middleClick && PlacesUtils.nodeIsContainer(node)) {
         // The command execution function will take care of seeing if the
         // selection is a folder or a different container type, and will
         // load its contents in tabs.

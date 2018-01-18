@@ -59,6 +59,7 @@ extensions.registerSchemaAPI("sessions", "addon_parent", context => {
         let maxResults = filter.maxResults == undefined ? this.MAX_SESSION_RESULTS : filter.maxResults;
         return Promise.resolve(getRecentlyClosed(maxResults, extension));
       },
+
       restore: function(sessionId) {
         let session, closedId;
         if (sessionId) {
