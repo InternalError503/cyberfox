@@ -71,7 +71,7 @@ namespace {
 
 // Anything smaller should compile fast enough that caching will just add
 // overhead.
-static const size_t sMinCachedModuleLength = 10000;
+// static const size_t sMinCachedModuleLength = 10000;
 
 // The number of characters to hash into the Metadata::Entry::mFastHash.
 static const unsigned sNumFastHashChars = 4096;
@@ -1520,6 +1520,7 @@ DeallocEntryChild(PAsmJSCacheEntryChild* aActor)
   static_cast<ChildRunnable*>(aActor)->Release();
 }
 
+/*
 namespace {
 
 JS::AsmJSCacheResult
@@ -1582,6 +1583,7 @@ OpenFile(nsIPrincipal* aPrincipal,
 }
 
 } // namespace
+*/
 
 typedef uint32_t AsmJSCookieType;
 static const uint32_t sAsmJSCookie = 0x600d600d;
@@ -1594,6 +1596,9 @@ OpenEntryForRead(nsIPrincipal* aPrincipal,
                  const uint8_t** aMemory,
                  intptr_t* aHandle)
 {
+  return false;
+
+/*
   if (size_t(aLimit - aBegin) < sMinCachedModuleLength) {
     return false;
   }
@@ -1633,6 +1638,7 @@ OpenEntryForRead(nsIPrincipal* aPrincipal,
   // failure) at which point the file will be closed.
   childRunnable.Forget(reinterpret_cast<ChildRunnable**>(aHandle));
   return true;
+*/
 }
 
 void
@@ -1657,6 +1663,9 @@ OpenEntryForWrite(nsIPrincipal* aPrincipal,
                   uint8_t** aMemory,
                   intptr_t* aHandle)
 {
+  return JS::AsmJSCache_ESR52;
+
+/*
   if (size_t(aEnd - aBegin) < sMinCachedModuleLength) {
     return JS::AsmJSCache_ModuleTooSmall;
   }
@@ -1690,6 +1699,7 @@ OpenEntryForWrite(nsIPrincipal* aPrincipal,
   // failure) at which point the file will be closed
   childRunnable.Forget(reinterpret_cast<ChildRunnable**>(aHandle));
   return JS::AsmJSCache_Success;
+*/
 }
 
 void

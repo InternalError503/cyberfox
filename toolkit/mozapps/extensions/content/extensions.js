@@ -1613,6 +1613,21 @@ function createItem(aObj, aIsInstall, aIsRemote) {
   item.setAttribute("type", aObj.type);
   item.setAttribute("remote", !!aIsRemote);
 
+  // Filter gecko media plugins from regular plugins
+  if(aObj._plugin){
+    switch(aObj._plugin.id){
+      case "gmp-gmpopenh264":
+        item.setAttribute("id", "gmp"); 
+      break;
+      case "gmp-widevinecdm":
+        item.setAttribute("id", "gmp"); 
+      break;
+      case "gmp-eme-adobe":
+        item.setAttribute("id", "gmp"); 
+      break;
+    }
+}
+
   if (aIsInstall) {
     item.mInstall = aObj;
 

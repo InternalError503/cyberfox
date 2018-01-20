@@ -289,3 +289,10 @@ richlistitem:not([selected]) * {
 	text-shadow: 0px 0px -1px #333;
 	background-image: linear-gradient(rgb(212, 0, 0), rgb(167, 2, 2) 95%, rgb(92, 0, 0));
 }
+
+/* Gecko media pugins highlight */
+#gmp {
+  color: rgb(52,52,52);
+  background-color: linear-gradient(rgb(200, 200, 200), rgb(190, 190, 190) 95%, rgb(220, 220, 220))!important;
+  background-image: linear-gradient(rgb(200, 200, 200), rgb(190, 190, 190) 95%, rgb(220, 220, 220))!important;
+}
