@@ -17,6 +17,9 @@ AppName={#MyAppName}
 #endif
 #endif
 #define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\"+SetupSetting("AppId")+"_is1"
+#if True == RemoveBeta
+#define UNINSTKEYBETA "Software\Microsoft\Windows\CurrentVersion\Uninstall\{{A7689C89-E92D-4051-A3B7-92C92DA5D1DF}_is1"
+#endif
 #if Arch == "i368"
 #define RegPath "Software\Clients\StartMenuInternet"
 #else

@@ -178,6 +178,34 @@ function cleanUninstall : Boolean;
 		end	
 end;
 
+#if True == RemoveBeta
+// Helper function for clean beta installations. 
+function betaUninstall : Boolean;
+	var
+		iResultCode: Integer;
+		sUnInstallString: String;
+    begin
+			// Perform clean install and uninstall existing installation.
+			if RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEYBETA}'), 'UninstallString') then
+				begin
+					sUnInstallString := GetUninstallString(ExpandConstant('{#UNINSTKEYBETA}'));
+					sUnInstallString := RemoveQuotes(sUnInstallString);
+					log('Current beta installation found!');
+			if Exec(ExpandConstant(sUnInstallString), '/VERYSILENT', '', SW_SHOW, ewWaitUntilTerminated, iResultCode) then
+			begin
+				// All IO operations have completed.
+				log('Beta installation was uninstalled');
+				Result := True;
+			end
+			else begin
+			    log('Error occurred trying to uninstall beta version.');
+				if UninstallSilent() then begin ExitProcess(11); end; // Our Exit code for clean install fail.
+				Result := False;				
+			end
+		end	
+end;
+#endif
+
 // Helper function for upgrade command line argument.
 function wasUpdate : Boolean;
 	var
@@ -311,6 +339,10 @@ var
 			log('Incompatible CPU: This computer has an older CPU that lacks SSE2 instruction set support. Cyberfox 49.0 and later can not run on this computer.');
 			ExitProcess(13); // Our Exit code for no sse2 support.
 		end;
+#if True == RemoveBeta
+			// Remove beta installations shift them too release versions
+			betaUninstall();
+#endif
 	end
 end;
 // After initializing installer event.
