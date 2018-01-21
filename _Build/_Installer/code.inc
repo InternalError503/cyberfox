@@ -133,13 +133,13 @@ var
 end;
 	
 // Get the uninstall string;
-function GetUninstallString: String;
+function GetUninstallString(const Key : String): String;
 	var
 		sUnInstPath: String;
 		sUnInstallString: String;
 	begin
 		Result := '';
-		sUnInstPath := ExpandConstant('{#UNINSTKEY}');
+		sUnInstPath := Key;
 		sUnInstallString := '';
 	if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
 		RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
@@ -156,7 +156,7 @@ function cleanUninstall : Boolean;
 			// Perform clean install and uninstall existing installation.
 			if RegValueExists(HKEY_LOCAL_MACHINE, ExpandConstant('{#UNINSTKEY}'), 'UninstallString') then
 				begin
-					sUnInstallString := GetUninstallString();
+					sUnInstallString := GetUninstallString(ExpandConstant('{#UNINSTKEY}'));
 					sUnInstallString := RemoveQuotes(sUnInstallString);
 					Wizardform.NextButton.Enabled := False;
 					Wizardform.BackButton.Enabled := False;
