@@ -73,6 +73,12 @@ var snapshotFormatters = {
     $("multiprocess-box").textContent = strings.formatStringFromName("multiProcessWindows",
       [data.numRemoteWindows, data.numTotalWindows, statusText], 3);
 
+    let keyGoogleFound = data.keyGoogleFound ? "found" : "missing";
+    $("key-google-box").textContent = strings.GetStringFromName(keyGoogleFound);
+
+    let keyMozillaFound = data.keyMozillaFound ? "found" : "missing";
+    $("key-mozilla-box").textContent = strings.GetStringFromName(keyMozillaFound);
+
     $("safemode-box").textContent = data.safeMode;
   },
 

@@ -122,3 +122,6 @@ variant of aboutSupport.showDir.label. -->
 <!ENTITY aboutSupport.graphicsDecisionLogTitle "Decision Log">
 <!ENTITY aboutSupport.graphicsCrashGuardsTitle "Crash Guard Disabled Features">
 <!ENTITY aboutSupport.graphicsWorkaroundsTitle "Workarounds">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google Key">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service Key">
