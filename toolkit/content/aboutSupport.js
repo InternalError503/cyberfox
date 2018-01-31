@@ -20,7 +20,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "PlacesDBUtils",
 window.addEventListener("load", function onload(event) {
   try {
   window.removeEventListener("load", onload, false);
-  Troubleshoot.snapshot(function (snapshot) {
+  Troubleshoot.snapshot(function(snapshot) {
     for (let prop in snapshotFormatters)
       snapshotFormatters[prop](snapshot[prop]);
   });
@@ -37,6 +37,7 @@ window.addEventListener("load", function onload(event) {
 var snapshotFormatters = {
 
   application: function application(data) {
+    let strings = stringBundle();
     $("application-box").textContent = data.name;
     $("useragent-box").textContent = data.userAgent;
     $("os-box").textContent = data.osVersion;
@@ -50,7 +51,7 @@ var snapshotFormatters = {
       $("updatechannel-box").textContent = data.updateChannel;
     $("profile-dir-box").textContent = Services.dirsvc.get("ProfD", Ci.nsIFile).path;
 
-    let statusText = stringBundle().GetStringFromName("multiProcessStatus.unknown");
+    let statusText = strings.GetStringFromName("multiProcessStatus.unknown");
 
     // Whitelist of known values with string descriptions:
     switch (data.autoStartStatus) {
@@ -61,7 +62,7 @@ var snapshotFormatters = {
       case 6:
       case 7:
       case 8:
-        statusText = stringBundle().GetStringFromName("multiProcessStatus." + data.autoStartStatus);
+        statusText = strings.GetStringFromName("multiProcessStatus." + data.autoStartStatus);
         break;
 
       case 10:
@@ -69,7 +70,7 @@ var snapshotFormatters = {
         break;
     }
 
-    $("multiprocess-box").textContent = stringBundle().formatStringFromName("multiProcessWindows",
+    $("multiprocess-box").textContent = strings.formatStringFromName("multiProcessWindows",
       [data.numRemoteWindows, data.numTotalWindows, statusText], 3);
 
     $("safemode-box").textContent = data.safeMode;
@@ -90,8 +91,7 @@ var snapshotFormatters = {
       // Ignore any non http/https urls
       if (!/^https?:/i.test(reportURL))
         reportURL = null;
-    }
-    catch (e) { }
+    } catch (e) { }
     if (!reportURL) {
       $("crashes-noConfig").style.display = "block";
       $("crashes-noConfig").classList.remove("no-copy");
@@ -107,26 +107,21 @@ var snapshotFormatters = {
     }
 
     let dateNow = new Date();
-    $.append($("crashes-tbody"), data.submitted.map(function (crash) {
+    $.append($("crashes-tbody"), data.submitted.map(function(crash) {
       let date = new Date(crash.date);
       let timePassed = dateNow - date;
       let formattedDate;
-      if (timePassed >= 24 * 60 * 60 * 1000)
-      {
+      if (timePassed >= 24 * 60 * 60 * 1000) {
         let daysPassed = Math.round(timePassed / (24 * 60 * 60 * 1000));
         let daysPassedString = strings.GetStringFromName("crashesTimeDays");
         formattedDate = PluralForm.get(daysPassed, daysPassedString)
                                   .replace("#1", daysPassed);
-      }
-      else if (timePassed >= 60 * 60 * 1000)
-      {
+      } else if (timePassed >= 60 * 60 * 1000) {
         let hoursPassed = Math.round(timePassed / (60 * 60 * 1000));
         let hoursPassedString = strings.GetStringFromName("crashesTimeHours");
         formattedDate = PluralForm.get(hoursPassed, hoursPassedString)
                                   .replace("#1", hoursPassed);
-      }
-      else
-      {
+      } else {
         let minutesPassed = Math.max(Math.round(timePassed / (60 * 1000)), 1);
         let minutesPassedString = strings.GetStringFromName("crashesTimeMinutes");
         formattedDate = PluralForm.get(minutesPassed, minutesPassedString)
@@ -134,7 +129,7 @@ var snapshotFormatters = {
       }
       return $.new("tr", [
         $.new("td", [
-          $.new("a", crash.id, null, {href : reportURL + crash.id})
+          $.new("a", crash.id, null, {href: reportURL + crash.id})
         ]),
         $.new("td", formattedDate)
       ]);
@@ -142,7 +137,7 @@ var snapshotFormatters = {
   },
 
   extensions: function extensions(data) {
-    $.append($("extensions-tbody"), data.map(function (extension) {
+    $.append($("extensions-tbody"), data.map(function(extension) {
       return $.new("tr", [
         $.new("td", extension.name),
         $.new("td", extension.version),
@@ -153,7 +148,7 @@ var snapshotFormatters = {
   },
 
   experiments: function experiments(data) {
-    $.append($("experiments-tbody"), data.map(function (experiment) {
+    $.append($("experiments-tbody"), data.map(function(experiment) {
       return $.new("tr", [
         $.new("td", experiment.name),
         $.new("td", experiment.id),
@@ -161,7 +156,7 @@ var snapshotFormatters = {
         $.new("td", experiment.active),
         $.new("td", experiment.endDate),
         $.new("td", [
-          $.new("a", experiment.detailURL, null, {href : experiment.detailURL, })
+          $.new("a", experiment.detailURL, null, {href: experiment.detailURL, })
         ]),
         $.new("td", experiment.branch),
       ]);
@@ -170,7 +165,7 @@ var snapshotFormatters = {
 
   modifiedPreferences: function modifiedPreferences(data) {
     $.append($("prefs-tbody"), sortedArrayFromObject(data).map(
-      function ([name, value]) {
+      function([name, value]) {
         return $.new("tr", [
           $.new("td", name, "pref-name"),
           // Very long preference values can cause users problems when they
@@ -184,7 +179,7 @@ var snapshotFormatters = {
 
   lockedPreferences: function lockedPreferences(data) {
     $.append($("locked-prefs-tbody"), sortedArrayFromObject(data).map(
-      function ([name, value]) {
+      function([name, value]) {
         return $.new("tr", [
           $.new("td", name, "pref-name"),
           $.new("td", String(value).substr(0, 120), "pref-value"),
@@ -204,8 +199,7 @@ var snapshotFormatters = {
         try {
           return strings.formatStringFromName(nameOrMsg, msgArray,
                                               msgArray.length);
-        }
-        catch (err) {
+        } catch (err) {
           // Throws if nameOrMsg is not a name in the bundle.  This shouldn't
           // actually happen though, since msgArray.length > 1 => nameOrMsg is a
           // name in the bundle, not a message, and the remaining msgArray
@@ -215,8 +209,7 @@ var snapshotFormatters = {
       }
       try {
         return strings.GetStringFromName(nameOrMsg);
-      }
-      catch (err) {
+      } catch (err) {
         // Throws if nameOrMsg is not a name in the bundle.
       }
       return nameOrMsg;
@@ -224,17 +217,17 @@ var snapshotFormatters = {
 
     // Read APZ info out of data.info, stripping it out in the process.
     let apzInfo = [];
-    let formatApzInfo = function (info) {
+    let formatApzInfo = function(info) {
       let out = [];
-      for (let type of ['Wheel', 'Touch', 'Drag']) {
-        let key = 'Apz' + type + 'Input';
+      for (let type of ["Wheel", "Touch", "Drag", "Keyboard", "Autoscroll"]) {
+        let key = "Apz" + type + "Input";
 
         if (!(key in info))
           continue;
 
         delete info[key];
 
-        let message = localizedMsg([type.toLowerCase() + 'Enabled']);
+        let message = localizedMsg([type.toLowerCase() + "Enabled"]);
         out.push(message);
       }
 
@@ -280,7 +273,7 @@ var snapshotFormatters = {
     if ("info" in data) {
       apzInfo = formatApzInfo(data.info);
 
-      let trs = sortedArrayFromObject(data.info).map(function ([prop, val]) {
+      let trs = sortedArrayFromObject(data.info).map(function([prop, val]) {
         return $.new("tr", [
           $.new("th", prop, "column"),
           $.new("td", String(val)),
@@ -333,7 +326,7 @@ var snapshotFormatters = {
       } else {
         $.append($("graphics-failures-tbody"),
           [$.new("tr", [$.new("th", "LogFailure", "column"),
-                        $.new("td", data.failures.map(function (val) {
+                        $.new("td", data.failures.map(function(val) {
                           return $.new("p", val);
                        }))])]);
       }
@@ -556,7 +549,7 @@ var snapshotFormatters = {
       ])
     ];
     sortedArrayFromObject(data).forEach(
-      function ([name, val]) {
+      function([name, val]) {
         trs.push($.new("tr", [
           $.new("td", name),
           $.new("td", val.minVersion),
@@ -624,8 +617,7 @@ function stringBundle() {
            "chrome://global/locale/aboutSupport.properties");
 }
 
-function assembleFromGraphicsFailure(i, data)
-{
+function assembleFromGraphicsFailure(i, data) {
   // Only cover the cases we have today; for example, we do not have
   // log failures that assert and we assume the log level is 1/error.
   let message = data.failures[i];
@@ -644,9 +636,9 @@ function assembleFromGraphicsFailure(i, data)
     what = "Assert";
     message = message.substring(8);
   }
-  let assembled = {"index" : index,
-                   "header" : ("(#" + index + ") " + what),
-                   "message" : message};
+  let assembled = {"index": index,
+                   "header": ("(#" + index + ") " + what),
+                   "message": message};
   return assembled;
 }
 
@@ -662,7 +654,7 @@ function copyRawDataToClipboard(button) {
   if (button)
     button.disabled = true;
   try {
-    Troubleshoot.snapshot(function (snapshot) {
+    Troubleshoot.snapshot(function(snapshot) {
       if (button)
         button.disabled = false;
       let str = Cc["@mozilla.org/supports-string;1"].
@@ -686,8 +678,7 @@ function copyRawDataToClipboard(button) {
         Services.androidBridge.handleGeckoMessage(message);
       }
     });
-  }
-  catch (err) {
+  } catch (err) {
     if (button)
       button.disabled = false;
     throw err;
@@ -797,8 +788,7 @@ Serializer.prototype = {
         let text = this._nodeText(child);
         this._appendText(text);
         hasText = hasText || !!text.trim();
-      }
-      else if (child.nodeType == Node.ELEMENT_NODE)
+      } else if (child.nodeType == Node.ELEMENT_NODE)
         this._serializeElement(child);
     }
 
