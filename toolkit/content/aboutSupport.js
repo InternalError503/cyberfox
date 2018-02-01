@@ -40,7 +40,7 @@ var snapshotFormatters = {
     let strings = stringBundle();
     $("application-box").textContent = data.name;
     $("useragent-box").textContent = data.userAgent;
-    $("os-box").textContent = data.osVersion;
+    $("os-box").textContent = data.arch ? data.osVersion + " (x64bit)" : data.osVersion + " (x32bit)";
     $("supportLink").href = data.supportURL + "/index.php";
     let version = AppConstants.MOZ_APP_VERSION_DISPLAY;
     if (data.vendor)
