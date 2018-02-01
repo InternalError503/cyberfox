@@ -37,10 +37,22 @@ window.addEventListener("load", function onload(event) {
 var snapshotFormatters = {
 
   application: function application(data) {
+
+    function getArchString(){
+      // Append "(32-bit)" or "(64-bit)" build architecture to OS information:
+      let bundle = Services.strings.createBundle("chrome://browser/locale/browser.properties");
+      let arch = data.arch
+                     ? "aboutDialog.architecture.sixtyFourBit"
+                     : "aboutDialog.architecture.thirtyTwoBit";
+      let archString = data.osVersion + ` (${bundle.GetStringFromName(arch)})`;
+      return archString;
+    }
+    
     let strings = stringBundle();
+    let archString = getArchString();
     $("application-box").textContent = data.name;
     $("useragent-box").textContent = data.userAgent;
-    $("os-box").textContent = data.arch ? data.osVersion + " (x64bit)" : data.osVersion + " (x32bit)";
+    $("os-box").textContent = archString;
     $("supportLink").href = data.supportURL + "/index.php";
     let version = AppConstants.MOZ_APP_VERSION_DISPLAY;
     if (data.vendor)
