@@ -206,6 +206,27 @@ const SNAPSHOT_SCHEMA = {
         },
       },
     },
+    features: {
+      required: true,
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: {
+            required: true,
+            type: "string",
+          },
+          version: {
+            required: true,
+            type: "string",
+          },
+          id: {
+            required: true,
+            type: "string",
+          },
+        },
+      },
+    },
     modifiedPreferences: {
       required: true,
       type: "object",
