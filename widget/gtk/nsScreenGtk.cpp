@@ -15,6 +15,7 @@
 #include <gtk/gtk.h>
 #include <dlfcn.h>
 #include "gfxPlatformGtk.h"
+#include "nsIWidget.h"
 
 static uint32_t sScreenId = 0;
 

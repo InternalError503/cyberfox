@@ -544,6 +544,12 @@ nsDocumentViewer::~nsDocumentViewer()
     mDocument->Destroy();
   }
 
+  if (mPrintEngine) {
+    mPrintEngine->Destroy();
+    mPrintEngine = nullptr;
+  }
+
+  MOZ_RELEASE_ASSERT(mDestroyRefCount == 0);
   NS_ASSERTION(!mPresShell && !mPresContext,
                "User did not call nsIContentViewer::Destroy");
   if (mPresShell || mPresContext) {
@@ -1611,7 +1617,6 @@ nsDocumentViewer::Destroy()
   // We also keep the viewer from being cached in session history, since
   // we require all documents there to be sanitized.
   if (mDestroyRefCount != 0) {
-    --mDestroyRefCount;
     return NS_OK;
   }
 
@@ -4418,6 +4423,12 @@ void
 nsDocumentViewer::IncrementDestroyRefCount()
 {
   ++mDestroyRefCount;
+}
+
+void
+nsDocumentViewer::DecrementDestroyRefCount()
+{
+  --mDestroyRefCount;
 }
 
 //------------------------------------------------------------

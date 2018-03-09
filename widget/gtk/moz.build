@@ -24,10 +24,18 @@ UNIFIED_SOURCES += [
     'nsAppShell.cpp',
     'nsBidiKeyboard.cpp',
     'nsColorPicker.cpp',
+    'nsDbusmenu.cpp',
     'nsFilePicker.cpp',
     'nsGtkKeyUtils.cpp',
     'nsImageToPixbuf.cpp',
     'nsLookAndFeel.cpp',
+    'nsMenuBar.cpp',
+    'nsMenuContainer.cpp',
+    'nsMenuItem.cpp',
+    'nsMenuObject.cpp',
+    'nsMenuSeparator.cpp',
+    'nsNativeMenuAtoms.cpp',
+    'nsNativeMenuDocListener.cpp',
     'nsNativeThemeGTK.cpp',
     'nsScreenGtk.cpp',
     'nsScreenManagerGtk.cpp',
@@ -40,6 +48,8 @@ UNIFIED_SOURCES += [
 ]
 
 SOURCES += [
+    'nsMenu.cpp', # conflicts with X11 headers
+    'nsNativeMenuService.cpp',
     'nsWindow.cpp', # conflicts with X11 headers
 ]
 

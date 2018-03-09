@@ -58,6 +58,7 @@
 #include "nsIScreen.h"
 
 #include "nsIContent.h" // for menus
+#include "nsIAtom.h"
 #include "nsIScriptSecurityManager.h"
 
 // For calculating size
@@ -73,7 +74,7 @@
 
 #include "nsPIWindowRoot.h"
 
-#ifdef XP_MACOSX
+#if defined(XP_MACOSX) || defined(MOZ_WIDGET_GTK)
 #include "nsINativeMenuService.h"
 #define USE_NATIVE_MENUS
 #endif
@@ -499,6 +500,11 @@ static void LoadNativeMenus(nsIDOMDocument *aDOMDoc, nsIWidget *aParentWindow)
 
   if (menubarNode) {
     nsCOMPtr<nsIContent> menubarContent(do_QueryInterface(menubarNode));
+#ifdef MOZ_WIDGET_GTK
+    nsCOMPtr<nsIAtom> atom = NS_Atomize(NS_LITERAL_CSTRING("_moz-menubarkeeplocal"));
+    if (menubarContent->AttrValueIs(kNameSpaceID_None, atom, nsGkAtoms::_true, eCaseMatters))
+      return;
+#endif
     nms->CreateNativeMenuBar(aParentWindow, menubarContent);
   } else {
     nms->CreateNativeMenuBar(aParentWindow, nullptr);

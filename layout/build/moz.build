@@ -77,6 +77,10 @@ elif CONFIG['MOZ_WIDGET_TOOLKIT'] == 'gonk':
     LOCAL_INCLUDES += [
         '/dom/system/gonk',
     ]
+elif 'gtk' in CONFIG['MOZ_WIDGET_TOOLKIT']:
+    LOCAL_INCLUDES += [
+        '/widget/gtk',
+    ]
 
 if CONFIG['MOZ_WEBSPEECH']:
     LOCAL_INCLUDES += [
