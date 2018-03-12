@@ -131,10 +131,6 @@ using namespace mozilla::system;
 #include "mozilla/StaticPresData.h"
 #include "mozilla/dom/WebIDLGlobalNameHash.h"
 
-#ifdef MOZ_WIDGET_GTK
-#include "nsNativeMenuAtoms.h"
-#endif
-
 using namespace mozilla;
 using namespace mozilla::net;
 using namespace mozilla::dom;
@@ -169,9 +165,6 @@ nsLayoutStatics::Initialize()
   nsTextServicesDocument::RegisterAtoms();
   nsHTMLTags::RegisterAtoms();
   nsRDFAtoms::RegisterAtoms();
-#ifdef MOZ_WIDGET_GTK
-  nsNativeMenuAtoms::RegisterAtoms();
-#endif
 
   NS_SealStaticAtomTable();
 

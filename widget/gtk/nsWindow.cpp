@@ -5175,11 +5175,6 @@ nsWindow::HideWindowChrome(bool aShouldHide)
     return NS_OK;
 }
 
-void
-nsWindow::SetMenuBar(nsMenuBar *aMenuBar) {
-    mMenuBar.reset(aMenuBar);
-}
-
 bool
 nsWindow::CheckForRollup(gdouble aMouseX, gdouble aMouseY,
                          bool aIsWheel, bool aAlwaysRollup)
