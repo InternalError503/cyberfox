@@ -301,12 +301,18 @@ static const DllBlockInfo sWindowsDllBlocklist[] = {
 
   // Bug 1268470 - crashes with Kaspersky Lab on Windows 8
   { "klsihk64.dll", MAKE_VERSION(14, 0, 456, 0xffff), DllBlockInfo::BLOCK_WIN8_ONLY },
-  
+
   // Bug 1407337, crashes with OpenSC < 0.16.0
   { "onepin-opensc-pkcs11.dll", MAKE_VERSION(0, 15, 0xffff, 0xffff) },
-  
+
   // Avecto Privilege Guard causes crashes, bug 1385542
   { "pghook.dll", ALL_VERSIONS },
+
+  // Old versions of G DATA BankGuard, bug 1421991
+  { "banksafe64.dll", MAKE_VERSION(1, 2, 15299, 65535) },
+
+  // Old versions of G DATA, bug 1043775
+  { "gdkbfltdll64.dll", MAKE_VERSION(1, 0, 14141, 240) },
 
   { nullptr, 0 }
 };
