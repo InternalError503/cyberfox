@@ -38,12 +38,11 @@ var healthReportWrapper = {
 
   updatePrefState: function () {
     try {
-      let prefs = {
+      let prefsObj = {
         enabled: MozSelfSupport.healthReportDataSubmissionEnabled,
       };
-      healthReportWrapper.injectData("prefs", prefs);
-    }
-    catch (ex) {
+      healthReportWrapper.injectData("prefs", prefsObj);
+    } catch (ex) {
       healthReportWrapper.reportFailure(healthReportWrapper.ERROR_PREFS_FAILED);
     }
   },
@@ -176,5 +175,5 @@ var healthReportWrapper = {
   },
 }
 
-window.addEventListener("load", function () { healthReportWrapper.init(); });
-window.addEventListener("unload", function () { healthReportWrapper.uninit(); });
+window.addEventListener("load", function() { healthReportWrapper.init(); });
+window.addEventListener("unload", function() { healthReportWrapper.uninit(); });

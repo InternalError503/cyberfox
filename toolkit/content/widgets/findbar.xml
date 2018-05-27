@@ -395,7 +395,7 @@
         this._entireWord = prefsvc.getBoolPref("findbar.entireword");
         this._highlightAll = prefsvc.getBoolPref("findbar.highlightAll");
 
-        // Convenience
+        // Convenience.
         this.nsITypeAheadFind = Components.interfaces.nsITypeAheadFind;
         this.nsISelectionController = Components.interfaces.nsISelectionController;
         this._findSelection = this.nsISelectionController.SELECTION_FIND;
@@ -403,7 +403,7 @@
         this._findResetTimeout = -1;
 
         // Make sure the FAYT keypress listener is attached by initializing the
-        // browser property
+        // browser property.
         if (this.getAttribute("browserid"))
           setTimeout(function(aSelf) { aSelf.browser = aSelf.browser; }, 0, this);
       ]]></constructor>
@@ -804,8 +804,7 @@
                       .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
                       .getInterface(Components.interfaces.nsIXULWindow)
                       .XULBrowserWindow;
-            }
-            catch (ex) { }
+            } catch (ex) { }
             if (!this._xulBrowserWindow)
               return false;
           }
@@ -1119,7 +1118,6 @@
           return this.dispatchEvent(event);
         ]]></body>
       </method>
-
 
       <!--
         - Opens the findbar, focuses the findfield and selects its contents.

@@ -241,8 +241,7 @@ amManager.prototype = {
         let API = AddonManager.webAPI;
         if (payload.type in API) {
           API[payload.type](aMessage.target, ...payload.args).then(resolve, reject);
-        }
-        else {
+        } else {
           reject("Unknown Add-on API request.");
         }
         break;

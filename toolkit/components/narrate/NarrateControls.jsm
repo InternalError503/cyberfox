@@ -191,20 +191,9 @@ NarrateControls.prototype = {
       }
 
       let narrateToggle = win.document.getElementById("narrate-toggle");
-      let histogram = Services.telemetry.getKeyedHistogramById(
-        "NARRATE_CONTENT_BY_LANGUAGE_2");
       let initial = !this._voicesInitialized;
       this._voicesInitialized = true;
-
-      if (initial) {
-        histogram.add(language, 0);
-      }
-
-      if (options.length && narrateToggle.hidden) {
-        // About to show for the first time..
-        histogram.add(language, 1);
-      }
-
+	  
       // We disable this entire feature if there are no available voices.
       narrateToggle.hidden = !options.length;
     });

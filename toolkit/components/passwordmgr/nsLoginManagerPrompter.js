@@ -322,7 +322,7 @@ LoginManagerPrompter.prototype = {
    * doesn't really make sense and therefore isn't implemented.
    */
   prompt : function (aDialogTitle, aText, aPasswordRealm,
-                     aSavePassword, aDefaultText, aResult) {
+                    aSavePassword, aDefaultText, aResult) {
     if (aSavePassword != Ci.nsIAuthPrompt.SAVE_PASSWORD_NEVER)
       throw new Components.Exception("prompt only supports SAVE_PASSWORD_NEVER",
                                      Cr.NS_ERROR_NOT_IMPLEMENTED);
@@ -444,7 +444,7 @@ LoginManagerPrompter.prototype = {
    * allows it, then the password will be saved in the database.
    */
   promptPassword : function (aDialogTitle, aText, aPasswordRealm,
-                             aSavePassword, aPassword) {
+                            aSavePassword, aPassword) {
     this.log("===== promptPassword called() =====");
 
     if (aSavePassword == Ci.nsIAuthPrompt.SAVE_PASSWORD_FOR_SESSION)
@@ -964,7 +964,7 @@ LoginManagerPrompter.prototype = {
       callback: () => {
         histogram.add(PROMPT_ADD_OR_UPDATE);
         if (histogramName == "PWMGR_PROMPT_REMEMBER_ACTION") {
-          Services.obs.notifyObservers(null, 'LoginStats:NewSavedPassword', null);
+          Services.obs.notifyObservers(null, "LoginStats:NewSavedPassword", null);
         }
         readDataFromUI();
         persistData();

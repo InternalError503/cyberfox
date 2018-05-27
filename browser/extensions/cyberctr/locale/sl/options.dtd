@@ -17,11 +17,11 @@
 <!ENTITY Ctr_window			"okno">
 <!ENTITY Ctr_centered		"Na sredini">
 <!ENTITY Ctr_page			"Stran">
-<!ENTITY Ctr_position		"Position">
-<!ENTITY Ctr_appearance		"Appearance">
-<!ENTITY Ctr_left			"Left">
-<!ENTITY Ctr_right			"Right">
-<!ENTITY Ctr_privmode		"(private window)">
+<!ENTITY Ctr_position		"Položaj">
+<!ENTITY Ctr_appearance		"Videz">
+<!ENTITY Ctr_left			"Levo">
+<!ENTITY Ctr_right			"Desno">
+<!ENTITY Ctr_privmode		"(zasebno okno)">
 
 <!ENTITY Ctr_cuibuttons		"Gumbi">
 <!ENTITY Ctr_cuibutnormal	"Običajno">
@@ -148,7 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Desno">
 <!ENTITY Ctr_html5warning	"Celozaslonsko opozorilo HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Slike 'vrhnje domene': klasični videz">
-<!ENTITY Ctr_altdlprogbar	"Alternative appearance for download progress bar">
+<!ENTITY Ctr_altdlprogbar	"Nadomestni videz vrstice napredka prenosov">
 <!ENTITY Ctr_altalertbox	"'Okno opozorila': nadomestni videz">
 <!ENTITY Ctr_emptygfavico	"Nadomesti splošno zaznamko">
 <!ENTITY Ctr_mstatusbar		"Premakljivo podokno stanja">
@@ -159,7 +159,7 @@
 <!ENTITY Ctr_combrelstop	"Ustavi in Ponovno naloži: združi gumba v orodni vrstici">
 <!ENTITY Ctr_stoprel1		"Pomembno: gumb Ponovno naloži vstavite za gumb Ustavi!">
 <!ENTITY Ctr_panelmenucol	"Ploščasti meniji: nadomestna barva ozadja">
-<!ENTITY Ctr_hideprivmask	"Zasebno brskanje: skrij kazalnik maskiranja">
+<!ENTITY Ctr_hideprivmask	"Zasebno brskanje: skrij kazalnik maske">
 <!ENTITY Ctr_navsmallicons	"Majhne ikone">
 <!ENTITY Ctr_navlargeicons	"Velike ikone">
 <!ENTITY Ctr_nbisizedelay0	"Zakasnitev izvajanja v ms">
@@ -189,8 +189,8 @@
 <!ENTITY Ctr_ctrosearchdel	"zakasnitev">
 <!ENTITY Ctr_search_oit		"Odpri iskanje v novem zavihku">
 <!ENTITY Ctr_osearch_meoit	"Srednji kliki: išči v novem 'zavihku v ospredju'">
-<!ENTITY Ctr_osearch_meoit1	"Search engine">
-<!ENTITY Ctr_osearch_meoit2	"Search glass">
+<!ENTITY Ctr_osearch_meoit1	"Iskalnik">
+<!ENTITY Ctr_osearch_meoit2	"Iskalno steklo">
 <!ENTITY Ctr_osearch_iwidth	"Samodejno prilagodi širino pojavnega okna">
 <!ENTITY Ctr_osearch_cwidth	"Širina po meri pojavnih oken za iskanje">
 <!ENTITY Ctr_osearch_dm		"Majhna spustna puščica">
@@ -400,7 +400,7 @@
 <!ENTITY Ctr_e_findbarhl	"Poudarjanje iskalne vrstice">
 <!ENTITY Ctr_fx50findbarhl	"Odznačitev teh nastavitev odstrani možnosti 'poudarjanja' iskalne vrstice.">
 <!ENTITY Ctr_e_flyweb		"Flyweb">
-<!ENTITY Ctr_e_oldfontgfx	"Old font rendering">
+<!ENTITY Ctr_e_oldfontgfx	"Stari izris pisav">
 
 
 <!ENTITY Ctr_pw_settings	"Nastavitve">

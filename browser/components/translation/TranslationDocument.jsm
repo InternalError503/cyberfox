@@ -175,7 +175,7 @@ this.TranslationDocument.prototype = {
         // It's not necessary to add more than one placeholder in sequence;
         // we can optimize them away.
         item.original.push(TranslationItem_NodePlaceholder);
-        str += '<br>';
+        str += "<br>";
         wasLastItemPlaceholder = true;
       }
     }
@@ -279,8 +279,7 @@ TranslationItem.prototype = {
     if (this.isRoot) {
       if (this.isSimpleRoot) {
         rootType = " (simple root)";
-      }
-      else {
+      } else {
         rootType = " (non simple root)";
       }
     }
@@ -369,7 +368,7 @@ const TranslationItem_NodePlaceholder = {
  */
 function generateTranslationHtmlForItem(item, content) {
   let localName = item.isRoot ? "div" : "b";
-  return '<' + localName + ' id=n' + item.id + '>' +
+  return "<" + localName + " id=n" + item.id + ">" +
          content +
          "</" + localName + ">";
 }

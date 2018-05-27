@@ -75,7 +75,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
  * This is thrown by |TelemetryStorage.loadPingFile| when reading the ping
  * from the disk fails.
  */
-function PingReadError(message="Error reading the ping file", becauseNoSuchFile = false) {
+function PingReadError(message = "Error reading the ping file", becauseNoSuchFile = false) {
   Error.call(this, message);
   let error = new Error();
   this.name = "PingReadError";
@@ -90,7 +90,7 @@ PingReadError.prototype.constructor = PingReadError;
  * This is thrown by |TelemetryStorage.loadPingFile| when parsing the ping JSON
  * content fails.
  */
-function PingParseError(message="Error parsing ping content") {
+function PingParseError(message = "Error parsing ping content") {
   Error.call(this, message);
   let error = new Error();
   this.name = "PingParseError";
@@ -1521,8 +1521,8 @@ var TelemetryStorageImpl = {
             Telemetry.getHistogramById("TELEMETRY_DISCARDED_PENDING_PINGS_SIZE_MB")
                      .add(Math.floor(info.size / 1024 / 1024));
             Telemetry.getHistogramById("TELEMETRY_PING_SIZE_EXCEEDED_PENDING").add();
-            continue;
           }
+          continue;
         }
 
         let id = OS.Path.basename(file.path);
@@ -1816,7 +1816,7 @@ function getArchivedPingPath(aPingId, aDate, aType) {
   // Get the ping creation date and generate the archive directory to hold it. Note
   // that getMonth returns a 0-based month, so we need to add an offset.
   let archivedPingDir = OS.Path.join(gPingsArchivePath,
-    aDate.getFullYear() + '-' + addLeftPadding(aDate.getMonth() + 1));
+    aDate.getFullYear() + "-" + addLeftPadding(aDate.getMonth() + 1));
   // Generate the archived ping file path as YYYY-MM/<TIMESTAMP>.UUID.type.json
   let fileName = [aDate.getTime(), aPingId, aType, "json"].join(".");
   return OS.Path.join(archivedPingDir, fileName);

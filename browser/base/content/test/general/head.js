@@ -32,7 +32,7 @@ function waitForNotificationClose(notification, cb) {
   observer.observe(parent, {childList: true});
 }
 
-function closeAllNotifications () {
+function closeAllNotifications() {
   let notificationBox = document.getElementById("global-notificationbox");
 
   if (!notificationBox || !notificationBox.currentNotification) {
@@ -41,7 +41,7 @@ function closeAllNotifications () {
 
   let deferred = Promise.defer();
   for (let notification of notificationBox.allNotifications) {
-    waitForNotificationClose(notification, function () {
+    waitForNotificationClose(notification, function() {
       if (notificationBox.allNotifications.length === 0) {
         deferred.resolve();
       }
@@ -104,7 +104,7 @@ function closeToolbarCustomizationUI(aCallback, aBrowserWin) {
 }
 
 function waitForCondition(condition, nextTest, errorMsg, retryTimes) {
-  retryTimes = typeof retryTimes !== 'undefined' ?  retryTimes : 30;
+  retryTimes = typeof retryTimes !== "undefined" ? retryTimes : 30;
   var tries = 0;
   var interval = setInterval(function() {
     if (tries >= retryTimes) {
@@ -242,7 +242,7 @@ function promiseWindowClosed(win) {
   return promise;
 }
 
-function promiseOpenAndLoadWindow(aOptions, aWaitForDelayedStartup=false) {
+function promiseOpenAndLoadWindow(aOptions, aWaitForDelayedStartup = false) {
   let deferred = Promise.defer();
   let win = OpenBrowserWindow(aOptions);
   if (aWaitForDelayedStartup) {
@@ -356,7 +356,7 @@ function promiseHistoryClearedState(aURIs, aShouldBeCleared) {
     if (++callbackCount == aURIs.length)
       deferred.resolve();
   }
-  aURIs.forEach(function (aURI) {
+  aURIs.forEach(function(aURI) {
     PlacesUtils.asyncHistory.isURIVisited(aURI, function(uri, isVisited) {
       is(isVisited, !aShouldBeCleared,
          "history visit " + uri.spec + " should " + niceStr + " exist");
@@ -383,7 +383,7 @@ function promiseHistoryClearedState(aURIs, aShouldBeCleared) {
  *        progress listener callback.
  * @return promise
  */
-function waitForDocLoadAndStopIt(aExpectedURL, aBrowser=gBrowser.selectedBrowser, aStopFromProgressListener=true) {
+function waitForDocLoadAndStopIt(aExpectedURL, aBrowser = gBrowser.selectedBrowser, aStopFromProgressListener = true) {
   function content_script(contentStopFromProgressListener) {
     let { interfaces: Ci, utils: Cu } = Components;
     Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -424,7 +424,7 @@ function waitForDocLoadAndStopIt(aExpectedURL, aBrowser=gBrowser.selectedBrowser
      * event handler is the easiest way to ensure the weakly referenced
      * progress listener is kept alive as long as necessary.
      */
-    addEventListener("unload", function () {
+    addEventListener("unload", function() {
       try {
         wp.removeProgressListener(progressListener);
       } catch (e) { /* Will most likely fail. */ }
@@ -451,7 +451,7 @@ function waitForDocLoadAndStopIt(aExpectedURL, aBrowser=gBrowser.selectedBrowser
  *
  * @return promise
  */
-function waitForDocLoadComplete(aBrowser=gBrowser) {
+function waitForDocLoadComplete(aBrowser = gBrowser) {
   return new Promise(resolve => {
     let listener = {
       onStateChange: function (webProgress, req, flags, status) {
@@ -525,7 +525,7 @@ var FullZoomHelper = {
           resolve();
       }, true);
 
-      this.waitForLocationChange().then(function () {
+      this.waitForLocationChange().then(function() {
         didZoom = true;
         if (didLoad)
           resolve();
@@ -570,7 +570,7 @@ var FullZoomHelper = {
       else if (direction == this.FORWARD)
         gBrowser.goForward();
 
-      this.waitForLocationChange().then(function () {
+      this.waitForLocationChange().then(function() {
         didZoom = true;
         if (didPs)
           resolve();
@@ -579,7 +579,7 @@ var FullZoomHelper = {
   },
 
   failAndContinue: function failAndContinue(func) {
-    return function (err) {
+    return function(err) {
       ok(false, err);
       func();
     };
@@ -598,8 +598,7 @@ var FullZoomHelper = {
  * @resolves to the received event
  * @rejects if a valid load event is not received within a meaningful interval
  */
-function promiseTabLoadEvent(tab, url)
-{
+function promiseTabLoadEvent(tab, url) {
   info("Wait tab event: load");
 
   function handle(loadedUrl) {
@@ -657,7 +656,7 @@ function waitForNewTabEvent(aTabBrowser) {
  */
 function assertMixedContentBlockingState(tabbrowser, states = {}) {
   if (!tabbrowser || !("activeLoaded" in states) ||
-      !("activeBlocked" in states) || !("passiveLoaded" in states))  {
+      !("activeBlocked" in states) || !("passiveLoaded" in states)) {
     throw new Error("assertMixedContentBlockingState requires a browser and a states object");
   }
 
@@ -886,8 +885,7 @@ function promiseNotificationShown(notification) {
  *           notification.
  * @rejects Never.
  */
-function promiseTopicObserved(aTopic)
-{
+function promiseTopicObserved(aTopic) {
   return new Promise((resolve) => {
     Services.obs.addObserver(
       function PTO_observe(aSubject, aTopic2, aData) {
@@ -955,8 +953,7 @@ function promiseOnBookmarkItemAdded(aExpectedURI) {
         PlacesUtils.bookmarks.removeObserver(bookmarksObserver);
         if (aURI.equals(aExpectedURI)) {
           resolve();
-        }
-        else {
+        } else {
           reject(new Error("Added an unexpected bookmark"));
         }
       },

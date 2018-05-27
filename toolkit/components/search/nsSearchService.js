@@ -21,8 +21,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Task",
   "resource://gre/modules/Task.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "TelemetryStopwatch",
-  "resource://gre/modules/TelemetryStopwatch.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Deprecated",
   "resource://gre/modules/Deprecated.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "SearchStaticData",
@@ -235,7 +233,7 @@ function DO_LOG(aText) {
 var LOG = function() {};
 
 if (AppConstants.DEBUG) {
-  LOG = function (aText) {
+  LOG = function(aText) {
     if (getBoolPref(BROWSER_SEARCH_PREF + "log", false)) {
       DO_LOG(aText);
     }
@@ -549,10 +547,6 @@ var ensureKnownCountryCode = Task.async(function* (ss) {
       });
     });
   }
-
-  // If gInitialized is true then the search service was forced to perform
-  // a sync initialization during our XHRs - capture this via telemetry.
-  Services.telemetry.getHistogramById("SEARCH_SERVICE_COUNTRY_FETCH_CAUSED_SYNC_INIT").add(gInitialized);
 });
 
 // Store the result of the geoip request as well as any other values and
@@ -564,15 +558,7 @@ function storeCountryCode(cc) {
   if (!Services.prefs.prefHasUserValue("browser.search.region")) {
     Services.prefs.setCharPref("browser.search.region", cc);
   }
-  // and telemetry...
-  let isTimezoneUS = isUSTimezone();
-  if (cc == "US" && !isTimezoneUS) {
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_US_COUNTRY_MISMATCHED_TIMEZONE").add(1);
-  }
-  if (cc != "US" && isTimezoneUS) {
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_US_TIMEZONE_MISMATCHED_COUNTRY").add(1);
-  }
-  // telemetry to compare our geoip response with platform-specific country data.
+
   // On Mac and Windows, we can get a country code via sysinfo
   let platformCC = Services.sysinfo.get("countryCode");
   if (platformCC) {
@@ -589,15 +575,6 @@ function storeCountryCode(cc) {
       default:
         Cu.reportError("Platform " + Services.appinfo.OS + " has system country code but no search service telemetry probes");
         break;
-    }
-    if (probeUSMismatched && probeNonUSMismatched) {
-      if (cc == "US" || platformCC == "US") {
-        // one of the 2 said US, so record if they are the same.
-        Services.telemetry.getHistogramById(probeUSMismatched).add(cc != platformCC);
-      } else {
-        // different country - record if they are the same
-        Services.telemetry.getHistogramById(probeNonUSMismatched).add(cc != platformCC);
-      }
     }
   }
 }
@@ -635,8 +612,6 @@ function fetchCountryCode(ss) {
     let geoipTimeoutPossible = true;
     let timerId = setTimeout(() => {
       LOG("_fetchCountryCode: timeout fetching country information");
-      if (geoipTimeoutPossible)
-        Services.telemetry.getHistogramById("SEARCH_SERVICE_COUNTRY_TIMEOUT").add(1);
       timerId = null;
       resolve();
     }, timeoutMS);
@@ -647,13 +622,11 @@ function fetchCountryCode(ss) {
       if (result) {
         storeCountryCode(result);
       }
-      Services.telemetry.getHistogramById("SEARCH_SERVICE_COUNTRY_FETCH_RESULT").add(reason);
 
       // This notification is just for tests...
       Services.obs.notifyObservers(null, SEARCH_SERVICE_TOPIC, "geoip-lookup-xhr-complete");
 
       if (timerId) {
-        Services.telemetry.getHistogramById("SEARCH_SERVICE_COUNTRY_TIMEOUT").add(0);
         geoipTimeoutPossible = false;
       }
 
@@ -685,7 +658,6 @@ function fetchCountryCode(ss) {
       let took = Date.now() - startTime;
       let cc = event.target.response && event.target.response.country_code;
       LOG("_fetchCountryCode got success response in " + took + "ms: " + cc);
-      Services.telemetry.getHistogramById("SEARCH_SERVICE_COUNTRY_FETCH_TIME_MS").add(took);
       let reason = cc ? TELEMETRY_RESULT_ENUM.SUCCESS : TELEMETRY_RESULT_ENUM.SUCCESS_WITHOUT_DATA;
       resolveAndReportSuccess(cc, reason);
     };
@@ -935,7 +907,7 @@ function sanitizeName(aName) {
 
   // Use a random name if our input had no valid characters.
   if (name.length < minLength)
-    name = Math.random().toString(36).replace(/^.*\./, '');
+    name = Math.random().toString(36).replace(/^.*\./, "");
 
   // Force max length.
   return name.substring(0, maxLength);
@@ -1010,16 +982,14 @@ function ParamSubstitution(aParamValue, aSearchTerms, aEngine) {
   var distributionID = Services.appinfo.distributionID;
   try {
     distributionID = Services.prefs.getCharPref(BROWSER_SEARCH_PREF + "distributionID");
-  }
-  catch (ex) { }
+  } catch (ex) { }
   var official = MOZ_OFFICIAL;
   try {
     if (Services.prefs.getBoolPref(BROWSER_SEARCH_PREF + "official"))
       official = "official";
     else
       official = "unofficial";
-  }
-  catch (ex) { }
+  } catch (ex) { }
 
   // Custom search parameters. These are only available to default search
   // engines.
@@ -1194,8 +1164,7 @@ EngineURL.prototype = {
           this.addParam(param.name, value);
         }
         this._addMozParam(param);
-      }
-      else
+      } else
         this.addParam(param.name, param.value, param.purpose || undefined);
     }
   },
@@ -1275,8 +1244,7 @@ function Engine(aLocation, aIsReadOnly) {
     let shortName;
     if (file) {
       shortName = file.leafName;
-    }
-    else if (uri && uri instanceof Ci.nsIURL) {
+    } else if (uri && uri instanceof Ci.nsIURL) {
       if (aIsReadOnly || (gEnvironment.get("XPCSHELL_TEST_PROFILE_DIR") &&
                           uri.scheme == "resource")) {
         shortName = uri.fileName;
@@ -1301,11 +1269,9 @@ function Engine(aLocation, aIsReadOnly) {
       // They aren't default engines (because they aren't app-shipped), but we
       // still need to give their id an [app] prefix for backward compat.
       this._id = "[app]/" + this._shortName + ".xml";
-    }
-    else if (!aIsReadOnly) {
+    } else if (!aIsReadOnly) {
       this._id = "[profile]/" + this._shortName + ".xml";
-    }
-    else {
+    } else {
       // If the engine is neither a default one, nor a user-installed one,
       // it must be extension-shipped, so use the full path as id.
       LOG("Setting _id to full path for engine from " + this._loadPath);
@@ -1544,7 +1510,7 @@ Engine.prototype = {
 
     var ps = Services.prompt;
     var buttonFlags = (ps.BUTTON_TITLE_IS_STRING * ps.BUTTON_POS_0) +
-                      (ps.BUTTON_TITLE_CANCEL    * ps.BUTTON_POS_1) +
+                      (ps.BUTTON_TITLE_CANCEL * ps.BUTTON_POS_1) +
                        ps.BUTTON_POS_0_DEFAULT;
 
     var checked = {value: false};
@@ -1783,7 +1749,7 @@ Engine.prototype = {
                      loadUsingSystemPrincipal: true
                    });
 
-        let iconLoadCallback = function (aByteArray, aEngine) {
+        let iconLoadCallback = function(aByteArray, aEngine) {
           // This callback may run after we've already set a preferred icon,
           // so check again.
           if (aEngine._hasPreferredIcon && !aIsPreferred)
@@ -1956,7 +1922,7 @@ Engine.prototype = {
     let height = parseInt(aElement.getAttribute("height"), 10);
     let isPrefered = width == 16 && height == 16;
 
-    if (isNaN(width) || isNaN(height) || width <= 0 || height <=0) {
+    if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
       LOG("OpenSearch image element must have positive width and height.");
       return;
     }
@@ -2686,7 +2652,7 @@ SearchService.prototype = {
   // If initialization has not been completed yet, perform synchronous
   // initialization.
   // Throws in case of initialization error.
-  _ensureInitialized: function  SRCH_SVC__ensureInitialized() {
+  _ensureInitialized: function SRCH_SVC__ensureInitialized() {
     if (gInitialized) {
       if (!Components.isSuccessCode(this._initRV)) {
         LOG("_ensureInitialized: failure");
@@ -2734,9 +2700,6 @@ SearchService.prototype = {
     this._initObservers.resolve(this._initRV);
 
     Services.obs.notifyObservers(null, SEARCH_SERVICE_TOPIC, "init-complete");
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_INIT_SYNC").add(true);
-    this._recordEngineTelemetry();
-
     LOG("_syncInit end");
   },
 
@@ -2783,9 +2746,6 @@ SearchService.prototype = {
     this._cacheFileJSON = null;
     this._initObservers.resolve(this._initRV);
     Services.obs.notifyObservers(null, SEARCH_SERVICE_TOPIC, "init-complete");
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_INIT_SYNC").add(false);
-    this._recordEngineTelemetry();
-
     LOG("_asyncInit: Completed _asyncInit");
   }),
 
@@ -3155,7 +3115,6 @@ SearchService.prototype = {
         // Typically we'll re-init as a result of a pref observer,
         // so signal to 'callers' that we're done.
         Services.obs.notifyObservers(null, SEARCH_SERVICE_TOPIC, "init-complete");
-        this._recordEngineTelemetry();
         gInitialized = true;
       } catch (err) {
         LOG("Reinit failed: " + err);
@@ -3505,7 +3464,7 @@ SearchService.prototype = {
   }),
 
   _loadFromChromeURLs: function SRCH_SVC_loadFromChromeURLs(aURLs) {
-    aURLs.forEach(function (url) {
+    aURLs.forEach(function(url) {
       try {
         LOG("_loadFromChromeURLs: loading engine from chrome url: " + url);
 
@@ -3786,8 +3745,8 @@ SearchService.prototype = {
         // without us knowing, we may already have an engine in this slot. If
         // that happens, we just skip it - it will be added later on as an
         // unsorted engine.
-        if (orderNumber && !this.__sortedEngines[orderNumber-1]) {
-          this.__sortedEngines[orderNumber-1] = engine;
+        if (orderNumber && !this.__sortedEngines[orderNumber - 1]) {
+          this.__sortedEngines[orderNumber - 1] = engine;
           addedEngines[engine.name] = engine;
         } else {
           // We need to call _saveSortedEngineList so this gets sorted out.
@@ -3823,8 +3782,7 @@ SearchService.prototype = {
           this.__sortedEngines.push(engine);
           addedEngines[engine.name] = engine;
         }
-      }
-      catch (e) { }
+      } catch (e) { }
 
       let prefNameBase = getGeoSpecificPrefName(BROWSER_SEARCH_PREF + "order");
       while (true) {
@@ -3872,7 +3830,7 @@ SearchService.prototype = {
     if (aWithHidden)
       return this._sortedEngines;
 
-    return this._sortedEngines.filter(function (engine) {
+    return this._sortedEngines.filter(function(engine) {
                                         return !engine.hidden;
                                       });
   },
@@ -3882,21 +3840,17 @@ SearchService.prototype = {
     LOG("SearchService.init");
     let self = this;
     if (!this._initStarted) {
-      TelemetryStopwatch.start("SEARCH_SERVICE_INIT_MS");
       this._initStarted = true;
       Task.spawn(function* task() {
         try {
           // Complete initialization by calling asynchronous initializer.
           yield self._asyncInit();
-          TelemetryStopwatch.finish("SEARCH_SERVICE_INIT_MS");
         } catch (ex) {
           if (ex.result == Cr.NS_ERROR_ALREADY_INITIALIZED) {
             // No need to pursue asynchronous because synchronous fallback was
             // called and has finished.
-            TelemetryStopwatch.finish("SEARCH_SERVICE_INIT_MS");
           } else {
             self._initObservers.reject(ex);
-            TelemetryStopwatch.cancel("SEARCH_SERVICE_INIT_MS");
           }
         }
       });
@@ -3980,7 +3934,7 @@ SearchService.prototype = {
 
     LOG("getDefaultEngines: engineOrder: " + engineOrder.toSource());
 
-    function compareEngines (a, b) {
+    function compareEngines(a, b) {
       var aIdx = engineOrder[a.name];
       var bIdx = engineOrder[b.name];
 
@@ -4042,7 +3996,7 @@ SearchService.prototype = {
       var uri = makeURI(aEngineURL);
       var engine = new Engine(uri, false);
       if (aCallback) {
-        engine._installCallback = function (errorCode) {
+        engine._installCallback = function(errorCode) {
           try {
             if (errorCode == null)
               aCallback.onSuccess(engine);
@@ -4347,25 +4301,6 @@ SearchService.prototype = {
     }
 
     return result;
-  },
-
-  _recordEngineTelemetry: function() {
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_ENGINE_COUNT")
-            .add(Object.keys(this._engines).length);
-    let hasUpdates = false;
-    let hasIconUpdates = false;
-    for (let name in this._engines) {
-      let engine = this._engines[name];
-      if (engine._hasUpdates) {
-        hasUpdates = true;
-        if (engine._iconUpdateURL) {
-          hasIconUpdates = true;
-          break;
-        }
-      }
-    }
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_HAS_UPDATES").add(hasUpdates);
-    Services.telemetry.getHistogramById("SEARCH_SERVICE_HAS_ICON_UPDATES").add(hasIconUpdates);
   },
 
   /**

@@ -220,14 +220,6 @@ this.BookmarkHTMLUtils = Object.freeze({
       let exporter = new BookmarkExporter(bookmarks);
       yield exporter.exportToFile(aFilePath);
 
-      try {
-        Services.telemetry
-                .getHistogramById("PLACES_EXPORT_TOHTML_MS")
-                .add(Date.now() - startTime);
-      } catch (ex) {
-        Components.utils.reportError("Unable to report telemetry.");
-      }
-
       return count;
     });
   },
@@ -746,6 +738,7 @@ BookmarkImporter.prototype = {
         this._curFrame.inDescription = true;
         break;
       case "hr":
+        this._closeContainer(aElt);
         this._handleSeparator(aElt);
         break;
     }
@@ -1042,7 +1035,7 @@ BookmarkExporter.prototype = {
   },
 
   _writeAttribute: function (aName, aValue) {
-    this._write(' ' +  aName + '="' + aValue + '"');
+    this._write(" " + aName + '="' + aValue + '"');
   },
 
   _writeLine: function (aText) {
@@ -1063,8 +1056,7 @@ BookmarkExporter.prototype = {
     if (aItem == this._root) {
       this._writeLine("<H1>" + escapeHtmlEntities(this._root.title) + "</H1>");
       this._writeLine("");
-    }
-    else {
+    } else {
       this._write(aIndent + "<DT><H3");
       this._writeDateAttributes(aItem);
 

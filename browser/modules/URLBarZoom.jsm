@@ -44,8 +44,8 @@ function updateZoomButton(aSubject, aTopic) {
     }
     zoomResetButton.setAttribute("label",
         win.gNavigatorBundle.getFormattedString("urlbar-zoom-button.label", [zoomFactor]));
-  // Hide button if zoom is at 100%
   } else {
-      zoomResetButton.hidden = true;
+    // Hide button if zoom is at 100%
+    zoomResetButton.hidden = true;
   }
 }

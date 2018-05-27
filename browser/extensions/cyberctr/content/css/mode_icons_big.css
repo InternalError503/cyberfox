@@ -281,7 +281,7 @@
 	  list-style-image: url(chrome://browser/skin/menuPanel.png) !important;
 	}
 	
-	#main-window[fx51plus="true"] #ctraddon_stop-button > .toolbarbutton-icon{
+	#main-window[fx51plus="true"] #nav-bar #ctraddon_stop-button > .toolbarbutton-icon{
 	  -moz-image-region: rect(0px, 96px, 32px, 64px) !important;
 	  list-style-image: url(chrome://browser/skin/menuPanel.svg) !important;
 	}
@@ -291,7 +291,7 @@
 	  list-style-image: url(chrome://browser/skin/menuPanel.png) !important;
 	}
 	
-	#main-window[fx51plus="true"] #ctraddon_reload-button > .toolbarbutton-icon{
+	#main-window[fx51plus="true"] #nav-bar #ctraddon_reload-button > .toolbarbutton-icon{
 	  -moz-image-region: rect(0px, 64px, 32px, 32px) !important;
 	  list-style-image: url(chrome://browser/skin/menuPanel.svg) !important;
 	}

@@ -281,7 +281,7 @@
             let tmp = {};
             Components.utils.import("resource://gre/modules/WindowDraggingUtils.jsm", tmp);
             let draghandle = new tmp.WindowDraggingElement(this);
-            draghandle.mouseDownCheck = function () {
+            draghandle.mouseDownCheck = function() {
               return this._dragBindingAlive;
             }
           } catch (e) {}
@@ -439,13 +439,11 @@
           if (position.indexOf("start_") == 0) {
             container.dir = "reverse";
             this.setAttribute("side", isRTL ? "left" : "right");
-          }
-          else {
+          } else {
             container.dir = "";
             this.setAttribute("side", isRTL ? "right" : "left");
           }
-        }
-        else if (position.indexOf("before_") == 0 || position.indexOf("after_") == 0) {
+        } else if (position.indexOf("before_") == 0 || position.indexOf("after_") == 0) {
           container.orient = "";
           arrowbox.orient = "";
           if (position.indexOf("_end") > 0) {
@@ -458,8 +456,7 @@
           if (position.indexOf("before_") == 0) {
             container.dir = "reverse";
             this.setAttribute("side", "bottom");
-          }
-          else {
+          } else {
             container.dir = "";
             this.setAttribute("side", "top");
           }
@@ -487,11 +484,9 @@
         var fadeDelay = 0;
         if (fade == "fast") {
           fadeDelay = 1;
-        }
-        else if (fade == "slow") {
+        } else if (fade == "slow") {
           fadeDelay = 4000;
-        }
-        else {
+        } else {
           return;
         }
 
@@ -506,8 +501,7 @@
           if (animate) {
             this.setAttribute("animate", "fade");
           }
-        }
-        else if (animate) {
+        } else if (animate) {
           this.setAttribute("animate", "cancel");
         }
       </handler>

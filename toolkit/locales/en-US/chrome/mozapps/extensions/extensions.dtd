@@ -20,6 +20,9 @@
 <!ENTITY installAddonFromFile.accesskey       "I">
 <!ENTITY toolsMenu.tooltip                    "Tools for all add-ons">
 
+<!ENTITY getThemes.description                "Looking to personalize your browser?">
+<!ENTITY getThemes.learnMore                  "Choose from thousands of themes.">
+
 <!ENTITY cmd.back.tooltip                     "Go back one page">
 <!ENTITY cmd.forward.tooltip                  "Go forward one page">
 
@@ -36,10 +39,6 @@
 <!ENTITY warning.updatesecurity.label              "Add-on update security checking is disabled. You may be compromised by updates.">
 <!ENTITY warning.updatesecurity.enable.label       "Enable">
 <!ENTITY warning.updatesecurity.enable.tooltip     "Enable add-on update security checking">
-
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Check to see if your plugins are up to date">
-<!ENTITY info.plugincheck.tooltip               "Check to see if your plugins are up to date">
 
 <!-- categories / views -->
 <!ENTITY view.search.label                    "Search">

@@ -355,12 +355,10 @@ this.MigratorPrototype = {
         let resources = this._getMaybeCachedResources("");
         if (resources && resources.length > 0)
           exists = true;
-      }
-      else {
+      } else {
         exists = profiles.length > 0;
       }
-    }
-    catch (ex) {
+    } catch (ex) {
       Cu.reportError(ex);
     }
     return exists;
@@ -372,8 +370,7 @@ this.MigratorPrototype = {
     if (this._resourcesByProfile) {
       if (profileKey in this._resourcesByProfile)
         return this._resourcesByProfile[profileKey];
-    }
-    else {
+    } else {
       this._resourcesByProfile = { };
     }
     this._resourcesByProfile[profileKey] = this.getResources(aProfile);
@@ -434,8 +431,7 @@ this.MigrationUtils = Object.freeze({
       try {
         aFunction.apply(null, arguments);
         success = true;
-      }
-      catch (ex) {
+      } catch (ex) {
         Cu.reportError(ex);
       }
       // Do not change this to call aCallback directly in try try & catch
@@ -623,13 +619,11 @@ this.MigrationUtils = Object.freeze({
     let migrator = null;
     if (this._migrators.has(aKey)) {
       migrator = this._migrators.get(aKey);
-    }
-    else {
+    } else {
       try {
         migrator = Cc["@mozilla.org/profile/migrator;1?app=browser&type=" +
                       aKey].createInstance(Ci.nsIBrowserProfileMigrator);
-      }
-      catch (ex) { Cu.reportError(ex) }
+      } catch (ex) { Cu.reportError(ex) }
       this._migrators.set(aKey, migrator);
     }
 
@@ -671,8 +665,7 @@ this.MigrationUtils = Object.freeze({
       if (!key && browserDesc.startsWith("Firefox")) {
         key = "firefox";
       }
-    }
-    catch (ex) {
+    } catch (ex) {
       Cu.reportError("Could not detect default browser: " + ex);
     }
 
@@ -849,8 +842,7 @@ this.MigrationUtils = Object.freeze({
       }
       migratorKey = aMigratorKey;
       skipSourcePage = true;
-    }
-    else {
+    } else {
       let defaultBrowserKey = this.getMigratorKeyForDefaultBrowser();
       if (defaultBrowserKey) {
         migrator = this.getMigrator(defaultBrowserKey);

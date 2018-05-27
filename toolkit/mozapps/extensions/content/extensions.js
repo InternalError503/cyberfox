@@ -5,7 +5,7 @@
 "use strict";
 
 /* import-globals-from ../../../content/contentAreaUtils.js */
-/* globals XMLStylesheetProcessingInstruction*/
+/* globals XMLStylesheetProcessingInstruction */
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
@@ -127,9 +127,11 @@ class FakeFrameMessageManager {
     let dispatcher = new MessageDispatcher(browser);
     let frameDispatcher = new MessageDispatcher(null);
 
-    this.sendAsyncMessage = frameDispatcher.sendAsyncMessage.bind(frameDispatcher);
-    this.addMessageListener = dispatcher.addMessageListener.bind(dispatcher);
-    this.removeMessageListener = dispatcher.removeMessageListener.bind(dispatcher);
+    let bind = (object, method) => object[method].bind(object);
+
+    this.sendAsyncMessage = bind(frameDispatcher, "sendAsyncMessage");
+    this.addMessageListener = bind(dispatcher, "addMessageListener");
+    this.removeMessageListener = bind(dispatcher, "removeMessageListener");
 
     this.frame = {
       get content() {
@@ -140,12 +142,12 @@ class FakeFrameMessageManager {
         return browser.docShell;
       },
 
-      addEventListener: browser.addEventListener.bind(browser),
-      removeEventListener: browser.removeEventListener.bind(browser),
+      addEventListener: bind(browser, "addEventListener"),
+      removeEventListener: bind(browser, "removeEventListener"),
 
-      sendAsyncMessage: dispatcher.sendAsyncMessage.bind(dispatcher),
-      addMessageListener: frameDispatcher.addMessageListener.bind(frameDispatcher),
-      removeMessageListener: frameDispatcher.removeMessageListener.bind(frameDispatcher),
+      sendAsyncMessage: bind(dispatcher, "sendAsyncMessage"),
+      addMessageListener: bind(frameDispatcher, "addMessageListener"),
+      removeMessageListener: bind(frameDispatcher, "removeMessageListener"),
     }
   }
 
@@ -483,8 +485,7 @@ if (window.QueryInterface(Ci.nsIInterfaceRequestor)
           .getInterface(Ci.nsIWebNavigation)
           .sessionHistory) {
   var gHistory = HTML5History;
-}
-else {
+} else {
   gHistory = FakeHistory;
 }
 
@@ -560,8 +561,7 @@ var gEventManager = {
           tiptext += " " + (addonItem.hasAttribute("upgrade") ? addonItem.mManualUpdate.version
                                                               : addonItem.mAddon.version);
         }
-      }
-      else if (shouldShowVersionNumber(addonItem.mInstall)) {
+      } else if (shouldShowVersionNumber(addonItem.mInstall)) {
         tiptext += " " + addonItem.mInstall.version;
       }
 
@@ -749,8 +749,7 @@ var gViewController = {
     try {
       this.loadViewInternal(state.view, state.previousView, state);
       this.lastHistoryIndex = gHistory.index;
-    }
-    catch (e) {
+    } catch (e) {
       // The attempt to load the view failed, try moving further along history
       if (this.lastHistoryIndex > gHistory.index) {
         if (gHistory.canGoBack)
@@ -937,7 +936,7 @@ var gViewController = {
 
         let appStartup = Cc["@mozilla.org/toolkit/app-startup;1"].
                          getService(Ci.nsIAppStartup);
-        appStartup.quit(Ci.nsIAppStartup.eAttemptQuit |  Ci.nsIAppStartup.eRestart);
+        appStartup.quit(Ci.nsIAppStartup.eAttemptQuit | Ci.nsIAppStartup.eRestart);
       }
     },
 
@@ -956,15 +955,6 @@ var gViewController = {
       },
       doCommand: function() {
         AddonManager.checkUpdateSecurity = true;
-      }
-    },
-
-    cmd_pluginCheck: {
-      isEnabled: function() {
-        return true;
-      },
-      doCommand: function() {
-        openURL(Services.urlFormatter.formatURLPref("plugins.update.url"));
       }
     },
 
@@ -1569,7 +1559,7 @@ function formatDate(aDate) {
   const locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
                  .getService(Ci.nsIXULChromeRegistry)
                  .getSelectedLocale("global", true);
-  const dtOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  const dtOptions = { year: "numeric", month: "long", day: "numeric" };
   return aDate.toLocaleDateString(locale, dtOptions);
 }
 
@@ -1943,8 +1933,7 @@ var gCategories = {
       var prefName = PREF_UI_TYPE_HIDDEN.replace("%TYPE%", aType.id);
       try {
         startHidden = Services.prefs.getBoolPref(prefName);
-      }
-      catch (e) {
+      } catch (e) {
         // Default to hidden
         startHidden = true;
       }
@@ -2220,8 +2209,7 @@ var gDiscoverView = {
   destroy: function() {
     try {
       this._browser.removeProgressListener(this);
-    }
-    catch (e) {
+    } catch (e) {
       // Ignore the case when the listener wasn't already registered
     }
   },
@@ -2772,6 +2760,13 @@ var gListView = {
         .setAttribute("href", Services.urlFormatter.formatURLPref("app.learn.more.plugins_disabled"));
     } else {
       document.getElementById("plugindisabled-notice").hidden = true;
+    }
+
+    if (Preferences.get("extensions.getAddons.themes.browseURL", "")) {
+      document.getElementById("getthemes-learnmore-link")
+        .setAttribute("href", Services.urlFormatter.formatURLPref("extensions.getAddons.themes.browseURL"));
+    } else {
+      document.getElementById("getthemes-container").hidden = true;
     }
   },
 
@@ -3383,7 +3378,7 @@ var gDetailView = {
 
       menulist.disabled = !hasActivatePermission;
       menulist.hidden = false;
-      menulist.classList.add('no-auto-hide');
+      menulist.classList.add("no-auto-hide");
     } else {
       menulist.hidden = true;
     }
@@ -3447,7 +3442,7 @@ var gDetailView = {
     // removing any child elements. Removing the text nodes ensures any XBL
     // bindings apply properly.
     function stripTextNodes(aNode) {
-      var text = '';
+      var text = "";
       for (var i = 0; i < aNode.childNodes.length; i++) {
         if (aNode.childNodes[i].nodeType != document.ELEMENT_NODE) {
           text += aNode.childNodes[i].textContent;

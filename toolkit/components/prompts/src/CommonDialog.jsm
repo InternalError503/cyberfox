@@ -75,7 +75,7 @@ CommonDialog.prototype = {
             this.numButtons = 2;
             this.iconClass  = ["authentication-icon", "question-icon"];
             this.soundID    = Ci.nsISound.EVENT_PROMPT_DIALOG_OPEN;
-            this.initTextbox("login",     this.args.user);
+            this.initTextbox("login", this.args.user);
             this.initTextbox("password1", this.args.pass);
             break;
           case "promptPassword":
@@ -159,7 +159,7 @@ CommonDialog.prototype = {
         let button = this.ui["button" + b];
 
         if (xulDialog)
-            xulDialog.defaultButton = ['accept', 'cancel', 'extra1', 'extra2'][b];
+            xulDialog.defaultButton = ["accept", "cancel", "extra1", "extra2"][b];
         else
             button.setAttribute("default", "true");
 

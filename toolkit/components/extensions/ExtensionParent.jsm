@@ -106,6 +106,7 @@ let apiManager = new class extends SchemaAPIManager {
 // `onConnect` events are updated if needed.
 ProxyMessenger = {
   _initialized: false,
+
   init() {
     if (this._initialized) {
       return;
@@ -147,6 +148,7 @@ ProxyMessenger = {
       // native messages are handled by NativeApp.
       return;
     }
+
     let extension = GlobalManager.extensionMap.get(sender.extensionId);
     let receiverMM = this._getMessageManagerForRecipient(recipient);
     if (!extension || !receiverMM) {

@@ -135,14 +135,12 @@ function sendNotification(aType, aData) {
                      createInstance(Ci.nsISupportsString);
     strWrapper.data = aData;
     aData = strWrapper;
-  }
-  else if (typeof aData == "number") {
+  } else if (typeof aData == "number") {
     let intWrapper = Cc["@mozilla.org/supports-PRInt64;1"].
                      createInstance(Ci.nsISupportsPRInt64);
     intWrapper.data = aData;
     aData = intWrapper;
-  }
-  else if (aData) {
+  } else if (aData) {
     throw Components.Exception("Invalid type " + (typeof aType) + " passed to sendNotification",
                                Cr.NS_ERROR_ILLEGAL_VALUE);
   }
@@ -234,7 +232,7 @@ function validateSearchData(aData, aDataType) {
   }
 }
 
-function makeQueryPredicates(aQueryData, delimiter = ' AND ') {
+function makeQueryPredicates(aQueryData, delimiter = " AND ") {
   return Object.keys(aQueryData).map(function(field) {
     if (field == "firstUsedStart") {
       return "firstUsed >= :" + field;
@@ -310,7 +308,7 @@ function makeRemoveStatement(aSearchData, aBindingArrays) {
 
 function makeUpdateStatement(aGuid, aNewData, aBindingArrays) {
   let query = "UPDATE moz_formhistory SET ";
-  let queryTerms = makeQueryPredicates(aNewData, ', ');
+  let queryTerms = makeQueryPredicates(aNewData, ", ");
 
   if (!queryTerms) {
     throw Components.Exception("Update query must define fields to modify.",
@@ -352,7 +350,7 @@ function generateGUID() {
   let uuid = uuidService.generateUUID().toString();
   let raw = ""; // A string with the low bytes set to random values
   let bytes = 0;
-  for (let i = 1; bytes < 12 ; i+= 2) {
+  for (let i = 1; bytes < 12 ; i += 2) {
     // Skip dashes
     if (uuid[i] == "-")
       i++;
@@ -509,7 +507,7 @@ function dbMigrate(oldVersion) {
       Migrators["dbMigrateToVersion" + v]();
     }
   } catch (e) {
-    this.log("Migration failed: "  + e);
+    this.log("Migration failed: " + e);
     this.dbConnection.rollbackTransaction();
     throw e;
   }
@@ -775,7 +773,7 @@ this.FormHistory = {
 
   search : function formHistorySearch(aSelectTerms, aSearchData, aCallbacks) {
     // if no terms selected, select everything
-    aSelectTerms = (aSelectTerms) ?  aSelectTerms : validFields;
+    aSelectTerms = (aSelectTerms) ? aSelectTerms : validFields;
     validateSearchData(aSearchData, "Search");
 
     let stmt = makeSearchStatement(aSearchData, aSelectTerms);
@@ -951,8 +949,7 @@ this.FormHistory = {
             if (completedSearches == numSearches) {
               if (!aReason && !searchFailed) {
                 updateFormHistoryWrite(aChanges, aCallbacks);
-              }
-              else if (aCallbacks && aCallbacks.handleCompletion) {
+              } else if (aCallbacks && aCallbacks.handleCompletion) {
                 aCallbacks.handleCompletion(1);
               }
             }
@@ -1016,9 +1013,9 @@ this.FormHistory = {
                 "SELECT value, " +
                 "ROUND( " +
                     "timesUsed / MAX(1.0, (lastUsed - firstUsed) / :timeGroupingSize) * " +
-                    "MAX(1.0, :maxTimeGroupings - (:now - lastUsed) / :timeGroupingSize) * "+
+                    "MAX(1.0, :maxTimeGroupings - (:now - lastUsed) / :timeGroupingSize) * " +
                     "MAX(1.0, :agedWeight * (firstUsed < :expiryDate)) / " +
-                    ":bucketSize "+
+                    ":bucketSize " +
                 ", 3) AS frecency, " +
                 boundaryCalc + " AS boundaryBonuses " +
                 "FROM moz_formhistory " +

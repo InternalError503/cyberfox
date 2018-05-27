@@ -97,12 +97,11 @@ this.Log = {
   enumerateInterfaces: function Log_enumerateInterfaces(aObject) {
     let interfaces = [];
 
-    for (i in Ci) {
+    for (let i in Ci) {
       try {
         aObject.QueryInterface(Ci[i]);
         interfaces.push(i);
-      }
-      catch (ex) {}
+      } catch (ex) {}
     }
 
     return interfaces;
@@ -114,14 +113,13 @@ this.Log = {
   enumerateProperties: function (aObject, aExcludeComplexTypes) {
     let properties = [];
 
-    for (p in aObject) {
+    for (let p in aObject) {
       try {
         if (aExcludeComplexTypes &&
             (typeof(aObject[p]) == "object" || typeof(aObject[p]) == "function"))
           continue;
         properties.push(p + " = " + aObject[p]);
-      }
-      catch (ex) {
+      } catch (ex) {
         properties.push(p + " = " + ex);
       }
     }
@@ -152,8 +150,7 @@ this.Log = {
     }
     if (e instanceof Ci.nsIException) {
       return e.toString() + " " + Log.stackTrace(e);
-    }
-    else if (isError(e)) {
+    } else if (isError(e)) {
       return Log._formatError(e);
     }
     // else
@@ -435,7 +432,7 @@ LoggerRepository.prototype = {
   },
 
   _updateParents: function LogRep__updateParents(name) {
-    let pieces = name.split('.');
+    let pieces = name.split(".");
     let cur, parent;
 
     // find the closest parent
@@ -443,7 +440,7 @@ LoggerRepository.prototype = {
     // there in this._loggers
     for (let i = 0; i < pieces.length - 1; i++) {
       if (cur)
-        cur += '.' + pieces[i];
+        cur += "." + pieces[i];
       else
         cur = pieces[i];
       if (cur in this._loggers)
@@ -543,7 +540,7 @@ BasicFormatter.prototype = {
     }
     // Defensive handling of non-object params
     // We could add a special case for NSRESULT values here...
-    let pIsObject = (typeof(params) == 'object' || typeof(params) == 'function');
+    let pIsObject = (typeof(params) == "object" || typeof(params) == "function");
 
     // if we have params, try and find substitutions.
     if (this.parameterFormatter) {
@@ -560,7 +557,7 @@ BasicFormatter.prototype = {
               subDone = true;
               return this.parameterFormatter.format(message.params[sub]);
             }
-            return '${' + sub + '}';
+            return "${" + sub + "}";
           }
           // ${} means use the entire params object.
           subDone = true;
@@ -574,7 +571,7 @@ BasicFormatter.prototype = {
           textParts.push(rest);
         }
       }
-      return textParts.join(': ');
+      return textParts.join(": ");
     }
     return undefined;
   },
@@ -634,7 +631,7 @@ StructuredFormatter.prototype = {
  * Test an object to see if it is a Mozilla JS Error.
  */
 function isError(aObj) {
-  return (aObj && typeof(aObj) == 'object' && "name" in aObj && "message" in aObj &&
+  return (aObj && typeof(aObj) == "object" && "name" in aObj && "message" in aObj &&
           "fileName" in aObj && "lineNumber" in aObj && "stack" in aObj);
 }
 
@@ -663,8 +660,7 @@ ParameterFormatter.prototype = {
       }
       if (ob instanceof Ci.nsIException) {
         return ob.toString() + " " + Log.stackTrace(ob);
-      }
-      else if (isError(ob)) {
+      } else if (isError(ob)) {
         return Log._formatError(ob);
       }
       // Just JSONify it. Filter out our internal fields and those the caller has
@@ -675,8 +671,7 @@ ParameterFormatter.prototype = {
         }
         return val;
       });
-    }
-    catch (e) {
+    } catch (e) {
       dumpError("Exception trying to format object for log message: " + Log.exceptionStr(e));
     }
     // Fancy formatting failed. Just toSource() it - but even this may fail!
@@ -699,7 +694,7 @@ ParameterFormatter.prototype = {
 
 function Appender(formatter) {
   this._name = "Appender";
-  this._formatter = formatter? formatter : new BasicFormatter();
+  this._formatter = formatter ? formatter : new BasicFormatter();
 }
 Appender.prototype = {
   level: Log.Level.All,
@@ -966,4 +961,3 @@ BoundedFileAppender.prototype = {
     });
   }
 };
-

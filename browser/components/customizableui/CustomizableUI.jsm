@@ -627,7 +627,7 @@ var CustomizableUIInternal = {
       }
       let props = {type: CustomizableUI.TYPE_TOOLBAR, legacy: true};
       let defaultsetAttribute = aToolbar.getAttribute("defaultset") || "";
-      props.defaultPlacements = defaultsetAttribute.split(',').filter(s => s);
+      props.defaultPlacements = defaultsetAttribute.split(",").filter(s => s);
       this.registerArea(area, props);
       areaProperties = gAreas.get(area);
     }
@@ -990,7 +990,7 @@ var CustomizableUIInternal = {
       this.notifyListeners("onWidgetAfterDOMChange", widgetNode, null, container, true);
 
       if (isToolbar) {
-        areaNode.setAttribute("currentset", gPlacements.get(aArea).join(','));
+        areaNode.setAttribute("currentset", gPlacements.get(aArea).join(","));
       }
 
       let windowCache = gSingleWrapperCache.get(window);
@@ -1162,7 +1162,7 @@ var CustomizableUIInternal = {
     this.insertWidgetBefore(widgetNode, nextNode, insertionContainer, areaId);
 
     if (gAreas.get(areaId).get("type") == CustomizableUI.TYPE_TOOLBAR) {
-      aAreaNode.setAttribute("currentset", gPlacements.get(areaId).join(','));
+      aAreaNode.setAttribute("currentset", gPlacements.get(areaId).join(","));
     }
   },
 
@@ -1305,17 +1305,17 @@ var CustomizableUIInternal = {
     let toolboxes = gBuildWindows.get(aWindow);
     for (let toolbox of toolboxes) {
       if (toolbox.palette) {
-        // Attempt to locate a node with a matching ID within
+        // Attempt to locate an element with a matching ID within
         // the palette.
-        let node = toolbox.palette.getElementsByAttribute("id", aId)[0];
-        if (node) {
+        let element = toolbox.palette.getElementsByAttribute("id", aId)[0];
+        if (element) {
           // Normalize the removable attribute. For backwards compat, this
           // is optional if the widget is located in the toolbox palette,
           // and defaults to *true*, unlike if it was located elsewhere.
-          if (!node.hasAttribute("removable")) {
-            node.setAttribute("removable", true);
+          if (!element.hasAttribute("removable")) {
+            element.setAttribute("removable", true);
           }
-          return node;
+          return element;
         }
       }
     }
@@ -1342,8 +1342,7 @@ var CustomizableUIInternal = {
       }
       if (!node || !(node instanceof aDocument.defaultView.XULElement))
         log.error("Custom widget with id " + aWidget.id + " does not return a valid node");
-    }
-    else {
+    } else {
       if (aWidget.onBeforeCreated) {
         aWidget.onBeforeCreated(aDocument);
       }
@@ -2132,7 +2131,7 @@ var CustomizableUIInternal = {
     aWindow.gNavToolbox.dispatchEvent(evt);
   },
 
-  dispatchToolboxEvent: function(aEventType, aDetails={}, aWindow=null) {
+  dispatchToolboxEvent: function(aEventType, aDetails = {}, aWindow = null) {
     if (aWindow) {
       this._dispatchToolboxEventToWindow(aEventType, aDetails, aWindow);
       return;
@@ -2752,7 +2751,7 @@ var CustomizableUIInternal = {
         // widgets (if any) - use that instead:
         if (props.get("type") == CustomizableUI.TYPE_TOOLBAR) {
           let currentSet = container.currentSet;
-          currentPlacements = currentSet ? currentSet.split(',') : [];
+          currentPlacements = currentSet ? currentSet.split(",") : [];
           currentPlacements = currentPlacements.filter(removableOrDefault);
         } else {
           // Clone the array so we don't modify the actual placements...
@@ -3535,7 +3534,7 @@ this.CustomizableUI = {
    *
    *   null // if the widget is not placed anywhere (ie in the palette)
    */
-  getPlacementOfWidget: function(aWidgetId, aOnlyRegistered=true, aDeadAreas=false) {
+  getPlacementOfWidget: function(aWidgetId, aOnlyRegistered = true, aDeadAreas = false) {
     return CustomizableUIInternal.getPlacementOfWidget(aWidgetId, aOnlyRegistered, aDeadAreas);
   },
   /**
@@ -3706,7 +3705,7 @@ this.CustomizableUI = {
    * @param aDetails optional, the details of the event.
    * @param aWindow optional, the window in which to send the event.
    */
-  dispatchToolboxEvent: function(aEvent, aDetails={}, aWindow=null) {
+  dispatchToolboxEvent: function(aEvent, aDetails = {}, aWindow = null) {
     CustomizableUIInternal.dispatchToolboxEvent(aEvent, aDetails, aWindow);
   },
 
@@ -4139,7 +4138,7 @@ OverflowableToolbar.prototype = {
       let doc = this._panel.ownerDocument;
       this._panel.hidden = false;
       let contextMenu = doc.getElementById(this._panel.getAttribute("context"));
-      gELS.addSystemEventListener(contextMenu, 'command', this, true);
+      gELS.addSystemEventListener(contextMenu, "command", this, true);
       let anchor = doc.getAnonymousElementByAttribute(this._chevron, "class", "toolbarbutton-icon");
       this._panel.openPopup(anchor || this._chevron);
       this._chevron.open = true;
@@ -4169,7 +4168,7 @@ OverflowableToolbar.prototype = {
     this._panel.removeEventListener("dragend", this);
     let doc = aEvent.target.ownerDocument;
     let contextMenu = doc.getElementById(this._panel.getAttribute("context"));
-    gELS.removeSystemEventListener(contextMenu, 'command', this, true);
+    gELS.removeSystemEventListener(contextMenu, "command", this, true);
   },
 
   onOverflow: function(aEvent) {
@@ -4327,18 +4326,16 @@ OverflowableToolbar.prototype = {
         aNode.setAttribute("cui-anchorid", this._chevron.id);
         aNode.setAttribute("overflowedItem", true);
         CustomizableUIInternal.notifyListeners("onWidgetOverflow", aNode, this._target);
-      }
-      // If it is not overflowed and not in the toolbar, and was not overflowed
-      // either, it moved out of the toolbar. That means there's now space in there!
-      // Let's try to move stuff back:
-      else if (!nowInBar) {
+      } else if (!nowInBar) {
+        // If it is not overflowed and not in the toolbar, and was not overflowed
+        // either, it moved out of the toolbar. That means there's now space in there!
+        // Let's try to move stuff back:
         this._moveItemsBackToTheirOrigin(true);
       }
       // If it's in the toolbar now, then we don't care. An overflow event may
       // fire afterwards; that's ok!
-    }
-    // If it used to be overflowed...
-    else if (!nowOverflowed) {
+    } else if (!nowOverflowed) {
+      // If it used to be overflowed...
       // ... and isn't anymore, let's remove our bookkeeping:
       this._collapsed.delete(aNode.id);
       aNode.removeAttribute("cui-anchorid");
@@ -4403,7 +4400,7 @@ OverflowableToolbar.prototype = {
 
   _hideTimeoutId: null,
   _showWithTimeout: function() {
-    this.show().then(function () {
+    this.show().then(function() {
       let window = this._toolbar.ownerGlobal;
       if (this._hideTimeoutId) {
         window.clearTimeout(this._hideTimeoutId);

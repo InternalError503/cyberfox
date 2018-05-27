@@ -48,7 +48,6 @@ var snapshotFormatters = {
       return archString;
     }
     
-    let strings = stringBundle();
     let archString = getArchString();
     $("application-box").textContent = data.name;
     $("useragent-box").textContent = data.userAgent;
@@ -63,7 +62,7 @@ var snapshotFormatters = {
       $("updatechannel-box").textContent = data.updateChannel;
     $("profile-dir-box").textContent = Services.dirsvc.get("ProfD", Ci.nsIFile).path;
 
-    let statusText = strings.GetStringFromName("multiProcessStatus.unknown");
+    let statusText = stringBundle().GetStringFromName("multiProcessStatus.unknown");
 
     // Whitelist of known values with string descriptions:
     switch (data.autoStartStatus) {
@@ -74,7 +73,7 @@ var snapshotFormatters = {
       case 6:
       case 7:
       case 8:
-        statusText = strings.GetStringFromName("multiProcessStatus." + data.autoStartStatus);
+        statusText = stringBundle().GetStringFromName("multiProcessStatus." + data.autoStartStatus);
         break;
 
       case 10:
@@ -82,14 +81,14 @@ var snapshotFormatters = {
         break;
     }
 
-    $("multiprocess-box").textContent = strings.formatStringFromName("multiProcessWindows",
+    $("multiprocess-box").textContent = stringBundle().formatStringFromName("multiProcessWindows",
       [data.numRemoteWindows, data.numTotalWindows, statusText], 3);
 
     let keyGoogleFound = data.keyGoogleFound ? "found" : "missing";
-    $("key-google-box").textContent = strings.GetStringFromName(keyGoogleFound);
+    $("key-google-box").textContent = stringBundle().GetStringFromName(keyGoogleFound);
 
     let keyMozillaFound = data.keyMozillaFound ? "found" : "missing";
-    $("key-mozilla-box").textContent = strings.GetStringFromName(keyMozillaFound);
+    $("key-mozilla-box").textContent = stringBundle().GetStringFromName(keyMozillaFound);
 
     $("safemode-box").textContent = data.safeMode;
   },
@@ -98,10 +97,9 @@ var snapshotFormatters = {
     if (!AppConstants.MOZ_CRASHREPORTER)
       return;
 
-    let strings = stringBundle();
     let daysRange = Troubleshoot.kMaxCrashAge / (24 * 60 * 60 * 1000);
     $("crashes-title").textContent =
-      PluralForm.get(daysRange, strings.GetStringFromName("crashesTitle"))
+      PluralForm.get(daysRange, stringBundle().GetStringFromName("crashesTitle"))
                 .replace("#1", daysRange);
     let reportURL;
     try {
@@ -120,7 +118,7 @@ var snapshotFormatters = {
 
     if (data.pending > 0) {
       $("crashes-allReportsWithPending").textContent =
-        PluralForm.get(data.pending, strings.GetStringFromName("pendingReports"))
+        PluralForm.get(data.pending, stringBundle().GetStringFromName("pendingReports"))
                   .replace("#1", data.pending);
     }
 
@@ -131,23 +129,23 @@ var snapshotFormatters = {
       let formattedDate;
       if (timePassed >= 24 * 60 * 60 * 1000) {
         let daysPassed = Math.round(timePassed / (24 * 60 * 60 * 1000));
-        let daysPassedString = strings.GetStringFromName("crashesTimeDays");
+        let daysPassedString = stringBundle().GetStringFromName("crashesTimeDays");
         formattedDate = PluralForm.get(daysPassed, daysPassedString)
                                   .replace("#1", daysPassed);
       } else if (timePassed >= 60 * 60 * 1000) {
         let hoursPassed = Math.round(timePassed / (60 * 60 * 1000));
-        let hoursPassedString = strings.GetStringFromName("crashesTimeHours");
+        let hoursPassedString = stringBundle().GetStringFromName("crashesTimeHours");
         formattedDate = PluralForm.get(hoursPassed, hoursPassedString)
                                   .replace("#1", hoursPassed);
       } else {
         let minutesPassed = Math.max(Math.round(timePassed / (60 * 1000)), 1);
-        let minutesPassedString = strings.GetStringFromName("crashesTimeMinutes");
+        let minutesPassedString = stringBundle().GetStringFromName("crashesTimeMinutes");
         formattedDate = PluralForm.get(minutesPassed, minutesPassedString)
                                   .replace("#1", minutesPassed);
       }
       return $.new("tr", [
         $.new("td", [
-          $.new("a", crash.id, null, {href: reportURL + crash.id})
+          $.new("a", crash.id, null, {href : reportURL + crash.id})
         ]),
         $.new("td", formattedDate)
       ]);
@@ -184,7 +182,7 @@ var snapshotFormatters = {
         $.new("td", experiment.active),
         $.new("td", experiment.endDate),
         $.new("td", [
-          $.new("a", experiment.detailURL, null, {href: experiment.detailURL, })
+          $.new("a", experiment.detailURL, null, {href : experiment.detailURL, })
         ]),
         $.new("td", experiment.branch),
       ]);
@@ -217,7 +215,6 @@ var snapshotFormatters = {
   },
 
   graphics: function graphics(data) {
-    let strings = stringBundle();
 
     function localizedMsg(msgArray) {
       let nameOrMsg = msgArray.shift();
@@ -225,7 +222,7 @@ var snapshotFormatters = {
         // formatStringFromName logs an NS_ASSERTION failure otherwise that says
         // "use GetStringFromName".  Lame.
         try {
-          return strings.formatStringFromName(nameOrMsg, msgArray,
+          return stringBundle().formatStringFromName(nameOrMsg, msgArray,
                                               msgArray.length);
         } catch (err) {
           // Throws if nameOrMsg is not a name in the bundle.  This shouldn't
@@ -236,7 +233,7 @@ var snapshotFormatters = {
         }
       }
       try {
-        return strings.GetStringFromName(nameOrMsg);
+        return stringBundle().GetStringFromName(nameOrMsg);
       } catch (err) {
         // Throws if nameOrMsg is not a name in the bundle.
       }
@@ -272,7 +269,7 @@ var snapshotFormatters = {
         title = key.substr(1);
       } else {
         try {
-          title = strings.GetStringFromName(key);
+          title = stringBundle().GetStringFromName(key);
         } catch (e) {
           title = key;
         }
@@ -324,7 +321,7 @@ var snapshotFormatters = {
           windowUtils.terminateGPUProcess();
         });
 
-        gpuProcessKillButton.textContent = strings.GetStringFromName("gpuProcessKillButton");
+        gpuProcessKillButton.textContent = stringBundle().GetStringFromName("gpuProcessKillButton");
         addRow("diagnostics", "GPUProcessPid", gpuProcessPid);
         addRow("diagnostics", "GPUProcess", [gpuProcessKillButton]);
       }
@@ -391,7 +388,7 @@ var snapshotFormatters = {
 
     let compositor = data.windowLayerManagerRemote
                      ? data.windowLayerManagerType
-                     : "BasicLayers (" + strings.GetStringFromName("mainThreadNoOMTC") + ")";
+                     : "BasicLayers (" + stringBundle().GetStringFromName("mainThreadNoOMTC") + ")";
     addRow("features", "compositing", compositor);
     delete data.windowLayerManagerRemote;
     delete data.windowLayerManagerType;
@@ -452,7 +449,7 @@ var snapshotFormatters = {
       if ("isGPU2Active" in data && ((suffix == "2") != data.isGPU2Active)) {
         active = "no";
       }
-      addRow(id, "gpuActive", strings.GetStringFromName(active));
+      addRow(id, "gpuActive", stringBundle().GetStringFromName(active));
       addRows(id, trs);
     }
     showGpu("gpu-1", "");
@@ -487,18 +484,18 @@ var snapshotFormatters = {
           let contents;
           if (entry.message.length > 0 && entry.message[0] == "#") {
             // This is a failure ID. See nsIGfxInfo.idl.
-            let m;
-            if (m = /#BLOCKLIST_FEATURE_FAILURE_BUG_(\d+)/.exec(entry.message)) {
+            let m = /#BLOCKLIST_FEATURE_FAILURE_BUG_(\d+)/.exec(entry.message);
+            if (m) {
               let bugSpan = $.new("span");
-              bugSpan.textContent = strings.GetStringFromName("blocklistedBug") + "; ";
+              bugSpan.textContent = stringBundle().GetStringFromName("blocklistedBug") + "; ";
 
               let bugHref = $.new("a");
               bugHref.href = "https://bugzilla.mozilla.org/show_bug.cgi?id=" + m[1];
-              bugHref.textContent = strings.formatStringFromName("bugLink", [m[1]], 1);
+              bugHref.textContent = stringBundle().formatStringFromName("bugLink", [m[1]], 1);
 
               contents = [bugSpan, bugHref];
             } else {
-              contents = strings.formatStringFromName(
+              contents = stringBundle().formatStringFromName(
                 "unknownFailure", [entry.message.substr(1)], 1);
             }
           } else {
@@ -538,7 +535,7 @@ var snapshotFormatters = {
           };
         })(guard);
 
-        resetButton.textContent = strings.GetStringFromName("resetOnNextRestart");
+        resetButton.textContent = stringBundle().GetStringFromName("resetOnNextRestart");
         resetButton.addEventListener("click", onClickReset);
 
         addRow("crashguards", guard.type + "CrashGuard", [resetButton]);
@@ -568,12 +565,11 @@ var snapshotFormatters = {
   },
 
   libraryVersions: function libraryVersions(data) {
-    let strings = stringBundle();
     let trs = [
       $.new("tr", [
         $.new("th", ""),
-        $.new("th", strings.GetStringFromName("minLibVersions")),
-        $.new("th", strings.GetStringFromName("loadedLibVersions")),
+        $.new("th", stringBundle().GetStringFromName("minLibVersions")),
+        $.new("th", stringBundle().GetStringFromName("loadedLibVersions")),
       ])
     ];
     sortedArrayFromObject(data).forEach(
@@ -603,7 +599,6 @@ var snapshotFormatters = {
     if (!AppConstants.MOZ_SANDBOX)
       return;
 
-    let strings = stringBundle();
     let tbody = $("sandbox-tbody");
     for (let key in data) {
       // Simplify the display a little in the common case.
@@ -612,7 +607,7 @@ var snapshotFormatters = {
         continue;
       }
       tbody.appendChild($.new("tr", [
-        $.new("th", strings.GetStringFromName(key), "column"),
+        $.new("th", stringBundle().GetStringFromName(key), "column"),
         $.new("td", data[key])
       ]));
     }
@@ -664,9 +659,9 @@ function assembleFromGraphicsFailure(i, data) {
     what = "Assert";
     message = message.substring(8);
   }
-  let assembled = {"index": index,
-                   "header": ("(#" + index + ") " + what),
-                   "message": message};
+  let assembled = {"index" : index,
+                   "header" : ("(#" + index + ") " + what),
+                   "message" : message};
   return assembled;
 }
 
@@ -990,34 +985,33 @@ function safeModeRestart() {
  * Set up event listeners for buttons.
  */
 function setupEventListeners() {
-  $("show-update-history-button").addEventListener("click", function (event) {
+  $("show-update-history-button").addEventListener("click", function(event) {
   //Set Update History Link.
        var historylink = document.getElementById("support-update-history");
 	     var url = Services.urlFormatter.formatURLPref("app.support.baseURL");
 			  url += "/viewtopic.php?f=6&t=322#support-update-history";		 
 				historylink.setAttribute("href", url);
   });
-  $("reset-box-button").addEventListener("click", function (event) {
+  $("reset-box-button").addEventListener("click", function(event) {
     ResetProfile.openConfirmationDialog(window);
   });
-  $("copy-raw-data-to-clipboard").addEventListener("click", function (event) {
+  $("copy-raw-data-to-clipboard").addEventListener("click", function(event) {
     copyRawDataToClipboard(this);
   });
-  $("copy-to-clipboard").addEventListener("click", function (event) {
+  $("copy-to-clipboard").addEventListener("click", function(event) {
     copyContentsToClipboard();
   });
-  $("profile-dir-button").addEventListener("click", function (event) {
+  $("profile-dir-button").addEventListener("click", function(event) {
     openProfileDirectory();
   });
-  $("restart-in-safe-mode-button").addEventListener("click", function (event) {
+  $("restart-in-safe-mode-button").addEventListener("click", function(event) {
     if (Services.obs.enumerateObservers("restart-in-safe-mode").hasMoreElements()) {
       Services.obs.notifyObservers(null, "restart-in-safe-mode", "");
-    }
-    else {
+    } else {
       safeModeRestart();
     }
   });
-  $("verify-place-integrity-button").addEventListener("click", function (event) {
+  $("verify-place-integrity-button").addEventListener("click", function(event) {
     PlacesDBUtils.checkAndFixDatabase(function(aLog) {
       let msg = aLog.join("\n");
       $("verify-place-result").style.display = "block";

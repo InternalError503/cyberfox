@@ -23,7 +23,7 @@ if ("@mozilla.org/xre/app-info;1" in Cc) {
 
 Cu.import("resource://gre/modules/AppConstants.jsm");
 
-const MOZ_COMPATIBILITY_NIGHTLY = !['aurora', 'beta', 'release', 'esr'].includes(AppConstants.MOZ_UPDATE_CHANNEL);
+const MOZ_COMPATIBILITY_NIGHTLY = !["aurora", "beta", "release", "esr"].includes(AppConstants.MOZ_UPDATE_CHANNEL);
 
 const PREF_BLOCKLIST_PINGCOUNTVERSION = "extensions.blocklist.pingCountVersion";
 const PREF_DEFAULT_PROVIDERS_ENABLED  = "extensions.defaultProviders.enabled";
@@ -157,18 +157,15 @@ var PrefObserver = {
       if (aTopic == "xpcom-shutdown") {
         Services.prefs.removeObserver(PREF_LOGGING_ENABLED, this);
         Services.obs.removeObserver(this, "xpcom-shutdown");
-      }
-      else if (aTopic == NS_PREFBRANCH_PREFCHANGE_TOPIC_ID) {
+      } else if (aTopic == NS_PREFBRANCH_PREFCHANGE_TOPIC_ID) {
         let debugLogEnabled = false;
         try {
           debugLogEnabled = Services.prefs.getBoolPref(PREF_LOGGING_ENABLED);
-        }
-        catch (e) {
+        } catch (e) {
         }
         if (debugLogEnabled) {
           parentLogger.level = Log.Level.Debug;
-        }
-        else {
+        } else {
           parentLogger.level = Log.Level.Warn;
         }
       }
@@ -187,8 +184,7 @@ PrefObserver.init();
 function safeCall(aCallback, ...aArgs) {
   try {
     aCallback.apply(null, aArgs);
-  }
-  catch (e) {
+  } catch (e) {
     logger.warn("Exception calling callback", e);
   }
 }
@@ -235,8 +231,7 @@ function callProvider(aProvider, aMethod, aDefault, ...aArgs) {
 
   try {
     return aProvider[aMethod].apply(aProvider, aArgs);
-  }
-  catch (e) {
+  } catch (e) {
     reportProviderError(aProvider, aMethod, e);
     return aDefault;
   }
@@ -262,8 +257,7 @@ function callProviderAsync(aProvider, aMethod, ...aArgs) {
   }
   try {
     return aProvider[aMethod].apply(aProvider, aArgs);
-  }
-  catch (e) {
+  } catch (e) {
     reportProviderError(aProvider, aMethod, e);
     callback(undefined);
     return undefined;
@@ -298,21 +292,18 @@ function getLocale() {
   try {
     if (Services.prefs.getBoolPref(PREF_MATCH_OS_LOCALE))
       return Services.locale.getLocaleComponentForUserAgent();
-  }
-  catch (e) { }
+  } catch (e) { }
 
   try {
     let locale = Services.prefs.getComplexValue(PREF_SELECTED_LOCALE,
                                                 Ci.nsIPrefLocalizedString);
     if (locale)
       return locale;
-  }
-  catch (e) { }
+  } catch (e) { }
 
   try {
     return Services.prefs.getCharPref(PREF_SELECTED_LOCALE);
-  }
-  catch (e) { }
+  } catch (e) { }
 
   return "en-US";
 }
@@ -431,8 +422,7 @@ BrowserListener.prototype = {
     for (let install of this.installs) {
       try {
         install.cancel();
-      }
-      catch (e) {
+      } catch (e) {
         // Some installs may have already failed or been cancelled, ignore these
       }
     }
@@ -653,8 +643,7 @@ function AddonType(aID, aLocaleURI, aLocaleKey, aViewType, aUIPriority, aFlags) 
       let bundle = Services.strings.createBundle(aLocaleURI);
       return bundle.GetStringFromName(aLocaleKey.replace("%ID%", aID));
     });
-  }
-  else {
+  } else {
     this.name = aLocaleKey;
   }
 }
@@ -710,8 +699,7 @@ var AddonManagerInternal = {
     if (!profileBlocklist.exists()) {
       try {
         appBlocklist.copyTo(profileBlocklist.parent, FILE_BLOCKLIST);
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn("Failed to copy the application shipped blocklist to the profile", e);
       }
       return;
@@ -736,16 +724,13 @@ var AddonManagerInternal = {
       let parser = Cc["@mozilla.org/xmlextras/domparser;1"].
                    createInstance(Ci.nsIDOMParser);
       var doc = parser.parseFromString(data, "text/xml");
-    }
-    catch (e) {
+    } catch (e) {
       logger.warn("Application shipped blocklist could not be loaded", e);
       return;
-    }
-    finally {
+    } finally {
       try {
         fileStream.close();
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn("Unable to close blocklist file stream", e);
       }
     }
@@ -772,8 +757,7 @@ var AddonManagerInternal = {
     // Otherwise copy the application shipped blocklist to the profile
     try {
       appBlocklist.copyTo(profileBlocklist.parent, FILE_BLOCKLIST);
-    }
-    catch (e) {
+    } catch (e) {
       logger.warn("Failed to copy the application shipped blocklist to the profile", e);
     }
   },
@@ -788,7 +772,7 @@ var AddonManagerInternal = {
 
     logger.debug(`Starting provider: ${providerName(aProvider)}`);
     callProvider(aProvider, "startup", null, aAppChanged, aOldAppVersion, aOldPlatformVersion);
-    if ('shutdown' in aProvider) {
+    if ("shutdown" in aProvider) {
       let name = providerName(aProvider);
       let AMProviderShutdown = () => {
         // If the provider has been unregistered, it will have been removed from
@@ -848,16 +832,14 @@ var AddonManagerInternal = {
       try {
         oldAppVersion = Services.prefs.getCharPref(PREF_EM_LAST_APP_VERSION);
         appChanged = Services.appinfo.version != oldAppVersion;
-      }
-      catch (e) { }
+      } catch (e) { }
 
       Extension.browserUpdated = appChanged;
 
       let oldPlatformVersion = null;
       try {
         oldPlatformVersion = Services.prefs.getCharPref(PREF_EM_LAST_PLATFORM_VERSION);
-      }
-      catch (e) { }
+      } catch (e) { }
 
       if (appChanged !== false) {
         logger.debug("Application has been upgraded");
@@ -936,8 +918,7 @@ var AddonManagerInternal = {
               AddonManagerPrivate.recordException("AMI", "provider " + url, "no startup()");
             }
             logger.debug("Loaded provider scope for " + url + ": " + Object.keys(scope).toSource());
-          }
-          catch (e) {
+          } catch (e) {
             AddonManagerPrivate.recordException("AMI", "provider " + url + " load failed", e);
             logger.error("Exception loading default provider \"" + url + "\"", e);
           }
@@ -955,8 +936,7 @@ var AddonManagerInternal = {
         try {
           Components.utils.import(url, {});
           logger.debug(`Loaded provider scope for ${url}`);
-        }
-        catch (e) {
+        } catch (e) {
           AddonManagerPrivate.recordException("AMI", "provider " + url + " load failed", e);
           logger.error("Exception loading provider " + entry + " from category \"" +
                 url + "\"", e);
@@ -991,8 +971,7 @@ var AddonManagerInternal = {
 
       gStartupComplete = true;
       this.recordTimestamp("AMI_startup_end");
-    }
-    catch (e) {
+    } catch (e) {
       logger.error("startup failed", e);
       AddonManagerPrivate.recordException("AMI", "startup failed", e);
     }
@@ -1036,8 +1015,7 @@ var AddonManagerInternal = {
           let typeListeners = this.typeListeners.slice(0);
           for (let listener of typeListeners)
             safeCall(() => listener.onTypeAdded(type));
-        }
-        else {
+        } else {
           this.types[type.id].providers.push(aProvider);
         }
       }
@@ -1150,8 +1128,7 @@ var AddonManagerInternal = {
       try {
         if (aMethod in provider)
           provider[aMethod].apply(provider, aArgs);
-      }
-      catch (e) {
+      } catch (e) {
         reportProviderError(provider, aMethod, e);
       }
     }
@@ -1202,8 +1179,7 @@ var AddonManagerInternal = {
     if (gStarted) {
       try {
         yield gShutdownBarrier.wait();
-      }
-      catch (err) {
+      } catch (err) {
         savedError = err;
         logger.error("Failure during wait for shutdown barrier", err);
         AddonManagerPrivate.recordException("AMI", "Async shutdown of AddonManager providers", err);
@@ -1215,8 +1191,7 @@ var AddonManagerInternal = {
       gRepoShutdownState = "in progress";
       yield AddonRepository.shutdown();
       gRepoShutdownState = "done";
-    }
-    catch (err) {
+    } catch (err) {
       savedError = err;
       logger.error("Failure during AddonRepository shutdown", err);
       AddonManagerPrivate.recordException("AMI", "Async shutdown of AddonRepository", err);
@@ -1358,8 +1333,7 @@ var AddonManagerInternal = {
    *         The optional application version to use for %APP_VERSION%
    * @return The appropriately escaped URI.
    */
-  escapeAddonURI: function(aAddon, aUri, aAppVersion)
-  {
+  escapeAddonURI: function(aAddon, aUri, aAppVersion) {
     if (!aAddon || typeof aAddon != "object")
       throw Components.Exception("aAddon must be an Addon object",
                                  Cr.NS_ERROR_INVALID_ARG);
@@ -1413,8 +1387,7 @@ var AddonManagerInternal = {
         var contractID = catMan.getCategoryEntry(CATEGORY_UPDATE_PARAMS, aParam);
         var paramHandler = Cc[contractID].getService(Ci.nsIPropertyBag2);
         return paramHandler.getPropertyAsAString(aParam);
-      }
-      catch (e) {
+      } catch (e) {
         return aMatch;
       }
     });
@@ -1492,8 +1465,7 @@ var AddonManagerInternal = {
         var hotfixVersion = "";
         try {
           hotfixVersion = Services.prefs.getCharPref(PREF_EM_HOTFIX_LASTVERSION);
-        }
-        catch (e) { }
+        } catch (e) { }
 
         let url = null;
         if (Services.prefs.getPrefType(PREF_EM_HOTFIX_URL) == Ci.nsIPrefBranch.PREF_STRING)
@@ -1550,8 +1522,7 @@ var AddonManagerInternal = {
                 try {
                   if (!Services.prefs.getBoolPref(PREF_EM_CERT_CHECKATTRIBUTES))
                     return;
-                }
-                catch (e) {
+                } catch (e) {
                   // By default don't do certificate checks.
                   return;
                 }
@@ -1559,8 +1530,7 @@ var AddonManagerInternal = {
                 try {
                   CertUtils.validateCert(aInstall.certificate,
                                          CertUtils.readCertPrefs(PREF_EM_HOTFIX_CERTS));
-                }
-                catch (e) {
+                } catch (e) {
                   logger.warn("The hotfix add-on was not signed by the expected " +
                        "certificate and so will not be installed.", e);
                   aInstall.cancel();
@@ -1589,8 +1559,7 @@ var AddonManagerInternal = {
       if (appUpdateEnabled) {
         try {
           yield AddonManagerInternal._getProviderByName("XPIProvider").updateSystemAddons();
-        }
-        catch (e) {
+        } catch (e) {
           logger.warn("Failed to update system addons", e);
         }
       }
@@ -1686,8 +1655,7 @@ var AddonManagerInternal = {
       try {
         if (aMethod in listener)
           listener[aMethod].apply(listener, aArgs);
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn("AddonManagerListener threw exception when calling " + aMethod, e);
       }
     }
@@ -1730,8 +1698,7 @@ var AddonManagerInternal = {
           if (listener[aMethod].apply(listener, aArgs) === false)
             result = false;
         }
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn("InstallListener threw exception when calling " + aMethod, e);
       }
     }
@@ -1759,8 +1726,7 @@ var AddonManagerInternal = {
       try {
         if (aMethod in listener)
           listener[aMethod].apply(listener, aArgs);
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn("AddonListener threw exception when calling " + aMethod, e);
       }
     }
@@ -2433,8 +2399,7 @@ var AddonManagerInternal = {
         // If both best size and current size are larger than the wanted size then choose
         // the one closest to the wanted size
         bestSize = Math.min(bestSize, size);
-      }
-      else {
+      } else {
         // Otherwise choose the largest of the two so we'll prefer sizes as close to below aSize
         // or above aSize
         bestSize = Math.max(bestSize, size);
@@ -3117,8 +3082,7 @@ this.AddonManagerPrivate = {
 
     if (typeof aException == "number") {
       report.message = Components.Exception("", aException).name;
-    }
-    else {
+    } else {
       report.message = aException.toString();
       if (aException.fileName) {
         report.file = aException.fileName;

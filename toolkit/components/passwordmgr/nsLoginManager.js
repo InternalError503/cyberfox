@@ -107,8 +107,6 @@ LoginManager.prototype = {
       // Initialize storage so that asynchronous data loading can start.
       this._initStorage();
     }
-
-    Services.obs.addObserver(this._observer, "gather-telemetry", false);
   },
 
 
@@ -173,85 +171,11 @@ LoginManager.prototype = {
           Services.obs.notifyObservers(null,
                        "passwordmgr-storage-replace-complete", null);
         }.bind(this));
-      } else if (topic == "gather-telemetry") {
-        // When testing, the "data" parameter is a string containing the
-        // reference time in milliseconds for time-based statistics.
-        this._pwmgr._gatherTelemetry(data ? parseInt(data)
-                                          : new Date().getTime());
       } else {
         log.debug("Oops! Unexpected notification:", topic);
       }
     }
   },
-
-  /**
-   * Collects statistics about the current logins and settings. The telemetry
-   * histograms used here are not accumulated, but are reset each time this
-   * function is called, since it can be called multiple times in a session.
-   *
-   * This function might also not be called at all in the current session.
-   *
-   * @param referenceTimeMs
-   *        Current time used to calculate time-based statistics, expressed as
-   *        the number of milliseconds since January 1, 1970, 00:00:00 UTC.
-   *        This is set to a fake value during unit testing.
-   */
-  _gatherTelemetry(referenceTimeMs) {
-    function clearAndGetHistogram(histogramId) {
-      let histogram = Services.telemetry.getHistogramById(histogramId);
-      histogram.clear();
-      return histogram;
-    }
-
-    clearAndGetHistogram("PWMGR_BLOCKLIST_NUM_SITES").add(
-      this.getAllDisabledHosts({}).length
-    );
-    clearAndGetHistogram("PWMGR_NUM_SAVED_PASSWORDS").add(
-      this.countLogins("", "", "")
-    );
-    clearAndGetHistogram("PWMGR_NUM_HTTPAUTH_PASSWORDS").add(
-      this.countLogins("", null, "")
-    );
-
-    // This is a boolean histogram, and not a flag, because we don't want to
-    // record any value if _gatherTelemetry is not called.
-    clearAndGetHistogram("PWMGR_SAVING_ENABLED").add(this._remember);
-
-    // Don't try to get logins if MP is enabled, since we don't want to show a MP prompt.
-    if (!this.isLoggedIn) {
-      return;
-    }
-
-    let logins = this.getAllLogins({});
-
-    let usernamePresentHistogram = clearAndGetHistogram("PWMGR_USERNAME_PRESENT");
-    let loginLastUsedDaysHistogram = clearAndGetHistogram("PWMGR_LOGIN_LAST_USED_DAYS");
-
-    let hostnameCount = new Map();
-    for (let login of logins) {
-      usernamePresentHistogram.add(!!login.username);
-
-      let hostname = login.hostname;
-      hostnameCount.set(hostname, (hostnameCount.get(hostname) || 0 ) + 1);
-
-      login.QueryInterface(Ci.nsILoginMetaInfo);
-      let timeLastUsedAgeMs = referenceTimeMs - login.timeLastUsed;
-      if (timeLastUsedAgeMs > 0) {
-        loginLastUsedDaysHistogram.add(
-          Math.floor(timeLastUsedAgeMs / MS_PER_DAY)
-        );
-      }
-    }
-
-    let passwordsCountHistogram = clearAndGetHistogram("PWMGR_NUM_PASSWORDS_PER_HOSTNAME");
-    for (let count of hostnameCount.values()) {
-      passwordsCountHistogram.add(count);
-    }
-  },
-
-
-
-
 
   /* ---------- Primary Public interfaces ---------- */
 

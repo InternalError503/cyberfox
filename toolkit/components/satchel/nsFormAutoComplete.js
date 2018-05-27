@@ -284,7 +284,7 @@ FormAutoComplete.prototype = {
                                         aPreviousResult,
                                         aDatalistResult,
                                         aListener) {
-        function sortBytotalScore (a, b) {
+        function sortBytotalScore(a, b) {
             return b.totalScore - a.totalScore;
         }
 
@@ -312,7 +312,7 @@ FormAutoComplete.prototype = {
         }
 
         // don't allow form inputs (aField != null) to get results from search bar history
-        if (aInputName == 'searchbar-history' && aField) {
+        if (aInputName == "searchbar-history" && aField) {
             this.log('autoCompleteSearch for input name "' + aInputName + '" is denied');
             if (aListener) {
                 aListener.onSearchCompletion(emptyResult);
@@ -321,7 +321,7 @@ FormAutoComplete.prototype = {
         }
 
         if (aField && isAutocompleteDisabled(aField)) {
-            this.log('autoCompleteSearch not allowed due to autcomplete=off');
+            this.log("autoCompleteSearch not allowed due to autcomplete=off");
             if (aListener) {
                 aListener.onSearchCompletion(emptyResult);
             }
@@ -384,7 +384,7 @@ FormAutoComplete.prototype = {
                     continue;
                 this._calculateScore(entry, searchString, searchTokens);
                 this.log("Reusing autocomplete entry '" + entry.text +
-                         "' (" + entry.frecency +" / " + entry.totalScore + ")");
+                         "' (" + entry.frecency + " / " + entry.totalScore + ")");
                 filteredEntries.push(entry);
             }
             filteredEntries.sort(sortBytotalScore);
@@ -421,7 +421,7 @@ FormAutoComplete.prototype = {
             let processEntry = (aEntries) => {
                 if (aField && aField.maxLength > -1) {
                     result.entries =
-                        aEntries.filter(function (el) { return el.text.length <= aField.maxLength; });
+                        aEntries.filter(function(el) { return el.text.length <= aField.maxLength; });
                 } else {
                     result.entries = aEntries;
                 }

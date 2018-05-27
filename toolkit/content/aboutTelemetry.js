@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict';
+"use strict";
 
 var Ci = Components.interfaces;
 var Cc = Components.classes;
@@ -61,7 +61,7 @@ function isRTL() {
 }
 
 function isArray(arg) {
-  return Object.prototype.toString.call(arg) === '[object Array]';
+  return Object.prototype.toString.call(arg) === "[object Array]";
 }
 
 function isFlatArray(obj) {
@@ -175,7 +175,7 @@ function removeAllChildNodes(node) {
  * Pad a number to two digits with leading "0".
  */
 function padToTwoDigits(n) {
-  return (n > 9) ? n: "0" + n;
+  return (n > 9) ? n : "0" + n;
 }
 
 /**
@@ -952,14 +952,14 @@ var StackRenderer = {
   },
   renderStacks: function StackRenderer_renderStacks(aPrefix, aStacks,
                                                     aMemoryMap, aRenderHeader) {
-    let div = document.getElementById(aPrefix + '-data');
+    let div = document.getElementById(aPrefix + "-data");
     removeAllChildNodes(div);
 
-    let fetchE = document.getElementById(aPrefix + '-fetch-symbols');
+    let fetchE = document.getElementById(aPrefix + "-fetch-symbols");
     if (fetchE) {
       fetchE.classList.remove("hidden");
     }
-    let hideE = document.getElementById(aPrefix + '-hide-symbols');
+    let hideE = document.getElementById(aPrefix + "-hide-symbols");
     if (hideE) {
       hideE.classList.add("hidden");
     }
@@ -968,7 +968,7 @@ var StackRenderer = {
       return;
     }
 
-    setHasData(aPrefix + '-section', true);
+    setHasData(aPrefix + "-section", true);
 
     this.renderMemoryMap(div, aMemoryMap);
 
@@ -1324,7 +1324,7 @@ var Histogram = {
       barDiv.style.paddingTop = aboveEm + "em";
 
       // Add value label or an nbsp if no value
-      barDiv.appendChild(document.createTextNode(value ? value : '\u00A0'));
+      barDiv.appendChild(document.createTextNode(value ? value : "\u00A0"));
 
       // Create the blue bar
       let bar = document.createElement("div");
@@ -1376,8 +1376,7 @@ var Histogram = {
       var r = filter.match(/^\/(.*)\/(i?)$/);
       try {
         filter = RegExp(r[1], r[2]);
-      }
-      catch (e) { // Incomplete or bad RegExp - always no match
+      } catch (e) { // Incomplete or bad RegExp - always no match
         isPassFunc = function() {
           return false;
         };
@@ -1748,8 +1747,7 @@ function toggleSection(aEvent) {
 /**
  * Sets the text of the page header based on a config pref + bundle strings
  */
-function setupPageHeader()
-{
+function setupPageHeader() {
   let serverOwner = Preferences.get(PREF_TELEMETRY_SERVER_OWNER, "Mozilla");
   let brandName = brandBundle.GetStringFromName("brandFullName");
   let subtitleText = bundle.formatStringFromName(
@@ -1774,7 +1772,7 @@ function setupListeners() {
   }, false);
 
   document.getElementById("chrome-hangs-fetch-symbols").addEventListener("click",
-    function () {
+    function() {
       if (!gPingData) {
         return;
       }
@@ -1789,7 +1787,7 @@ function setupListeners() {
   }, false);
 
   document.getElementById("chrome-hangs-hide-symbols").addEventListener("click",
-    function () {
+    function() {
       if (!gPingData) {
         return;
       }
@@ -1798,7 +1796,7 @@ function setupListeners() {
   }, false);
 
   document.getElementById("late-writes-fetch-symbols").addEventListener("click",
-    function () {
+    function() {
       if (!gPingData) {
         return;
       }
@@ -1812,7 +1810,7 @@ function setupListeners() {
   }, false);
 
   document.getElementById("late-writes-hide-symbols").addEventListener("click",
-    function () {
+    function() {
       if (!gPingData) {
         return;
       }
@@ -1870,7 +1868,7 @@ var LateWritesSingleton = {
 
     let stacks = lateWrites.stacks;
     let memoryMap = lateWrites.memoryMap;
-    StackRenderer.renderStacks('late-writes', stacks, memoryMap,
+    StackRenderer.renderStacks("late-writes", stacks, memoryMap,
                                LateWritesSingleton.renderHeader);
   }
 };
@@ -1885,7 +1883,7 @@ var LateWritesSingleton = {
 function sortStartupMilestones(aSimpleMeasurements) {
   const telemetryTimestamps = TelemetryTimestamps.get();
   let startupEvents = Services.startup.getStartupInfo();
-  delete startupEvents['process'];
+  delete startupEvents["process"];
 
   function keyIsMilestone(k) {
     return (k in startupEvents) || (k in telemetryTimestamps);
@@ -1936,7 +1934,7 @@ function renderProcessList(ping, selectEl) {
 
   for (let process of Object.keys(ping.payload.processes)) {
     // TODO: parent hgrams are on root payload, not in payload.processes.parent
-    // When/If that gets moved, you'll need to remove this:
+    // When/If that gets moved, you'll need to remove this
     if (process === "parent") {
       continue;
     }

@@ -113,8 +113,7 @@ GMPInstallManager.prototype = {
     addonPromise.then(res => {
       if (!res || !res.gmpAddons) {
         this._deferred.resolve({gmpAddons: []});
-      }
-      else {
+      } else {
         res.gmpAddons = res.gmpAddons.map(a => new GMPAddon(a));
         this._deferred.resolve(res);
       }
@@ -325,7 +324,7 @@ function GMPAddon(addon) {
   for (let name of Object.keys(addon)) {
     this[name] = addon[name];
   }
-  log.info ("Created new addon: " + this.toString());
+  log.info("Created new addon: " + this.toString());
 }
 
 GMPAddon.prototype = {
@@ -336,7 +335,7 @@ GMPAddon.prototype = {
     return this.id + " (" +
            "isValid: " + this.isValid +
            ", isInstalled: " + this.isInstalled +
-           ", hashFunction: " + this.hashFunction+
+           ", hashFunction: " + this.hashFunction +
            ", hashValue: " + this.hashValue +
            (this.size !== undefined ? ", size: " + this.size : "" ) +
            ")";
@@ -473,8 +472,7 @@ GMPExtractor.prototype = {
  * the specified GMPAddon object.
  * @param gmpAddon The addon to install.
  */
-function GMPDownloader(gmpAddon)
-{
+function GMPDownloader(gmpAddon) {
   this._gmpAddon = gmpAddon;
 }
 

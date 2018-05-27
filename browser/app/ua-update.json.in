@@ -12,5 +12,7 @@
   //okcupid.com shows Bummer, this page isn't supported in your browser" with cyberfox user-agent.
   "okcupid.com": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0",
    //privat24.ua shows Bummer, this page isn't supported in your browser" with cyberfox user-agent. 
-  "privat24.ua": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0"
+  "privat24.ua": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0",
+  //addons.mozilla.org Shows get Firefox not addon install if sending Cyberfox useragent
+  "addons.mozilla.org": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0" 
 }

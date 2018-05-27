@@ -70,7 +70,7 @@ Point.prototype = {
     };
   }
 
-  for (let f of ['add', 'subtract', 'equals', 'set'])
+  for (let f of ["add", "subtract", "equals", "set"])
     Point.prototype[f] = takePointOrArgs(Point.prototype[f]);
 })();
 
@@ -119,8 +119,8 @@ Rect.prototype = {
   setRect: function(x, y, w, h) {
     this.left = x;
     this.top = y;
-    this.right = x+w;
-    this.bottom = y+h;
+    this.right = x + w;
+    this.bottom = y + h;
 
     return this;
   },
@@ -228,7 +228,7 @@ Rect.prototype = {
     let r = Math.max(this.right, other.right);
     let t = Math.min(this.top, other.top);
     let b = Math.max(this.bottom, other.bottom);
-    return this.setRect(l, t, r-l, b-t);
+    return this.setRect(l, t, r - l, b - t);
   },
 
   /**
@@ -311,9 +311,9 @@ Rect.prototype = {
    */
   blend: function blend(rect, scalar) {
     return new Rect(
-      this.left   + (rect.left   - this.left  ) * scalar,
-      this.top    + (rect.top    - this.top   ) * scalar,
-      this.width  + (rect.width  - this.width ) * scalar,
+      this.left + (rect.left - this.left ) * scalar,
+      this.top + (rect.top - this.top ) * scalar,
+      this.width + (rect.width - this.width ) * scalar,
       this.height + (rect.height - this.height) * scalar);
   },
 

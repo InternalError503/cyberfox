@@ -23,14 +23,14 @@ XPCOMUtils.defineLazyModuleGetter(this, "PageThumbs",
 XPCOMUtils.defineLazyModuleGetter(this, "BinarySearch",
   "resource://gre/modules/BinarySearch.jsm");
 
-XPCOMUtils.defineLazyGetter(this, "gCryptoHash", function () {
+XPCOMUtils.defineLazyGetter(this, "gCryptoHash", function() {
   return Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
 });
 
-XPCOMUtils.defineLazyGetter(this, "gUnicodeConverter", function () {
+XPCOMUtils.defineLazyGetter(this, "gUnicodeConverter", function() {
   let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
                     .createInstance(Ci.nsIScriptableUnicodeConverter);
-  converter.charset = 'utf8';
+  converter.charset = "utf8";
   return converter;
 });
 
@@ -48,9 +48,6 @@ const HISTORY_RESULTS_LIMIT = 100;
 
 // The maximum number of links Links.getLinks will return.
 const LINKS_GET_LINKS_LIMIT = 100;
-
-// The gather telemetry topic.
-const TOPIC_GATHER_TELEMETRY = "gather-telemetry";
 
 /**
  * Calculate the MD5 hash for a string.
@@ -83,8 +80,7 @@ function LinksStorage() {
         throw new Error("Unsupported newTab storage version");
       }
       // Add further migration steps here.
-    }
-    else {
+    } else {
       // This is a downgrade.  Since we cannot predict future, upgrades should
       // be backwards compatible.  We will set the version to the old value
       // regardless, so, on next upgrade, the migration steps will run again.
@@ -95,7 +91,7 @@ function LinksStorage() {
     // Something went wrong in the update process, we can't recover from here,
     // so just clear the storage and start from scratch (dataloss!).
     Components.utils.reportError(
-      "Unable to migrate the newTab storage to the current version. "+
+      "Unable to migrate the newTab storage to the current version. " +
       "Restarting from scratch.\n" + ex);
     this.clear();
   }
@@ -274,7 +270,7 @@ var AllPages = {
       }
     }
     // and all notifications get forwarded to each page.
-    this._pages.forEach(function (aPage) {
+    this._pages.forEach(function(aPage) {
       aPage.observe(aSubject, aTopic, aData);
     }, this);
   },
@@ -286,7 +282,7 @@ var AllPages = {
   _addObserver: function AllPages_addObserver() {
     Services.prefs.addObserver(PREF_NEWTAB_ENABLED, this, true);
     Services.obs.addObserver(this, "page-thumbnail:create", true);
-    this._addObserver = function () {};
+    this._addObserver = function() {};
   },
 
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
@@ -395,10 +391,10 @@ var PinnedLinks = {
     let links = this.links;
     links[index] = null;
     // trim trailing nulls
-    let i=links.length-1;
+    let i = links.length - 1;
     while (i >= 0 && links[i] == null)
       i--;
-    links.splice(i +1);
+    links.splice(i + 1);
     this.save();
   },
 
@@ -901,7 +897,7 @@ var Links = {
     }
 
     // Filter blocked and pinned links and duplicate base domains.
-    links = links.filter(function (link) {
+    links = links.filter(function(link) {
       let site = NewTabUtils.extractSite(link.url);
       if (site == null || sites.has(site))
         return false;
@@ -1107,7 +1103,7 @@ var Links = {
                    cache in _providers. Defaults to -1 if the provider doesn't know the index
    * @param aDeleted Boolean indicating if the provider has deleted the link.
    */
-  onLinkChanged: function Links_onLinkChanged(aProvider, aLink, aIndex=-1, aDeleted=false) {
+  onLinkChanged: function Links_onLinkChanged(aProvider, aLink, aIndex = -1, aDeleted = false) {
     if (!("url" in aLink))
       throw new Error("Changed links must have a url property");
 
@@ -1156,8 +1152,7 @@ var Links = {
         existingLink.title = aLink.title;
         updatePages = true;
       }
-    }
-    else if (this._sortProperties.every(prop => prop in aLink)) {
+    } else if (this._sortProperties.every(prop => prop in aLink)) {
       // Before doing the O(lg n) insertion below, do an O(1) check for the
       // common case where the new link is too low-ranked to be in the list.
       if (sortedLinks.length && sortedLinks.length == aProvider.maxNumLinks) {
@@ -1221,7 +1216,7 @@ var Links = {
     // Make sure to update open about:newtab instances. If there are no opened
     // pages we can just wait for the next new tab to populate the cache again.
     if (AllPages.length && AllPages.enabled)
-      this.populateCache(function () { AllPages.update() }, true);
+      this.populateCache(function() { AllPages.update() }, true);
     else
       this.resetCache();
   },
@@ -1244,7 +1239,7 @@ var Links = {
    */
   _addObserver: function Links_addObserver() {
     Services.obs.addObserver(this, "browser:purge-session-history", true);
-    this._addObserver = function () {};
+    this._addObserver = function() {};
   },
 
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
@@ -1252,45 +1247,6 @@ var Links = {
 };
 
 Links.compareLinks = Links.compareLinks.bind(Links);
-
-/**
- * Singleton used to collect telemetry data.
- *
- */
-var Telemetry = {
-  /**
-   * Initializes object.
-   */
-  init: function Telemetry_init() {
-    Services.obs.addObserver(this, TOPIC_GATHER_TELEMETRY, false);
-  },
-
-  /**
-   * Collects data.
-   */
-  _collect: function Telemetry_collect() {
-    let probes = [
-      { histogram: "NEWTAB_PAGE_ENABLED",
-        value: AllPages.enabled },
-      { histogram: "NEWTAB_PAGE_PINNED_SITES_COUNT",
-        value: PinnedLinks.links.length },
-      { histogram: "NEWTAB_PAGE_BLOCKED_SITES_COUNT",
-        value: Object.keys(BlockedLinks.links).length }
-    ];
-
-    probes.forEach(function Telemetry_collect_forEach(aProbe) {
-      Services.telemetry.getHistogramById(aProbe.histogram)
-        .add(aProbe.value);
-    });
-  },
-
-  /**
-   * Listens for gather telemetry topic.
-   */
-  observe: function Telemetry_observe(aSubject, aTopic, aData) {
-    this._collect();
-  }
-};
 
 /**
  * Singleton that checks if a given link should be displayed on about:newtab
@@ -1340,7 +1296,7 @@ var ExpirationFilter = {
       return;
     }
 
-    Links.populateCache(function () {
+    Links.populateCache(function() {
       let urls = [];
 
       // Add all URLs to the list that we want to keep thumbnails for.
@@ -1426,7 +1382,7 @@ this.NewTabUtils = {
     PinnedLinks.resetCache();
     BlockedLinks.resetCache();
 
-    Links.populateCache(function () {
+    Links.populateCache(function() {
       AllPages.update();
     }, true);
   },

@@ -38,8 +38,7 @@ this.PlacesDBUtils = {
    * @param aTasks
    *        Tasks object to execute.
    */
-  _executeTasks: function PDBU__executeTasks(aTasks)
-  {
+  _executeTasks: function PDBU__executeTasks(aTasks) {
     if (PlacesDBUtils._isShuttingDown) {
       aTasks.log("- We are shutting down. Will not schedule the tasks.");
       aTasks.clear();
@@ -48,16 +47,8 @@ this.PlacesDBUtils = {
     let task = aTasks.pop();
     if (task) {
       task.call(PlacesDBUtils, aTasks);
-    }
-    else {
+    } else {
       // All tasks have been completed.
-      // Telemetry the time it took for maintenance, if a start time exists.
-      if (aTasks._telemetryStart) {
-        Services.telemetry.getHistogramById("PLACES_IDLE_MAINTENANCE_TIME_MS")
-                          .add(Date.now() - aTasks._telemetryStart);
-        aTasks._telemetryStart = 0;
-      }
-
       if (aTasks.callback) {
         let scope = aTasks.scope || Cu.getGlobalForObject(aTasks.callback);
         aTasks.callback.call(scope, aTasks.messages);
@@ -82,14 +73,12 @@ this.PlacesDBUtils = {
    * @param [optional] aScope
    *        Scope for the callback.
    */
-  maintenanceOnIdle: function PDBU_maintenanceOnIdle(aCallback, aScope)
-  {
+  maintenanceOnIdle: function PDBU_maintenanceOnIdle(aCallback, aScope) {
     let tasks = new Tasks([
       this.checkIntegrity
     , this.checkCoherence
     , this._refreshUI
     ]);
-    tasks._telemetryStart = Date.now();
     tasks.callback = function() {
       Services.prefs.setIntPref("places.database.lastMaintenance",
                                 parseInt(Date.now() / 1000));
@@ -110,8 +99,7 @@ this.PlacesDBUtils = {
    * @param [optional] aScope
    *        Scope for the callback.
    */
-  checkAndFixDatabase: function PDBU_checkAndFixDatabase(aCallback, aScope)
-  {
+  checkAndFixDatabase: function PDBU_checkAndFixDatabase(aCallback, aScope) {
     let tasks = new Tasks([
       this.checkIntegrity
     , this.checkCoherence
@@ -131,8 +119,7 @@ this.PlacesDBUtils = {
    * @param [optional] aTasks
    *        Tasks object to execute.
    */
-  _refreshUI: function PDBU__refreshUI(aTasks)
-  {
+  _refreshUI: function PDBU__refreshUI(aTasks) {
     let tasks = new Tasks(aTasks);
 
     // Send batch update notifications to update the UI.
@@ -142,8 +129,7 @@ this.PlacesDBUtils = {
     PlacesDBUtils._executeTasks(tasks);
   },
 
-  _handleError: function PDBU__handleError(aError)
-  {
+  _handleError: function PDBU__handleError(aError) {
     Cu.reportError("Async statement execution returned with '" +
                    aError.result + "', '" + aError.message + "'");
   },
@@ -154,8 +140,7 @@ this.PlacesDBUtils = {
    * @param [optional] aTasks
    *        Tasks object to execute.
    */
-  reindex: function PDBU_reindex(aTasks)
-  {
+  reindex: function PDBU_reindex(aTasks) {
     let tasks = new Tasks(aTasks);
     tasks.log("> Reindex");
 
@@ -164,12 +149,10 @@ this.PlacesDBUtils = {
       handleError: PlacesDBUtils._handleError,
       handleResult: function () {},
 
-      handleCompletion: function (aReason)
-      {
+      handleCompletion: function (aReason) {
         if (aReason == Ci.mozIStorageStatementCallback.REASON_FINISHED) {
           tasks.log("+ The database has been reindexed");
-        }
-        else {
+        } else {
           tasks.log("- Unable to reindex database");
         }
 
@@ -197,8 +180,7 @@ this.PlacesDBUtils = {
    * @param [optional] aSkipdReindex
    *        Whether to try to reindex database or not.
    */
-  checkIntegrity: function PDBU_checkIntegrity(aTasks, aSkipReindex)
-  {
+  checkIntegrity: function PDBU_checkIntegrity(aTasks, aSkipReindex) {
     let tasks = new Tasks(aTasks);
     tasks.log("> Integrity check");
 
@@ -208,14 +190,12 @@ this.PlacesDBUtils = {
       handleError: PlacesDBUtils._handleError,
 
       _corrupt: false,
-      handleResult: function (aResultSet)
-      {
+      handleResult: function (aResultSet) {
         let row = aResultSet.getNextRow();
         this._corrupt = row.getResultByIndex(0) != "ok";
       },
 
-      handleCompletion: function (aReason)
-      {
+      handleCompletion: function (aReason) {
         if (aReason == Ci.mozIStorageStatementCallback.REASON_FINISHED) {
           if (this._corrupt) {
             tasks.log("- The database is corrupt");
@@ -223,19 +203,16 @@ this.PlacesDBUtils = {
               tasks.log("- Unable to fix corruption, database will be replaced on next startup");
               Services.prefs.setBoolPref("places.database.replaceOnStartup", true);
               tasks.clear();
-            }
-            else {
+            } else {
               // Try to reindex, this often fixed simple indices corruption.
               // We insert from the top of the queue, they will run inverse.
               tasks.push(PlacesDBUtils._checkIntegritySkipReindex);
               tasks.push(PlacesDBUtils.reindex);
             }
-          }
-          else {
+          } else {
             tasks.log("+ The database is sane");
           }
-        }
-        else {
+        } else {
           tasks.log("- Unable to check database status");
           tasks.clear();
         }
@@ -252,8 +229,7 @@ this.PlacesDBUtils = {
    * @param [optional] aTasks
    *        Tasks object to execute.
    */
-  checkCoherence: function PDBU_checkCoherence(aTasks)
-  {
+  checkCoherence: function PDBU_checkCoherence(aTasks) {
     let tasks = new Tasks(aTasks);
     tasks.log("> Coherence check");
 
@@ -262,12 +238,10 @@ this.PlacesDBUtils = {
       handleError: PlacesDBUtils._handleError,
       handleResult: function () {},
 
-      handleCompletion: function (aReason)
-      {
+      handleCompletion: function (aReason) {
         if (aReason == Ci.mozIStorageStatementCallback.REASON_FINISHED) {
           tasks.log("+ The database is coherent");
-        }
-        else {
+        } else {
           tasks.log("- Unable to check database coherence");
           tasks.clear();
         }
@@ -278,8 +252,7 @@ this.PlacesDBUtils = {
     stmts.forEach(aStmt => aStmt.finalize());
   },
 
-  _getBoundCoherenceStatements: function PDBU__getBoundCoherenceStatements()
-  {
+  _getBoundCoherenceStatements: function PDBU__getBoundCoherenceStatements() {
     let cleanupStatements = [];
 
     // MOZ_ANNO_ATTRIBUTES
@@ -735,8 +708,7 @@ this.PlacesDBUtils = {
    * @param [optional] aTasks
    *        Tasks object to execute.
    */
-  vacuum: function PDBU_vacuum(aTasks)
-  {
+  vacuum: function PDBU_vacuum(aTasks) {
     let tasks = new Tasks(aTasks);
     tasks.log("> Vacuum");
 
@@ -750,16 +722,14 @@ this.PlacesDBUtils = {
       handleError: PlacesDBUtils._handleError,
       handleResult: function () {},
 
-      handleCompletion: function (aReason)
-      {
+      handleCompletion: function (aReason) {
         if (aReason == Ci.mozIStorageStatementCallback.REASON_FINISHED) {
           tasks.log("+ The database has been vacuumed");
           let vacuumedDBFile = Services.dirsvc.get("ProfD", Ci.nsILocalFile);
           vacuumedDBFile.append("places.sqlite");
           tasks.log("Final database size is " +
                     parseInt(vacuumedDBFile.fileSize / 1024) + " KiB");
-        }
-        else {
+        } else {
           tasks.log("- Unable to vacuum database");
           tasks.clear();
         }
@@ -776,15 +746,14 @@ this.PlacesDBUtils = {
    * @param [optional] aTasks
    *        Tasks object to execute.
    */
-  expire: function PDBU_expire(aTasks)
-  {
+  expire: function PDBU_expire(aTasks) {
     let tasks = new Tasks(aTasks);
     tasks.log("> Orphans expiration");
 
     let expiration = Cc["@mozilla.org/places/expiration;1"].
                      getService(Ci.nsIObserver);
 
-    Services.obs.addObserver(function (aSubject, aTopic, aData) {
+    Services.obs.addObserver(function(aSubject, aTopic, aData) {
       Services.obs.removeObserver(arguments.callee, aTopic);
       tasks.log("+ Database cleaned up");
       PlacesDBUtils._executeTasks(tasks);
@@ -800,8 +769,7 @@ this.PlacesDBUtils = {
    * @param [optional] aTasks
    *        Tasks object to execute.
    */
-  stats: function PDBU_stats(aTasks)
-  {
+  stats: function PDBU_stats(aTasks) {
     let tasks = new Tasks(aTasks);
     tasks.log("> Statistics");
 
@@ -814,7 +782,7 @@ this.PlacesDBUtils = {
     , "cache_size"
     , "journal_mode"
     , "synchronous"
-    ].forEach(function (aPragma) {
+    ].forEach(function(aPragma) {
       let stmt = DBConn.createStatement("PRAGMA " + aPragma);
       stmt.executeStep();
       tasks.log(aPragma + " is " + stmt.getString(0));
@@ -857,181 +825,6 @@ this.PlacesDBUtils = {
   },
 
   /**
-   * Collects telemetry data and reports it to Telemetry.
-   *
-   * @param [optional] aTasks
-   *        Tasks object to execute.
-   */
-  telemetry: function PDBU_telemetry(aTasks)
-  {
-    let tasks = new Tasks(aTasks);
-
-    // This will be populated with one integer property for each probe result,
-    // using the histogram name as key.
-    let probeValues = {};
-
-    // The following array contains an ordered list of entries that are
-    // processed to collect telemetry data.  Each entry has these properties:
-    //
-    //  histogram: Name of the telemetry histogram to update.
-    //  query:     This is optional.  If present, contains a database command
-    //             that will be executed asynchronously, and whose result will
-    //             be added to the telemetry histogram.
-    //  callback:  This is optional.  If present, contains a function that must
-    //             return the value that will be added to the telemetry
-    //             histogram. If a query is also present, its result is passed
-    //             as the first argument of the function.  If the function
-    //             raises an exception, no data is added to the histogram.
-    //
-    // Since all queries are executed in order by the database backend, the
-    // callbacks can also use the result of previous queries stored in the
-    // probeValues object.
-    let probes = [
-      { histogram: "PLACES_PAGES_COUNT",
-        query:     "SELECT count(*) FROM moz_places" },
-
-      { histogram: "PLACES_BOOKMARKS_COUNT",
-        query:     `SELECT count(*) FROM moz_bookmarks b
-                    JOIN moz_bookmarks t ON t.id = b.parent
-                    AND t.parent <> :tags_folder
-                    WHERE b.type = :type_bookmark` },
-
-      { histogram: "PLACES_TAGS_COUNT",
-        query:     `SELECT count(*) FROM moz_bookmarks
-                    WHERE parent = :tags_folder` },
-
-      { histogram: "PLACES_KEYWORDS_COUNT",
-        query:     "SELECT count(*) FROM moz_keywords" },
-
-      { histogram: "PLACES_SORTED_BOOKMARKS_PERC",
-        query:     `SELECT IFNULL(ROUND((
-                      SELECT count(*) FROM moz_bookmarks b
-                      JOIN moz_bookmarks t ON t.id = b.parent
-                      AND t.parent <> :tags_folder AND t.parent > :places_root
-                      WHERE b.type  = :type_bookmark
-                      ) * 100 / (
-                      SELECT count(*) FROM moz_bookmarks b
-                      JOIN moz_bookmarks t ON t.id = b.parent
-                      AND t.parent <> :tags_folder
-                      WHERE b.type = :type_bookmark
-                    )), 0)` },
-
-      { histogram: "PLACES_TAGGED_BOOKMARKS_PERC",
-        query:     `SELECT IFNULL(ROUND((
-                      SELECT count(*) FROM moz_bookmarks b
-                      JOIN moz_bookmarks t ON t.id = b.parent
-                      AND t.parent = :tags_folder
-                      ) * 100 / (
-                      SELECT count(*) FROM moz_bookmarks b
-                      JOIN moz_bookmarks t ON t.id = b.parent
-                      AND t.parent <> :tags_folder
-                      WHERE b.type = :type_bookmark
-                    )), 0)` },
-
-      { histogram: "PLACES_DATABASE_FILESIZE_MB",
-        callback: function () {
-          let DBFile = Services.dirsvc.get("ProfD", Ci.nsILocalFile);
-          DBFile.append("places.sqlite");
-          return parseInt(DBFile.fileSize / BYTES_PER_MEBIBYTE);
-        }
-      },
-
-      { histogram: "PLACES_DATABASE_PAGESIZE_B",
-        query:     "PRAGMA page_size /* PlacesDBUtils.jsm PAGESIZE_B */" },
-
-      { histogram: "PLACES_DATABASE_SIZE_PER_PAGE_B",
-        query:     "PRAGMA page_count",
-        callback: function (aDbPageCount) {
-          // Note that the database file size would not be meaningful for this
-          // calculation, because the file grows in fixed-size chunks.
-          let dbPageSize = probeValues.PLACES_DATABASE_PAGESIZE_B;
-          let placesPageCount = probeValues.PLACES_PAGES_COUNT;
-          return Math.round((dbPageSize * aDbPageCount) / placesPageCount);
-        }
-      },
-
-      { histogram: "PLACES_ANNOS_BOOKMARKS_COUNT",
-        query:     "SELECT count(*) FROM moz_items_annos" },
-
-      { histogram: "PLACES_ANNOS_PAGES_COUNT",
-        query:     "SELECT count(*) FROM moz_annos" },
-
-      { histogram: "PLACES_MAINTENANCE_DAYSFROMLAST",
-        callback: function () {
-          try {
-            let lastMaintenance = Services.prefs.getIntPref("places.database.lastMaintenance");
-            let nowSeconds = parseInt(Date.now() / 1000);
-            return parseInt((nowSeconds - lastMaintenance) / 86400);
-          } catch (ex) {
-            return 60;
-          }
-        }
-      },
-    ];
-
-    let params = {
-      tags_folder: PlacesUtils.tagsFolderId,
-      type_folder: PlacesUtils.bookmarks.TYPE_FOLDER,
-      type_bookmark: PlacesUtils.bookmarks.TYPE_BOOKMARK,
-      places_root: PlacesUtils.placesRootId
-    };
-
-    for (let i = 0; i < probes.length; i++) {
-      let probe = probes[i];
-
-      let promiseDone = new Promise((resolve, reject) => {
-        if (!("query" in probe)) {
-          resolve([probe]);
-          return;
-        }
-
-        let stmt = DBConn.createAsyncStatement(probe.query);
-        for (let param in params) {
-          if (probe.query.indexOf(":" + param) > 0) {
-            stmt.params[param] = params[param];
-          }
-        }
-
-        try {
-          stmt.executeAsync({
-            handleError: reject,
-            handleResult: function (aResultSet) {
-              let row = aResultSet.getNextRow();
-              resolve([probe, row.getResultByIndex(0)]);
-            },
-            handleCompletion: function () {}
-          });
-        } finally {
-          stmt.finalize();
-        }
-      });
-
-      // Report the result of the probe through Telemetry.
-      // The resulting promise cannot reject.
-      promiseDone.then(
-        // On success
-        ([aProbe, aValue]) => {
-          let value = aValue;
-          try {
-            if ("callback" in aProbe) {
-              value = aProbe.callback(value);
-            }
-            probeValues[aProbe.histogram] = value;
-            Services.telemetry.getHistogramById(aProbe.histogram).add(value);
-          } catch (ex) {
-            Components.utils.reportError("Error adding value " + value +
-                                         " to histogram " + aProbe.histogram +
-                                         ": " + ex);
-          }
-        },
-        // On failure
-        this._handleError);
-    }
-
-    PlacesDBUtils._executeTasks(tasks);
-  },
-
-  /**
    * Runs a list of tasks, notifying log messages to the callback.
    *
    * @param aTasks
@@ -1054,21 +847,18 @@ this.PlacesDBUtils = {
  * @param [optional] aTasks
  *        Array of tasks or another Tasks object to clone.
  */
-function Tasks(aTasks)
-{
+function Tasks(aTasks) {
   if (aTasks) {
     if (Array.isArray(aTasks)) {
       this._list = aTasks.slice(0, aTasks.length);
-    }
-    // This supports passing in a Tasks-like object, with a "list" property,
-    // for compatibility reasons.
-    else if (typeof(aTasks) == "object" &&
-             (Tasks instanceof Tasks || "list" in aTasks)) {
+    } else if (typeof(aTasks) == "object" &&
+               (Tasks instanceof Tasks || "list" in aTasks)) {
+      // This supports passing in a Tasks-like object, with a "list" property,
+      // for compatibility reasons.
       this._list = aTasks.list;
       this._log = aTasks.messages;
       this.callback = aTasks.callback;
       this.scope = aTasks.scope;
-      this._telemetryStart = aTasks._telemetryStart;
     }
   }
 }
@@ -1078,7 +868,6 @@ Tasks.prototype = {
   _log: [],
   callback: null,
   scope: null,
-  _telemetryStart: 0,
 
   /**
    * Adds a task to the top of the list.
@@ -1086,8 +875,7 @@ Tasks.prototype = {
    * @param aNewElt
    *        Task to be added.
    */
-  push: function T_push(aNewElt)
-  {
+  push: function T_push(aNewElt) {
     this._list.unshift(aNewElt);
   },
 
@@ -1096,24 +884,21 @@ Tasks.prototype = {
    *
    * @return next task or undefined if no task is left.
    */
-  pop: function T_pop()
-  {
+  pop: function T_pop() {
     return this._list.shift();
   },
 
   /**
    * Removes all tasks.
    */
-  clear: function T_clear()
-  {
+  clear: function T_clear() {
     this._list.length = 0;
   },
 
   /**
    * Returns array of tasks ordered from the next to be run to the latest.
    */
-  get list()
-  {
+  get list() {
     return this._list.slice(0, this._list.length);
   },
 
@@ -1123,16 +908,14 @@ Tasks.prototype = {
    * @param aMsg
    *        String message to be added.
    */
-  log: function T_log(aMsg)
-  {
+  log: function T_log(aMsg) {
     this._log.push(aMsg);
   },
 
   /**
    * Returns array of log messages ordered from oldest to newest.
    */
-  get messages()
-  {
+  get messages() {
     return this._log.slice(0, this._log.length);
   },
 }

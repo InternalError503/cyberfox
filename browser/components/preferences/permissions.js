@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// Imported via permissions.xul.
+/* import-globals-from ../../../toolkit/content/treeUtils.js */
+
 Components.utils.import("resource://gre/modules/Services.jsm");
 
 const nsIPermissionManager = Components.interfaces.nsIPermissionManager;
@@ -325,8 +328,7 @@ var gPermissionManager = {
     document.getElementById("removeAllPermissions").disabled = true;
   },
 
-  onPermissionKeyPress: function(aEvent)
-  {
+  onPermissionKeyPress: function(aEvent) {
     if (aEvent.keyCode == KeyEvent.DOM_VK_DELETE) {
       this.onPermissionDeleted();
     } else if (AppConstants.platform == "macosx" &&

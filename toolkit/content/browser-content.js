@@ -68,7 +68,7 @@ var ClickEventHandler = {
 
   findNearestScrollableElement: function(aNode) {
     // this is a list of overflow property values that allow scrolling
-    const scrollingAllowed = ['scroll', 'auto'];
+    const scrollingAllowed = ["scroll", "auto"];
 
     // go upward in the DOM and find any parent element that has a overflow
     // area and can therefore be scrolled
@@ -83,11 +83,11 @@ var ClickEventHandler = {
       }
 
       var overflowx = this._scrollable.ownerDocument.defaultView
-                          .getComputedStyle(this._scrollable, '')
-                          .getPropertyValue('overflow-x');
+                          .getComputedStyle(this._scrollable, "")
+                          .getPropertyValue("overflow-x");
       var overflowy = this._scrollable.ownerDocument.defaultView
-                          .getComputedStyle(this._scrollable, '')
-                          .getPropertyValue('overflow-y');
+                          .getComputedStyle(this._scrollable, "")
+                          .getPropertyValue("overflow-y");
       // we already discarded non-multiline selects so allow vertical
       // scroll for multiline ones directly without checking for a
       // overflow property
@@ -199,13 +199,13 @@ var ClickEventHandler = {
     var actualScrollY = 0;
     // don't bother scrolling vertically when the scrolldir is only horizontal
     // and the other way around
-    if (this._scrolldir != 'EW') {
+    if (this._scrolldir != "EW") {
       var y = this.accelerate(this._screenY, this._startY) * timeCompensation;
       var desiredScrollY = this._scrollErrorY + y;
       actualScrollY = this.roundToZero(desiredScrollY);
       this._scrollErrorY = (desiredScrollY - actualScrollY);
     }
-    if (this._scrolldir != 'NS') {
+    if (this._scrolldir != "NS") {
       var x = this.accelerate(this._screenX, this._startX) * timeCompensation;
       var desiredScrollX = this._scrollErrorX + x;
       actualScrollX = this.roundToZero(desiredScrollX);
@@ -498,7 +498,7 @@ var Printing = {
     // By using ReaderMode primitives, we parse given document and place the
     // resulting JS object into the DOM of current browser.
     let articlePromise = ReaderMode.parseDocument(contentWindow.document).catch(Cu.reportError);
-    articlePromise.then(function (article) {
+    articlePromise.then(function(article) {
       // We make use of a web progress listener in order to know when the content we inject
       // into the DOM has finished rendering. If our layout engine is still painting, we
       // will wait for MozAfterPaint event to be fired.
@@ -675,7 +675,7 @@ var Printing = {
                                .getInterface(Ci.nsIWebBrowserPrint);
 
       print.print(printSettings, null);
-	  
+  
     } catch (e) {
       // Pressing cancel is expressed as an NS_ERROR_ABORT return value,
       // causing an exception to be thrown which we catch here.
@@ -875,7 +875,7 @@ let WebChannelMessageToChromeListener = {
     let principal = e.target.nodePrincipal ? e.target.nodePrincipal : e.target.document.nodePrincipal;
 
     if (e.detail) {
-      if (typeof e.detail != 'string') {
+      if (typeof e.detail != "string") {
         // Check if the principal is one of the ones that's allowed to send
         // non-string values for e.detail.
         let objectsAllowed = this._getWhitelistedPrincipals().some(whitelisted =>
@@ -886,7 +886,7 @@ let WebChannelMessageToChromeListener = {
         }
       }
       sendAsyncMessage("WebChannelMessageToChrome", e.detail, { eventTarget: e.target }, principal);
-    } else  {
+    } else {
       Cu.reportError("WebChannel message failed. No message detail.");
     }
   }
@@ -1137,10 +1137,10 @@ var ViewSelectionSource = {
     var tmpNode;
     if (canDrawSelection) {
       var i;
-      for (i = startPath ? startPath.length-1 : -1; i >= 0; i--) {
+      for (i = startPath ? startPath.length - 1 : -1; i >= 0; i--) {
         startContainer = startContainer.childNodes.item(startPath[i]);
       }
-      for (i = endPath ? endPath.length-1 : -1; i >= 0; i--) {
+      for (i = endPath ? endPath.length - 1 : -1; i >= 0; i--) {
         endContainer = endContainer.childNodes.item(endPath[i]);
       }
 
@@ -1166,8 +1166,7 @@ var ViewSelectionSource = {
           else
             endContainer.parentNode.insertBefore(tmpNode, endContainer.nextSibling);
         }
-      }
-      else {
+      } else {
         tmpNode = dataDoc.createTextNode(MARK_SELECTION_END);
         endContainer.insertBefore(tmpNode, endContainer.childNodes.item(endOffset));
       }
@@ -1191,8 +1190,7 @@ var ViewSelectionSource = {
           else
             startContainer.parentNode.insertBefore(tmpNode, startContainer.nextSibling);
         }
-      }
-      else {
+      } else {
         tmpNode = dataDoc.createTextNode(MARK_SELECTION_START);
         startContainer.insertBefore(tmpNode, startContainer.childNodes.item(startOffset));
       }
@@ -1239,21 +1237,21 @@ var ViewSelectionSource = {
 
     let bundle = Services.strings.createBundle(BUNDLE_URL);
     var title = bundle.GetStringFromName("viewMathMLSourceTitle");
-    var wrapClass = this.wrapLongLines ? ' class="wrap"' : '';
+    var wrapClass = this.wrapLongLines ? ' class="wrap"' : "";
     var source =
-      '<!DOCTYPE html>'
-    + '<html>'
-    + '<head><title>' + title + '</title>'
+      "<!DOCTYPE html>"
+    + "<html>"
+    + "<head><title>" + title + "</title>"
     + '<link rel="stylesheet" type="text/css" href="' + VIEW_SOURCE_CSS + '">'
     + '<style type="text/css">'
-    + '#target { border: dashed 1px; background-color: lightyellow; }'
-    + '</style>'
-    + '</head>'
+    + "#target { border: dashed 1px; background-color: lightyellow; }"
+    + "</style>"
+    + "</head>"
     + '<body id="viewsource"' + wrapClass
-    +        ' onload="document.title=\''+title+'\'; document.getElementById(\'target\').scrollIntoView(true)">'
-    + '<pre>'
+    + ' onload="document.title=\'' + title + '\'; document.getElementById(\'target\').scrollIntoView(true)">'
+    + "<pre>"
     + this.getOuterMarkup(topNode, 0)
-    + '</pre></body></html>'
+    + "</pre></body></html>"
     ; // end
 
     return { uri: "data:text/html;charset=utf-8," + encodeURIComponent(source),
@@ -1265,7 +1263,7 @@ var ViewSelectionSource = {
   },
 
   getInnerMarkup: function(node, indent) {
-    var str = '';
+    var str = "";
     for (var i = 0; i < node.childNodes.length; i++) {
       str += this.getOuterMarkup(node.childNodes.item(i), indent);
     }
@@ -1296,35 +1294,33 @@ var ViewSelectionSource = {
         padding += " ";
       }
       str += newline + padding
-          +  '&lt;<span class="start-tag">' + node.nodeName + '</span>';
+          + '&lt;<span class="start-tag">' + node.nodeName + "</span>";
       for (var i = 0; i < node.attributes.length; i++) {
         var attr = node.attributes.item(i);
         if (attr.nodeName.match(/^[-_]moz/)) {
           continue;
         }
         str += ' <span class="attribute-name">'
-            +  attr.nodeName
-            +  '</span>=<span class="attribute-value">"'
-            +  this.unicodeToEntity(attr.nodeValue)
-            +  '"</span>';
+            + attr.nodeName
+            + '</span>=<span class="attribute-value">"'
+            + this.unicodeToEntity(attr.nodeValue)
+            + '"</span>';
       }
       if (!node.hasChildNodes()) {
         str += "/&gt;";
-      }
-      else {
+      } else {
         str += "&gt;";
         var oldLine = this._lineCount;
         str += this.getInnerMarkup(node, indent + 2);
         if (oldLine == this._lineCount) {
           newline = "";
           padding = "";
-        }
-        else {
+        } else {
           newline = (this._lineCount == this._endTargetLine) ? "" : "\n";
           this._lineCount++;
         }
         str += newline + padding
-            +  '&lt;/<span class="end-tag">' + node.nodeName + '</span>&gt;';
+            + '&lt;/<span class="end-tag">' + node.nodeName + "</span>&gt;";
       }
       break;
     case Node.TEXT_NODE: // Text
@@ -1333,7 +1329,7 @@ var ViewSelectionSource = {
       tmp = tmp.replace(/^ +/, "");
       tmp = tmp.replace(/ +$/, "");
       if (tmp.length != 0) {
-        str += '<span class="text">' + this.unicodeToEntity(tmp) + '</span>';
+        str += '<span class="text">' + this.unicodeToEntity(tmp) + "</span>";
       }
       break;
     default:
@@ -1342,16 +1338,16 @@ var ViewSelectionSource = {
 
     if (node == this._targetNode) {
       this._endTargetLine = this._lineCount;
-      str += '</pre><pre>';
+      str += "</pre><pre>";
     }
     return str;
   },
 
   unicodeToEntity: function(text) {
     const charTable = {
-      '&': '&amp;<span class="entity">amp;</span>',
-      '<': '&amp;<span class="entity">lt;</span>',
-      '>': '&amp;<span class="entity">gt;</span>',
+      "&": '&amp;<span class="entity">amp;</span>',
+      "<": '&amp;<span class="entity">lt;</span>',
+      ">": '&amp;<span class="entity">gt;</span>',
       '"': '&amp;<span class="entity">quot;</span>'
     };
 
@@ -1364,7 +1360,7 @@ var ViewSelectionSource = {
         var unichar = this._entityConverter
                           .ConvertToEntity(letter, entityVersion);
         var entity = unichar.substring(1); // extract '&'
-        return '&amp;<span class="entity">' + entity + '</span>';
+        return '&amp;<span class="entity">' + entity + "</span>";
       } catch (ex) {
         return letter;
       }
@@ -1500,12 +1496,12 @@ let AutoCompletePopup = {
     }
   },
 
-  get input () { return this._input; },
-  get overrideValue () { return null; },
-  set selectedIndex (index) {
+  get input() { return this._input; },
+  get overrideValue() { return null; },
+  set selectedIndex(index) {
     sendAsyncMessage("FormAutoComplete:SetSelectedIndex", { index });
   },
-  get selectedIndex () {
+  get selectedIndex() {
     // selectedIndex getter must be synchronous because we need the
     // correct value when the controller is in controller::HandleEnter.
     // We can't easily just let the parent inform us the new value every
@@ -1514,7 +1510,7 @@ let AutoCompletePopup = {
     // list).
     return sendSyncMessage("FormAutoComplete:GetSelectedIndex", {});
   },
-  get popupOpen () {
+  get popupOpen() {
     return this._popupOpen;
   },
 

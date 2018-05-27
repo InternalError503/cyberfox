@@ -69,7 +69,7 @@
       <property name="_prefBranch" readonly="true">
         <getter><![CDATA[
           if (this.__prefBranch === null) {
-            this.__prefBranch = Components.classes['@mozilla.org/preferences-service;1']
+            this.__prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
                                           .getService(Components.interfaces.nsIPrefBranch);
           }
           return this.__prefBranch;
@@ -83,8 +83,7 @@
             try {
               this._scrollIncrement = this._prefBranch
                                           .getIntPref("toolkit.scrollbox.scrollIncrement");
-            }
-            catch (ex) {
+            } catch (ex) {
               this._scrollIncrement = 20;
             }
           }
@@ -102,8 +101,7 @@
               try {
                 this._smoothScroll = this._prefBranch
                                          .getBoolPref("toolkit.scrollbox.smoothScroll");
-              }
-              catch (ex) {
+              } catch (ex) {
                 this._smoothScroll = true;
               }
             }
@@ -297,10 +295,12 @@
           if (!this.requestHandle)
             this.requestHandle = window.requestAnimationFrame(this.sample.bind(this));
         },
+
         stop: function scrollAnim_stop() {
           window.cancelAnimationFrame(this.requestHandle);
           this.requestHandle = 0;
         },
+
         sample: function scrollAnim_handleEvent(timeStamp) {
           const timePassed = timeStamp - this.startTime;
           const pos = timePassed >= this.duration ? 1 :
@@ -521,16 +521,14 @@
           if (this.hasAttribute("notoverflowing")) {
             scrolledToStart = true;
             scrolledToEnd = true;
-          }
-          else if (this.scrollPosition == 0) {
+          } else if (this.scrollPosition == 0) {
             // In the RTL case, this means the _last_ element in the
             // scrollbox is visible
             if (this._isRTLScrollbox)
               scrolledToEnd = true;
             else
               scrolledToStart = true;
-          }
-          else if (this.scrollClientSize + this.scrollPosition == this.scrollSize) {
+          } else if (this.scrollClientSize + this.scrollPosition == this.scrollSize) {
             // In the RTL case, this means the _first_ element in the
             // scrollbox is visible
             if (this._isRTLScrollbox)
@@ -640,8 +638,7 @@
         if (this.orient == "vertical") {
           if (event.detail == 1)
             return;
-        }
-        else if (event.detail == 0) {
+        } else if (event.detail == 0) {
           // horizontal scrollbox
           return;
         }
@@ -656,8 +653,7 @@
           let childNodes = this._getScrollableElements();
           if (childNodes && childNodes.length)
             this.ensureElementIsVisible(childNodes[0], false);
-        }
-        catch (e) {
+        } catch (e) {
           this.removeAttribute("notoverflowing");
         }
       ]]></handler>
@@ -675,8 +671,7 @@
         if (this.orient == "vertical") {
           if (event.detail == 1)
             return;
-        }
-        else if (event.detail == 0) {
+        } else if (event.detail == 0) {
           // horizontal scrollbox
           return;
         }
@@ -690,8 +685,7 @@
           // means that the notoverflowing attribute was removed erroneously,
           // as the whole overflow event should not be happening in that case.
           this._updateScrollButtonsDisabledState();
-        }
-        catch (e) {
+        } catch (e) {
           this.setAttribute("notoverflowing", "true");
         }
       ]]></handler>
@@ -740,8 +734,7 @@
         try {
           this._scrollDelay = this._prefBranch
                                   .getIntPref("toolkit.scrollbox.clickToScroll.scrollDelay");
-        }
-        catch (ex) {
+        } catch (ex) {
         }
       ]]></constructor>
 

@@ -259,7 +259,7 @@ function AecLogging() {
 AecLogging.prototype = Object.create(Control.prototype);
 AecLogging.prototype.constructor = AecLogging;
 
-AecLogging.prototype.offState = function () {
+AecLogging.prototype.offState = function() {
   this._label = getString("aec_logging_off_state_label");
   try {
     let file = Services.prefs.getCharPref("media.webrtc.debug.aec_log_dir");
@@ -269,7 +269,7 @@ AecLogging.prototype.offState = function () {
   }
 };
 
-AecLogging.prototype.onState = function () {
+AecLogging.prototype.onState = function() {
   this._label = getString("aec_logging_on_state_label");
   try {
     let file = Services.prefs.getCharPref("media.webrtc.debug.aec_log_dir");
@@ -279,7 +279,7 @@ AecLogging.prototype.onState = function () {
   }
 };
 
-AecLogging.prototype.onClick = function () {
+AecLogging.prototype.onClick = function() {
   if (WebrtcGlobalInformation.aecDebug) {
     WebrtcGlobalInformation.aecDebug = false;
     this.offState();
@@ -527,7 +527,7 @@ RTPStats.prototype = {
 
   generateRTPStats: function() {
     let remoteRtpStats = {};
-    let rtpStats = [].concat((this._report.inboundRTPStreamStats  || []),
+    let rtpStats = [].concat((this._report.inboundRTPStreamStats || []),
                              (this._report.outboundRTPStreamStats || []));
 
     // Generate an id-to-streamStat index for each streamStat that is marked
@@ -678,6 +678,7 @@ ICEStats.prototype = {
 
     heading.textContent = getString("ice_stats_heading");
     div.appendChild(heading);
+
     div.appendChild(statsTable.render());
 
     return div;
@@ -739,7 +740,7 @@ ICEStats.prototype = {
 
     var type = c.candidateType;
 
-    if (c.type == "localcandidate" && c.candidateType == "relayed") {
+    if (c.type == "local-candidate" && c.candidateType == "relayed") {
       type = `${c.candidateType}-${c.mozLocalTransport}`;
     }
 

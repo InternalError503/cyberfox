@@ -17,7 +17,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "Task",
 XPCOMUtils.defineLazyModuleGetter(this, "Deprecated",
                                   "resource://gre/modules/Deprecated.jsm");
 
-XPCOMUtils.defineLazyGetter(this, "asyncHistory", function () {
+XPCOMUtils.defineLazyGetter(this, "asyncHistory", function() {
   // Lazily add an history observer when it's actually needed.
   PlacesUtils.history.addObserver(PlacesUtils.livemarks, true);
   return PlacesUtils.asyncHistory;
@@ -123,8 +123,7 @@ LivemarkService.prototype = {
   _startReloadTimer(livemarksMap, forceUpdate, reloaded) {
     if (this._reloadTimer) {
       this._reloadTimer.cancel();
-    }
-    else {
+    } else {
       this._reloadTimer = Cc["@mozilla.org/timer;1"]
                             .createInstance(Ci.nsITimer);
     }
@@ -176,7 +175,7 @@ LivemarkService.prototype = {
     // Must provide at least non-null parent guid/id, index and feedURI.
     if ((!hasParentId && !hasParentGuid) ||
         (hasParentId && aLivemarkInfo.parentId < 1) ||
-        (hasParentGuid &&!/^[a-zA-Z0-9\-_]{12}$/.test(aLivemarkInfo.parentGuid)) ||
+        (hasParentGuid && !/^[a-zA-Z0-9\-_]{12}$/.test(aLivemarkInfo.parentGuid)) ||
         (hasIndex && aLivemarkInfo.index < Ci.nsINavBookmarksService.DEFAULT_INDEX) ||
         !(aLivemarkInfo.feedURI instanceof Ci.nsIURI) ||
         (aLivemarkInfo.siteURI && !(aLivemarkInfo.siteURI instanceof Ci.nsIURI)) ||
@@ -415,8 +414,7 @@ LivemarkService.prototype = {
  *
  * @note terminate() must be invoked before getting rid of this object.
  */
-function Livemark(aLivemarkInfo)
-{
+function Livemark(aLivemarkInfo) {
   this.id = aLivemarkInfo.id;
   this.guid = aLivemarkInfo.guid;
   this.feedURI = aLivemarkInfo.feedURI;
@@ -481,8 +479,7 @@ Livemark.prototype = {
     try {
       secMan.checkLoadURIWithPrincipal(feedPrincipal, aSiteURI,
                                        Ci.nsIScriptSecurityManager.DISALLOW_INHERIT_PRINCIPAL);
-    }
-    catch (ex) {
+    } catch (ex) {
       return;
     }
 
@@ -546,8 +543,7 @@ Livemark.prototype = {
       channel.asyncOpen2(listener);
 
       this.loadGroup = loadgroup;
-    }
-    catch (ex) {
+    } catch (ex) {
       this.status = Ci.mozILivemark.STATUS_FAILED;
     }
   },

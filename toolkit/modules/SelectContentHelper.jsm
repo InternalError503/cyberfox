@@ -30,7 +30,7 @@ this.EXPORTED_SYMBOLS = [
   "SelectContentHelper"
 ];
 
-this.SelectContentHelper = function (aElement, aOptions, aGlobal) {
+this.SelectContentHelper = function(aElement, aOptions, aGlobal) {
   this.element = aElement;
   this.initialSelection = aElement[aElement.selectedIndex] || null;
   this.global = aGlobal;
@@ -206,13 +206,13 @@ function buildOptionListForChildren(node) {
   for (let child of node.children) {
     let tagName = child.tagName.toUpperCase();
 
-    if (tagName == 'OPTION' || tagName == 'OPTGROUP') {
+    if (tagName == "OPTION" || tagName == "OPTGROUP") {
       if (child.hidden) {
         continue;
       }
 
       let textContent =
-        tagName == 'OPTGROUP' ? child.getAttribute("label")
+        tagName == "OPTGROUP" ? child.getAttribute("label")
                               : child.text;
       if (textContent == null) {
         textContent = "";
@@ -237,7 +237,7 @@ function buildOptionListForChildren(node) {
         // color does not override color: menutext in the parent.
         // backgroundColor: computedStyle.backgroundColor,
         // color: computedStyle.color,
-        children: tagName == 'OPTGROUP' ? buildOptionListForChildren(child) : []
+        children: tagName == "OPTGROUP" ? buildOptionListForChildren(child) : []
       };
       result.push(info);
     }

@@ -148,7 +148,7 @@
 <!ENTITY Ctr_puibut_r_sep	"Derecha">
 <!ENTITY Ctr_html5warning	"Advertencia de pantalla completa de contenidos HTML5">
 <!ENTITY Ctr_oldtoplevimg	"Vista de imagen: Apariencia clásica sobre fondo blanco">
-<!ENTITY Ctr_altdlprogbar	"Barra de progreso de descarga: Apariencia alternativa">
+<!ENTITY Ctr_altdlprogbar	"Apariencia alternativa para la barra de progreso de descargas">
 <!ENTITY Ctr_altalertbox	"'Recuadro de alerta': Apariencia alternativa">
 <!ENTITY Ctr_emptygfavico	"Reemplazar favicon genérico">
 <!ENTITY Ctr_mstatusbar		"Mostrar panel móvil del contenedor de la antigua barra de estado">
@@ -188,7 +188,7 @@
 <!ENTITY Ctr_ctroldsearchr	"Volver al primer motor de búsqueda de la lista después de buscar">
 <!ENTITY Ctr_ctrosearchdel	"de retardo">
 <!ENTITY Ctr_search_oit		"Abrir búsqueda en una nueva pestaña">
-<!ENTITY Ctr_osearch_meoit	"Clic central: Realiza la búsqueda en una nueva 'pestaña en primer plano'">
+<!ENTITY Ctr_osearch_meoit	"Abrir búsqueda en una nueva pestaña -en primer plano- al hacer clic medio sobre">
 <!ENTITY Ctr_osearch_meoit1	"Motor de búsqueda">
 <!ENTITY Ctr_osearch_meoit2	"Lupa">
 <!ENTITY Ctr_osearch_iwidth	"Ajustar automáticamente la anchura del menú emergente">
@@ -359,7 +359,7 @@
 <!ENTITY Ctr_nonavbarbg2	"Afecta a todas las barras con 'Chrome esbelto' del complemento 'Beyond Australis'.">
 <!ENTITY Ctr_nonavborder	"Añadir borde superior a la barra">
 <!ENTITY Ctr_nonavtbborder	"Barras superiores: Eliminar bordes de barra de herramientas">
-<!ENTITY Ctr_toptb_oldpad	"Barras superiores: Ahuecados antiguos a izquierda y derecha">
+<!ENTITY Ctr_toptb_oldpad	"Barras superiores: Antiguos ahuecados a izquierda y derecha">
 <!ENTITY Ctr_hidesbclose	"Ocultar botón cerrar de las barras laterales">
 <!ENTITY Ctr_notextshadow	"Ocultar sombreado para texto de barra de herramientas y texto de pestaña">
 <!ENTITY Ctr_chevronfix		"Barra de navegación: Ocultar botón de doble flecha ('Más herramientas') al final de las barras">

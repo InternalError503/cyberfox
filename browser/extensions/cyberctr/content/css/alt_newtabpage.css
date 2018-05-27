@@ -27,7 +27,12 @@
 	#newtab-window .newtab-cell {
 	  margin: 20px 10px 0px !important;
 	}
-	
+
+	html #newtab-grid {
+	  min-height: unset !important;
+	  max-height: unset !important;
+	}
+
    .newtab-link {
       overflow:visible !important;
    }

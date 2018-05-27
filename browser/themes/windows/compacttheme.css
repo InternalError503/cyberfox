@@ -2,24 +2,20 @@
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-%include ../shared/devedition.inc.css
+%include ../shared/compacttheme.inc.css
 
 :root {
   --forwardbutton-width: 29px;
-}
-
-:root[devtoolstheme="dark"],
-:root[devtoolstheme="light"] {
    /* Matches the #browser-border-start, #browser-border-end color */
   --chrome-nav-bar-separator-color: rgba(10, 31, 51, 0.35);
 }
 
 /* The window background is white due to no accentcolor in the lightweight
    theme. It can't be changed to transparent when there is no compositor
-   (Win XP or 7 in classic / basic theme), or else dragging and focus become
+   (Win 7 in classic / basic theme), or else dragging and focus become
    broken. So instead just show the normal titlebar in that case, and override
    the window color as transparent when the compositor is available. */
-@media not all and (-moz-windows-compositor) {
+@media (-moz-windows-compositor: 0) {
   #main-window[tabsintitlebar] #titlebar:-moz-lwtheme {
     visibility: visible;
   }
@@ -100,8 +96,8 @@
   text-shadow: none !important;
 }
 
-:root[devtoolstheme="dark"] .findbar-closebutton,
-:root[devtoolstheme="dark"] #sidebar-header > .close-icon,
+.findbar-closebutton:-moz-lwtheme-brighttext,
+#sidebar-header > .close-icon:-moz-lwtheme-brighttext,
 /* Tab styling - make sure to use an inverted icon for the selected tab
    (brighttext only covers the unselected tabs) */
 .tab-close-button[selected=true] {
@@ -109,16 +105,28 @@
 }
 
 @media (min-resolution: 1.1dppx) {
-  :root[devtoolstheme="dark"] .findbar-closebutton,
-  :root[devtoolstheme="dark"] #sidebar-header > .close-icon,
+  .findbar-closebutton:-moz-lwtheme-brighttext,
+  #sidebar-header > .close-icon:-moz-lwtheme-brighttext,
   .tab-close-button[selected=true] {
     list-style-image: url("chrome://global/skin/icons/close-inverted@2x.png");
   }
 }
 
-@media (-moz-os-version: windows-xp),
-       (-moz-os-version: windows-vista),
-       (-moz-os-version: windows-win7),
+/* Override tab close icon (to disable inversion) for better contrast with
+   light theme on Windows 7 Classic theme. */
+@media not all and (min-resolution: 1.1dppx) {
+  #TabsToolbar[brighttext] .tab-close-button:-moz-lwtheme-darktext:not([selected="true"]) {
+    list-style-image: url("chrome://global/skin/icons/close.png");
+  }
+}
+
+@media (min-resolution: 1.1dppx) {
+  #TabsToolbar[brighttext] .tab-close-button:-moz-lwtheme-darktext:not([selected="true"]) {
+    list-style-image: url("chrome://global/skin/icons/close@2x.png");
+  }
+}
+
+@media (-moz-os-version: windows-win7),
        (-moz-os-version: windows-win8) {
   :root {
     --space-above-tabbar: 15px;
@@ -191,8 +199,8 @@
   }
 
   /* Use proper menu text styling in Win7 classic mode (copied from browser.css) */
-  @media not all and (-moz-windows-compositor),
-         not all and (-moz-windows-default-theme) {
+  @media (-moz-windows-compositor: 0),
+         (-moz-windows-default-theme: 0) {
     #main-window[tabsintitlebar]:not([inFullscreen]) #toolbar-menubar,
     #main-window[tabsintitlebar]:not([inFullscreen]) #TabsToolbar {
       color: CaptionText;
@@ -263,8 +271,7 @@
   color: var(--chrome-color);
 }
 
-@media (-moz-os-version: windows-vista),
-       (-moz-os-version: windows-win7),
+@media (-moz-os-version: windows-win7),
        (-moz-os-version: windows-win8) {
   /* And then we add them back on toolbars so that they don't look borderless: */
   #main-window:not([customizing])[sizemode=normal] #navigator-toolbox::after,
@@ -282,34 +289,33 @@
   }
 
   /* Force white caption buttons for the dark theme on Windows 10 */
-  :root[devtoolstheme="dark"] #titlebar-min {
+  #titlebar-min:-moz-lwtheme-brighttext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#minimize-white);
   }
-  :root[devtoolstheme="dark"] #titlebar-max {
+  #titlebar-max:-moz-lwtheme-brighttext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#maximize-white);
   }
-  #main-window[devtoolstheme="dark"][sizemode="maximized"] #titlebar-max {
+  #main-window[sizemode="maximized"] #titlebar-max:-moz-lwtheme-brighttext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#restore-white);
   }
-  :root[devtoolstheme="dark"] #titlebar-close {
+  #titlebar-close:-moz-lwtheme-brighttext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#close-white);
   }
 
   /* ... and normal ones for the light theme on Windows 10 */
-  :root[devtoolstheme="light"] #titlebar-min {
+  #titlebar-min:-moz-lwtheme-darktext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#minimize);
   }
-  :root[devtoolstheme="light"] #titlebar-max {
+  #titlebar-max:-moz-lwtheme-darktext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#maximize);
   }
-  #main-window[devtoolstheme="light"][sizemode="maximized"] #titlebar-max {
+  #main-window[sizemode="maximized"] #titlebar-max:-moz-lwtheme-darktext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#restore);
   }
-  :root[devtoolstheme="light"] #titlebar-close {
+  #titlebar-close:-moz-lwtheme-darktext {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#close);
   }
-
-  :root[devtoolstheme="light"] #titlebar-close:hover {
+  #titlebar-close:-moz-lwtheme-darktext:hover {
     list-style-image: url(chrome://browser/skin/caption-buttons.svg#close-white);
   }
 }
@@ -318,4 +324,21 @@
   /* Left-align the type icon in awesomebar popup results with the icon in the
      urlbar. */
   margin-inline-start: 13px;
+}
+
+@media (-moz-os-version: windows-win7),
+       (-moz-os-version: windows-win8) {
+	#TabsToolbar:-moz-lwtheme {
+	  opacity: 1;
+	}
+
+	#toolbar-menubar:-moz-lwtheme {
+	  text-shadow: 0 0 .5em white, 0 0 .5em white, 0 1px 0 rgba(255,255,255,.4);
+	}
+
+	#main-menubar:-moz-lwtheme:not(:-moz-window-inactive) {
+	  background-color: rgba(255,255,255,.5);
+	  color: black;
+	  border-radius: 4px;
+	}
 }

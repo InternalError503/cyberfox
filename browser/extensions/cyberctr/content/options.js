@@ -37,7 +37,11 @@ classicthemerestorerjso.ctr = {
 	} catch(e){}
 	
 	try{
-		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org') {
+		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'
+			|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-dark@mozilla.org'
+			|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-light@mozilla.org'
+		  )
+		{
 		  this.fxdefaulttheme=false;
 		}
 	} catch(e){}
@@ -96,6 +100,7 @@ classicthemerestorerjso.ctr = {
 
 		document.getElementById('ctraddon_pw_closeonleft').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_nbcompact').style.visibility = 'collapse';
+		document.getElementById('ctraddon_pw_nbcompact2').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tabc_act_tb').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_aerocolors').style.visibility = 'collapse';
 		document.getElementById('ctraddon_pw_tbsep_winc').style.visibility = 'collapse';
@@ -125,7 +130,10 @@ classicthemerestorerjso.ctr = {
 		document.getElementById('ctraddon_altoptions_list2').style.visibility = 'collapse';
 	};
 	
-	if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org') {
+	if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'
+		|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-dark@mozilla.org'
+		|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-light@mozilla.org'
+	  ) {
 	  document.getElementById('ctraddon_altoptions_list').style.visibility = 'visible';
 	  document.getElementById('ctraddon_pw_alt_addonsm').style.visibility = 'visible';
 	  document.getElementById('ctraddon_altoptions_list2').style.visibility = 'collapse';
@@ -134,7 +142,21 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_verifiedcolors').style.visibility = 'visible';
 	  document.getElementById('ctraddon_pw_altdlprogbar').style.visibility = 'visible';
 	  document.getElementById('ctraddon_pw_altalertbox').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_tabc_act_tb').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_invertedicons').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_altreaderico').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_urlbardark').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_searchbardark').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_altdlprogbar').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_menubargroup2').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_menubarnofog').style.visibility = 'visible';
+	  document.getElementById('ctraddon_pw_am_compact').style.visibility = 'visible';
+	  if(this.prefs.getBoolPref("am_compact"))
+	    document.getElementById('ctraddon_pw_am_compact2').style.visibility = 'visible';
+	  
+	  document.getElementById('ctraddon_pw_colors_ntab_t').disabled = false;
 	}
+
 	document.getElementById('ctraddon_pw_cappbutctcl').disabled = true;
 	document.getElementById('ctraddon_pw_cappbutctct').disabled = true;
 	document.getElementById('ctraddon_pw_cappbutctcc').disabled = true;
@@ -468,6 +490,15 @@ classicthemerestorerjso.ctr = {
 	  document.getElementById('ctraddon_pw_ttoverflow').style.visibility = 'collapse';
 	}
 	
+	if (this.appversion < 54) {
+	  document.getElementById('ctraddon_pw_nbcompact2').style.visibility = 'collapse';
+	}
+	
+	if (this.appversion >= 54) {
+	  document.getElementById('ctraddon_pw_nbcompact').style.visibility = 'collapse';
+	}
+	
+	
 	function PrefListener(branch_name, callback) {
 	  // Keeping a reference to the observed preference branch or it will get
 	  // garbage collected.
@@ -749,8 +780,11 @@ classicthemerestorerjso.ctr = {
 		  
 		    if (classicthemerestorerjso.ctr.appversion >= 47 && branch.getBoolPref("drawInTitlebar")==false
 			  && (classicthemerestorerjso.ctr.fxdefaulttheme
-			    || Services.prefs.getBranch("lightweightThemes.")
-				  .getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org')) {
+			      || Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'
+				  || Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-dark@mozilla.org'
+				  || Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-light@mozilla.org'
+				 )
+			   ) {
 			  document.getElementById('ctraddon_pw_dblclnewtab').disabled = true;
 			  document.getElementById('ctraddon_pw_dblclnewtabdes').style.visibility = 'collapse';
 			} else {
@@ -975,7 +1009,11 @@ classicthemerestorerjso.ctr = {
 	setTimeout(function(){
 
 	  try {
-		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'){
+		if(Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'
+			|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-dark@mozilla.org'
+			|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-light@mozilla.org'
+		  )
+		{
 		  document.getElementById('ctraddon_pw_tabforminfo').style.visibility = 'visible';
 		  document.getElementById('ctraddon_pw_tabmenulist').disabled = true;
 		} else if(classicthemerestorerjso.ctr.fxdefaulttheme) {
@@ -1007,8 +1045,10 @@ classicthemerestorerjso.ctr = {
 	document.getElementById('ctraddon_pw_hide_bf_popup').style.visibility = itemvis;
 	document.getElementById('ctraddon_pw_bf_space').style.visibility = itemvis;
 	if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref('smallnavbut')==false){
-	  document.getElementById('ctraddon_pw_nbcompact').disabled = which;
-	  document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
+	  if (this.appversion < 54) document.getElementById('ctraddon_pw_nbcompact').disabled = which;
+	  if (this.appversion < 54) document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
+	  if (this.appversion >= 54) document.getElementById('ctraddon_pw_nbcompact2').disabled = which;
+	  if (this.appversion >= 54) document.getElementById('ctraddon_pw_nbcompact2').style.visibility = itemvis;
 	}
   },
   
@@ -1021,8 +1061,10 @@ classicthemerestorerjso.ctr = {
 	  } else {
 		which=true; itemvis = 'collapse';
 	  }
-	  document.getElementById('ctraddon_pw_nbcompact').disabled = which;
-	  document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
+	  if (this.appversion < 54) document.getElementById('ctraddon_pw_nbcompact').disabled = which;
+	  if (this.appversion < 54) document.getElementById('ctraddon_pw_nbcompact').style.visibility = itemvis;
+	  if (this.appversion >= 54) document.getElementById('ctraddon_pw_nbcompact2').disabled = which;
+	  if (this.appversion >= 54) document.getElementById('ctraddon_pw_nbcompact2').style.visibility = itemvis;
 	}
   },
   

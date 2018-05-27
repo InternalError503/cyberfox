@@ -4,6 +4,8 @@
 
 "use strict";
 
+/* exported logger */
+
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
@@ -203,8 +205,7 @@ var PluginProvider = {
 
         seenPlugins[tag.name][tag.description] = plugin;
         list[plugin.id] = plugin;
-      }
-      else {
+      } else {
         seenPlugins[tag.name][tag.description].tags.push(tag);
       }
     }

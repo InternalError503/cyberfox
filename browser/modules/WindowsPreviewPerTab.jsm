@@ -147,7 +147,7 @@ function PreviewController(win, tab) {
 
   this.tab.addEventListener("TabAttrModified", this, false);
 
-  XPCOMUtils.defineLazyGetter(this, "canvasPreview", function () {
+  XPCOMUtils.defineLazyGetter(this, "canvasPreview", function() {
     let canvas = PageThumbs.createCanvas();
     canvas.mozOpaque = true;
     return canvas;
@@ -276,7 +276,7 @@ PreviewController.prototype = {
       // Use transparency, Aero glass is drawn black without it.
       composite.mozOpaque = false;
 
-      let ctx = composite.getContext('2d');
+      let ctx = composite.getContext("2d");
       let scale = this.screenPixelsPerCSSPixel / this.zoom;
 
       composite.width = winWidth * scale;
@@ -295,7 +295,7 @@ PreviewController.prototype = {
       ctx.restore();
 
       // Deliver the resulting composite canvas to Windows
-      this.win.tabbrowser.previewTab(this.tab, function () {
+      this.win.tabbrowser.previewTab(this.tab, function() {
         aTaskbarCallback.done(composite, false);
       });
     });
@@ -344,7 +344,8 @@ PreviewController.prototype = {
 };
 
 XPCOMUtils.defineLazyGetter(PreviewController.prototype, "canvasPreviewFlags",
-  function () { let canvasInterface = Ci.nsIDOMCanvasRenderingContext2D;
+  function() {
+ let canvasInterface = Ci.nsIDOMCanvasRenderingContext2D;
                 return canvasInterface.DRAWWINDOW_DRAW_VIEW
                      | canvasInterface.DRAWWINDOW_DRAW_CARET
                      | canvasInterface.DRAWWINDOW_ASYNC_DECODE_IMAGES
@@ -410,10 +411,10 @@ TabWindow.prototype = {
     AeroPeek.checkPreviewCount();
   },
 
-  get width () {
+  get width() {
     return this.win.innerWidth;
   },
-  get height () {
+  get height() {
     return this.win.innerHeight;
   },
 
@@ -462,11 +463,11 @@ TabWindow.prototype = {
     AeroPeek.removePreview(preview);
   },
 
-  get enabled () {
+  get enabled() {
     return this._enabled;
   },
 
-  set enabled (enable) {
+  set enabled(enable) {
     this._enabled = enable;
     // Because making a tab visible requires that the tab it is next to be
     // visible, it is far simpler to unset the 'next' tab and recreate them all
@@ -541,7 +542,7 @@ TabWindow.prototype = {
     this.invalidateTimer.initWithCallback(() => {
       // invalidate every preview. note the internal implementation of
       // invalidate ignores thumbnails that aren't visible.
-      this.previews.forEach(function (aPreview) {
+      this.previews.forEach(function(aPreview) {
         let controller = aPreview.controller.wrappedJSObject;
         if (!controller.testCacheBrowserDims()) {
           controller.cacheBrowserDims();
@@ -692,7 +693,7 @@ this.AeroPeek = {
 
     this._enabled = enable;
 
-    this.windows.forEach(function (win) {
+    this.windows.forEach(function(win) {
       win.enabled = enable;
     });
   },
@@ -792,7 +793,7 @@ this.AeroPeek = {
 
   resetCacheTimer: function () {
     this.cacheTimer.cancel();
-    this.cacheTimer.init(this, 1000*this.cacheLifespan, Ci.nsITimer.TYPE_ONE_SHOT);
+    this.cacheTimer.init(this, 1000 * this.cacheLifespan, Ci.nsITimer.TYPE_ONE_SHOT);
   },
 
   // nsIObserver
@@ -814,7 +815,7 @@ this.AeroPeek = {
         this.checkPreviewCount();
         break;
       case "timer-callback":
-        this.previews.forEach(function (preview) {
+        this.previews.forEach(function(preview) {
           let controller = preview.controller.wrappedJSObject;
           controller.resetCanvasPreview();
         });

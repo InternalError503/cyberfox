@@ -20,8 +20,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "Deprecated",
   ["gBrowser",          "content"],
   ["gViewSourceBundle", "viewSourceBundle"],
   ["gContextMenu",      "viewSourceContextMenu"]
-].forEach(function ([name, id]) {
-  window.__defineGetter__(name, function () {
+].forEach(function([name, id]) {
+  window.__defineGetter__(name, function() {
     var element = document.getElementById(id);
     if (!element)
       return null;
@@ -768,7 +768,7 @@ function getBrowser() {
   return gBrowser;
 }
 
-this.__defineGetter__("gPageLoader", function () {
+this.__defineGetter__("gPageLoader", function() {
   var webnav = viewSourceChrome.webNav;
   if (!webnav)
     return null;
@@ -779,8 +779,7 @@ this.__defineGetter__("gPageLoader", function () {
 });
 
 // Strips the |view-source:| for internalSave()
-function ViewSourceSavePage()
-{
+function ViewSourceSavePage() {
   internalSave(gBrowser.currentURI.spec.replace(/^view-source:/i, ""),
                null, null, null, null, null, "SaveLinkTitle",
                null, null, gBrowser.contentDocumentAsCPOW, null,
@@ -790,7 +789,7 @@ function ViewSourceSavePage()
 // Below are old deprecated functions and variables left behind for
 // compatibility reasons. These will be removed soon via bug 1159293.
 
-this.__defineGetter__("gLastLineFound", function () {
+this.__defineGetter__("gLastLineFound", function() {
   Deprecated.warning("gLastLineFound is deprecated - please use " +
                      "viewSourceChrome.lastLineFound instead.",
                      "https://developer.mozilla.org/en-US/Add-ons/Code_snippets/View_Source_for_XUL_Applications");
@@ -825,8 +824,7 @@ function ViewSourceReload() {
   viewSourceChrome.reload();
 }
 
-function getWebNavigation()
-{
+function getWebNavigation() {
   Deprecated.warning("getWebNavigation() is deprecated - please use " +
                      "viewSourceChrome.webNav instead.",
                      "https://developer.mozilla.org/en-US/Add-ons/Code_snippets/View_Source_for_XUL_Applications");
@@ -846,16 +844,14 @@ function viewSource(url) {
   viewSourceChrome.loadURL(url);
 }
 
-function ViewSourceGoToLine()
-{
+function ViewSourceGoToLine() {
   Deprecated.warning("ViewSourceGoToLine() is deprecated - please use " +
                      "viewSourceChrome.promptAndGoToLine() instead.",
                      "https://developer.mozilla.org/en-US/Add-ons/Code_snippets/View_Source_for_XUL_Applications");
   viewSourceChrome.promptAndGoToLine();
 }
 
-function goToLine(line)
-{
+function goToLine(line) {
   Deprecated.warning("goToLine() is deprecated - please use " +
                      "viewSourceChrome.goToLine() instead.",
                      "https://developer.mozilla.org/en-US/Add-ons/Code_snippets/View_Source_for_XUL_Applications");

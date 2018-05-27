@@ -208,17 +208,20 @@ var Service = {
   },
 
   generateBackgroundPageUrl(extension) {
-    let background_scripts = extension.manifest.background &&
-      extension.manifest.background.scripts;
+    let background_scripts = (extension.manifest.background &&
+                              extension.manifest.background.scripts);
+
     if (!background_scripts) {
       return;
     }
-    let html = "<!DOCTYPE html>\n<body>\n";
+
+    let html = "<!DOCTYPE html>\n<html>\n<body>\n";
     for (let script of background_scripts) {
       script = script.replace(/"/g, "&quot;");
       html += `<script src="${script}"></script>\n`;
     }
     html += "</body>\n</html>\n";
+
     return "data:text/html;charset=utf-8," + encodeURIComponent(html);
   },
 

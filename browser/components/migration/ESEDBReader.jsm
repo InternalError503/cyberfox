@@ -114,6 +114,7 @@ function convertESEError(errorCode) {
     case -1507 /* JET_errColumnNotFound */:
       // The DB format has changed and we haven't updated this migration code:
       return "The database format has changed, error code: " + errorCode;
+    case -1032 /* JET_errFileAccessDenied */:
     case -1207 /* JET_errDatabaseLocked */:
     case -1302 /* JET_errTableLocked */:
       return "The database or table is locked, error code: " + errorCode;
@@ -134,7 +135,7 @@ function convertESEError(errorCode) {
 }
 
 function handleESEError(method, methodName, shouldThrow = true, errorLog = true) {
-  return function () {
+  return function() {
     let rv;
     try {
       rv = method.apply(null, arguments);

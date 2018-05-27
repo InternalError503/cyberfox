@@ -274,7 +274,7 @@ var wrapper = {
   },
 
   handleRemoteCommand: function (evt) {
-    log('command: ' + evt.detail.command);
+    log("command: " + evt.detail.command);
     let data = evt.detail.data;
 
     switch (evt.detail.command) {

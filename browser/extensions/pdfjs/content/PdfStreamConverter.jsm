@@ -14,7 +14,7 @@
  */
 /* jshint esnext:true */
 /* globals Components, Services, XPCOMUtils, NetUtil, PrivateBrowsingUtils,
-           dump, NetworkManager, PdfJsTelemetry, PdfjsContentUtils */
+           dump, NetworkManager, PdfjsContentUtils */
 
 'use strict';
 
@@ -43,9 +43,6 @@ XPCOMUtils.defineLazyModuleGetter(this, 'NetworkManager',
 
 XPCOMUtils.defineLazyModuleGetter(this, 'PrivateBrowsingUtils',
   'resource://gre/modules/PrivateBrowsingUtils.jsm');
-
-XPCOMUtils.defineLazyModuleGetter(this, 'PdfJsTelemetry',
-  'resource://pdf.js/PdfJsTelemetry.jsm');
 
 XPCOMUtils.defineLazyModuleGetter(this, 'PdfjsContentUtils',
   'resource://pdf.js/PdfjsContentUtils.jsm');
@@ -230,13 +227,6 @@ PdfDataListener.prototype = {
 function ChromeActions(domWindow, contentDispositionFilename) {
   this.domWindow = domWindow;
   this.contentDispositionFilename = contentDispositionFilename;
-  this.telemetryState = {
-    documentInfo: false,
-    firstPageInfo: false,
-    streamTypesUsed: [],
-    fontTypesUsed: [],
-    startAt: Date.now()
-  };
 }
 
 ChromeActions.prototype = {
@@ -372,62 +362,6 @@ ChromeActions.prototype = {
       metaKey: getIntPref('mousewheel.with_meta.action', 1) === 3,
     };
   },
-  reportTelemetry: function (data) {
-    var probeInfo = JSON.parse(data);
-    switch (probeInfo.type) {
-      case 'documentInfo':
-        if (!this.telemetryState.documentInfo) {
-          PdfJsTelemetry.onDocumentVersion(probeInfo.version | 0);
-          PdfJsTelemetry.onDocumentGenerator(probeInfo.generator | 0);
-          if (probeInfo.formType) {
-            PdfJsTelemetry.onForm(probeInfo.formType === 'acroform');
-          }
-          this.telemetryState.documentInfo = true;
-        }
-        break;
-      case 'pageInfo':
-        if (!this.telemetryState.firstPageInfo) {
-          var duration = Date.now() - this.telemetryState.startAt;
-          PdfJsTelemetry.onTimeToView(duration);
-          this.telemetryState.firstPageInfo = true;
-        }
-        break;
-      case 'documentStats':
-        // documentStats can be called several times for one documents.
-        // if stream/font types are reported, trying not to submit the same
-        // enumeration value multiple times.
-        var documentStats = probeInfo.stats;
-        if (!documentStats || typeof documentStats !== 'object') {
-          break;
-        }
-        var i, streamTypes = documentStats.streamTypes;
-        if (Array.isArray(streamTypes)) {
-          var STREAM_TYPE_ID_LIMIT = 20;
-          for (i = 0; i < STREAM_TYPE_ID_LIMIT; i++) {
-            if (streamTypes[i] &&
-                !this.telemetryState.streamTypesUsed[i]) {
-              PdfJsTelemetry.onStreamType(i);
-              this.telemetryState.streamTypesUsed[i] = true;
-            }
-          }
-        }
-        var fontTypes = documentStats.fontTypes;
-        if (Array.isArray(fontTypes)) {
-          var FONT_TYPE_ID_LIMIT = 20;
-          for (i = 0; i < FONT_TYPE_ID_LIMIT; i++) {
-            if (fontTypes[i] &&
-                !this.telemetryState.fontTypesUsed[i]) {
-              PdfJsTelemetry.onFontType(i);
-              this.telemetryState.fontTypesUsed[i] = true;
-            }
-          }
-        }
-        break;
-      case 'print':
-        PdfJsTelemetry.onPrint();
-        break;
-    }
-  },
   fallback: function(args, sendResponse) {
     var featureId = args.featureId;
     var url = args.url;
@@ -441,7 +375,7 @@ ChromeActions.prototype = {
     } else {
       message = getLocalizedString(strings, 'unsupported_feature');
     }
-    PdfJsTelemetry.onFallback();
+
     PdfjsContentUtils.displayWarning(domWindow, message,
       getLocalizedString(strings, 'open_with_different_viewer'),
       getLocalizedString(strings, 'open_with_different_viewer', 'accessKey'));
@@ -956,9 +890,6 @@ PdfStreamConverter.prototype = {
       aRequest.setResponseHeader('Refresh', '', false);
     }
 
-    PdfJsTelemetry.onViewerIsUsed();
-    PdfJsTelemetry.onDocumentSize(aRequest.contentLength);
-
     // Creating storage for PDF data
     var contentLength = aRequest.contentLength;
     this.dataListener = new PdfDataListener(contentLength);
@@ -1008,12 +939,6 @@ PdfStreamConverter.prototype = {
           findEventManager.bind();
         }
         listener.onStopRequest(aRequest, aContext, statusCode);
-
-        if (domWindow.frameElement) {
-          var isObjectEmbed = domWindow.frameElement.tagName !== 'IFRAME' ||
-            domWindow.frameElement.className === 'previewPluginContentFrame';
-          PdfJsTelemetry.onEmbed(isObjectEmbed);
-        }
       }
     };
 

@@ -7,41 +7,41 @@
 const { utils: Cu, interfaces: Ci, classes: Cc, results: Cr } = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import('resource://gre/modules/Preferences.jsm');
+Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const FRAME_SCRIPT_URL = "chrome://gfxsanity/content/gfxFrameScript.js";
 
-const PAGE_WIDTH=92;
-const PAGE_HEIGHT=166;
-const DRIVER_PREF="sanity-test.driver-version";
-const DEVICE_PREF="sanity-test.device-id";
-const VERSION_PREF="sanity-test.version";
-const DISABLE_VIDEO_PREF="media.hardware-video-decoding.failed";
-const RUNNING_PREF="sanity-test.running";
-const TIMEOUT_SEC=20;
+const PAGE_WIDTH = 92;
+const PAGE_HEIGHT = 166;
+const DRIVER_PREF = "sanity-test.driver-version";
+const DEVICE_PREF = "sanity-test.device-id";
+const VERSION_PREF = "sanity-test.version";
+const DISABLE_VIDEO_PREF = "media.hardware-video-decoding.failed";
+const RUNNING_PREF = "sanity-test.running";
+const TIMEOUT_SEC = 20;
 
 // GRAPHICS_SANITY_TEST histogram enumeration values
-const TEST_PASSED=0;
-const TEST_FAILED_RENDER=1;
-const TEST_FAILED_VIDEO=2;
-const TEST_CRASHED=3;
-const TEST_TIMEOUT=4;
+const TEST_PASSED = 0;
+const TEST_FAILED_RENDER = 1;
+const TEST_FAILED_VIDEO = 2;
+const TEST_CRASHED = 3;
+const TEST_TIMEOUT = 4;
 
 // GRAPHICS_SANITY_TEST_REASON enumeration values.
-const REASON_FIRST_RUN=0;
-const REASON_FIREFOX_CHANGED=1;
-const REASON_DEVICE_CHANGED=2;
-const REASON_DRIVER_CHANGED=3;
+const REASON_FIRST_RUN = 0;
+const REASON_FIREFOX_CHANGED = 1;
+const REASON_DEVICE_CHANGED = 2;
+const REASON_DRIVER_CHANGED = 3;
 
 // GRAPHICS_SANITY_TEST_OS_SNAPSHOT histogram enumeration values
-const SNAPSHOT_VIDEO_OK=0;
-const SNAPSHOT_VIDEO_FAIL=1;
-const SNAPSHOT_ERROR=2;
-const SNAPSHOT_TIMEOUT=3;
-const SNAPSHOT_LAYERS_OK=4;
-const SNAPSHOT_LAYERS_FAIL=5;
+const SNAPSHOT_VIDEO_OK = 0;
+const SNAPSHOT_VIDEO_FAIL = 1;
+const SNAPSHOT_ERROR = 2;
+const SNAPSHOT_TIMEOUT = 3;
+const SNAPSHOT_LAYERS_OK = 4;
+const SNAPSHOT_LAYERS_FAIL = 5;
 
 function testPixel(ctx, x, y, r, g, b, a, fuzz) {
   var data = ctx.getImageData(x, y, 1, 1);
@@ -56,24 +56,14 @@ function testPixel(ctx, x, y, r, g, b, a, fuzz) {
 }
 
 function reportResult(val) {
-  try {
-    let histogram = Services.telemetry.getHistogramById("GRAPHICS_SANITY_TEST");
-    histogram.add(val);
-  } catch (e) {}
-
   Preferences.set(RUNNING_PREF, false);
   Services.prefs.savePrefFile(null);
-}
-
-function reportTestReason(val) {
-  let histogram = Services.telemetry.getHistogramById("GRAPHICS_SANITY_TEST_REASON");
-  histogram.add(val);
 }
 
 function annotateCrashReport(value) {
   try {
     // "1" if we're annotating the crash report, "" to remove the annotation.
-    var crashReporter = Cc['@mozilla.org/toolkit/crash-reporter;1'].
+    var crashReporter = Cc["@mozilla.org/toolkit/crash-reporter;1"].
                           getService(Ci.nsICrashReporter);
     crashReporter.annotateCrashReport("GraphicsSanityTest", value ? "1" : "");
   } catch (e) {
@@ -81,7 +71,7 @@ function annotateCrashReport(value) {
 }
 
 function setTimeout(aMs, aCallback) {
-  var timer = Cc['@mozilla.org/timer;1'].
+  var timer = Cc["@mozilla.org/timer;1"].
                 createInstance(Ci.nsITimer);
   timer.initWithCallback(aCallback, aMs, Ci.nsITimer.TYPE_ONE_SHOT);
 }
@@ -257,19 +247,13 @@ SanityTest.prototype = {
       if (prefValue == value) {
         return true;
       }
-      if (prefValue === undefined) {
-        reportTestReason(REASON_FIRST_RUN);
-      } else {
-        reportTestReason(reason);
-      }
       return false;
     }
 
     // TODO: Handle dual GPU setups
     if (checkPref(DRIVER_PREF, gfxinfo.adapterDriverVersion, REASON_DRIVER_CHANGED) &&
         checkPref(DEVICE_PREF, gfxinfo.adapterDeviceID, REASON_DEVICE_CHANGED) &&
-        checkPref(VERSION_PREF, buildId, REASON_FIREFOX_CHANGED))
-    {
+        checkPref(VERSION_PREF, buildId, REASON_FIREFOX_CHANGED)) {
       return false;
     }
 

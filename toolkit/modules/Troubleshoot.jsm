@@ -15,8 +15,7 @@ Cu.import("resource://gre/modules/AppConstants.jsm");
 var Experiments;
 try {
   Experiments = Cu.import("resource:///modules/experiments/Experiments.jsm").Experiments;
-}
-catch (e) {
+} catch (e) {
 }
 
 // We use a preferences whitelist to make sure we only show preferences that
@@ -158,8 +157,7 @@ this.Troubleshoot = {
     for (let name in dataProviders) {
       try {
         dataProviders[name](providerDone.bind(null, name));
-      }
-      catch (err) {
+      } catch (err) {
         let msg = "Troubleshoot data provider failed: " + name + "\n" + err;
         Cu.reportError(msg);
         providerDone(name, msg);
@@ -199,14 +197,12 @@ var dataProviders = {
 
     try {
       data.vendor = Services.prefs.getCharPref("app.support.vendor");
-    }
-    catch (e) {}
+    } catch (e) {}
     let urlFormatter = Cc["@mozilla.org/toolkit/URLFormatterService;1"].
                        getService(Ci.nsIURLFormatter);
     try {
       data.supportURL = urlFormatter.formatURLPref("app.support.baseURL");
-    }
-    catch (e) {}
+    } catch (e) {}
 
     data.numTotalWindows = 0;
     data.numRemoteWindows = 0;
@@ -245,9 +241,9 @@ var dataProviders = {
   },
 
   extensions: function extensions(done) {
-    AddonManager.getAddonsByTypes(["extension"], function (extensions) {
+    AddonManager.getAddonsByTypes(["extension"], function(extensions) {
       extensions = extensions.filter(e => !e.isSystem);
-      extensions.sort(function (a, b) {
+      extensions.sort(function(a, b) {
         if (a.isActive != b.isActive)
           return b.isActive ? 1 : -1;
 
@@ -262,8 +258,8 @@ var dataProviders = {
         return 0;
       });
       let props = ["name", "version", "isActive", "id"];
-      done(extensions.map(function (ext) {
-        return props.reduce(function (extData, prop) {
+      done(extensions.map(function(ext) {
+        return props.reduce(function(extData, prop) {
           extData[prop] = ext[prop];
           return extData;
         }, {});
@@ -324,8 +320,7 @@ var dataProviders = {
       let msg = [""];
       try {
         var status = gfxInfo.getFeatureStatus(feature);
-      }
-      catch (e) {}
+      } catch (e) {}
       switch (status) {
       case Ci.nsIGfxInfo.FEATURE_BLOCKED_DEVICE:
       case Ci.nsIGfxInfo.FEATURE_DISCOURAGED:
@@ -338,8 +333,7 @@ var dataProviders = {
         try {
           var suggestedDriverVersion =
             gfxInfo.getFeatureSuggestedDriverVersion(feature);
-        }
-        catch (e) {}
+        } catch (e) {}
         msg = suggestedDriverVersion ?
               ["tryNewerDriver", suggestedDriverVersion] :
               ["blockedDriver"];
@@ -356,8 +350,7 @@ var dataProviders = {
     try {
       // nsIGfxInfo may not be implemented on some platforms.
       var gfxInfo = Cc["@mozilla.org/gfx/info;1"].getService(Ci.nsIGfxInfo);
-    }
-    catch (e) {}
+    } catch (e) {}
 
     let promises = [];
     // done will be called upon all pending promises being resolved.
@@ -381,8 +374,7 @@ var dataProviders = {
         data.numTotalWindows++;
         data.windowLayerManagerType = winUtils.layerManagerType;
         data.windowLayerManagerRemote = winUtils.layerManagerRemote;
-      }
-      catch (e) {
+      } catch (e) {
         continue;
       }
       if (data.windowLayerManagerType != "Basic")
@@ -446,8 +438,7 @@ var dataProviders = {
     for (let prop in gfxInfoProps) {
       try {
         data[gfxInfoProps[prop] || prop] = gfxInfo[prop];
-      }
-      catch (e) {}
+      } catch (e) {}
     }
 
     if (("direct2DEnabled" in data) && !data.direct2DEnabled)
@@ -481,8 +472,7 @@ var dataProviders = {
         let gl = null;
         try {
           gl = canvas.getContext(contextType);
-        }
-        catch (e) {
+        } catch (e) {
           if (!creationError) {
             creationError = e.toString();
           }
@@ -552,8 +542,7 @@ var dataProviders = {
     try {
       data.forceDisabled =
         Services.prefs.getIntPref("accessibility.force_disabled");
-    }
-    catch (e) {}
+    } catch (e) {}
     done(data);
   },
 

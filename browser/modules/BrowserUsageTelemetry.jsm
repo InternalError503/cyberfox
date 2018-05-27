@@ -268,7 +268,7 @@ let BrowserUsageTelemetry = {
    *        The object describing the event that triggered the search.
    * @throws if source is not in the known sources list.
    */
-  recordSearch(engine, source, details={}) {
+  recordSearch(engine, source, details = {}) {
     const isOneOff = !!details.isOneOff;
     const countId = getSearchEngineId(engine) + "." + source;
 
@@ -279,7 +279,7 @@ let BrowserUsageTelemetry = {
         // calling |recordSearch| twice from two different
         // code paths because they want to record the search
         // in SEARCH_COUNTS.
-        if (['urlbar', 'searchbar'].includes(source)) {
+        if (["urlbar", "searchbar"].includes(source)) {
           return;
         }
         throw new Error("Unknown source for one-off search: " + source);

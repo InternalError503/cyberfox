@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* exported cancelClicked, continueClicked, initialize, restartClicked, unload */
+
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 var Cu = Components.utils;
@@ -82,8 +84,7 @@ function initialize() {
     // Only mark the add-on as seen if the page actually gets focus
     if (document.hasFocus()) {
       aAddon.markAsSeen();
-    }
-    else {
+    } else {
       document.addEventListener("focus", () => aAddon.markAsSeen(), false);
     }
 
@@ -125,7 +126,7 @@ function restartClicked() {
 
   let appStartup = Components.classes["@mozilla.org/toolkit/app-startup;1"].
                    getService(Components.interfaces.nsIAppStartup);
-  appStartup.quit(Ci.nsIAppStartup.eAttemptQuit |  Ci.nsIAppStartup.eRestart);
+  appStartup.quit(Ci.nsIAppStartup.eAttemptQuit | Ci.nsIAppStartup.eRestart);
 }
 
 function cancelClicked() {

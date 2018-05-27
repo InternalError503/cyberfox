@@ -310,6 +310,10 @@
 		#main-window[sizemode="normal"][developertheme="true"][devtoolstheme="light"]:not([tabsontop="false"]) {
 		  background: #e3e4e6 !important;
 		}
+		
+		#main-window[sizemode="normal"][developertheme="true"] #titlebar {
+		  margin-bottom: -50px !important;
+		}
 	}
 
 }

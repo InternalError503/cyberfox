@@ -1144,7 +1144,7 @@ CustomizeMode.prototype = {
     }
   },
 
-  persistCurrentSets: function(aSetBeforePersisting)  {
+  persistCurrentSets: function(aSetBeforePersisting) {
     let document = this.document;
     let toolbars = document.querySelectorAll("toolbar[customizable='true'][currentset]");
     for (let toolbar of toolbars) {
@@ -1326,7 +1326,7 @@ CustomizeMode.prototype = {
 
   openAddonsManagerThemes: function(aEvent) {
     aEvent.target.parentNode.parentNode.hidePopup();
-    this.window.BrowserOpenAddonsMgr('addons://list/theme');
+    this.window.BrowserOpenAddonsMgr("addons://list/theme");
   },
 
   getMoreThemes: function(aEvent) {
@@ -1341,9 +1341,10 @@ CustomizeMode.prototype = {
 
     this._clearLWThemesMenu(aEvent.target);
 
-    function previewTheme(aEvent) {
-      LightweightThemeManager.previewTheme(aEvent.target.theme.id != DEFAULT_THEME_ID ?
-                                           aEvent.target.theme : null);
+    function previewTheme(aPreviewThemeEvent) {
+      LightweightThemeManager.previewTheme(
+        aPreviewThemeEvent.target.theme.id != DEFAULT_THEME_ID ?
+        aPreviewThemeEvent.target.theme : null);
     }
 
     function resetPreview() {
@@ -1390,9 +1391,16 @@ CustomizeMode.prototype = {
 
       let themes = [aDefaultTheme];
       let lwts = LightweightThemeManager.usedThemes;
+      let currentLwt = LightweightThemeManager.currentTheme;
+      let currentLwtIndex = lwts.indexOf(currentLwt);
+      if (currentLwtIndex > -1) {
+        // Make sure that the current lightweight theme
+        // is at the beginning of the array to avoid truncation
+        // in the next step.
+        lwts = lwts.splice(currentLwtIndex, 1).concat(lwts);
+      }
       if (lwts.length > RECENT_LWT_COUNT)
         lwts.length = RECENT_LWT_COUNT;
-      let currentLwt = LightweightThemeManager.currentTheme;
       for (let lwt of lwts) {
         lwt.isActive = !!currentLwt && (lwt.id == currentLwt.id);
         themes.push(lwt);
@@ -2010,7 +2018,7 @@ CustomizeMode.prototype = {
         if (makeSpaceImmediately) {
           aItem.setAttribute("notransition", "true");
         }
-        aItem.style[prop] = width + 'px';
+        aItem.style[prop] = width + "px";
         aItem.style.removeProperty(otherProp);
         if (makeSpaceImmediately) {
           // Force a layout flush:
@@ -2041,7 +2049,7 @@ CustomizeMode.prototype = {
         aItem.getBoundingClientRect();
         aItem.removeAttribute("notransition");
       }
-    } else  {
+    } else {
       aItem.removeAttribute("dragover");
       if (aNextItem) {
         let nextArea = this._getCustomizableParent(aNextItem);
@@ -2142,7 +2150,7 @@ CustomizeMode.prototype = {
   _getDragOverNode: function(aEvent, aAreaElement, aInToolbar, aDraggedItemId) {
     let expectedParent = aAreaElement.customizationTarget || aAreaElement;
     // Our tests are stupid. Cope:
-    if (!aEvent.clientX  && !aEvent.clientY) {
+    if (!aEvent.clientX && !aEvent.clientY) {
       return aEvent.target;
     }
     // Offset the drag event's position with the offset to the center of

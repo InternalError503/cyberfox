@@ -300,7 +300,7 @@ IdentityRelyingParty.prototype = {
       this._store.addIdentity(email, null, null);
     }
 
-    let cert = this._store.fetchIdentity(email)['cert'];
+    let cert = this._store.fetchIdentity(email)["cert"];
     if (cert) {
       this._generateAssertion(audience, email, function generatedAssertion(err, assertion) {
         if (err) {
@@ -331,7 +331,7 @@ IdentityRelyingParty.prototype = {
     log("_generateAssertion: audience:", aAudience, "identity:", aIdentity);
 
     let id = this._store.fetchIdentity(aIdentity);
-    if (! (id && id.cert)) {
+    if (!(id && id.cert)) {
       let errStr = "Cannot generate an assertion without a certificate";
       log("ERROR: _generateAssertion:", errStr);
       aCallback(errStr);
@@ -356,7 +356,7 @@ IdentityRelyingParty.prototype = {
   _cleanUpProvisionFlow: function RP_cleanUpProvisionFlow(aRPId, aProvId) {
     let rp = this._rpFlows[aRPId];
     if (rp) {
-      delete rp['provId'];
+      delete rp["provId"];
     } else {
       log("Error: Couldn't delete provision flow ", aProvId, " for RP ", aRPId);
     }

@@ -26,8 +26,7 @@ XPCOMUtils.defineLazyServiceGetter(this, "contentSecManager",
 
 // Similar to Python. Returns dict[key] if it exists. Otherwise,
 // sets dict[key] to default_ and returns default_.
-function setDefault(dict, key, default_)
-{
+function setDefault(dict, key, default_) {
   if (key in dict) {
     return dict[key];
   }
@@ -311,8 +310,7 @@ AboutProtocolChannel.prototype = {
 };
 
 // This shim protocol handler is used when content fetches an about: URL.
-function AboutProtocolInstance(contractID)
-{
+function AboutProtocolInstance(contractID) {
   this._contractID = contractID;
   this._uriFlags = undefined;
 }
@@ -474,8 +472,7 @@ EventTargetChild.prototype = {
 // reference in the child. For simplicity, we kill off these strong
 // references whenever we navigate away from the page for which the
 // sandbox was created.
-function SandboxChild(chromeGlobal)
-{
+function SandboxChild(chromeGlobal) {
   this.chromeGlobal = chromeGlobal;
   this.sandboxes = [];
 }

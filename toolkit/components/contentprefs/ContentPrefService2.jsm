@@ -222,7 +222,7 @@ ContentPrefService2.prototype = {
       storesToCheck.push(this._pbStore);
 
     let outStore = new ContentPrefStore();
-    storesToCheck.forEach(function (store) {
+    storesToCheck.forEach(function(store) {
       for (let [sgroup, val] of store.match(group, name, includeSubdomains)) {
         outStore.set(sgroup, name, val);
       }
@@ -252,7 +252,7 @@ ContentPrefService2.prototype = {
 
     if (context && context.usePrivateBrowsing) {
       this._pbStore.set(group, name, value);
-      this._schedule(function () {
+      this._schedule(function() {
         cbHandleCompletion(callback, Ci.nsIContentPrefCallback2.COMPLETE_OK);
         this._cps._notifyPrefSet(group, name, value, context.usePrivateBrowsing);
       });
@@ -300,8 +300,7 @@ ContentPrefService2.prototype = {
         )
       `);
       stmt.params.group = group;
-    }
-    else {
+    } else {
       stmt = this._stmt(`
         INSERT OR REPLACE INTO prefs (id, groupID, settingID, value, timestamp)
         VALUES(
@@ -478,8 +477,7 @@ ContentPrefService2.prototype = {
         DELETE FROM prefs
         WHERE groupID NOTNULL AND groupID NOT IN (SELECT id FROM groups)
       `));
-    }
-    else {
+    } else {
       stmts.push(this._stmt(`
         SELECT NULL AS grp, settings.name AS name
         FROM prefs
@@ -739,8 +737,7 @@ ContentPrefService2.prototype = {
             if (callbacks.onRow)
               callbacks.onRow.call(self, row);
           }
-        }
-        catch (err) {
+        } catch (err) {
           Cu.reportError(err);
         }
       },
@@ -751,8 +748,7 @@ ContentPrefService2.prototype = {
                                 ok ? Ci.nsIContentPrefCallback2.COMPLETE_OK :
                                   Ci.nsIContentPrefCallback2.COMPLETE_ERROR,
                                 ok, gotRow);
-        }
-        catch (err) {
+        } catch (err) {
           Cu.reportError(err);
         }
       },
@@ -760,8 +756,7 @@ ContentPrefService2.prototype = {
         try {
           if (callbacks.onError)
             callbacks.onError.call(self, Cr.NS_ERROR_FAILURE);
-        }
-        catch (err) {
+        } catch (err) {
           Cu.reportError(err);
         }
       }
@@ -782,8 +777,7 @@ ContentPrefService2.prototype = {
       return null;
     try {
       var groupURI = Services.io.newURI(groupStr, null, null);
-    }
-    catch (err) {
+    } catch (err) {
       return groupStr;
     }
     return this._cps._grouper.group(groupURI);

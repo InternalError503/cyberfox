@@ -272,8 +272,7 @@ TransactionsHistory.__proto__ = {
     if (this.length == 0 || aForceNewEntry) {
       this.clearRedoEntries();
       this.unshift([aProxifiedTransaction]);
-    }
-    else {
+    } else {
       this[this.undoPosition].unshift(aProxifiedTransaction);
     }
   },
@@ -325,8 +324,7 @@ var PlacesTransactions = {
         for (let txn of aToBatch) {
           try {
             yield txn.transact();
-          }
-          catch (ex) {
+          } catch (ex) {
             console.error(ex);
           }
         }
@@ -544,8 +542,7 @@ var TransactionsManager = {
       try {
         // We should return here, but bug 958949 makes that impossible.
         rv = (yield Task.spawn(aTask));
-      }
-      finally {
+      } finally {
         this._batching = false;
         this._createdBatchEntry = false;
       }
@@ -565,8 +562,7 @@ var TransactionsManager = {
       for (let txnProxy of entry) {
         try {
           yield TransactionsHistory.getRawTransaction(txnProxy).undo();
-        }
-        catch (ex) {
+        } catch (ex) {
           // If one transaction is broken, it's not safe to work with any other
           // undo entry.  Report the error and clear the undo history.
           console.error(ex,
@@ -598,8 +594,7 @@ var TransactionsManager = {
             yield transaction.redo();
           else
             yield transaction.execute();
-        }
-        catch (ex) {
+        } catch (ex) {
           // If one transaction is broken, it's not safe to work with any other
           // redo entry. Report the error and clear the undo history.
           console.error(ex,
@@ -640,8 +635,7 @@ var TransactionsManager = {
       let win = Services.focus.activeWindow;
       if (win)
         win.updateCommands("undo");
-    }
-    catch (ex) { console.error(ex, "Couldn't update undo commands"); }
+    } catch (ex) { console.error(ex, "Couldn't update undo commands"); }
   }
 };
 
@@ -667,7 +661,7 @@ function DefineTransaction(aRequiredProps = [], aOptionalProps = []) {
       throw new Error("Property '" + prop + "' is not defined");
   }
 
-  let ctor = function (aInput) {
+  let ctor = function(aInput) {
     // We want to support both syntaxes:
     // let t = new PlacesTransactions.NewBookmark(),
     // let t = PlacesTransactions.NewBookmark()
@@ -709,7 +703,7 @@ function isPrimitive(v) {
   return v === null || (typeof(v) != "object" && typeof(v) != "function");
 }
 
-DefineTransaction.annotationObjectValidate = function (obj) {
+DefineTransaction.annotationObjectValidate = function(obj) {
   let checkProperty = (aPropName, aRequired, aCheckFunc) => {
     if (aPropName in obj)
       return aCheckFunc(obj[aPropName]);
@@ -741,26 +735,23 @@ DefineTransaction.urlValidate = function(url) {
 
 DefineTransaction.inputProps = new Map();
 DefineTransaction.defineInputProps =
-function (aNames, aValidationFunction, aDefaultValue) {
+function(aNames, aValidationFunction, aDefaultValue) {
   for (let name of aNames) {
-    // Workaround bug 449811.
-    let propName = name;
-    this.inputProps.set(propName, {
+    this.inputProps.set(name, {
       validateValue: function (aValue) {
         if (aValue === undefined)
           return aDefaultValue;
         try {
           return aValidationFunction(aValue);
-        }
-        catch (ex) {
-          throw new Error(`Invalid value for input property ${propName}`);
+        } catch (ex) {
+          throw new Error(`Invalid value for input property ${name}`);
         }
       },
 
       validateInput: function (aInput, aRequired) {
-        if (aRequired && !(propName in aInput))
-          throw new Error(`Required input property is missing: ${propName}`);
-        return this.validateValue(aInput[propName]);
+        if (aRequired && !(name in aInput))
+          throw new Error(`Required input property is missing: ${name}`);
+        return this.validateValue(aInput[name]);
       },
 
       isArrayProperty: false
@@ -769,7 +760,7 @@ function (aNames, aValidationFunction, aDefaultValue) {
 };
 
 DefineTransaction.defineArrayInputProp =
-function (aName, aBasePropertyName) {
+function(aName, aBasePropertyName) {
   let baseProp = this.inputProps.get(aBasePropertyName);
   if (!baseProp)
     throw new Error(`Unknown input property: ${aBasePropertyName}`);
@@ -820,12 +811,12 @@ function (aName, aBasePropertyName) {
 };
 
 DefineTransaction.validatePropertyValue =
-function (aProp, aInput, aRequired) {
+function(aProp, aInput, aRequired) {
   return this.inputProps.get(aProp).validateInput(aInput, aRequired);
 };
 
 DefineTransaction.getInputObjectForSingleValue =
-function (aInput, aRequiredProps, aOptionalProps) {
+function(aInput, aRequiredProps, aOptionalProps) {
   // The following input forms may be deduced from a single value:
   // * a single required property with or without optional properties (the given
   //   value is set to the required property).
@@ -844,7 +835,7 @@ function (aInput, aRequiredProps, aOptionalProps) {
 };
 
 DefineTransaction.verifyInput =
-function (aInput, aRequiredProps = [], aOptionalProps = []) {
+function(aInput, aRequiredProps = [], aOptionalProps = []) {
   if (aRequiredProps.length == 0 && aOptionalProps.length == 0)
     return {};
 
@@ -1023,8 +1014,7 @@ function* createItemsFromBookmarksTree(aBookmarksTree, aRestoring = false,
               yield createItem(child, guid);
             }
           }
-        }
-        else {
+        } else {
           let livemark =
             yield PlacesUtils.livemarks.addLivemark({ title: aItem.title
                                                     , feedURI: feedURI
@@ -1085,7 +1075,7 @@ PT.NewBookmark = DefineTransaction(["parentGuid", "url"],
                                     "annotations", "tags"]);
 PT.NewBookmark.prototype = Object.seal({
   execute: function (aParentGuid, aURI, aIndex, aTitle,
-                     aKeyword, aPostData, aAnnos, aTags) {
+                    aKeyword, aPostData, aAnnos, aTags) {
     return ExecuteCreateItem(this, aParentGuid,
       function* (parentId, guidToRestore = "") {
         let itemId = PlacesUtils.bookmarks.insertBookmark(
@@ -1129,7 +1119,7 @@ PT.NewFolder = DefineTransaction(["parentGuid", "title"],
                                  ["index", "annotations"]);
 PT.NewFolder.prototype = Object.seal({
   execute: function (aParentGuid, aTitle, aIndex, aAnnos) {
-    return ExecuteCreateItem(this,  aParentGuid,
+    return ExecuteCreateItem(this, aParentGuid,
       function* (parentId, guidToRestore = "") {
         let itemId = PlacesUtils.bookmarks.createFolder(
           parentId, aTitle, aIndex, guidToRestore);
@@ -1315,8 +1305,7 @@ PT.Annotate.prototype = {
         let currentAnno = currentAnnos.find(a => a.name == newAnno.name);
         if (currentAnno) {
           undoAnnos.push(currentAnno);
-        }
-        else {
+        } else {
           // An unset value removes the annotation.
           undoAnnos.push({ name: newAnno.name });
         }
@@ -1413,8 +1402,7 @@ PT.SortByName.prototype = {
           preSep.splice(0, preSep.length);
         }
         newOrder.push(node);
-      }
-      else
+      } else
         preSep.push(node);
     }
     contents.containerOpen = false;
@@ -1458,8 +1446,7 @@ PT.Remove.prototype = {
     function promiseBookmarksTree(guid) {
       try {
         return PlacesUtils.promiseBookmarksTree(guid);
-      }
-      catch (ex) {
+      } catch (ex) {
         throw new Error("Failed to get info for the specified item (guid: " +
                         guid + "). Ex: " + ex);
       }
@@ -1517,35 +1504,32 @@ PT.Tag.prototype = {
   execute: function* (aURIs, aTags) {
     let onUndo = [], onRedo = [];
     for (let uri of aURIs) {
-      // Workaround bug 449811.
-      let currentURI = uri;
 
       let promiseIsBookmarked = function* () {
         let deferred = Promise.defer();
         PlacesUtils.asyncGetBookmarkIds(
-          currentURI, ids => { deferred.resolve(ids.length > 0); });
+          uri, ids => { deferred.resolve(ids.length > 0); });
         return deferred.promise;
       };
 
-      if (yield promiseIsBookmarked(currentURI)) {
+      if (yield promiseIsBookmarked(uri)) {
         // Tagging is only allowed for bookmarked URIs (but see 424160).
         let createTxn = TransactionsHistory.getRawTransaction(
-          PT.NewBookmark({ url: currentURI
+          PT.NewBookmark({ url: uri
                          , tags: aTags
                          , parentGuid: PlacesUtils.bookmarks.unfiledGuid }));
         yield createTxn.execute();
         onUndo.unshift(createTxn.undo.bind(createTxn));
         onRedo.push(createTxn.redo.bind(createTxn));
-      }
-      else {
-        let currentTags = PlacesUtils.tagging.getTagsForURI(currentURI);
+      } else {
+        let currentTags = PlacesUtils.tagging.getTagsForURI(uri);
         let newTags = aTags.filter(t => !currentTags.includes(t));
-        PlacesUtils.tagging.tagURI(currentURI, newTags);
+        PlacesUtils.tagging.tagURI(uri, newTags);
         onUndo.unshift(() => {
-          PlacesUtils.tagging.untagURI(currentURI, newTags);
+          PlacesUtils.tagging.untagURI(uri, newTags);
         });
         onRedo.push(() => {
-          PlacesUtils.tagging.tagURI(currentURI, newTags);
+          PlacesUtils.tagging.tagURI(uri, newTags);
         });
       }
     }
@@ -1575,20 +1559,18 @@ PT.Untag.prototype = {
   execute: function* (aURIs, aTags) {
     let onUndo = [], onRedo = [];
     for (let uri of aURIs) {
-      // Workaround bug 449811.
-      let currentURI = uri;
       let tagsToRemove;
-      let tagsSet = PlacesUtils.tagging.getTagsForURI(currentURI);
+      let tagsSet = PlacesUtils.tagging.getTagsForURI(uri);
       if (aTags.length > 0)
         tagsToRemove = aTags.filter(t => tagsSet.includes(t));
       else
         tagsToRemove = tagsSet;
-      PlacesUtils.tagging.untagURI(currentURI, tagsToRemove);
+      PlacesUtils.tagging.untagURI(uri, tagsToRemove);
       onUndo.unshift(() => {
-        PlacesUtils.tagging.tagURI(currentURI, tagsToRemove);
+        PlacesUtils.tagging.tagURI(uri, tagsToRemove);
       });
       onRedo.push(() => {
-        PlacesUtils.tagging.untagURI(currentURI, tagsToRemove);
+        PlacesUtils.tagging.untagURI(uri, tagsToRemove);
       });
     }
     this.undo = function* () {
@@ -1617,8 +1599,7 @@ PT.Copy.prototype = {
     let creationInfo = null;
     try {
       creationInfo = yield PlacesUtils.promiseBookmarksTree(aGuid);
-    }
-    catch (ex) {
+    } catch (ex) {
       throw new Error("Failed to get info for the specified item (guid: " +
                       aGuid + "). Ex: " + ex);
     }

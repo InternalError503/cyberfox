@@ -99,18 +99,18 @@ LoginManagerStorage_mozStorage.prototype = {
   _dbSchema: {
     tables: {
       moz_logins:         "id                  INTEGER PRIMARY KEY," +
-                          "hostname            TEXT NOT NULL,"       +
-                          "httpRealm           TEXT,"                +
-                          "formSubmitURL       TEXT,"                +
-                          "usernameField       TEXT NOT NULL,"       +
-                          "passwordField       TEXT NOT NULL,"       +
-                          "encryptedUsername   TEXT NOT NULL,"       +
-                          "encryptedPassword   TEXT NOT NULL,"       +
-                          "guid                TEXT,"                +
-                          "encType             INTEGER,"             +
-                          "timeCreated         INTEGER,"             +
-                          "timeLastUsed        INTEGER,"             +
-                          "timePasswordChanged INTEGER,"             +
+                          "hostname            TEXT NOT NULL," +
+                          "httpRealm           TEXT," +
+                          "formSubmitURL       TEXT," +
+                          "usernameField       TEXT NOT NULL," +
+                          "passwordField       TEXT NOT NULL," +
+                          "encryptedUsername   TEXT NOT NULL," +
+                          "encryptedPassword   TEXT NOT NULL," +
+                          "guid                TEXT," +
+                          "encType             INTEGER," +
+                          "timeCreated         INTEGER," +
+                          "timeLastUsed        INTEGER," +
+                          "timePasswordChanged INTEGER," +
                           "timesUsed           INTEGER",
       // Changes must be reflected in this._dbAreExpectedColumnsPresent(),
       // this._searchLogins(), and this.modifyLogin().
@@ -119,7 +119,7 @@ LoginManagerStorage_mozStorage.prototype = {
                           "hostname           TEXT UNIQUE ON CONFLICT REPLACE",
 
       moz_deleted_logins: "id                  INTEGER PRIMARY KEY," +
-                          "guid                TEXT,"                +
+                          "guid                TEXT," +
                           "timeDeleted         INTEGER",
     },
     indices: {
@@ -608,7 +608,7 @@ LoginManagerStorage_mozStorage.prototype = {
     };
     let matchData = { };
     for (let field of ["hostname", "formSubmitURL", "httpRealm"])
-      if (loginData[field] != '')
+      if (loginData[field] != "")
         matchData[field] = loginData[field];
     let [logins, ids] = this._searchLogins(matchData);
 
@@ -673,7 +673,7 @@ LoginManagerStorage_mozStorage.prototype = {
   _getIdForLogin : function (login) {
     let matchData = { };
     for (let field of ["hostname", "formSubmitURL", "httpRealm"])
-      if (login[field] != '')
+      if (login[field] != "")
         matchData[field] = login[field];
     let [logins, ids] = this._searchLogins(matchData);
 
@@ -710,21 +710,21 @@ LoginManagerStorage_mozStorage.prototype = {
 
     if (hostname == null) {
       conditions.push("hostname isnull");
-    } else if (hostname != '') {
+    } else if (hostname != "") {
       conditions.push("hostname = :hostname");
       params["hostname"] = hostname;
     }
 
     if (formSubmitURL == null) {
       conditions.push("formSubmitURL isnull");
-    } else if (formSubmitURL != '') {
+    } else if (formSubmitURL != "") {
       conditions.push("formSubmitURL = :formSubmitURL OR formSubmitURL = ''");
       params["formSubmitURL"] = formSubmitURL;
     }
 
     if (httpRealm == null) {
       conditions.push("httpRealm isnull");
-    } else if (httpRealm != '') {
+    } else if (httpRealm != "") {
       conditions.push("httpRealm = :httpRealm");
       params["httpRealm"] = httpRealm;
     }
@@ -929,7 +929,7 @@ LoginManagerStorage_mozStorage.prototype = {
         this[migrateFunction]();
       }
     } catch (e) {
-      this.log("Migration failed: "  + e);
+      this.log("Migration failed: " + e);
       transaction.rollback();
       throw e;
     }
@@ -1019,8 +1019,8 @@ LoginManagerStorage_mozStorage.prototype = {
       while (stmt.executeStep()) {
         let params = { id: stmt.row.id };
         // We will tag base64 logins correctly, but no longer support their use.
-        if (stmt.row.encryptedUsername.charAt(0) == '~' ||
-            stmt.row.encryptedPassword.charAt(0) == '~')
+        if (stmt.row.encryptedUsername.charAt(0) == "~" ||
+            stmt.row.encryptedPassword.charAt(0) == "~")
           params.encType = Ci.nsILoginManagerCrypto.ENCTYPE_BASE64;
         else
           params.encType = Ci.nsILoginManagerCrypto.ENCTYPE_SDR;

@@ -83,8 +83,7 @@ function sign(aPayload, aKeypair, aCallback) {
   });
 }
 
-function jwcryptoClass()
-{
+function jwcryptoClass() {
 }
 
 jwcryptoClass.prototype = {
@@ -101,7 +100,7 @@ jwcryptoClass.prototype = {
    *        Current date in milliseconds.  Useful for mocking clock
    *        skew in testing.
    */
-  getExpiration: function(duration=DURATION_MS, localtimeOffsetMsec=0, now=Date.now()) {
+  getExpiration: function(duration = DURATION_MS, localtimeOffsetMsec = 0, now = Date.now()) {
     return now + localtimeOffsetMsec + duration;
   },
 

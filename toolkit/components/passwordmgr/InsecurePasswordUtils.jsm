@@ -145,6 +145,5 @@ this.InsecurePasswordUtils = {
       passwordSafety = 5;
     }
 
-    Services.telemetry.getHistogramById("PWMGR_LOGIN_PAGE_SAFETY").add(passwordSafety);
   },
 };

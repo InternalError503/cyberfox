@@ -15,7 +15,7 @@ Cu.import("resource://gre/modules/Task.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
   "resource://gre/modules/PlacesUtils.jsm");
 
-Cu.importGlobalProperties(['URL']);
+Cu.importGlobalProperties(["URL"]);
 
 this.BrowserUtils = {
 
@@ -80,8 +80,7 @@ this.BrowserUtils = {
       let principalStr = "";
       try {
         principalStr = " from " + aPrincipal.URI.spec;
-      }
-      catch (e2) { }
+      } catch (e2) { }
 
       throw "Load of " + aURL + principalStr + " denied.";
     }
@@ -270,7 +269,7 @@ this.BrowserUtils = {
     // The HTML spec says that rel should be split on spaces before looking
     // for particular rel values.
     let values = rel.split(/[ \t\r\n\f]/);
-    return values.indexOf('noreferrer') != -1;
+    return values.indexOf("noreferrer") != -1;
   },
 
   /**
@@ -424,9 +423,8 @@ this.BrowserUtils = {
         try {
           url = this.makeURI(linkText);
         } catch (ex) {}
-      }
-      // Check if this could be a valid url, just missing the protocol.
-      else if (/^(?:[a-z\d-]+\.)+[a-z]+$/i.test(linkText)) {
+      } else if (/^(?:[a-z\d-]+\.)+[a-z]+$/i.test(linkText)) {
+        // Check if this could be a valid url, just missing the protocol.
         // Now let's see if this is an intentional link selection. Our guess is
         // based on whether the selection begins/ends with whitespace or is
         // preceded/followed by a non-word character.

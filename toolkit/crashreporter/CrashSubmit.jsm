@@ -7,7 +7,7 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/KeyValueParser.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.importGlobalProperties(['File']);
+Cu.importGlobalProperties(["File"]);
 
 XPCOMUtils.defineLazyModuleGetter(this, "PromiseUtils",
                                   "resource://gre/modules/PromiseUtils.jsm");
@@ -65,18 +65,18 @@ function getL10nStrings() {
   }
   let crstrings = parseINIStrings(path);
   let strings = {
-    'crashid': crstrings.CrashID,
-    'reporturl': crstrings.CrashDetailsURL
+    "crashid": crstrings.CrashID,
+    "reporturl": crstrings.CrashDetailsURL
   };
 
   path = dirSvc.get("XCurProcD", Ci.nsIFile);
   path.append("crashreporter-override.ini");
   if (path.exists()) {
     crstrings = parseINIStrings(path);
-    if ('CrashID' in crstrings)
-      strings['crashid'] = crstrings.CrashID;
-    if ('CrashDetailsURL' in crstrings)
-      strings['reporturl'] = crstrings.CrashDetailsURL;
+    if ("CrashID" in crstrings)
+      strings["crashid"] = crstrings.CrashID;
+    if ("CrashDetailsURL" in crstrings)
+      strings["reporturl"] = crstrings.CrashDetailsURL;
   }
   return strings;
 }
@@ -95,7 +95,7 @@ function getDir(name) {
 function writeFile(dirName, fileName, data) {
   let path = getDir(dirName);
   if (!path.exists())
-    path.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt('0700', 8));
+    path.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0700", 8));
   path.append(fileName);
   var fs = Cc["@mozilla.org/network/file-output-stream;1"].
            createInstance(Ci.nsIFileOutputStream);
@@ -174,11 +174,11 @@ function pruneSavedDumps() {
       let matches = extra.leafName.match(/(.+)\.extra$/);
       if (matches) {
         let dump = extra.clone();
-        dump.leafName = matches[1] + '.dmp';
+        dump.leafName = matches[1] + ".dmp";
         dump.remove(false);
 
         let memory = extra.clone();
-        memory.leafName = matches[1] + '.memory.json.gz';
+        memory.leafName = matches[1] + ".memory.json.gz";
         if (memory.exists()) {
           memory.remove(false);
         }
@@ -216,8 +216,7 @@ function Submitter(id, recordSubmission, noThrottle, extraExtraKeyVals) {
 }
 
 Submitter.prototype = {
-  submitSuccess: function Submitter_submitSuccess(ret)
-  {
+  submitSuccess: function Submitter_submitSuccess(ret) {
     // Write out the details file to submitted/
     writeSubmittedReport(ret.CrashID, ret.ViewURL);
 
@@ -233,8 +232,7 @@ Submitter.prototype = {
       for (let i of this.additionalDumps) {
         i.dump.remove(false);
       }
-    }
-    catch (ex) {
+    } catch (ex) {
       // report an error? not much the user can do here.
     }
 
@@ -255,18 +253,17 @@ Submitter.prototype = {
       CrashSubmit._activeSubmissions.splice(idx, 1);
   },
 
-  submitForm: function Submitter_submitForm()
-  {
-    if (!('ServerURL' in this.extraKeyVals)) {
+  submitForm: function Submitter_submitForm() {
+    if (!("ServerURL" in this.extraKeyVals)) {
       return false;
     }
     let serverURL = this.extraKeyVals.ServerURL;
 
     // Override the submission URL from the environment
 
-    var envOverride = Cc['@mozilla.org/process/environment;1'].
+    var envOverride = Cc["@mozilla.org/process/environment;1"].
       getService(Ci.nsIEnvironment).get("MOZ_CRASHREPORTER_URL");
-    if (envOverride != '') {
+    if (envOverride != "") {
       serverURL = envOverride;
     }
 
@@ -295,7 +292,7 @@ Submitter.prototype = {
       let names = [];
       for (let i of this.additionalDumps) {
         names.push(i.name);
-        formData.append("upload_file_minidump_"+i.name,
+        formData.append("upload_file_minidump_" + i.name,
                         File.createFromFileName(i.dump.path));
       }
     }
@@ -321,8 +318,7 @@ Submitter.prototype = {
 
         if (submitted) {
           this.submitSuccess(ret);
-        }
-        else {
+        } else {
            this.notifyStatus(FAILED);
            this.cleanup();
         }
@@ -336,8 +332,7 @@ Submitter.prototype = {
     return true;
   },
 
-  notifyStatus: function Submitter_notify(status, ret)
-  {
+  notifyStatus: function Submitter_notify(status, ret) {
     let propBag = Cc["@mozilla.org/hash-property-bag;1"].
                   createInstance(Ci.nsIWritablePropertyBag2);
     propBag.setPropertyAsAString("minidumpID", this.id);
@@ -366,8 +361,7 @@ Submitter.prototype = {
     }
   },
 
-  submit: function Submitter_submit()
-  {
+  submit: function Submitter_submit() {
     let [dump, extra, memory] = getPendingMinidump(this.id);
 
     if (!dump.exists() || !extra.exists()) {
@@ -392,7 +386,7 @@ Submitter.prototype = {
 
     let additionalDumps = [];
     if ("additional_minidumps" in this.extraKeyVals) {
-      let names = this.extraKeyVals.additional_minidumps.split(',');
+      let names = this.extraKeyVals.additional_minidumps.split(",");
       for (let name of names) {
         let [dump, extra, memory] = getPendingMinidump(this.id + "-" + name);
         if (!dump.exists()) {
@@ -400,7 +394,7 @@ Submitter.prototype = {
           this.cleanup();
           return this.deferredSubmit.promise;
         }
-        additionalDumps.push({'name': name, 'dump': dump});
+        additionalDumps.push({"name": name, "dump": dump});
       }
     }
 
@@ -443,8 +437,7 @@ this.CrashSubmit = {
    *  @return a Promise that is fulfilled with the server crash ID when the
    *          submission succeeds and rejected otherwise.
    */
-  submit: function CrashSubmit_submit(id, params)
-  {
+  submit: function CrashSubmit_submit(id, params) {
     params = params || {};
     let recordSubmission = false;
     let submitSuccess = null;
@@ -452,11 +445,11 @@ this.CrashSubmit = {
     let noThrottle = false;
     let extraExtraKeyVals = null;
 
-    if ('recordSubmission' in params)
+    if ("recordSubmission" in params)
       recordSubmission = params.recordSubmission;
-    if ('noThrottle' in params)
+    if ("noThrottle" in params)
       noThrottle = params.noThrottle;
-    if ('extraExtraKeyVals' in params)
+    if ("extraExtraKeyVals" in params)
       extraExtraKeyVals = params.extraExtraKeyVals;
 
     let submitter = new Submitter(id, recordSubmission,

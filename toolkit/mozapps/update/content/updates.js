@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict';
+"use strict";
 
 /* import-globals-from ../../../content/contentAreaUtils.js */
 
@@ -99,8 +99,7 @@ function openUpdateURL(event) {
 function getPref(func, preference, defaultValue) {
   try {
     return Services.prefs[func](preference);
-  }
-  catch (e) {
+  } catch (e) {
     LOG("General", "getPref - failed to get preference: " + preference);
   }
   return defaultValue;
@@ -447,8 +446,7 @@ var gUpdates = {
         aCallback(this.updatesFoundPageId);
         return;
       }
-    }
-    else {
+    } else {
       var um = CoC["@mozilla.org/updates/update-manager;1"].
                getService(CoI.nsIUpdateManager);
       if (um.activeUpdate) {
@@ -809,8 +807,7 @@ var gDownloadingPage = {
 
       if (activeUpdate)
         this._setUIState(!aus.isDownloading);
-    }
-    catch (e) {
+    } catch (e) {
       LOG("gDownloadingPage", "onPageShow - error: " + e);
     }
 
@@ -874,8 +871,7 @@ var gDownloadingPage = {
         let pausedStatus = gUpdates.getAUSString("downloadPausedStatus", [status]);
         this._setStatus(pausedStatus);
       }
-    }
-    else {
+    } else {
       if (this._downloadProgress.mode != "undetermined")
         this._downloadProgress.mode = "undetermined";
       this._pauseButton.setAttribute("paused", "false");
@@ -1310,7 +1306,7 @@ var gFinishedPage = {
     }
 
     if (getPref("getBoolPref", PREF_APP_UPDATE_TEST_LOOP, false)) {
-      setTimeout(function () { gUpdates.wiz.getButton("finish").click(); },
+      setTimeout(function() { gUpdates.wiz.getButton("finish").click(); },
                  UPDATE_TEST_LOOP_INTERVAL);
     }
   },

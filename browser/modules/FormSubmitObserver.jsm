@@ -38,8 +38,7 @@ FormSubmitObserver.prototype =
    * Public apis
    */
 
-  init: function(aWindow, aTabChildGlobal)
-  {
+  init: function(aWindow, aTabChildGlobal) {
     this._content = aWindow;
     this._tab = aTabChildGlobal;
     this._mm =
@@ -57,8 +56,7 @@ FormSubmitObserver.prototype =
     this._tab.addEventListener("unload", this, false);
   },
 
-  uninit: function()
-  {
+  uninit: function() {
     Services.obs.removeObserver(this, "invalidformsubmit");
     this._content.removeEventListener("pageshow", this, false);
     this._content.removeEventListener("unload", this, false);
@@ -95,8 +93,7 @@ FormSubmitObserver.prototype =
    * nsIFormSubmitObserver
    */
 
-  notifyInvalidSubmit : function (aFormElement, aInvalidElements)
-  {
+  notifyInvalidSubmit : function (aFormElement, aInvalidElements) {
     // We are going to handle invalid form submission attempt by focusing the
     // first invalid element and show the corresponding validation message in a
     // panel attached to the element.
@@ -196,13 +193,13 @@ FormSubmitObserver.prototype =
     // and where the content begin for the other elements.
     let offset = 0;
 
-    if (aElement.tagName == 'INPUT' &&
-        (aElement.type == 'radio' || aElement.type == 'checkbox')) {
+    if (aElement.tagName == "INPUT" &&
+        (aElement.type == "radio" || aElement.type == "checkbox")) {
       panelData.position = "bottomcenter topleft";
     } else {
       let win = aElement.ownerGlobal;
       let style = win.getComputedStyle(aElement, null);
-      if (style.direction == 'rtl') {
+      if (style.direction == "rtl") {
         offset = parseInt(style.paddingRight) + parseInt(style.borderRightWidth);
       } else {
         offset = parseInt(style.paddingLeft) + parseInt(style.borderLeftWidth);

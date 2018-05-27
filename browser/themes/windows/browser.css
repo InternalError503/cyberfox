@@ -1527,22 +1527,47 @@ html|span.ac-emphasize-text-url {
 
 @media not all and (-moz-windows-default-theme) {
   .autocomplete-richlistitem[selected=true] {
-    background-color: Highlight;
+    background-color: hsl(210, 80%, 52%);
+    color: hsl(0, 0%, 100%);
   }
 
-  .ac-title {
-    color: inherit;
+  .ac-title:not([selected=true]) {
+    color: hsl(0, 0%, 0%);
+  }
+
+  .ac-separator:not([selected=true]) {
+    color: hsl(0, 0%, 50%);
+  }
+
+  .ac-url:not([selected=true]) {
+    color: hsl(210, 77%, 47%);
+  }
+
+  .ac-action:not([selected=true]) {
+    color: hsl(178, 100%, 28%);
+  }
+
+  html|span.ac-tag {
+    background-color: hsl(216, 0%, 88%);
+    color: hsl(0, 0%, 0%);
+  }
+
+  .ac-tags-text[selected] > html|span.ac-tag {
+    background-color: hsl(0, 0%, 100%);
+    color: hsl(210, 80%, 40%);
+  }
+}
+
+@media (-moz-windows-default-theme: 0) {
+  .ac-separator:not([selected=true]),
+  .ac-url:not([selected=true]),
+  .ac-action:not([selected=true]) {
+    color: -moz-nativehyperlinktext;
   }
 
   html|span.ac-tag {
     background-color: -moz-FieldText;
     color: -moz-Field;
-  }
-
-  .ac-separator,
-  .ac-url,
-  .ac-action {
-    color: -moz-nativehyperlinktext;
   }
 
   .ac-tags-text[selected] > html|span.ac-tag {

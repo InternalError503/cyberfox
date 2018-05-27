@@ -458,11 +458,6 @@ var Scheduler = this.Scheduler = {
       // let's not waste time attempting to extract telemetry from it.
       return;
     }
-    let HISTOGRAM_LAUNCH = Services.telemetry.getHistogramById("OSFILE_WORKER_LAUNCH_MS");
-    HISTOGRAM_LAUNCH.add(worker.workerTimeStamps.entered - worker.launchTimeStamp);
-
-    let HISTOGRAM_READY = Services.telemetry.getHistogramById("OSFILE_WORKER_READY_MS");
-    HISTOGRAM_READY.add(worker.workerTimeStamps.loaded - worker.launchTimeStamp);
   }
 };
 

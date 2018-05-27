@@ -4,7 +4,7 @@
 
 var { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
-Cu.importGlobalProperties(['Blob', 'FileReader']);
+Cu.importGlobalProperties(["Blob", "FileReader"]);
 
 Cu.import("resource://gre/modules/PageThumbUtils.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -115,19 +115,16 @@ const backgroundPageThumbsContent = {
           this._finishCurrentCapture();
           delete this._currentCapture;
           this._startNextCapture();
-        }
-        else if (this._state == STATE_CANCELED) {
+        } else if (this._state == STATE_CANCELED) {
           delete this._currentCapture;
           this._startNextCapture();
         }
-      }
-      else if (this._state == STATE_LOADING &&
+      } else if (this._state == STATE_LOADING &&
                Components.isSuccessCode(status)) {
         // The requested page has loaded.  Capture it.
         this._state = STATE_CAPTURING;
         this._captureCurrentPage();
-      }
-      else if (this._state != STATE_CANCELED) {
+      } else if (this._state != STATE_CANCELED) {
         // Something went wrong.  Cancel the capture.  Loading about:blank
         // while onStateChange is still on the stack does not actually stop
         // the request if it redirects, so do it asyncly.

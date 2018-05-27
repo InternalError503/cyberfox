@@ -23,7 +23,7 @@ XPCOMUtils.defineLazyGetter(this, "gNavigatorBundle", function() {
 XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
   "resource://gre/modules/AppConstants.jsm");
 
-this.PluginContent = function (global) {
+this.PluginContent = function(global) {
   this.init(global);
 }
 
@@ -43,14 +43,14 @@ PluginContent.prototype = {
     // Note that the XBL binding is untrusted
     global.addEventListener("PluginBindingAttached", this, true, true);
     global.addEventListener("PluginPlaceholderReplaced", this, true, true);
-    global.addEventListener("PluginCrashed",         this, true);
-    global.addEventListener("PluginOutdated",        this, true);
-    global.addEventListener("PluginInstantiated",    this, true);
-    global.addEventListener("PluginRemoved",         this, true);
-    global.addEventListener("pagehide",              this, true);
-    global.addEventListener("pageshow",              this, true);
-    global.addEventListener("unload",                this);
-    global.addEventListener("HiddenPlugin",          this, true);
+    global.addEventListener("PluginCrashed", this, true);
+    global.addEventListener("PluginOutdated", this, true);
+    global.addEventListener("PluginInstantiated", this, true);
+    global.addEventListener("PluginRemoved", this, true);
+    global.addEventListener("pagehide", this, true);
+    global.addEventListener("pageshow", this, true);
+    global.addEventListener("unload", this);
+    global.addEventListener("HiddenPlugin", this, true);
 
     global.addMessageListener("BrowserPlugins:ActivatePlugins", this);
     global.addMessageListener("BrowserPlugins:NotificationShown", this);
@@ -67,14 +67,14 @@ PluginContent.prototype = {
 
     global.removeEventListener("PluginBindingAttached", this, true);
     global.removeEventListener("PluginPlaceholderReplaced", this, true, true);
-    global.removeEventListener("PluginCrashed",         this, true);
-    global.removeEventListener("PluginOutdated",        this, true);
-    global.removeEventListener("PluginInstantiated",    this, true);
-    global.removeEventListener("PluginRemoved",         this, true);
-    global.removeEventListener("pagehide",              this, true);
-    global.removeEventListener("pageshow",              this, true);
-    global.removeEventListener("unload",                this);
-    global.removeEventListener("HiddenPlugin",          this, true);
+    global.removeEventListener("PluginCrashed", this, true);
+    global.removeEventListener("PluginOutdated", this, true);
+    global.removeEventListener("PluginInstantiated", this, true);
+    global.removeEventListener("PluginRemoved", this, true);
+    global.removeEventListener("pagehide", this, true);
+    global.removeEventListener("pageshow", this, true);
+    global.removeEventListener("unload", this);
+    global.removeEventListener("HiddenPlugin", this, true);
 
     global.removeMessageListener("BrowserPlugins:ActivatePlugins", this);
     global.removeMessageListener("BrowserPlugins:NotificationShown", this);
@@ -553,8 +553,8 @@ PluginContent.prototype = {
 
     let closeIcon = this.getPluginUI(plugin, "closeIcon");
     if (closeIcon) {
-      closeIcon.addEventListener("click", event => {
-        if (event.button == 0 && event.isTrusted) {
+      closeIcon.addEventListener("click", clickEvent => {
+        if (clickEvent.button == 0 && clickEvent.isTrusted) {
           this.hideClickToPlayOverlay(plugin);
           overlay.setAttribute("dismissed", "true");
         }
@@ -677,8 +677,8 @@ PluginContent.prototype = {
     let overlay = this.getPluginUI(plugin, "main");
     // Have to check that the target is not the link to update the plugin
     if (!(event.originalTarget instanceof contentWindow.HTMLAnchorElement) &&
-        (event.originalTarget.getAttribute('anonid') != 'closeIcon') &&
-        !overlay.hasAttribute('dismissed') &&
+        (event.originalTarget.getAttribute("anonid") != "closeIcon") &&
+        !overlay.hasAttribute("dismissed") &&
         event.button == 0 &&
         event.isTrusted) {
       this._showClickToPlayNotification(plugin, true);
@@ -762,8 +762,8 @@ PluginContent.prototype = {
       let cwu = contentWindow.QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIDOMWindowUtils);
       // cwu.plugins may contain non-plugin <object>s, filter them out
-      plugins = cwu.plugins.filter((plugin) =>
-        plugin.getContentTypeForMIMEType(plugin.actualType) == Ci.nsIObjectLoadingContent.TYPE_PLUGIN);
+      plugins = cwu.plugins.filter((p) =>
+        p.getContentTypeForMIMEType(p.actualType) == Ci.nsIObjectLoadingContent.TYPE_PLUGIN);
 
       if (plugins.length == 0) {
         this.removeNotification("click-to-play-plugins");
@@ -799,8 +799,7 @@ PluginContent.prototype = {
       if (permissionObj) {
         pluginInfo.pluginPermissionPrePath = permissionObj.principal.originNoSuffix;
         pluginInfo.pluginPermissionType = permissionObj.expireType;
-      }
-      else {
+      } else {
         pluginInfo.pluginPermissionPrePath = principal.originNoSuffix;
         pluginInfo.pluginPermissionType = undefined;
       }
@@ -811,7 +810,7 @@ PluginContent.prototype = {
     this.haveShownNotification = true;
 
     this.global.sendAsyncMessage("PluginContent:ShowClickToPlayNotification", {
-      plugins: [... this.pluginData.values()],
+      plugins: [...this.pluginData.values()],
       showNow: showNow,
       location: location,
     }, null, principal);
@@ -894,7 +893,7 @@ PluginContent.prototype = {
     // plugins that need a notification bar.
     this.global.sendAsyncMessage("PluginContent:UpdateHiddenPluginUI", {
       haveInsecure: haveInsecure,
-      actions: [... actions.values()],
+      actions: [...actions.values()],
       location: location,
     }, null, principal);
   },

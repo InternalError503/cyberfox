@@ -86,13 +86,11 @@ Bookmarks.prototype = {
             yield this._migrateCollection(children, this.READING_LIST_COLLECTION);
           else if (entry.get("ShouldOmitFromUI") !== true)
             entriesFiltered.push(entry);
-        }
-        else if (type == "WebBookmarkTypeLeaf") {
+        } else if (type == "WebBookmarkTypeLeaf") {
           entriesFiltered.push(entry);
         }
       }
-    }
-    else {
+    } else {
       entriesFiltered = aEntries;
     }
 
@@ -221,8 +219,7 @@ History.prototype = {
                             title: entry.get("title"),
                             visits: [{ transitionType: transType,
                                        visitDate: visitDate }] });
-            }
-            catch (ex) {
+            } catch (ex) {
               // Safari's History file may contain malformed URIs which
               // will be ignored.
               Cu.reportError(ex);
@@ -241,12 +238,10 @@ History.prototype = {
               aCallback(this._success);
             }
           });
-        }
-        else {
+        } else {
           aCallback(false);
         }
-      }
-      catch (ex) {
+      } catch (ex) {
         Cu.reportError(ex);
         aCallback(false);
       }
@@ -284,8 +279,7 @@ MainPreferencesPropertyList.prototype = {
         for (let callback of this._callbacks) {
           try {
             callback(aDict);
-          }
-          catch (ex) {
+          } catch (ex) {
             Cu.reportError(ex);
           }
         }

@@ -75,11 +75,11 @@ var SocialServiceInternal = {
       }
     }
     let originUri = Services.io.newURI(origin, null, null);
-    return originUri.hostPort.replace('.', '-');
+    return originUri.hostPort.replace(".", "-");
   },
   orderedProviders: function(aCallback) {
     if (SocialServiceInternal.providerArray.length < 2) {
-      schedule(function () {
+      schedule(function() {
         aCallback(SocialServiceInternal.providerArray);
       });
       return;
@@ -132,7 +132,7 @@ var SocialServiceInternal = {
   }
 };
 
-XPCOMUtils.defineLazyGetter(SocialServiceInternal, "providers", function () {
+XPCOMUtils.defineLazyGetter(SocialServiceInternal, "providers", function() {
   initService();
   let providers = {};
   for (let manifest of this.manifests) {
@@ -158,7 +158,7 @@ function getOriginActivationType(origin) {
     return "internal";
   }
 
-  let directories = Services.prefs.getCharPref("social.directories").split(',');
+  let directories = Services.prefs.getCharPref("social.directories").split(",");
   if (directories.indexOf(origin) >= 0)
     return "directory";
 
@@ -405,7 +405,7 @@ this.SocialService = {
     SocialServiceInternal.providers[provider.origin] = provider;
     ActiveProviders.add(provider.origin);
 
-    this.getOrderedProviderList(function (providers) {
+    this.getOrderedProviderList(function(providers) {
       this._notifyProviderListeners("provider-enabled", provider.origin, providers);
       if (onDone)
         onDone(provider);
@@ -438,7 +438,7 @@ this.SocialService = {
       AddonManagerPrivate.callAddonListeners("onDisabled", addon);
     }
 
-    this.getOrderedProviderList(function (providers) {
+    this.getOrderedProviderList(function(providers) {
       this._notifyProviderListeners("provider-disabled", origin, providers);
       if (onDone)
         onDone();
@@ -448,7 +448,7 @@ this.SocialService = {
   // Returns a single provider object with the specified origin.  The provider
   // must be "installed" (ie, in ActiveProviders)
   getProvider: function getProvider(origin, onDone) {
-    schedule((function () {
+    schedule((function() {
       onDone(SocialServiceInternal.providers[origin] || null);
     }).bind(this));
   },
@@ -497,12 +497,12 @@ this.SocialService = {
   },
 
   _manifestFromData: function(type, data, installOrigin) {
-    let featureURLs = ['shareURL'];
-    let resolveURLs = featureURLs.concat(['postActivationURL']);
+    let featureURLs = ["shareURL"];
+    let resolveURLs = featureURLs.concat(["postActivationURL"]);
 
-    if (type == 'directory' || type == 'internal') {
+    if (type == "directory" || type == "internal") {
       // directory provided manifests must have origin in manifest, use that
-      if (!data['origin']) {
+      if (!data["origin"]) {
         Cu.reportError("SocialService.manifestFromData directory service provided manifest without origin.");
         return null;
       }
@@ -519,7 +519,7 @@ this.SocialService = {
       Cu.reportError("SocialService.manifestFromData manifest missing required urls.");
       return null;
     }
-    if (!data['name'] || !data['iconURL']) {
+    if (!data["name"] || !data["iconURL"]) {
       Cu.reportError("SocialService.manifestFromData manifest missing name or iconURL.");
       return null;
     }
@@ -575,7 +575,7 @@ this.SocialService = {
                                         action, [], options);
   },
 
-  installProvider: function(data, installCallback, options={}) {
+  installProvider: function(data, installCallback, options = {}) {
     data.installType = getOriginActivationType(data.origin);
     // if we get data, we MUST have a valid manifest generated from the data
     let manifest = this._manifestFromData(data.installType, data.manifest, data.origin);
@@ -596,7 +596,7 @@ this.SocialService = {
         aAddon.cancelUninstall();
         aAddon.userDisabled = false;
       }
-      schedule(function () {
+      schedule(function() {
         try {
           this._installProvider(data, options, aManifest => {
               this._notifyProviderListeners("provider-installed", aManifest.origin);

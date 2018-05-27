@@ -131,7 +131,7 @@ function handleGUMRequest(aSubject, aTopic, aData) {
 
   contentWindow.navigator.mozGetUserMediaDevices(
     constraints,
-    function (devices) {
+    function(devices) {
       // If the window has been closed while we were waiting for the list of
       // devices, there's nothing to do in the callback anymore.
       if (contentWindow.closed)
@@ -140,7 +140,7 @@ function handleGUMRequest(aSubject, aTopic, aData) {
       prompt(contentWindow, aSubject.windowID, aSubject.callID,
              constraints, devices, secure);
     },
-    function (error) {
+    function(error) {
       // bug 827146 -- In the future, the UI should catch NotFoundError
       // and allow the user to plug in a device, instead of immediately failing.
       denyGUMRequest({callID: aSubject.callID}, error);
@@ -308,16 +308,13 @@ function updateIndicators(aSubject, aTopic, aData) {
     if (tabState.screen) {
       if (tabState.screen == "Screen") {
         state.showScreenSharingIndicator = "Screen";
-      }
-      else if (tabState.screen == "Window") {
+      } else if (tabState.screen == "Window") {
         if (state.showScreenSharingIndicator != "Screen")
           state.showScreenSharingIndicator = "Window";
-      }
-      else if (tabState.screen == "Application") {
+      } else if (tabState.screen == "Application") {
         if (!state.showScreenSharingIndicator)
           state.showScreenSharingIndicator = "Application";
-      }
-      else if (tabState.screen == "Browser") {
+      } else if (tabState.screen == "Browser") {
         if (!state.showScreenSharingIndicator)
           state.showScreenSharingIndicator = "Browser";
       }

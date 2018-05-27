@@ -22,8 +22,7 @@
             var enabled = true;
             try {
               enabled = this.mPrefs.getBoolPref("general.autoScroll");
-            }
-            catch (ex) {
+            } catch (ex) {
             }
 
             return enabled;
@@ -141,7 +140,7 @@
             if (params && typeof(params) == "object") {
               aFlags = params.flags;
               aReferrerURI = params.referrerURI;
-              if ('referrerPolicy' in params) {
+              if ("referrerPolicy" in params) {
                 aReferrerPolicy = params.referrerPolicy;
               }
               aCharset = params.charset;
@@ -161,8 +160,7 @@
           <![CDATA[
             try {
               this.loadURI(this.homePage);
-            }
-            catch (e) {
+            } catch (e) {
             }
           ]]>
         </body>
@@ -559,7 +557,7 @@
       </property>
 
       <field name="mPrefs" readonly="true">
-        Components.classes['@mozilla.org/preferences-service;1']
+        Components.classes["@mozilla.org/preferences-service;1"]
                   .getService(Components.interfaces.nsIPrefBranch);
       </field>
 
@@ -793,7 +791,7 @@
             this._audioBlocked = false;
             this.messageManager.sendAsyncMessage("AudioPlayback",
                                                  {type: "resumeMedia"});
-            let  event = document.createEvent("Events");
+            let event = document.createEvent("Events");
             event.initEvent("DOMAudioPlaybackBlockStopped", true, false);
             this.dispatchEvent(event);
           ]]>
@@ -919,14 +917,13 @@
                 }
               }
             }
-          }
-          catch (e) {
+          } catch (e) {
             Components.utils.reportError(e);
           }
           try {
-            var securityUI = this.securityUI;
-          }
-          catch (e) {
+            // Ensures the securityUI is initialized.
+            var securityUI = this.securityUI; // eslint-disable-line no-unused-vars
+          } catch (e) {
           }
 
           // XXX tabbrowser.xml sets "relatedBrowser" as a direct property on
@@ -1133,8 +1130,7 @@
               if (this.hasAttribute("autoscrollpopup")) {
                 // our creator provided a popup to share
                 this._autoScrollPopup = document.getElementById(this.getAttribute("autoscrollpopup"));
-              }
-              else {
+              } else {
                 // we weren't provided a popup; we have to use the global scope
                 this._autoScrollPopup = this._createAutoScrollPopup();
                 document.documentElement.appendChild(this._autoScrollPopup);
@@ -1363,8 +1359,7 @@
             // lazily re-created on access. We need to do this because they
             // might have attached the wrong docShell.
             this._fastFind = aOtherBrowser._fastFind = null;
-          }
-          else {
+          } else {
             // Rewire the remote listeners
             this._remoteWebNavigationImpl.swapBrowser(this);
             aOtherBrowser._remoteWebNavigationImpl.swapBrowser(aOtherBrowser);
@@ -1484,11 +1479,11 @@
                                           .getService(Components.interfaces.nsIPromptService);
 
             var buttonPressed = promptService.confirmEx(window,
-              this.mStrBundle.GetStringFromName('browsewithcaret.checkWindowTitle'),
-              this.mStrBundle.GetStringFromName('browsewithcaret.checkLabel'),
+              this.mStrBundle.GetStringFromName("browsewithcaret.checkWindowTitle"),
+              this.mStrBundle.GetStringFromName("browsewithcaret.checkLabel"),
               // Make "No" the default:
               promptService.STD_YES_NO_BUTTONS | promptService.BUTTON_POS_1_DEFAULT,
-              null, null, null, this.mStrBundle.GetStringFromName('browsewithcaret.checkMsg'),
+              null, null, null, this.mStrBundle.GetStringFromName("browsewithcaret.checkMsg"),
               checkValue);
             if (buttonPressed != 0) {
               if (checkValue.value) {
@@ -1502,8 +1497,7 @@
             if (checkValue.value) {
               try {
                 this.mPrefs.setBoolPref(kPrefWarnOnEnable, false);
-              }
-              catch (ex) {
+              } catch (ex) {
               }
             }
           }

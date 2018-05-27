@@ -132,7 +132,7 @@ XPCOMUtils.defineLazyGetter(this, "Barriers", () => {
    * The observer is passed the connection identifier of the database
    * connection that is being finalized.
    */
-  let finalizationObserver = function (subject, topic, identifier) {
+  let finalizationObserver = function(subject, topic, identifier) {
     let connectionData = ConnectionData.byId.get(identifier);
 
     if (connectionData === undefined) {
@@ -207,7 +207,7 @@ XPCOMUtils.defineLazyGetter(this, "Barriers", () => {
  * OpenedConnection needs to use the methods in this object, it will
  * dispatch its method calls here.
  */
-function ConnectionData(connection, identifier, options={}) {
+function ConnectionData(connection, identifier, options = {}) {
   this._log = Log.repository.getLoggerWithMessagePrefix("Sqlite.Connection",
                                                         identifier + ": ");
   this._log.info("Opened");
@@ -259,7 +259,7 @@ function ConnectionData(connection, identifier, options={}) {
   Barriers.connections.client.addBlocker(
     this._identifier + ": waiting for shutdown",
     this._deferredClose.promise,
-    () =>  ({
+    () => ({
       identifier: this._identifier,
       isCloseRequested: this._closeRequested,
       hasDbConn: !!this._dbConn,
@@ -471,7 +471,7 @@ ConnectionData.prototype = Object.freeze({
     return this._deferredClose.promise;
   },
 
-  executeCached: function (sql, params=null, onRow=null) {
+  executeCached: function (sql, params = null, onRow = null) {
     this.ensureOpen();
 
     if (!sql) {
@@ -505,7 +505,7 @@ ConnectionData.prototype = Object.freeze({
     });
   },
 
-  execute: function (sql, params=null, onRow=null) {
+  execute: function (sql, params = null, onRow = null) {
     if (typeof(sql) != "string") {
       throw new Error("Must define SQL to execute as a string: " + sql);
     }
@@ -995,7 +995,7 @@ function cloneStorageConnection(options) {
   if (!source) {
     throw new TypeError("connection not specified in clone options.");
   }
-  if (!source instanceof Ci.mozIStorageAsyncConnection) {
+  if (!(source instanceof Ci.mozIStorageAsyncConnection)) {
     throw new TypeError("Connection must be a valid Storage connection.");
   }
 
@@ -1133,7 +1133,7 @@ function wrapStorageConnection(options) {
  *        (object) Options to control behavior of connection. See
  *        `openConnection`.
  */
-function OpenedConnection(connection, identifier, options={}) {
+function OpenedConnection(connection, identifier, options = {}) {
   // Store all connection data in a field distinct from the
   // witness. This enables us to store an additional reference to this
   // field without preventing garbage collection of
@@ -1373,7 +1373,7 @@ OpenedConnection.prototype = Object.freeze({
    * @param type optional
    *        One of the TRANSACTION_* constants attached to this type.
    */
-  executeTransaction: function (func, type=this.TRANSACTION_DEFERRED) {
+  executeTransaction: function (func, type = this.TRANSACTION_DEFERRED) {
     if (this.TRANSACTION_TYPES.indexOf(type) == -1) {
       throw new Error("Unknown transaction type: " + type);
     }

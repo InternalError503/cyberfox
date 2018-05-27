@@ -155,7 +155,7 @@ Links.prototype = {
    *
    * @returns {Promise} Returns a promise with the array of retrieved items
    */
-  executePlacesQuery: Task.async(function*(aSql, aOptions={}) {
+  executePlacesQuery: Task.async(function*(aSql, aOptions = {}) {
     let {columns, params, callback} = aOptions;
     let items = [];
     let queryError = null;
@@ -165,9 +165,8 @@ Links.prototype = {
         // check if caller wants to handle query raws
         if (callback) {
           callback(aRow);
-        }
-        // otherwise fill in the item and add items array
-        else {
+        } else {
+          // otherwise fill in the item and add items array
           let item = null;
           // if columns array is given construct an object
           if (columns && Array.isArray(columns)) {

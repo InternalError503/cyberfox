@@ -50,7 +50,7 @@ this.Social = {
     // front-end can generate UI
     if (SocialService.hasEnabledProviders) {
       // Retrieve the current set of providers, and set the current provider.
-      SocialService.getOrderedProviderList(function (providers) {
+      SocialService.getOrderedProviderList(function(providers) {
         Social._updateProviderCache(providers);
         Social._updateEnabledState(SocialService.enabled);
         deferred.resolve(false);
@@ -233,8 +233,8 @@ this.OpenGraphBuilder = {
     let [endpointURL, queryString] = URLTemplate.split("?");
     let query = {};
     if (queryString) {
-      queryString.split('&').forEach(function (val) {
-        let [name, value] = val.split('=');
+      queryString.split("&").forEach(function(val) {
+        let [name, value] = val.split("=");
         let p = /%\{(.+)\}/.exec(value);
         if (!p) {
           // preserve non-template query vars

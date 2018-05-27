@@ -297,7 +297,7 @@ this.ContentSearch = {
     return result;
   }),
 
-  addFormHistoryEntry: Task.async(function* (browser, entry="") {
+  addFormHistoryEntry: Task.async(function* (browser, entry = "") {
     let isPrivate = false;
     try {
       // isBrowserPrivate assumes that the passed-in browser has all the normal
@@ -324,7 +324,7 @@ this.ContentSearch = {
     return true;
   }),
 
-  currentStateObj: Task.async(function* (uriFlag=false) {
+  currentStateObj: Task.async(function* (uriFlag = false) {
     let state = {
       engines: [],
       currentEngine: yield this._currentEngineObj(),
@@ -463,8 +463,7 @@ this.ContentSearch = {
     if (data === "engine-current") {
       let engine = yield this._currentEngineObj();
       this._broadcast("CurrentEngine", engine);
-    }
-    else if (data !== "engine-default") {
+    } else if (data !== "engine-default") {
       // engine-default is always sent with engine-current and isn't otherwise
       // relevant to content searches.
       let state = yield this.currentStateObj();
@@ -538,8 +537,7 @@ this.ContentSearch = {
     try {
       // This throws if the URI is erroneously encoded.
       xhr.send();
-    }
-    catch (err) {
+    } catch (err) {
       return Promise.resolve(null);
     }
     return deferred.promise;

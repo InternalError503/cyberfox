@@ -86,18 +86,6 @@ add_task(function* () {
       is(engineName, args.expectedName, "Engine name in DOM should match engine we just added");
     });
 
-    let numSearchesBefore = 0;
-    // Get the current number of recorded searches.
-    let histogramKey = engine.identifier + ".abouthome";
-    try {
-      let hs = Services.telemetry.getKeyedHistogramById("SEARCH_COUNTS").snapshot();
-      if (histogramKey in hs) {
-        numSearchesBefore = hs[histogramKey].sum;
-      }
-    } catch (ex) {
-      // No searches performed yet, not a problem, |numSearchesBefore| is 0.
-    }
-
     let searchStr = "a search";
 
     let expectedURL = Services.search.currentEngine
@@ -113,12 +101,6 @@ add_task(function* () {
     });
 
     yield promise;
-
-    // Make sure the SEARCH_COUNTS histogram has the right key and count.
-    let hs = Services.telemetry.getKeyedHistogramById("SEARCH_COUNTS").snapshot();
-    Assert.ok(histogramKey in hs, "histogram with key should be recorded");
-    Assert.equal(hs[histogramKey].sum, numSearchesBefore + 1,
-                 "histogram sum should be incremented");
 
     Services.search.currentEngine = currEngine;
     try {

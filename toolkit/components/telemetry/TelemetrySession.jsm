@@ -228,12 +228,12 @@ var processInfo = {
     if (!this._initialized) {
       Cu.import("resource://gre/modules/ctypes.jsm");
       this._IO_COUNTERS = new ctypes.StructType("IO_COUNTERS", [
-        {'readOps': ctypes.unsigned_long_long},
-        {'writeOps': ctypes.unsigned_long_long},
-        {'otherOps': ctypes.unsigned_long_long},
-        {'readBytes': ctypes.unsigned_long_long},
-        {'writeBytes': ctypes.unsigned_long_long},
-        {'otherBytes': ctypes.unsigned_long_long} ]);
+        {"readOps": ctypes.unsigned_long_long},
+        {"writeOps": ctypes.unsigned_long_long},
+        {"otherOps": ctypes.unsigned_long_long},
+        {"readBytes": ctypes.unsigned_long_long},
+        {"writeBytes": ctypes.unsigned_long_long},
+        {"otherBytes": ctypes.unsigned_long_long} ]);
       try {
         this._kernel32 = ctypes.open("Kernel32.dll");
         this._GetProcessIoCounters = this._kernel32.declare("GetProcessIoCounters",
@@ -998,7 +998,7 @@ var Impl = {
     // Don't return the test scalars.
     let ret = {};
     for (let name in scalarsSnapshot) {
-      if (name.startsWith('telemetry.test') && this._testing == false) {
+      if (name.startsWith("telemetry.test") && this._testing == false) {
         this._log.trace("getScalars - Skipping test scalar: " + name);
       } else {
         ret[name] = scalarsSnapshot[name];
@@ -1149,7 +1149,7 @@ var Impl = {
     }
     let b = (id, n) => h(id, Ci.nsIMemoryReporter.UNITS_BYTES, n);
     let c = (id, n) => h(id, Ci.nsIMemoryReporter.UNITS_COUNT, n);
-    let cc= (id, n) => h(id, Ci.nsIMemoryReporter.UNITS_COUNT_CUMULATIVE, n);
+    let cc = (id, n) => h(id, Ci.nsIMemoryReporter.UNITS_COUNT_CUMULATIVE, n);
     let p = (id, n) => h(id, Ci.nsIMemoryReporter.UNITS_PERCENTAGE, n);
 
     b("MEMORY_VSIZE", "vsize");
@@ -1208,15 +1208,12 @@ var Impl = {
     let val;
     if (units == Ci.nsIMemoryReporter.UNITS_BYTES) {
       val = Math.floor(amount / 1024);
-    }
-    else if (units == Ci.nsIMemoryReporter.UNITS_PERCENTAGE) {
+    } else if (units == Ci.nsIMemoryReporter.UNITS_PERCENTAGE) {
       // UNITS_PERCENTAGE amounts are 100x greater than their raw value.
       val = Math.floor(amount / 100);
-    }
-    else if (units == Ci.nsIMemoryReporter.UNITS_COUNT) {
+    } else if (units == Ci.nsIMemoryReporter.UNITS_COUNT) {
       val = amount;
-    }
-    else if (units == Ci.nsIMemoryReporter.UNITS_COUNT_CUMULATIVE) {
+    } else if (units == Ci.nsIMemoryReporter.UNITS_COUNT_CUMULATIVE) {
       // If the reporter gives us a cumulative count, we'll report the
       // difference in its value between now and our previous ping.
 
@@ -1230,8 +1227,7 @@ var Impl = {
 
       val = amount - this._prevValues[id];
       this._prevValues[id] = amount;
-    }
-    else {
+    } else {
       NS_ASSERT(false, "Can't handle memory reporter with units " + units);
       return;
     }
@@ -1521,7 +1517,7 @@ var Impl = {
           GCTelemetry.init();
         }
 
-        Telemetry.asyncFetchTelemetryData(function () {});
+        Telemetry.asyncFetchTelemetryData(function() {});
 
         if (IS_UNIFIED_TELEMETRY) {
           // Check for a previously written aborted session ping.
@@ -1748,7 +1744,7 @@ var Impl = {
         addEnvironment: true,
       };
       p.push(TelemetryController.submitExternalPing(getPingType(payload), payload, options)
-                                .catch (e => this._log.error("saveShutdownPings - failed to submit saved-session ping", e)));
+                                .catch(e => this._log.error("saveShutdownPings - failed to submit saved-session ping", e)));
     }
 
     // Wait on pings to be saved.

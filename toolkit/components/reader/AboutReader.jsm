@@ -83,7 +83,8 @@ var AboutReader = function(mm, win, articlePromise) {
   let colorSchemeOptions = colorSchemeValues.map((value) => {
     return { name: gStrings.GetStringFromName("aboutReader.colorScheme." + value),
              value: value,
-             itemClass: value + "-button" };
+             itemClass: value + "-button"
+    };
   });
 
   let colorScheme = Services.prefs.getCharPref("reader.color_scheme");
@@ -227,9 +228,9 @@ AboutReader.prototype = {
     switch (aEvent.type) {
       case "click":
         let target = aEvent.target;
-        if (target.classList.contains('dropdown-toggle')) {
+        if (target.classList.contains("dropdown-toggle")) {
           this._toggleDropdownClicked(aEvent);
-        } else if (!target.closest('.dropdown-popup')) {
+        } else if (!target.closest(".dropdown-popup")) {
           this._closeDropdowns();
         }
         break;
@@ -243,7 +244,7 @@ AboutReader.prototype = {
         this._updateImageMargins();
         if (this._isToolbarVertical) {
           this._win.setTimeout(() => {
-            for (let dropdown of this._doc.querySelectorAll('.dropdown.open')) {
+            for (let dropdown of this._doc.querySelectorAll(".dropdown.open")) {
               this._updatePopupPosition(dropdown);
             }
           }, 0);
@@ -513,7 +514,7 @@ AboutReader.prototype = {
       return;
     }
     // Holds the average of the lux values collected in this._luxValues.
-    let averageLuxValue = this._totalLux/luxValuesSize;
+    let averageLuxValue = this._totalLux / luxValuesSize;
 
     this._updateColorScheme(averageLuxValue);
     // Pop the oldest value off the array.
@@ -671,11 +672,11 @@ AboutReader.prototype = {
 
     let doc = this._doc;
 
-    let link = doc.createElement('link');
-    link.rel = 'shortcut icon';
+    let link = doc.createElement("link");
+    link.rel = "shortcut icon";
     link.href = faviconUrl;
 
-    doc.getElementsByTagName('head')[0].appendChild(link);
+    doc.getElementsByTagName("head")[0].appendChild(link);
   },
 
   _updateImageMargins: function() {
@@ -691,7 +692,7 @@ AboutReader.prototype = {
       }
 
       // If the image is at least half as wide as the body, center it on desktop.
-      if (img.naturalWidth >= bodyWidth/2) {
+      if (img.naturalWidth >= bodyWidth / 2) {
         img.setAttribute("moz-reader-center", true);
       } else {
         img.removeAttribute("moz-reader-center");
@@ -932,7 +933,7 @@ AboutReader.prototype = {
   },
 
   _toggleDropdownClicked: function(event) {
-    let dropdown = event.target.closest('.dropdown');
+    let dropdown = event.target.closest(".dropdown");
 
     if (!dropdown)
       return;

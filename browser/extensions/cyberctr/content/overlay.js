@@ -307,8 +307,11 @@ classicthemerestorerjs.ctr = {
 
 		  case "selectedThemeID":
 			try{
-			  if (branch.getCharPref("selectedThemeID")=='firefox-devedition@mozilla.org' 
-				&& Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("nodevtheme2")==false) {
+			  if (
+				(branch.getCharPref("selectedThemeID")=='firefox-devedition@mozilla.org'
+					|| branch.getCharPref("selectedThemeID")=='firefox-compact-dark@mozilla.org'
+					|| branch.getCharPref("selectedThemeID")=='firefox-compact-light@mozilla.org'
+				) && Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("nodevtheme2")==false) {
 				
 				classicthemerestorerjs.ctr.fxdevelopertheme=true;
 			  
@@ -339,7 +342,9 @@ classicthemerestorerjs.ctr = {
 					selectedThemeID = Services.prefs.getBranch("lightweightThemes.").getCharPref("selectedThemeID");
 				  } catch (e) {}
 				  
-				  if (selectedThemeID=='firefox-devedition@mozilla.org') {
+				  if (selectedThemeID=='firefox-devedition@mozilla.org' 
+					|| selectedThemeID=='firefox-compact-dark@mozilla.org'
+					|| selectedThemeID=='firefox-compact-light@mozilla.org') {
 					document.getElementById("main-window").setAttribute('developertheme',true);
 				  } else {
 					document.getElementById("main-window").setAttribute('developertheme',false);
@@ -2653,9 +2658,13 @@ classicthemerestorerjs.ctr = {
 					{
 
 					  if(classicthemerestorerjs.ctr.appversion >= 47 && Services.prefs.getBranch("browser.tabs.").getBoolPref("drawInTitlebar")==false
-						&& (classicthemerestorerjs.ctr.fxdefaulttheme==true || Services.prefs.getBranch("lightweightThemes.")
-						  .getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org')) {
-							//do nothing
+						&& (classicthemerestorerjs.ctr.fxdefaulttheme==true
+							|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'
+							|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-dark@mozilla.org'
+							|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-light@mozilla.org'
+						   )
+						) {
+						//do nothing
 					  } else {
 						BrowserOpenTab();
 
@@ -3970,7 +3979,11 @@ classicthemerestorerjs.ctr = {
 	if(Services.prefs.getBranch("extensions.classicthemerestorer.").getBoolPref("nodevtheme2")) {
 
 	  try {
-		if (Services.prefs.getBranch("lightweightThemes.").getCharPref("selectedThemeID")=='firefox-devedition@mozilla.org') {
+		if (Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-devedition@mozilla.org'
+			|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-dark@mozilla.org'
+			|| Services.prefs.getBranch("lightweightThemes.").getCharPref('selectedThemeID')=='firefox-compact-light@mozilla.org'
+		   )
+		{
 		 var {LightweightThemeManager} = Cu.import("resource://gre/modules/LightweightThemeManager.jsm", {});
 		  LightweightThemeManager.themeChanged(null);
 		  Services.prefs.getBranch("lightweightThemes.").deleteBranch("selectedThemeID");
@@ -4620,7 +4633,11 @@ classicthemerestorerjs.ctr = {
 		
 		case "hidenavbar": 			manageCSS("hidenavbar.css");  			break;
 		case "backforward":			manageCSS("back-forward.css");			break;
-		case "nbcompact":			manageCSS("navbar_compact.css");		break;
+		case "nbcompact":
+			if(classicthemerestorerjs.ctr.appversion < 54)
+			  manageCSS("navbar_compact.css");
+		    else manageCSS("navbar_compact2.css");	
+		break;
 		case "noconicons": 			manageCSS("nocontexticons.css");		break;
 		case "options_alt": 		manageCSS("alt_optionspage.css");		break;
 		case "options_alt2": 		manageCSS("alt_optionswindow.css");		break;

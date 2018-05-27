@@ -103,12 +103,12 @@ this.SitePermissions = {
   /* Returns an array of permission states to be exposed to the user for a
    * permission with the given ID.
    */
-  getAvailableStates: function (aPermissionID) {
-    if (aPermissionID in gPermissionObject &&
-        gPermissionObject[aPermissionID].states)
-      return gPermissionObject[aPermissionID].states;
+  getAvailableStates: function (permissionID) {
+    if (permissionID in gPermissionObject &&
+        gPermissionObject[permissionID].states)
+      return gPermissionObject[permissionID].states;
 
-    if (this.getDefault(aPermissionID) == this.UNKNOWN)
+    if (this.getDefault(permissionID) == this.UNKNOWN)
       return [ SitePermissions.UNKNOWN, SitePermissions.ALLOW, SitePermissions.BLOCK ];
 
     return [ SitePermissions.ALLOW, SitePermissions.BLOCK ];
@@ -116,57 +116,57 @@ this.SitePermissions = {
 
   /* Returns the default state of a particular permission.
    */
-  getDefault: function (aPermissionID) {
-    if (aPermissionID in gPermissionObject &&
-        gPermissionObject[aPermissionID].getDefault)
-      return gPermissionObject[aPermissionID].getDefault();
+  getDefault: function (permissionID) {
+    if (permissionID in gPermissionObject &&
+        gPermissionObject[permissionID].getDefault)
+      return gPermissionObject[permissionID].getDefault();
 
     return this.UNKNOWN;
   },
 
   /* Returns the state of a particular permission for a given URI.
    */
-  get: function (aURI, aPermissionID) {
+  get: function (aURI, permissionID) {
     if (!this.isSupportedURI(aURI))
       return this.UNKNOWN;
 
     let state;
-    if (aPermissionID in gPermissionObject &&
-        gPermissionObject[aPermissionID].exactHostMatch)
-      state = Services.perms.testExactPermission(aURI, aPermissionID);
+    if (permissionID in gPermissionObject &&
+        gPermissionObject[permissionID].exactHostMatch)
+      state = Services.perms.testExactPermission(aURI, permissionID);
     else
-      state = Services.perms.testPermission(aURI, aPermissionID);
+      state = Services.perms.testPermission(aURI, permissionID);
     return state;
   },
 
   /* Sets the state of a particular permission for a given URI.
    */
-  set: function (aURI, aPermissionID, aState) {
+  set: function (aURI, permissionID, aState) {
     if (!this.isSupportedURI(aURI))
       return;
 
     if (aState == this.UNKNOWN) {
-      this.remove(aURI, aPermissionID);
+      this.remove(aURI, permissionID);
       return;
     }
 
-    Services.perms.add(aURI, aPermissionID, aState);
+    Services.perms.add(aURI, permissionID, aState);
   },
 
   /* Removes the saved state of a particular permission for a given URI.
    */
-  remove: function (aURI, aPermissionID) {
+  remove: function (aURI, permissionID) {
     if (!this.isSupportedURI(aURI))
       return;
 
-    Services.perms.remove(aURI, aPermissionID);
+    Services.perms.remove(aURI, permissionID);
   },
 
   /* Returns the localized label for the permission with the given ID, to be
    * used in a UI for managing permissions.
    */
-  getPermissionLabel: function (aPermissionID) {
-    let labelID = gPermissionObject[aPermissionID].labelID || aPermissionID;
+  getPermissionLabel: function (permissionID) {
+    let labelID = gPermissionObject[permissionID].labelID || permissionID;
     return gStringBundle.GetStringFromName("permission." + labelID + ".label");
   },
 

@@ -22,8 +22,7 @@ var MigrationWizard = { /* exported MigrationWizard */
   _migrator: null,
   _autoMigrate: null,
 
-  init: function ()
-  {
+  init: function () {
     let os = Services.obs;
     os.addObserver(this, "Migration:Started", false);
     os.addObserver(this, "Migration:ItemBeforeMigrate", false);
@@ -57,8 +56,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     this.onImportSourcePageShow();
   },
 
-  uninit: function ()
-  {
+  uninit: function () {
     var os = Components.classes["@mozilla.org/observer-service;1"]
                        .getService(Components.interfaces.nsIObserverService);
     os.removeObserver(this, "Migration:Started");
@@ -70,8 +68,7 @@ var MigrationWizard = { /* exported MigrationWizard */
   },
 
   // 1 - Import Source
-  onImportSourcePageShow: function ()
-  {
+  onImportSourcePageShow: function () {
     // Show warning message to close the selected browser when needed
     function toggleCloseBrowserWarning() {
       let visibility = "hidden";
@@ -127,8 +124,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  onImportSourcePageAdvanced: function ()
-  {
+  onImportSourcePageAdvanced: function () {
     var newSource = document.getElementById("importSourceGroup").selectedItem.id;
 
     if (newSource == "nothing") {
@@ -166,8 +162,7 @@ var MigrationWizard = { /* exported MigrationWizard */
   },
 
   // 2 - [Profile Selection]
-  onSelectProfilePageShow: function ()
-  {
+  onSelectProfilePageShow: function () {
     // Disabling this for now, since we ask about import sources in automigration
     // too and don't want to disable the back button
     // if (this._autoMigrate)
@@ -193,16 +188,14 @@ var MigrationWizard = { /* exported MigrationWizard */
     profiles.selectedItem = this._selectedProfile ? document.getElementById(this._selectedProfile.id) : profiles.firstChild;
   },
 
-  onSelectProfilePageRewound: function ()
-  {
+  onSelectProfilePageRewound: function () {
     var profiles = document.getElementById("profiles");
     this._selectedProfile = this._migrator.sourceProfiles.find(
       profile => profile.id == profiles.selectedItem.id
     ) || null;
   },
 
-  onSelectProfilePageAdvanced: function ()
-  {
+  onSelectProfilePageAdvanced: function () {
     var profiles = document.getElementById("profiles");
     this._selectedProfile = this._migrator.sourceProfiles.find(
       profile => profile.id == profiles.selectedItem.id
@@ -214,8 +207,7 @@ var MigrationWizard = { /* exported MigrationWizard */
   },
 
   // 3 - ImportItems
-  onImportItemsPageShow: function ()
-  {
+  onImportItemsPageShow: function () {
     var dataSources = document.getElementById("dataSources");
     while (dataSources.hasChildNodes())
       dataSources.removeChild(dataSources.firstChild);
@@ -235,14 +227,12 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  onImportItemsPageRewound: function ()
-  {
+  onImportItemsPageRewound: function () {
     this._wiz.canAdvance = true;
     this.onImportItemsPageAdvanced();
   },
 
-  onImportItemsPageAdvanced: function ()
-  {
+  onImportItemsPageAdvanced: function () {
     var dataSources = document.getElementById("dataSources");
     this._itemsFlags = 0;
     for (var i = 0; i < dataSources.childNodes.length; ++i) {
@@ -252,8 +242,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  onImportItemCommand: function ()
-  {
+  onImportItemCommand: function () {
     var items = document.getElementById("dataSources");
     var checkboxes = items.getElementsByTagName("checkbox");
 
@@ -269,8 +258,7 @@ var MigrationWizard = { /* exported MigrationWizard */
   },
 
   // 4 - Home Page Selection
-  onHomePageMigrationPageShow: function ()
-  {
+  onHomePageMigrationPageShow: function () {
     // only want this on the first run
     if (!this._autoMigrate) {
       this._wiz.advance();
@@ -319,8 +307,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  onHomePageMigrationPageAdvanced: function ()
-  {
+  onHomePageMigrationPageAdvanced: function () {
     // we might not have a selectedItem if we're in fallback mode
     try {
       var radioGroup = document.getElementById("homePageRadiogroup");
@@ -330,8 +317,7 @@ var MigrationWizard = { /* exported MigrationWizard */
   },
 
   // 5 - Migrating
-  onMigratingPageShow: function ()
-  {
+  onMigratingPageShow: function () {
     this._wiz.getButton("cancel").disabled = true;
     this._wiz.canRewind = false;
     this._wiz.canAdvance = false;
@@ -344,8 +330,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     setTimeout(() => this.onMigratingMigrate(), 0);
   },
 
-  onMigratingMigrate: function ()
-  {
+  onMigratingMigrate: function () {
     this._migrator.migrate(this._itemsFlags, this._autoMigrate, this._selectedProfile);
 
     if (!this._autoMigrate) {
@@ -358,8 +343,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  _listItems: function (aID)
-  {
+  _listItems: function (aID) {
     var items = document.getElementById(aID);
     while (items.hasChildNodes())
       items.removeChild(items.firstChild);
@@ -383,8 +367,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  observe: function (aSubject, aTopic, aData)
-  {
+  observe: function (aSubject, aTopic, aData) {
     var label;
     switch (aTopic) {
       case "Migration:Started":
@@ -473,8 +456,7 @@ var MigrationWizard = { /* exported MigrationWizard */
     }
   },
 
-  onDonePageShow: function ()
-  {
+  onDonePageShow: function () {
     this._wiz.getButton("cancel").disabled = true;
     this._wiz.canRewind = false;
     this._listItems("doneItems");
