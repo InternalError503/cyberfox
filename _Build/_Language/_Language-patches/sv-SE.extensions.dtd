@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Kontrollera om dina instickmoduler Ã¤r uppdaterade">
-<!ENTITY info.plugincheck.tooltip               "Kontrollera om dina instickmoduler Ã¤r uppdaterade">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Funderar du på att anpassa din webbläsare?">
+<!ENTITY getThemes.learnMore                  "Välj bland tusentals teman.">

@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName; могућности">
+<!ENTITY aboutSupport.featureName "Назив">
+<!ENTITY aboutSupport.featureVersion "Издање">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google кључ">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Кључ Mozilla сервиса за локацију">

@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Tapitz'a' qa wawe' richin natz'Ã«t we ek'exon ri taq apluyin">
-<!ENTITY info.plugincheck.tooltip               "Tapitz'a' qa wawe' richin natz'Ã«t we ek'exon ri taq apluyin">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "¿La tajin natojtob'ej nawichinaj ri awokik'amaya'l?">
+<!ENTITY getThemes.learnMore                  "Tacha' chi kikojol jalajöj taq wachinïk.">

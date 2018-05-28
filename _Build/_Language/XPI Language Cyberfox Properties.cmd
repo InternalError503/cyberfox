@@ -44,9 +44,9 @@ if not exist %InputPath% goto :eof
 
 for /f %%f in ('dir /b "%InputPath%"') do (
 	if exist "%PatchFile%\%%~nf.cyberfox.properties" (
-		copy /y "%PatchFile%\%%~nf.cyberfox.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\cyberfox.properties"
+		copy /y /z "%PatchFile%\%%~nf.cyberfox.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\cyberfox.properties"
 	) else (
-		copy /y "%PatchFile%\en-US.cyberfox.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\cyberfox.properties"
+		copy /y /z "%PatchFile%\en-US.cyberfox.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\cyberfox.properties"
 	)
 )
 exit /b %ERRORLEVEL%

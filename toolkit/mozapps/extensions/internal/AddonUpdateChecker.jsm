@@ -462,7 +462,7 @@ function parseJSONManifest(aId, aUpdateKey, aRequest, aManifestData) {
   function getRequiredProperty(aObj, aProperty, aType) {
     let value = getProperty(aObj, aProperty, aType);
     if (value === undefined)
-      throw Components.Exception(`Update manifest is missing a required ${aProperty} property.`);
+      throw Components.Exception(`Update manifest is missing a required ${aProperty} property. ${aType}`);
     return value;
   }
 
@@ -662,7 +662,7 @@ UpdateParser.prototype = {
     try {
       results = parser();
     } catch (e) {
-      logger.warn("onUpdateCheckComplete failed to parse update manifest", e);
+      //logger.warn("onUpdateCheckComplete failed to parse update manifest", e);
       this.notifyError(AddonUpdateChecker.ERROR_PARSE_ERROR);
       return;
     }

@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "SeiceÃ¡il an bhfuil do chuid forlÃ­ontÃ¡n cothrom le dÃ¡ta">
-<!ENTITY info.plugincheck.tooltip               "SeiceÃ¡il an bhfuil do chuid forlÃ­ontÃ¡n cothrom le dÃ¡ta">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Ar mhaith leat cuma phearsanta a chur ar do bhrabhsálaí?">
+<!ENTITY getThemes.learnMore                  "Is leatsa an rogha as na mílte téama atá ar fáil.">

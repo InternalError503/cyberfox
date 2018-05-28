@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Плагиндеріңіздің барлығы жаңа ма, соны тексеріңіз">
-<!ENTITY info.plugincheck.tooltip               "Плагиндеріңіздің барлығы жаңа ма, соны тексеріңіз">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Браузерді өзіңіз үшін ыңғайлатуды қалайсыз ба?">
+<!ENTITY getThemes.learnMore                  "Мыңдаған темалар ішінен таңдаңыз.">

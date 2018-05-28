@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "Funkce aplikace &brandShortName;">
+<!ENTITY aboutSupport.featureName "Název">
+<!ENTITY aboutSupport.featureVersion "Verze">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Klíč Google">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Klíč Mozilla Location Service">

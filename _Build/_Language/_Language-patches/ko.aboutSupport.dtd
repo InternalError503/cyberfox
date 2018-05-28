@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName; 주요 기능">
+<!ENTITY aboutSupport.featureName "이름">
+<!ENTITY aboutSupport.featureVersion "버전">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google 키">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla 위치 서비스 키">

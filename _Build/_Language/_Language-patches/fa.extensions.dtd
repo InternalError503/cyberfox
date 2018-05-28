@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "بررسی کن که آیا افزودنی‌ها به‌روز هستند">
-<!ENTITY info.plugincheck.tooltip               "بررسی اینکه آیا افزدونی‌های شما بروز هستند یا خیر">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "مایلید مرورگر خود را شخصی سازی کنید؟">
+<!ENTITY getThemes.learnMore                  "از بین هزاران زمینه انتخاب کنید">

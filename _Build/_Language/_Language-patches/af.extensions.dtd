@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Kontroleer of al die inproppe op datum is">
-<!ENTITY info.plugincheck.tooltip               "Kontroleer of al die inproppe op datum is">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Lus om die blaaier te verpersoonlik?">
+<!ENTITY getThemes.learnMore                  "Kies uit duisende temas.">

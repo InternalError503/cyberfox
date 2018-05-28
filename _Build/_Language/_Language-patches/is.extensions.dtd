@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Athuga hvort tengiforrit eru Ã­ nÃ½justu ÃºtgÃ¡fu">
-<!ENTITY info.plugincheck.tooltip               "Athuga hvort tengiforrit eru Ã­ nÃ½justu ÃºtgÃ¡fu">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Ertu að leita eftir að gera vafrann persónulegri?">
+<!ENTITY getThemes.learnMore                  "Veldu frá þúsundum þema.">

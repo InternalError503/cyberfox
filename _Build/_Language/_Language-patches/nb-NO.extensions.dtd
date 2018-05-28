@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Kontroller om programtillegg er oppdaterte">
-<!ENTITY info.plugincheck.tooltip               "Kontroller om programtillegg er oppdaterte">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Ønsker du å tilpasse nettleseren din?">
+<!ENTITY getThemes.learnMore                  "Velg blant tusenvis av temaer.">

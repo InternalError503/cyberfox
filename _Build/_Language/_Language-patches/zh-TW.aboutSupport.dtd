@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName; 功能">
+<!ENTITY aboutSupport.featureName "名稱">
+<!ENTITY aboutSupport.featureVersion "版本">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google 金鑰">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service 金鑰">

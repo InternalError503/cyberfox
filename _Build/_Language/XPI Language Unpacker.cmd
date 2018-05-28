@@ -45,7 +45,7 @@ goto :exit
 cls
 @echo off
 for /f %%f in ('dir /b "%Originals%"') do md "%DestinPath%\%%f"
-for /f %%f in ('dir /b "%Originals%"') do copy /y "%Originals%\%%f" "%DestinPath%\%%f" 
+for /f %%f in ('dir /b "%Originals%"') do copy /y /z "%Originals%\%%f" "%DestinPath%\%%f" 
 goto :extract
 
 :extract
@@ -84,7 +84,7 @@ for /f %%f in ('dir /b "%DestinPath%"') do if exist "%DestinPath%\%%f\%%f" del "
 for /f %%f in ('dir /b "%DestinPath%"') do %SevenZip% a -mmt -mx9 -tzip "%DestinPath%\%%f\%%f" "%CD%_XPI_Folder\%%f\*"
 ::----
 if not exist "%OutputPath%" mkdir "%OutputPath%"
-for /f %%f in ('dir /b "%DestinPath%"') do copy /y "%DestinPath%\%%f\%%f" "%OutputPath%\"
+for /f %%f in ('dir /b "%DestinPath%"') do copy /y /z "%DestinPath%\%%f\%%f" "%OutputPath%\"
 ::----
 for /f %%f in ('dir /b "%DestinPath%"') do del "%DestinPath%\%%f\%%f"
 

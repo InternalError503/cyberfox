@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "Caratteristiche di &brandShortName;">
+<!ENTITY aboutSupport.featureName "Nome">
+<!ENTITY aboutSupport.featureVersion "Versione">
+<!ENTITY aboutSupport.featureId "ID">
+ 
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Chiave Google">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Chiave per il servizio Mozilla Location">

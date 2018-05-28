@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label "Проверить актуальность версий установленных у вас плагинов">
-<!ENTITY info.plugincheck.tooltip "Проверить актуальность версий установленных у вас плагинов">
-
 <!ENTITY pluginDisabled.description "Не можете что-то найти? По умолчанию плагины в &brandShortName; отключены.">
 <!ENTITY pluginDisabled.learnMore "Узнать больше.">
+
+<!ENTITY getThemes.description                "Хотите настроить под себя свой браузер?">
+<!ENTITY getThemes.learnMore                  "Выберите нужные вам темы">

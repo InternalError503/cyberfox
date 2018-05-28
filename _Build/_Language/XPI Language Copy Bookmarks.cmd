@@ -18,9 +18,9 @@ SET PATCHFILE=_Language-patches
 
 FOR /F %%F IN ('DIR /B "%INPUTPATH%"') DO (
 	IF EXIST "%PATCHFILE%\%%~NF.bookmarks.html" (
-		COPY /Y "%PATCHFILE%\%%~NF.bookmarks.html" "%INPUTPATH%\%%F\browser\defaults\profile"
+		COPY /Y /z "%PATCHFILE%\%%~NF.bookmarks.html" "%INPUTPATH%\%%F\browser\defaults\profile"
 	) ELSE (
-		COPY /Y "%PATCHFILE%\en-US.bookmarks.html" "%INPUTPATH%\%%F\browser\defaults\profile"
+		COPY /Y /z "%PATCHFILE%\en-US.bookmarks.html" "%INPUTPATH%\%%F\browser\defaults\profile"
 	)
 )
 EXIT /B %ERRORLEVEL%

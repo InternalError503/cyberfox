@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName; സവിശേഷതകൾ">
+<!ENTITY aboutSupport.featureName "പേര്">
+<!ENTITY aboutSupport.featureVersion "പതിപ്പ്">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google Key">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service Key">

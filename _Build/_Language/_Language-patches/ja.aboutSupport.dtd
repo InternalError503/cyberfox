@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle		"&brandShortName; の機能">
+<!ENTITY aboutSupport.featureName		"名前">
+<!ENTITY aboutSupport.featureVersion		"バージョン">
+<!ENTITY aboutSupport.featureId			"ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle	"Google キー">
+<!ENTITY aboutSupport.appBasicsKeyMozilla	"Mozilla Location Service キー">

@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName;-funksjonar">
+<!ENTITY aboutSupport.featureName "Namn">
+<!ENTITY aboutSupport.featureVersion "Versjon">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google-nykel">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service-nykel">

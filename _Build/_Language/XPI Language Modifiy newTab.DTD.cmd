@@ -45,10 +45,10 @@ goto :eof
 :copinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\newTab.dtd" "%OutputPath%\%%~nf.newTab.dtd" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\newTab.dtd" "%OutputPath%\%%~nf.newTab.dtd" 
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.newTab.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\newTab.dtd"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.newTab.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\newTab.dtd"
 exit /b %ERRORLEVEL%

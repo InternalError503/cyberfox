@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName;-ominaisuudet">
+<!ENTITY aboutSupport.featureName "Nimi">
+<!ENTITY aboutSupport.featureVersion "Versio">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google-avain">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service -avain">

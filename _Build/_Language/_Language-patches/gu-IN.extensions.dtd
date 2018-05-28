@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "જોવા માટે ચકાસો જો તમારા પ્લગઇનો અદ્યતન છે">
-<!ENTITY info.plugincheck.tooltip               "જોવા માટે ચકાસો જો તમારા પ્લગઇનો અદ્યતન છે">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Looking to personalize your browser?">
+<!ENTITY getThemes.learnMore                  "Choose from thousands of themes.">

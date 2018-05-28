@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label "Pulse aquí para ver si sus plugins están actualizados">
-<!ENTITY info.plugincheck.tooltip "Pulse aquí para ver si sus plugins están actualizados">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description "�Pensando en personalizar su navegador?">
+<!ENTITY getThemes.learnMore "Elija entre miles de temas.">

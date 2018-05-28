@@ -45,10 +45,10 @@ goto :eof
 :copinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\list.json" "%OutputPath%\%%~nf.list.json" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\list.json" "%OutputPath%\%%~nf.list.json" 
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.list.json" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\list.json"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.list.json" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\list.json"
 exit /b %ERRORLEVEL%

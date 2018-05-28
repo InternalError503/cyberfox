@@ -46,10 +46,10 @@ goto :eof
 :copinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\install.rdf" "%OutputPath%\%%~nf.install.rdf" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\install.rdf" "%OutputPath%\%%~nf.install.rdf" 
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.install.rdf" "%InputPath%\%%f\install.rdf"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.install.rdf" "%InputPath%\%%f\install.rdf"
 exit /b %ERRORLEVEL%

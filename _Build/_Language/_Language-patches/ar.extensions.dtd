@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "التمس لتعرف إذا كانت ملحقاتك محدّثة">
-<!ENTITY info.plugincheck.tooltip               "التمس لتعرف إذا كانت ملحقاتك محدّثة">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "هل تبحث عن طريقة لإضفاء طابع شخصي على متصفحك؟">
+<!ENTITY getThemes.learnMore                  "اختر من بين آلاف السمات.">

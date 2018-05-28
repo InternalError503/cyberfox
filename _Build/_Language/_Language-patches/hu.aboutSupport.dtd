@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "A &brandShortName; szolgáltatásai">
+<!ENTITY aboutSupport.featureName "Név">
+<!ENTITY aboutSupport.featureVersion "Verzió">
+<!ENTITY aboutSupport.featureId "Azonosító">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google kulcs">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla helymeghatározási szolgáltatás kulcs">

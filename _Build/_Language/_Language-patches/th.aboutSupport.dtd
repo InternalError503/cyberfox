@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "คุณลักษณะของ &brandShortName;">
+<!ENTITY aboutSupport.featureName "ชื่อ">
+<!ENTITY aboutSupport.featureVersion "รุ่น">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google Key">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service Key">

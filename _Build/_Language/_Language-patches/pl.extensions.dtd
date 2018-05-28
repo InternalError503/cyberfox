@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Sprawdź, czy zainstalowane wtyczki są aktualne">
-<!ENTITY info.plugincheck.tooltip               "Sprawdź, czy zainstalowane wtyczki są aktualne">
-
 <!ENTITY pluginDisabled.description "Czegoś brakuje? Wtyczki są domyślnie wyłączone w programie &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Dowiedz się więcej.">
+
+<!ENTITY getThemes.description "Szukasz sposobu na personalizację przeglądarki?">
+<!ENTITY getThemes.learnMore "Wybieraj spośród tysięcy motywów.">

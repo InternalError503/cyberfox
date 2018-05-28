@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Əlavə proqramların aktual olub olmadığını yoxlayın">
-<!ENTITY info.plugincheck.tooltip               "Əlavə proqramların aktual olub olmadığını yoxlayın">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Səyyahınızı şəxsiləşdirmək istəyirsiz?">
+<!ENTITY getThemes.learnMore                  "Minlərlə mövzulardan birini seçin.">

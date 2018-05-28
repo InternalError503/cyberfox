@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Controllar sche tes plug-ins èn actuals">
-<!ENTITY info.plugincheck.tooltip               "Controllescha sche tes plug-ins èn actuals">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Vuls ti persunalisar tes navigatur?">
+<!ENTITY getThemes.learnMore                  "Tscherna da millis designs.">

@@ -27,7 +27,7 @@ set SevenZip=..\_7ZipPortable\App\7-Zip\7za.exe
 for /f %%f in ('dir /b "%DestinPath%"') do (
 	if exist "%DestinPath%\%%f\%%f" del "%DestinPath%\%%f\%%f"
 	%SevenZip% a -mmt -mx9 -tzip "%DestinPath%\%%f\langpack-%%~nf@8pecxstudios.com.xpi" "%DestinPath%\%%f\*"
-	copy /y "%DestinPath%\%%f\langpack-%%~nf@8pecxstudios.com.xpi" "%OutputPath%\"
+	copy /y /z "%DestinPath%\%%f\langpack-%%~nf@8pecxstudios.com.xpi" "%OutputPath%\"
 	del "%DestinPath%\%%f\langpack-%%~nf@8pecxstudios.com.xpi"
 )
 

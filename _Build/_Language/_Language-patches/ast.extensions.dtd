@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Marca pa ver si los plugins tÃ¡n anovaos">
-<!ENTITY info.plugincheck.tooltip               "Marca pa ver si los plugins tÃ¡n anovaos">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "¿Tas mirando cómo personalizar el restolador?">
+<!ENTITY getThemes.learnMore                  "Escueyi ente milenta temes.">

@@ -16,6 +16,6 @@ set InputPath=_XPI_Folder
 set Plugins=_SearchPlugins
 
 for /f %%f in ('dir /b "%InputPath%"') do (
-	copy /y "%Plugins%\*.*" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\"
+	copy /y /z "%Plugins%\*.*" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\"
 )
 exit /b %ERRORLEVEL%

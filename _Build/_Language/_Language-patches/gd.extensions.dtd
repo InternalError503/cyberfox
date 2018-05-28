@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Thoir sÃ¹il ach a bheil na plugain agad cho Ã¹r 's a ghabhas">
-<!ENTITY info.plugincheck.tooltip               "Thoir sÃ¹il ach a bheil na plugain agad cho Ã¹r 's a ghabhas">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "A bheil thu airson dreach pearsanta a chur air a’ bhrabhsair agad?">
+<!ENTITY getThemes.learnMore                  "Tha roghadh is taghadh agad am measg nam mìltean a dh’ùrlaran.">

@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName;-funktioner">
+<!ENTITY aboutSupport.featureName "Navn">
+<!ENTITY aboutSupport.featureVersion "Version">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google-nøgle">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service-nøgle">

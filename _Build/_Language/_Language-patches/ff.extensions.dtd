@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Ƴeewto ngam yiyde so ceŋe maa ena kesɗiti">
-<!ENTITY info.plugincheck.tooltip               "Ƴeewto ngam yiyde so ceŋe maa ena kesɗiti">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Looking to personalize your browser?">
+<!ENTITY getThemes.learnMore                  "Choose from thousands of themes.">

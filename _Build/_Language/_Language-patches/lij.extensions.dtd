@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "ContrÃ²lla se ti gh'Ã¦ da agiornÃ¢ di plugin">
-<!ENTITY info.plugincheck.tooltip               "ContrÃ²lla se ti gh'Ã¦ da agiornÃ¢ di plugin">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "T'eu personalizâ o teu navegatô?">
+<!ENTITY getThemes.learnMore                  "Çerni fra migiæe de temi.">

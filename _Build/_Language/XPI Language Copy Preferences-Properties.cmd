@@ -44,9 +44,9 @@ goto :eof
 
 :copinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\preferences\preferences.properties" "%OutputPath%\%%~nf.preferences.properties" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\preferences\preferences.properties" "%OutputPath%\%%~nf.preferences.properties" 
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.preferences.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\preferences\preferences.properties"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.preferences.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\preferences\preferences.properties"
 exit /b %ERRORLEVEL%

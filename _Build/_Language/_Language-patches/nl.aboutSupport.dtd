@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName;-functies">
+<!ENTITY aboutSupport.featureName "Naam">
+<!ENTITY aboutSupport.featureVersion "Versie">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google-sleutel">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla-locatieservicesleutel">

@@ -45,10 +45,14 @@ goto :eof
 :copinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\chrome\%%~nf\locale\%%~nf\mozapps\extensions\extensions.dtd" "%OutputPath%\%%~nf.extensions.dtd" 
+for /f %%f in ('dir /b "%InputPath%"') do (
+	copy /y /z "%InputPath%\%%f\chrome\%%~nf\locale\%%~nf\mozapps\extensions\extensions.dtd" "%OutputPath%\%%~nf.extensions.dtd" 
+)
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.extensions.dtd" "%InputPath%\%%f\chrome\%%~nf\locale\%%~nf\mozapps\extensions\extensions.dtd"
+for /f %%f in ('dir /b "%InputPath%"') do (
+	copy /y /z "%OutputPath%\%%~nf.extensions.dtd" "%InputPath%\%%f\chrome\%%~nf\locale\%%~nf\mozapps\extensions\extensions.dtd"
+)
 exit /b %ERRORLEVEL%

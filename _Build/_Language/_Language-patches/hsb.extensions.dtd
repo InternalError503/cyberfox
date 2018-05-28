@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Přepruwujće, hač waše tykače su aktualne">
-<!ENTITY info.plugincheck.tooltip               "Přepruwujće, hač waše tykače su aktualne">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Chceće swój wobhladowak přiměrić?">
+<!ENTITY getThemes.learnMore                  "Wubjerće z tysacow drastow.">

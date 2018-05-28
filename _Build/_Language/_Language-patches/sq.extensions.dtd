@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Kontroll për të parë nëse shtojcat tuaja janë të përditësuara">
-<!ENTITY info.plugincheck.tooltip               "Bëni një kontroll për të parë nëse shtojcat tuaja janë të përditësuara">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Po k�rkoni si t� personalizoni shfletuesin tuaj?">
+<!ENTITY getThemes.learnMore                  "Zgjidhni prej mij�ra temash.">

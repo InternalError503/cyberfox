@@ -45,10 +45,10 @@ goto :eof
 :copinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.dtd" "%OutputPath%\%%~nf.aboutDialog.dtd" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.dtd" "%OutputPath%\%%~nf.aboutDialog.dtd" 
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
 cls
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.aboutDialog.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.dtd"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.aboutDialog.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.dtd"
 exit /b %ERRORLEVEL%

@@ -44,9 +44,9 @@ goto :eof
 
 :copinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b %InputPath%') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\appstrings.properties" "%OutputPath%\%%~nf.appstrings.properties" 
+for /f %%f in ('dir /b %InputPath%') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\appstrings.properties" "%OutputPath%\%%~nf.appstrings.properties" 
 exit /b %ERRORLEVEL%
 :upinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b %InputPath%') do copy /y  "%OutputPath%\%%~nf.appstrings.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\appstrings.properties"
+for /f %%f in ('dir /b %InputPath%') do copy /y /z "%OutputPath%\%%~nf.appstrings.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\appstrings.properties"
 exit /b %ERRORLEVEL%

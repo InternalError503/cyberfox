@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Kontroli ĉu viaj kromprogramoj estas ĝisdataj">
-<!ENTITY info.plugincheck.tooltip               "Kontroli ĉu viaj kromprogramoj estas ĝisdataj">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Ĉu vi pretas personecigi vian retumilon?">
+<!ENTITY getThemes.learnMore                  "Elektu inter miloj da etosoj.">

@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "&brandShortName; eiginleikar">
+<!ENTITY aboutSupport.featureName "Nafn">
+<!ENTITY aboutSupport.featureVersion "Útgáfa">
+<!ENTITY aboutSupport.featureId "Auðkenni">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Google lykill">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Mozilla Location Service lykill">

@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "Ejopy ko'ápe ehecha hag̃ua hekopyahúpa mba'ejoajurã">
-<!ENTITY info.plugincheck.tooltip               "Ejopy ko'ápe ehecha hag̃ua hekopyahúmapa mba'ejoajurãnguéra">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "�E�emomba'ese nekundah�ra rehe?">
+<!ENTITY getThemes.learnMore                  "Eiporavo hetaite mbojeguaha apyt�pe.">

@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "Возможности &brandShortName;">
+<!ENTITY aboutSupport.featureName "Имя">
+<!ENTITY aboutSupport.featureVersion "Версия">
+<!ENTITY aboutSupport.featureId "ID">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "Ключ Google">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "Ключ Службы определения местоположения от Mozilla">

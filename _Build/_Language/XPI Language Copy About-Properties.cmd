@@ -17,9 +17,9 @@ set PatchFile=_Language-patches
 
 for /f %%f in ('dir /b "%InputPath%"') do (
 	if exist "%PatchFile%\%%~nf.aboutDialog.properties" (
-		copy /y "%PatchFile%\%%~nf.aboutDialog.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.properties"
+		copy /y /z "%PatchFile%\%%~nf.aboutDialog.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.properties"
 	) else (
-		copy /y "%PatchFile%\en-US.aboutDialog.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.properties"
+		copy /y /z "%PatchFile%\en-US.aboutDialog.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\aboutDialog.properties"
 	)
 )
 exit /b %ERRORLEVEL%

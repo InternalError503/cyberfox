@@ -47,7 +47,7 @@ if not exist %InputPath% goto :eof
 cls
 for /f %%f in ('dir /b "%InputPath%"') do (
 	mkdir "%OutputPath%\%%~nf"
-	copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\*.*" "%OutputPath%\%%~nf\"
+	copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\*.*" "%OutputPath%\%%~nf\"
 	del "%OutputPath%\%%~nf\duckduckgo.xml"
 	del "%OutputPath%\%%~nf\ixquick.xml"
 	del "%OutputPath%\%%~nf\list.json"
@@ -62,6 +62,6 @@ exit /b %ERRORLEVEL%
 if not exist %InputPath% goto :eof
 cls
 for /f %%f in ('dir /b "%InputPath%"') do (
-	copy /y  "%OutputPath%\%%~nf\*.*" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\"
+	copy /y /z "%OutputPath%\%%~nf\*.*" "%InputPath%\%%f\browser\chrome\%%~nf\locale\browser\searchplugins\"
 )
 exit /b %ERRORLEVEL%

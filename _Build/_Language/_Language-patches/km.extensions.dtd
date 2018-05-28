@@ -1,6 +1,5 @@
-<!-- global informations -->
-<!ENTITY info.plugincheck.label                 "ពិនិត្យមើល​ថា​តើ​ កម្មវិធី​ជំនួយ​ទាន់សម័យ​ដែរ​ឬ​ទេ">
-<!ENTITY info.plugincheck.tooltip               "ពិនិត្យមើល​ថា​តើ​ កម្មវិធី​ជំនួយ​ទាន់សម័យ​ដែរ​ឬ​ទេ">
-
 <!ENTITY pluginDisabled.description "Missing something? Plugins are disabled by default in &brandShortName;.">
 <!ENTITY pluginDisabled.learnMore "Learn More.">
+
+<!ENTITY getThemes.description                "Looking to personalize your browser?">
+<!ENTITY getThemes.learnMore                  "Choose from thousands of themes.">

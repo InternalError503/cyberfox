@@ -1,0 +1,8 @@
+
+<!ENTITY aboutSupport.featuresTitle "התכונות של &brandShortName;">
+<!ENTITY aboutSupport.featureName "שם">
+<!ENTITY aboutSupport.featureVersion "גרסה">
+<!ENTITY aboutSupport.featureId "מזהה">
+
+<!ENTITY aboutSupport.appBasicsKeyGoogle "מפתח עבור שירותי Google">
+<!ENTITY aboutSupport.appBasicsKeyMozilla "מפתח עבור שירותי המיקום של Mozilla">

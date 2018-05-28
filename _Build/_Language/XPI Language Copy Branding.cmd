@@ -45,16 +45,16 @@ goto :eof
 
 :copinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.dtd" "%OutputPath%\%%~nf.brand.dtd" 
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.properties" "%OutputPath%\%%~nf.brand.properties"
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%Branding%\brand.dtd" "%OutputPath%\%%~nf.brand.dtd" 
-for /f %%f in ('dir /b "%InputPath%"') do copy /y "%Branding%\brand.properties" "%OutputPath%\%%~nf.brand.properties" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.dtd" "%OutputPath%\%%~nf.brand.dtd" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.properties" "%OutputPath%\%%~nf.brand.properties"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%Branding%\brand.dtd" "%OutputPath%\%%~nf.brand.dtd" 
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%Branding%\brand.properties" "%OutputPath%\%%~nf.brand.properties" 
 for /f %%f in ('dir /b "%InputPath%"') do if exist "%PatchFile%\%%~nf.brand.dtd" copy /y "%PatchFile%\%%~nf.brand.dtd" "%OutputPath%\%%~nf.brand.dtd"
 for /f %%f in ('dir /b "%InputPath%"') do if exist "%PatchFile%\%%~nf.brand.properties" copy /y "%PatchFile%\%%~nf.brand.properties" "%OutputPath%\%%~nf.brand.properties"
 exit /b %ERRORLEVEL%
 
 :upinst
 if not exist %InputPath% goto :eof
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.brand.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.dtd"
-for /f %%f in ('dir /b "%InputPath%"') do copy /y  "%OutputPath%\%%~nf.brand.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.properties"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.brand.dtd" "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.dtd"
+for /f %%f in ('dir /b "%InputPath%"') do copy /y /z "%OutputPath%\%%~nf.brand.properties" "%InputPath%\%%f\browser\chrome\%%~nf\locale\branding\brand.properties"
 exit /b %ERRORLEVEL%
