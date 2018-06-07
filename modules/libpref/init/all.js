@@ -2006,6 +2006,9 @@ pref("network.proxy.autoconfig_url.include_path", false);
 pref("network.proxy.autoconfig_retry_interval_min", 5);    // 5 seconds
 pref("network.proxy.autoconfig_retry_interval_max", 300);  // 5 minutes
 
+// Use HSTS { security vs privacy some users prefer privacy over the security }
+pref("network.stricttransportsecurity.enabled", true);
+
 // Use the HSTS preload list by default
 pref("network.stricttransportsecurity.preloadlist", true);
 

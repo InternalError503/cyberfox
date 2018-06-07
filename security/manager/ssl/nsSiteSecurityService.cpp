@@ -210,6 +210,7 @@ const uint64_t kSixtyDaysInSeconds = 60 * 24 * 60 * 60;
 nsSiteSecurityService::nsSiteSecurityService()
   : mMaxMaxAge(kSixtyDaysInSeconds)
   , mUsePreloadList(true)
+  , mUseStrictTransService(true)
   , mPreloadListTimeOffset(0)
 {
 }
@@ -239,6 +240,8 @@ nsSiteSecurityService::Init()
     "network.stricttransportsecurity.preloadlist", true);
   mozilla::Preferences::AddStrongObserver(this,
     "network.stricttransportsecurity.preloadlist");
+  mUseStrictTransService = mozilla::Preferences::GetBool(
+    "network.stricttransportsecurity.enabled", true);
   mProcessPKPHeadersFromNonBuiltInRoots = mozilla::Preferences::GetBool(
     "security.cert_pinning.process_headers_from_non_builtin_roots", false);
   mozilla::Preferences::AddStrongObserver(this,
@@ -930,6 +933,13 @@ nsSiteSecurityService::IsSecureURI(uint32_t aType, nsIURI* aURI,
   nsAutoCString hostname;
   nsresult rv = GetHost(aURI, hostname);
   NS_ENSURE_SUCCESS(rv, rv);
+   
+  // False if strict transport security not enabled
+  if (!mUseStrictTransService) {
+    *aResult = false;
+    return NS_OK;
+  }
+  
   /* An IP address never qualifies as a secure URI. */
   if (HostIsIPAddress(hostname.get())) {
     *aResult = false;
@@ -986,6 +996,11 @@ nsSiteSecurityService::IsSecureHost(uint32_t aType, const char* aHost,
   *aResult = false;
   if (aCached) {
     *aCached = false;
+  }
+  
+  // False if strict transport security not enabled
+  if (!mUseStrictTransService) {
+    return NS_OK;
   }
 
   /* An IP address never qualifies as a secure URI. */

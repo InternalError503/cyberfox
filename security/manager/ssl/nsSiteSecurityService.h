@@ -150,6 +150,7 @@ private:
 
   uint64_t mMaxMaxAge;
   bool mUsePreloadList;
+  bool mUseStrictTransService;
   int64_t mPreloadListTimeOffset;
   bool mProcessPKPHeadersFromNonBuiltInRoots;
   RefPtr<mozilla::DataStorage> mSiteStateStorage;
