@@ -4,15 +4,7 @@
 // The test runs from a container ID 2.
 // Output: we have no referrer.
 
-function getReferrerTest(aTestNumber) {
-  let test = _referrerTests[aTestNumber];
-  if (test) {
-    // We want all the referrer tests to fail!
-    test.result = "";
-  }
-
-  return test;
-}
+getReferrerTest = getRemovedReferrerTest;
 
 function startNewTabTestCase(aTestNumber) {
   info("browser_referrer_open_link_in_container_tab: " +

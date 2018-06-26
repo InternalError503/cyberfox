@@ -268,6 +268,15 @@ function openLinkIn(url, where, params) {
   }
 
   if (!w || where == "window") {
+	  
+    let features = "chrome,dialog=no,all";
+    if (aIsPrivate) {
+      features += ",private";
+      // To prevent regular browsing data from leaking to private browsing sites,
+      // strip the referrer when opening a new private window. (See Bug: 1409226)
+      aNoReferrer = true;
+    }
+	  
     // This propagates to window.arguments.
     var sa = Cc["@mozilla.org/array;1"].
              createInstance(Ci.nsIMutableArray);
@@ -310,11 +319,6 @@ function openLinkIn(url, where, params) {
     sa.appendElement(referrerPolicySupports, /* weak =*/ false);
     sa.appendElement(userContextIdSupports, /* weak =*/ false);
     sa.appendElement(aPrincipal, /* weak =*/ false);
-
-    let features = "chrome,dialog=no,all";
-    if (aIsPrivate) {
-      features += ",private";
-    }
 
     Services.ww.openWindow(w || window, getBrowserURL(), null, features, sa);
     return;

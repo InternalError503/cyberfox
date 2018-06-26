@@ -2745,8 +2745,8 @@ pref("editor.resizing.preserve_ratio",       true);
 pref("editor.positioning.offset",            0);
 
 pref("dom.use_watchdog", true);
-pref("dom.max_chrome_script_run_time", 25);
-pref("dom.max_script_run_time", 25);
+pref("dom.max_chrome_script_run_time", 45);
+pref("dom.max_script_run_time", 45);
 
 // Stop all scripts in a compartment when the "stop script" dialog is used.
 pref("dom.global_stop_script", true);
