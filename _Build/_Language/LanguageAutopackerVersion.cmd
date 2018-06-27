@@ -1,9 +1,9 @@
 @echo off
-title Language Autopacker Version: 1.1
+title Language Autopacker Version: 1.2
 ECHO&color 03
 ECHO.###########################################################
 ECHO.#                                                         #
-ECHO.#              Copyright(c) 2017 8pecxstudios             #
+ECHO.#              Copyright(c) 2018 8pecxstudios             #
 ECHO.#         ---------------------------------------         #
 ECHO.#                                                         #
 ECHO.#                      8pecxstudios                       #
@@ -11,6 +11,7 @@ ECHO.#                                                         #
 ECHO.#         ---------------------------------------         #
 ECHO.###########################################################
 ECHO.
+cd %~DP0
 set DestinPath=%~DP0_XPI_Folder
 set OutputPath=..\_Installation\LanguageA
 
